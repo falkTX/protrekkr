@@ -7,11 +7,11 @@
 #ifndef _CAPTURE_MIDI_H_
 #define _CAPTURE_MIDI_H_
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
 
 // ------------------------------------------------------
 // Includes
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <Windows.h>
 #include <mmsystem.h>
 #endif

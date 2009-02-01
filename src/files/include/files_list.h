@@ -9,7 +9,7 @@
 
 // ------------------------------------------------------
 // Includes
-#if defined(MINGW)
+#if defined(__GCC__)
 #include "../../include/variables.h"
 #include "../../ui/include/misc_draw.h"
 #else
@@ -17,7 +17,7 @@
 #include "../ui/include/misc_draw.h"
 #endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <io.h>
 #include <direct.h>
 #endif

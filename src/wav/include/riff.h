@@ -26,7 +26,7 @@
 typedef unsigned int UINT32;
 typedef int INT32;
 
-#if !defined(MINGW)
+#if !defined(__GCC__)
 #pragma pack(push)
 #pragma pack(1)
 #else

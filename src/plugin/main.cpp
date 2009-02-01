@@ -1,6 +1,8 @@
 // ----------------------------------------------------------------
 // Protrekkr winamp plugin v0.6
 // Written by Franck 'hitchhikr' Charlet
+//
+// TODO: Clean that mess up and create a makefile for mingw !
 // ----------------------------------------------------------------
 #include <windows.h>
 #include <stdio.h>

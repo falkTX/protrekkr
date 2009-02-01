@@ -9,7 +9,7 @@
 
 // ------------------------------------------------------
 // Includes
-#if defined(MINGW)
+#if defined(__GCC__)
 #include "../../include/variables.h"
 #include "../../ui/include/misc_draw.h"
 #else

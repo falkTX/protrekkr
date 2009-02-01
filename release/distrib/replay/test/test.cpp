@@ -35,7 +35,7 @@ extern "C"
 int main(void)
 {
     /* Init the sound driver and the various tables */
-#ifdef __WIN32__
+#if defined(__WIN32__)
     if(!Ptk_InitDriver(GetConsoleWindow(), LATENCY)) return(0);
 #else
     if(!Ptk_InitDriver(LATENCY)) return(0);
@@ -51,7 +51,7 @@ int main(void)
     /* Start playing it */
     Ptk_Play();
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     while(!GetAsyncKeyState(VK_ESCAPE))
     {
         printf("   :   ");
@@ -74,7 +74,7 @@ int main(void)
     Ptk_Stop();
     Ptk_ReleaseDriver();
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     ExitProcess(0);
 #endif
 }

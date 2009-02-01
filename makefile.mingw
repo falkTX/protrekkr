@@ -3,7 +3,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lmingw32 -lsdlmain -lSDL -ldsound -lmsacm32 -lwinmm -lsdldraw -lz
-FLAGS = -mwindows -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -D G_OS_WIN32 -D __WIN32__ -D MINGW
+FLAGS = -mwindows -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -D G_OS_WIN32 -D __WIN32__ -D __GCC__
 EXEOBJS = main.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \

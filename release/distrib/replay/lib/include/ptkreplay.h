@@ -9,7 +9,7 @@
 
 // ------------------------------------------------------
 // Includes
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <windows.h>
 #define PTKEXPORT __stdcall
 #endif
@@ -20,8 +20,8 @@
 
 // ------------------------------------------------------
 // Functions
-#ifndef WINAMP
-#ifdef __WIN32__
+#if !defined(__WINAMP__)
+#if defined(__WIN32__)
 int PTKEXPORT Ptk_InitDriver(HWND hWnd, int Latency);
 #else
 int PTKEXPORT Ptk_InitDriver(int Latency);

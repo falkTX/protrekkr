@@ -13,11 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(STAND_ALONE)
-    #if defined(WINAMP)
+#if defined(__STAND_ALONE__)
+    #if defined(__WINAMP__)
         #include "ptk_def_properties.h"
     #else
-        #if defined(MINGW)
+        #if defined(__GCC__)
         #include "../../ptk_properties.h"
         #else
         #include "../ptk_properties.h"
@@ -33,7 +33,7 @@
 
 // ------------------------------------------------------
 // Types
-#if defined(__WIN32__) && !defined(MINGW)
+#if defined(__WIN32__) && !defined(__GCC__)
 typedef __int64 int64;
 typedef unsigned __int64 Uint64;
 #else
@@ -46,8 +46,8 @@ typedef unsigned long long Uint64;
 
 /* Struct used to store/update synthesizer parameters */
 
-#if defined(STAND_ALONE) && !defined(WINAMP)
-    #if !defined(MINGW)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    #if !defined(__GCC__)
     #pragma pack(push)
     #pragma pack(1)
     #else
@@ -57,7 +57,7 @@ typedef unsigned long long Uint64;
 
 struct SynthParameters
 {
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char presetname[20];
 #endif
 
@@ -145,7 +145,7 @@ struct SynthParameters
     int lfo2_release;
 };
 
-#if defined(STAND_ALONE) && !defined(WINAMP)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     #pragma pack(pop)
 #endif
 
@@ -160,7 +160,7 @@ extern short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
 extern short STOCK_PUL[SIZE_WAVEFORMS_SPACE * 2];
 extern short STOCK_WIT[SIZE_WAVEFORMS_SPACE * 2];
 
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
     extern short STOCK_PIN[SIZE_WAVEFORMS_SPACE * 2];
 #endif
 
@@ -195,7 +195,8 @@ class CSynth
                         int *track2,
                         Uint64 *position_osc1,
                         Uint64 *position_osc2,
-#ifdef PTK_SYNTH_OSC3
+
+#if defined(PTK_SYNTH_OSC3)
                         Uint64 *position_osc3,
 #endif
                         int64 osc_speed);
@@ -215,7 +216,7 @@ class CSynth
         void EnvRun(int *track, int *track2);
 
         /* Synthesizer properties */
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
         float FILT_CUTO;
         float FILT_RESO;
         float FILT_A;
@@ -237,7 +238,7 @@ class CSynth
         float VCF_CUTOFF;
         float VCF_RESONANCE;
 
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
         char VCF_TYPE;
 #endif
 
@@ -376,7 +377,7 @@ class CSynth
         float ENV1_MIN;
         float ENV2_MIN;
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
         float OSC3_VOLUME;
         bool OSC3_SWITCH;
 #endif
@@ -397,7 +398,7 @@ class CSynth
         float DISTO;
 };
 
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
 class rFilter
 {
     private: 

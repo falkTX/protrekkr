@@ -67,12 +67,12 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(12, 482, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 500, 56, 16, "Midi OUT", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 522, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL
-#ifdef NOMIDI
+#if defined(__NOMIDI__)
     | BUTTON_DISABLED
 #endif
     );
     Gui_Draw_Button_Box(138, 522, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL
-#ifdef NOMIDI
+#if defined(__NOMIDI__)
     | BUTTON_DISABLED
 #endif
     );
@@ -264,7 +264,7 @@ void Actualize_Master_Ed(char gode)
         }
 
         // -----------
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
         MidiIn_Init();
         MidiOut_Init();
 #endif
@@ -272,13 +272,13 @@ void Actualize_Master_Ed(char gode)
         if(gode == 0 || gode == 11)
         {
             value_box(70, 482, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED
-#ifdef NOMIDI
+#if defined(__NOMIDI__)
             | BUTTON_DISABLED
 #endif
             );
             if(c_midiin != -1)
             {
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                 Gui_Draw_Button_Box(132, 482, 182, 16, caps_midiin[c_midiin].szPname, BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
             }
@@ -291,13 +291,13 @@ void Actualize_Master_Ed(char gode)
         if(gode == 0 || gode == 12)
         {
             value_box(70, 500, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED
-#ifdef NOMIDI
+#if defined(__NOMIDI__)
             | BUTTON_DISABLED
 #endif
             );
             if(c_midiout != -1)
             {
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                 Gui_Draw_Button_Box(132, 500, 182, 16, caps_midiout[c_midiout].szPname, BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
             }
@@ -523,7 +523,7 @@ void Mouse_Left_Master_Ed(void)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
             MidiNoteOff(ped_track);
 #endif
 
@@ -534,14 +534,14 @@ void Mouse_Left_Master_Ed(void)
         if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
         {
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
             MidiAllNotesOff();
 #endif
 
             gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
         }
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
         // Previous midi in device
         if(zcheckMouse(70, 482, 16, 16))
         {

@@ -22,7 +22,7 @@
 #endif
 
 #if defined(__WIN32__)
-#if !defined(MINGW)
+#if !defined(__GCC__)
 #define _WIN32_WINNT 0x0500
 #endif
 #include <windows.h>

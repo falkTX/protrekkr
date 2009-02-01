@@ -18,7 +18,7 @@ short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
 short STOCK_PUL[SIZE_WAVEFORMS_SPACE * 2];
 short STOCK_WIT[SIZE_WAVEFORMS_SPACE * 2];
 
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
     short STOCK_PIN[SIZE_WAVEFORMS_SPACE * 2];
 #endif
 
@@ -27,7 +27,7 @@ short STOCK_WIT[SIZE_WAVEFORMS_SPACE * 2];
 void CSynth::Reset(void)
 {
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     /* Synthesizer General Reset */
     GS_VAL = 0;
     GLB_VOLUME = 1.0f;
@@ -152,7 +152,7 @@ void CSynth::Reset(void)
 
     OSC3_VOLUME = 0;
 
-#if defined(MINGW)
+#if defined(__GCC__)
     PTC_GLIDE64 = 4294967296ll;
 #else
     PTC_GLIDE64 = 4294967296;
@@ -564,7 +564,7 @@ float CSynth::GetSample(short *Left_Samples,
                         int *track2,
                         Uint64 *position_osc1,
                         Uint64 *position_osc2,
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
                         Uint64 *position_osc3,
 #endif
                         int64 osc_speed)
@@ -572,9 +572,11 @@ float CSynth::GetSample(short *Left_Samples,
 
     s_access *pos_osc1 = (s_access *) position_osc1;
     s_access *pos_osc2 = (s_access *) position_osc2;
-#ifdef PTK_SYNTH_OSC3
+
+#if defined(PTK_SYNTH_OSC3)
     s_access *pos_osc3 = (s_access *) position_osc3;
 #endif
+
     s_access *pos_osc1_disto;
     short *Left_Samples1;
     unsigned int i_POSITION;
@@ -640,7 +642,7 @@ float CSynth::GetSample(short *Left_Samples,
                         case 3:
                             Left_Samples1 = STOCK_WIT;
                             break;
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
                         case 6:
                             Left_Samples1 = STOCK_PIN;
                             break;
@@ -787,7 +789,7 @@ float CSynth::GetSample(short *Left_Samples,
                         case 3:
                             Left_Samples = STOCK_WIT;
                             break;
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
                         case 6:
                             Left_Samples = STOCK_PIN;
                             break;
@@ -888,7 +890,7 @@ float CSynth::GetSample(short *Left_Samples,
         }
     }
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
     if(OSC3_SWITCH)
     {
 
@@ -1001,7 +1003,7 @@ float CSynth::GetSample(short *Left_Samples,
     }
 #endif // PTK_SYNTH_OSC3
 
-#ifdef PTK_SYNTH_DISTO
+#if defined(PTK_SYNTH_DISTO)
     if(DISTO != 1.0f)
     {
         GS_VAL /= 32767.0f;
@@ -1011,7 +1013,7 @@ float CSynth::GetSample(short *Left_Samples,
     }
 #endif
 
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
     if(VCF_TYPE < 2)
     {
         FILT_CUTO = VCF_CUTOFF
@@ -1038,7 +1040,8 @@ float CSynth::GetSample(short *Left_Samples,
 
     if(Stereo == 2)
     {
-#ifdef PTK_SYNTH_DISTO
+
+#if defined(PTK_SYNTH_DISTO)
         if(DISTO != 1.0f)
         {
             GS_VAL2 /= 32767.0f;
@@ -1048,7 +1051,7 @@ float CSynth::GetSample(short *Left_Samples,
         }
 #endif
 
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
         if(VCF_TYPE < 2) GS_VAL2 = FilterR();
 #endif
 
@@ -1078,7 +1081,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     VCF_CUTOFF = (float) TSP.vcf_cutoff * 0.0078125f;
     VCF_RESONANCE = (float) TSP.vcf_resonance * 0.0078125f;
 
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
     VCF_TYPE = TSP.vcf_type;
 #endif
 
@@ -1140,7 +1143,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     ENV2_VCF_CUTOFF =    ((float) TSP.env2_vcf_cutoff - 64) * 0.015625f;
     ENV2_VCF_RESONANCE = ((float) TSP.env2_vcf_resonance - 64) * 0.015625f;
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
     OSC3_VOLUME =        ((float) TSP.osc3_volume - 64) * 0.015625f;
     OSC3_SWITCH =        TSP.osc3_switch;
 #endif
@@ -1150,7 +1153,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
 
     GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
 
-#ifdef PTK_SYNTH_DISTO
+#if defined(PTK_SYNTH_DISTO)
     DISTO =              (((float) TSP.disto)) + 1.0f;
 #endif
 
@@ -1169,7 +1172,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     if(LFO2_RELEASE < 0.15f) LFO2_RELEASE = 0.15f;
 }
 
-#ifdef PTK_SYNTH_FILTER
+#if defined(PTK_SYNTH_FILTER)
 float CSynth::FilterL(void)
 {
     GS_VAL++;

@@ -9,7 +9,7 @@
 #include "include/files_list.h"
 #include "../include/main.h"
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <shlwapi.h>
 #else
 #include <ftw.h>
@@ -132,7 +132,7 @@ void Read_SMPT(void)
     lt_curr = 0;
     lt_index = 0;
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     struct _finddata_t c_file;
 #endif
 
@@ -155,7 +155,7 @@ void Read_SMPT(void)
     /* Find first .c file in current directory */
     strcpy(Dir_Act, cur_dir);
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     strcat(Dir_Act, "\\*.*");
     if((hFile = _findfirst(Dir_Act, &c_file)) == -1L)
     {

@@ -7,15 +7,15 @@
 #ifndef _SAMPLES_UNPACK_H_
 #define _SAMPLES_UNPACK_H_
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
 
 // ------------------------------------------------------
 // Includes
-#if defined(STAND_ALONE)
-    #if defined(WINAMP)
+#if defined(__STAND_ALONE__)
+    #if defined(__WINAMP__)
         #include "ptk_def_properties.h"
     #else
-        #if defined(MINGW)
+        #if defined(__GCC__)
         #include "../../ptk_properties.h"
         #else
         #include "../ptk_properties.h"

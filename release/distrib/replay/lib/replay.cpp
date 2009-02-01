@@ -8,7 +8,7 @@
 // Includes
 #include "include/replay.h"
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
 #include "../../../../src/midi/include/capture_midi.h"
 #include "../../../../src/include/variables.h"
 #endif
@@ -17,7 +17,7 @@
 // Variables
 long SamplesPerTick;
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int BeatsPerMin = 125;
     int TicksPerBeat = 4;
     float Feedback = 0.6f;
@@ -29,7 +29,7 @@ long SamplesPerTick;
     int c_threshold;
 #endif
 
-#ifdef PTK_FX_AUTOFADEMODE
+#if defined(PTK_FX_AUTOFADEMODE)
     char FADEMODE[MAX_TRACKS];    // 0 - Off, 1- In, 2 - Out;
     float FADECOEF[MAX_TRACKS];
 #endif
@@ -43,7 +43,7 @@ float oldspawn[MAX_TRACKS];
 float roldspawn[MAX_TRACKS];
 char LFO_ON[MAX_TRACKS];
 
-#ifdef PTK_LFO
+#if defined(PTK_LFO)
     float LFO_RATE[MAX_TRACKS];
     float LFO_AMPL[MAX_TRACKS];
     float LFOGR[MAX_TRACKS];
@@ -51,7 +51,7 @@ char LFO_ON[MAX_TRACKS];
 
 char FLANGER_ON[MAX_TRACKS];
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
     float FLANGER_AMOUNT[MAX_TRACKS];
     float FLANGER_DEPHASE[MAX_TRACKS];
     float FLANGER_RATE[MAX_TRACKS];
@@ -72,7 +72,7 @@ float DSend[MAX_TRACKS];
 int CSend[MAX_TRACKS];
 int64 Vstep1[MAX_TRACKS];
 
-#ifdef PTK_FX_TRANCEGLIDER
+#if defined(PTK_FX_TRANCEGLIDER)
     int64 glidestep[MAX_TRACKS];
 #endif
 
@@ -83,7 +83,7 @@ s_access sp_Position[MAX_TRACKS];
 s_access sp_Position_osc1[MAX_TRACKS];
 s_access sp_Position_osc2[MAX_TRACKS];
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
     s_access sp_Position_osc3[MAX_TRACKS];
 #endif
 
@@ -105,7 +105,7 @@ float coeftab[5][128][128][4];
 
 int Songplaying;
 
-#ifdef PTK_303
+#if defined(PTK_303)
     gear303 tb303engine[2];
     para303 tb303[2];
     unsigned char track3031;
@@ -121,7 +121,7 @@ float delay_right_final;
 int PosInTick;
 bool rawrender;
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float mas_vol = 1.0f;
 #else
     float mas_vol;
@@ -130,7 +130,7 @@ bool rawrender;
 int left_value;
 int right_value;
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
     int Songplaying_Pattern;
 #else
     extern int done;
@@ -138,9 +138,9 @@ int right_value;
 
 int Subicounter;
 
-#ifdef PTK_FX_PATTERNBREAK
+#if defined(PTK_FX_PATTERNBREAK)
 // 255 when no jump or yes on patbreak < 128 = line to jump.
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int Patbreak = 255;
     int Patbreak2 = 255;
 #else
@@ -149,7 +149,7 @@ int Subicounter;
 #endif
 #endif
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char Songtracks = 6;
 #else
     char Songtracks;
@@ -176,18 +176,18 @@ unsigned int SubCounter;
 unsigned int SamplesPerSub;
 int shuffle;
 
-#ifdef PTK_SHUFFLE
+#if defined(PTK_SHUFFLE)
 int shufflestep;
 int shuffleswitch;
 #endif
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     unsigned char sLength = 1;
 #else
     unsigned char sLength;
 #endif
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
     int64 Vstep_arp[MAX_TRACKS];
     int Arpeggio_Switch[MAX_TRACKS];
     float Arpeggio_BaseNote[MAX_TRACKS];
@@ -217,7 +217,7 @@ unsigned int Player_LE[MAX_TRACKS];//[MAX_POLYPHONY];
 unsigned int Player_LL[MAX_TRACKS];//[MAX_POLYPHONY];
 unsigned int Player_NS[MAX_TRACKS];//[MAX_POLYPHONY];
 
-#ifdef PTK_LIMITER
+#if defined(PTK_LIMITER)
     #define MAS_COMPRESSOR_SECONDS 0.1f
     #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * SAMPLESPERSEC)
     float mas_comp_bufferL[MAS_COMPRESSOR_SIZE];
@@ -235,7 +235,7 @@ unsigned int Player_NS[MAX_TRACKS];//[MAX_POLYPHONY];
 
 bool SACTIVE[256][MAX_TRACKS];
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     bool SHISTORY[256][MAX_TRACKS];
 #endif
 
@@ -258,7 +258,7 @@ char SampleChannels[128][16];
 float FDecay[128][16];
 short *RawSamples[128][2][16];
 
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
     int currentCounter;
     int delayedCounter;
     int delayedCounter2;
@@ -293,7 +293,7 @@ float xi0[MAX_TRACKS];
 float xi1[MAX_TRACKS];
 float xi2[MAX_TRACKS];
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float lchorus_feedback = 0.6f;
     float rchorus_feedback = 0.5f;
     int lchorus_delay = 10584;
@@ -316,13 +316,13 @@ float xi2[MAX_TRACKS];
 // 0-->Off 1-->On
 char compressor;
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char num_echoes = 1;
 #else
     char num_echoes;
 #endif
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float REVERBFILTER = 0.3f;
 #else
     float REVERBFILTER;
@@ -335,7 +335,7 @@ char SampleCompression[128];
 int delay_time;
 int DelayType;
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
     float Flanger_sbuf0L;
     float Flanger_sbuf1L;
     float Flanger_sbuf0R;
@@ -348,7 +348,7 @@ float segue_volume[MAX_TRACKS];
 float Segue_SamplesL[MAX_TRACKS];
 float Segue_SamplesR[MAX_TRACKS];
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     int L_MaxLevel;
     int R_MaxLevel;
     extern int TRACKMIDICHANNEL[MAX_TRACKS];
@@ -395,7 +395,7 @@ void allPassInit(float miliSecs);
 float ApplyLfo(float cy, char trcy);
 void ComputeCoefs(int freq, int r, int t);
 
-#ifdef PTK_FX_TICK0
+#if defined(PTK_FX_TICK0)
     void DoEffects_tick0(void);
 #endif
 
@@ -415,7 +415,7 @@ float filterhp(char ch, float input, float f, float q);
 float filterhp2(char ch, float input, float f, float q);
 int f2i(float d);
 
-#ifdef PTK_303
+#if defined(PTK_303)
     void live303(int pltr_eff_row, int pltr_dat_row);
     void Fire303(unsigned char number,char unit);
     void Go303(void);
@@ -426,12 +426,12 @@ float Resonance(float v);
 float Bandwidth(int v);
 void Compressor_work(void);
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
     float Filter_FlangerL(float input);
     float Filter_FlangerR(float input);
 #endif
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     void Mas_Compressor_Set_Variables(float treshold, float ratio);
 #endif
 
@@ -445,12 +445,12 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
     short *pSamples = (short *) Buffer;
     int i;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     float clamp_left_value;
     float clamp_right_value;
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     if(!rawrender)
     {
 #endif
@@ -461,7 +461,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             *pSamples++ = left_value;
             *pSamples++ = right_value;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             // Gather datas for the scopes and the vumeters
             if(Songplaying_Pattern)
             {
@@ -493,22 +493,22 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             }
 #endif
         }
-#ifndef WINAMP
+#if !defined(__WINAMP__)
         if(AUDIO_GetSamples() > ((AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3)) / 4))
         {
             Songplaying_Pattern = TRUE;
         }
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     } //RawRender
 #endif
 }
 
 // ------------------------------------------------------
 // Init the replayer driver
-#ifndef WINAMP
-#ifdef __WIN32__
+#if !defined(__WINAMP__)
+#if defined(__WIN32__)
 int STDCALL Ptk_InitDriver(HWND hWnd, int milliseconds)
 {
     AUDIO_Milliseconds = milliseconds;
@@ -534,7 +534,7 @@ int STDCALL Ptk_InitDriver(void)
     short *wav_pul = STOCK_PUL;
     short *wav_wit = STOCK_WIT;
 
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
     short *wav_pin = STOCK_PIN;
     unsigned int newrand;
     unsigned int prevrand;
@@ -544,7 +544,7 @@ int STDCALL Ptk_InitDriver(void)
     unsigned int seed = 0x12345678;
     unsigned int total = 0;
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     Mas_Compressor_Set_Variables(100.0f, 0.0f);
 #endif
 
@@ -569,7 +569,7 @@ int STDCALL Ptk_InitDriver(void)
 
         *wav_wit++ = (short) (rand() - 16384);
 
-#ifdef PTK_SYNTH_PINKNOISE
+#if defined(PTK_SYNTH_PINKNOISE)
         // McCartney pink noise generator
         k = ctz[SIZE_WAVEFORMS & 63];
         prevrand = dice[k];
@@ -591,9 +591,9 @@ int STDCALL Ptk_InitDriver(void)
         SIN[i] = (float) sinf(i * 0.0174532f);
     }
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     if(!AUDIO_Init_Driver(hWnd, &Mixer))
 #else
     if(!AUDIO_Init_Driver(&Mixer))
@@ -603,18 +603,18 @@ int STDCALL Ptk_InitDriver(void)
     }
     AUDIO_Play();
 
-#else  // WINAMP
+#else  // __WINAMP__
 
     Pre_Song_Init();
 
-#endif // WINAMP
+#endif // __WINAMP__
 
     return(TRUE);
 }
 
 // ------------------------------------------------------
 // Load a module
-#ifdef STAND_ALONE
+#if defined(__STAND_ALONE__)
 Uint8 *Cur_Module;
 
 void Mod_Dat_Read(void *Dest, int size)
@@ -648,21 +648,21 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type)
         {
             case SMP_PACK_GSM:
 
-#ifdef PTK_GSM
+#if defined(PTK_GSM)
                 UnpackGSM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
 #endif
 
                 break;
             case SMP_PACK_MP3:
 
-#ifdef PTK_MP3
+#if defined(PTK_MP3)
                 UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
 #endif
                 break;
 
             case SMP_PACK_TRUESPEECH:
 
-#ifdef PTK_TRUESPEECH
+#if defined(PTK_TRUESPEECH)
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
 #endif
                 break;
@@ -863,7 +863,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         int Comp_Flag;
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 
-#ifdef PTK_LIMITER
+#if defined(PTK_LIMITER)
         Mod_Dat_Read(&mas_threshold, sizeof(float));
         Mod_Dat_Read(&mas_ratio, sizeof(float));
 #endif
@@ -895,7 +895,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         {
             Mod_Dat_Read(&LFO_ON[twrite], sizeof(char));
 
-#ifdef PTK_LFO
+#if defined(PTK_LFO)
             if(LFO_ON[twrite])
             {
                 Mod_Dat_Read(&LFO_RATE[twrite], sizeof(float));
@@ -908,7 +908,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         {
             Mod_Dat_Read(&FLANGER_ON[twrite], sizeof(char));
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
             if(FLANGER_ON[twrite])
             {
                 Mod_Dat_Read(&FLANGER_AMOUNT[twrite], sizeof(float));
@@ -941,7 +941,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Read the 303 datas
         Mod_Dat_Read(&tb303_1_enabled, sizeof(unsigned char));
 
-#ifdef PTK_303
+#if defined(PTK_303)
         if(tb303_1_enabled)
         {
             Mod_Dat_Read(&tb303[0], sizeof(para303));
@@ -950,7 +950,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         Mod_Dat_Read(&tb303_2_enabled, sizeof(unsigned char));
 
-#ifdef PTK_303
+#if defined(PTK_303)
         if(tb303_2_enabled)
         {
             Mod_Dat_Read(&tb303[1], sizeof(para303));
@@ -963,7 +963,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         cPosition = start_position;
 
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
         Initreverb();
 #endif
 
@@ -976,14 +976,14 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         return(FALSE);
     }
 }
-#endif  // STAND_ALONE
+#endif  // __STAND_ALONE__
 
 // ------------------------------------------------------
 // Release the replayer driver
 void PTKEXPORT Ptk_ReleaseDriver(void)
 {
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
     AUDIO_Stop_Driver();
 #endif
 
@@ -1007,7 +1007,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     if(new_position >= sLength) new_position = sLength - 1;
     if(new_position < 0) new_position = 0;
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
     Songplaying_Pattern = FALSE;
 #endif
 
@@ -1027,7 +1027,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 void PTKEXPORT Ptk_Play(void)
 {
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     int i;
     int j;
 
@@ -1049,7 +1049,7 @@ void PTKEXPORT Ptk_Stop(void)
 {
     Songplaying = 0;
 
-#ifdef PTK_303
+#if defined(PTK_303)
     tb303engine[0].tbPattern = 255;
     tb303engine[0].tbLine = 255;
     tb303engine[1].tbPattern = 255;
@@ -1076,11 +1076,11 @@ void Pre_Song_Init(void)
 {
     int i;
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
     int j;
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     Initreverb();
 #endif
 
@@ -1089,7 +1089,7 @@ void Pre_Song_Init(void)
     for(int ini = 0; ini < MAX_TRACKS; ini++)
     {
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
         Arpeggio_Switch[ini] = 0;
         Arpeggio_BaseNote[ini] = 0;
         Vstep_arp[ini] = 0;
@@ -1108,7 +1108,7 @@ void Pre_Song_Init(void)
         Player_LL[ini] = 0;
         Player_NS[ini] = 0;
 
-#ifdef PTK_FX_AUTOFADEMODE
+#if defined(PTK_FX_AUTOFADEMODE)
         FADEMODE[ini] = 0;
         FADECOEF[ini] = 0.0f;
 #endif
@@ -1120,7 +1120,7 @@ void Pre_Song_Init(void)
         sp_Position_osc1[ini].absolu = 0;
         sp_Position_osc2[ini].absolu = 0;
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
         sp_Position_osc3[ini].absolu = 0;
 #endif
         
@@ -1131,7 +1131,7 @@ void Pre_Song_Init(void)
         sp_channelsample[ini] = -1;
         sp_split[ini] = 0;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         TRACKMIDICHANNEL[ini] = ini;
         TRACKSTATE[ini] = 0;
 #endif
@@ -1143,11 +1143,11 @@ void Pre_Song_Init(void)
         LFO_RATE[ini] = 0.0001f;
         LFO_AMPL[ini] = 0;
 
-#ifdef PTK_LFO
+#if defined(PTK_LFO)
         LFOGR[ini] = 0;
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         FLANGER_AMOUNT[ini] = -0.8f;
         FLANGER_DEPHASE[ini] = 0.0174532f;
         FLANGER_ON[ini] = 0;
@@ -1181,7 +1181,7 @@ void Pre_Song_Init(void)
 
         ramper[ini] = 0;
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
         foff2[ini] = 0.0f;
         foff1[ini] = 0.0f;
         for(int ini2 = 0; ini2 < 16400; ini2++)
@@ -1194,25 +1194,21 @@ void Pre_Song_Init(void)
         sp_Cvol[ini] = 0.0f;
         sp_Tvol[ini] = 0.0f;
         
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         DSend[ini] = 0;
         CSend[ini] = 0;
 #endif
 
         Vstep1[ini] = 0;
 
-#ifdef PTK_FX_TRANCEGLIDER
+#if defined(PTK_FX_TRANCEGLIDER)
         glidestep[ini] = 0;
 #endif
-
-//#ifndef STAND_ALONE
-        //ComputeStereo(ini);
-//#endif
 
         CCut[ini] = 126.0f;
     }
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
     Flanger_sbuf0L = 0;
     Flanger_sbuf1L = 0;
     Flanger_sbuf0R = 0;
@@ -1233,7 +1229,7 @@ void Pre_Song_Init(void)
         CustomVol[i] = 1.0f;
     }
 
-#ifdef PTK_LIMITER
+#if defined(PTK_LIMITER)
     mas_comp_pos_rms_buffer = 0;
     rms_sumL = 0;
     rms_sumR = 0;
@@ -1271,7 +1267,7 @@ void Pre_Song_Init(void)
         }
     }
 
-#ifdef STAND_ALONE
+#if defined(__STAND_ALONE__)
     for(int freer = 0; freer < 128; freer++)
     {
         for(char pedsplit = 0; pedsplit < 16; pedsplit++)
@@ -1298,7 +1294,7 @@ void Post_Song_Init(void)
 {
     allPassInit((float) c_threshold);
 
-#ifdef PTK_SHUFFLE
+#if defined(PTK_SHUFFLE)
     shufflestep = shuffle;
     shuffleswitch = -1;
 #endif
@@ -1307,7 +1303,7 @@ void Post_Song_Init(void)
     repeat_loop_pos = 0;       // No repeat loop
     repeat_loop_counter = -1;
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
     for(int i = 0; i < MAX_TRACKS; i++)
     {
         Arpeggio_Switch[i] = 0;
@@ -1326,11 +1322,11 @@ void Post_Song_Init(void)
     ped_line = 0;
     ped_line_delay = 0;
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
     Songplaying_Pattern = FALSE;
 #endif
 
-#ifdef PTK_SHUFFLE
+#if defined(PTK_SHUFFLE)
     if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle) / 200);
     else shufflestep = (SamplesPerTick * shuffle) / 200;
 #endif
@@ -1344,7 +1340,7 @@ void Post_Song_Init(void)
         ComputeStereo(spl);
     }
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
     AUDIO_ResetTimer();
 #endif
 
@@ -1355,7 +1351,7 @@ void Post_Song_Init(void)
 void Sp_Player(void)
 {
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     int i;
 #endif
 
@@ -1369,13 +1365,13 @@ void Sp_Player(void)
         if(PosInTick == 0)
         {
 
-#ifdef PTK_FX_TICK0
+#if defined(PTK_FX_TICK0)
             DoEffects_tick0();
 #endif
 
             Subicounter = 0;
 
-#ifdef PTK_FX_PATTERNBREAK
+#if defined(PTK_FX_PATTERNBREAK)
             Patbreak = 255;
             Patbreak2 = 255;
 #endif
@@ -1396,7 +1392,7 @@ void Sp_Player(void)
 
                 if(pl_vol_row <= 64) sp_Tvol[ct] = (float) pl_vol_row * 0.015625f; // Setting volume.
 
-#ifdef PTK_FX_SETVOLUME
+#if defined(PTK_FX_SETVOLUME)
                 if(pl_eff_row == 3) sp_Tvol[ct] = (float) pl_dat_row * 0.0039062f; // Setting volume.
 #endif
 
@@ -1406,16 +1402,16 @@ void Sp_Player(void)
                     ComputeStereo(ct);
                 }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 if(!sr_isrecording)
 #endif
-#ifdef PTK_303
+#if defined(PTK_303)
                 {
                     live303(pl_eff_row, pl_dat_row);
                 }
 #endif
 
-#ifdef PTK_303
+#if defined(PTK_303)
                 if(pl_eff_row == 0x31)
                 {
                     track3031 = ct;
@@ -1428,8 +1424,8 @@ void Sp_Player(void)
                 }
 #endif
 
-#ifndef STAND_ALONE
-#ifndef NOMIDI
+#if !defined(__STAND_ALONE__)
+#if !defined(__NOMIDI__)
                 /* MidiController commands */
                 if(pl_pan_row == 144 && c_midiout != -1 && pl_eff_row < 128)
                 {
@@ -1443,7 +1439,7 @@ void Sp_Player(void)
 #endif
 #endif
 
-#ifdef PTK_FX_PATTERNBREAK
+#if defined(PTK_FX_PATTERNBREAK)
                 if(pl_eff_row == 0xd && pl_dat_row < 128) Patbreak = pl_dat_row;
                 if(pl_eff_row2 == 0xd && pl_dat_row2 < 128) Patbreak2 = pl_dat_row2;
 #endif
@@ -1474,19 +1470,19 @@ void Sp_Player(void)
                     Synthesizer[ct]/*[i]*/.NoteOff();
                     //}
 
-#ifdef PTK_303
+#if defined(PTK_303)
                     noteoff303(ct); // 303 Note Off...
 #endif
 
-#ifndef STAND_ALONE
-#ifndef NOMIDI
+#if !defined(__STAND_ALONE__)
+#if !defined(__NOMIDI__)
                     MidiNoteOff(ct);
 #endif
 #endif
                 }
             } // For loop
 
-#ifdef PTK_303
+#if defined(PTK_303)
             Go303();
 #endif
 
@@ -1503,7 +1499,7 @@ void Sp_Player(void)
         }
 
         PosInTick++;
-#ifdef PTK_SHUFFLE
+#if defined(PTK_SHUFFLE)
         if(PosInTick > SamplesPerTick + shufflestep)
         {
             shuffleswitch = -shuffleswitch;
@@ -1523,7 +1519,7 @@ void Sp_Player(void)
             SubCounter = 0;
             PosInTick = 0;
 
-#ifdef PTK_FX_PATTERNBREAK
+#if defined(PTK_FX_PATTERNBREAK)
             if(Patbreak > 127)
             {
                 ped_line++;
@@ -1533,7 +1529,7 @@ void Sp_Player(void)
                 // Pattern break
                 ped_line = Patbreak;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 if(!plx) 
 #endif
                 {
@@ -1543,12 +1539,12 @@ void Sp_Player(void)
                 if(cPosition >= sLength)
                 {
                     cPosition = 0;
-#ifdef WINAMP
+#if defined(__WINAMP__)
                     done = 1;
 #endif
                 }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
                     SHISTORY[cPosition][i] = false;
@@ -1567,7 +1563,7 @@ void Sp_Player(void)
                 // Normal end of pattern
                 ped_line = 0;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 if(!plx)
 #endif
                 {
@@ -1577,12 +1573,12 @@ void Sp_Player(void)
                 if(cPosition >= sLength)
                 {
                     cPosition = 0;
-#ifdef WINAMP
+#if defined(__WINAMP__)
                     done = 1;
 #endif
                 }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
                     SHISTORY[cPosition][i] = false;
@@ -1593,11 +1589,11 @@ void Sp_Player(void)
                 repeat_loop_pos = 0;
             }
 
-#ifndef WINAMP
+#if !defined(__WINAMP__)
             if(Songplaying_Pattern)
             {
 
-#ifdef PTK_FX_PATTERNBREAK
+#if defined(PTK_FX_PATTERNBREAK)
                 if(Patbreak2 > 127)
                 {
                     ped_line_delay++;
@@ -1605,7 +1601,7 @@ void Sp_Player(void)
                 else
                 {
                     ped_line_delay = Patbreak2;
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                     if(!plx)
 #endif
                     {
@@ -1620,7 +1616,7 @@ void Sp_Player(void)
 				if(ped_line_delay == patternLines[pSequence[cPosition_delay]])
                 {
                     ped_line_delay = 0;
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                     if(!plx)
 #endif
                     {
@@ -1630,7 +1626,7 @@ void Sp_Player(void)
                 }
             }
 
-#endif // WINAMP
+#endif // __WINAMP__
         }
     }
 
@@ -1737,7 +1733,7 @@ ByPass_Wav:
             }
         } // sp!!0
 
-#ifdef PTK_303
+#if defined(PTK_303)
         if(track3031 == c)
         {
             currsygnal += tb303engine[0].tbGetSample();
@@ -1761,7 +1757,7 @@ ByPass_Wav:
                                                    Rns[c], sp_Cvol[c] * Player_SV[c], &sp_Stage2[c], &sp_Stage3[c],
                                                    (Uint64 *) &sp_Position_osc1[c],
                                                    (Uint64 *) &sp_Position_osc2[c],
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
                                                    (Uint64 *) &sp_Position_osc3[c],
 #endif
                                                    Vstep1[c]);
@@ -1779,26 +1775,26 @@ ByPass_Wav:
         // Send a note off if the channel is being turned off
         if(!SACTIVE[cPosition][c]
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
            && !SHISTORY[cPosition][c]
 #endif
 
           )
         {
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             SHISTORY[cPosition][c] = true;
 #endif
 
             Synthesizer[c].NoteOff();
 
-#ifndef STAND_ALONE
-#ifndef NOMIDI
+#if !defined(__STAND_ALONE__)
+#if !defined(__NOMIDI__)
             MidiNoteOff(c);
 #endif
 #endif
 
-#ifdef PTK_303
+#if defined(PTK_303)
             noteoff303(c);
 #endif
 
@@ -1809,7 +1805,7 @@ ByPass_Wav:
         if(gotsome)
         {
 
-#ifdef PTK_TRACKFILTERS
+#if defined(PTK_TRACKFILTERS)
             if(FType[c] != 4)
             { /* Track filter actived */
                 float const dfi = TCut[c] - CCut[c];
@@ -1819,7 +1815,7 @@ ByPass_Wav:
                 if(FType[c] < 4)
                 {
 
-#ifdef PTK_FILTER_LOHIBAND
+#if defined(PTK_FILTER_LOHIBAND)
                     gco = f2i(ApplyLfo(CCut[c] - ramper[c], c));
 
                     ramper[c] += Player_FD[c] * gco * 0.015625f;
@@ -1844,14 +1840,14 @@ ByPass_Wav:
                     switch(FType[c])
                     {
 
-#ifdef PTK_FILTER_LO24
+#if defined(PTK_FILTER_LO24)
                         case 5:
                             currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
                             if(grown) currsygnal2 = filter2p(c, currsygnal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_LO48
+#if defined(PTK_FILTER_LO48)
                         case 6:
                             currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
                             currsygnal = filter2p24d(c, currsygnal + 1, realcut, (float) FRez[c]);
@@ -1863,119 +1859,119 @@ ByPass_Wav:
                             break;
 #endif
 
-#ifdef PTK_FILTER_LP24
+#if defined(PTK_FILTER_LP24)
                         case 7:
                             currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
                             currsygnal2 = filter2p24d(c, currsygnal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_AMODM
+#if defined(PTK_FILTER_AMODM)
                         case 8:
                             currsygnal = filterRingMod(c, currsygnal, realcut, (float) FRez[c]);
                             if(grown) currsygnal2 = filterRingMod(c, currsygnal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_AMODS
+#if defined(PTK_FILTER_AMODS)
                         case 9:
                             currsygnal = filterRingMod(c, currsygnal, realcut, (float) FRez[c]);
                             currsygnal2 = filterRingModStereo(c, currsygnal2);
                             break;
 #endif
 
-#ifdef PTK_FILTER_SINGLEM
+#if defined(PTK_FILTER_SINGLEM)
                         case 10:
                             currsygnal = filterWater(c, currsygnal, realcut, (float) FRez[c]);
                             if(grown) currsygnal2 = filterWater(c, currsygnal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_SINGLES
+#if defined(PTK_FILTER_SINGLES)
                         case 11:
                             currsygnal = filterWater(c, currsygnal, realcut, (float) FRez[c]);
                             currsygnal2 = filterWaterStereo(c, currsygnal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_EQM15
+#if defined(PTK_FILTER_EQM15)
                         case 12:
                             currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], -15);
                             if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], -15);
                             break;
 #endif
 
-#ifdef PTK_FILTER_EQM6
+#if defined(PTK_FILTER_EQM6)
                         case 13:
                             currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], -6);
                             if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], -6);
                             break;
 #endif
 
-#ifdef PTK_FILTER_EQP6
+#if defined(PTK_FILTER_EQP6)
                         case 14:
                             currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], 6);
                             if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], 6);
                             break;
 #endif
 
-#ifdef PTK_FILTER_EQP15
+#if defined(PTK_FILTER_EQP15)
                         case 15:
                             currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], 15);
                             if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], 15);
                             break;
 #endif
 
-#ifdef PTK_FILTER_DELTA
+#if defined(PTK_FILTER_DELTA)
                         case 16:
                             currsygnal = filterDelta(c, currsygnal, realcut, (float) FRez[c]);
                             if(grown) currsygnal2 = filterDelta(c, currsygnal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_DISTL
+#if defined(PTK_FILTER_DISTL)
                         case 17:
                             currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.25f);
                             if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.25f);
                             break;
 #endif
 
-#ifdef PTK_FILTER_DISTM
+#if defined(PTK_FILTER_DISTM)
                         case 18:
                             currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.56f);
                             if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.56f);
                             break;
 #endif
 
-#ifdef PTK_FILTER_DISTH
+#if defined(PTK_FILTER_DISTH)
                         case 19:
                             currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.78f);
                             if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.78f);
                             break;
 #endif
 
-#ifdef PTK_FILTER_DIST
+#if defined(PTK_FILTER_DIST)
                         case 20:
                             currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.96f);
                             if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.96f);
                             break;
 #endif
 
-#ifdef PTK_FILTER_HP12M
+#if defined(PTK_FILTER_HP12M)
                         case 21:
                             currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
                             if(grown) currsygnal2 = filterhp(c, currsygnal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_HP12S
+#if defined(PTK_FILTER_HP12S)
                         case 22:
                             currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
                             currsygnal2 = filterhp2(c, currsygnal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
-#ifdef PTK_FILTER_HP24M
+#if defined(PTK_FILTER_HP24M)
                         case 23:
                             currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
                             currsygnal = filterhp2(c, currsygnal + 1, realcut, (float) FRez[c]);
@@ -2026,7 +2022,7 @@ ByPass_Wav:
 
             // 32-Bit HQ Interpolated System Flanger
 
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
             if(FLANGER_ON[c])
             {
                 FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = currsygnal * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
@@ -2060,7 +2056,7 @@ ByPass_Wav:
             }
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             if(!TRACKSTATE[c])
 #endif
             {
@@ -2092,7 +2088,7 @@ ByPass_Wav:
             } // Close trackstate
         }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         if(Songplaying_Pattern)
         {
             if(!TRACKSTATE[c])
@@ -2116,7 +2112,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                  unsigned int offset, int glide, int Play_Entire)
 {
 
-#ifdef PTK_FX_AUTOFADEMODE
+#if defined(PTK_FX_AUTOFADEMODE)
     FADEMODE[channel] = 0;
 #endif
 
@@ -2152,7 +2148,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         sp_Position[channel].absolu = 0;
         sp_Position_osc1[channel].absolu = 0;
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
         sp_Position_osc3[channel].absolu = 0;
 #endif
 
@@ -2208,7 +2204,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         double spreadnote = (double) powf(2.0f, note2 / 12.0f);
         spreadnote *= 4294967296.0f;
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
         Vstep_arp[channel] = (int64) spreadnote;
         Arpeggio_BaseNote[channel] = note2;
 #endif
@@ -2252,7 +2248,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             if(!offset) sp_Cvol[channel] = vol;
             else sp_Cvol[channel] = 0;
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
             Arpeggio_BaseNote[channel] = note;
 #endif
 
@@ -2261,7 +2257,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 double spreadnote = (double) (SampleNumSamples[associated_sample][split]) / ((double) beatlines[associated_sample] * (double) SamplesPerTick);
                 spreadnote *= 4294967296.0f;
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
                 Vstep_arp[channel] = (int64) spreadnote;
 #endif
 
@@ -2273,7 +2269,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 double spreadnote = (double) powf(2.0f, note / 12.0f);
                 spreadnote *= 4294967296.0f;
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
                 Vstep_arp[channel] = (int64) spreadnote;
 #endif
 
@@ -2294,7 +2290,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
 
             // Player Pointer Assignment
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             Uint32 Sel_Start;
             Uint32 Sel_End;
             
@@ -2366,7 +2362,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             sp_Position_osc1[channel] = sp_Position[channel];
             sp_Position_osc2[channel] = sp_Position[channel];
 
-#ifdef PTK_SYNTH_OSC3
+#if defined(PTK_SYNTH_OSC3)
             sp_Position_osc3[channel] = sp_Position[channel];
 #endif
 
@@ -2375,13 +2371,13 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         segue_volume[channel] = 1.0f;
         new_instrument[channel] = TRUE;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         if(TRACKSTATE[channel] == 0 &&
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
             MidiNoteOff(channel);
 #endif
 
@@ -2389,7 +2385,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             if(LastProgram[TRACKMIDICHANNEL[channel]] != Midiprg[associated_sample])
             {
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                 MidiCommand(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
 #endif
 
@@ -2398,7 +2394,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             }
             /* Send the note to the midi device */
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
             float veloc = vol * mas_vol;
 
             Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
@@ -2413,7 +2409,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
 
 // ------------------------------------------------------
 // All pass filter initialization
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
 void allPassInit(float miliSecs)
 {
     currentCounter = 5759;
@@ -2445,7 +2441,7 @@ void allPassInit(float miliSecs)
 
 // ------------------------------------------------------
 // Handle patterns effects
-#ifdef PTK_FX_TICK0
+#if defined(PTK_FX_TICK0)
 void DoEffects_tick0(void)
 {
     int temp_ped_line = ped_line;
@@ -2459,7 +2455,7 @@ void DoEffects_tick0(void)
         switch(pltr_eff_row)
         {
 
-#ifdef PTK_FX_PATTERNLOOP
+#if defined(PTK_FX_PATTERNLOOP)
             // $06 Pattern loop
             case 0x6:
                 if(!pltr_dat_row)
@@ -2495,7 +2491,7 @@ void DoEffects_tick0(void)
                 break;
 #endif
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
             // $1b arpeggio switch on/off
             case 0x1b:
 
@@ -2531,7 +2527,7 @@ void DoEffects(void)
             if(pltr_note == 121 && pltr_sample != 255) sp_Tvol[trackef] = CustomVol[pltr_sample];
         }
 
-#ifdef PTK_FX_AUTOFADEMODE
+#if defined(PTK_FX_AUTOFADEMODE)
         // Autofade routine
         switch(FADEMODE[trackef])
         {
@@ -2559,7 +2555,7 @@ void DoEffects(void)
 
         // Effects
 
-#ifdef PTK_FX_NOTECUT
+#if defined(PTK_FX_NOTECUT)
         if((pltr_vol_row & 0xf0) == 0xf0)
         { /* Note Cut: Fx */
             unsigned char kinder = pltr_vol_row & 0xf;
@@ -2572,8 +2568,8 @@ void DoEffects(void)
                 }
                 Synthesizer[trackef].NoteOff();
 
-#ifndef STAND_ALONE
-#ifndef NOMIDI
+#if !defined(__STAND_ALONE__)
+#if !defined(__NOMIDI__)
                 MidiNoteOff(trackef);
 #endif
 #endif
@@ -2581,14 +2577,14 @@ void DoEffects(void)
         }
 #endif
 
-#ifdef PTK_FX_0
+#if defined(PTK_FX_0)
         switch(pltr_eff_row)
         {
 
-#ifdef PTK_FX_PITCHUP
+#if defined(PTK_FX_PITCHUP)
             // $01 Pitch Up 
             case 0x1:
-#if defined(MINGW)
+#if defined(__GCC__)
                 if(Vstep1[trackef] < 137438953472ll) Vstep1[trackef] += pltr_dat_row << 21;
 #else
                 if(Vstep1[trackef] < 137438953472) Vstep1[trackef] += pltr_dat_row << 21;
@@ -2596,7 +2592,7 @@ void DoEffects(void)
                 break;
 #endif  // PTK_FX_PITCHUP
 
-#ifdef PTK_FX_PITCHDOWN
+#if defined(PTK_FX_PITCHDOWN)
             // $02 Pitch Down 
             case 0x2:
                 Vstep1[trackef] -= pltr_dat_row << 21;
@@ -2604,14 +2600,14 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_SETVOLUME
+#if defined(PTK_FX_SETVOLUME)
             // $03 Set volume
             case 0x3:
                 sp_Tvol[trackef] = pltr_dat_row * 0.0039062f;
                 break;
 #endif
 
-#ifdef PTK_FX_TRANCESLICER
+#if defined(PTK_FX_TRANCESLICER)
             // $04 Trance slicer
             case 0x4:
                 if(Subicounter == 0) sp_Tvol[trackef] = 1.0f;
@@ -2620,7 +2616,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_TRANCEGLIDER
+#if defined(PTK_FX_TRANCEGLIDER)
             // $05 Glider
             case 0x5:
                 if(pltr_dat_row) glidestep[trackef] = pltr_dat_row << 21;
@@ -2647,25 +2643,25 @@ void DoEffects(void)
         } // SWITCH CASES
 #endif  // PTK_FX_0
 
-#ifdef PTK_FX_X
+#if defined(PTK_FX_X)
         switch(pltr_eff_row)
         {
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             // $07 FX
             case 0x7:
                 // ... nothing ...
                 break;
 #endif
 
-#ifdef PTK_FX_SETCUTOFF
+#if defined(PTK_FX_SETCUTOFF)
             // $08 SetCutOff
             case 0x8:
                 TCut[trackef] = (float) pltr_dat_row / 2.0f;
                 break;
 #endif
 
-#ifdef PTK_FX_SETRANDOMCUTOFF
+#if defined(PTK_FX_SETRANDOMCUTOFF)
             // $0a SetRandomCutOff
             case 0xa:
                 if(Subicounter == 0)
@@ -2678,7 +2674,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_SLIDEUPCUTOFF
+#if defined(PTK_FX_SLIDEUPCUTOFF)
             // $0b SlideUpCutOff 
             case 0xb:
                 if(Subicounter == 0)
@@ -2689,7 +2685,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_SLIDEDOWNCUTOFF
+#if defined(PTK_FX_SLIDEDOWNCUTOFF)
             // $0c SlideDownCutOff 
             case 0xc:
                 if(Subicounter == 0)
@@ -2700,7 +2696,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_NOTERETRIGGER
+#if defined(PTK_FX_NOTERETRIGGER)
             // $0e Note retrigger
             case 0xe: 
                 if(pltr_note == 121) pltr_note = old_note[trackef];
@@ -2719,7 +2715,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_SETBPM
+#if defined(PTK_FX_SETBPM)
             // $f0 Set BPM
             case 0xf0:
                 if(pltr_dat_row > 32)
@@ -2728,14 +2724,14 @@ void DoEffects(void)
                     SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));  
                     SamplesPerSub = SamplesPerTick / 6;
                 }
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
                 teac = 2;
 #endif
                 break;
 #endif
 
-#ifdef PTK_FX_SETSPEED
+#if defined(PTK_FX_SETSPEED)
             // $0f Set speed
             case 0x0f:
                 TicksPerBeat = (int) pltr_dat_row;
@@ -2744,62 +2740,62 @@ void DoEffects(void)
                 SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));  
                 SamplesPerSub = SamplesPerTick / 6;
 
-#ifdef PTK_SHUFFLE
+#if defined(PTK_SHUFFLE)
                 if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle) / 200);
                 else shufflestep = (SamplesPerTick * shuffle) / 200;
 #endif
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
                 gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
                 teac = 2;
 #endif
                 break;
 #endif
 
-#ifdef PTK_FX_SENDTODELAYCOMMAND
+#if defined(PTK_FX_SENDTODELAYCOMMAND)
             // $10 Send to delay Command
             case 0x10: 
                 CCoef[trackef] = (float) pltr_dat_row / 255.0f;
                 break;
 #endif
 
-#ifdef PTK_FX_SENDTOREVERBCOMMAND
+#if defined(PTK_FX_SENDTOREVERBCOMMAND)
             // $11 Send to reverb Command
             case 0x11: 
                 DSend[trackef] = (float) pltr_dat_row / 255.0f;
                 break;
 #endif
 
-#ifdef PTK_FX_SETDISTORTIONTHRESHOLD
+#if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
             // $12 Set distortion Threshold
             case 0x12: 
                 DThreshold[trackef] = (float) pltr_dat_row * 128.0f;
                 break;
 #endif
 
-#ifdef PTK_FX_SETDISTORTIONCLAMP
+#if defined(PTK_FX_SETDISTORTIONCLAMP)
             // $13 Set distortion clamp
             case 0x13: 
                 DClamp[trackef] = (float) pltr_dat_row * 128.0f;
                 break;
 #endif
 
-#ifdef PTK_FX_SETFILTERRESONANCE
+#if defined(PTK_FX_SETFILTERRESONANCE)
             // $14 Set filter resonance
             case 0x14: 
                 FRez[trackef] = (int) (pltr_dat_row / 2);
                 break;
 #endif
 
-#ifdef PTK_FX_SETFILTERTYPE
+#if defined(PTK_FX_SETFILTERTYPE)
             // $15 Set filter Type
             case 0x15: 
                 if(pltr_dat_row <= MAX_FILTER) FType[trackef] = (int) pltr_dat_row;
                 break;
 #endif
 
-#ifdef PTK_LFO
-#ifdef PTK_FX_RESETFILTERLFO
+#if defined(PTK_LFO)
+#if defined(PTK_FX_RESETFILTERLFO)
             // $16 Reset filter lfo
             case 0x16:
                 LFOGR[trackef] = 0.0f;
@@ -2807,7 +2803,7 @@ void DoEffects(void)
 #endif
 #endif
 
-#ifdef PTK_FX_AUTOFADEIN
+#if defined(PTK_FX_AUTOFADEIN)
             // $17 Auto fade in xx ticks
             case 0x17: 
                 if(pltr_dat_row > 0)
@@ -2818,7 +2814,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_AUTOFADEOUT
+#if defined(PTK_FX_AUTOFADEOUT)
             // $18 Auto fade out xx ticks
             case 0x18: 
                 if(pltr_dat_row > 0)
@@ -2829,7 +2825,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_VOLUMESLIDEUP
+#if defined(PTK_FX_VOLUMESLIDEUP)
             // $19 Volume slide up
             case 0x19:
                 sp_Tvol[trackef] += pltr_dat_row * 0.0039062f;
@@ -2837,7 +2833,7 @@ void DoEffects(void)
                 break;
 #endif
 
-#ifdef PTK_FX_VOLUMESLIDEDOWN
+#if defined(PTK_FX_VOLUMESLIDEDOWN)
             // $1a Volume slide down
             case 0x1a: 
                 sp_Tvol[trackef] -= pltr_dat_row * 0.0039062f;
@@ -2850,7 +2846,7 @@ void DoEffects(void)
 #endif  // PTK_FX_X
 
 
-#ifdef PTK_FX_ARPEGGIO
+#if defined(PTK_FX_ARPEGGIO)
         // Let's do the arpeggio
         double arpnote;
 
@@ -2900,7 +2896,7 @@ void ResetFilters(char tr)
 float ApplyLfo(float cy, char trcy)
 {
 
-#ifdef PTK_LFO
+#if defined(PTK_LFO)
     if(LFO_ON[trcy] == 1)
     {
         cy += SIN[f2i(LFOGR[trcy])] * LFO_AMPL[trcy];
@@ -2943,11 +2939,11 @@ void GetPlayerValues(float master_coef)
     left_float = lchore + left_float;
     right_float = rchore + right_float;
 
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
     Compressor_work();
 #endif
 
-#ifdef PTK_LIMITER
+#if defined(PTK_LIMITER)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
     if(mas_comp_ratio != 0.0f)
@@ -3042,7 +3038,7 @@ void ComputeCoefs(int freq, int r, int t)
 // ------------------------------------------------------
 // Filters run
 
-#ifdef PTK_PROC_FILTER
+#if defined(PTK_PROC_FILTER)
 float Filter(float x, char i)
 {
     float y;
@@ -3076,7 +3072,7 @@ int f2i(float d)
     return((int) d);
 }
 
-#ifdef PTK_PROC_FILTER2P
+#if defined(PTK_PROC_FILTER2P)
 float filter2p(char ch, float input, float f, float q)
 {
     f *= 0.0078125f;
@@ -3090,7 +3086,7 @@ float filter2p(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERHP2
+#if defined(PTK_PROC_FILTERHP2)
 float filterhp2(char ch, float input, float f, float q)
 {
     f *= 0.0078125f;
@@ -3104,7 +3100,7 @@ float filterhp2(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERHP
+#if defined(PTK_PROC_FILTERHP)
 float filterhp(char ch, float input, float f, float q)
 {
     f *= 0.0078125f;
@@ -3118,7 +3114,7 @@ float filterhp(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTER2P24D
+#if defined(PTK_PROC_FILTER2P24D)
 float filter2p24d(char ch, float input, float f, float q)
 {
     f *= 0.0078125f;
@@ -3131,7 +3127,7 @@ float filter2p24d(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERRINGMOD
+#if defined(PTK_PROC_FILTERRINGMOD)
 float filterRingMod(char ch, float input, float f, float q)
 {
     q++;
@@ -3144,14 +3140,14 @@ float filterRingMod(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERRINGMODSTEREO
+#if defined(PTK_PROC_FILTERRINGMODSTEREO)
 float filterRingModStereo(char ch, float input)
 {
     return float(input * cosf(buf0[ch] * 0.0174532f));
 }
 #endif
 
-#ifdef PTK_PROC_FILTERWATER
+#if defined(PTK_PROC_FILTERWATER)
 float filterWater(char ch, float input, float f, float q)
 {
     f = 127.0f - f;
@@ -3162,7 +3158,7 @@ float filterWater(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERWATERSTEREO
+#if defined(PTK_PROC_FILTERWATERSTEREO)
 float filterWaterStereo(char ch, float input, float f, float q)
 {
     f = 127.0f - f;
@@ -3173,7 +3169,7 @@ float filterWaterStereo(char ch, float input, float f, float q)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERDELTA
+#if defined(PTK_PROC_FILTERDELTA)
 float filterDelta(char ch, float input, float f, float q)
 {
     f = 127.0f - f;
@@ -3212,7 +3208,7 @@ float filterDelta(char ch, float input, float f, float q)
 }
 */
 
-#ifdef PTK_PROC_FILTERBELLSHAPED
+#if defined(PTK_PROC_FILTERBELLSHAPED)
 float filterBellShaped(char ch, float input, float f, float q, float g)
 {
     input++;
@@ -3244,7 +3240,7 @@ float filterBellShaped(char ch, float input, float f, float q, float g)
 }
 #endif
 
-#ifdef PTK_PROC_FILTERINT2P
+#if defined(PTK_PROC_FILTERINT2P)
 float int_filter2p(char ch, float input, float f, float q, float q2)
 {
     q *= 0.0787401f;
@@ -3266,7 +3262,7 @@ float filter2px(char ch, float input, float f, float q)
 // ------------------------------------------------------
 // Record the 303 parameters changes
 
-#ifdef PTK_303
+#if defined(PTK_303)
 void live303(int pltr_eff_row, int pltr_dat_row)
 {
     switch(pltr_eff_row)
@@ -3285,7 +3281,7 @@ void live303(int pltr_eff_row, int pltr_dat_row)
         case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
     }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     if(!sr_isrecording) Actualize_303_Ed(0);
 #endif
 
@@ -3336,7 +3332,7 @@ void Fire303(unsigned char number,char unit)
             break;
     }
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     if(!sr_isrecording) Actualize_303_Ed(0);
 #endif
 
@@ -3383,7 +3379,7 @@ void Go303(void)
 
 // ------------------------------------------------------
 // Bank initializer
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void init_sample_bank(void)
 {
     Reset_303_Parameters(&tb303[0]);
@@ -3397,7 +3393,7 @@ void init_sample_bank(void)
         {
             SACTIVE[inico][inico2] = true;
 
-#if !defined(STAND_ALONE)
+#if !defined(__STAND_ALONE__)
             SHISTORY[inico][inico2] = false;
 #endif
 
@@ -3409,7 +3405,7 @@ void init_sample_bank(void)
             beatsync[inico] = false;
             beatlines[inico] = 16;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
             sprintf(nameins[inico], "Untitled");
 #endif
 
@@ -3422,7 +3418,7 @@ void init_sample_bank(void)
 void KillInst(int inst_nbr)
 {
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     // Gsm is the default packing scheme
     SampleCompression[inst_nbr] = SMP_PACK_GSM;
 #else
@@ -3458,7 +3454,7 @@ void KillInst(int inst_nbr)
         FDecay[inst_nbr][z] = 0.0f;
         Basenote[inst_nbr][z] = 48;
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         sprintf(SampleName[inst_nbr][z], "Untitled");
         Midiprg[inst_nbr] = -1;
 #endif
@@ -3474,7 +3470,7 @@ void KillInst(int inst_nbr)
 void ResetSynthParameters(SynthParameters *TSP)
 {
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
     sprintf(TSP->presetname, "Untitled");
 #endif
 
@@ -3565,10 +3561,10 @@ void Free_Samples(void)
         }
     }
 }
-#endif // STAND_ALONE
+#endif // __STAND_ALONE__
 
 // ------------------------------------------------------
-#ifdef PTK_COMPRESSOR
+#if defined(PTK_COMPRESSOR)
 void Initreverb()
 {
     LFP_L.Reset();
@@ -3815,7 +3811,7 @@ void Compressor_work(void)
 #endif
 
 // ------------------------------------------------------
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void Reset_303_Parameters(para303 *tbpars)
 {
     char c;
@@ -3847,7 +3843,7 @@ void Reset_303_Parameters(para303 *tbpars)
             tbpars->flag[c][d].reserved3_flag = 0;
             tbpars->flag[c][d].reserved4_flag = 0;
         }
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
         for(d = 0; d < 16; d++)
         {
             sprintf(tbpars->pattern_name[c], "Untitled");
@@ -3859,7 +3855,7 @@ void Reset_303_Parameters(para303 *tbpars)
 
 // ------------------------------------------------------
 // Filter flanger signal
-#ifdef PTK_FLANGER
+#if defined(PTK_FLANGER)
 float Filter_FlangerL(float input)
 {
     float fa = 1.0f - FLANGER_LOPASS_CUTOFF; 
@@ -3880,11 +3876,11 @@ float Filter_FlangerR(float input)
 
 // ------------------------------------------------------
 // Compressor / Limiter
-#ifdef PTK_LIMITER
+#if defined(PTK_LIMITER)
 float mas_attack = 0.977579f;
 float mas_release = 0.977579f;
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void Mas_Compressor_Set_Variables(float threshold, float ratio)
 {
     if(threshold < 0.01f) threshold = 0.01f;

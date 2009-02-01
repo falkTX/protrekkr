@@ -7,7 +7,7 @@
 #ifndef _SAMPLES_PACK_H_
 #define _SAMPLES_PACK_H_
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
 
 // ------------------------------------------------------
 // Constants

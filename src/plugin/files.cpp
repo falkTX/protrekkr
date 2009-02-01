@@ -71,7 +71,7 @@ void Init_Tracker_Context_After_ModLoad(void)
     rchorus_counter2 = 44100 - rchorus_delay;
     Initreverb();
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     Mas_Compressor_Set_Variables(mas_comp_threshold, mas_comp_ratio);
 #endif
 

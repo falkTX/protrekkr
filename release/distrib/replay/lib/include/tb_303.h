@@ -11,11 +11,11 @@
 // Includes
 #include <math.h>
 
-#if defined(STAND_ALONE)
-    #if defined(WINAMP)
+#if defined(__STAND_ALONE__)
+    #if defined(__WINAMP__)
         #include "ptk_def_properties.h"
     #else
-        #if defined(MINGW)
+        #if defined(__GCC__)
         #include "../../ptk_properties.h"
         #else
         #include "../ptk_properties.h"
@@ -25,7 +25,7 @@
     #include "ptk_def_properties.h"
 #endif
 
-#ifdef PTK_303
+#if defined(PTK_303)
 
 // ------------------------------------------------------
 // Constants
@@ -35,8 +35,8 @@
 // ------------------------------------------------------
 // Structures
 
-#if defined(STAND_ALONE) && !defined(WINAMP)
-    #if !defined(MINGW)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    #if !defined(__GCC__)
     #pragma pack(push)
     #pragma pack(1)
     #else
@@ -70,7 +70,7 @@ struct para303 {
     unsigned char tone[32][16];
     struct flag303 flag[32][16];
 
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char pattern_name[32][20];
 #endif
 
@@ -87,7 +87,7 @@ struct para303 {
     //    \   \                                       bit 4 = Pause/Note (0x10)
 };
 
-#if defined(STAND_ALONE) && !defined(WINAMP)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     #pragma pack(pop)
 #endif
 
@@ -140,7 +140,7 @@ class gear303
 
 // ------------------------------------------------------
 // Functions
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void ReInit_303_Parameters(para303 *tbpars);
 void Reset_303_Parameters(para303 *tbpars);
 #endif

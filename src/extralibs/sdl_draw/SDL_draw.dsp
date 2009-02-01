@@ -107,7 +107,7 @@ SOURCE=.\src\Draw_VLine.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\include\SDL_draw.h
+SOURCE=.\include\sdl_draw.h
 # End Source File
 # End Group
 # End Target

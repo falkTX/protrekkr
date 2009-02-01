@@ -4,13 +4,13 @@
 // Based on the work of Juan Antonio Arguelles Rius 
 // ------------------------------------------------------
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
 
 // ------------------------------------------------------
 // Includes
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <windows.h>
-#if defined(MINGW)
+#if defined(__GCC__)
 #include "../../release/distrib/replay/lib/include/mmreg.h"
 #include "../../release/distrib/replay/lib/include/msacm.h"
 #else

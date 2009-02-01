@@ -4,7 +4,7 @@
 // Based on the work of Juan Antonio Arguelles Rius 
 // ------------------------------------------------------
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
 
 // ------------------------------------------------------
 // Includes

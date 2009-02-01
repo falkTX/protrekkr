@@ -39,7 +39,7 @@ typedef struct
    int new_order;
 } INSTR_ORDER, *LPINSTR_ORDER;
 
-#if !defined(MINGW)
+#if !defined(__GCC__)
 #pragma pack(push)
 #pragma pack(1)
 #else
@@ -262,7 +262,7 @@ void LoadAmigaMod(char *FileName, int channels)
         Free_Samples();
         Clean_Up_Patterns_Pool();
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
         MidiReset();
 #endif
 
@@ -649,7 +649,7 @@ void LoadMod(char *FileName)
 
             Clean_Up_Patterns_Pool();
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
             MidiReset();
 #endif
 
@@ -1270,7 +1270,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 {
     int Packed_Length;
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     short *Dest_Buffer;
 #endif
 
@@ -1287,7 +1287,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
     else
     {
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
         // Read the packer buffer
         fread(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
@@ -1327,7 +1327,7 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
     int PackedLen = 0;
     short *PackedSample = NULL;
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     short *AlignedSample;
     int Aligned_Size;
 
@@ -1384,11 +1384,11 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
         Write_Mod_Datas(&PackedLen, sizeof(char), 4, FileHandle);
         Write_Mod_Datas(Sample, sizeof(char), Size * 2, FileHandle);
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     }
 #endif
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     if(PackedSample) free(PackedSample);
 #endif
 
@@ -2249,7 +2249,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Datas(&PARASynth[swrite].lfo2_release, sizeof(int), 1, in);
             }
 
-#ifdef NOCODEC
+#if defined(__NOCODEC__)
             int No_Comp = SMP_PACK_NONE;
             Write_Mod_Datas(&No_Comp, sizeof(char), 1, in);
 #else
@@ -2267,7 +2267,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 {
                     int Apply_Interpolation = FALSE;
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
                     // Check if any of the packing scheme has been used
                     switch(SampleCompression[swrite])
                     {
@@ -3455,7 +3455,7 @@ void SaveConfig(void)
     sprintf(extension, "TWNNCFG1");
     mess_box("Saving 'ptk.cfg' on current directory...");
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     sprintf(FileName, "%s\\ptk.cfg", ExePath);
 #else
     sprintf(FileName, "%s/ptk.cfg", ExePath);
@@ -3516,7 +3516,7 @@ void LoadConfig(void)
     char FileName[MAX_PATH];
     char KeyboardName[MAX_PATH];
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     sprintf(FileName, "%s\\ptk.cfg", ExePath);
 #else
     sprintf(FileName, "%s/ptk.cfg", ExePath);
@@ -3568,7 +3568,7 @@ void LoadConfig(void)
     {
         GETCWD(Dir_Mods, MAX_PATH);
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
         strcat(Dir_Mods, "\\modules");
 #else
         strcat(Dir_Mods, "/modules");
@@ -3579,7 +3579,7 @@ void LoadConfig(void)
     {
         GETCWD(Dir_Instrs, MAX_PATH);
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
         strcat(Dir_Instrs, "\\instruments");
 #else
         strcat(Dir_Instrs, "/instruments");
@@ -3590,7 +3590,7 @@ void LoadConfig(void)
     {
         GETCWD(Dir_Presets, MAX_PATH);
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
         strcat(Dir_Presets, "\\presets");
 #else
         strcat(Dir_Presets, "/presets");

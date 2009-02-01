@@ -7,7 +7,7 @@
 #ifndef _VARIABLES_H_
 #define _VARIABLES_H_
 
-#undef STAND_ALONE
+#undef __STAND_ALONE__
 
 // ------------------------------------------------------
 // Includes
@@ -21,7 +21,7 @@
 #define MAXLOOPTYPE 1
 #define FULLYESNO 0
 
-#ifndef __WIN32__
+#if !defined(__WIN32__)
 #define FALSE 0
 #define TRUE 1
 #endif

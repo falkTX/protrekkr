@@ -10,7 +10,7 @@
 
 #if defined(__WIN32__)
     #define DIRECTSOUND_VERSION 0x0900
-    #if defined(MINGW)
+    #if defined(__GCC__)
     #include "include/DSound.h"
     #else
     #include <DSound.h>

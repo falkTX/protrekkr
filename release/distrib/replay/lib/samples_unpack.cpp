@@ -4,13 +4,13 @@
 // Based on the work of Juan Antonio Arguelles Rius 
 // ------------------------------------------------------
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
 
 // ------------------------------------------------------
 // Includes
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <windows.h>
-#if defined(MINGW)
+#if defined(__GCC__)
 #include "include/mmreg.h"
 #include "include/msacm.h"
 #else
@@ -23,15 +23,15 @@
 
 // ------------------------------------------------------
 // Variables
-#ifdef STAND_ALONE
+#if defined(__STAND_ALONE__)
 WAVEFORMATEX Wave_Format;
-#ifdef PTK_GSM
+#if defined(PTK_GSM)
 GSM610WAVEFORMAT GSM_Format;
 #endif
-#ifdef PTK_TRUESPEECH
+#if defined(PTK_TRUESPEECH)
 TRUESPEECHWAVEFORMAT TrueSpeech_Format;
 #endif
-#ifdef PTK_MP3
+#if defined(PTK_MP3)
 MPEGLAYER3WAVEFORMAT MP3_Format;
 #endif
 #else
@@ -45,7 +45,7 @@ HACMSTREAM Unpack_Stream;
 
 // ------------------------------------------------------
 // Unpack a GSM sample
-#ifdef PTK_GSM
+#if defined(PTK_GSM)
 void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     int i;
@@ -89,7 +89,7 @@ void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 
 // ------------------------------------------------------
 // Unpack a TrueSpeech sample
-#ifdef PTK_TRUESPEECH
+#if defined(PTK_TRUESPEECH)
 void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     int i;
@@ -135,7 +135,7 @@ void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 
 // ------------------------------------------------------
 // Unpack a MP3 sample
-#ifdef PTK_MP3
+#if defined(PTK_MP3)
 void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     int i;

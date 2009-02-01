@@ -59,13 +59,13 @@ extern MOUSE Mouse;
 extern HWND Main_Window;
 #endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #define STDCALL __stdcall
 #else
 #define STDCALL
 #endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #define GETCWD _getcwd
 #define CHDIR _chdir
 #define GETDRIVE _getdrive

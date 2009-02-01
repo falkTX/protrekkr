@@ -32,7 +32,7 @@
 ==========================================================================*/
 
 // Standard includes
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <io.h>
 #endif
 

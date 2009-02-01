@@ -159,7 +159,7 @@ extern float REVERBFILTER;
 
 extern float CustomVol[128];
 
-#ifndef STAND_ALONE
+#if !defined(__STAND_ALONE__)
 extern unsigned int SubCounter;
 extern int PosInTick;
 extern int plx;

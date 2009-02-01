@@ -4,7 +4,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lSDL -lsdldraw -lz
 FLAGS = -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
-        -D __LINUX__ -D MINGW -D NOMIDI -D NOCODEC
+        -D __LINUX__ -D __GCC__ -D __NOMIDI__ -D __NOCODEC__
 EXEOBJS = main.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \

@@ -8,11 +8,11 @@
 // Includes
 #include "include/tb_303.h"
 
-#ifdef PTK_303
+#if defined(PTK_303)
 
 // ------------------------------------------------------
 // Constructor, 303 initialization
-#if !defined(STAND_ALONE) || defined(WINAMP)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 gear303::gear303()
 {
     tbPattern = 255;

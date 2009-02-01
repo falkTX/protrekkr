@@ -48,7 +48,7 @@ void Draw_Instrument_Ed(void)
         case 0:
             Gui_Draw_Flat_Box("Instrument Editor [Sampler]");
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
             Gui_Draw_Button_Box(640, 466, 88, 16, "Packing Scheme", BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
 
@@ -207,14 +207,14 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 }
                 if(gode == 0 || gode == 10)
                 {
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                     if(Midiprg[ped_patsam] == -1)
                     {
 #endif
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                         Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_DISABLED);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                     }
                     else
                     {
@@ -306,7 +306,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     switch(SampleCompression[ped_patsam])
                     {
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
                         case SMP_PACK_GSM:
                             Gui_Draw_Button_Box(640, 484, 88, 16, "Gsm 6.10", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + 18, 88, 16, "Mp3", Allow_Global);
@@ -482,7 +482,7 @@ void Mouse_Left_Instrument_Ed(void)
             NewWav();
         }
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
         if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
         {
             Midiprg[ped_patsam]--;
@@ -572,7 +572,7 @@ void Mouse_Left_Instrument_Ed(void)
         if(Allow_Global_Sliders)
         {
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
             if(zcheckMouse(640, 484, 88, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_GSM;
@@ -660,7 +660,7 @@ void Mouse_Right_Instrument_Ed(void)
             }
         }
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
         if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
         {
             if(Midiprg[ped_patsam] > 14) Midiprg[ped_patsam] -= 16;

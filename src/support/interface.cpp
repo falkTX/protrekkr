@@ -13,7 +13,7 @@
 #include "include/timer.h"
 #include "include/resource.h"
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <windows.h>
 #include <shlwapi.h>
 #endif
@@ -332,13 +332,13 @@ int main(int argc, char *argv[])
     char *NoMidi = "";
     char *NoCodec = "";
 
-#ifdef NOMIDI
+#if defined(__NOMIDI__)
     NoMidi = "no midi";
 #endif
-#ifdef NOCODEC
+#if defined(__NOCODEC__)
     NoCodec = " - no codec";
 #endif
-#if !defined(NOMIDI) && !defined(NOCODEC)
+#if !defined(__NOMIDI__) && !defined(__NOCODEC__)
     NoMidi = "none";
 #endif
 
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
     // Obtain SDL window
     SDL_GetWMInfo(&WMInfo);
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     Main_Window = WMInfo.window;
     // Set the icon of the window
     SetClassLong(Main_Window, GCL_HICON,
@@ -679,7 +679,7 @@ int main(int argc, char *argv[])
 
     // Close the midi devices on any exit
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiIn_Close();
     MidiOut_Close();
 #endif

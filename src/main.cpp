@@ -193,7 +193,7 @@ SDL_Surface *Load_Skin_Picture(char *name)
         return(NULL);
     }
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     sprintf(filepath, "skins\\%s", pic_filename);
 #else
     sprintf(filepath, "skins/%s", pic_filename);
@@ -225,7 +225,7 @@ int Load_Font_Datas(char *name)
         return(FALSE);
     }
     
-#ifdef __WIN32__
+#if defined(__WIN32__)
     sprintf(filepath, "skins\\%s", pic_filename);
 #else
     sprintf(filepath, "skins/%s", pic_filename);
@@ -244,7 +244,7 @@ int Load_Font_Datas(char *name)
 int Init_Context(void)
 {
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiGetAll();           /* Retrieves Midi Info */
 #endif
 
@@ -255,7 +255,7 @@ int Init_Context(void)
     fsize = 638 + restx;
     visiblecolums = CONSOLE_WIDTH / 128;
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
     srand(GetTickCount());
 #else
     srand(rand());
@@ -296,7 +296,7 @@ int Init_Context(void)
     midiin_changed = 2;
     midiout_changed = 2;
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiIn_Init();
     MidiOut_Init();
 #endif
@@ -309,7 +309,7 @@ int Init_Context(void)
 
     if(!Init_Block_Work()) return(FALSE);
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiReset();
 #endif
 
@@ -320,7 +320,7 @@ int Init_Context(void)
     }
 
     /* Player initialization */
-#ifdef __WIN32__
+#if defined(__WIN32__)
     if(!Ptk_InitDriver(Main_Window, AUDIO_Milliseconds))
 #else
     if(!Ptk_InitDriver(AUDIO_Milliseconds))
@@ -1266,7 +1266,7 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
     SampleType[n_index][ped_split] = 1;
     // Gsm by default
 
-#ifndef NOCODEC
+#if !defined(__NOCODEC__)
     SampleCompression[n_index] = SMP_PACK_GSM;
 #else
     SampleCompression[n_index] = SMP_PACK_NONE;
@@ -1543,7 +1543,7 @@ void SongStop(void)
         ped_line = ped_line_delay;
     }
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiAllNotesOff();
 #endif
 
@@ -1583,7 +1583,7 @@ void Newmod(void)
 
     nPatterns = 1;
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
     MidiReset();
 #endif
 
@@ -3112,7 +3112,7 @@ void Keyboard_Handler(void)
                         noteoff303(Track_Number); // 303 Note Off...
                         if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
 
-#ifndef NOMIDI
+#if !defined(__NOMIDI__)
                         MidiNoteOff(Track_Number);
 #endif
 
