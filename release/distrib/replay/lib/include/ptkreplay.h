@@ -1,0 +1,40 @@
+// ------------------------------------------------------
+// Protrekkr
+// Written by Franck Charlet
+// Based on the work of Juan Antonio Arguelles Rius 
+// ------------------------------------------------------
+
+#ifndef _PTK_REPLAY_H_
+#define _PTK_REPLAY_H_
+
+// ------------------------------------------------------
+// Includes
+#ifdef __WIN32__
+#include <windows.h>
+#define PTKEXPORT __stdcall
+#endif
+
+#if defined(__LINUX__)
+#define PTKEXPORT
+#endif
+
+// ------------------------------------------------------
+// Functions
+#ifndef WINAMP
+#ifdef __WIN32__
+int PTKEXPORT Ptk_InitDriver(HWND hWnd, int Latency);
+#else
+int PTKEXPORT Ptk_InitDriver(int Latency);
+#endif
+#else
+int PTKEXPORT Ptk_InitDriver(void);
+#endif
+int PTKEXPORT Ptk_InitModule(unsigned char *Module, int start_position);
+int PTKEXPORT Ptk_GetRow(void);
+int PTKEXPORT Ptk_GetPosition(void);
+void PTKEXPORT Ptk_SetPosition(int position);
+void PTKEXPORT Ptk_Play(void);
+void PTKEXPORT Ptk_Stop(void);
+void PTKEXPORT Ptk_ReleaseDriver(void);
+
+#endif

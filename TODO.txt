@@ -1,0 +1,32 @@
+TODO:
+
+ - Port to Mac OS X.
+ - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
+   to other Operating systems.
+ - Create a decent gadgets system (events based).
+ - Add a function to wipe the current song
+   (removing unused patterns, although this is done for .ptp files, it's not implemented for .ptk).
+ - Add copy/paste functions in the samples editor.
+ - Auto-scrolling of the patterns when selecting a block with the mouse.
+ - List of instruments (maybe switched with the scopes/files lists).
+ - A global synchro editor.
+ - Remove totally empty channels (nothing on every used patterns or always off).
+   (and remove identical samples in .ptp).
+ - Import .mid.
+ - Also save the synchro data as milliseconds (+ add a Ptk_GetTime function).
+ - Ability to record a selected range of patterns to WAV.
+ - Add an option to play a packed sample in order to test it.
+ - Add customization for the keys shortcuts in the xml file.
+ - Add a large patterns view mode (more rows).
+ - Navigate through samples data with the mouse wheel in the samples editor.
+ - Arrows to finetune samples looping datas in instruments tab.
+ - Undo function for samples and patterns.
+ - Click on numbers & move the mouse to modify them (or use the wheel).
+ - More shortcuts.
+ - Small / big fonts for patterns.
+ 
+ - Use more xml scripting to completely customize the interface.
+ - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
+ - Add requesters (especially before overwriting files and before exiting).
+ - Auto update (checks some web site's version file eventually).
+ 

@@ -1,0 +1,320 @@
+// ------------------------------------------------------
+// Protrekkr
+// Written by Franck Charlet
+// Based on the work of Juan Antonio Arguelles Rius 
+// ------------------------------------------------------
+
+// ------------------------------------------------------
+// Includes
+#include "include/editor_fx_setup.h"
+
+// ------------------------------------------------------
+// Variables
+int Ticks_Synchro_Left = 1;
+int Ticks_Synchro_Right = 1;
+
+// ------------------------------------------------------
+// Functions
+void Draw_Fx_Ed(void)
+{
+    Draw_Editors_Bar(USER_SCREEN_FX_SETUP_EDIT);
+
+    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Flat_Box("FX: Setup");
+    Gui_Draw_Button_Box(8, 464, 224, 108, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 480, 56, 16, "Switch", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 498, 56, 16, "Feedback", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 516, 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 534, 56, 16, "Room Size", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 552, 56, 16, "Filter", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(240, 464, 288, 96, "Stereo Delay Settings", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, 480, 56, 16, "L.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, 498, 56, 16, "R.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, 516, 56, 16, "L.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, 534, 56, 16, "R.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(530, 464, 104, 56, "Ticks Delay Synchro", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL);
+}
+
+void Actualize_Fx_Ed(char gode)
+{
+    if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
+    {
+        if(gode == 0 || gode == 1)
+        {
+            if(DelayType < 0) DelayType = 0;
+            if(DelayType > 6) DelayType = 6;
+            switch(DelayType)
+            {
+                case 0: Gui_Draw_Button_Box(142, 516, 81, 16, "Room", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 1: Gui_Draw_Button_Box(142, 516, 81, 16, "Great Hall", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 2: Gui_Draw_Button_Box(142, 516, 81, 16, "Room 2", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 3: Gui_Draw_Button_Box(142, 516, 81, 16, "Echoy", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 4: Gui_Draw_Button_Box(142, 516, 81, 16, "1Comb", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 5: Gui_Draw_Button_Box(142, 516, 81, 16, "Room2", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 6: Gui_Draw_Button_Box(142, 516, 81, 16, "Hall3", BUTTON_NORMAL | BUTTON_DISABLED); break;
+
+                default:Gui_Draw_Button_Box(142, 516, 81, 16, "Not Defined", BUTTON_NORMAL | BUTTON_DISABLED); break;
+            }
+
+            if(gode) Initreverb();
+            value_box(79, 516, DelayType, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+
+        if(gode == 0 || gode == 2)
+        {
+            Realslider(77, 498, f2i(Feedback * 127.0f), TRUE);
+        }
+
+        if(gode == 0 || gode == 3)
+        {
+            if(lchorus_delay > 22100) lchorus_delay = 22100;
+            if(lchorus_delay < 1) lchorus_delay = 1;
+            if(gode == 3)
+            {
+                lchorus_counter = 44100;
+                lchorus_counter2 = 44100 - lchorus_delay;
+            }
+            Realslider(307, 480, lchorus_delay / 175, TRUE);
+            outlong(458, 480, (lchorus_delay * 1000) / 44100, 2);
+        }
+
+        if(gode == 0 || gode == 4)
+        {
+            if(rchorus_delay > 22100) rchorus_delay = 22100;
+            if(rchorus_delay < 1) rchorus_delay = 1;
+            if(gode == 4)
+            {
+                rchorus_counter = 44100;
+                rchorus_counter2 = 44100 - rchorus_delay;
+            }
+            Realslider(307, 498, rchorus_delay / 175, TRUE);
+            outlong(458, 498, (rchorus_delay * 1000) / 44100, 2);
+        }
+
+        if(gode == 0 || gode == 5)
+        {
+            if(lchorus_feedback > 0.95f) lchorus_feedback = 0.95f;
+            if(lchorus_feedback < 0) lchorus_feedback = 0;
+            Realslider(307, 516, f2i(lchorus_feedback * 127), TRUE);
+            outlong(458, 516, f2i(lchorus_feedback * 100), 1);
+        }
+
+        if(gode == 0 || gode == 6)
+        {
+            if(rchorus_feedback > 0.95f) rchorus_feedback = 0.95f;
+            if(rchorus_feedback < 0) rchorus_feedback = 0;
+            Realslider(307, 534, f2i(rchorus_feedback * 127), TRUE);
+            outlong(458, 534, f2i(rchorus_feedback * 100), 1);
+        }
+
+        if(gode == 0 || gode == 7)
+        {
+            if(c_threshold < 10) c_threshold = 10;
+            if(c_threshold > 127) c_threshold = 127;
+            Realslider(77, 534, c_threshold, TRUE);
+            allPassInit((float) c_threshold);
+        }
+
+        if(gode == 0 || gode == 8)
+        {
+            if(compressor == 0)
+            {
+                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_PUSHED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_NORMAL);
+            }
+        }
+
+        if(gode == 0 || gode == 9)
+        {
+            if(REVERBFILTER < 0.05f) REVERBFILTER = 0.05f;
+            if(REVERBFILTER > 0.99f) REVERBFILTER = 0.99f;
+            Realslider(77, 552, f2i(REVERBFILTER * 128.0f), TRUE);
+        }
+
+        if(gode == 0 || gode == 10)
+        {
+            if(Ticks_Synchro_Left < 1) Ticks_Synchro_Left = 1;
+            if(Ticks_Synchro_Left > TicksPerBeat + 1) Ticks_Synchro_Left = TicksPerBeat + 1;
+            Gui_Draw_Arrows_Number_Box2(534, 480, Ticks_Synchro_Left, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+        if(gode == 0 || gode == 11)
+        {
+            if(Ticks_Synchro_Right < 1) Ticks_Synchro_Right = 1;
+            if(Ticks_Synchro_Right > TicksPerBeat + 1) Ticks_Synchro_Right = TicksPerBeat + 1;
+            Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+    }
+}
+
+void Mouse_Sliders_Fx_Ed(void)
+{
+    if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
+    {
+        if(zcheckMouse(77, 498, 148, 16))
+        {
+            Feedback = float(float(Mouse.old_x - 87) / 127.0f);
+            if(Feedback < 0) Feedback = 0;
+            if(Feedback > 0.99f) Feedback = 0.99f;
+
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 2;
+        }
+        
+        if(zcheckMouse(77, 534, 148, 16))
+        {
+            c_threshold = Mouse.old_x - 87;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 7;
+        }
+        if(zcheckMouse(77, 552, 148, 16))
+        {
+            REVERBFILTER = (float)(Mouse.old_x - 87) / 128.0f;
+            if(REVERBFILTER < 0.0f) REVERBFILTER = 0.0f;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 9;
+        }  
+        if(zcheckMouse(307, 480, 148, 16))
+        {
+            lchorus_delay = (Mouse.old_x - 317) * 174;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 3;
+        }
+        if(zcheckMouse(307, 498, 148, 16))
+        {
+            rchorus_delay = (Mouse.old_x - 317) * 174;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 4;
+        }
+        if(zcheckMouse(307, 516, 148, 16))
+        {
+            lchorus_feedback = float(Mouse.old_x - 317) / 127;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 5;
+        }
+        if(zcheckMouse(307, 534, 148, 16))
+        {
+            rchorus_feedback = float(Mouse.old_x - 317) / 127;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 6;
+        }
+    } // userscreen
+}
+
+void Mouse_Right_Fx_Ed(void)
+{
+    if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
+    {
+        // Ticks synchro left
+        if(zcheckMouse(534, 480, 16, 16) == 1)
+        {
+            Ticks_Synchro_Left -= 10;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 10;
+        }
+        if(zcheckMouse(578, 480, 16, 16) == 1)
+        {
+            Ticks_Synchro_Left += 10;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 10;
+        }
+
+        // Ticks synchro right
+        if(zcheckMouse(534, 498, 16, 16) == 1)
+        {
+            Ticks_Synchro_Right -= 10;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 11;
+        }
+        if(zcheckMouse(578, 498, 16, 16) == 1)
+        {
+            Ticks_Synchro_Right += 10;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 11;
+        }
+    }
+}
+
+void Mouse_Left_Fx_Ed(void)
+{
+    if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
+    {
+
+        // Delay type
+        if(zcheckMouse(79, 516, 16, 16) == 1)
+        {
+            DelayType--;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 1;
+        }
+        // Delay type
+        if(zcheckMouse(79 + 44, 516, 16, 16) == 1)
+        {
+            DelayType++;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 1;
+        }
+
+        // Ticks synchro left
+        if(zcheckMouse(534, 480, 16, 16) == 1)
+        {
+            Ticks_Synchro_Left--;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 10;
+        }
+        if(zcheckMouse(578, 480, 16, 16) == 1)
+        {
+            Ticks_Synchro_Left++;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 10;
+        }
+
+        // Ticks synchro right
+        if(zcheckMouse(534, 498, 16, 16) == 1)
+        {
+            Ticks_Synchro_Right--;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 11;
+        }
+        if(zcheckMouse(578, 498, 16, 16) == 1)
+        {
+            Ticks_Synchro_Right++;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 11;
+        }
+
+        if(zcheckMouse(596, 480, 32, 16) == 1)
+        {
+            lchorus_delay = SamplesPerTick * Ticks_Synchro_Left;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 3;
+        }
+        if(zcheckMouse(596, 498, 32, 16) == 1)
+        {
+            rchorus_delay = SamplesPerTick * Ticks_Synchro_Right;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 4;
+        }
+
+        if(compressor == 0 && zcheckMouse(79, 480, 32, 16) == 1)
+        {
+            compressor = 1;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 8;
+        }
+        if(compressor == 1 && zcheckMouse(113, 480, 32, 16) == 1)
+        {
+            compressor = 0;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 8;
+        }  
+    }
+}

@@ -1,0 +1,591 @@
+===============================================================================
+ProTrekkr Docs
+===============================================================================
+
+Contents
+--------
+
+- Introduction
+- How to install (Windows *ONLY*)
+- Compressed modules
+- FAQ/Troubleshooting
+- The sequencer
+- Keyboard Shortcuts
+- Keyboard Localization (Linux only)
+- Thanks to...
+
+===============================================================================
+INTRODUCTION
+===============================================================================
+
+ProTrekkr (formerly known as NoiseTrekker) is an attempt to create a tracker
+program targetting the creation of electronic music for small sized intros
+& games by combining a synthesizer together with a traditional samples tracker.
+
+ProTrekkr is a music workstation composed of:
+
+ - 16 tracks sampler.
+ - Sample editor (support up to 16 bits stereo samples).
+ - Pattern based tracker style sequencer.
+ - 16 tracks synthesizer with custom waveforms support.
+ - 2 303s units.
+ - Wav files import/export.<br>
+ - Multi fx engine with reverb, distortion, filters, delay, EQs, flanger, etc.
+ - Midi in/out support.
+ - .mod files import.
+ - Samples compressor handling Gsm/Mp3/TrueSpeech.
+ - Replay routine to be included & used inside your own programs.
+
+ProTrekkr is a FREEWARE tool, this means that you can use it for whatever
+you want and for free, but if you're planning to release any commercial stuff
+with it (who knows), i would be glad if you could mention the original authors
+of that program, especially Arguru (even if the original code has been heavily
+modified) and myself, eventually.
+
+Also, There's NO GUARANTEE that this program will perform well or even run on
+your computer.
+
+If you like the program and find it useful: congratulations, enjoy it and make
+some more music and 64k intros. :]
+
+===============================================================================
+HOW TO INSTALL (Windows *ONLY*)
+===============================================================================
+
+Simply copy the files lame_acm.xml & lameACM.acm located in the install
+directory into the system directory of the OS (usually Windows/system32).
+
+The particular version of the lame mp3 encoder will strip some datas off
+compared to the official one (thus producing slightly smaller files).
+
+===============================================================================
+COMPRESSED MODULES
+===============================================================================
+
+These modules can be recognized as they're using the ".ptp" extension
+(normal modules use ".ptk"), they can be reloaded inside the tracker so the
+musician can actually hear how damaged by the lossy compression they've been,
+there's two commands related to compressed modules:
+
+"Save packed": Create a module with extension ".ptp" in the current directory.
+"Calc packed": Calculate (roughly) the size that the module would take once
+                 used in an intro.
+
+Samples inside .ptp modules can be packed, the user have the ability to select
+the packing algorithm which'll be used (GSM, MP3, TRUESPEECH or no compression
+at all) on a per sample basis, the 3 available compression schemes are lossy.
+
+GSM: Adapted to drums/snares.
+
+MP3: Adapted for longer samples like cymbals (it's tuned to pack at 64kbits).
+
+True Speech: Adapted for human voices
+     (you can use some track effects to cover the radio like quality).
+
+None: Adapted for very short ("chip") samples
+      (if you want to keep perfect quality).
+
+      Note that this is the only way to save packed samples if the tracker
+      has been compiled without codecs supports.
+
+The .ptp are the only modules format recognized by the replay routine.
+
+Note: The MP3 compression might not work on a bare bone Windows 2000
+      (it works on any others).
+
+Note2: When a packing is selected for a sample (other than none)
+       samples are reconstructed by interpolation.
+
+Alongside with the .ptp are the optional .psy files which contain possible
+synchro informations related to the effect "07" used within the patterns,
+the .psy file format is as follow:
+
+Header:
+
+1.w: number of synchros
+
+Synchro datas * number of synchros:
+
+1.b: position
+1.b: row
+1.b: fx data
+
+Note: The fx data field is removed from the .ptp files
+      and moved to the .psy files.
+
+Note2: Only one fx per position/row is saved.
+
+===============================================================================
+F.A.Q./TROUBLESHOOTING
+===============================================================================
+
+-------------------------------------------------------------------------------
+Q> No Fasttracker support, no 53194 tracks ?
+   No etc...?, "m... i dont like the gui, the key shortcuts,
+   you should have to..."
+-------------------------------------------------------------------------------
+A1> Get a compiler and code the best tracker ever. I'm sure you'll do fine.
+A2> Use fastracker, impulse tracker, buzz or whatever stuff you want.
+A3> Use your browser and search for some stuff...
+
+-------------------------------------------------------------------------------
+Q> I Cannot run the program! Any idea ?
+-------------------------------------------------------------------------------
+A> If u have got a SBLive, try disabling EMU driver on your soundcard.
+   Be sure you have got lastest DirectX drivers for your stuff [gfx/sfx card]
+   and DirectX6.1 or above installed.
+   [Microsoft DirectX 6.1 or above is required to run ptk]
+   Ptk won't run on Windows NT, it should run on Windows 95, 98, 2k, xp
+   and (possibly) vista. Also, might not work with some goofy gfx/sfx cards.
+
+-------------------------------------------------------------------------------
+Q> Well, the program runs ok but ... how I can quit it ?
+-------------------------------------------------------------------------------
+A> Click 2 times on the exit button.
+   Or just close the window if you're running ptk in windows mode.
+   Alternatively, you can also use the key combo: LALT + F4.
+
+-------------------------------------------------------------------------------
+Q> Ehh Everything sounds clicks, distorted and weird !!?
+-------------------------------------------------------------------------------
+Plan A> Try to use higher latency in Misc. Setup section.
+        This means that the CPU is not having enough time to render/fill
+        the audio buffer data, and this produce clicking...
+Plan B> Buy a faster computer.
+
+-------------------------------------------------------------------------------
+Q> How I play 303 patterns in ptk ?
+-------------------------------------------------------------------------------
+A> Use ptk command 31xy and 32xy. 31xy will trigger pattern 'y' (1-8)
+   from bank 'x' (A-D) from the first 303 unit
+   (ptk has got 2 303 units, just like Rebirth).
+
+Example
+-------
+
+  --- .. .. .. 31A3 <- Play the 3th pattern of the bank A of the 1st 303 unit.
+  --- .. .. .. 0000 
+  --- .. .. .. 0000 
+  --- .. .. .. 0000 
+  Off .. .. .. 0000 <- Switch the 303 unit off.
+
+The 303 unit 1 will be assigned to the track 0 stream.
+
+This means, that panning, fx setup, filter settings of the track will be
+applied to the sound of the 303 unit 1.
+
+To play the second 303 unit, use the same method but with 32xy command
+instead of 31. To stop 303 playing [patterns are played "looped" continuously]
+just put a note off (Right shift key) on the track were it was triggered.
+
+Also, using -3100- or -3200- will replay the patterns that are currently
+selected on the 303 editor. Can be handy while composing basslines.
+
+Btw: 303 engine will not "eat" the track sampler/csynth engine,
+     so you can have both playing ex. a bassdrum and a 303 line
+     on the same track.
+
+Also, both 303 units can be triggered in the same track.
+Well, just play with them :].
+
+-------------------------------------------------------------------------------
+Q> Oh!, the 303 sounds great, will you code a 'buzz' port ?
+-------------------------------------------------------------------------------
+A> Nope.
+
+-------------------------------------------------------------------------------
+Q> How I can record 303 or the tracks tweakings on the fly ?
+-------------------------------------------------------------------------------
+A> Press the "Live Rec: OFF" [top/left of the screen] button
+   and, voila, the 303 tweakings or current track are autofilled on pattern
+   while the tune is being played.
+
+-------------------------------------------------------------------------------
+Q> How I can alter 303s CutOff, Resonance, etc.. on the pattern while playing ?
+-------------------------------------------------------------------------------
+A> Easy, just use the 303 special pattern commands.
+   They're very useful to automatize 303 stuff.
+
+-------------------------------------------------------------------------------
+Q1> What're the pattern commands effects on ptk ?
+    Are they the same as .xm or .mod ?
+-------------------------------------------------------------------------------
+A> No they aren't, this is the complete list of the pattern effects:
+
+    General
+    -------
+
+    Command '00': No Effect
+    Command '01': Pitch Up (Disabled when using Arpeggio)
+    Command '02': Pitch Down (Disabled when using Arpeggio)
+    Command '03': Volume
+    Command '04': Trance Slicer
+    Command '05': Glider (Disabled when using Arpeggio)
+    Command '06': Pattern Loop (0600 sets the loop point; 06xx loops xx times)
+    Command '07': FX Synchro
+    Command '08': Set Filter CutOff
+    Command '09': Set Sample Play Offset (256 bytes steps).
+    Command '0A': Randomize Filter CutOff
+    Command '0B': Filter CutOff Slide Up
+    Command '0C': Filter CutOff Slide Down
+    Command '0D': Jump To Next Sequencer Position (aka pattern break)
+    Command '0E': Note Retrigger
+    Command '0F': Set Number Of Ticks Per Beat
+    Command '10': Set Delay/Echo Send
+    Command '11': Set Reverb Send
+    Command '12': Set Distortion Threshold
+    Command '13': Set Distortion Clamp
+    Command '14': Set Filter Resonance
+    Command '15': Set Filter Type
+    Command '16': Reset Filter LFO
+    Command '17xx': Auto Fade In in 'xx' ticks
+    Command '18xx': Auto Fade Out in 'xx' ticks
+    Command '19': Volume Up
+    Command '1A': Volume Down
+    Command '1B': Arpeggio (1Bxx to turn on / 1B00 to turn off):
+
+                  C-7 00 .. .. 1B37 <- Turn it on
+                  --- .. .. .. 0000
+                  --- .. .. .. 0000
+                  --- .. .. .. 0000
+                  --- .. .. .. 1B38 <- Change datas
+                  --- .. .. .. 0000
+                  --- .. .. .. 0000
+                  --- .. .. .. 0000
+                  --- .. .. .. 1B00 <- Turn it off
+
+    Command 'F0': Set BPM speed
+
+    303 Triggering
+    --------------
+
+    Command '31xy': Trigger 303 Bassline [Unit 1] Bank 'x' (A-D)
+                                                  Pattern 'y' (1-8),
+                    also '00' will trigger current selected pattern.
+    Command '32xy': Trigger 303 Bassline [Unit 2] Bank 'x' (A-D)
+                                                  Pattern 'y' (1-8),
+                    also '00' will trigger current selected pattern.
+
+
+    303 Controllers
+    ---------------
+
+    Where 'xx' is a number between $00 and $FF [hex]
+
+    Command '33xx': Set 303 [Unit 1] Filter Cutoff
+    Command '34xx': Set 303 [Unit 2] Filter Cutoff
+    Command '35xx': Set 303 [Unit 1] Filter Resonance
+    Command '36xx': Set 303 [Unit 2] Filter Resonance
+    Command '37xx': Set 303 [Unit 1] Filter Env Mod
+    Command '38xx': Set 303 [Unit 2] Filter Env Mod
+    Command '39xx': Set 303 [Unit 1] Filter Decay
+    Command '3Axx': Set 303 [Unit 2] Filter Decay
+    Command '3Bxx': Set 303 [Unit 1] Accent
+    Command '3Cxx': Set 303 [Unit 2] Accent
+    Command '3Dxx': Set 303 [Unit 1] Tune
+    Command '3Exx': Set 303 [Unit 2] Tune
+
+    Volume column
+    -------------
+
+    Command 'F0': Note cut
+
+    Midi
+    ----
+
+    Command '80': Set Patch Bank [MIDI]
+                  (might not work on all midi equipments)
+                  (won't work in the replay routine)
+                  (won't work if the tracker was compiled without midi support)
+
+    Read below how you can send MidiOut controller messages
+    and read the manual of your gear to how send RRPN messages
+    using this midiOut messages, also, you might find here the
+    midi implementation table of your hardware.
+
+-------------------------------------------------------------------------------
+Q> How to use Midi In/Out ?
+-------------------------------------------------------------------------------
+A> First of all, midi in & out capabilities of this program are rather
+   *primitive* to say the least.
+
+   Follow these steps:
+
+    1 - Go to Misc. Setup section and select a midi in or out device to use
+        (ptk only supports one device at a time).
+
+    2 - Go to instrument section, and select a MIDI PRG
+        (the default is N/A, which means no midi program selected).
+
+    3 - Go to track section and here u can assign a midi channel
+        to each track of ptk.
+
+    4 - Play notes :]. Note off works. F'x' note cut command also works too,
+        and note-volume command (speed) is supported.
+
+   Also, you can change midicontrollers in the tracker,
+   using '90' in the panning row:
+
+   ex:
+       C-3 02 .. .. 0000  
+       --- .. .. 90 xxyy <-- This will change the value 
+       --- .. .. .. 0000     of the controller n.'xx' to 'yy' [both in hex]
+       --- .. .. .. 0000
+
+   So "--- .. .. 90 2040" will change the controller number $20(32) to $40(64).
+
+   You will need the midi implementation table of your gear to know
+   what you can change with midi controller messages.
+   Probably, it's located at the end of the manual =].
+
+-------------------------------------------------------------------------------
+Q> Audio & Midi are not synchronized, what I can do ?
+-------------------------------------------------------------------------------
+A1> Buy a commercail software package.
+A2> Well, there is a nasty trick to synchronize both.
+    It's a bit hardcore but work with me:
+
+    Simply put one line down to all midi notes on your pattern [use Insert key]
+    and go to 'Misc. Setup', adjust the latency and just search a value
+    that will make sound sync both audio/midi.
+
+-------------------------------------------------------------------------------
+Q> The stock Sin/Saw/Pulse and Rnd waveforms are too simple/common,
+   is there a way to use something more complex/rich ?
+-------------------------------------------------------------------------------
+A> You have to ability to redirect the waveforms of the instruments
+   through the synth pipe by selecting the "wav" option for the oscillator
+   you're using for this synth instrument, samples can be used as wavetables
+   to replace the stock signals.
+
+===============================================================================
+THE SEQUENCER
+===============================================================================
+
+The sequencer used in ptk is a little bit different from those usually found
+in other trackers, the user have the ability to re-use patterns with different
+tracks playing state configurations:
+
+       Tracks can be turned on/off by left clicking on their digits.
+       (Inactive tracks will be displayed with a darker font color).
+       (Right clicking will solo/unmute all tracks alternatively).
+       |
+000    |             000
+000    |             000
+000    |             000
+000 01234567         001
+001 01234567         002
+002 0123-567         003
+003 012-4-67         003 <- Ex: The pattern number 3 will be played during
+ |                    |         song position 3 with it's 3th and 5th tracks
+ |                    |         disabled.
+ |                    |
+ |                    |
+ |                    Click Left or right mouse button on the right digits to
+ |                    increase the pattern associated with the current position
+ |
+ Click on the position to position the seqeucner on it.
+
+(The mouse wheel can also be used to scroll through positions sequence).
+
+===============================================================================
+KEYBOARD SHORTCUTS
+===============================================================================
+
+Playing
+-------
+
+  RCTRL:                           Play song
+  RALT:                            Play pattern
+  Left mouse on 'Play Sng/Pttrn':  Play song.
+  Right mouse on 'Play Sng/Pttrn': Play pattern.
+  Left mouse on 'Edit/Record':     Edit mode on/off.
+  Right mouse on 'Edit/Record':    Record mode on/off.
+
+Editing
+-------
+
+  TAB:                             Go to next track
+  LSHIFT + TAB:                    Go to prev. track
+  SPACE:                           Toggle Edit mode On & Off.
+                                   (Also stop if the song is being played)
+  SHIFT SPACE:                     Toggle Record mode On & Off
+                                   (Wait for a key note to be pressed
+                                    or a midi in message to be received)
+  DOWN ARROW:                      1 Line down
+  UP ARROW:                        1 Line up
+  LEFT ARROW:                      1 Row left
+  RIGHT ARROW:                     1 Row right
+  PREV. PAGE:                      16 Arrows Up
+  NEXT PAGE:                       16 Arrows Down
+  HOME / END:                      First / last track
+  LCTRL + HOME / END:              Top left / Bottom right of pattern
+  F5, F6, F7, F8, F9:              Jump to 0, 16, 32, 48, 63 line
+  + - (Numeric keypad):            Next / Previous pattern
+  LCTRL + LEFT / RIGHT:            Next / Previous pattern
+  LCTRL + LALT + LEFT / RIGHT:     Next / Previous position
+  LALT + LEFT / RIGHT:             Next / Previous instrument
+  LSHIFT + M:                      Toggle mute state of the current channel
+  LCTRL + LSHIFT + M:              Solo the current track / Unmute all
+  LSHIFT + F1 - F10:               Select the different tabs
+
+Tracking
+--------
+
+  1st and 2nd keys rows:           Upper octave row
+  3rd and 4th keys rows:           Lower octave row
+  RSHIFT:                          Insert a note off
+  / and * (Numeric keypad):        -1 or +1 octave
+  INSERT / BACKSPACE:              Insert or Delete an empty line
+                                   in current track
+  LSHIFT + INSERT / BACKSPACE:     Insert or Delete an empty line
+                                   in current pattern
+  DELETE (NOT BACKSPACE):          Overwrite an empty note
+  F1:                              Select lower octave
+  F2:                              Select higher octave
+
+Blocks
+------
+
+  (Blocks can also be selected with the mouse by holding the right button
+   and scrolling the pattern with the mouse wheel).
+
+  LCTRL + A:          Select entire current track
+  LCTRL + LSHIFT + A: Select entire current pattern
+  LCTRL + B:          Set start of a block
+  LCTRL + E:          Set end of a block
+  LCTRL + X:          Cut the selected block and copy it into the block-buffer
+  LCTRL + C:          Copy the selected block into the block-buffer
+  LCTRL + V:          Paste the data from the block buffer into the pattern
+  LCTRL + I:          Interpolate selected datas from the first
+                      to the last row of a selection
+
+                      example:
+                      (assuming only the 2 effects datas columns are selected)
+
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  00
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  02
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  05
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  08
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  0A
+                      C-3  04  ..  ..  09  00 ---> C-3  04  ..  ..  09  0D
+                      C-3  04  ..  ..  09  10 ---> C-3  04  ..  ..  09  10
+
+                     Cool to make cutoff transitions, etc...
+                     (You can also switch on the Slider Rec to On,
+                      and perform parameter-live-recording, such as cutoff,
+                      resonance or panning tweaking, etc..)
+
+                     Note: this command (as well as the randomize one below)
+                           only works for volume/panning and fx datas columns.
+
+  LSHIFT + ARROWS
+           PREV. PAGE
+           NEXT PAGE: Select a block
+
+  LCTRL + R:          Randomize the select columns of a selection,
+                      works similar to CTRL + I, but it randomizes values
+                      instead of interpolating them.
+
+  LCTRL + U:          Transpose the note of a selection to 1 seminote higher
+  LCTRL + D:          Transpose the note of a selection to 1 seminote lower
+  LCTRL + LSHIFT + U: Transpose the note of a selection to 1 seminote higher
+                      (only for the current instrument)
+  LCTRL + LSHIFT + D: Transpose the note of a selection to 1 seminote lower
+                      (only for the current instrument)
+
+Misc.
+-----
+
+  LALT + ENTER:       Switch between fullscreen / windowed mode
+  LALT + F4:          Exit program
+  LCTRL + S:          Save current module
+
+===============================================================================
+KEYBOARD LOCALIZATION
+===============================================================================
+
+In order to keep a constant layout for the keyboard, the tracker uses locale
+keyboards text definitions which are located within the skins directory.
+
+These files contains the full name of the region on the first line
+and the 37 ASCII codes used for that particular type of keyboard
+(the keys layout) following on 4 rows.
+
+To add a new keyboard definition:
+
+first copy an already existing file and rename it after the keyboard's country
+it is supposed to describe, modify the 4 rows then edit the skin.xml file
+and insert it's file's name into the value key of the "keyboards" tag
+along with the others.
+
+Load (or reload) the tracker and select the new keyboard
+in the Misc. Setup panel.
+
+Hexadecimal notation is allowed in the form 0xXXXX or just plain ASCII.
+(it *may* work with unicode characters but i haven't tested it).
+
+You can eventually submit a new keyboard layout at: hitchhikr@australia.edu
+
+===============================================================================
+THANKS TO...
+===============================================================================
+
+Arguru:
+
+  The original NoiseTrekker (you may be gone but your code lives on).
+
+Daxx,
+Teis,
+Kaneel,
+Ne7,
+Preacher,
+Mice ,
+Kmuland,
+Manwe,
+Manbearpig,
+Misioslaw,
+Raina,
+Grusbanan,
+Syphus,
+Nula,
+Little bitchard,
+Lemmon,
+cp:
+
+  Beta testing, ideas & bugs reports.
+
+Nula / Clrsrc:
+
+  Ordinary-Zero.ptk
+
+Mice / Brainstorm:
+
+  Bitchbiker.ptk
+
+Rhino / Torment:
+
+  Round A Bout.ptk
+  Jameson.ptk
+  Money.ptk
+  Dragon.ptk
+  Chemistry.ptk
+  Brass Tacks.ptk
+
+Tomchi:
+
+  devenirunpoulet.ptk
+
+Michael Wolniak, AAS Tao, Arguru:
+
+  Presets and instruments.
+
+Leonid:
+
+  303 skin.
+
+Alien & Kenet:
+
+  The startup logo.
+
+===============================================================================

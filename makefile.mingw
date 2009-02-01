@@ -1,0 +1,113 @@
+LIBS = src/extralibs/tinyxml/tinyxml.o \
+       src/extralibs/tinyxml/tinyxmlparser.o \
+       src/extralibs/tinyxml/tinystr.o \
+       src/extralibs/tinyxml/tinyxmlerror.o \
+       -lmingw32 -lsdlmain -lSDL -ldsound -lmsacm32 -lwinmm -lsdldraw -lz
+FLAGS = -mwindows -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -D G_OS_WIN32 -D __WIN32__ -D MINGW
+EXEOBJS = main.o \
+          editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
+          patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
+          editor_diskio.o editor_instrument.o \
+          samples_pack.o files_list.o files.o \
+          capture_midi.o \
+          timer.o interface.o \
+          misc_draw.o xml.o \
+          riff.o \
+          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o \
+          sounddriver.o
+
+all: ProTrekkr
+
+clean: RemObj
+
+RemObj:
+	-rm -f $(EXEOBJS)
+
+ProTrekkr: $(EXEOBJS)
+	g++ -o ./release/distrib/ptk_win.exe -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	strip -s -x ./release/distrib/ptk_win.exe
+	-rm -f $(EXEOBJS)
+	
+main.o: src/main.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/$(*).cpp
+
+editor_303.o: src/editors/editor_303.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_pattern.o: src/editors/editor_pattern.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_sequencer.o: src/editors/editor_sequencer.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_track.o: src/editors/editor_track.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_track_fx.o: src/editors/editor_track_fx.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+patterns_blocks.o: src/editors/patterns_blocks.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_synth.o: src/editors/editor_synth.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_sample.o: src/editors/editor_sample.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_fx_setup.o: src/editors/editor_fx_setup.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_setup.o: src/editors/editor_setup.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_diskio.o: src/editors/editor_diskio.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+editor_instrument.o: src/editors/editor_instrument.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+
+samples_pack.o: src/files/samples_pack.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+
+files_list.o: src/files/files_list.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+
+files.o: src/files/files.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+
+capture_midi.o: src/midi/capture_midi.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/midi/$(*).cpp
+
+timer.o: src/support/timer.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/support/$(*).cpp
+
+interface.o: src/support/interface.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/support/$(*).cpp
+
+misc_draw.o: src/ui/misc_draw.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/ui/$(*).cpp
+
+xml.o: src/ui/xml.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/ui/$(*).cpp
+
+riff.o: src/wav/riff.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/wav/$(*).cpp
+
+tb_303.o: release/distrib/replay/lib/tb_303.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+cubic_spline.o: release/distrib/replay/lib/cubic_spline.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+replay.o: release/distrib/replay/lib/replay.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+synth.o: release/distrib/replay/lib/synth.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+sounddriver.o: release/distrib/replay/lib/sounddriver/sounddriver.cpp
+	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp

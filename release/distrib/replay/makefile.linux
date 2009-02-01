@@ -1,0 +1,23 @@
+LIBS = -lptkreplay -lpthread
+FLAGS = -O2 -mms-bitfields -D G_OS_WIN32 -D __LINUX__ -D MINGW -D STAND_ALONE -D NOCODEC -D NOMIDI
+EXEOBJS = test.o module.o
+
+all: ptkreplay replaytest
+clean: remobj
+
+remobj:
+	-rm -f $(EXEOBJS)
+	
+replaytest: $(EXEOBJS)
+	g++ -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	strip -s -x $(@)
+	-rm -f $(EXEOBJS)
+
+test.o: test/test.cpp
+	g++ -c -o $(@) $(FLAGS) test/test.cpp
+
+module.o: test/module.s
+	as -o $(@) test/module.s
+
+# the library itself #
+include lib/makefile

@@ -1,0 +1,39 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: zlib - Win32 LIB ASM Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPEF.tmp" with contents
+[
+/nologo /out:"..\..\..\..\..\zlib.lib" 
+".\Win32_LIB_ASM_Release\adler32.obj"
+".\Win32_LIB_ASM_Release\compress.obj"
+".\Win32_LIB_ASM_Release\crc32.obj"
+".\Win32_LIB_ASM_Release\deflate.obj"
+".\Win32_LIB_ASM_Release\gzio.obj"
+".\Win32_LIB_ASM_Release\infback.obj"
+".\Win32_LIB_ASM_Release\inffast.obj"
+".\Win32_LIB_ASM_Release\inflate.obj"
+".\Win32_LIB_ASM_Release\inftrees.obj"
+".\Win32_LIB_ASM_Release\trees.obj"
+".\Win32_LIB_ASM_Release\uncompr.obj"
+".\Win32_LIB_ASM_Release\zutil.obj"
+".\Win32_LIB_ASM_Release\gvmat32c.obj"
+".\Win32_LIB_ASM_Release\zlib1.res"
+".\Win32_LIB_ASM_Release\gvmat32.obj"
+".\Win32_LIB_ASM_Release\inffas32.obj"
+]
+Creating command line "link.exe -lib @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPEF.tmp"
+<h3>Output Window</h3>
+Creating library...
+
+
+
+<h3>Results</h3>
+zlib.lib - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
