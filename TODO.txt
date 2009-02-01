@@ -24,6 +24,8 @@ TODO:
  - Click on numbers & move the mouse to modify them (or use the wheel).
  - More shortcuts.
  - Small / big fonts for patterns.
+ - Channels polyphony.
+ - Alternate way to enter notes (a la fruity loops).
  
  - Use more xml scripting to completely customize the interface.
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
