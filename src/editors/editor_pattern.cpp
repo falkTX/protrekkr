@@ -419,6 +419,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     int dover;
     int synchro_fx = FALSE;
     int Fx_Color;
+    int tracky;
 
     if(!In_Prev_Next) Shadow_Pattern = 0;
     else Shadow_Pattern = 1;
@@ -429,10 +430,19 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         if(rel % patt_highlight == 0) multip = true;
     }
     cur_column = (track * 11);
-    
-    for(int tracky = 0; tracky < tvisiblecolums; tracky++)
-    {
 
+    // Browse all tracks to seek synchro markers
+    for(tracky = 0; tracky < Songtracks; tracky++)
+    {
+        offset_t = (rel * 96 + (tracky * 6)) + pattern * 12288;
+        unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
+        unsigned char p_eh_sync = p_e_sync & 0xf;
+
+        if((p_e_sync >> 4) == 0) if(p_eh_sync == 0x07) synchro_fx = TRUE;
+    }
+    
+    for(tracky = 0; tracky < tvisiblecolums; tracky++)
+    {
         dover = tracky * PAT_COL_MAX;
 
         // Read the datas
@@ -448,6 +458,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         unsigned char p_eh = p_e & 0xf;
         unsigned char p_f = *(RawPatterns + offset_t + 5);
         unsigned char p_fh = p_f & 0xf;
+
 
         // Note
         cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
@@ -511,7 +522,6 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         Letter(PAT_COL_EFFECTS + 8 + PAT_COL_SHIFT + dover, y, p_eh, cur_color, cur_color + 7);
         cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
         
-        if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
         Letter(PAT_COL_EFFECTS + 16 + PAT_COL_SHIFT + dover, y, p_f >> 4, cur_color, cur_color + 7);
         cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
         Letter(PAT_COL_EFFECTS + 24 + PAT_COL_SHIFT + dover, y, p_fh, cur_color, cur_color + 7);
@@ -561,7 +571,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     }
     if(synchro_fx)
     {
-        Letter(2, y, Fx_Color, 0, 0);
+        Letter(24, y, Fx_Color, 0, 0);
     }
 }
 
@@ -576,6 +586,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
     int pattern;
     int Cur_Position;
     int synchro_fx = FALSE;
+    int tracky;
 
     int tvisiblecolums = visiblecolums;
 
@@ -586,16 +597,24 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
     if(RawPatterns)
     {
-
         if(tvisiblecolums > Songtracks) tvisiblecolums = Songtracks;
+
+        // Browse all tracks to seek synchro markers
+        for(tracky = 0; tracky < Songtracks; tracky++)
+        {
+            offset_t = (line * 96 + (tracky * 6)) + pattern * 12288;
+            unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
+            unsigned char p_eh_sync = p_e_sync & 0xf;
+
+            if((p_e_sync >> 4) == 0) if(p_eh_sync == 0x07) synchro_fx = TRUE;
+        }
 
         SetColor(COL_PATTERN_LO_BACK);
         bjbox(0, YVIEW, (PAT_COL_MAX * tvisiblecolums) + 16 + 4, 16);
 
         cur_column = (track * 11);
-        for(int tracky = 0; tracky < tvisiblecolums; tracky++)
+        for(tracky = 0; tracky < tvisiblecolums; tracky++)
         {
-
             dover = tracky * PAT_COL_MAX;
 
             char tri = track + tracky;
@@ -609,7 +628,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             unsigned char p_ch = p_c & 0xf;
             unsigned char p_d = *(RawPatterns + offset_t + 3);
             unsigned char p_dh = p_d & 0xf;
-            unsigned char p_e = *(RawPatterns+offset_t + 4);
+            unsigned char p_e = *(RawPatterns + offset_t + 4);
             unsigned char p_eh = p_e & 0xf;
             unsigned char p_f = *(RawPatterns + offset_t + 5);
             unsigned char p_fh = p_f & 0xf;
@@ -822,7 +841,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         }
         if(synchro_fx)
         {
-            Letter(2, YVIEW + 4, 33, 0, 0);
+            Letter(24, YVIEW + 4, 33, 0, 0);
         }
     }
 }

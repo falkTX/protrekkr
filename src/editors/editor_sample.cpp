@@ -85,7 +85,7 @@ void Draw_Sampled_Wave(void)
             Realslider3(0, 559, sed_display_start, sed_display_length, SampleNumSamples[ped_patsam][ped_split], 512, TRUE);
 
             if(SampleType[ped_patsam][ped_split] > 0)
-            { /* Any Sample Out There? */
+            { // Any Sample Out There?
                 int strober = SampleChannels[ped_patsam][ped_split] * 2;
                 int rcolor1;
                 int rcolor2;
@@ -253,7 +253,7 @@ void Draw_Sampled_Wave2(void)
     if(draw_sampled_wave2)
     {
         if(SampleType[ped_patsam][ped_split] > 0)
-        { /* Any Sample Out There? */
+        { // Any Sample Out There ?
             int strober = SampleChannels[ped_patsam][ped_split] * 2;
             int s_ey = 450 + (resty / strober);
             int s_ey2 = s_ey + ((resty / strober) * 2);
@@ -383,11 +383,11 @@ void Actualize_Wave_Ed(char gode)
 
             if(gode == 0 || gode == 6) mess_box("Full Vertical View...");
 
-            /* Sample Processing plant here */
+            // Sample Processing plant here
 
             // Sample editor functions code are implemented in this function.
 
-            /* Cut Sample */
+            // Cut Sample
             if(gode == 20)
             {
 
@@ -522,7 +522,7 @@ void Actualize_Wave_Ed(char gode)
                 mess_box("Selection calibrated...");
             }
 
-            /* Normalizing */
+            // Normalizing
             if(gode == 22)
             {
 
@@ -577,7 +577,7 @@ void Actualize_Wave_Ed(char gode)
                 mess_box("Selection maximized...");
             }
 
-            /* Fade In */
+            // Fade In
             if(gode == 23)
             {
                 mess_box("Fade In Selection...");
@@ -613,7 +613,7 @@ void Actualize_Wave_Ed(char gode)
                 mess_box("Finished...");
             }
 
-            /* Fade Out */
+            // Fade Out
             if(gode == 24)
             {
                 mess_box("Fade Out Selection...");
@@ -649,7 +649,7 @@ void Actualize_Wave_Ed(char gode)
                 mess_box("Finished...");
             }
 
-            /* Half */
+            // Half
             if(gode == 25)
             {
                 mess_box("Halving Selection Volume...");
@@ -677,7 +677,7 @@ void Actualize_Wave_Ed(char gode)
                 mess_box("Finished...");
             }
 
-            /* SAMPLE EDITOR FUNCTIONS */
+            // SAMPLE EDITOR FUNCTIONS
         }
         else
         {

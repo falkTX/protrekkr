@@ -28,7 +28,7 @@ void CSynth::Reset(void)
 {
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    /* Synthesizer General Reset */
+    // Synthesizer General Reset
     GS_VAL = 0;
     GLB_VOLUME = 1.0f;
     DISTO = 0.0f;

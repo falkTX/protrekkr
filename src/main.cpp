@@ -57,7 +57,7 @@ int ped_track = 0;
 int gui_track = 0;
 int xoffseted;
 float gr = 0;
-float synthsygnal = 0;
+float synthsignal = 0;
 
 char userscreen = USER_SCREEN_DISKIO_EDIT;
 int c_r_release = 0;
@@ -306,7 +306,7 @@ int Init_Context(void)
         return(FALSE);
     }
 
-    /* Player initialization */
+    // Player initialization
 #if defined(__WIN32__)
     if(!Ptk_InitDriver(Main_Window, AUDIO_Milliseconds))
 #else

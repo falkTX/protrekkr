@@ -2,6 +2,15 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.84b:
+
+- Added dream weaver.ptk from Rhino.
+- Fixed a bug which occured when loading presets files,
+  portamento glide was turned to 50% if it was off.
+- Divided the output level of the stock waveforms by 2.
+- Synchro markers are always visible now
+  (on the right of the columns rows numbers).
+
 v1.84:
 
 - Source code cleaned up, also the tracker is now using the same code as

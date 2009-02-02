@@ -199,8 +199,8 @@ int repeat_loop_counter;
 
 short patternLines[128];
 bool grown;
-float currsygnal;
-float currsygnal2;
+float currsignal;
+float currsignal2;
 unsigned int res_dec;
 unsigned int Currentpointer;
 
@@ -527,6 +527,7 @@ int STDCALL Ptk_InitDriver(void)
     float incr = 1.0f / 44100.0f;
     float stop = 2.0f;
     float x;
+    unsigned short temp_saw;
     short *wav_sin = STOCK_SIN;
     short *wav_saw = STOCK_SAW;
     short *wav_pul = STOCK_PUL;
@@ -556,7 +557,9 @@ int STDCALL Ptk_InitDriver(void)
         if(sinf(value) < 0.0f) *wav_pul++ = 32767;
         else *wav_pul++ = -32767;
 
-        *wav_saw++ = (unsigned short) (fmodf(x * 2.0f, 64.0f) * 32767.0f);
+        // There's a problem with fmodf->signed short in mingw here
+        temp_saw = (unsigned short) (fmodf(x * 2.0f, 64.0f) * 32767.0f);
+        *wav_saw++ = (short) (((float) (short) temp_saw));
 
         //*wav_pul++ = (short) (value2 * 16384.0f);
         //value = (float) ((PI * 2.0) * x);
@@ -583,7 +586,7 @@ int STDCALL Ptk_InitDriver(void)
         SIZE_WAVEFORMS++;
     }
 
-    /* Initializing SINETABLE */
+    // Initializing working SINETABLE
     for(i = 0; i < 360; i++)
     {
         SIN[i] = (float) sinf(i * 0.0174532f);
@@ -1497,6 +1500,7 @@ void Sp_Player(void)
         }
 
         PosInTick++;
+
 #if defined(PTK_SHUFFLE)
         if(PosInTick > SamplesPerTick + shufflestep)
         {
@@ -1514,6 +1518,7 @@ void Sp_Player(void)
         if(PosInTick > SamplesPerTick)
         {
 #endif
+
             SubCounter = 0;
             PosInTick = 0;
 
@@ -1631,8 +1636,8 @@ void Sp_Player(void)
     for(char c = 0; c < Songtracks; c++)
     {
         grown = false;
-        currsygnal = 0;
-        currsygnal2 = 0;
+        currsignal = 0;
+        currsignal2 = 0;
         bool gotsome = false;
 
         // If wav is selected in the synth we don't play it directly but through the synth.
@@ -1664,7 +1669,7 @@ ByPass_Wav:
 
                 Currentpointer = sp_Position[c].half.first;
 
-                currsygnal = Cubic_Work(
+                currsignal = Cubic_Work(
                             *(Player_WL[c] + Currentpointer - 1),
                             *(Player_WL[c] + Currentpointer),
                             *(Player_WL[c] + Currentpointer + 1),
@@ -1676,7 +1681,7 @@ ByPass_Wav:
                 if(Player_SC[c] == 2)
                 {
                     grown = true;
-                    currsygnal2 = Cubic_Work(*(Player_WR[c]+ Currentpointer - 1),
+                    currsignal2 = Cubic_Work(*(Player_WR[c]+ Currentpointer - 1),
                                              *(Player_WR[c] + Currentpointer),
                                              *(Player_WR[c] + Currentpointer + 1),
                                              *(Player_WR[c] + Currentpointer + 2),
@@ -1726,32 +1731,32 @@ ByPass_Wav:
             // We have no adsr for those
             if(!SACTIVE[cPosition][c])
             {
-                currsygnal = 0;
-                currsygnal2 = 0;
+                currsignal = 0;
+                currsignal2 = 0;
             }
         } // sp!!0
 
 #if defined(PTK_303)
         if(track3031 == c)
         {
-            currsygnal += tb303engine[0].tbGetSample();
+            currsignal += tb303engine[0].tbGetSample();
             gotsome = true;
         }
         if(track3032 == c)
         {
-            currsygnal += tb303engine[1].tbGetSample();
+            currsignal += tb303engine[1].tbGetSample();
             gotsome = true;
         }
 #endif
 
         if(Synthesizer[c].ENV1_STAGE || Synthesizer[c].ENV2_STAGE)
         {
-            currsygnal += Synthesizer[c].GetSample(Player_WL[c], Player_WR[c],
+            currsignal += Synthesizer[c].GetSample(Player_WL[c], Player_WR[c],
                                                    Player_SC[c],
                                                    Player_LT[c],
                                                    Player_LT[c] > SMP_LOOP_NONE ? Player_LE[c]: Player_NS[c],
                                                    Player_LT[c] > SMP_LOOP_NONE ? Player_LL[c]: 0,
-                                                   &currsygnal2,
+                                                   &currsignal2,
                                                    Rns[c], sp_Cvol[c] * Player_SV[c], &sp_Stage2[c], &sp_Stage3[c],
                                                    (Uint64 *) &sp_Position_osc1[c],
                                                    (Uint64 *) &sp_Position_osc2[c],
@@ -1799,13 +1804,12 @@ ByPass_Wav:
         }
 
         // -----------------------------------------------
-
         if(gotsome)
         {
 
 #if defined(PTK_TRACKFILTERS)
             if(FType[c] != 4)
-            { /* Track filter actived */
+            { // Track filter actived
                 float const dfi = TCut[c] - CCut[c];
 
                 if(dfi < -1.0 || dfi > 1.0f) CCut[c] += dfi * ICut[c];
@@ -1823,8 +1827,8 @@ ByPass_Wav:
                     coef[2] = coeftab[2][gco][FRez[c]][FType[c]];
                     coef[3] = coeftab[3][gco][FRez[c]][FType[c]];
                     coef[4] = coeftab[4][gco][FRez[c]][FType[c]];
-                    currsygnal = Filter(currsygnal + 1, c);
-                    if(grown) currsygnal2 = Filter(currsygnal2 + 1, c);
+                    currsignal = Filter(currsignal + 1, c);
+                    if(grown) currsignal2 = Filter(currsignal2 + 1, c);
 #endif
 
                 }
@@ -1840,158 +1844,158 @@ ByPass_Wav:
 
 #if defined(PTK_FILTER_LO24)
                         case 5:
-                            currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            if(grown) currsygnal2 = filter2p(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
+                            if(grown) currsignal2 = filter2p(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_LO48)
                         case 6:
-                            currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            currsygnal = filter2p24d(c, currsygnal + 1, realcut, (float) FRez[c]);
+                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
+                            currsignal = filter2p24d(c, currsignal + 1, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                currsygnal2 = filter2p(c, currsygnal2 + 1, realcut, (float) FRez[c]);
-                                currsygnal2 = filter2p24d(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                                currsignal2 = filter2p(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                                currsignal2 = filter2p24d(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
 
 #if defined(PTK_FILTER_LP24)
                         case 7:
-                            currsygnal = filter2p(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            currsygnal2 = filter2p24d(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
+                            currsignal2 = filter2p24d(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_AMODM)
                         case 8:
-                            currsygnal = filterRingMod(c, currsygnal, realcut, (float) FRez[c]);
-                            if(grown) currsygnal2 = filterRingMod(c, currsygnal2, realcut, (float) FRez[c]);
+                            currsignal = filterRingMod(c, currsignal, realcut, (float) FRez[c]);
+                            if(grown) currsignal2 = filterRingMod(c, currsignal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_AMODS)
                         case 9:
-                            currsygnal = filterRingMod(c, currsygnal, realcut, (float) FRez[c]);
-                            currsygnal2 = filterRingModStereo(c, currsygnal2);
+                            currsignal = filterRingMod(c, currsignal, realcut, (float) FRez[c]);
+                            currsignal2 = filterRingModStereo(c, currsignal2);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLEM)
                         case 10:
-                            currsygnal = filterWater(c, currsygnal, realcut, (float) FRez[c]);
-                            if(grown) currsygnal2 = filterWater(c, currsygnal2, realcut, (float) FRez[c]);
+                            currsignal = filterWater(c, currsignal, realcut, (float) FRez[c]);
+                            if(grown) currsignal2 = filterWater(c, currsignal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLES)
                         case 11:
-                            currsygnal = filterWater(c, currsygnal, realcut, (float) FRez[c]);
-                            currsygnal2 = filterWaterStereo(c, currsygnal2, realcut, (float) FRez[c]);
+                            currsignal = filterWater(c, currsignal, realcut, (float) FRez[c]);
+                            currsignal2 = filterWaterStereo(c, currsignal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM15)
                         case 12:
-                            currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], -15);
-                            if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], -15);
+                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], -15);
+                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], -15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM6)
                         case 13:
-                            currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], -6);
-                            if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], -6);
+                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], -6);
+                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], -6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP6)
                         case 14:
-                            currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], 6);
-                            if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], 6);
+                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], 6);
+                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], 6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP15)
                         case 15:
-                            currsygnal = filterBellShaped(c, currsygnal, realcut, (float) FRez[c], 15);
-                            if(grown) currsygnal2 = filterBellShaped(c, currsygnal2, realcut, (float) FRez[c], 15);
+                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], 15);
+                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], 15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DELTA)
                         case 16:
-                            currsygnal = filterDelta(c, currsygnal, realcut, (float) FRez[c]);
-                            if(grown) currsygnal2 = filterDelta(c, currsygnal2, realcut, (float) FRez[c]);
+                            currsignal = filterDelta(c, currsignal, realcut, (float) FRez[c]);
+                            if(grown) currsignal2 = filterDelta(c, currsignal2, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTL)
                         case 17:
-                            currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.25f);
-                            if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.25f);
+                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.25f);
+                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.25f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTM)
                         case 18:
-                            currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.56f);
-                            if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.56f);
+                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.56f);
+                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.56f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTH)
                         case 19:
-                            currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.78f);
-                            if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.78f);
+                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.78f);
+                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.78f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DIST)
                         case 20:
-                            currsygnal = int_filter2p(c, currsygnal, realcut, (float) FRez[c], 0.96f);
-                            if(grown) currsygnal2 = int_filter2p(c, currsygnal2, realcut, (float) FRez[c], 0.96f);
+                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.96f);
+                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.96f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12M)
                         case 21:
-                            currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            if(grown) currsygnal2 = filterhp(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
+                            if(grown) currsignal2 = filterhp(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12S)
                         case 22:
-                            currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            currsygnal2 = filterhp2(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
+                            currsignal2 = filterhp2(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP24M)
                         case 23:
-                            currsygnal = filterhp(c, currsygnal + 1, realcut, (float) FRez[c]);
-                            currsygnal = filterhp2(c, currsygnal + 1, realcut, (float) FRez[c]);
+                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
+                            currsignal = filterhp2(c, currsignal + 1, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                currsygnal2 = filterhp(c, currsygnal2 + 1, realcut, (float) FRez[c]);
-                                currsygnal2 = filterhp2(c, currsygnal2 + 1, realcut, (float) FRez[c]);
+                                currsignal2 = filterhp(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                                currsignal2 = filterhp2(c, currsignal2 + 1, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
 
                     } //SWITCHCASE [FILTERS]
                 }
-            } /* Filter end */
+            } // Filter end
 #endif // PTK_TRACKFILTERS
 
-            if(!grown) currsygnal2 = currsygnal;
+            if(!grown) currsignal2 = currsignal;
 
             if(new_instrument[c])
             {
-                currsygnal = (currsygnal * (1.0f - segue_volume[c])) + (Segue_SamplesL[c] * segue_volume[c]);
-                currsygnal2 = (currsygnal2 * (1.0f - segue_volume[c])) + (Segue_SamplesR[c] * segue_volume[c]);
+                currsignal = (currsignal * (1.0f - segue_volume[c])) + (Segue_SamplesL[c] * segue_volume[c]);
+                currsignal2 = (currsignal2 * (1.0f - segue_volume[c])) + (Segue_SamplesR[c] * segue_volume[c]);
                 Pos_Segue[c]++;
                 segue_volume[c] -= 1.0f / 127.0f;
                 if(Pos_Segue[c] >= 128)
@@ -2002,29 +2006,29 @@ ByPass_Wav:
             else
             {
                 // Store the transition
-                Segue_SamplesL[c] = currsygnal;
-                Segue_SamplesR[c] = currsygnal2;
+                Segue_SamplesL[c] = currsignal;
+                Segue_SamplesR[c] = currsignal2;
             }
 
             if(Disclap[c])
-            { /* Distortion */
-                if(currsygnal > DThreshold[c]) currsygnal = DClamp[c];
-                else if(currsygnal < -DThreshold[c]) currsygnal = -DClamp[c];
+            { // Distortion
+                if(currsignal > DThreshold[c]) currsignal = DClamp[c];
+                else if(currsignal < -DThreshold[c]) currsignal = -DClamp[c];
 
-                if(currsygnal2 > DThreshold[c]) currsygnal2 = DClamp[c];
-                else if(currsygnal2 < -DThreshold[c]) currsygnal2 = -DClamp[c];
+                if(currsignal2 > DThreshold[c]) currsignal2 = DClamp[c];
+                else if(currsignal2 < -DThreshold[c]) currsignal2 = -DClamp[c];
             }
 
-            currsygnal *= LVol[c];
-            currsygnal2 *= RVol[c];
+            currsignal *= LVol[c];
+            currsignal2 *= RVol[c];
 
             // 32-Bit HQ Interpolated System Flanger
 
 #if defined(PTK_FLANGER)
             if(FLANGER_ON[c])
             {
-                FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = currsygnal * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
-                FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = currsygnal2 * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
+                FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = currsignal * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
+                FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = currsignal2 * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
 
                 float fstep1 = powf(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
                 float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
@@ -2039,8 +2043,8 @@ ByPass_Wav:
 
                 oldspawn[c] = FLANGE_LEFTBUFFER[c][f2i(foff2[c])];
                 roldspawn[c] = FLANGE_RIGHTBUFFER[c][f2i(foff1[c])];
-                currsygnal += Filter_FlangerL(oldspawn[c]);
-                currsygnal2 += Filter_FlangerR(roldspawn[c]);
+                currsignal += Filter_FlangerL(oldspawn[c]);
+                currsignal2 += Filter_FlangerR(roldspawn[c]);
 
                 if(++FLANGER_OFFSET[c] > 16383) FLANGER_OFFSET[c] = 0;
                 FLANGER_GR[c] += FLANGER_RATE[c];
@@ -2060,8 +2064,8 @@ ByPass_Wav:
             {
                 // Dry Send
 
-                left_float += currsygnal;
-                right_float += currsygnal2;
+                left_float += currsignal;
+                right_float += currsignal2;
 
                 // Sending to delay...
 
@@ -2069,8 +2073,8 @@ ByPass_Wav:
 
                 if(DS > 0.008f)
                 {
-                    delay_left_final += currsygnal * DS;
-                    delay_right_final += currsygnal2 * DS;
+                    delay_left_final += currsignal * DS;
+                    delay_right_final += currsignal2 * DS;
                 }
 
                 // Sending to chorus
@@ -2079,8 +2083,8 @@ ByPass_Wav:
 
                 if(DC > 0.008f)
                 {
-                    left_chorus += currsygnal * DC;
-                    right_chorus += currsygnal2 * DC;
+                    left_chorus += currsignal * DC;
+                    right_chorus += currsignal2 * DC;
                 }
 
             } // Close trackstate
@@ -2091,7 +2095,7 @@ ByPass_Wav:
         {
             if(!TRACKSTATE[c])
             {
-                Scope_Dats[c][Cscope[c]] = (currsygnal + currsygnal2) * 0.15f;
+                Scope_Dats[c][Cscope[c]] = (currsignal + currsignal2) * 0.15f;
             }
             else
             {
@@ -2101,6 +2105,7 @@ ByPass_Wav:
             Cscope[c] &= 127;
         }
 #endif
+
     }
 }
 
@@ -2379,7 +2384,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             MidiNoteOff(channel);
 #endif
 
-            /* Set the midi program if it was modified */
+            // Set the midi program if it was modified
             if(LastProgram[TRACKMIDICHANNEL[channel]] != Midiprg[associated_sample])
             {
 
@@ -2387,10 +2392,9 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 MidiSend(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
 #endif
 
-                //midiOutShortMsg(midiout_handle, (192 + TRACKMIDICHANNEL[channel]) | (Midiprg[associated_sample] << 8) | (127 << 16));
                 LastProgram[TRACKMIDICHANNEL[channel]] = Midiprg[associated_sample];
             }
-            /* Send the note to the midi device */
+            // Send the note to the midi device
 
 #if !defined(__NOMIDI__)
             float veloc = vol * mas_vol;
@@ -2399,7 +2403,6 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             MidiSend(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
 #endif
 
-            //midiOutShortMsg(midiout_handle, (144 + TRACKMIDICHANNEL[channel]) | (mnote << 8) | (f2i(veloc * 127) << 16));
         }
 #endif
     }
@@ -2555,7 +2558,7 @@ void DoEffects(void)
 
 #if defined(PTK_FX_NOTECUT)
         if((pltr_vol_row & 0xf0) == 0xf0)
-        { /* Note Cut: Fx */
+        { // Note Cut: Fx
             unsigned char kinder = pltr_vol_row & 0xf;
             if(Subicounter == kinder)
             {
@@ -2944,7 +2947,7 @@ void GetPlayerValues(float master_coef)
 #if defined(PTK_LIMITER)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
-    if(mas_comp_ratio != 0.0f)
+    if(mas_comp_ratio > 0.01f)
     {
         left_float = Mas_Compressor(left_float / 32767.0f, &rms_sumL, mas_comp_bufferL, &mas_envL) * 32767.0f;
         right_float = Mas_Compressor(right_float / 32767.0f, &rms_sumR, mas_comp_bufferR, &mas_envR) * 32767.0f;
@@ -2963,10 +2966,22 @@ void GetPlayerValues(float master_coef)
     left_value = f2i(left_float * master_coef);
     right_value = f2i(right_float * master_coef);
 
-    if(left_value > 32767) left_value = 32767;
-    if(left_value < -32767) left_value = -32767;
-    if(right_value > 32767) right_value = 32767;
-    if(right_value < -32767) right_value = -32767;
+    if(left_value > 32767)
+    {
+        left_value = 32767;
+    }
+    if(left_value < -32767)
+    {
+        left_value = -32767;
+    }
+    if(right_value > 32767)
+    {
+        right_value = 32767;
+    }
+    if(right_value < -32767)
+    {
+        right_value = -32767;
+    }
 }
 
 // ------------------------------------------------------
@@ -3325,7 +3340,7 @@ void Fire303(unsigned char number,char unit)
         case 0xd7: tb303engine[unit].tbPattern = 30; break;
         case 0xd8: tb303engine[unit].tbPattern = 31; break;
 
-        default: /* No Fire */
+        default: // No Fire
             tb303engine[unit].tbLine = 255;
             break;
     }
@@ -3463,8 +3478,8 @@ void KillInst(int inst_nbr)
 }
 
 // ------------------------------------------------------
-/* Next Function: used to reset synthparameters Structure */
-/* Well, I think the default preset is not very cool, but nah! */
+// Next Function: used to reset synthparameters Structure
+// Well, I think the default preset is not very cool, but nah!
 void ResetSynthParameters(SynthParameters *TSP)
 {
 

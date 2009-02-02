@@ -746,7 +746,7 @@ void LoadMod(char *FileName)
                     PARASynth[swrite].lfo2_sustain = 128;
                     PARASynth[swrite].lfo2_release = 0x10000;
 
-                    // BEWARE: struct is aligned on 4 bytes !!!
+                    // WARNING: struct is aligned on 4 bytes !!!
                     if(!new_disto)
                     {
                         Read_Mod_Datas(&PARASynth[swrite], sizeof(SynthParameters) - 4 - 32, 1, in);
@@ -762,6 +762,16 @@ void LoadMod(char *FileName)
                             Read_Mod_Datas(&PARASynth[swrite], sizeof(SynthParameters) - 32, 1, in);
                         }
                     }
+
+                    // Fix some very old Ntk bugs
+                    if(PARASynth[swrite].lfo1_period > 128) PARASynth[swrite].lfo1_period = 128;
+                    if(PARASynth[swrite].lfo2_period > 128) PARASynth[swrite].lfo2_period = 128;
+                    if(Old_303)
+                    {
+                        if(PARASynth[swrite].ptc_glide < 1) PARASynth[swrite].ptc_glide = 64;
+                        if(PARASynth[swrite].glb_volume < 1) PARASynth[swrite].glb_volume = 64;
+                    }
+
                     // Compression type
                     if(Pack_Scheme) Read_Mod_Datas(&SampleCompression[swrite], sizeof(char), 1, in);
 
@@ -1151,7 +1161,6 @@ void LoadMod(char *FileName)
 
             if(Old_Mod_Format)
             {
-
                 Read_Mod_Datas(&FLANGER_DEPHASE, sizeof(float), 1, in);
 
                 for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
@@ -2963,7 +2972,7 @@ void LoadSynth(char *FileName)
 
         if(strcmp(extension, "TWNNSYN0") == 0)
         {
-            /* Ok, extension matched! */
+            // Ok, extension matched!
             mess_box("Loading Synthesizer -> structure.");  
             ResetSynthParameters(&PARASynth[ped_patsam]);
 
@@ -2981,8 +2990,9 @@ void LoadSynth(char *FileName)
 
             fread(&PARASynth[ped_patsam], sizeof(SynthParameters), 1, in);
 
-            if(PARASynth[ped_patsam].ptc_glide < 1) PARASynth[ped_patsam].ptc_glide = 64;
-            if(PARASynth[ped_patsam].glb_volume < 1) PARASynth[ped_patsam].glb_volume = 64;
+            // Fix some old Ntk bugs
+            if(PARASynth[ped_patsam].lfo1_period > 128) PARASynth[ped_patsam].lfo1_period = 128;
+            if(PARASynth[ped_patsam].lfo2_period > 128) PARASynth[ped_patsam].lfo2_period = 128;
 
             Synthprg[ped_patsam] = SYNTH_WAVE_CURRENT;
             sprintf(nameins[ped_patsam],PARASynth[ped_patsam].presetname);
@@ -3177,7 +3187,6 @@ void LoadInst(char *FileName)
 // Save the current instrument
 void SaveInst(void)
 {
-
     FILE *in;
     char Temph[96];
     char extension[10];

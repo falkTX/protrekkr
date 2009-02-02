@@ -128,14 +128,7 @@ BYTE *Depack_Data(BYTE *Memory, int Size)
 
 int check_file_type(char *extension)
 {
-    if(strcmp(extension, "TWNNSNG2") &&
-       strcmp(extension, "TWNNSNG3") &&
-       strcmp(extension, "TWNNSNG4") &&
-       strcmp(extension, "TWNNSNG5") &&
-       strcmp(extension, "TWNNSNG6") &&
-       strcmp(extension, "TWNNSNG7") &&
-       strcmp(extension, "TWNNSNG8") &&
-       strcmp(extension, "TWNNSNG9"))
+    if(strcmp(extension, "TWNNSNG9"))
     {
         return(FALSE);
     }
@@ -187,35 +180,13 @@ int LoadMod(const char *FileName)
             return(FALSE);
         }
 
-        switch(extension[7])
-        {
-            case '9':
-                Mod_Simulate = LOAD_READMEM;
-            case '8':
-                New_Comp = TRUE;
-            case '7':
-                New_adsr = TRUE;
-            case '6':
-                Pack_Scheme = TRUE;
-            case '5':
-                new_disto = TRUE;
-            case '4':
-                Old_Bug = FALSE;
-            case '3':
-                goto Read_Mod_File;
+        Mod_Simulate = LOAD_READMEM;
+        New_Comp = TRUE;
+        New_adsr = TRUE;
+        Pack_Scheme = TRUE;
+        new_disto = TRUE;
+        Old_Bug = FALSE;
 
-            // Old noisetrekker
-            case '2':
-                Old_303 = TRUE;
-                goto Read_Mod_File;
-        }
-
-        // Read a possible packed module ID
-        unsigned int New_Extension;
-        fseek(in, 0, SEEK_SET);
-        fread(&New_Extension, sizeof(char), 4, in);
-      
-Read_Mod_File:
         Free_Samples();
 
         mas_comp_threshold = 100.0f;

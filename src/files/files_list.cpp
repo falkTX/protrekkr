@@ -152,7 +152,7 @@ void Read_SMPT(void)
     }
     CHDIR(cur_dir);
 
-    /* Find first .c file in current directory */
+    // Find first .c file in current directory
     strcpy(Dir_Act, cur_dir);
 
 #if defined(__WIN32__)
@@ -171,7 +171,7 @@ void Read_SMPT(void)
         lt_items++;
         list_counter++;
 
-        /* Find the rest of the files (directorys)*/
+        // Find the rest of the files (directories)
 
         while(_findnext(hFile, &c_file) == 0)
         {
@@ -203,7 +203,7 @@ void Read_SMPT(void)
             lt_items++;
             list_counter++;
         }
-        /* Find the rest of the files (files)*/
+        // Find the rest of the files (files)
         while(_findnext(hFile, &c_file) == 0)
         {
             if(!(c_file.attrib & _A_SUBDIR))
@@ -232,9 +232,9 @@ void Read_SMPT(void)
 
 #endif
 
-/* Display the drives list */
+// Display the drives list
 #if defined(__WIN32__)
-    /* Save current drive */
+    // Save current drive
     int curdrive = _getdrive();
 
     for(int drivex = 1; drivex < 16; drivex++)
