@@ -280,10 +280,10 @@ int Init_Context(void)
 
     Clear_Files_List();
 
+#if !defined(__NOMIDI__)
     midiin_changed = 2;
     midiout_changed = 2;
 
-#if !defined(__NOMIDI__)
     MidiIn_Init();
     MidiOut_Init();
 #endif

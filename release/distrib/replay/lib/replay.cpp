@@ -2375,36 +2375,29 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         new_instrument[channel] = TRUE;
 
 #if !defined(__STAND_ALONE__)
+#if !defined(__NOMIDI__)
         if(TRACKSTATE[channel] == 0 &&
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
-
-#if !defined(__NOMIDI__)
             MidiNoteOff(channel);
-#endif
 
             // Set the midi program if it was modified
             if(LastProgram[TRACKMIDICHANNEL[channel]] != Midiprg[associated_sample])
             {
-
-#if !defined(__NOMIDI__)
                 MidiSend(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
-#endif
-
                 LastProgram[TRACKMIDICHANNEL[channel]] = Midiprg[associated_sample];
             }
-            // Send the note to the midi device
 
-#if !defined(__NOMIDI__)
+            // Send the note to the midi device
             float veloc = vol * mas_vol;
 
             Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
             MidiSend(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
-#endif
-
         }
-#endif
+#endif // __NOMIDI
+#endif // __STAND_ALONE__
+
     }
 }
 

@@ -61,7 +61,11 @@ void Draw_Master_Ed(void)
 
     char middev[80];
 
+#if defined(__NOMIDI__)
+    sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", 0, 0);
+#else
     sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", n_midiindevices, n_midioutdevices);
+#endif
     Gui_Draw_Button_Box(8, 466, 310, 96, middev, BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(12, 482, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -271,40 +275,44 @@ void Actualize_Master_Ed(char gode)
 
         if(gode == 0 || gode == 11)
         {
-            value_box(70, 482, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NOMIDI__)
-            | BUTTON_DISABLED
+            value_box(70, 482, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+#else
+            value_box(70, 482, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
-            );
+#if !defined(__NOMIDI__)
             if(c_midiin != -1)
             {
-#if !defined(__NOMIDI__)
                 Gui_Draw_Button_Box(132, 482, 182, 16, GetMidiInName(), BUTTON_NORMAL | BUTTON_DISABLED);
-#endif
             }
             else
             {
+#endif
                 Gui_Draw_Button_Box(132, 482, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+#if !defined(__NOMIDI__)
             }
+#endif
         }
 
         if(gode == 0 || gode == 12)
         {
-            value_box(70, 500, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NOMIDI__)
-            | BUTTON_DISABLED
+            value_box(70, 500, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+#else
+            value_box(70, 500, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
-            );
+#if !defined(__NOMIDI__)
             if(c_midiout != -1)
             {
-#if !defined(__NOMIDI__)
                 Gui_Draw_Button_Box(132, 500, 182, 16, GetMidiOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
-#endif
             }
             else
             {
+#endif
                 Gui_Draw_Button_Box(132, 500, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+#if !defined(__NOMIDI__)
             }
+#endif
         }
     }
 }
@@ -520,26 +528,22 @@ void Mouse_Left_Master_Ed(void)
         // ---
 
         // Midi track notes off
+#if !defined(__NOMIDI__)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
-
-#if !defined(__NOMIDI__)
             MidiNoteOff(ped_track);
-#endif
-
             gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
         }
-
-        // All Midi notes off
-        if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
-        {
-
-#if !defined(__NOMIDI__)
-            MidiAllNotesOff();
 #endif
 
+        // All Midi notes off
+#if !defined(__NOMIDI__)
+        if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
+        {
+            MidiAllNotesOff();
             gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
         }
+#endif
 
 #if !defined(__NOMIDI__)
         // Previous midi in device

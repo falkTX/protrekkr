@@ -3460,6 +3460,7 @@ void SaveConfig(void)
     int i;
     int Real_Palette_Idx;
     char KeyboardName[MAX_PATH];
+    signed char phony = -1;
 
     sprintf(extension, "TWNNCFG1");
     mess_box("Saving 'ptk.cfg' on current directory...");
@@ -3480,8 +3481,19 @@ void SaveConfig(void)
         fwrite(&ped_pattad, sizeof(ped_pattad), 1, in);
         fwrite(&patt_highlight, sizeof(patt_highlight), 1, in);
         fwrite(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+
+#if defined(__NOMIDI__)
+        fwrite(&phony, sizeof(phony), 1, in);
+#else
         fwrite(&c_midiin, sizeof(c_midiin), 1, in);
+#endif
+
+#if defined(__NOMIDI__)
+        fwrite(&phony, sizeof(phony), 1, in);
+#else
         fwrite(&c_midiout, sizeof(c_midiout), 1, in);
+#endif
+
         fwrite(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
         fwrite(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
         fwrite(&FullScreen, sizeof(FullScreen), 1, in);
@@ -3524,6 +3536,7 @@ void LoadConfig(void)
     int Real_Palette_Idx;
     char FileName[MAX_PATH];
     char KeyboardName[MAX_PATH];
+    signed char phony = -1;
 
 #if defined(__WIN32__)
     sprintf(FileName, "%s\\ptk.cfg", ExePath);
@@ -3545,8 +3558,19 @@ void LoadConfig(void)
             fread(&ped_pattad, sizeof(ped_pattad), 1, in);
             fread(&patt_highlight, sizeof(patt_highlight), 1, in);
             fread(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+
+#if defined(__NOMIDI__)
+            fread(&phony, sizeof(phony), 1, in);
+#else
             fread(&c_midiin, sizeof(c_midiin), 1, in);
+#endif
+
+#if defined(__NOMIDI__)
+            fread(&phony, sizeof(phony), 1, in);
+#else
             fread(&c_midiout, sizeof(c_midiout), 1, in);
+#endif
+
             fread(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
             fread(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
             fread(&FullScreen, sizeof(FullScreen), 1, in);
