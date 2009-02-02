@@ -104,17 +104,9 @@ int hd_isrecording = 0;
 
 int snamesel = 0;
 
-signed char n_midioutdevices = 0;
-signed char n_midiindevices = 0;
 SDL_Surface *PFONT;
 SDL_Surface *FONT;
 SDL_Surface *FONT_LOW;
-
-int midiin_changed = 0;
-int midiout_changed = 0;
-
-signed char c_midiin = -1;
-signed char c_midiout = -1;
 
 SDL_TimerID Timer;
 Uint32 Timer_CallBack(Uint32 interval, void *param);
@@ -243,11 +235,6 @@ int Load_Font_Datas(char *name)
 // Load the necessary datas and initialize the interface
 int Init_Context(void)
 {
-
-#if !defined(__NOMIDI__)
-    MidiGetAll();           /* Retrieves Midi Info */
-#endif
-
     restx = CONSOLE_WIDTH - 640;
     resty = CONSOLE_HEIGHT - 492;
     CONSOLE_HEIGHT2 = CONSOLE_HEIGHT - 42;

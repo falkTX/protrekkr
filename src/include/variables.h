@@ -375,12 +375,6 @@ extern MOUSE Mouse;
 
 extern int fluzy;
 
-extern signed char n_midioutdevices;
-extern signed char n_midiindevices;
-
-extern int midiin_changed;
-extern int midiout_changed;
-
 extern signed char c_midiin;
 extern signed char c_midiout;
 
@@ -474,9 +468,6 @@ extern int allow_save;
 void ResetFilters(char tr);
 void MidiReset(void);
 void MidiAllNotesOff(void);
-void MidiNoteOff(int nbr_track);
-void MidiCommand(int nbr_track, int eff_dat, int row_dat);
-void MidiGetAll(void);
 void WavRenderizer(void);
 void DoEffects_tick0(void);
 void DoEffects(void);

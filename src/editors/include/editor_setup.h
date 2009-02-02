@@ -25,9 +25,5 @@ void Mouse_Left_Master_Ed(void);
 void Mouse_Right_Master_Ed(void);
 void Mouse_Sliders_Master_Ed(void);
 void Actualize_Fx_Ed(char gode);
-void MidiIn_Init(void);
-void MidiIn_Close(void);
-void MidiOut_Init(void);
-void MidiOut_Close(void);
 
 #endif

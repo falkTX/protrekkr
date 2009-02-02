@@ -394,12 +394,16 @@ SOURCE=.\src\Wav\Riff.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\Midi\Include\Capture_Midi.h
+SOURCE=.\src\midi\include\midi.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\src\Midi\Capture_Midi.cpp
+SOURCE=.\src\midi\midi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\midi\midi_drv_windows.cpp
 # End Source File
 # End Group
 # Begin Source File

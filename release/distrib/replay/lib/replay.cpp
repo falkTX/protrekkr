@@ -9,7 +9,7 @@
 #include "include/replay.h"
 
 #if !defined(__STAND_ALONE__)
-#include "../../../../src/midi/include/capture_midi.h"
+#include "../../../../src/midi/include/midi.h"
 #include "../../../../src/include/variables.h"
 #endif
 
@@ -358,8 +358,6 @@ float Segue_SamplesR[MAX_TRACKS];
     int pos_scope;
     extern signed char c_midiin;
     extern signed char c_midiout;
-    void MidiCommand(int nbr_track, int eff_dat, int row_dat);
-    void MidiNoteOff(int track);
     int plx;
     char Midiprg[128];
     int LastProgram[MAX_TRACKS];
@@ -1429,12 +1427,12 @@ void Sp_Player(void)
                 /* MidiController commands */
                 if(pl_pan_row == 144 && c_midiout != -1 && pl_eff_row < 128)
                 {
-                    MidiCommand(176 + TRACKMIDICHANNEL[ct], pl_eff_row, pl_dat_row);
+                    MidiSend(176 + TRACKMIDICHANNEL[ct], pl_eff_row, pl_dat_row);
                 }
 
                 if(pl_eff_row == 128 && c_midiout != -1 && pl_dat_row < 128)
                 {
-                    MidiCommand(176 + TRACKMIDICHANNEL[ct], 0, pl_dat_row);
+                    MidiSend(176 + TRACKMIDICHANNEL[ct], 0, pl_dat_row);
                 }
 #endif
 #endif
@@ -2386,7 +2384,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             {
 
 #if !defined(__NOMIDI__)
-                MidiCommand(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
+                MidiSend(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
 #endif
 
                 //midiOutShortMsg(midiout_handle, (192 + TRACKMIDICHANNEL[channel]) | (Midiprg[associated_sample] << 8) | (127 << 16));
@@ -2398,7 +2396,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             float veloc = vol * mas_vol;
 
             Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
-            MidiCommand(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
+            MidiSend(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
 #endif
 
             //midiOutShortMsg(midiout_handle, (144 + TRACKMIDICHANNEL[channel]) | (mnote << 8) | (f2i(veloc * 127) << 16));

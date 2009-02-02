@@ -18,16 +18,27 @@
 
 // ------------------------------------------------------
 // Variables
-extern HMIDIIN midiin_handle;
-extern HMIDIOUT midiout_handle;
+extern signed char n_midioutdevices;
+extern signed char n_midiindevices;
 
-extern MIDIINCAPS caps_midiin[255];
-extern MIDIOUTCAPS caps_midiout[255];
+extern int midiin_changed;
+extern int midiout_changed;
 
 // ------------------------------------------------------
 // Functions
+void MidiGetAll(void);
+void MidiFreeAll(void);
+
 void MidiIn_Init(void);
+void MidiIn_Close(void);
 void MidiOut_Init(void);
+void MidiOut_Close(void);
+
+void MidiNoteOff(int track);
+void MidiSend(int nbr_track, int eff_dat, int row_dat);
+
+char *GetMidiInName(void);
+char *GetMidiOutName(void);
 
 #endif
 

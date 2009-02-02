@@ -480,6 +480,11 @@ int main(int argc, char *argv[])
 
     Prog_End = FALSE;
 
+#if !defined(__NOMIDI__)
+    // Load midi devices infos
+    MidiGetAll();
+#endif
+
     if(!Init_Context())
     {
         return(0);
@@ -677,11 +682,16 @@ int main(int argc, char *argv[])
     exiting = TRUE;
     SaveConfig();
 
-    // Close the midi devices on any exit
 
 #if !defined(__NOMIDI__)
+    // Close any opened midi devices on any exit
     MidiIn_Close();
     MidiOut_Close();
+#endif
+
+#if !defined(__NOMIDI__)
+    // Free the devices enumeration
+    MidiFreeAll();
 #endif
 
     return(0);

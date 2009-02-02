@@ -8,7 +8,7 @@
 // Includes
 #include "include/editor_setup.h"
 #include "include/editor_sequencer.h"
-#include "../midi/include/capture_midi.h"
+#include "../midi/include/midi.h"
 
 // ------------------------------------------------------
 // Variables
@@ -279,7 +279,7 @@ void Actualize_Master_Ed(char gode)
             if(c_midiin != -1)
             {
 #if !defined(__NOMIDI__)
-                Gui_Draw_Button_Box(132, 482, 182, 16, caps_midiin[c_midiin].szPname, BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 482, 182, 16, GetMidiInName(), BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
             }
             else
@@ -298,7 +298,7 @@ void Actualize_Master_Ed(char gode)
             if(c_midiout != -1)
             {
 #if !defined(__NOMIDI__)
-                Gui_Draw_Button_Box(132, 500, 182, 16, caps_midiout[c_midiout].szPname, BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 500, 182, 16, GetMidiOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
             }
             else

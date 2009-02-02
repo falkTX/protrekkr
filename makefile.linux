@@ -10,7 +10,7 @@ EXEOBJS = main.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_instrument.o \
           samples_pack.o files_list.o files.o \
-          capture_midi.o \
+          midi.o \
           timer.o interface.o \
           misc_draw.o xml.o \
           riff.o \
@@ -77,7 +77,7 @@ files_list.o: src/files/files_list.cpp
 files.o: src/files/files.cpp
 	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
 
-capture_midi.o: src/midi/capture_midi.cpp
+midi.o: src/midi/midi.cpp
 	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/midi/$(*).cpp
 
 timer.o: src/support/timer.cpp

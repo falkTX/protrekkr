@@ -36,6 +36,8 @@
 
 #include "../support/include/timer.h"
 
+#include "../midi/include/midi.h"
+
 #include <string>
 #include <list>
 #include <sstream>

@@ -210,10 +210,13 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #if !defined(__NOMIDI__)
                     if(Midiprg[ped_patsam] == -1)
                     {
-#endif
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_DISABLED);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+#else
+                        Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+#endif
+                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_DISABLED);
 #if !defined(__NOMIDI__)
                     }
                     else
