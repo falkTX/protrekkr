@@ -114,7 +114,7 @@ char *HexTab[] =
     "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
 };
 
-SDL_Color Palette[256];
+SDL_Color Ptk_Palette[256];
 SDL_Color Palette_303[256];
 SDL_Color Palette_Logo[256];
 
@@ -239,9 +239,9 @@ void Get_Phony_Palette(void)
 
     for(i = 0; i < sizeof(Default_Palette) / sizeof(SDL_Color); i++)
     {
-        Phony_Palette[i].r = Palette[i].r;
-        Phony_Palette[i].g = Palette[i].g;
-        Phony_Palette[i].b = Palette[i].b;
+        Phony_Palette[i].r = Ptk_Palette[i].r;
+        Phony_Palette[i].g = Ptk_Palette[i].g;
+        Phony_Palette[i].b = Ptk_Palette[i].b;
     }
 }
 
@@ -269,9 +269,9 @@ void Set_Phony_Palette(void)
                 if(ComponentR > 0xff) ComponentR = 0xff;
                 if(ComponentG > 0xff) ComponentG = 0xff;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-                Palette[i].r = ComponentR;
-                Palette[i].g = ComponentG;
-                Palette[i].b = ComponentB;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 break;
 
             case 4:
@@ -299,9 +299,9 @@ void Set_Phony_Palette(void)
                     if(ComponentG < 0) ComponentG = 0;
                     if(ComponentB < 0) ComponentB = 0;
                 }
-                Palette[i].r = ComponentR;
-                Palette[i].g = ComponentG;
-                Palette[i].b = ComponentB;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 break;
 
             // The font
@@ -309,18 +309,18 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
-                Palette[i].r = ComponentR;
-                Palette[i].g = ComponentG;
-                Palette[i].b = ComponentB;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 if(ComponentR == 0) ComponentR = 255;
                 if(ComponentG == 0) ComponentG = 255;
                 if(ComponentB == 0) ComponentB = 255;
                 ComponentR >>= 1;
                 ComponentG >>= 1;
                 ComponentB >>= 1;
-                Palette[i + 1].r = ComponentR;
-                Palette[i + 1].g = ComponentG;
-                Palette[i + 1].b = ComponentB;
+                Ptk_Palette[i + 1].r = ComponentR;
+                Ptk_Palette[i + 1].g = ComponentG;
+                Ptk_Palette[i + 1].b = ComponentB;
                 Phony_Palette[i + 1].r = ComponentR;
                 Phony_Palette[i + 1].g = ComponentG;
                 Phony_Palette[i + 1].b = ComponentB;
@@ -335,36 +335,36 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
-                Palette[i].r = ComponentR;
-                Palette[i].g = ComponentG;
-                Palette[i].b = ComponentB;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 ComponentR >>= 1;
                 ComponentG >>= 1;
                 ComponentB >>= 1;
-                Palette[i + 9].r = ComponentR;
-                Palette[i + 9].g = ComponentG;
-                Palette[i + 9].b = ComponentB;
+                Ptk_Palette[i + 9].r = ComponentR;
+                Ptk_Palette[i + 9].g = ComponentG;
+                Ptk_Palette[i + 9].b = ComponentB;
                 Phony_Palette[i + 9].r = ComponentR;
                 Phony_Palette[i + 9].g = ComponentG;
                 Phony_Palette[i + 9].b = ComponentB;
                 break;
 
             case 25:
-                Palette[i].r = Phony_Palette[i].r;
-                Palette[i].g = Phony_Palette[i].g;
-                Palette[i].b = Phony_Palette[i].b;
+                Ptk_Palette[i].r = Phony_Palette[i].r;
+                Ptk_Palette[i].g = Phony_Palette[i].g;
+                Ptk_Palette[i].b = Phony_Palette[i].b;
                 break;
 
             case 26:
-                Palette[i].r = Phony_Palette[i].r;
-                Palette[i].g = Phony_Palette[i].g;
-                Palette[i].b = Phony_Palette[i].b;
+                Ptk_Palette[i].r = Phony_Palette[i].r;
+                Ptk_Palette[i].g = Phony_Palette[i].g;
+                Ptk_Palette[i].b = Phony_Palette[i].b;
                 break;
 
             default:
-                Palette[i].r = Phony_Palette[i].r;
-                Palette[i].g = Phony_Palette[i].g;
-                Palette[i].b = Phony_Palette[i].b;
+                Ptk_Palette[i].r = Phony_Palette[i].r;
+                Ptk_Palette[i].g = Phony_Palette[i].g;
+                Ptk_Palette[i].b = Phony_Palette[i].b;
                 break;
         }
     }
@@ -1502,10 +1502,10 @@ void Restore_Default_Palette(void)
     int i;
     for(i = 0; i < sizeof(Default_Palette) / sizeof(SDL_Color); i++)
     {
-        Palette[i].r = Default_Palette[i].r;
-        Palette[i].g = Default_Palette[i].g;
-        Palette[i].b = Default_Palette[i].b;
-        Palette[i].unused = Default_Palette[i].unused;
+        Ptk_Palette[i].r = Default_Palette[i].r;
+        Ptk_Palette[i].g = Default_Palette[i].g;
+        Ptk_Palette[i].b = Default_Palette[i].b;
+        Ptk_Palette[i].unused = Default_Palette[i].unused;
     }
 }
 
@@ -1571,9 +1571,9 @@ void Set_Pictures_Colors(void)
     Set_Logo_Palette();
     Get_Phony_Palette();
     Set_Phony_Palette();
-    Palette[0].r = 0;
-    Palette[0].g = 0;
-    Palette[0].b = 0;
+    Ptk_Palette[0].r = 0;
+    Ptk_Palette[0].g = 0;
+    Ptk_Palette[0].b = 0;
     Init_UI();
 
     Create_Pattern_font();
@@ -1590,10 +1590,10 @@ Wait_Palette:
 
     for(i = 0; i < max_colors_303; i++)
     {
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_303[i].r;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_303[i].g;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_303[i].b;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_303[i].r;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_303[i].g;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_303[i].b;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
     }
 }
 
@@ -1603,10 +1603,10 @@ void Set_Logo_Palette(void)
 
     for(i = 0; i < max_colors_logo; i++)
     {
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_Logo[i].r;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_Logo[i].g;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_Logo[i].b;
-        Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_Logo[i].r;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_Logo[i].g;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_Logo[i].b;
+        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
     }
 }
 
@@ -1614,7 +1614,7 @@ void Set_Logo_Palette(void)
 // Set the screen palette
 void Refresh_Palette(void)
 {
-    UISetPalette(Palette, 256);
+    UISetPalette(Ptk_Palette, 256);
 }
 
 // ------------------------------------------------------

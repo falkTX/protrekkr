@@ -28,10 +28,6 @@ list <skin_file> skin_files;
 TiXmlDocument doc("skins/skin.xml");
 char xml_error[256];
 
-#if defined(__WIN32__)
-extern HWND Main_Window;
-#endif
-
 extern char Window_Title[256];
 
 // ------------------------------------------------------

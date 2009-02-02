@@ -57,7 +57,7 @@ extern list <skin_file> skin_files;
 extern SDL_Surface *Main_Screen;
 extern MOUSE Mouse;
 
-#if !defined(__LINUX__)
+#if defined(__WIN32__)
 extern HWND Main_Window;
 #endif
 

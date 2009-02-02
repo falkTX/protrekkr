@@ -3162,11 +3162,22 @@ void Keyboard_Handler(void)
         }
         if(!Get_LAlt() && po_alt) po_alt = false;
 
+
+// This is a nasty hack: we should have a specific ASCII buffer
+// instead of using the unicode one.
+#if !defined(__MACOSX__)
+#define UNICODE_OFFSET1 0x20
+#define UNICODE_OFFSET2 0x60
+#else
+#define UNICODE_OFFSET1 0
+#define UNICODE_OFFSET2 0
+#endif
+
         if(Key_Unicode)
         {
             if(Get_LShift())
             {
-                if(Keys[SDLK_m - 0x20])
+                if(Keys[SDLK_m - UNICODE_OFFSET1])
                 {
                     if(TRACKSTATE[ped_track] == 0) TRACKSTATE[ped_track] = 1;
                     else TRACKSTATE[ped_track] = 0;
@@ -3202,7 +3213,7 @@ void Keyboard_Handler(void)
             {
                 if(Get_LShift())
                 {
-                    if(Keys[SDLK_m - 0x60])
+                    if(Keys[SDLK_m - UNICODE_OFFSET2])
                     {
                         Solo_Track(ped_track);
                         // Will unmute the correct track
@@ -3213,61 +3224,61 @@ void Keyboard_Handler(void)
                     }
                 }
 
-                if(Keys[SDLK_s - 0x60])
+                if(Keys[SDLK_s - UNICODE_OFFSET2])
                 {
                     gui_action = GUI_CMD_SAVE_MODULE;
                 }
 
                 // Ctrl+B
-                if(Keys[SDLK_b - 0x60] && !Songplaying)
+                if(Keys[SDLK_b - UNICODE_OFFSET2] && !Songplaying)
                 {
                     Mark_Block_Start(ped_row, ped_track, ped_line);
                 }
 
                 // Ctrl+E
-                if(Keys[SDLK_e - 0x60] && !Songplaying)
+                if(Keys[SDLK_e - UNICODE_OFFSET2] && !Songplaying)
                 {
                     Mark_Block_End(ped_row, ped_track, ped_line, 3);
                 }
 
-                if(Keys[SDLK_c - 0x60] && block_start_track != -1 && block_end_track != -1)
+                if(Keys[SDLK_c - UNICODE_OFFSET2] && block_start_track != -1 && block_end_track != -1)
                 {
                     Copy_Selection(Cur_Position);
                 }
 
-                if(Keys[SDLK_x - 0x60] && block_start_track != -1 && block_end_track != -1)
+                if(Keys[SDLK_x - UNICODE_OFFSET2] && block_start_track != -1 && block_end_track != -1)
                 {
                     Cut_Selection(Cur_Position);
                 }
 
-                if(Keys[SDLK_i - 0x60] && is_editing)
+                if(Keys[SDLK_i - UNICODE_OFFSET2] && is_editing)
                 {
                     Interpolate_Block(Cur_Position);
                 }
 
-                if(Keys[SDLK_r - 0x60] && is_editing)
+                if(Keys[SDLK_r - UNICODE_OFFSET2] && is_editing)
                 {
                     Randomize_Block(Cur_Position);
                 }
 
-                if(Keys[SDLK_v - 0x60] && block_start_track_nibble != -1 && block_end_track_nibble != -1 && is_editing)
+                if(Keys[SDLK_v - UNICODE_OFFSET2] && block_start_track_nibble != -1 && block_end_track_nibble != -1 && is_editing)
                 {
                     Paste_Block(Cur_Position);
                 }
 
-                if(Keys[SDLK_u - 0x60] && is_editing)
+                if(Keys[SDLK_u - UNICODE_OFFSET2] && is_editing)
                 {
                     if(Get_LShift()) Instrument_Seminote_Up_Block(Cur_Position);
                     else Seminote_Up_Block(Cur_Position);
                 }
 
-                if(Keys[SDLK_d - 0x60] && is_editing)
+                if(Keys[SDLK_d - UNICODE_OFFSET2] && is_editing)
                 {
                     if(Get_LShift()) Instrument_Seminote_Down_Block(Cur_Position);
                     else Seminote_Down_Block(Cur_Position);
                 }
 
-                if(Keys[SDLK_a - 0x60])
+                if(Keys[SDLK_a - UNICODE_OFFSET2])
                 {
                     if(Get_LShift()) Select_Pattern_Block();
                     else Select_Track_Block();

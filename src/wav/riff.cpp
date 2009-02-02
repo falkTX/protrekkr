@@ -273,19 +273,23 @@ DDCRET RiffFile::Read ( void *Data, unsigned NumBytes )
    return retcode;
 }
 
-int RiffFile::SeekChunk ( const char *ChunkName) {
+int RiffFile::SeekChunk ( const char *ChunkName)
+{
    int Chunk;
    int Chunk_To_Find = FourCC(ChunkName);
    int i;
    int data_size;
    
    i = 0;
-   while(!feof(file)) {
+   while(!feof(file))
+   {
       Chunk = 0;
       Seek(i);
       Read(&Chunk, 4);
-      if(Chunk == Chunk_To_Find) {
-         if(Chunk_To_Find == 'atad') {
+      if(Chunk == Chunk_To_Find)
+      {
+         if(Chunk_To_Find == 'atad')
+         {
             Seek(i + 4);
             return(0);
          }
@@ -293,7 +297,8 @@ int RiffFile::SeekChunk ( const char *ChunkName) {
          return(1);
       }
       // Skip the datas
-      if(Chunk == 'atad') {
+      if(Chunk == 'atad')
+      {
          Read(&data_size, 4);
          i += data_size + 4 + 4 - 1;
       }
@@ -372,7 +377,6 @@ DDCRET WaveFile::OpenForRead ( const char *Filename )
    return retcode;
 }
 
-
 DDCRET WaveFile::OpenForWrite ( const char  *Filename,
                                 UINT32       SamplingRate,
                                 UINT16       BitsPerSample,
@@ -410,7 +414,6 @@ DDCRET WaveFile::OpenForWrite ( const char  *Filename,
    return retcode;
 }
 
-
 DDCRET WaveFile::Close()
 {
    DDCRET rc = DDC_SUCCESS;
@@ -423,7 +426,6 @@ DDCRET WaveFile::Close()
 
    return rc;
 }
-
 
 DDCRET WaveFile::WriteSample ( const INT16 Sample [MAX_WAVE_CHANNELS] )
 {
@@ -488,7 +490,6 @@ DDCRET WaveFile::WriteSample ( const INT16 Sample [MAX_WAVE_CHANNELS] )
    return retcode;
 }
 
-
 DDCRET WaveFile::WriteMonoSample ( INT16 SampleData )
 {
    switch ( wave_format.data.nBitsPerSample )
@@ -504,7 +505,6 @@ DDCRET WaveFile::WriteMonoSample ( INT16 SampleData )
 
    return DDC_INVALID_CALL;
 }
-
 
 DDCRET WaveFile::WriteStereoSample ( INT16 LeftSample,
                                      INT16 RightSample )
@@ -573,7 +573,6 @@ DDCRET WaveFile::ReadMonoSample ( INT16 *Sample )
    return retcode;
 }
 
-
 DDCRET WaveFile::ReadStereoSample ( INT16 *L, INT16 *R )
 {
    DDCRET retcode = DDC_SUCCESS;
@@ -608,7 +607,6 @@ DDCRET WaveFile::ReadStereoSample ( INT16 *L, INT16 *R )
    return retcode;
 }
 
-
 DDCRET WaveFile::SeekToSample ( unsigned long SampleIndex )
 {
    if ( SampleIndex >= NumSamples() )
@@ -624,12 +622,10 @@ DDCRET WaveFile::SeekToSample ( unsigned long SampleIndex )
    return rc;
 }
 
-
 UINT32 WaveFile::SamplingRate() const
 {
    return wave_format.data.nSamplesPerSec;
 }
-
 
 UINT16 WaveFile::BitsPerSample() const
 {
@@ -664,7 +660,6 @@ UINT32 WaveFile::LoopEnd() const
    return wave_Smpl.data.End;
 }
 
-
 DDCRET WaveFile::WriteData ( const void *data, UINT32 numData )
 {
     UINT32 extraBytes = numData;
@@ -677,7 +672,6 @@ DDCRET WaveFile::WriteData ( const INT32 *data, UINT32 numData )
     pcm_data.ckSize += extraBytes;
     return RiffFile::Write ( data, extraBytes );
 }
-
 
 DDCRET WaveFile::WriteData ( const INT16 *data, UINT32 numData )
 {
@@ -693,12 +687,10 @@ DDCRET WaveFile::WriteData ( const UINT8 *data, UINT32 numData )
     return RiffFile::Write ( data, numData );
 }
 
-
 DDCRET WaveFile::ReadData ( INT16 *data, UINT32 numData )
 {
     return RiffFile::Read ( data, numData * sizeof(INT16) );
 }
-
 
 DDCRET WaveFile::ReadData ( UINT8 *data, UINT32 numData )
 {

@@ -3501,9 +3501,9 @@ void SaveConfig(void)
         for(i = 0; i < NUMBER_COLORS; i++)
         {
             Real_Palette_Idx = Idx_Palette[i];
-            fwrite(&Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
-            fwrite(&Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
-            fwrite(&Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
+            fwrite(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
+            fwrite(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
+            fwrite(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
         }
         fwrite(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
         fwrite(&Beveled, sizeof(Beveled), 1, in);
@@ -3578,10 +3578,10 @@ void LoadConfig(void)
             for(i = 0; i < NUMBER_COLORS; i++)
             {
                 Real_Palette_Idx = Idx_Palette[i];
-                fread(&Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
-                fread(&Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
-                fread(&Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
-                Palette[Real_Palette_Idx].unused = 0;
+                fread(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
+                fread(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
+                fread(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
+                Ptk_Palette[Real_Palette_Idx].unused = 0;
             }
             fread(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
             fread(&Beveled, sizeof(Beveled), 1, in);

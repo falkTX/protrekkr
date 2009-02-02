@@ -14,7 +14,7 @@
 #define PTKEXPORT __stdcall
 #endif
 
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__MACOSX__)
 #define PTKEXPORT
 #endif
 

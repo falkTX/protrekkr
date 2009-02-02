@@ -178,7 +178,7 @@
 #define LARG_VUMETER 208
 #define MIN_PEAK MAX_VUMETER - 12
 
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__MACOSX__)
 #define MAX_PATH 1024
 #endif
 
@@ -459,7 +459,7 @@ extern int LastProgram[MAX_TRACKS];
 
 extern Uint32 Alloc_midi_Channels[MAX_TRACKS];
 
-extern char ExePath[MAX_PATH];
+extern char *ExePath;
 
 extern int allow_save;
 

@@ -218,12 +218,12 @@ void Actualize_Master_Ed(char gode)
             if(Phony_Palette[Real_Palette_Idx].g > 255) Phony_Palette[Real_Palette_Idx].g = 255;
             if(Phony_Palette[Real_Palette_Idx].b < 0) Phony_Palette[Real_Palette_Idx].b = 0;
             if(Phony_Palette[Real_Palette_Idx].b > 255) Phony_Palette[Real_Palette_Idx].b = 255;
-            Realslider(518, 515, Palette[Real_Palette_Idx].r / 2, TRUE);
-            outlong_small(668, 515, Palette[Real_Palette_Idx].r, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
-            Realslider(518, 535, Palette[Real_Palette_Idx].g / 2, TRUE);
-            outlong_small(668, 535, Palette[Real_Palette_Idx].g, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
-            Realslider(518, 555, Palette[Real_Palette_Idx].b / 2, TRUE);
-            outlong_small(668, 555, Palette[Real_Palette_Idx].b, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(518, 515, Ptk_Palette[Real_Palette_Idx].r / 2, TRUE);
+            outlong_small(668, 515, Ptk_Palette[Real_Palette_Idx].r, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(518, 535, Ptk_Palette[Real_Palette_Idx].g / 2, TRUE);
+            outlong_small(668, 535, Ptk_Palette[Real_Palette_Idx].g, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(518, 555, Ptk_Palette[Real_Palette_Idx].b / 2, TRUE);
+            outlong_small(668, 555, Ptk_Palette[Real_Palette_Idx].b, 0, 41, BUTTON_NORMAL | BUTTON_DISABLED);
             Set_Phony_Palette();
             Refresh_Palette();
         }

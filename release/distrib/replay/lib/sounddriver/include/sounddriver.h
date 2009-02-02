@@ -21,6 +21,11 @@
 #include <math.h>
 #endif
 
+#if defined(__MACOSX__)
+#include <AudioUnit/AudioUnit.h>
+#include <unistd.h>
+#endif
+
 #if defined(__WIN32__)
 #if !defined(__GCC__)
 #define _WIN32_WINNT 0x0500

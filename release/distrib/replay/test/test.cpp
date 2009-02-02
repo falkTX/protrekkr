@@ -16,7 +16,7 @@
 #include <Windows.h>
 #endif
 
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__MACOSX__)
 #include <unistd.h>
 #endif
 
@@ -63,7 +63,7 @@ int main(void)
     }
 #endif
 
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__MACOSX__)
     while(1)
     {
         usleep(10);

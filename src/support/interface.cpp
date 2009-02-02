@@ -18,6 +18,11 @@
 #include <shlwapi.h>
 #endif
 
+#if defined(__MACOSX__)
+#include <mach-o/dyld.h>
+typedef int (*NSGetExecutablePathProcPtr)(char *buf, size_t *bufsize);
+#endif
+
 #include "../include/main.h"
 
 // ------------------------------------------------------
@@ -61,7 +66,8 @@ float delay_refresh;
 float delay_refresh2;
 extern int display_title;
 int exiting;
-char ExePath[MAX_PATH];
+
+char *ExePath;
 
 static SDL_Event Events[MAX_EVENTS];
 
@@ -295,8 +301,13 @@ void Load_Keyboard_Def(char *FileName)
 #if defined(__WIN32__)
 extern SDL_NEED int SDL_main(int argc, char *argv[])
 #else
-int main(int argc, char *argv[])
+	#if defined(__LINUX__)
+		int main(int argc, char *argv[])
+	#else
+		extern "C" int main(int argc, char *argv[])
+	#endif
 #endif
+
 {
     int Startup_Mouse_Pos_x;
     int Startup_Mouse_Pos_y;
@@ -311,6 +322,7 @@ int main(int argc, char *argv[])
     int Key_Value;
     int Uni_Trans;
     FILE *KbFile;
+    Uint32 ExeName_Size = MAX_PATH;
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
     SDL_putenv("SDL_VIDEO_CENTERED=1");
@@ -356,7 +368,30 @@ int main(int argc, char *argv[])
                  MAKEINTRESOURCE(IDI_ICON1)));
 #endif
 
+/*#if defined(__MACOSX__)
+    static NSGetExecutablePathProcPtr NSGetExecutablePath = NULL;
+    NSGetExecutablePath = (NSGetExecutablePathProcPtr) NSAddressOfSymbol(NSLookupAndBindSymbol("__NSGetExecutablePath"));
+    ExeName_Size = 1024;
+    if(NSGetExecutablePath == NULL)
+    {
+        Message_Error("Can't find NSGetExecutablePath, operating system may be too old.");
+        return(0);
+  	}
+#endif
+*/
+    ExePath = (char *) malloc(ExeName_Size + 1);
+    if(ExePath == NULL)
+    {
+        Message_Error("Can't open alloc memory.");
+        return(0);
+    }
+    memset(ExePath, 0, ExeName_Size + 1);
+
 #if defined(__LINUX__)
+    // Note:
+    // it looks like some distributions don't have /proc/self
+    // Maybe a better (?) solution would be to use:
+    // sprintf(ExeProc, "/proc/$d/exe", getpid());
     readlink("/proc/self/exe", ExePath, sizeof(ExePath));
     int exename_len = strlen(ExePath);
     while(exename_len--)
@@ -370,7 +405,12 @@ int main(int argc, char *argv[])
     }
     CHDIR(ExePath);
 #else
-    GETCWD(ExePath, MAX_PATH);
+    #if defined(__MACOSX__)
+        GETCWD(ExePath, MAX_PATH);
+        CHDIR(ExePath);
+    #else
+        GETCWD(ExePath, MAX_PATH);
+    #endif
 #endif
 
     // Default values
@@ -458,22 +498,22 @@ int main(int argc, char *argv[])
     }
 
     // Avoid a possible flash
-    int Save_R = Palette[0].r;
-    int Save_G = Palette[0].g;
-    int Save_B = Palette[0].b;
+    int Save_R = Ptk_Palette[0].r;
+    int Save_G = Ptk_Palette[0].g;
+    int Save_B = Ptk_Palette[0].b;
 
-    Palette[0].r = 0;
-    Palette[0].g = 0;
-    Palette[0].b = 0;
+    Ptk_Palette[0].r = 0;
+    Ptk_Palette[0].g = 0;
+    Ptk_Palette[0].b = 0;
 
     if(!Switch_FullScreen())
     {
         Message_Error("Can't open screen.");
         return(0);
     }
-    Palette[0].r = Save_R;
-    Palette[0].g = Save_G;
-    Palette[0].b = Save_B;
+    Ptk_Palette[0].r = Save_R;
+    Ptk_Palette[0].g = Save_G;
+    Ptk_Palette[0].b = Save_B;
 
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
     SDL_EnableUNICODE(TRUE);
@@ -524,11 +564,15 @@ int main(int argc, char *argv[])
                     Symbol = Events[i].key.keysym.sym;
                     if(Symbol != SDLK_KP_DIVIDE)
                     {
+#if !defined(__MACOSX__)
                         Uni_Trans = Events[i].key.keysym.unicode;
                         if(!Uni_Trans) Uni_Trans = Symbol;
+#else
+                        Uni_Trans = Symbol;
+#endif
                         Keys[Uni_Trans] = TRUE;
-
                         Scancode = Translate_Locale_Key(Symbol);
+//                        printf("%d %d\n", Scancode, Symbol);
                         Keys_Raw[Scancode] = TRUE;
                         Keys_Raw_Off[Scancode] = FALSE;
                     }
@@ -670,7 +714,7 @@ int main(int argc, char *argv[])
 
         if(!Screen_Update()) break;
 
-#if defined(__WIN32__)
+#if defined(__WIN32__) || defined(__MACOSX__)
         // Flush all pending blits
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 #endif
@@ -682,6 +726,7 @@ int main(int argc, char *argv[])
     exiting = TRUE;
     SaveConfig();
 
+	if(ExePath) free(ExePath);
 
 #if !defined(__NOMIDI__)
     // Close any opened midi devices on any exit

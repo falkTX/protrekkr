@@ -26,6 +26,11 @@ int AUDIO_Samples;
 int volatile AUDIO_Acknowledge;
 float AUDIO_Timer;
 
+#if defined(__MACOSX__)
+AudioUnit AUDIO_Device;
+short *AUDIO_SoundBuffer;
+#endif
+
 #if defined(__LINUX__)
 int AUDIO_Device;
 short *AUDIO_SoundBuffer;
@@ -72,6 +77,19 @@ void AUDIO_Synth_Play(void);
 // ------------------------------------------------------
 // Name: AUDIO_Thread()
 // Desc: Audio rendering
+#if defined(__MACOSX__)
+static OSStatus AUDIO_Callback(void *inRefCon,
+                               AudioUnitRenderActionFlags inActionFlags,
+                               const AudioTimeStamp *inTimeStamp,
+                               UInt32 inBusNumber,
+                               AudioBuffer *ioData
+                              )
+{
+
+    return(0);
+}
+#endif
+
 #if defined(__LINUX__)
 void *AUDIO_Thread(void *arg)
 {
@@ -180,7 +198,30 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 {
 #endif
 
-   AUDIO_Mixer = Mixer;
+    AUDIO_Mixer = Mixer;
+
+#if defined(__MACOSX__)
+    Component comp;
+    ComponentDescription desc;
+
+    desc.componentType = kAudioUnitComponentType;
+    desc.componentSubType = kAudioUnitSubType_Output;
+    desc.componentManufacturer = kAudioUnitID_DefaultOutput;
+    desc.componentFlags = 0;
+    desc.componentFlagsMask = 0;
+
+    comp = FindNextComponent(NULL, &desc);
+    if(comp)
+    {
+        if(OpenAComponent(comp, &AUDIO_Device) == noErr)
+        {
+            if(AudioUnitInitialize(AUDIO_Device) == noErr)
+            {
+                return(TRUE);
+            }
+        }
+    }
+#endif
 
 #if defined(__LINUX__)
     char *Mixer_Name;
@@ -235,6 +276,50 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 
     num_fragments = 6;
     frag_size = (int) (AUDIO_PCM_FREQ * (milliseconds / 1000.0f));
+
+#if defined(__MACOSX__)
+    OSStatus result = noErr;
+    struct AudioUnitInputCallback callback;
+    AudioStreamBasicDescription requestedDesc;
+
+    requestedDesc.mFormatID = kAudioFormatLinearPCM;
+    requestedDesc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kLinearPCMFormatFlagIsSignedInteger;
+    requestedDesc.mChannelsPerFrame = AUDIO_DBUF_CHANNELS;
+    requestedDesc.mSampleRate = AUDIO_PCM_FREQ;
+    requestedDesc.mBitsPerChannel = AUDIO_DBUF_RESOLUTION;
+
+#if defined(__BIGENDIAN__)
+    requestedDesc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
+#endif
+
+    requestedDesc.mFramesPerPacket = num_fragments; // ???? Not sure
+    // AUDIO_Wave_Format.nBlockAlign
+    requestedDesc.mBytesPerFrame = (requestedDesc.mBitsPerChannel * requestedDesc.mChannelsPerFrame) >> 3;
+    requestedDesc.mBytesPerPacket = frag_size * requestedDesc.mBytesPerFrame * requestedDesc.mFramesPerPacket;
+    AUDIO_Latency = frag_size * requestedDesc.mBytesPerFrame * num_fragments;
+    AUDIO_SoundBuffer_Size = AUDIO_Latency;
+
+    AudioUnitSetProperty(AUDIO_Device,
+                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Input,
+                         0,
+                         &requestedDesc,
+                         sizeof (requestedDesc)
+                        );
+
+    callback.inputProc = AUDIO_Callback;
+    callback.inputProcRefCon = NULL;
+    AudioUnitSetProperty(AUDIO_Device, 
+                         kAudioUnitProperty_SetInputCallback, 
+                         kAudioUnitScope_Input, 
+                         0,
+                         &callback,
+                         sizeof(callback)
+                        );
+
+    AUDIO_SoundBuffer = (short *) malloc(AUDIO_SoundBuffer_Size << 1);
+
+#endif
 
 #if defined(__LINUX__)
     int Dsp_Val;
@@ -320,6 +405,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 // Desc: Wait for a command acknowledgment from the thread
 void AUDIO_Wait_For_Thread(void)
 {
+
+#if defined(__MACOSX__)
+    usleep(10);
+#else
+
     if(AUDIO_Play_Flag)
     {
         while(AUDIO_Acknowledge)
@@ -328,7 +418,7 @@ void AUDIO_Wait_For_Thread(void)
 #if defined(__WIN32__)
             Sleep(10);
 #endif
-#if defined(__LINUX__)
+#if defined(__LINUX__) 
             usleep(10);
 #endif
 #if defined(__PSP__)
@@ -345,7 +435,7 @@ void AUDIO_Wait_For_Thread(void)
 #if defined(__WIN32__)
             Sleep(10);
 #endif
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__MACOSX__)
             usleep(10);
 #endif
 #if defined(__PSP__)
@@ -354,6 +444,8 @@ void AUDIO_Wait_For_Thread(void)
 
         };
     }
+#endif // __MACOSX__
+
 }
 
 // ------------------------------------------------------
@@ -361,6 +453,11 @@ void AUDIO_Wait_For_Thread(void)
 // Desc: Play the sound buffer endlessly
 void AUDIO_Play(void)
 {
+
+#if defined(__MACOSX__)
+    AudioOutputUnitStart(AUDIO_Device);
+#endif
+
 #if defined(__PSP__)
     sceWaveStart(SCE_KERNEL_USER_HIGHEST_PRIORITY);
 #endif
@@ -415,6 +512,10 @@ void AUDIO_Stop(void)
     AUDIO_Play_Flag = FALSE;
     AUDIO_Wait_For_Thread();
 
+#if defined(__MACOSX__)
+    AudioOutputUnitStop(AUDIO_Device);
+#endif
+
 #if defined(__WIN32__)
     if(AUDIO_Sound_Buffer) AUDIO_Sound_Buffer->Stop();
 #endif
@@ -426,6 +527,11 @@ void AUDIO_Stop(void)
 void AUDIO_Stop_Sound_Buffer(void)
 {
     AUDIO_Stop();
+
+#if defined(__MACOSX)
+    if(AUDIO_SoundBuffer) free(AUDIO_SoundBuffer);
+    AUDIO_SoundBuffer = NULL;
+#endif
 
 #if defined(__LINUX__)
     Thread_Running = 0;
@@ -443,18 +549,18 @@ void AUDIO_Stop_Sound_Buffer(void)
 #endif
 
 #if defined(__WIN32__)
-   if(AUDIO_hReplayThread)
-   {
-      TerminateThread(AUDIO_hReplayThread, 0);
-      CloseHandle(AUDIO_hReplayThread);
-      AUDIO_hReplayThread = 0;
-   }
-   if(AUDIO_Sound_Buffer)
-   {
-      AUDIO_Sound_Buffer->Stop();
-      AUDIO_Sound_Buffer->Release();
-      AUDIO_Sound_Buffer = NULL;
-   }
+    if(AUDIO_hReplayThread)
+    {
+        TerminateThread(AUDIO_hReplayThread, 0);
+        CloseHandle(AUDIO_hReplayThread);
+        AUDIO_hReplayThread = 0;
+    }
+    if(AUDIO_Sound_Buffer)
+    {
+        AUDIO_Sound_Buffer->Stop();
+        AUDIO_Sound_Buffer->Release();
+        AUDIO_Sound_Buffer = NULL;
+    }
 #endif
 }
 
@@ -464,6 +570,25 @@ void AUDIO_Stop_Sound_Buffer(void)
 void AUDIO_Stop_Driver(void)
 {
     AUDIO_Stop_Sound_Buffer();
+
+#if defined(__MACOSX__)
+    struct AudioUnitInputCallback callback;
+
+    if(AUDIO_Device)
+    {
+        callback.inputProc = 0;
+        callback.inputProcRefCon = 0;
+        AudioUnitSetProperty(AUDIO_Device, 
+                             kAudioUnitProperty_SetInputCallback, 
+                             kAudioUnitScope_Input, 
+                             0,
+                             &callback, 
+                             sizeof(callback)
+                            );
+        CloseComponent(AUDIO_Device);
+    }
+    AUDIO_Device = 0;
+#endif
 
 #if defined(__LINUX__)
     if(AUDIO_Device) close(AUDIO_Device);
