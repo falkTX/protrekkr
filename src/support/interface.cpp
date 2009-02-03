@@ -55,6 +55,7 @@ unsigned short Keys[SDLK_LAST];
 unsigned short Keys_Sym[SDLK_LAST];
 unsigned short Keys_Raw_Off[SDLK_LAST];
 unsigned short Keys_Raw[SDLK_LAST];
+unsigned short Keys_Unicode[SDLK_LAST];
 int Key_Unicode;
 char FullScreen = FALSE;
 char AutoSave;
@@ -344,13 +345,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     char *NoMidi = "";
     char *NoCodec = "";
 
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
     NoMidi = "no midi";
 #endif
-#if defined(__NOCODEC__)
+#if defined(__NO_CODEC__)
     NoCodec = " - no codec";
 #endif
-#if !defined(__NOMIDI__) && !defined(__NOCODEC__)
+#if !defined(__NO_MIDI__) && !defined(__NOCODEC__)
     NoMidi = "none";
 #endif
 
@@ -368,17 +369,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                  MAKEINTRESOURCE(IDI_ICON1)));
 #endif
 
-/*#if defined(__MACOSX__)
-    static NSGetExecutablePathProcPtr NSGetExecutablePath = NULL;
-    NSGetExecutablePath = (NSGetExecutablePathProcPtr) NSAddressOfSymbol(NSLookupAndBindSymbol("__NSGetExecutablePath"));
-    ExeName_Size = 1024;
-    if(NSGetExecutablePath == NULL)
-    {
-        Message_Error("Can't find NSGetExecutablePath, operating system may be too old.");
-        return(0);
-  	}
-#endif
-*/
     ExePath = (char *) malloc(ExeName_Size + 1);
     if(ExePath == NULL)
     {
@@ -389,9 +379,9 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
 #if defined(__LINUX__)
     // Note:
-    // it looks like some distributions don't have /proc/self
+    // it looks like some distros don't have /proc/self
     // Maybe a better (?) solution would be to use:
-    // sprintf(ExeProc, "/proc/$d/exe", getpid());
+    // sprintf(ExeProc, "/proc/$d/exe", getpid()); 
     readlink("/proc/self/exe", ExePath, sizeof(ExePath));
     int exename_len = strlen(ExePath);
     while(exename_len--)
@@ -520,7 +510,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     Prog_End = FALSE;
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     // Load midi devices infos
     Midi_GetAll();
 #endif
@@ -533,8 +523,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     SDL_GetMouseState((int *) &Startup_Mouse_Pos_x, (int *) &Startup_Mouse_Pos_y);
     Mouse.x = Startup_Mouse_Pos_x;
     Mouse.y = Startup_Mouse_Pos_y;
-    Mouse.old_x = Startup_Mouse_Pos_x;
-    Mouse.old_y = Startup_Mouse_Pos_y;
+    Mouse.old_x = -16;
+    Mouse.old_y = -16;
 
     while(!Prog_End)
     {
@@ -546,6 +536,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         memset(Keys, 0, sizeof(Keys));
         memset(Keys_Sym, 0, sizeof(Keys_Sym));
         memset(Keys_Raw, 0, sizeof(Keys_Raw));
+        memset(Keys_Unicode, 0, sizeof(Keys_Raw));
 
         SDL_PumpEvents();
         int Nbr_Events = SDL_PeepEvents(Events, MAX_EVENTS, SDL_GETEVENT, 0xffffff);
@@ -564,15 +555,24 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Symbol = Events[i].key.keysym.sym;
                     if(Symbol != SDLK_KP_DIVIDE)
                     {
-#if !defined(__MACOSX__)
                         Uni_Trans = Events[i].key.keysym.unicode;
+                        // This is only used for the digits on all systems
+                        // (especially on kb configs where they can only
+                        //  be accessed by pressing shift).
+                        // Otherwise it doesn't work on Mac OSX
+                        Keys_Unicode[Uni_Trans] = TRUE;
+
+#if !defined(__MACOSX__)
                         if(!Uni_Trans) Uni_Trans = Symbol;
 #else
                         Uni_Trans = Symbol;
 #endif
                         Keys[Uni_Trans] = TRUE;
+
                         Scancode = Translate_Locale_Key(Symbol);
-//                        printf("%d %d\n", Scancode, Symbol);
+
+                        //printf("%x %d %x %d\n", Events[i].key.keysym.unicode, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
+
                         Keys_Raw[Scancode] = TRUE;
                         Keys_Raw_Off[Scancode] = FALSE;
                     }
@@ -605,8 +605,10 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Symbol = Events[i].key.keysym.sym;
                     Keys_Sym[Symbol] = FALSE;
 
-                    //Uni_Trans = Events[i].key.keysym.unicode;
-                    //if(Uni_Trans) Symbol = Uni_Trans;
+// Don't even bother
+//                    Uni_Trans = Events[i].key.keysym.unicode;
+//                    if(Uni_Trans) Symbol = Uni_Trans;
+                    
                     Scancode = Translate_Locale_Key(Symbol);
                     Keys_Raw[Scancode] = FALSE;
                     Keys_Raw_Off[Scancode] = TRUE;
@@ -614,15 +616,15 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
                 case SDL_MOUSEBUTTONUP:
                 case SDL_MOUSEBUTTONDOWN:
+                    Mouse.x = Events[i].button.x;
+                    Mouse.y = Events[i].button.y;
+
                     if(!display_title)
                     {
                         Remove_Title();
                     }
                     else
                     {
-                        Mouse.x = Events[i].button.x;
-                        Mouse.y = Events[i].button.y;
-
                         switch(Events[i].button.state)
                         {
                             case SDL_PRESSED:
@@ -680,10 +682,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                 case SDL_MOUSEMOTION:
                     Mouse.x = Events[i].motion.x;
                     Mouse.y = Events[i].motion.y;
-                    Mouse.delta_x = Mouse.old_x - Mouse.x;
-                    Mouse.delta_y = Mouse.old_y - Mouse.y;
-                    Mouse.old_x = Mouse.x;
-                    Mouse.old_y = Mouse.y;
                     break;
 
                 case SDL_QUIT:
@@ -712,14 +710,16 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
             }
         }
 
+        if(display_title == 3) Display_Mouse_Pointer(Mouse.old_x, Mouse.old_y, TRUE);
+
         if(!Screen_Update()) break;
 
-#if defined(__WIN32__) || defined(__MACOSX__)
+        if(display_title == 3) Display_Mouse_Pointer(Mouse.x, Mouse.y, FALSE);
         // Flush all pending blits
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
-#endif
 
-        SDL_Flip(Main_Screen);
+        Mouse.old_x = Mouse.x;
+        Mouse.old_y = Mouse.y;
 
         SDL_Delay(10);
     }
@@ -728,13 +728,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
 	if(ExePath) free(ExePath);
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     // Close any opened midi devices on any exit
     Midi_CloseIn();
     Midi_CloseOut();
 #endif
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     // Free the devices enumeration
     Midi_FreeAll();
 #endif
@@ -755,11 +755,13 @@ int Switch_FullScreen(void)
 {
     Env_Change = TRUE;
     if((Main_Screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                       SCREEN_BPP, (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+                                       SCREEN_BPP, SDL_SWSURFACE | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
     {
         return(FALSE);
     }
     Init_UI();
+
+    SDL_ShowCursor(0);
     return(TRUE);
 }
 

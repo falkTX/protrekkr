@@ -111,7 +111,6 @@ SDL_Surface *FONT_LOW;
 SDL_TimerID Timer;
 Uint32 Timer_CallBack(Uint32 interval, void *param);
 Uint32 (*Timer_Ptr)(Uint32 interval, void *param) = &Timer_CallBack;
-int Cpu_Trigger;
 char CpuStr[80];
 
 int Asking_Exit;
@@ -137,7 +136,6 @@ int Track_Number;
 
 void Mouse_Sliders_Master_Shuffle(void);
 void Display_Beat_Time(void);
-void Update_Cpu_Load(void);
 void Calc_Length(void);
 
 extern int Ticks_Synchro_Left;
@@ -280,7 +278,7 @@ int Init_Context(void)
 
     Clear_Files_List();
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     midiin_changed = 2;
     midiout_changed = 2;
 
@@ -296,7 +294,7 @@ int Init_Context(void)
 
     if(!Init_Block_Work()) return(FALSE);
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     Midi_Reset();
 #endif
 
@@ -342,6 +340,8 @@ int Init_Context(void)
         return(FALSE);
     }
 
+    POINTER = Load_Skin_Picture("pointer");
+    if(!POINTER) return(FALSE);
     SKIN303 = Load_Skin_Picture("303");
     if(!SKIN303) return(FALSE);
     PFONT = Load_Skin_Picture("pattern_font");
@@ -351,12 +351,13 @@ int Init_Context(void)
     FONT_LOW = Load_Skin_Picture("font");
     if(!FONT_LOW) return(FALSE);
 
-    Set_Pictures_Colors();
+    if(!Set_Pictures_Colors()) return(FALSE);
 
     if(!Load_Font_Datas("font_datas")) return(FALSE);
 
     SDL_SetColorKey(FONT, SDL_SRCCOLORKEY, 0);
     SDL_SetColorKey(FONT_LOW, SDL_SRCCOLORKEY, 0);
+    SDL_SetColorKey(POINTER, SDL_SRCCOLORKEY, 0);
 
     Timer = SDL_AddTimer(1000, Timer_Ptr, NULL);
 
@@ -375,10 +376,9 @@ void Destroy_Context(void)
     Free_Samples();
 
     // Freeing Allocated Patterns
-    if(RawPatterns)
-    {
-        free(RawPatterns);
-    }
+    if(RawPatterns) free(RawPatterns);
+
+    Destroy_UI();
     SDL_Quit();
 }
 
@@ -454,8 +454,6 @@ int Screen_Update(void)
         DrawHLine(18, Rt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
 
         if(actuloop) Afloop();
-
-        Update_Cpu_Load();
     }
 
     if(gui_action != 0)
@@ -464,13 +462,13 @@ int Screen_Update(void)
         // Files list slider
         if(gui_action == GUI_CMD_SET_FILES_LIST_SLIDER)
         {
-            lt_ykar = Mouse.old_y - 72;
+            lt_ykar = Mouse.y - 72;
             ltActualize(0);
         }
 
         if(gui_action == GUI_CMD_SET_FILES_LIST_SELECT_FILE)
         {
-            int broadcast = lt_index + (Mouse.old_y - 44) / 12;
+            int broadcast = lt_index + (Mouse.y - 44) / 12;
             last_index = -1;
             if(broadcast != lt_curr)
             {
@@ -725,23 +723,23 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_TRACK_CUTOFF_FREQ)
         {
-            TCut[ped_track] = float(Mouse.old_x - 88);
+            TCut[ped_track] = float(Mouse.x - 88);
             Actualize_Track_Ed(1);
             liveparam = LIVE_PARAM_TRACK_CUTOFF;
-            livevalue = (Mouse.old_x - 88) * 2;
+            livevalue = (Mouse.x - 88) * 2;
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_RESONANCE)
         {
-            FRez[ped_track] = Mouse.old_x - 88;
+            FRez[ped_track] = Mouse.x - 88;
             Actualize_Track_Ed(2);
             liveparam = LIVE_PARAM_TRACK_RESONANCE;
-            livevalue = (Mouse.old_x - 88) * 2;
+            livevalue = (Mouse.x - 88) * 2;
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_INERTIA)
         {
-            ICut[ped_track] = (Mouse.old_x - 88.0f) * 0.00006103515625f;
+            ICut[ped_track] = (Mouse.x - 88.0f) * 0.00006103515625f;
             Actualize_Track_Ed(3);
         }
 
@@ -752,34 +750,34 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_TRACK_THRESHOLD)
         {
-            DThreshold[ped_track] = float((Mouse.old_x - 318) * 512);
+            DThreshold[ped_track] = float((Mouse.x - 318) * 512);
             Actualize_Track_Ed(7);
             liveparam = LIVE_PARAM_TRACK_THRESHOLD;
-            livevalue = (Mouse.old_x - 318) * 2;
+            livevalue = (Mouse.x - 318) * 2;
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_CLAMP)
         {
-            DClamp[ped_track] = float((Mouse.old_x - 318) * 512);
+            DClamp[ped_track] = float((Mouse.x - 318) * 512);
             Actualize_Track_Ed(8);
             liveparam = LIVE_PARAM_TRACK_CLAMP;
-            livevalue = (Mouse.old_x - 318) * 2;
+            livevalue = (Mouse.x - 318) * 2;
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_REVERB_SEND)
         {
-            DSend[ped_track] = float(((float) Mouse.old_x - 318) / 128.0f);
+            DSend[ped_track] = float(((float) Mouse.x - 318) / 128.0f);
             Actualize_Track_Ed(5);
             liveparam = LIVE_PARAM_TRACK_REVERB_SEND;
-            livevalue = (Mouse.old_x - 318) * 2;
+            livevalue = (Mouse.x - 318) * 2;
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_PANNING)
         {
-            TPan[ped_track] = ((float) Mouse.old_x - 318) / 128.0f;
+            TPan[ped_track] = ((float) Mouse.x - 318) / 128.0f;
             Actualize_Track_Ed(9);
             liveparam = LIVE_PARAM_TRACK_PANNING;
-            livevalue = Mouse.old_x - 318;
+            livevalue = Mouse.x - 318;
         }
 
         // Tabs select
@@ -932,13 +930,13 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_AMPLI)
         {
-            SampleVol[ped_patsam][ped_split] = float((Mouse.old_x - 436) / 32.0f);
+            SampleVol[ped_patsam][ped_split] = float((Mouse.x - 436) / 32.0f);
             Actualize_Instrument_Ed(0, 1);
         }
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_FINETUNE)
         {
-            FineTune_Value = ((Mouse.old_x - 436) - 64) * 2;
+            FineTune_Value = ((Mouse.x - 436) - 64) * 2;
             if(FineTune_Value > 127) FineTune_Value = 127;
             if(FineTune_Value < -127) FineTune_Value = -127;
             Finetune[ped_patsam][ped_split] = FineTune_Value;
@@ -947,7 +945,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_DECAY)
         {
-            FDecay[ped_patsam][ped_split] = float(Mouse.old_x - 62) / 8192.0f;
+            FDecay[ped_patsam][ped_split] = float(Mouse.x - 62) / 8192.0f;
             Actualize_Instrument_Ed(0, 3);
         }
 
@@ -1149,7 +1147,6 @@ int Screen_Update(void)
     // Draw the main windows layout
     if(redraw_everything == 1)
     {
-
         if(!display_title)
         {
             SetColor(LOGO_BKCOL);
@@ -1200,6 +1197,9 @@ int Screen_Update(void)
             Gui_Draw_Button_Box(320, 134, 64, 16, "Delete", BUTTON_NORMAL);
 
             Refresh_UI_Context();
+
+            // CPU meter was here
+            Gui_Draw_Button_Box(586 + 60 + 100, 6, 52, 16, CpuStr, BUTTON_NORMAL | BUTTON_DISABLED);
 
             ltActualize(0);
 
@@ -1253,7 +1253,7 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
     SampleType[n_index][ped_split] = 1;
     // Gsm by default
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     SampleCompression[n_index] = SMP_PACK_GSM;
 #else
     SampleCompression[n_index] = SMP_PACK_NONE;
@@ -1495,7 +1495,7 @@ void StartRec(void)
     liveparam = 0;
     livevalue = 0;
     if(sr_isrecording) Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: ON", BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(8, 80, 80, 16, "Live rec: OFF", BUTTON_NORMAL);
+    else Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: OFF", BUTTON_NORMAL);
 }
 
 // ------------------------------------------------------
@@ -1530,7 +1530,7 @@ void SongStop(void)
         ped_line = ped_line_delay;
     }
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     Midi_AllNotesOff();
 #endif
 
@@ -1570,7 +1570,7 @@ void Newmod(void)
 
     nPatterns = 1;
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
     Midi_Reset();
 #endif
 
@@ -2221,14 +2221,17 @@ void Keyboard_Handler(void)
             else Insert_Track_Line(ped_track, Cur_Position);
         }
 
-        if(Keys[SDLK_BACKSPACE] && is_editing)
+        if(snamesel == 0)
         {
-            // BACKSPACE
-            if(ped_line)
+            if(Keys[SDLK_BACKSPACE] && is_editing)
             {
-                ped_line--;
-                if(Get_LShift()) Remove_Pattern_Line(Cur_Position);
-                else Remove_Track_Line(ped_track, Cur_Position);
+                // BACKSPACE
+                if(ped_line)
+                {
+                    ped_line--;
+                    if(Get_LShift()) Remove_Pattern_Line(Cur_Position);
+                    else Remove_Track_Line(ped_track, Cur_Position);
+                }
             }
         }
     }
@@ -2522,7 +2525,7 @@ void Keyboard_Handler(void)
             retletter[27] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_0])
+        if(Keys_Unicode['0'])
         {
             retletter[27] = TRUE;
             reelletter = TRUE;
@@ -2532,7 +2535,7 @@ void Keyboard_Handler(void)
             retletter[28] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_1])
+        if(Keys_Unicode['1'])
         {
             retletter[28] = TRUE;
             reelletter = TRUE;
@@ -2542,7 +2545,7 @@ void Keyboard_Handler(void)
             retletter[29] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_2])
+        if(Keys_Unicode['2'])
         {
             retletter[29] = TRUE;
             reelletter = TRUE;
@@ -2552,7 +2555,7 @@ void Keyboard_Handler(void)
             retletter[30] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_3])
+        if(Keys_Unicode['3'])
         {
             retletter[30] = TRUE;
             reelletter = TRUE;
@@ -2562,7 +2565,7 @@ void Keyboard_Handler(void)
             retletter[31] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_4])
+        if(Keys_Unicode['4'])
         {
             retletter[31] = TRUE;
             reelletter = TRUE;
@@ -2572,7 +2575,7 @@ void Keyboard_Handler(void)
             retletter[32] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_5])
+        if(Keys_Unicode['5'])
         {
             retletter[32] = TRUE;
             reelletter = TRUE;
@@ -2582,7 +2585,7 @@ void Keyboard_Handler(void)
             retletter[33] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_6])
+        if(Keys_Unicode['6'])
         {
             retletter[33] = TRUE;
             reelletter = TRUE;
@@ -2592,7 +2595,7 @@ void Keyboard_Handler(void)
             retletter[34] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_7])
+        if(Keys_Unicode['7'])
         {
             retletter[34] = TRUE;
             reelletter = TRUE;
@@ -2602,7 +2605,7 @@ void Keyboard_Handler(void)
             retletter[35] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_8])
+        if(Keys_Unicode['8'])
         {
             retletter[35] = TRUE;
             reelletter = TRUE;
@@ -2612,7 +2615,7 @@ void Keyboard_Handler(void)
             retletter[36] = TRUE;
             reelletter = TRUE;
         }
-        if(Keys[SDLK_9])
+        if(Keys_Unicode['9'])
         {
             retletter[36] = TRUE;
             reelletter = TRUE;
@@ -2955,37 +2958,27 @@ void Keyboard_Handler(void)
         if(Keys_Raw_Off[0x34]) { Record_Keys[34] = (14 + 1) | 0x80; Keys_Raw_Off[0x34] = FALSE; }
         if(Keys_Raw_Off[0x27]) { Record_Keys[35] = (15 + 1) | 0x80; Keys_Raw_Off[0x27] = FALSE; }
         if(Keys_Raw_Off[0x35]) { Record_Keys[36] = (16 + 1) | 0x80; Keys_Raw_Off[0x35] = FALSE; }
-/*
-        if(Keys_Raw[2]) retvalue = 1;             //
-        if(Keys_Raw[3]) retvalue = 2;             //
-        if(Keys_Raw[4]) retvalue = 3;             //
-        if(Keys_Raw[5]) retvalue = 4;             //
-        if(Keys_Raw[6]) retvalue = 5;             //
-        if(Keys_Raw[7]) retvalue = 6;             //
-        if(Keys_Raw[8]) retvalue = 7;             //
-        if(Keys_Raw[9]) retvalue = 8;             //
-        if(Keys_Raw[10]) retvalue = 9;            //
-        if(Keys_Raw[11]) retvalue = 0;            //
-*/
-        if(Keys[SDLK_0]) retvalue = 0;
+
+        // Data columns
+        if(Keys_Unicode['0']) retvalue = 0;
         if(Keys[SDLK_KP0]) retvalue = 0;
-        if(Keys[SDLK_1]) retvalue = 1;
+        if(Keys_Unicode['1']) retvalue = 1;
         if(Keys[SDLK_KP1]) retvalue = 1;
-        if(Keys[SDLK_2]) retvalue = 2;
+        if(Keys_Unicode['2']) retvalue = 2;
         if(Keys[SDLK_KP2]) retvalue = 2;
-        if(Keys[SDLK_3]) retvalue = 3;
+        if(Keys_Unicode['3']) retvalue = 3;
         if(Keys[SDLK_KP3]) retvalue = 3;
-        if(Keys[SDLK_4]) retvalue = 4;
+        if(Keys_Unicode['4']) retvalue = 4;
         if(Keys[SDLK_KP4]) retvalue = 4;
-        if(Keys[SDLK_5]) retvalue = 5;
+        if(Keys_Unicode['5']) retvalue = 5;
         if(Keys[SDLK_KP5]) retvalue = 5;
-        if(Keys[SDLK_6]) retvalue = 6;
+        if(Keys_Unicode['6']) retvalue = 6;
         if(Keys[SDLK_KP6]) retvalue = 6;
-        if(Keys[SDLK_7]) retvalue = 7;
+        if(Keys_Unicode['7']) retvalue = 7;
         if(Keys[SDLK_KP7]) retvalue = 7;
-        if(Keys[SDLK_8]) retvalue = 8;
+        if(Keys_Unicode['8']) retvalue = 8;
         if(Keys[SDLK_KP8]) retvalue = 8;
-        if(Keys[SDLK_9]) retvalue = 9;
+        if(Keys_Unicode['9']) retvalue = 9;
         if(Keys[SDLK_KP9]) retvalue = 9;
         if(Keys[SDLK_a]) retvalue = 10;
         if(Keys[SDLK_b]) retvalue = 11;
@@ -3099,7 +3092,7 @@ void Keyboard_Handler(void)
                         noteoff303(Track_Number); // 303 Note Off...
                         if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                         Midi_NoteOff(Track_Number);
 #endif
 
@@ -3711,7 +3704,7 @@ void Mouse_Handler(void)
         // Current track slider
         if(zcheckMouse(726, 429, 72, 16))
         {
-            float Pos_Mouse = (Mouse.old_x - 726);
+            float Pos_Mouse = (Mouse.x - 726);
             if(Pos_Mouse < 0) Pos_Mouse = 0;
             int disp = 6;
             if(Songtracks < disp) disp = Songtracks;
@@ -4092,7 +4085,7 @@ void Mouse_Handler(void)
         // Solo track with right mouse button
         if(zcheckMouse(1, 184, CONSOLE_WIDTH, 10) == 1)
         {
-            int tmp_track = gui_track + ((Mouse.old_x - 24) / PAT_COL_MAX);
+            int tmp_track = gui_track + ((Mouse.x - 24) / PAT_COL_MAX);
 
             if(tmp_track > 15) tmp_track = 15;
             if(tmp_track < 0) tmp_track = 0;
@@ -4302,7 +4295,7 @@ void Display_Master_Comp(void)
         Realslider_Size(159 + 54, 6, 50, f2i(mas_comp_threshold * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
-            sprintf(tt, "off");
+            sprintf(tt, "Off");
         }
         else
         {
@@ -4314,7 +4307,7 @@ void Display_Master_Comp(void)
         Realslider_Size(283 + 41, 6, 50, f2i(mas_comp_ratio * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
-            sprintf(tt, "off");
+            sprintf(tt, "Off");
         }
         else
         {
@@ -4365,18 +4358,17 @@ void Mouse_Sliders_Master_Shuffle(void)
 {
     if(display_title)
     {
-
         // Compressor threshold
         if(zcheckMouse(213, 6, 67, 18))
         {
-            Mas_Compressor_Set_Variables((Mouse.old_x - 223.0f) * 2.0f, mas_comp_ratio);
+            Mas_Compressor_Set_Variables((Mouse.x - 223.0f) * 2.0f, mas_comp_ratio);
             Display_Master_Comp();
         }
 
         // Compressor ratio
         if(zcheckMouse(324, 6, 67, 18))
         {
-            Mas_Compressor_Set_Variables(mas_comp_threshold, (Mouse.old_x - 334.0f) * 2.0f);
+            Mas_Compressor_Set_Variables(mas_comp_threshold, (Mouse.x - 334.0f) * 2.0f);
             Display_Master_Comp();
         }
 
@@ -4384,26 +4376,16 @@ void Mouse_Sliders_Master_Shuffle(void)
         if(zcheckMouse(438, 6, 148, 18))
         {
             // Normalized
-            mas_vol = (Mouse.old_x - 448.0f) / 128.0f;
+            mas_vol = (Mouse.x - 448.0f) / 128.0f;
             Display_Master_Volume();
         }
 
         // Shuffle
         if(zcheckMouse(586 + 40, 6, 120, 18))
         {
-            shuffle = (int) ((Mouse.old_x - (586 + 40 + 10)));
+            shuffle = (int) ((Mouse.x - (586 + 40 + 10)));
             Display_Shuffle();
         }
-    }
-}
-
-void Update_Cpu_Load(void)
-{
-    // Update the CPU load display
-    if(Cpu_Trigger)
-    {
-        Cpu_Trigger = FALSE;
-        Gui_Draw_Button_Box(586 + 60 + 100, 6, 52, 16, CpuStr, BUTTON_NORMAL | BUTTON_DISABLED);
     }
 }
 

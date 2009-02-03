@@ -13,7 +13,7 @@ EXEOBJS = main.o \
           timer.o interface.o \
           misc_draw.o xml.o \
           riff.o \
-          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o \
+          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver.o
 
 all: ProTrekkr
@@ -29,88 +29,91 @@ ProTrekkr: $(EXEOBJS)
 	-rm -f $(EXEOBJS)
 	
 main.o: src/main.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/$(*).cpp
 
 editor_303.o: src/editors/editor_303.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_pattern.o: src/editors/editor_pattern.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_sequencer.o: src/editors/editor_sequencer.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_track.o: src/editors/editor_track.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_track_fx.o: src/editors/editor_track_fx.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 patterns_blocks.o: src/editors/patterns_blocks.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_synth.o: src/editors/editor_synth.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_sample.o: src/editors/editor_sample.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_fx_setup.o: src/editors/editor_fx_setup.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_setup.o: src/editors/editor_setup.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_diskio.o: src/editors/editor_diskio.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_instrument.o: src/editors/editor_instrument.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/editors/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 samples_pack.o: src/files/samples_pack.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 files_list.o: src/files/files_list.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 files.o: src/files/files.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/files/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 midi.o: src/midi/midi.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/midi/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
 
 midi_drv_windows.o: src/midi/midi_drv_windows.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/midi/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
 
 timer.o: src/support/timer.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/support/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 interface.o: src/support/interface.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/support/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 misc_draw.o: src/ui/misc_draw.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/ui/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 xml.o: src/ui/xml.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/ui/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 riff.o: src/wav/riff.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) src/wav/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) src/wav/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 cubic_spline.o: release/distrib/replay/lib/cubic_spline.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 replay.o: release/distrib/replay/lib/replay.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 synth.o: release/distrib/replay/lib/synth.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+endianness.o: release/distrib/replay/lib/endianness.cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 sounddriver.o: release/distrib/replay/lib/sounddriver/sounddriver.cpp
-	g++ -c -o $(@) $(FLAGS) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp
+	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp

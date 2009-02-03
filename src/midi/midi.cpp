@@ -4,7 +4,7 @@
 // Based on the work of Juan Antonio Arguelles Rius 
 // ------------------------------------------------------
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
 
 // ------------------------------------------------------
 // Includes

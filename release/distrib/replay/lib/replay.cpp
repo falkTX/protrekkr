@@ -7,6 +7,7 @@
 // ------------------------------------------------------
 // Includes
 #include "include/replay.h"
+#include "include/endianness.h"
 
 #if !defined(__STAND_ALONE__)
 #include "../../../../src/midi/include/midi.h"
@@ -1426,7 +1427,7 @@ void Sp_Player(void)
 #endif
 
 #if !defined(__STAND_ALONE__)
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                 /* MidiController commands */
                 if(pl_pan_row == 144 && c_midiout != -1 && pl_eff_row < 128)
                 {
@@ -1476,7 +1477,7 @@ void Sp_Player(void)
 #endif
 
 #if !defined(__STAND_ALONE__)
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                     Midi_NoteOff(ct);
 #endif
 #endif
@@ -1792,7 +1793,7 @@ ByPass_Wav:
             Synthesizer[c].NoteOff();
 
 #if !defined(__STAND_ALONE__)
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             Midi_NoteOff(c);
 #endif
 #endif
@@ -2375,7 +2376,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         new_instrument[channel] = TRUE;
 
 #if !defined(__STAND_ALONE__)
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         if(TRACKSTATE[channel] == 0 &&
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
@@ -2395,7 +2396,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
             Midi_Send(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
         }
-#endif // __NOMIDI
+#endif // __NO_MIDI
 #endif // __STAND_ALONE__
 
     }
@@ -2563,7 +2564,7 @@ void DoEffects(void)
                 Synthesizer[trackef].NoteOff();
 
 #if !defined(__STAND_ALONE__)
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                 Midi_NoteOff(trackef);
 #endif
 #endif
@@ -3424,7 +3425,7 @@ void init_sample_bank(void)
 void KillInst(int inst_nbr)
 {
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     // Gsm is the default packing scheme
     SampleCompression[inst_nbr] = SMP_PACK_GSM;
 #else

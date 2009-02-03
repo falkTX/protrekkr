@@ -7,7 +7,7 @@
 #ifndef _SAMPLES_UNPACK_H_
 #define _SAMPLES_UNPACK_H_
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
 
 // ------------------------------------------------------
 // Includes

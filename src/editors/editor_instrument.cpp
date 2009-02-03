@@ -48,7 +48,7 @@ void Draw_Instrument_Ed(void)
         case 0:
             Gui_Draw_Flat_Box("Instrument Editor [Sampler]");
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
             Gui_Draw_Button_Box(640, 466, 88, 16, "Packing Scheme", BUTTON_NORMAL | BUTTON_DISABLED);
 #endif
 
@@ -207,7 +207,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 }
                 if(gode == 0 || gode == 10)
                 {
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                     if(Midiprg[ped_patsam] == -1)
                     {
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -217,7 +217,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #endif
                         Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_DISABLED);
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
                     }
                     else
                     {
@@ -309,7 +309,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     switch(SampleCompression[ped_patsam])
                     {
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
                         case SMP_PACK_GSM:
                             Gui_Draw_Button_Box(640, 484, 88, 16, "Gsm 6.10", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + 18, 88, 16, "Mp3", Allow_Global);
@@ -416,7 +416,7 @@ void Mouse_Sliders_Instrument_Ed(void)
         {
             if(zcheckMouse(52, 546, 148, 16))
             {
-                CustomVol[ped_patsam] = float(Mouse.old_x - 62) * 0.0078125f;
+                CustomVol[ped_patsam] = float(Mouse.x - 62) * 0.0078125f;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 15;
             }
@@ -485,7 +485,7 @@ void Mouse_Left_Instrument_Ed(void)
             NewWav();
         }
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
         {
             Midiprg[ped_patsam]--;
@@ -575,7 +575,7 @@ void Mouse_Left_Instrument_Ed(void)
         if(Allow_Global_Sliders)
         {
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
             if(zcheckMouse(640, 484, 88, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_GSM;
@@ -663,7 +663,7 @@ void Mouse_Right_Instrument_Ed(void)
             }
         }
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
         {
             if(Midiprg[ped_patsam] > 14) Midiprg[ped_patsam] -= 16;

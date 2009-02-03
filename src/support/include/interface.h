@@ -41,8 +41,6 @@ typedef struct
     int old_y;
     int button;
     int button_oneshot;
-    int delta_x;
-    int delta_y;
     int wheel;
 } MOUSE, *LPMOUSE;
 
@@ -53,6 +51,7 @@ extern unsigned short Keys_Sym[SDLK_LAST];
 extern int Key_Unicode;
 extern unsigned short Keys_Raw[SDLK_LAST];
 extern unsigned short Keys_Raw_Off[SDLK_LAST];
+extern unsigned short Keys_Unicode[SDLK_LAST];
 extern int Env_Change;
 extern int key_on;
 extern char Keyboard_Name[];

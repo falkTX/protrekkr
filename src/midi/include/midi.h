@@ -7,7 +7,7 @@
 #ifndef _CAPTURE_MIDI_H_
 #define _CAPTURE_MIDI_H_
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
 
 // ------------------------------------------------------
 // Includes

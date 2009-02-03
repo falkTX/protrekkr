@@ -920,7 +920,7 @@ void Mouse_Sliders_303_Ed(void)
         // Volume Knob
         if(zcheckMouse(529, 485, 19, 88))
         {
-            float breakvol = (float) (90 - (Mouse.old_y - 485));
+            float breakvol = (float) (90 - (Mouse.y - 485));
             breakvol /= 86.0f;
             if(breakvol < 0.0f) breakvol = 0.0f;
             if(breakvol > 1.0f) breakvol = 1.0f;
@@ -932,9 +932,9 @@ void Mouse_Sliders_303_Ed(void)
         // Tune Knob
         if(zcheckMouse(229, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].tune;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].tune;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].tune = tempz;
@@ -947,9 +947,9 @@ void Mouse_Sliders_303_Ed(void)
         // CutOff Knob
         if(zcheckMouse(262, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].cutoff;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].cutoff;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].cutoff = tempz;
@@ -962,9 +962,9 @@ void Mouse_Sliders_303_Ed(void)
         // Reso knob
         if(zcheckMouse(295, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].resonance;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].resonance;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].resonance = tempz;
@@ -977,9 +977,9 @@ void Mouse_Sliders_303_Ed(void)
         // Envmod knob
         if(zcheckMouse(328, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].envmod;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].envmod;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].envmod = tempz;
@@ -992,9 +992,9 @@ void Mouse_Sliders_303_Ed(void)
         // Decay knob
         if(zcheckMouse(361, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].decay;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].decay;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].decay = tempz;
@@ -1007,9 +1007,9 @@ void Mouse_Sliders_303_Ed(void)
         // Accent knob
         if(zcheckMouse(394, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.old_y + tb303[sl3].accent;
+            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].accent;
 
-            int tempz = fluzy - Mouse.old_y;
+            int tempz = fluzy - Mouse.y;
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].accent = tempz;

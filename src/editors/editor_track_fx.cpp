@@ -150,19 +150,19 @@ void Mouse_Sliders_Track_Fx_Ed(void)
     {
         if(zcheckMouse(74, 490, 148, 16))
         {
-            LFO_RATE[ped_track] = (Mouse.old_x - 84) / 16384.0f;
+            LFO_RATE[ped_track] = (Mouse.x - 84) / 16384.0f;
             teac = 2;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
         }
         if(zcheckMouse(74, 508, 148, 16))
         {
-            LFO_AMPL[ped_track] = float(Mouse.old_x - 84);
+            LFO_AMPL[ped_track] = float(Mouse.x - 84);
             teac = 3;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
         }
         if(zcheckMouse(74, 544, 148, 16))
         {
-            FLANGER_DEPHASE[ped_track] = (Mouse.old_x - 84) * 0.0490873f;
+            FLANGER_DEPHASE[ped_track] = (Mouse.x - 84) * 0.0490873f;
             teac = 4;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 4;
@@ -171,30 +171,30 @@ void Mouse_Sliders_Track_Fx_Ed(void)
         if(zcheckMouse(298, 479, 148, 16))
         {
             teac = 1;
-            FLANGER_AMOUNT[ped_track] = ((Mouse.old_x - 308.0f) / 64.0f) - 1.0f;
+            FLANGER_AMOUNT[ped_track] = ((Mouse.x - 308.0f) / 64.0f) - 1.0f;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
         }
         if(zcheckMouse(298, 497, 148, 16))
         {
-            FLANGER_RATE[ped_track] = (Mouse.old_x - 308.0f) / 939104.92f;
+            FLANGER_RATE[ped_track] = (Mouse.x - 308.0f) / 939104.92f;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 5;
         }
         if(zcheckMouse(298, 515, 148, 16))
         {
-            FLANGER_AMPL[ped_track] = (Mouse.old_x - 308.0f) / 12800.0f;
+            FLANGER_AMPL[ped_track] = (Mouse.x - 308.0f) / 12800.0f;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 6;
         }
         if(zcheckMouse(298, 533, 148, 16))
         {
-            FLANGER_FEEDBACK[ped_track] = ((Mouse.old_x - 308) / 64.0f) - 1.0f;
+            FLANGER_FEEDBACK[ped_track] = ((Mouse.x - 308) / 64.0f) - 1.0f;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 7;
         }
         if(zcheckMouse(298, 551, 148, 16))
         {
-            FLANGER_DELAY[ped_track] = (Mouse.old_x - 308) * 32;
+            FLANGER_DELAY[ped_track] = (Mouse.x - 308) * 32;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             fld_chan = true;
             teac = 8;

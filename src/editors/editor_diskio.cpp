@@ -10,7 +10,6 @@
 
 // ------------------------------------------------------
 // Variables
-extern int Cpu_Trigger;
 extern char CpuStr[80];
 int allow_save = TRUE;
 int song_Seconds;
@@ -96,8 +95,6 @@ void Draw_DiskIO_Ed(void)
 
     PrintXY(350, 472, USE_FONT, "Tracks To Render As WAV:");
     Display_Tracks_To_Render();
-
-    Cpu_Trigger = TRUE;
 }
 
 void Actualize_DiskIO_Ed(void)

@@ -179,7 +179,7 @@
 #define MIN_PEAK MAX_VUMETER - 12
 
 #if defined(__LINUX__) || defined(__MACOSX__)
-#define MAX_PATH 1024
+#define MAX_PATH 260
 #endif
 
 // ------------------------------------------------------

@@ -1,9 +1,9 @@
 TODO:
 
  Concerning the MacOSX port:
- - See the problem when entering numeric digits (not keypad) in patterns.
  - Finish to implement the sound callback.
- - There's probably a lot of endianness insanity.
+ - There's probably a lot of endianness insanity in files handling.
+
  - Modify the executable makefile to produce universal binary.
  - Create 2 make files for the replay (x86/ppc).
  - See to create a distrib within a .app folder.

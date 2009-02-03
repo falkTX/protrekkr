@@ -250,6 +250,10 @@ SOURCE=.\Release\Distrib\Replay\lib\include\Cubic_Spline.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\release\distrib\replay\lib\include\endianness.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Release\Distrib\Replay\lib\include\Ptk_Def_Properties.h
 # End Source File
 # Begin Source File
@@ -292,6 +296,10 @@ SOURCE=.\Release\Distrib\Replay\lib\SoundDriver\SoundDriver.cpp
 # Begin Source File
 
 SOURCE=.\Release\Distrib\Replay\lib\Cubic_Spline.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\release\distrib\replay\lib\endianness.cpp
 # End Source File
 # Begin Source File
 

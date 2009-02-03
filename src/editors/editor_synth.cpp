@@ -557,7 +557,7 @@ void Check_Slider(int *Value, int x, int y)
 {
     if(zcheckMouse(x - 2, y, 148, 16))
     {
-        *Value = Mouse.old_x - ((x - 2) + 10);
+        *Value = Mouse.x - ((x - 2) + 10);
         if(*Value < 0) *Value = 0;
         if(*Value > 128) *Value = 128;
         teac = UPDATE_SYNTH_ED_VALIDATE_PARAMS;

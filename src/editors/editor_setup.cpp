@@ -61,7 +61,7 @@ void Draw_Master_Ed(void)
 
     char middev[80];
 
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
     sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", 0, 0);
 #else
     sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", n_midiindevices, n_midioutdevices);
@@ -71,12 +71,12 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(12, 482, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 500, 56, 16, "Midi OUT", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 522, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
     );
     Gui_Draw_Button_Box(138, 522, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
     );
@@ -262,25 +262,37 @@ void Actualize_Master_Ed(char gode)
             {
                 Load_Keyboard_Def(Get_Keyboard_FileName());
             }
+
+#if defined(__WIN32__)
+            Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+#else
             Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+#endif            
+
             Gui_Draw_Button_Box(520 + 62 + 2 + 18, 475, 106, 16, Get_Keyboard_Label(), BUTTON_NORMAL | BUTTON_DISABLED);
+
+#if defined(__WIN32__)
+            Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+#else
             Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+#endif
+
         }
 
         // -----------
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         Midi_InitIn();
         Midi_InitOut();
 #endif
 
         if(gode == 0 || gode == 11)
         {
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
             value_box(70, 482, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
 #else
             value_box(70, 482, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             if(c_midiin != -1)
             {
                 Gui_Draw_Button_Box(132, 482, 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
@@ -289,19 +301,19 @@ void Actualize_Master_Ed(char gode)
             {
 #endif
                 Gui_Draw_Button_Box(132, 482, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             }
 #endif
         }
 
         if(gode == 0 || gode == 12)
         {
-#if defined(__NOMIDI__)
+#if defined(__NO_MIDI__)
             value_box(70, 500, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
 #else
             value_box(70, 500, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             if(c_midiout != -1)
             {
                 Gui_Draw_Button_Box(132, 500, 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
@@ -310,7 +322,7 @@ void Actualize_Master_Ed(char gode)
             {
 #endif
                 Gui_Draw_Button_Box(132, 500, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             }
 #endif
         }
@@ -343,7 +355,6 @@ void Mouse_Left_Master_Ed(void)
 {
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
-
         // Milliseconds
         if(zcheckMouse(391, 455, 16, 16) == 1)
         {
@@ -528,7 +539,7 @@ void Mouse_Left_Master_Ed(void)
         // ---
 
         // Midi track notes off
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
             Midi_NoteOff(ped_track);
@@ -537,7 +548,7 @@ void Mouse_Left_Master_Ed(void)
 #endif
 
         // All Midi notes off
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
         {
             Midi_AllNotesOff();
@@ -545,7 +556,7 @@ void Mouse_Left_Master_Ed(void)
         }
 #endif
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         // Previous midi in device
         if(zcheckMouse(70, 482, 16, 16))
         {
@@ -581,6 +592,7 @@ void Mouse_Left_Master_Ed(void)
         }
 #endif
 
+#if !defined(__WIN32__)
         // Keyboard
         if(zcheckMouse(520 + 62 + 2, 475, 16, 16) == 1)
         {
@@ -596,6 +608,7 @@ void Mouse_Left_Master_Ed(void)
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 16;
         }
+#endif
 
     }
 }
@@ -610,7 +623,7 @@ void Mouse_Sliders_Master_Ed(void)
         if(zcheckMouse(518, 519, 148, 16))
         {
             Real_Palette_Idx = Idx_Palette[current_palette_idx];
-            Phony_Palette[Real_Palette_Idx].r = (int) ((Mouse.old_x - 10 - 518.0f)) * 2;
+            Phony_Palette[Real_Palette_Idx].r = (int) ((Mouse.x - 10 - 518.0f)) * 2;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
         }
@@ -619,7 +632,7 @@ void Mouse_Sliders_Master_Ed(void)
         if(zcheckMouse(518, 519 + 18, 148, 16))
         {
             Real_Palette_Idx = Idx_Palette[current_palette_idx];
-            Phony_Palette[Real_Palette_Idx].g = (int) ((Mouse.old_x - 10 - 518.0f)) * 2;
+            Phony_Palette[Real_Palette_Idx].g = (int) ((Mouse.x - 10 - 518.0f)) * 2;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
         }
@@ -628,7 +641,7 @@ void Mouse_Sliders_Master_Ed(void)
         if(zcheckMouse(518, 519 + 18 + 18, 148, 16))
         {
             Real_Palette_Idx = Idx_Palette[current_palette_idx];
-            Phony_Palette[Real_Palette_Idx].b = (int) ((Mouse.old_x - 10 - 518.0f)) * 2;
+            Phony_Palette[Real_Palette_Idx].b = (int) ((Mouse.x - 10 - 518.0f)) * 2;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
         }

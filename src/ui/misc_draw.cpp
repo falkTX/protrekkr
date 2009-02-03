@@ -8,6 +8,7 @@
 // Includes
 #include "include/misc_draw.h"
 #include "../include/variables.h"
+#include "../include/main.h"
 #include "../editors/include/editor_303.h"
 #include "../editors/include/editor_diskio.h"
 #include "../editors/include/editor_fx_setup.h"
@@ -214,6 +215,10 @@ SDL_Color Default_Palette[] =
 };
 
 LONGRGB Phony_Palette[sizeof(Default_Palette) / sizeof(SDL_Color)];
+
+SDL_Surface *POINTER;
+unsigned char *Pointer_BackBuf;
+int bare_color_idx;
 
 // ------------------------------------------------------
 // Functions
@@ -1127,6 +1132,11 @@ void UISetPalette(SDL_Color *Palette, int Amount)
         SDL_SetPalette(Temp_PFONT, SDL_PHYSPAL, Palette, 0, Amount);
         SDL_SetPalette(Temp_PFONT, SDL_LOGPAL, Palette, 0, Amount);
     }
+    if(POINTER)
+    {
+        SDL_SetPalette(POINTER, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(POINTER, SDL_LOGPAL, Palette, 0, Amount);
+    }
 
     SDL_SetPalette(Main_Screen, SDL_PHYSPAL, Palette, 0, Amount);
     SDL_SetPalette(Main_Screen, SDL_LOGPAL, Palette, 0, Amount);
@@ -1511,10 +1521,12 @@ void Restore_Default_Palette(void)
 
 // ------------------------------------------------------
 // Remap the pictures colors for our usage
-void Set_Pictures_Colors(void)
+int Set_Pictures_Colors(void)
 {
     int i;
     unsigned char *Pix;
+    int max_colors_pointer = 0;
+
     SDL_Palette *Pic_Palette;
     int min_idx = sizeof(Default_Palette) / sizeof(SDL_Color);
 
@@ -1529,6 +1541,8 @@ void Set_Pictures_Colors(void)
     {
         if(Pix[i]) Pix[i] = COL_FONT_LO;
     }
+   
+    bare_color_idx = min_idx;
 
     Pix = (unsigned char *) SKIN303->pixels;
     max_colors_303 = 0;
@@ -1566,7 +1580,11 @@ void Set_Pictures_Colors(void)
         Palette_Logo[i].b = Pic_Palette->colors[i].b;
         Palette_Logo[i].unused = Pic_Palette->colors[i].unused;
     }
+
     Temp_PFONT = SDL_AllocSurface(SDL_HWSURFACE, 192, 87 * 2, 8, 0, 0, 0, 0xff);
+
+    Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
+    memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));
 
     Set_Logo_Palette();
     Get_Phony_Palette();
@@ -1577,6 +1595,7 @@ void Set_Pictures_Colors(void)
     Init_UI();
 
     Create_Pattern_font();
+    return(TRUE);
 }
 
 void Set_Main_Palette(void)
@@ -1590,10 +1609,10 @@ Wait_Palette:
 
     for(i = 0; i < max_colors_303; i++)
     {
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_303[i].r;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_303[i].g;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_303[i].b;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
+        Ptk_Palette[i + bare_color_idx].r = Palette_303[i].r;
+        Ptk_Palette[i + bare_color_idx].g = Palette_303[i].g;
+        Ptk_Palette[i + bare_color_idx].b = Palette_303[i].b;
+        Ptk_Palette[i + bare_color_idx].unused = Palette_303[i].unused;
     }
 }
 
@@ -1603,11 +1622,60 @@ void Set_Logo_Palette(void)
 
     for(i = 0; i < max_colors_logo; i++)
     {
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].r = Palette_Logo[i].r;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].g = Palette_Logo[i].g;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].b = Palette_Logo[i].b;
-        Ptk_Palette[i + sizeof(Default_Palette) / sizeof(SDL_Color)].unused = Palette_303[i].unused;
+        Ptk_Palette[i + bare_color_idx].r = Palette_Logo[i].r;
+        Ptk_Palette[i + bare_color_idx].g = Palette_Logo[i].g;
+        Ptk_Palette[i + bare_color_idx].b = Palette_Logo[i].b;
+        Ptk_Palette[i + bare_color_idx].unused = Palette_303[i].unused;
     }
+}
+
+// ------------------------------------------------------
+// Display or clear the mouse pointer at given coordinates
+void Display_Mouse_Pointer(int x, int y, int clear)
+{
+    while(SDL_LockSurface(POINTER) < 0);
+    while(SDL_LockSurface(Main_Screen) < 0);
+
+    int i;
+    int j;
+    int Src_offset;
+    int Dst_offset;
+    int Len_Dst = Main_Screen->pitch * Main_Screen->h;
+    unsigned char *SrcPix = (unsigned char *) POINTER->pixels;
+    unsigned char *DstPix = (unsigned char *) Main_Screen->pixels;
+
+    for(j = 0; j < POINTER->h; j++)
+    {
+        for(i = 0; i < POINTER->w; i++)
+        {
+            Src_offset = (j * POINTER->pitch) + i;
+            Dst_offset = ((j + y) * Main_Screen->pitch) + (i + x);
+            if(Dst_offset >= 0)
+            {
+                if(((i + x) < Main_Screen->w) &&
+                   ((j + y) < Main_Screen->h))
+                {
+                    if(clear)
+                    {
+                        if(SrcPix[Src_offset])
+                        {
+                            DstPix[Dst_offset] = Pointer_BackBuf[Src_offset];
+                        }
+                    } 
+                    else
+                    {
+                        if(SrcPix[Src_offset])
+                        {
+                            Pointer_BackBuf[Src_offset] = DstPix[Dst_offset];
+                            DstPix[Dst_offset] = SrcPix[Src_offset];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    SDL_UnlockSurface(Main_Screen);
+    SDL_UnlockSurface(POINTER);
 }
 
 // ------------------------------------------------------
@@ -1622,4 +1690,11 @@ void Refresh_Palette(void)
 void Init_UI(void)
 {
     Refresh_Palette();
+}
+
+// ------------------------------------------------------
+// Free the allocated resources
+void Destroy_UI(void)
+{
+    if(Pointer_BackBuf) free(Pointer_BackBuf);
 }

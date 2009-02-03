@@ -51,6 +51,7 @@ class skin_file
 };
 
 extern list <skin_file> skin_files;
+extern SDL_Surface *POINTER;
 
 // ------------------------------------------------------
 // Variables
@@ -85,5 +86,6 @@ int Init_Context(void);
 void Destroy_Context(void);
 int Screen_Update(void);
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
+SDL_Surface *Load_Skin_Picture(char *name);
 
 #endif

@@ -161,7 +161,7 @@ void Mouse_Sliders_Fx_Ed(void)
     {
         if(zcheckMouse(77, 498, 148, 16))
         {
-            Feedback = float(float(Mouse.old_x - 87) / 127.0f);
+            Feedback = float(float(Mouse.x - 87) / 127.0f);
             if(Feedback < 0) Feedback = 0;
             if(Feedback > 0.99f) Feedback = 0.99f;
 
@@ -171,38 +171,38 @@ void Mouse_Sliders_Fx_Ed(void)
         
         if(zcheckMouse(77, 534, 148, 16))
         {
-            c_threshold = Mouse.old_x - 87;
+            c_threshold = Mouse.x - 87;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 7;
         }
         if(zcheckMouse(77, 552, 148, 16))
         {
-            REVERBFILTER = (float)(Mouse.old_x - 87) / 128.0f;
+            REVERBFILTER = (float)(Mouse.x - 87) / 128.0f;
             if(REVERBFILTER < 0.0f) REVERBFILTER = 0.0f;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 9;
         }  
         if(zcheckMouse(307, 480, 148, 16))
         {
-            lchorus_delay = (Mouse.old_x - 317) * 174;
+            lchorus_delay = (Mouse.x - 317) * 174;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 3;
         }
         if(zcheckMouse(307, 498, 148, 16))
         {
-            rchorus_delay = (Mouse.old_x - 317) * 174;
+            rchorus_delay = (Mouse.x - 317) * 174;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 4;
         }
         if(zcheckMouse(307, 516, 148, 16))
         {
-            lchorus_feedback = float(Mouse.old_x - 317) / 127;
+            lchorus_feedback = float(Mouse.x - 317) / 127;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 5;
         }
         if(zcheckMouse(307, 534, 148, 16))
         {
-            rchorus_feedback = float(Mouse.old_x - 317) / 127;
+            rchorus_feedback = float(Mouse.x - 317) / 127;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 6;
         }

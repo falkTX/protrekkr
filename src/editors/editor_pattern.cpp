@@ -1032,7 +1032,7 @@ int Get_Nibble_Color_Highlight(int row, int column)
 
 int Get_Track_Over_Mouse(void)
 {
-    int mouse_track = gui_track + ((Mouse.old_x - PAT_COL_NOTE) / PAT_COL_MAX);
+    int mouse_track = gui_track + ((Mouse.x - PAT_COL_NOTE) / PAT_COL_MAX);
     if(mouse_track > Songtracks - 1) mouse_track = Songtracks - 1;
     if(mouse_track < 0) mouse_track = 0;
     return(mouse_track);
@@ -1044,12 +1044,12 @@ int Get_Column_Over_Mouse(void)
     int max_tr = 6;
     if(Songtracks - 1 < 6) max_tr = Songtracks - 1;
 
-    int mouse_track = ((Mouse.old_x - PAT_COL_NOTE) / PAT_COL_MAX);
+    int mouse_track = ((Mouse.x - PAT_COL_NOTE) / PAT_COL_MAX);
 
     if(mouse_track > max_tr) return(10);
     if(mouse_track < 0) return(0);
 
-    int mouse_column = ((Mouse.old_x - PAT_COL_NOTE) % PAT_COL_MAX);
+    int mouse_column = ((Mouse.x - PAT_COL_NOTE) % PAT_COL_MAX);
     for(i = 0; i < (sizeof(Table_Columns) / sizeof(int)) - 1; i++)
     {
         if(mouse_column >= Table_Columns[i] && mouse_column < Table_Columns[i + 1])
@@ -1058,7 +1058,7 @@ int Get_Column_Over_Mouse(void)
             return(i);
         }
     }
-    if(Mouse.old_x < PAT_COL_NOTE) return(0);
+    if(Mouse.x < PAT_COL_NOTE) return(0);
     return(10);
 }
 
@@ -1068,7 +1068,7 @@ int Get_Line_Over_Mouse(void)
     int Cur_Position = cPosition;
     if(Songplaying) Cur_Position = cPosition_delay;
 
-    int mouse_line = (Mouse.old_y - 194) - 1;
+    int mouse_line = (Mouse.y - 194) - 1;
     for(i = 0; i < (sizeof(Table_Mouse_Lines) / sizeof(int)) - 1; i++)
     {
         if(mouse_line >= Table_Mouse_Lines[i] &&

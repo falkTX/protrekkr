@@ -281,7 +281,7 @@ void Mouse_Left_Sequencer_Ed(void)
         // Add 100 to the selected pattern
         if(zcheckMouse(260, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -305,7 +305,7 @@ void Mouse_Left_Sequencer_Ed(void)
         // Add 10 to the selected pattern
         if(zcheckMouse(266, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -329,7 +329,7 @@ void Mouse_Left_Sequencer_Ed(void)
         // Add 1 to the selected pattern
         if(zcheckMouse(272, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -350,11 +350,11 @@ void Mouse_Left_Sequencer_Ed(void)
         // Enable/Disable channels
         if(zcheckMouse(123, 469, 129, 84) == 1)
         {
-            int posindex = ((Mouse.old_y - 470) / 12) - 3;
+            int posindex = ((Mouse.y - 470) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
-                int seqindex = (Mouse.old_x - 123) / 8;
+                int seqindex = (Mouse.x - 123) / 8;
                 if(seqindex < 0) seqindex = 0;
                 if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
                 if(!SACTIVE[posindex][seqindex])
@@ -374,7 +374,7 @@ void Mouse_Left_Sequencer_Ed(void)
         // Scroll the positions
         if(zcheckMouse(89, 469, 24, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength && posindex != Cur_Position)
             {
@@ -398,7 +398,7 @@ void Mouse_Right_Sequencer_Ed(void)
         // Sub 100 to the selected pattern
         if(zcheckMouse(260, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -415,7 +415,7 @@ void Mouse_Right_Sequencer_Ed(void)
         // Sub 10 to the selected pattern
         if(zcheckMouse(266, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -433,7 +433,7 @@ void Mouse_Right_Sequencer_Ed(void)
         // Sub 1 to the selected pattern
         if(zcheckMouse(272, 468, 7, 84))
         {
-            int posindex = ((Mouse.old_y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength)
             {
@@ -451,12 +451,12 @@ void Mouse_Right_Sequencer_Ed(void)
         // Solo a track
         if(zcheckMouse(123, 469, 129, 84) == 1)
         {
-            int posindex = ((Mouse.old_y - 470) / 12) - 3;
+            int posindex = ((Mouse.y - 470) / 12) - 3;
             posindex += Cur_Position;
 
             if(posindex >= 0 && posindex < sLength)
             {
-                int seqindex = (Mouse.old_x - 123) / 8;
+                int seqindex = (Mouse.x - 123) / 8;
                 if(seqindex < 0) seqindex = 0;
                 if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
 

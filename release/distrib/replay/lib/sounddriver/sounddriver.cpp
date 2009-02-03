@@ -288,7 +288,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     requestedDesc.mSampleRate = AUDIO_PCM_FREQ;
     requestedDesc.mBitsPerChannel = AUDIO_DBUF_RESOLUTION;
 
-#if defined(__BIGENDIAN__)
+#if defined(__BIG_ENDIAN__)
     requestedDesc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
 #endif
 

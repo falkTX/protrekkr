@@ -25,6 +25,8 @@
 #include "../editors/include/editor_track.h"
 #include "../editors/include/editor_pattern.h"
 
+#include "../../release/distrib/replay/lib/include/endianness.h"
+
 // ------------------------------------------------------
 // Structures
 typedef struct
@@ -175,6 +177,8 @@ LPSYNC_FX Sync_Fx;
 void Write_Mod_Datas(const void *Datas, int Unit, int Length, FILE *Handle);
 void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type);
 short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type);
+int Write_Data(void *value, int size, int amount, FILE *handle);
+int Read_Data(void *value, int size, int amount, FILE *handle);
 
 // ------------------------------------------------------
 // Convert an amiga note for our own purpose
@@ -262,7 +266,7 @@ void LoadAmigaMod(char *FileName, int channels)
         Free_Samples();
         Clean_Up_Patterns_Pool();
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
         Midi_Reset();
 #endif
 
@@ -649,7 +653,7 @@ void LoadMod(char *FileName)
 
             Clean_Up_Patterns_Pool();
 
-#if !defined(__NOMIDI__)
+#if !defined(__NO_MIDI__)
             Midi_Reset();
 #endif
 
@@ -1279,7 +1283,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 {
     int Packed_Length;
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     short *Dest_Buffer;
 #endif
 
@@ -1296,7 +1300,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
     else
     {
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
         // Read the packer buffer
         fread(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
@@ -1336,7 +1340,7 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
     int PackedLen = 0;
     short *PackedSample = NULL;
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     short *AlignedSample;
     int Aligned_Size;
 
@@ -1393,11 +1397,11 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
         Write_Mod_Datas(&PackedLen, sizeof(char), 4, FileHandle);
         Write_Mod_Datas(Sample, sizeof(char), Size * 2, FileHandle);
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     }
 #endif
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
     if(PackedSample) free(PackedSample);
 #endif
 
@@ -2258,7 +2262,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Datas(&PARASynth[swrite].lfo2_release, sizeof(int), 1, in);
             }
 
-#if defined(__NOCODEC__)
+#if defined(__NO_CODEC__)
             int No_Comp = SMP_PACK_NONE;
             Write_Mod_Datas(&No_Comp, sizeof(char), 1, in);
 #else
@@ -2276,7 +2280,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 {
                     int Apply_Interpolation = FALSE;
 
-#if !defined(__NOCODEC__)
+#if !defined(__NO_CODEC__)
                     // Check if any of the packing scheme has been used
                     switch(SampleCompression[swrite])
                     {
@@ -3477,42 +3481,43 @@ void SaveConfig(void)
     in = fopen(FileName, "wb");
     if(in != NULL)
     {
-        fwrite(extension, sizeof(char), 9, in);
-        fwrite(&ped_pattad, sizeof(ped_pattad), 1, in);
-        fwrite(&patt_highlight, sizeof(patt_highlight), 1, in);
-        fwrite(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+        Write_Data(extension, sizeof(char), 9, in);
+        Write_Data(&ped_pattad, sizeof(ped_pattad), 1, in);
+        Write_Data(&patt_highlight, sizeof(patt_highlight), 1, in);
+        Write_Data(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
 
-#if defined(__NOMIDI__)
-        fwrite(&phony, sizeof(phony), 1, in);
+#if defined(__NO_MIDI__)
+        Write_Data(&phony, sizeof(phony), 1, in);
 #else
-        fwrite(&c_midiin, sizeof(c_midiin), 1, in);
+        Write_Data(&c_midiin, sizeof(c_midiin), 1, in);
 #endif
 
-#if defined(__NOMIDI__)
-        fwrite(&phony, sizeof(phony), 1, in);
+#if defined(__NO_MIDI__)
+        Write_Data(&phony, sizeof(phony), 1, in);
 #else
-        fwrite(&c_midiout, sizeof(c_midiout), 1, in);
+        Write_Data(&c_midiout, sizeof(c_midiout), 1, in);
 #endif
 
-        fwrite(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
-        fwrite(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
-        fwrite(&FullScreen, sizeof(FullScreen), 1, in);
+        Write_Data(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
+        Write_Data(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
+        Write_Data(&FullScreen, sizeof(FullScreen), 1, in);
 
         for(i = 0; i < NUMBER_COLORS; i++)
         {
             Real_Palette_Idx = Idx_Palette[i];
-            fwrite(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
-            fwrite(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
-            fwrite(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
         }
-        fwrite(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
-        fwrite(&Beveled, sizeof(Beveled), 1, in);
-        fwrite(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
-        fwrite(&AutoSave, sizeof(AutoSave), 1, in);
-        fwrite(&Dir_Mods, sizeof(Dir_Mods), 1, in);
-        fwrite(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
-        fwrite(&Dir_Presets, sizeof(Dir_Presets), 1, in);
-        fwrite(KeyboardName, MAX_PATH, 1, in);
+        Write_Data(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
+        Write_Data(&Beveled, sizeof(Beveled), 1, in);
+        Write_Data(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
+        Write_Data(&AutoSave, sizeof(AutoSave), 1, in);
+        
+        Write_Data(&Dir_Mods, sizeof(Dir_Mods), 1, in);
+        Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
+        Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
+        Write_Data(KeyboardName, MAX_PATH, 1, in);
         fclose(in);
 
         Read_SMPT();
@@ -3552,45 +3557,45 @@ void LoadConfig(void)
         // Reading and checking extension...
         char extension[10];
 
-        fread(extension, sizeof(char), 9, in);
+        Read_Data(extension, sizeof(char), 9, in);
         if(strcmp(extension, "TWNNCFG1") == 0)
         {
-            fread(&ped_pattad, sizeof(ped_pattad), 1, in);
-            fread(&patt_highlight, sizeof(patt_highlight), 1, in);
-            fread(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+            Read_Data(&ped_pattad, sizeof(ped_pattad), 1, in);
+            Read_Data(&patt_highlight, sizeof(patt_highlight), 1, in);
+            Read_Data(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
 
-#if defined(__NOMIDI__)
-            fread(&phony, sizeof(phony), 1, in);
+#if defined(__NO_MIDI__)
+            Read_Data(&phony, sizeof(phony), 1, in);
 #else
-            fread(&c_midiin, sizeof(c_midiin), 1, in);
+            Read_Data(&c_midiin, sizeof(c_midiin), 1, in);
 #endif
 
-#if defined(__NOMIDI__)
-            fread(&phony, sizeof(phony), 1, in);
+#if defined(__NO_MIDI__)
+            Read_Data(&phony, sizeof(phony), 1, in);
 #else
-            fread(&c_midiout, sizeof(c_midiout), 1, in);
+            Read_Data(&c_midiout, sizeof(c_midiout), 1, in);
 #endif
 
-            fread(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
-            fread(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
-            fread(&FullScreen, sizeof(FullScreen), 1, in);
+            Read_Data(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
+            Read_Data(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
+            Read_Data(&FullScreen, sizeof(FullScreen), 1, in);
 
             for(i = 0; i < NUMBER_COLORS; i++)
             {
                 Real_Palette_Idx = Idx_Palette[i];
-                fread(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
-                fread(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
-                fread(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
+                Read_Data(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
+                Read_Data(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
+                Read_Data(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
                 Ptk_Palette[Real_Palette_Idx].unused = 0;
             }
-            fread(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
-            fread(&Beveled, sizeof(Beveled), 1, in);
-            fread(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
-            fread(&AutoSave, sizeof(AutoSave), 1, in);
-            fread(&Dir_Mods, sizeof(Dir_Mods), 1, in);
-            fread(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
-            fread(&Dir_Presets, sizeof(Dir_Presets), 1, in);
-            fread(KeyboardName, MAX_PATH, 1, in);
+            Read_Data(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
+            Read_Data(&Beveled, sizeof(Beveled), 1, in);
+            Read_Data(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
+            Read_Data(&AutoSave, sizeof(AutoSave), 1, in);
+            Read_Data(&Dir_Mods, sizeof(Dir_Mods), 1, in);
+            Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
+            Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
+            Read_Data(KeyboardName, MAX_PATH, 1, in);
         }
         fclose(in);
     }
@@ -3632,4 +3637,63 @@ void LoadConfig(void)
     }
 
     cur_dir = Dir_Mods;
+}
+
+// ------------------------------------------------------
+// Write data into a file taking care of the endianness
+int Write_Data(void *value, int size, int amount, FILE *handle)
+{
+    short sswap_value;
+    int iswap_value;
+    short *svalue;
+    int *ivalue;
+
+    switch(size)
+    {
+        case 2:
+            svalue = (short *) value;
+            sswap_value = Swap_16(*svalue);
+            return(fwrite(&sswap_value, size, amount, handle));
+
+        case 4:
+            ivalue = (int *) value;
+            iswap_value = Swap_32(*ivalue);
+            return(fwrite(&iswap_value, size, amount, handle));
+
+        case 1:
+        default:
+            return(fwrite(value, size, amount, handle));
+    }
+    return(TRUE);
+}
+
+// ------------------------------------------------------
+// Read data from a file taking care of the endianness
+int Read_Data(void *value, int size, int amount, FILE *handle)
+{
+    short *svalue;
+    int *ivalue;
+    int ret_value;
+
+    switch(size)
+    {
+        case 2:
+            svalue = (short *) value;
+            ret_value = fread(&svalue, size, amount, handle);
+            svalue = (short *) Swap_16(svalue);
+            *((short *) value) = (int) svalue;
+            return(ret_value);
+
+        case 4:
+            ivalue = (int *) value;
+            ret_value = fread(&ivalue, size, amount, handle);
+            ivalue = (int *) Swap_32(ivalue);
+            *((int *) value) = (int) ivalue;
+            return(ret_value);
+            
+        case 1:
+        default:
+            return(fread(value, size, amount, handle));
+    }
+    return(0);
 }

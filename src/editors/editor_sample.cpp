@@ -919,7 +919,7 @@ void Mouse_Sliders_Sample_Ed(void)
             if(SampleType[ped_patsam][ped_split])
             {
 
-                Mouse_Pos = Mouse.old_x - 1;
+                Mouse_Pos = Mouse.x - 1;
                 if(Mouse_Pos < 0) Mouse_Pos = 0;
                 if(Mouse_Pos > 512) Mouse_Pos = 512;
                 axswave = SampleNumSamples[ped_patsam][ped_split] - 1;
@@ -962,7 +962,7 @@ void Mouse_Sliders_Sample_Ed(void)
             if(SampleNumSamples[ped_patsam][ped_split])
             {
                 int Center = Get_Slider_Center(sed_display_length, SampleNumSamples[ped_patsam][ped_split]);
-                float Pos_Mouse = ((float) (Mouse.old_x - (Center / 2))) / 512.0f;
+                float Pos_Mouse = ((float) (Mouse.x - (Center / 2))) / 512.0f;
                 if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
                 float s_offset = (Pos_Mouse * SampleNumSamples[ped_patsam][ped_split]);
                 if(s_offset > SampleNumSamples[ped_patsam][ped_split] - sed_display_length)
