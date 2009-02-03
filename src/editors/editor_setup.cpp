@@ -269,8 +269,8 @@ void Actualize_Master_Ed(char gode)
 
         // -----------
 #if !defined(__NOMIDI__)
-        MidiIn_Init();
-        MidiOut_Init();
+        Midi_InitIn();
+        Midi_InitOut();
 #endif
 
         if(gode == 0 || gode == 11)
@@ -283,7 +283,7 @@ void Actualize_Master_Ed(char gode)
 #if !defined(__NOMIDI__)
             if(c_midiin != -1)
             {
-                Gui_Draw_Button_Box(132, 482, 182, 16, GetMidiInName(), BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 482, 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
@@ -304,7 +304,7 @@ void Actualize_Master_Ed(char gode)
 #if !defined(__NOMIDI__)
             if(c_midiout != -1)
             {
-                Gui_Draw_Button_Box(132, 500, 182, 16, GetMidiOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 500, 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
@@ -531,7 +531,7 @@ void Mouse_Left_Master_Ed(void)
 #if !defined(__NOMIDI__)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
-            MidiNoteOff(ped_track);
+            Midi_NoteOff(ped_track);
             gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
         }
 #endif
@@ -540,7 +540,7 @@ void Mouse_Left_Master_Ed(void)
 #if !defined(__NOMIDI__)
         if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
         {
-            MidiAllNotesOff();
+            Midi_AllNotesOff();
             gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
         }
 #endif

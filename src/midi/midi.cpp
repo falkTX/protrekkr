@@ -29,7 +29,7 @@ extern CSynth Synthesizer[MAX_TRACKS];//[MAX_POLYPHONY];
 
 // ------------------------------------------------------
 // Return the instrument associated with the midi program
-int Get_Midi_Program(int midi_program)
+int Midi_GetProgram(int midi_program)
 {
     int i;
 
@@ -42,7 +42,7 @@ int Get_Midi_Program(int midi_program)
 
 // ------------------------------------------------------
 // Handle the midi events
-void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
+void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
 {
     int Midi_Channel_Number;
     int Midi_Command;
@@ -111,7 +111,7 @@ void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
 
             // Program Change
             case 0xc0:
-                Instrument_Number = Get_Midi_Program((Param1 >> 8) & 0xff);
+                Instrument_Number = Midi_GetProgram((Param1 >> 8) & 0xff);
                 if(Instrument_Number > -1)
                 {
                     ped_patsam = Instrument_Number;
@@ -234,7 +234,7 @@ void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
                             Synthesizer[Track_Number].NoteOff();
                             noteoff303(Track_Number); // 303 Note Off...
                             if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
-                            MidiNoteOff(Track_Number);
+                            Midi_NoteOff(Track_Number);
                         }
                     }
                 }
@@ -258,7 +258,7 @@ void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
         {
             // Program Change
             case 0xc0:
-                Instrument_Number = Get_Midi_Program((Param1 >> 8) & 0xff);
+                Instrument_Number = Midi_GetProgram((Param1 >> 8) & 0xff);
                 if(Instrument_Number > -1)
                 {
                     ped_patsam = Instrument_Number;
@@ -317,7 +317,7 @@ void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
                             Synthesizer[Track_Number].NoteOff();
                             noteoff303(Track_Number);
                             if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
-                            MidiNoteOff(Track_Number);
+                            Midi_NoteOff(Track_Number);
                         }
                     }
                 }
@@ -333,22 +333,22 @@ void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2)
 
 // ------------------------------------------------------
 // Turn all midi notes off
-void MidiAllNotesOff(void)
+void Midi_AllNotesOff(void)
 {
     if(c_midiout != -1)
     {
         for(int no_track = 0; no_track < MAX_TRACKS; no_track++)
         {
-            MidiNoteOff(no_track);
+            Midi_NoteOff(no_track);
         }
     }
 }
 
 // ------------------------------------------------------
 // Reset midi programs
-void MidiReset(void)
+void Midi_Reset(void)
 {
-    MidiAllNotesOff();
+    Midi_AllNotesOff();
 
     for(int mreset = 0; mreset < 16; mreset++)
     {

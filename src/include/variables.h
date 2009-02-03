@@ -466,8 +466,6 @@ extern int allow_save;
 // ------------------------------------------------------
 // Functions
 void ResetFilters(char tr);
-void MidiReset(void);
-void MidiAllNotesOff(void);
 void WavRenderizer(void);
 void DoEffects_tick0(void);
 void DoEffects(void);

@@ -263,7 +263,7 @@ void LoadAmigaMod(char *FileName, int channels)
         Clean_Up_Patterns_Pool();
 
 #if !defined(__NOMIDI__)
-        MidiReset();
+        Midi_Reset();
 #endif
 
         init_sample_bank();
@@ -650,7 +650,7 @@ void LoadMod(char *FileName)
             Clean_Up_Patterns_Pool();
 
 #if !defined(__NOMIDI__)
-            MidiReset();
+            Midi_Reset();
 #endif
 
             init_sample_bank();

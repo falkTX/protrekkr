@@ -26,19 +26,22 @@ extern int midiout_changed;
 
 // ------------------------------------------------------
 // Functions
-void MidiGetAll(void);
-void MidiFreeAll(void);
+void Midi_AllNotesOff(void);
+void Midi_Reset(void);
 
-void MidiIn_Init(void);
-void MidiIn_Close(void);
-void MidiOut_Init(void);
-void MidiOut_Close(void);
+void Midi_GetAll(void);
+void Midi_FreeAll(void);
 
-void MidiNoteOff(int track);
-void MidiSend(int nbr_track, int eff_dat, int row_dat);
+void Midi_InitIn(void);
+void Midi_CloseIn(void);
+void Midi_InitOut(void);
+void Midi_CloseOut(void);
 
-char *GetMidiInName(void);
-char *GetMidiOutName(void);
+void Midi_NoteOff(int track);
+void Midi_Send(int nbr_track, int eff_dat, int row_dat);
+
+char *Midi_GetInName(void);
+char *Midi_GetOutName(void);
 
 #endif
 

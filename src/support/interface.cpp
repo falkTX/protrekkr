@@ -522,7 +522,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
 #if !defined(__NOMIDI__)
     // Load midi devices infos
-    MidiGetAll();
+    Midi_GetAll();
 #endif
 
     if(!Init_Context())
@@ -730,13 +730,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
 #if !defined(__NOMIDI__)
     // Close any opened midi devices on any exit
-    MidiIn_Close();
-    MidiOut_Close();
+    Midi_CloseIn();
+    Midi_CloseOut();
 #endif
 
 #if !defined(__NOMIDI__)
     // Free the devices enumeration
-    MidiFreeAll();
+    Midi_FreeAll();
 #endif
 
     return(0);

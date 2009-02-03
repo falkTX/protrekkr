@@ -31,20 +31,22 @@ signed char n_midiindevices = 0;
 
 extern int Midi_Track_Notes[MAX_TRACKS];
 
-void MidiIncallBack(Uint32 dwParam1, Uint32 dwParam2);
+// ------------------------------------------------------
+// Functions
+void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2);
 
-void CALLBACK MidiInProc(HMIDIIN hMidiIn,
+void CALLBACK Midi_ProcIn(HMIDIIN hMidiIn,
                          UINT wMsg,
                          Uint32 dwInstance,
                          Uint32 dwParam1,
                          Uint32 dwParam2)
 {
-    MidiIncallBack(dwParam1, dwParam2);
+    Midi_CallBackIn(dwParam1, dwParam2);
 }
 
 // ------------------------------------------------------
 // Open the midi in device
-void MidiIn_Init(void)
+void Midi_InitIn(void)
 {
     if(midiin_changed != 0)
     {
@@ -53,8 +55,8 @@ void MidiIn_Init(void)
 
         if(c_midiin != -1)
         {
-            MidiIn_Close();
-            if(midiInOpen(&midiin_handle, c_midiin, (Uint32) &MidiInProc, 0xdeadc0fe, CALLBACK_FUNCTION | MIDI_IO_STATUS) == MMSYSERR_NOERROR)
+            Midi_CloseIn();
+            if(midiInOpen(&midiin_handle, c_midiin, (Uint32) &Midi_ProcIn, 0xdeadc0fe, CALLBACK_FUNCTION | MIDI_IO_STATUS) == MMSYSERR_NOERROR)
             {
                 midiInStart(midiin_handle);
                 if(midiin_changed == 1) mess_box("Midi In device activated...");
@@ -75,7 +77,7 @@ void MidiIn_Init(void)
 
 // ------------------------------------------------------
 // Close the midi in device
-void MidiIn_Close(void)
+void Midi_CloseIn(void)
 {
     if(midiin_handle != NULL)
     {
@@ -87,16 +89,16 @@ void MidiIn_Close(void)
 
 // ------------------------------------------------------
 // Open the midi out device
-void MidiOut_Init(void) {
+void Midi_InitOut(void) {
     if(midiout_changed != 0)
     {
-        MidiReset();
+        Midi_Reset();
         if(c_midiout < -1) c_midiout = n_midioutdevices - 1;
         if(c_midiout == n_midioutdevices) c_midiout = -1;
 
         if(c_midiout != -1)
         {
-            MidiOut_Close();
+            Midi_CloseOut();
             if(midiOutOpen(&midiout_handle, c_midiout, 0, 0, CALLBACK_NULL) == MMSYSERR_NOERROR)
             {
                 if(midiout_changed == 1) mess_box("Midi Out device activated...");
@@ -117,14 +119,14 @@ void MidiOut_Init(void) {
 
 // ------------------------------------------------------
 // Close the midi out device
-void MidiOut_Close(void)
+void Midi_CloseOut(void)
 {
     if(midiout_handle != NULL) midiOutClose(midiout_handle);
 }
 
 // ------------------------------------------------------
 // Retrieve all midi in/out interfaces
-void MidiGetAll(void)
+void Midi_GetAll(void)
 {
     int m;
 
@@ -152,7 +154,7 @@ void MidiGetAll(void)
 
 // ------------------------------------------------------
 // Free allocated interfaces resources
-void MidiFreeAll(void)
+void Midi_FreeAll(void)
 {
     if(caps_midiin) free(caps_midiin);
     if(caps_midiout) free(caps_midiout);
@@ -160,7 +162,7 @@ void MidiFreeAll(void)
 
 // ------------------------------------------------------
 // Turn a midi channel off
-void MidiNoteOff(int track)
+void Midi_NoteOff(int track)
 {
     if(c_midiout != -1)
     {
@@ -171,7 +173,7 @@ void MidiNoteOff(int track)
 
 // ------------------------------------------------------
 // Send a command to the midi out device
-void MidiSend(int nbr_track, int eff_dat, int row_dat)
+void Midi_Send(int nbr_track, int eff_dat, int row_dat)
 {
     if(c_midiout != -1)
     {
@@ -181,7 +183,7 @@ void MidiSend(int nbr_track, int eff_dat, int row_dat)
 
 // ------------------------------------------------------
 // Return the name of the current midi in device
-char *GetMidiInName(void)
+char *Midi_GetInName(void)
 {
     if(c_midiin == -1) return("");
     return(caps_midiin[c_midiin].szPname);
@@ -189,7 +191,7 @@ char *GetMidiInName(void)
 
 // ------------------------------------------------------
 // Return the name of the current midi out device
-char *GetMidiOutName(void)
+char *Midi_GetOutName(void)
 {
     if(c_midiout == -1) return("");
     return(caps_midiout[c_midiout].szPname);

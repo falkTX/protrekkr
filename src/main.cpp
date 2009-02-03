@@ -284,8 +284,8 @@ int Init_Context(void)
     midiin_changed = 2;
     midiout_changed = 2;
 
-    MidiIn_Init();
-    MidiOut_Init();
+    Midi_InitIn();
+    Midi_InitOut();
 #endif
 
     GETCWD(Prog_Path, MAX_PATH);
@@ -297,7 +297,7 @@ int Init_Context(void)
     if(!Init_Block_Work()) return(FALSE);
 
 #if !defined(__NOMIDI__)
-    MidiReset();
+    Midi_Reset();
 #endif
 
     if(!AllocPattern())
@@ -1531,7 +1531,7 @@ void SongStop(void)
     }
 
 #if !defined(__NOMIDI__)
-    MidiAllNotesOff();
+    Midi_AllNotesOff();
 #endif
 
     // Clear all channels
@@ -1571,7 +1571,7 @@ void Newmod(void)
     nPatterns = 1;
 
 #if !defined(__NOMIDI__)
-    MidiReset();
+    Midi_Reset();
 #endif
 
     Pre_Song_Init();
@@ -3100,7 +3100,7 @@ void Keyboard_Handler(void)
                         if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
 
 #if !defined(__NOMIDI__)
-                        MidiNoteOff(Track_Number);
+                        Midi_NoteOff(Track_Number);
 #endif
 
                         Alloc_midi_Channels[Track_Number] = 0;

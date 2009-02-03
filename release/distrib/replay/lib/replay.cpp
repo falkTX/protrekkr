@@ -1430,12 +1430,12 @@ void Sp_Player(void)
                 /* MidiController commands */
                 if(pl_pan_row == 144 && c_midiout != -1 && pl_eff_row < 128)
                 {
-                    MidiSend(176 + TRACKMIDICHANNEL[ct], pl_eff_row, pl_dat_row);
+                    Midi_Send(176 + TRACKMIDICHANNEL[ct], pl_eff_row, pl_dat_row);
                 }
 
                 if(pl_eff_row == 128 && c_midiout != -1 && pl_dat_row < 128)
                 {
-                    MidiSend(176 + TRACKMIDICHANNEL[ct], 0, pl_dat_row);
+                    Midi_Send(176 + TRACKMIDICHANNEL[ct], 0, pl_dat_row);
                 }
 #endif
 #endif
@@ -1477,7 +1477,7 @@ void Sp_Player(void)
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NOMIDI__)
-                    MidiNoteOff(ct);
+                    Midi_NoteOff(ct);
 #endif
 #endif
                 }
@@ -1793,7 +1793,7 @@ ByPass_Wav:
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NOMIDI__)
-            MidiNoteOff(c);
+            Midi_NoteOff(c);
 #endif
 #endif
 
@@ -2380,12 +2380,12 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
-            MidiNoteOff(channel);
+            Midi_NoteOff(channel);
 
             // Set the midi program if it was modified
             if(LastProgram[TRACKMIDICHANNEL[channel]] != Midiprg[associated_sample])
             {
-                MidiSend(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
+                Midi_Send(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
                 LastProgram[TRACKMIDICHANNEL[channel]] = Midiprg[associated_sample];
             }
 
@@ -2393,7 +2393,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             float veloc = vol * mas_vol;
 
             Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
-            MidiSend(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
+            Midi_Send(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
         }
 #endif // __NOMIDI
 #endif // __STAND_ALONE__
@@ -2564,7 +2564,7 @@ void DoEffects(void)
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NOMIDI__)
-                MidiNoteOff(trackef);
+                Midi_NoteOff(trackef);
 #endif
 #endif
             }
