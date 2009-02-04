@@ -9,7 +9,7 @@
 
 // ------------------------------------------------------
 // Includes
-#include "../support/include/interface.h"
+#include "../support/include/main.h"
 
 #include "../wav/include/riff.h"
 #include "../include/variables.h"

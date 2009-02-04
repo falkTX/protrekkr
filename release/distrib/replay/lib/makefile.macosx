@@ -1,0 +1,55 @@
+LIBFLAGS = -c
+LIBOBJS_PPC = replay_ppc.o cubic_spline_ppc.o synth_ppc.o tb_303_ppc.o samples_unpack_ppc.o sounddriver_ppc.o
+LIBOBJS_X86 = replay_x86.o cubic_spline_x86.o synth_x86.o tb_303_x86.o samples_unpack_x86.o sounddriver_x86.o
+
+all: ptkreplay
+clean: remlibobj
+
+remlibobj:
+	-rm -f $(LIBOBJS_PPC)
+	-rm -f $(LIBOBJS_X86)
+	
+ptkreplay: $(LIBOBJS_PPC) $(LIBOBJS_X86)
+	-rm libptkreplay_ppc.a
+	ar -s -r libptkreplay_ppc.a $(LIBOBJS_PPC)
+	-rm -f $(LIBOBJS_PPC)
+	-rm libptkreplay_x86.a
+	ar -s -r libptkreplay_x86.a $(LIBOBJS_X86)
+	-rm -f $(LIBOBJS_X86)
+
+sounddriver_ppc.o: lib/sounddriver/sounddriver.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/sounddriver/sounddriver.cpp
+
+samples_unpack_ppc.o: lib/samples_unpack.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/samples_unpack.cpp
+
+tb_303_ppc.o: lib/tb_303.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/tb_303.cpp
+
+synth_ppc.o: lib/synth.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/synth.cpp
+
+cubic_spline_ppc.o: lib/cubic_spline.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/cubic_spline.cpp
+
+replay_ppc.o: lib/replay.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/replay.cpp
+
+
+sounddriver_x86.o: lib/sounddriver/sounddriver.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/sounddriver/sounddriver.cpp
+
+samples_unpack_x86.o: lib/samples_unpack.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/samples_unpack.cpp
+
+tb_303_x86.o: lib/tb_303.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/tb_303.cpp
+
+synth_x86.o: lib/synth.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/synth.cpp
+
+cubic_spline_x86.o: lib/cubic_spline.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/cubic_spline.cpp
+
+replay_x86.o: lib/replay.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/replay.cpp

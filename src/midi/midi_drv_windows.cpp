@@ -8,7 +8,7 @@
 
 // ------------------------------------------------------
 // Includes
-#include "../include/main.h"
+#include "../include/ptk.h"
 
 #include "include/midi.h"
 

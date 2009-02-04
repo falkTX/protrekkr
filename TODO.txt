@@ -4,9 +4,7 @@ TODO:
  - Finish to implement the sound callback.
  - There's probably a lot of endianness insanity in files handling.
 
- - Modify the executable makefile to produce universal binary.
  - Create 2 make files for the replay (x86/ppc).
- - See to create a distrib within a .app folder.
  ------------------------------------------------------------------
 
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)

@@ -9,7 +9,7 @@
 #define NEED_SDL_GETENV
 #include <SDL/SDL_types.h>
 #include <string.h>
-#include "include/interface.h"
+#include "include/main.h"
 #include "include/timer.h"
 #include "include/resource.h"
 
@@ -20,10 +20,10 @@
 
 #if defined(__MACOSX__)
 #include <mach-o/dyld.h>
-typedef int (*NSGetExecutablePathProcPtr)(char *buf, size_t *bufsize);
+//typedef int (*NSGetExecutablePathProcPtr)(char *buf, size_t *bufsize);
 #endif
 
-#include "../include/main.h"
+#include "../include/ptk.h"
 
 // ------------------------------------------------------
 // Constants
@@ -323,7 +323,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     int Key_Value;
     int Uni_Trans;
     FILE *KbFile;
-    Uint32 ExeName_Size = MAX_PATH;
+    Uint32 ExePath_Size = MAX_PATH;
+
+#if defined(__MACOSX__)
+    Uint32 Path_Length;
+#endif
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
     SDL_putenv("SDL_VIDEO_CENTERED=1");
@@ -369,19 +373,20 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                  MAKEINTRESOURCE(IDI_ICON1)));
 #endif
 
-    ExePath = (char *) malloc(ExeName_Size + 1);
+    ExePath = (char *) malloc(ExePath_Size + 1);
     if(ExePath == NULL)
     {
         Message_Error("Can't open alloc memory.");
         return(0);
     }
-    memset(ExePath, 0, ExeName_Size + 1);
+    memset(ExePath, 0, ExePath_Size + 1);
 
 #if defined(__LINUX__)
     // Note:
     // it looks like some distros don't have /proc/self
     // Maybe a better (?) solution would be to use:
-    // sprintf(ExeProc, "/proc/$d/exe", getpid()); 
+    // sprintf(ExeProc, "/proc/$d/exe", getpid());
+    // readlink(ExeProc, ExePath, sizeof(ExePath));
     readlink("/proc/self/exe", ExePath, sizeof(ExePath));
     int exename_len = strlen(ExePath);
     while(exename_len--)
@@ -396,7 +401,17 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     CHDIR(ExePath);
 #else
     #if defined(__MACOSX__)
-        GETCWD(ExePath, MAX_PATH);
+        Path_Length = ExePath_Size;
+        _NSGetExecutablePath(ExePath, &Path_Length);
+        while(Path_Length--)
+        {
+            if(ExePath[Path_Length] == '/')
+            {
+                ExePath[Path_Length] = 0;
+                Path_Length++;
+                break;
+            }
+        }
         CHDIR(ExePath);
     #else
         GETCWD(ExePath, MAX_PATH);

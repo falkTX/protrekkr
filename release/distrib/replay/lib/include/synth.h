@@ -10,8 +10,6 @@
 // ------------------------------------------------------
 // Includes
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #if defined(__STAND_ALONE__)
     #if defined(__WINAMP__)

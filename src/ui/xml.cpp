@@ -7,7 +7,7 @@
 // ------------------------------------------------------
 // Includes
 #include <SDL/SDL_stdinc.h>
-#include "../include/main.h"
+#include "../include/ptk.h"
 
 // ------------------------------------------------------
 // Variables

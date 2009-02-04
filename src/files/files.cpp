@@ -9,7 +9,7 @@
 #include "../extralibs/zlib-1.2.3/zlib.h"
 
 #include "../include/variables.h"
-#include "../include/main.h"
+#include "../include/ptk.h"
 #include "include/files.h"
 #include "include/samples_pack.h"
 #include "../ui/include/misc_draw.h"

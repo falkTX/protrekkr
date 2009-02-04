@@ -13,7 +13,7 @@
 // Includes
 #include <SDL/SDL.h>
 
-#include "../support/include/interface.h"
+#include "../support/include/main.h"
 #include "../../release/distrib/replay/lib/include/replay.h"
 
 // ------------------------------------------------------

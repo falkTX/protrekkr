@@ -20,7 +20,7 @@ short __Swap_16(short Value);
 #else
 
 #define Swap_32(x) (int) x
-#define Swap_16(x) (short) x
+#define Swap_16(x) (int) x
 
 #endif
 

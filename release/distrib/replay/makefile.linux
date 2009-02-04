@@ -1,5 +1,5 @@
 LIBS = -lptkreplay -lpthread
-FLAGS = -O2 -mms-bitfields -D G_OS_WIN32 -D __LINUX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__
+FLAGS = -O3 -mms-bitfields -D __LINUX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__
 EXEOBJS = test.o module.o
 
 all: ptkreplay replaytest

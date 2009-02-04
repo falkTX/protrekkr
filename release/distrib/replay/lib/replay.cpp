@@ -650,22 +650,28 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type)
         {
             case SMP_PACK_GSM:
 
+#if !defined(__NO_CODEC__)
 #if defined(PTK_GSM)
                 UnpackGSM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+#endif
 #endif
 
                 break;
             case SMP_PACK_MP3:
 
+#if !defined(__NO_CODEC__)
 #if defined(PTK_MP3)
                 UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+#endif
 #endif
                 break;
 
             case SMP_PACK_TRUESPEECH:
 
+#if !defined(__NO_CODEC__)
 #if defined(PTK_TRUESPEECH)
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+#endif
 #endif
                 break;
         }

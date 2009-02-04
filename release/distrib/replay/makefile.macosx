@@ -1,0 +1,48 @@
+MODULE = "round a bout.ptp"
+
+LIBS_PPC = -lptkreplay_ppc -framework CoreAudio -framework AudioUnit -framework Cocoa 
+LIBS_X86 = -lptkreplay_x86 -framework CoreAudio -framework AudioUnit -framework Cocoa
+FLAGS_PPC = -O3 -arch ppc -D __MACOSX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __BIG_ENDIAN__
+FLAGS_X86 = -O3 -arch i386 -D __MACOSX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__
+EXEOBJS_PPC = test_ppc.o module_ppc.o
+EXEOBJS_X86 = test_x86.o module_x86.o
+
+all: bin2c module ptkreplay replaytest
+clean: remobj
+
+remobj:
+	-rm -f $(EXEOBJS_PPC)
+	-rm -f $(EXEOBJS_X86)
+	
+replaytest: $(EXEOBJS_PPC) $(EXEOBJS_X86)
+	g++ -o replaytest_x86 -s -isysroot /Developer/SDKs/MacOSX10.4u.sdk -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
+	g++ -o replaytest_ppc -s -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
+	lipo -create replaytest_x86 replaytest_ppc -output replaytest_uni
+	strip -x -X -S replaytest_ppc
+	strip -x -X -S replaytest_x86
+	strip -x -X -S replaytest_uni
+	-rm -f module.cpp
+	-rm -f bin2c_uni
+	-rm -f $(EXEOBJS_PPC)
+	-rm -f $(EXEOBJS_X86)
+
+test_x86.o: test/test.cpp
+	g++ -c -o $(@) $(FLAGS_X86) test/test.cpp
+
+test_ppc.o: test/test.cpp
+	g++ -c -o $(@) $(FLAGS_PPC) test/test.cpp
+
+module_x86.o: module.cpp
+	g++ -c -o $(@) -arch i386 module.cpp
+
+module_ppc.o: module.cpp
+	g++ -c -o $(@) -arch ppc module.cpp
+
+module:
+	./bin2c_uni $(MODULE) module.cpp _PTK_MODULE
+
+# bin2c #
+include ../../../src/extralibs/bin2c/makefile.macosx
+
+# the library itself #
+include lib/makefile.macosx

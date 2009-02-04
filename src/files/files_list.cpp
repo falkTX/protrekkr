@@ -7,7 +7,7 @@
 // ------------------------------------------------------
 // Includes
 #include "include/files_list.h"
-#include "../include/main.h"
+#include "../include/ptk.h"
 
 #if defined(__WIN32__)
 #include <shlwapi.h>

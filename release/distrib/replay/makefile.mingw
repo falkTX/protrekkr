@@ -8,7 +8,7 @@ clean: remobj
 remobj:
 	-rm -f $(EXEOBJS)
 	
-ReplayTest: $(EXEOBJS)
+replaytest: $(EXEOBJS)
 	g++ -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
 	strip -s -x $(@).exe
 	-rm -f $(EXEOBJS)

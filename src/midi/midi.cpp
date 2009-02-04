@@ -9,7 +9,7 @@
 // ------------------------------------------------------
 // Includes
 #include "../include/Variables.h"
-#include "../include/main.h"
+#include "../include/ptk.h"
 
 #include "include/midi.h"
 

@@ -18,7 +18,7 @@
 
 CC=gcc
 
-CFLAGS=-O3
+CFLAGS=-O3 -arch i386 -arch ppc
 #CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
 #CFLAGS=-g -DDEBUG
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
@@ -51,8 +51,6 @@ OBJS = adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
 
 OBJA =
 # to use the asm code: make OBJA=match.o
-
-TEST_OBJS = example.o minigzip.o
 
 all: libz.a
 

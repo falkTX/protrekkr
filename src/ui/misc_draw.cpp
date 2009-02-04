@@ -8,7 +8,7 @@
 // Includes
 #include "include/misc_draw.h"
 #include "../include/variables.h"
-#include "../include/main.h"
+#include "../include/ptk.h"
 #include "../editors/include/editor_303.h"
 #include "../editors/include/editor_diskio.h"
 #include "../editors/include/editor_fx_setup.h"

@@ -5,13 +5,13 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        -lSDL -lsdldraw -lz
 FLAGS = -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D __LINUX__ -D __GCC__ -D __NO_MIDI__ -D __NO_CODEC__
-EXEOBJS = main.o \
+EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_instrument.o \
           samples_pack.o files_list.o files.o \
           midi.o \
-          timer.o interface.o \
+          timer.o main.o \
           misc_draw.o xml.o \
           riff.o \
           tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o endianness.o \
@@ -29,7 +29,7 @@ protrekkr: $(EXEOBJS)
 	strip -s -x ./release/distrib/ptk_linux
 #	-rm -f $(EXEOBJS)
 	
-main.o: src/main.cpp
+ptk.o: src/ptk.cpp
 	g++ -c -o $(@) $(FLAGS) src/$(*).cpp
 
 editor_303.o: src/editors/editor_303.cpp
@@ -83,7 +83,7 @@ midi.o: src/midi/midi.cpp
 timer.o: src/support/timer.cpp
 	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
-interface.o: src/support/interface.cpp
+main.o: src/support/main.cpp
 	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 misc_draw.o: src/ui/misc_draw.cpp
