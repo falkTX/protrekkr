@@ -631,7 +631,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type)
     short *Dest_Buffer;
     Uint8 *Packed_Read_Buffer;
 
-    Mod_Dat_Read(&Packed_Length, sizeof(char) * 4);
+    Mod_Dat_Read(&Packed_Length, sizeof(int));
     if(Packed_Length == -1)
     {
         // Sample wasn't packed
@@ -731,7 +731,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     for(j = 0; j < patternLines[pwrite]; j++)
                     {   // Rows
                         TmpPatterns_Notes = TmpPatterns_Tracks + (j * (MAX_TRACKS * 6));
-                        Mod_Dat_Read(TmpPatterns_Notes + i, 1);
+                        Mod_Dat_Read(TmpPatterns_Notes + i, sizeof(char));
                     }
                 }
             }
@@ -741,10 +741,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         for(int swrite = 0; swrite < nbr_instr; swrite++)
         {
-            Mod_Dat_Read(&Synthprg[swrite], sizeof(bool));
+            Mod_Dat_Read(&Synthprg[swrite], sizeof(char));
 
             if(Synthprg[swrite])
             {
+                // ::FIX::
                 Mod_Dat_Read(&PARASynth[swrite], sizeof(SynthParameters));
             } 
 
@@ -766,10 +767,10 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
                     // No samples names in packed modules
                     Mod_Dat_Read(&Basenote[swrite][slwrite], sizeof(char));
-                    Mod_Dat_Read(&LoopStart[swrite][slwrite], sizeof(long));
-                    Mod_Dat_Read(&LoopEnd[swrite][slwrite], sizeof(long));
+                    Mod_Dat_Read(&LoopStart[swrite][slwrite], sizeof(int));
+                    Mod_Dat_Read(&LoopEnd[swrite][slwrite], sizeof(int));
                     Mod_Dat_Read(&LoopType[swrite][slwrite], sizeof(char));
-                    Mod_Dat_Read(&SampleNumSamples[swrite][slwrite], sizeof(long));
+                    Mod_Dat_Read(&SampleNumSamples[swrite][slwrite], sizeof(int));
                     Mod_Dat_Read(&Finetune[swrite][slwrite], sizeof(char));
                     Mod_Dat_Read(&SampleVol[swrite][slwrite], sizeof(float));
                     Mod_Dat_Read(&FDecay[swrite][slwrite], sizeof(float));
@@ -890,7 +891,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         {
             for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
             {
-                Mod_Dat_Read(&SACTIVE[tps_pos][tps_trk], sizeof(bool));
+                Mod_Dat_Read(&SACTIVE[tps_pos][tps_trk], sizeof(char));
             }
         }
 
@@ -935,13 +936,15 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
         {
-            Mod_Dat_Read(&Disclap[tps_trk], sizeof(bool));
+            Mod_Dat_Read(&Disclap[tps_trk], sizeof(char));
         }
 
-        Mod_Dat_Read(beatsync, sizeof(bool) * 128);
+        Mod_Dat_Read(beatsync, sizeof(char) * 128);
+        // ::FIX::
         Mod_Dat_Read(beatlines, sizeof(short) * 128);
         Mod_Dat_Read(&REVERBFILTER, sizeof(float));
 
+        // ::FIX::
         Mod_Dat_Read(CustomVol, sizeof(float) * 128);
 
         unsigned char tb303_1_enabled;
@@ -952,6 +955,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #if defined(PTK_303)
         if(tb303_1_enabled)
         {
+            // ::FIX::
             Mod_Dat_Read(&tb303[0], sizeof(para303));
         }
 #endif
@@ -961,6 +965,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #if defined(PTK_303)
         if(tb303_2_enabled)
         {
+            // ::FIX::
             Mod_Dat_Read(&tb303[1], sizeof(para303));
         }
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].tbVolume, sizeof(float));
@@ -1068,7 +1073,7 @@ void PTKEXPORT Ptk_Stop(void)
 
     for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
     {
-    //    for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++) {
+    //  for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++) {
         sp_Stage[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
         sp_Stage2[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
         sp_Stage3[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
@@ -1181,12 +1186,6 @@ void Pre_Song_Init(void)
         sp_Stage2[ini] = 0;
         sp_Stage3[ini] = 0;
 
-        new_instrument[ini] = 0;
-        Pos_Segue[ini] = 0;
-        segue_volume[ini] = 0;
-        Segue_SamplesL[ini] = 0;
-        Segue_SamplesR[ini] = 0;
-
         ramper[ini] = 0;
 
 #if defined(PTK_FLANGER)
@@ -1214,7 +1213,14 @@ void Pre_Song_Init(void)
 #endif
 
         CCut[ini] = 126.0f;
+
+        new_instrument[ini] = 0;
+        Pos_Segue[ini] = 0;
+        segue_volume[ini] = 0;
+        Segue_SamplesL[ini] = 0;
+        Segue_SamplesR[ini] = 0;
     }
+
 
 #if defined(PTK_FLANGER)
     Flanger_sbuf0L = 0;
@@ -1657,7 +1663,6 @@ void Sp_Player(void)
 
         if(sp_Stage[c] == PLAYING_SAMPLE || sp_Stage[c] == PLAYING_SAMPLE_NOTEOFF)
         {
-
             if(!Synth_Was[c]) goto ByPass_Wav;
             if((Synthesizer[c].OSC1_WAVEFORM != 5 && Synthesizer[c].OSC2_WAVEFORM != 5))
             {
@@ -1676,24 +1681,27 @@ ByPass_Wav:
 
                 Currentpointer = sp_Position[c].half.first;
 
-                currsignal = Cubic_Work(
-                            *(Player_WL[c] + Currentpointer - 1),
-                            *(Player_WL[c] + Currentpointer),
-                            *(Player_WL[c] + Currentpointer + 1),
-                            *(Player_WL[c] + Currentpointer + 2),
-                            res_dec, Currentpointer,
-                            Rns[c]) * sp_Cvol[c] * Player_SV[c];
+                if(Player_WL[c])
+                {
+                    currsignal = Cubic_Work(
+                                    *(Player_WL[c] + Currentpointer - 1),
+                                    *(Player_WL[c] + Currentpointer),
+                                    *(Player_WL[c] + Currentpointer + 1),
+                                    *(Player_WL[c] + Currentpointer + 2),
+                                    res_dec, Currentpointer,
+                                    Rns[c]) * sp_Cvol[c] * Player_SV[c];
+                }
 
                 // Stereo sample
                 if(Player_SC[c] == 2)
                 {
                     grown = true;
                     currsignal2 = Cubic_Work(*(Player_WR[c]+ Currentpointer - 1),
-                                             *(Player_WR[c] + Currentpointer),
-                                             *(Player_WR[c] + Currentpointer + 1),
-                                             *(Player_WR[c] + Currentpointer + 2),
-                                             res_dec, Currentpointer,
-                                             Rns[c]) * sp_Cvol[c] * Player_SV[c];
+                                                *(Player_WR[c] + Currentpointer),
+                                                *(Player_WR[c] + Currentpointer + 1),
+                                                *(Player_WR[c] + Currentpointer + 2),
+                                                res_dec, Currentpointer,
+                                                Rns[c]) * sp_Cvol[c] * Player_SV[c];
                 }
 
                 // End of Interpolation algo
@@ -1759,18 +1767,18 @@ ByPass_Wav:
         if(Synthesizer[c].ENV1_STAGE || Synthesizer[c].ENV2_STAGE)
         {
             currsignal += Synthesizer[c].GetSample(Player_WL[c], Player_WR[c],
-                                                   Player_SC[c],
-                                                   Player_LT[c],
-                                                   Player_LT[c] > SMP_LOOP_NONE ? Player_LE[c]: Player_NS[c],
-                                                   Player_LT[c] > SMP_LOOP_NONE ? Player_LL[c]: 0,
-                                                   &currsignal2,
-                                                   Rns[c], sp_Cvol[c] * Player_SV[c], &sp_Stage2[c], &sp_Stage3[c],
-                                                   (Uint64 *) &sp_Position_osc1[c],
-                                                   (Uint64 *) &sp_Position_osc2[c],
+                                                      Player_SC[c],
+                                                      Player_LT[c],
+                                                      Player_LT[c] > SMP_LOOP_NONE ? Player_LE[c]: Player_NS[c],
+                                                      Player_LT[c] > SMP_LOOP_NONE ? Player_LL[c]: 0,
+                                                      &currsignal2,
+                                                      Rns[c], sp_Cvol[c] * Player_SV[c], &sp_Stage2[c], &sp_Stage3[c],
+                                                      (Uint64 *) &sp_Position_osc1[c],
+                                                      (Uint64 *) &sp_Position_osc2[c],
 #if defined(PTK_SYNTH_OSC3)
-                                                   (Uint64 *) &sp_Position_osc3[c],
+                                                      (Uint64 *) &sp_Position_osc3[c],
 #endif
-                                                   Vstep1[c]);
+                                                      Vstep1[c]);
 
             if(sp_Cvol[c] > sp_Tvol[c]) sp_Cvol[c] -= 0.005f;
             else sp_Cvol[c] += 0.005f;
@@ -2134,7 +2142,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
     // Empty row ? Take the current one.
     if(sample == 255)
     {
-        sample = sp_channelsample[channel];
+        sample = (unsigned char) sp_channelsample[channel];
         vol = sp_Tvol[channel];
         if(glide) no_retrig_adsr = TRUE;
     }
@@ -2380,7 +2388,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
         Pos_Segue[channel] = 0;
         segue_volume[channel] = 1.0f;
         new_instrument[channel] = TRUE;
-
+        
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
         if(TRACKSTATE[channel] == 0 &&
@@ -2944,23 +2952,28 @@ void GetPlayerValues(float master_coef)
     Compressor_work();
 #endif
 
+    left_float /= 32767.0f;
+    right_float /= 32767.0f;
+
 #if defined(PTK_LIMITER)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
+
     if(mas_comp_ratio > 0.01f)
     {
-        left_float = Mas_Compressor(left_float / 32767.0f, &rms_sumL, mas_comp_bufferL, &mas_envL) * 32767.0f;
-        right_float = Mas_Compressor(right_float / 32767.0f, &rms_sumR, mas_comp_bufferR, &mas_envR) * 32767.0f;
+        left_float = Mas_Compressor(left_float, &rms_sumL, mas_comp_bufferL, &mas_envL);
+        right_float = Mas_Compressor(right_float, &rms_sumR, mas_comp_bufferR, &mas_envR);
     }
 #endif
 
 #if defined(__LINUX__)
     // It looks like the maximum range for OSS are -8192 +8192
     // (but i'm not sure about that)
-    left_float /= 32767.0f;
-    right_float /= 32767.0f;
     left_float *= 8192.0f;
     right_float *= 8192.0f;
+#else
+    left_float *= 32767.0f;
+    right_float *= 32767.0f;
 #endif
 
     left_value = f2i(left_float * master_coef);

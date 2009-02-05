@@ -1,11 +1,9 @@
 TODO:
 
- Concerning the MacOSX port:
+Concerning the MacOSX port:
  - Finish to implement the sound callback.
- - There's probably a lot of endianness insanity in files handling.
-
- - Create 2 make files for the replay (x86/ppc).
- ------------------------------------------------------------------
+ - There's probably a lot of nasty endianness insanity in files handling.
+------------------------------------------------------------------
 
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating systems.

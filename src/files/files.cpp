@@ -95,68 +95,68 @@ int mt_channels[13] =
 
 AMIGA_NOTE mt_period_conv[] =
 {
-    { 1712, 1 },
-    { 1616, 2 },
-    { 1524, 3 },
-    { 1440, 4 },
-    { 1356, 5 },
-    { 1280, 6 },
-    { 1208, 7 },
-    { 1140, 8 },
-    { 1076, 9 },
-    { 1016, 10 },
-    { 960, 11 },
-    { 906, 12 },
+    { 1712, 36 },
+    { 1616, 37 },
+    { 1524, 38 },
+    { 1440, 39 },
+    { 1356, 40 },
+    { 1280, 41 },
+    { 1208, 42 },
+    { 1140, 43 },
+    { 1076, 44 },
+    { 1016, 45 },
+    {  960, 46 },
+    {  906, 47 },
 
-    { 856, 13 },
-    { 808, 14 },
-    { 762, 15 },
-    { 720, 16 },
-    { 678, 17 },
-    { 640, 18 },
-    { 604, 19 },
-    { 570, 20 },
-    { 538, 21 },
-    { 508, 22 },
-    { 480, 23 },
-    { 453, 24 },
-    { 428, 25 },
-    { 404, 26 },
-    { 381, 27 },
-    { 360, 28 },
-    { 339, 29 },
-    { 320, 30 },
-    { 302, 31 },
-    { 285, 32 },
-    { 269, 33 },
-    { 254, 34 },
-    { 240, 35 },
-    { 226, 36 },
-    { 214, 37 },
-    { 202, 38 },
-    { 190, 39 },
-    { 180, 40 },
-    { 170, 41 },
-    { 160, 42 },
-    { 151, 43 },
-    { 143, 44 },
-    { 135, 45 },
-    { 127, 46 },
-    { 120, 47 },
-    { 113, 48 },
+    {  856, 48 },
+    {  808, 49 },
+    {  762, 50 },
+    {  720, 51 },
+    {  678, 52 },
+    {  640, 53 },
+    {  604, 54 },
+    {  570, 55 },
+    {  538, 56 },
+    {  508, 57 },
+    {  480, 58 },
+    {  453, 59 },
+    {  428, 60 },
+    {  404, 61 },
+    {  381, 62 },
+    {  360, 63 },
+    {  339, 64 },
+    {  320, 65 },
+    {  302, 66 },
+    {  285, 67 },
+    {  269, 68 },
+    {  254, 69 },
+    {  240, 70 },
+    {  226, 71 },
+    {  214, 72 },
+    {  202, 73 },
+    {  190, 74 },
+    {  180, 75 },
+    {  170, 76 },
+    {  160, 77 },
+    {  151, 78 },
+    {  143, 79 },
+    {  135, 80 },
+    {  127, 81 },
+    {  120, 82 },
+    {  113, 83 },
 
-    { 107, 49 },
-    { 101, 50 },
-    { 95, 51 },
-    { 90, 52 },
-    { 85, 53 },
-    { 75, 54 },
-    { 71, 55 },
-    { 67, 56 },
-    { 63, 57 },
-    { 60, 58 },
-    { 56, 59 },
-};
+    {  107, 84 },
+    {  101, 85 },
+    {   95, 86 },
+    {   90, 87 },
+    {   85, 88 },
+    {   75, 89 },
+    {   71, 90 },
+    {   67, 91 },
+    {   63, 92 },
+    {   60, 93 },
+    {   56, 94 },
+}; 
 
 INSTR_ORDER Used_Instr[128];
 INSTR_ORDER Used_Instr2[128];
@@ -247,6 +247,17 @@ void Init_Tracker_Context_After_ModLoad(void)
 }
 
 // ------------------------------------------------------
+// Scale an amiga protracker .mod effect data
+float Convert_AmigaMod_Value(int value, float scale1, float scale2)
+{
+    float newvalue = (float) value;
+    newvalue /= scale1;
+    newvalue *= scale2;
+    if(newvalue > scale2) newvalue = scale2;
+    return((int) newvalue);
+}
+
+// ------------------------------------------------------
 // Load a .mod file
 void LoadAmigaMod(char *FileName, int channels)
 {
@@ -258,6 +269,10 @@ void LoadAmigaMod(char *FileName, int channels)
     int pwrite;
     int li2;
     int pw2;
+    float volume;
+    Uint32 x;
+    int ramp;
+    float ramp_vol;
 
     SongStop();
 
@@ -286,24 +301,26 @@ void LoadAmigaMod(char *FileName, int channels)
             // Jump over 3 unhandled bytes for PTK samplename.
             fseek(in, 3, SEEK_CUR);
 
-            SampleNumSamples[swrite][0] = (int) (fgetc(in) * 256) + (int) fgetc(in);
+            SampleNumSamples[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
             SampleNumSamples[swrite][0] *= 2;
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
             Finetune[swrite][0] *= 16;
             CustomVol[swrite] = (float) fgetc(in) * 0.015625f;
             SampleVol[swrite][0] = 1.0f;
-            Basenote[swrite][0] = 48 - 5 + 12;
+            Basenote[swrite][0] = 48 - 5 + 12 + 12 + 12 + 12 - 2;
 
             SampleType[swrite][0] = 0;    // NO SAMPLE
 
-            // Calculate/Adapt AMIGA loop points to ntk LoopPoints:
+            // Calculate/Adapt AMIGA loop points to ptk LoopPoints:
 
-            LoopStart[swrite][0] = ((int) (fgetc(in) * 256) + (int) fgetc(in)) * 2;
-            long Replen = ((int) (fgetc(in) * 256) + (int) fgetc(in)) * 2;
+            LoopStart[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
+            LoopStart[swrite][0] *= 2;
+            long Replen = ((int) (fgetc(in) << 8) + (int) fgetc(in));
+            Replen *= 2;
 
             if(Replen > 2)
             {
-                LoopEnd[swrite][0] = LoopStart[swrite][0] + Replen;
+                LoopEnd[swrite][0] = LoopStart[swrite][0] + Replen - 2;
                 LoopType[swrite][0] = SMP_LOOP_FORWARD;
             }
             else
@@ -373,15 +390,15 @@ void LoadAmigaMod(char *FileName, int channels)
                             {
                                 switch(t_argu)
                                 {
-                                    case 1: t_argu = 9; break;
-                                    case 2: t_argu = 8; break;
-                                    case 3: t_argu = 7; break;
+                                    case 1: t_argu = 10; break;
+                                    case 2: t_argu = 9; break;
+                                    case 3: t_argu = 8; break;
                                     case 4: t_argu = 6; break;
                                     case 5: t_argu = 5; break;
                                     case 6: t_argu = 4; break;
                                     case 7: t_argu = 3; break;
-                                    case 8: t_argu = 2; break;
-                                    case 9: t_argu = 1; break;
+                                    case 8: t_argu = 3; break;
+                                    case 9: t_argu = 2; break;
                                     case 10: t_argu = 1; break;
                                     case 11: t_argu = 1; break;
                                     case 12: t_argu = 1; break;
@@ -410,7 +427,18 @@ void LoadAmigaMod(char *FileName, int channels)
 
                         // ARPEGGIO
                         case 0:
-                            t_command = 0x1b;
+                            if(t_argu) t_command = 0x1b;
+                            else t_command = 0;
+                            break;
+
+                        // PITCH UP
+                        case 1:
+                            t_argu >>= 1;
+                            break;
+
+                        // PITCH UP
+                        case 2:
+                            t_argu >>= 1;
                             break;
 
                         // GLIDE
@@ -418,42 +446,38 @@ void LoadAmigaMod(char *FileName, int channels)
                             t_command = 5;
                             break;
 
-                        // VIBRATO [Not supported by NTK, ntk wasn't to sound like a violin :P ].
+                        // VIBRATO [Not supported by PTK, ptk wasn't made to sound like a violin :P ].
                         case 4:
                             t_command = 0;
                             t_argu = 0;
                             break;
 
-                        // NO TREMOLO EITHER
-                        case 6:
-                            t_command = 0;
-                            t_argu = 0;
-                            break;
 
                         // DEMOSYNCHRO SIGNAL???
                         case 8:
                             t_command = 7;
                             break;
 
+                        // (Only handle the volume slide)
+                        case 6:
                         // Volume Sliders
                         case 0xa:
                             if(t_argu >= 16)
                             {
                                 t_command = 25; // Vol SlideUp
-                                t_argu = (t_argu >> 4) * 4;
+                                t_argu = Convert_AmigaMod_Value(t_argu >> 4, 16.0f, 40.0f);
                             }
                             else
                             {
                                 t_command = 26; // Vol Slide Down
-                                t_argu *= 4;
+                                t_argu = Convert_AmigaMod_Value(t_argu, 16.0f, 40.0f);
                             }
                             break;
 
                         // VOLUME
                         case 0xc:
                             t_command = 3;
-                            t_argu *= 8;
-                            if(t_argu > 255) t_argu = 255;
+                            t_argu = Convert_AmigaMod_Value(t_argu, 64.0f, 255.0f);
                             break;
 
                         // Pattern Jump Amiga Mod stylee
@@ -503,6 +527,12 @@ void LoadAmigaMod(char *FileName, int channels)
                                 t_command = 0;
                                 t_argu = 0;
                             }
+
+                            if(t_argu > 0xd0 && t_argu < 0xf0)
+                            {
+                                t_command = 0;
+                                t_argu = 0;
+                            }
                             break;
 
                     } // Pattern FX adapter end.
@@ -521,12 +551,58 @@ void LoadAmigaMod(char *FileName, int channels)
                 SampleType[swrite][0] = 1;
 
                 // Reserving space for 16-Bit Signed Short Data.
-                RawSamples[swrite][0][0] = (short *) malloc((SampleNumSamples[swrite][0] * 2));
-                for(Uint32 x = 0; x < SampleNumSamples[swrite][0]; x++)
+                RawSamples[swrite][0][0] = (short *) malloc((SampleNumSamples[swrite][0] * sizeof(short)));
+                for(x = 0; x < SampleNumSamples[swrite][0]; x++)
                 {
                     *(RawSamples[swrite][0][0] + x) = (short) fgetc(in) << 8;
                 }
-                *RawSamples[swrite][0][0] = 0;
+                *(RawSamples[swrite][0][0]) = 0;
+
+#define MOD_RAMP_SIZE 40
+
+                // Ramp volume at the end of the sample (if there's no loop)
+                if(LoopType[swrite][0] == SMP_LOOP_NONE)
+                {
+                    ramp_vol = 1.0f;
+                    for(ramp = (x - MOD_RAMP_SIZE);
+                        ramp < x; ramp++)
+                    {
+                        volume = (float) (*(RawSamples[swrite][0][0] + ramp));
+                        volume /= 32767;
+                        volume *= ramp_vol;
+
+                        *(RawSamples[swrite][0][0] + ramp) = (short) (volume * 32767.0f);
+                        ramp_vol -= 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
+                    }
+                    ramp_vol = 0.0f;
+                    for(ramp = 0;
+                        ramp < MOD_RAMP_SIZE; ramp++)
+                    {
+                        volume = (float) (*(RawSamples[swrite][0][0] + ramp));
+                        volume /= 32767;
+                        volume *= ramp_vol;
+
+                        *(RawSamples[swrite][0][0] + ramp) = (short) (volume * 32767.0f);
+                        ramp_vol += 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
+                    }
+                }
+                else
+                {
+                    if(LoopStart[swrite][0] >= MOD_RAMP_SIZE)
+                    {
+                        ramp_vol = 0.0f;
+                        for(ramp = 0;
+                            ramp < MOD_RAMP_SIZE; ramp++)
+                        {
+                            volume = (float) (*(RawSamples[swrite][0][0] + ramp));
+                            volume /= 32767;
+                            volume *= ramp_vol;
+
+                            *(RawSamples[swrite][0][0] + ramp) = (short) (volume * 32767.0f);
+                            ramp_vol += 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
+                        }
+                    }
+                }
             }
             else
             {
@@ -535,10 +611,10 @@ void LoadAmigaMod(char *FileName, int channels)
             }
         }
 
-        TPan[0] = 0.3f;
-        TPan[1] = 0.7f;
-        TPan[2] = 0.8f;
-        TPan[3] = 0.2f;
+        TPan[0] = 0.58f;
+        TPan[1] = 0.42f;
+        TPan[2] = 0.34f;
+        TPan[3] = 0.66f;
         ComputeStereo(0);
         ComputeStereo(1);
         ComputeStereo(2);
@@ -3678,14 +3754,12 @@ int Read_Data(void *value, int size, int amount, FILE *handle)
     switch(size)
     {
         case 2:
-            svalue = (short *) value;
             ret_value = fread(&svalue, size, amount, handle);
             svalue = (short *) Swap_16(svalue);
             *((short *) value) = (int) svalue;
             return(ret_value);
 
         case 4:
-            ivalue = (int *) value;
             ret_value = fread(&ivalue, size, amount, handle);
             ivalue = (int *) Swap_32(ivalue);
             *((int *) value) = (int) ivalue;

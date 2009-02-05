@@ -75,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib ..\PtkReplay.lib dsound.lib msacm32.lib msvcrt.lib /nologo /entry:"main" /subsystem:console /debug /machine:I386 /nodefaultlib /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib PtkReplay.lib dsound.lib msacm32.lib msvcrt.lib /nologo /entry:"main" /subsystem:console /debug /machine:I386 /nodefaultlib /pdbtype:sept
 
 !ENDIF 
 
@@ -102,6 +102,15 @@ InputName=module
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "Test - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\Test\module.asm
+InputName=module
+
+".\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	nasmw.exe -f win32 ".\Test\$(InputName).asm" -o ".\$(InputName).obj"  -s -O9
+
+# End Custom Build
 
 !ENDIF 
 

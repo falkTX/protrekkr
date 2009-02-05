@@ -95,7 +95,7 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\Support\include\interface.h
+SOURCE=.\src\support\include\main.h
 # End Source File
 # Begin Source File
 
@@ -108,7 +108,7 @@ SOURCE=.\src\Support\include\timer.h
 # End Group
 # Begin Source File
 
-SOURCE=.\src\Support\interface.cpp
+SOURCE=.\src\support\main.cpp
 # End Source File
 # Begin Source File
 
@@ -127,7 +127,7 @@ SOURCE=.\src\Support\timer.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\include\main.h
+SOURCE=.\src\include\ptk.h
 # End Source File
 # Begin Source File
 
@@ -416,11 +416,11 @@ SOURCE=.\src\midi\midi_drv_windows.cpp
 # End Group
 # Begin Source File
 
-SOURCE=.\src\main.cpp
+SOURCE=.\src\Support\Project.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Support\Project.ico
+SOURCE=.\src\ptk.cpp
 # End Source File
 # End Group
 # End Target
