@@ -904,7 +904,6 @@ Read_Mod_File:
                             Read_Mod_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
                             Read_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
-                            // FIX
                             RawSamples[swrite][0][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short));
                             Read_Mod_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
                             Swap_Sample(RawSamples[swrite][0][slwrite], swrite, slwrite);
@@ -919,7 +918,7 @@ Read_Mod_File:
                                 Swap_Sample(RawSamples[swrite][1][slwrite], swrite, slwrite);
                                 *RawSamples[swrite][1][slwrite] = 0;
                             }
-                        }// Exist Sample
+                        } // Exist Sample
                     }
                 }
             }
@@ -1161,6 +1160,7 @@ Read_Mod_File:
                     Read_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
                     if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
                     if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
+                    
                     Read_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
                     if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
                     if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
@@ -1182,7 +1182,7 @@ Read_Mod_File:
             {
                 for(tps_pos = 0; tps_pos < 256; tps_pos++)
                 {
-                    for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
+                    for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
                     {
                         Read_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
                         SHISTORY[tps_pos][tps_trk] = FALSE;
@@ -1289,7 +1289,7 @@ Read_Mod_File:
                 for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
                 {
                     Read_Mod_Data(&Disclap[tps_trk], sizeof(char), 1, in);
-                    Read_Mod_Data(&fake_value, sizeof(char), 1, in);
+                    if(!Portable) Read_Mod_Data(&fake_value, sizeof(char), 1, in);
                 }
             }
             else
@@ -1304,7 +1304,9 @@ Read_Mod_File:
             else memset(artist, 0, 20);
             if(Ptk_Format) Read_Mod_Data(style, sizeof(char), 20, in);
             else memset(style, 0, 20);
-            if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+            
+            if(!Portable) if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+            
             Read_Mod_Data(beatsync, sizeof(char), 128, in);
             
             for(i = 0; i < 128; i++)
@@ -1319,7 +1321,7 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
             }
 
-            if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+            if(!Portable) if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
 
             // Read the 303 datas
             if(Ptk_Format)
@@ -1410,6 +1412,8 @@ Read_Mod_File:
 
             // Init the tracker context
             Init_Tracker_Context_After_ModLoad();
+
+            mess_box("Module loaded sucessfully...");
         }
         else
         {
@@ -1484,7 +1488,6 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 // Save a packed sample
 void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
 {
-    int Sample_Pack_Value = FALSE;
     int PackedLen = 0;
     short *PackedSample = NULL;
 
@@ -1777,6 +1780,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     unsigned char *TmpPatterns_Notes;
     unsigned char *TmpPatterns_Rows;
     unsigned int New_Extension = 'KTRP';
+    char char_value;
     char FileName_FX[MAX_PATH];
     int i;
     int j;
@@ -1928,16 +1932,19 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     }
     Real_SongTracks = Songtracks - nbr_muted;
 
-    Write_Mod_Data(&int_pattern, sizeof(unsigned char), 1, in);
+    char_value = (char) int_pattern;
+    Write_Mod_Data(&char_value, sizeof(char), 1, in);
     // Number of tracks is stored here for new format
-    Write_Mod_Data(&Real_SongTracks, sizeof(char), 1, in);
-    Write_Mod_Data(&sLength, sizeof(unsigned char), 1, in);
+    char_value = (char) Real_SongTracks;
+    Write_Mod_Data(&char_value, sizeof(char), 1, in);
+    Write_Mod_Data(&sLength, sizeof(char), 1, in);
     // Patterns sequence
-    Write_Mod_Data(New_pSequence, sizeof(unsigned char), sLength, in);
+    Write_Mod_Data(New_pSequence, sizeof(char), sLength, in);
 
     for(i = 0; i < int_pattern; i++)
     {
-        Write_Mod_Data(&New_patternLines[i], sizeof(char), 1, in);
+        char_value = (char) New_patternLines[i];
+        Write_Mod_Data(&char_value, sizeof(char), 1, in);
     }
 
     // Check the instruments
@@ -2024,7 +2031,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         if(Number_Fx)
         {
             Rec_Fx = 0;
-            sprintf(FileName_FX, "%s.psy", FileName);
+            sprintf(FileName_FX, "%s.psm", FileName);
             Out_FX = fopen(FileName_FX, "wb");
 
             // Save the FX data
@@ -2930,16 +2937,14 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     int j;
     int k;
     char Temph[96];
-    int Old_Phony_Value = 0;
-    int Sample_Pack_Value = 0;
     int Ok_Memory = TRUE;
-    int fake_value;
-    int Comp_Flag = TRUE;
+    char Comp_Flag = TRUE;
     unsigned char *cur_pattern_col;
     unsigned char *cur_pattern;
 
     int twrite;
     int tps_trk;
+    
     Mod_Length = 0;
     Mod_Mem_Pos = 0;
     Mod_Simulate = SAVE_WRITE;
@@ -3019,7 +3024,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             for(int pwrite = 0; pwrite < nPatterns; pwrite++)
             {
-                Write_Mod_Data(RawPatterns + (pwrite * 12288), 1, 12288, in);
+                Write_Mod_Data(RawPatterns + (pwrite * 12288), sizeof(char), 12288, in);
             }
 
             // Writing sample data
@@ -3044,9 +3049,11 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                         rtrim_string(SampleName[swrite][slwrite], 64);
                         Write_Mod_Data(&SampleName[swrite][slwrite], sizeof(char), 64, in);
                         Write_Mod_Data(&Basenote[swrite][slwrite], sizeof(char), 1, in);
+                        
                         Write_Mod_Data_Swap(&LoopStart[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
+                        
                         Write_Mod_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                         Write_Mod_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
@@ -3064,7 +3071,9 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 Write_Mod_Data_Swap(&TCut[twrite], sizeof(float), 1, in);
                 Write_Mod_Data_Swap(&ICut[twrite], sizeof(float), 1, in);
+
                 Write_Mod_Data_Swap(&TPan[twrite], sizeof(float), 1, in);
+
                 Write_Mod_Data_Swap(&FType[twrite], sizeof(int), 1, in);
                 Write_Mod_Data_Swap(&FRez[twrite], sizeof(int), 1, in);
                 Write_Mod_Data_Swap(&DThreshold[twrite], sizeof(float), 1, in);
@@ -3079,9 +3088,11 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data_Swap(&BeatsPerMin, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&TicksPerBeat, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&mas_vol, sizeof(float), 1, in);
+            
             Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
             Write_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
+
             Write_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
@@ -3121,7 +3132,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 Write_Mod_Data_Swap(&FLANGER_AMPL[twrite], sizeof(float), 1, in);
                 Write_Mod_Data_Swap(&FLANGER_FEEDBACK[twrite], sizeof(float), 1, in);
                 Write_Mod_Data_Swap(&FLANGER_DELAY[twrite], sizeof(int), 1, in);
-            }  
+            }
 
             // Was a bug
             Write_Mod_Data_Swap(&FLANGER_DEPHASE, sizeof(float), 1, in);
@@ -3135,16 +3146,12 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
             {
                 Write_Mod_Data(&Disclap[tps_trk], sizeof(char), 1, in);
-                // Was dispan
-                Write_Mod_Data(&fake_value, sizeof(char), 1, in);
             }
 
             rtrim_string(artist, 20);
             Write_Mod_Data(artist, sizeof(char), 20, in);
             rtrim_string(style, 20);
             Write_Mod_Data(style, sizeof(char), 20, in);
-
-            Write_Mod_Data(&Old_Phony_Value, sizeof(char), 1, in);
 
             Write_Mod_Data(beatsync, sizeof(char), 128, in);
 
@@ -3158,8 +3165,6 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 Write_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
             }
-
-            Write_Mod_Data(&Old_Phony_Value, sizeof(char), 1, in);
 
             // Include the patterns names
             for(i = 0; i < 32; i++)
@@ -3203,20 +3208,20 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 char name[128];
                 if(NewFormat)
                 {
-                    sprintf(name, "Module '%s.ptp' saved succesfully...", FileName);
+                    sprintf(name, "Module '%s.ptp' saved succesfully.", FileName);
                 }
                 else
                 {
-                    sprintf(name, "Module '%s.ptk' saved succesfully...", FileName);
+                    sprintf(name, "Module '%s.ptk' saved succesfully.", FileName);
                 }
                 mess_box(name);
             }
         }
-        if(!Ok_Memory) mess_box("Not enough memory...");
+        if(!Ok_Memory) mess_box("Not enough memory.");
     }
     else
     {
-        if(!Simulate) mess_box("Module save failed...");   
+        if(!Simulate) mess_box("Module save failed.");   
     }
 
     if(!Simulate)
@@ -3338,7 +3343,7 @@ void SaveSynth(void)
 // Load an instrument
 void LoadInst(char *FileName)
 {
-    int old_bug;
+    int old_bug = FALSE;
     int Pack_Scheme = FALSE;
     int new_adsr = FALSE;
     int tight = FALSE;
@@ -3353,7 +3358,6 @@ void LoadInst(char *FileName)
         // Reading and checking extension...
         char extension[10];
         Read_Data(extension, sizeof(char), 9, in);
-        old_bug = FALSE;
         if(strcmp(extension, "TWNNINS0") == 0)
         {
             old_bug = TRUE;
@@ -3474,7 +3478,7 @@ void SaveInst(void)
     FILE *in;
     char Temph[96];
     char extension[10];
-    int synth_prg;
+    char synth_prg;
     int synth_save;
 
     sprintf(extension, "TWNNINS4");
@@ -3506,7 +3510,7 @@ void SaveInst(void)
                 break;
         }
 
-        Write_Data(&synth_prg, sizeof(unsigned char), 1, in);
+        Write_Data(&synth_prg, sizeof(char), 1, in);
 
         Write_Synth_Params(&Write_Data, &Write_Data_Swap, in, swrite);
 
@@ -3587,7 +3591,7 @@ void Load303(char *FileName)
 }
 
 // ------------------------------------------------------
-// Save a 303 pattern 
+// Save a 303 pattern
 void Save303(void)
 {
     FILE *in;
@@ -3689,8 +3693,8 @@ int Pack_Module(char *FileName)
     if(output)
     {
         sprintf(extension, "TWNNSNGA");
-        Write_Data(extension, sizeof(unsigned char), 9, output);
-        Write_Data(Final_Mem_Out, sizeof(unsigned char), Len, output);
+        Write_Data(extension, sizeof(char), 9, output);
+        Write_Data(Final_Mem_Out, sizeof(char), Len, output);
         fclose(output);
         sprintf(name, "Module '%s.ptk' saved succesfully...", FileName);
     }
@@ -4248,8 +4252,8 @@ void Save_303_Data(int (*Write_Function)(void *, int ,int, FILE *),
 {
     int i;
 
-    Write_Function(&tb303[unit].patternlength[pattern], sizeof(unsigned char), 1, in);
-    Write_Function(&tb303[unit].tone[pattern], sizeof(unsigned char), 16, in);
+    Write_Function(&tb303[unit].patternlength[pattern], sizeof(char), 1, in);
+    Write_Function(&tb303[unit].tone[pattern], sizeof(char), 16, in);
     for(i = 0; i < 16; i++)
     {
         Write_Function_Swap(&tb303[unit].flag[pattern][i], sizeof(struct flag303), 1, in);
