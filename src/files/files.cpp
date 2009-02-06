@@ -669,6 +669,7 @@ void LoadAmigaMod(char *FileName, int channels)
 
 // ------------------------------------------------------
 // Load a module file
+// TODO: split this one in 2
 void LoadMod(char *FileName)
 {
     int Ye_Old_Phony_Value;
@@ -676,7 +677,7 @@ void LoadMod(char *FileName)
     int New_adsr = FALSE;
     int New_Comp = FALSE;
     int Portable = FALSE;
-    int Comp_Flag;
+    char Comp_Flag;
 
     int i;
     int j;
@@ -744,7 +745,8 @@ void LoadMod(char *FileName)
         // Read a possible packed module ID
         unsigned int New_Extension;
         fseek(in, 0, SEEK_SET);
-        Read_Data_Swap(&New_Extension, sizeof(int), 1, in);
+        // (No swapping here to make sure the modules are endianness dependant)
+        Read_Data(&New_Extension, sizeof(int), 1, in);
 
         if(New_Extension == 'KTRP')
         {
@@ -787,6 +789,7 @@ Read_Mod_File:
             if(Ptk_Format) Read_Mod_Data(FileName, sizeof(char), 20, in);
             else memset(FileName, 0, 20);
             Read_Mod_Data(&nPatterns, sizeof(char), 1, in);
+
             Songtracks = MAX_TRACKS;
             if(!Ptk_Format) Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
             Read_Mod_Data(&sLength, sizeof(char), 1, in);
@@ -802,6 +805,7 @@ Read_Mod_File:
 
             memset(RawPatterns, 0, (12288 * nPatterns));
 
+            // Load the patterns rows infos
             if(Ptk_Format)
             {
                 for(i = 0; i < 128; i++)
@@ -817,9 +821,13 @@ Read_Mod_File:
                 }
                 for(i = 0; i < nPatterns; i++)
                 {
+                    patternLines[i] = 0;
                     Read_Mod_Data(&patternLines[i], sizeof(char), 1, in);
+                    patternLines[i] = Swap_16(patternLines[i]);
                 }
             }
+
+            // Load the patterns data
             if(Ptk_Format)
             {
                 for(int pwrite = 0; pwrite < nPatterns; pwrite++)
@@ -930,16 +938,18 @@ Read_Mod_File:
                 for(int swrite = 0; swrite < nbr_instr; swrite++)
                 {
                     memset(nameins[swrite], 0, 20);
-                    Read_Mod_Data(&Synthprg[swrite], sizeof(unsigned char), 1, in);
+                    Read_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
                     if(Synthprg[swrite])
                     {
                         Read_Mod_Data(&PARASynth[swrite].osc1_waveform, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].osc2_waveform, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].osc1_pw, sizeof(int), 1, in);
+                        
                         Read_Mod_Data(&PARASynth[swrite].osc2_pw, sizeof(int), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].osc2_detune, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].osc2_finetune, sizeof(char), 1, in);
+                        
                         Read_Mod_Data(&PARASynth[swrite].vcf_cutoff, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].vcf_resonance, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].vcf_type, sizeof(char), 1, in);
@@ -948,10 +958,12 @@ Read_Mod_File:
                         Read_Mod_Data(&PARASynth[swrite].env1_decay, sizeof(int), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env1_sustain, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env1_release, sizeof(int), 1, in);
+                        
                         Read_Mod_Data(&PARASynth[swrite].env2_attack, sizeof(int), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_decay, sizeof(int), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_sustain, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_release, sizeof(int), 1, in);
+                        
                         Read_Mod_Data(&PARASynth[swrite].lfo1_period, sizeof(int), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].lfo2_period, sizeof(int), 1, in);
 
@@ -979,19 +991,15 @@ Read_Mod_File:
                         Read_Mod_Data(&PARASynth[swrite].env1_osc2_pitch, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env1_osc1_volume, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env1_osc2_volume, sizeof(char), 1, in);
-
                         Read_Mod_Data(&PARASynth[swrite].env1_vcf_cutoff, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env1_vcf_resonance, sizeof(char), 1, in);
 
                         Read_Mod_Data(&PARASynth[swrite].env2_osc1_pw, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_osc2_pw, sizeof(char), 1, in);
-
                         Read_Mod_Data(&PARASynth[swrite].env2_osc1_pitch, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_osc2_pitch, sizeof(char), 1, in);
-
                         Read_Mod_Data(&PARASynth[swrite].env2_osc1_volume, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_osc2_volume, sizeof(char), 1, in);
-
                         Read_Mod_Data(&PARASynth[swrite].env2_vcf_cutoff, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].env2_vcf_resonance, sizeof(char), 1, in);
 
@@ -1000,6 +1008,7 @@ Read_Mod_File:
 
                         Read_Mod_Data(&PARASynth[swrite].ptc_glide, sizeof(char), 1, in);
                         Read_Mod_Data(&PARASynth[swrite].glb_volume, sizeof(char), 1, in);
+
                         Read_Mod_Data(&PARASynth[swrite].disto, sizeof(char), 1, in);
 
                         Read_Mod_Data(&PARASynth[swrite].lfo1_attack, sizeof(int), 1, in);
@@ -1023,6 +1032,7 @@ Read_Mod_File:
                     for(int slwrite = 0; slwrite < 16; slwrite++)
                     {
                         Read_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
+
                         if(SampleType[swrite][slwrite] != 0)
                         {
                             int Apply_Interpolation;
@@ -1039,10 +1049,13 @@ Read_Mod_File:
                             Read_Mod_Data(&LoopStart[swrite][slwrite], sizeof(int), 1, in);
                             Read_Mod_Data(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                             Read_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
+                            
                             Read_Mod_Data(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                             Read_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
+                            
                             Read_Mod_Data(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
                             Read_Mod_Data(&FDecay[swrite][slwrite], sizeof(float), 1, in);
+                            
                             Save_Len = SampleNumSamples[swrite][slwrite];
 
                             Apply_Interpolation = SampleCompression[swrite] == SMP_PACK_NONE ? FALSE : TRUE;
@@ -1124,57 +1137,114 @@ Read_Mod_File:
 
             mess_box("Loading song -> Track info, patterns and sequence.");   
 
-            // Reading Track Properties
-            for(twrite = 0; twrite < Songtracks; twrite++)
+            if(Ptk_Format)
             {
-                Read_Mod_Data_Swap(&TCut[twrite], sizeof(float), 1, in);
-                Read_Mod_Data_Swap(&ICut[twrite], sizeof(float), 1, in);
-                if(ICut[twrite] > 0.0078125f) ICut[twrite] = 0.0078125f;
-                if(ICut[twrite] < 0.00006103515625f) ICut[twrite] = 0.00006103515625f;
-
-                Read_Mod_Data_Swap(&TPan[twrite], sizeof(float), 1, in);
-                ComputeStereo(twrite);
-                Read_Mod_Data_Swap(&FType[twrite], sizeof(int), 1, in);
-                Read_Mod_Data_Swap(&FRez[twrite], sizeof(int), 1, in);
-                Read_Mod_Data_Swap(&DThreshold[twrite], sizeof(float), 1, in);
-                Read_Mod_Data_Swap(&DClamp[twrite], sizeof(float), 1, in);
-                Read_Mod_Data_Swap(&DSend[twrite], sizeof(float), 1, in);
-                Read_Mod_Data_Swap(&CSend[twrite], sizeof(int), 1, in);
-            }
-
-            // Reading mod properties
-            Read_Mod_Data_Swap(&compressor, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&c_threshold, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&BeatsPerMin, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&TicksPerBeat, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&mas_vol, sizeof(float), 1, in);
-            if(mas_vol < 0.01f) mas_vol = 0.01f;
-            if(mas_vol > 1.0f) mas_vol = 1.0f;
-
-            if(New_Comp)
-            {
-                Comp_Flag = 0;
-                Read_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
-                if(Comp_Flag)
+                // Reading Track Properties
+                for(twrite = 0; twrite < Songtracks; twrite++)
                 {
-                    Read_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
-                    if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
-                    if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
-                    
-                    Read_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
-                    if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
-                    if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
-                }
-            }
+                    Read_Mod_Data_Swap(&TCut[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data_Swap(&ICut[twrite], sizeof(float), 1, in);
+                    if(ICut[twrite] > 0.0078125f) ICut[twrite] = 0.0078125f;
+                    if(ICut[twrite] < 0.00006103515625f) ICut[twrite] = 0.00006103515625f;
 
-            Read_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
-            Read_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&lchorus_delay, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&rchorus_delay, sizeof(int), 1, in);
-            Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
-            Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
-            Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&TPan[twrite], sizeof(float), 1, in);
+                    ComputeStereo(twrite);
+                    Read_Mod_Data_Swap(&FType[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&FRez[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&DThreshold[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data_Swap(&DClamp[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data_Swap(&DSend[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data_Swap(&CSend[twrite], sizeof(int), 1, in);
+                }
+
+                // Reading mod properties
+                Read_Mod_Data_Swap(&compressor, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&c_threshold, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&BeatsPerMin, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&TicksPerBeat, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&mas_vol, sizeof(float), 1, in);
+                if(mas_vol < 0.01f) mas_vol = 0.01f;
+                if(mas_vol > 1.0f) mas_vol = 1.0f;
+
+                if(New_Comp)
+                {
+                    Comp_Flag = 0;
+                    Read_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+                    if(Comp_Flag)
+                    {
+                        Read_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
+                        if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
+                        if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
+                    
+                        Read_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
+                        if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
+                        if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
+                    }
+                }
+
+                Read_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
+                Read_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&lchorus_delay, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&rchorus_delay, sizeof(int), 1, in);
+                Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
+                Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
+                Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+            }
+            else
+            {
+                // Reading Track Properties
+                for(twrite = 0; twrite < Songtracks; twrite++)
+                {
+                    Read_Mod_Data(&TCut[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data(&ICut[twrite], sizeof(float), 1, in);
+                    if(ICut[twrite] > 0.0078125f) ICut[twrite] = 0.0078125f;
+                    if(ICut[twrite] < 0.00006103515625f) ICut[twrite] = 0.00006103515625f;
+
+                    Read_Mod_Data(&TPan[twrite], sizeof(float), 1, in);
+                    ComputeStereo(twrite);
+                    Read_Mod_Data(&FType[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+                    Read_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
+                }
+
+                // Reading mod properties
+                Read_Mod_Data(&compressor, sizeof(int), 1, in);
+                Read_Mod_Data(&c_threshold, sizeof(int), 1, in);
+                Read_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
+                Read_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
+                Read_Mod_Data(&mas_vol, sizeof(float), 1, in);
+                if(mas_vol < 0.01f) mas_vol = 0.01f;
+                if(mas_vol > 1.0f) mas_vol = 1.0f;
+
+                if(New_Comp)
+                {
+                    Comp_Flag = 0;
+                    Read_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+                    if(Comp_Flag)
+                    {
+                        Read_Mod_Data(&mas_comp_threshold, sizeof(float), 1, in);
+                        if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
+                        if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
+                    
+                        Read_Mod_Data(&mas_comp_ratio, sizeof(float), 1, in);
+                        if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
+                        if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
+                    }
+                }
+
+                Read_Mod_Data(&delay_time, sizeof(int), 1, in);
+                Read_Mod_Data(&Feedback, sizeof(float), 1, in);
+                Read_Mod_Data(&DelayType, sizeof(int), 1, in);
+                Read_Mod_Data(&lchorus_delay, sizeof(int), 1, in);
+                Read_Mod_Data(&rchorus_delay, sizeof(int), 1, in);
+                Read_Mod_Data(&lchorus_feedback, sizeof(float), 1, in);
+                Read_Mod_Data(&rchorus_feedback, sizeof(float), 1, in);
+                Read_Mod_Data(&shuffle, sizeof(int), 1, in);
+            }
 
             // Reading track part sequence
 
@@ -1245,7 +1315,6 @@ Read_Mod_File:
                     foff2[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
                     foff1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
                 }
-
             }
             else
             {
@@ -1300,25 +1369,48 @@ Read_Mod_File:
                 }
             }
 
-            if(Ptk_Format) Read_Mod_Data(artist, sizeof(char), 20, in);
-            else memset(artist, 0, 20);
-            if(Ptk_Format) Read_Mod_Data(style, sizeof(char), 20, in);
-            else memset(style, 0, 20);
-            
+            if(Ptk_Format)
+            {
+                Read_Mod_Data(artist, sizeof(char), 20, in);
+                Read_Mod_Data(style, sizeof(char), 20, in);
+            }
+            else
+            {
+                memset(artist, 0, 20);
+                memset(style, 0, 20);
+            }
+
             if(!Portable) if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
             
             Read_Mod_Data(beatsync, sizeof(char), 128, in);
             
-            for(i = 0; i < 128; i++)
+            if(Ptk_Format)
             {
-                Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
+                for(i = 0; i < 128; i++)
+                {
+                    Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
+                }
+
+                Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
+
+                for(i = 0; i < 128; i++)
+                {
+                    Read_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
+                }
             }
-
-            Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
-
-            for(i = 0; i < 128; i++)
+            else
             {
-                Read_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
+                for(i = 0; i < 128; i++)
+                {
+                    Read_Mod_Data(&beatlines[i], sizeof(short), 1, in);
+                }
+
+                Read_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
+
+                for(i = 0; i < 128; i++)
+                {
+                    Read_Mod_Data(&CustomVol[i], sizeof(float), 1, in);
+                }
             }
 
             if(!Portable) if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
@@ -1441,12 +1533,12 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 
     Uint8 *Packed_Read_Buffer;
 
-    Read_Data(&Packed_Length, sizeof(int), 1, FileHandle);
+    Read_Mod_Data(&Packed_Length, sizeof(int), 1, FileHandle);
     if(Packed_Length == -1)
     {
         // Sample wasn't packed
         Packed_Read_Buffer = (Uint8 *) malloc(Dest_Length * 2);
-        Read_Data(Packed_Read_Buffer, sizeof(char), Dest_Length * 2, FileHandle);
+        Read_Mod_Data(Packed_Read_Buffer, sizeof(char), Dest_Length * 2, FileHandle);
         return((short *) Packed_Read_Buffer);
     }
     else
@@ -1455,7 +1547,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 #if !defined(__NO_CODEC__)
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
         // Read the packer buffer
-        Read_Data(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
+        Read_Mod_Data(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
         Dest_Buffer = (short *) malloc(Dest_Length * 2);
         memset(Dest_Buffer, 0, Dest_Length * 2);
 
@@ -1788,8 +1880,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int l;
     int twrite;
     int tps_trk;
-    int Store_303_1 = FALSE;
-    int Store_303_2 = FALSE;
+    char Store_303_1 = FALSE;
+    char Store_303_2 = FALSE;
     int Store_Gsm = FALSE;
     int Store_Mp3 = FALSE;
     int Store_TrueSpeech = FALSE;
@@ -1934,9 +2026,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
     char_value = (char) int_pattern;
     Write_Mod_Data(&char_value, sizeof(char), 1, in);
-    // Number of tracks is stored here for new format
+    
+    // Number of tracks is stored here in .ptp format
     char_value = (char) Real_SongTracks;
     Write_Mod_Data(&char_value, sizeof(char), 1, in);
+    
     Write_Mod_Data(&sLength, sizeof(char), 1, in);
     // Patterns sequence
     Write_Mod_Data(New_pSequence, sizeof(char), sLength, in);
@@ -2514,7 +2608,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             }
 
 #if defined(__NO_CODEC__)
-            int No_Comp = SMP_PACK_NONE;
+            char No_Comp = SMP_PACK_NONE;
             Write_Mod_Data(&No_Comp, sizeof(char), 1, in);
 #else
             Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
@@ -2580,10 +2674,12 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     }
 
                     Write_Mod_Data(&Basenote[swrite][slwrite], sizeof(char), 1, in);
-                    Write_Mod_Data(&Loop_Start, sizeof(long), 1, in);
-                    Write_Mod_Data(&Loop_End, sizeof(long), 1, in);
+                    
+                    Write_Mod_Data(&Loop_Start, sizeof(int), 1, in);
+                    Write_Mod_Data(&Loop_End, sizeof(int), 1, in);
                     Write_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
-                    Write_Mod_Data(&Calc_Len, sizeof(long), 1, in);
+                    
+                    Write_Mod_Data(&Calc_Len, sizeof(int), 1, in);
                     Write_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                     Write_Mod_Data(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
                     Write_Mod_Data(&FDecay[swrite][slwrite], sizeof(float), 1, in);
@@ -2622,7 +2718,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         }
                     }
                     free(Smp_Dats);
-                } // Exist Sample
+                }   // Exist Sample
             }
         }
     }
@@ -2734,15 +2830,16 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     // Writing mod properties
     Write_Mod_Data(&compressor, sizeof(int), 1, in);
     Write_Mod_Data(&c_threshold, sizeof(int), 1, in);
-    Write_Mod_Data(&BeatsPerMin, sizeof(int ), 1, in);
-    Write_Mod_Data(&TicksPerBeat, sizeof(int ), 1, in);
+    Write_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
+    Write_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
     if(mas_vol < 0.01f) mas_vol = 0.01f;
     if(mas_vol > 1.0f) mas_vol = 1.0f;
     Write_Mod_Data(&mas_vol, sizeof(float), 1, in);
 
     float threshold = mas_comp_threshold;
     float ratio = mas_comp_ratio;
-    int Comp_Flag;
+    char Comp_Flag;
+
     if(threshold < 0.01f) threshold = 0.01f;
     if(threshold > 100.0f) threshold = 100.0f;
     if(ratio < 0.01f) ratio = 0.01f;
@@ -2873,35 +2970,35 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Write_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
     Write_Mod_Data(CustomVol, sizeof(float), 128, in);
 
-    Write_Mod_Data(&Store_303_1, sizeof(unsigned char), 1, in);
+    Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
     if(Store_303_1)
     {
-        Write_Mod_Data(&tb303[0].selectedpattern, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].tune, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].cutoff, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].resonance, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].envmod, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].decay, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].accent, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].waveform, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[0].patternlength, sizeof(unsigned char), 32, in);
-        Write_Mod_Data(&tb303[0].tone, sizeof(unsigned char), 32 * 16, in);
+        Write_Mod_Data(&tb303[0].selectedpattern, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].tune, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].cutoff, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].resonance, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].envmod, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].decay, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].accent, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].waveform, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].patternlength, sizeof(char), 32, in);
+        Write_Mod_Data(&tb303[0].tone, sizeof(char), 32 * 16, in);
         Write_Mod_Data(&tb303[0].flag, sizeof(struct flag303), 32 * 16, in);
     }
 
-    Write_Mod_Data(&Store_303_2, sizeof(unsigned char), 1, in);
+    Write_Mod_Data(&Store_303_2, sizeof(char), 1, in);
     if(Store_303_2)
     {
-        Write_Mod_Data(&tb303[1].selectedpattern, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].tune, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].cutoff, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].resonance, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].envmod, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].decay, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].accent, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].waveform, sizeof(unsigned char), 1, in);
-        Write_Mod_Data(&tb303[1].patternlength, sizeof(unsigned char), 32, in);
-        Write_Mod_Data(&tb303[1].tone, sizeof(unsigned char), 32 * 16, in);
+        Write_Mod_Data(&tb303[1].selectedpattern, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].tune, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].cutoff, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].resonance, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].envmod, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].decay, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].accent, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].waveform, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].patternlength, sizeof(char), 32, in);
+        Write_Mod_Data(&tb303[1].tone, sizeof(char), 32 * 16, in);
         Write_Mod_Data(&tb303[1].flag, sizeof(struct flag303), 32 * 16, in);
     }
     if(Store_303_1) Write_Mod_Data(&tb303engine[0].tbVolume, sizeof(float), 1, in);

@@ -713,14 +713,16 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         Pre_Song_Init();
 
-        Mod_Dat_Read(&nPatterns, sizeof(unsigned char));
+        Mod_Dat_Read(&nPatterns, sizeof(char));
         Mod_Dat_Read(&Songtracks, sizeof(char));
-        Mod_Dat_Read(&sLength, sizeof(unsigned char));
-        Mod_Dat_Read(pSequence, sizeof(unsigned char) * sLength);
+        Mod_Dat_Read(&sLength, sizeof(char));
+        Mod_Dat_Read(pSequence, sizeof(char) * sLength);
 
         for(i = 0; i < nPatterns; i++)
         {
+            patternLines[i] = 0;
             Mod_Dat_Read(&patternLines[i], sizeof(char));
+            patternLines[i] = Swap_16(patternLines[i]);
         }
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
@@ -748,7 +750,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
             if(Synthprg[swrite])
             {
-                // ::FIX::
                 Mod_Dat_Read(&PARASynth[swrite], sizeof(SynthParameters));
             } 
 
@@ -943,32 +944,28 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 
         Mod_Dat_Read(beatsync, sizeof(char) * 128);
-        // ::FIX::
         Mod_Dat_Read(beatlines, sizeof(short) * 128);
         Mod_Dat_Read(&REVERBFILTER, sizeof(float));
 
-        // ::FIX::
         Mod_Dat_Read(CustomVol, sizeof(float) * 128);
 
-        unsigned char tb303_1_enabled;
-        unsigned char tb303_2_enabled;
+        char tb303_1_enabled;
+        char tb303_2_enabled;
         // Read the 303 datas
-        Mod_Dat_Read(&tb303_1_enabled, sizeof(unsigned char));
+        Mod_Dat_Read(&tb303_1_enabled, sizeof(char));
 
 #if defined(PTK_303)
         if(tb303_1_enabled)
         {
-            // ::FIX::
             Mod_Dat_Read(&tb303[0], sizeof(para303));
         }
 #endif
 
-        Mod_Dat_Read(&tb303_2_enabled, sizeof(unsigned char));
+        Mod_Dat_Read(&tb303_2_enabled, sizeof(char));
 
 #if defined(PTK_303)
         if(tb303_2_enabled)
         {
-            // ::FIX::
             Mod_Dat_Read(&tb303[1], sizeof(para303));
         }
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].tbVolume, sizeof(float));
@@ -3868,9 +3865,6 @@ void Reset_303_Parameters(para303 *tbpars)
             tbpars->flag[c][d].transposeup_flag = 0;
             tbpars->flag[c][d].transposedown_flag = 0;
             tbpars->flag[c][d].pause = 1;
-            tbpars->flag[c][d].reserved2_flag = 0;
-            tbpars->flag[c][d].reserved3_flag = 0;
-            tbpars->flag[c][d].reserved4_flag = 0;
         }
 #if !defined(__STAND_ALONE__)
         for(d = 0; d < 16; d++)

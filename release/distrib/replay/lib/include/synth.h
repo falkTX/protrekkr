@@ -63,7 +63,7 @@ struct SynthParameters
     unsigned char osc2_waveform;
 
     int osc1_pw;
-    int osc2_pw;   
+    int osc2_pw;
 
     unsigned char osc2_detune;
     unsigned char osc2_finetune;

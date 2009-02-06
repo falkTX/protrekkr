@@ -2,6 +2,17 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.85:
+
+- First PARTIAL and EXPERIMENTAL test port for Mac OSX (ppc & x86)
+  (no midi and no samples compression).
+- Fixed a bug in the replay which would sometimes lead to a crash
+  if an instrument number was used without a note.
+- Renamed .psy file to .psm.
+- The tracker is now using a custom mouse pointer.
+- Forgot to mention it but the manual is now only available at this url:
+  http://code.google.com/p/protrekkr/wiki/introduction
+
 v1.84b:
 
 - Added dream weaver.ptk from Rhino.
