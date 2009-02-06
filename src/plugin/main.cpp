@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------
-// Protrekkr winamp plugin v1.84b
+// Protrekkr winamp plugin v1.85
 // Written by Franck 'hitchhikr' Charlet
 //
 // TODO: Clean that mess up and create a makefile for mingw !
@@ -32,7 +32,7 @@ BOOL WINAPI _DllMainCRTStartup(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lp
 #define PBLEN 1572864
 extern unsigned char *RawPatterns;
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
-int LoadMod(const char *FileName);
+int LoadMod(char *FileName);
 int calc_length(void);
 extern float mas_vol;
 extern char modname[22];
@@ -115,7 +115,7 @@ int play(const char *fn)
  //   Pre_Song_Init();
 //    Post_Song_Init();
 
-    if(!LoadMod(fn))
+    if(!LoadMod((char *) fn))
     {
 		// we return error. 1 means to keep going in the playlist, -1
 		// means to stop the playlist.
@@ -419,7 +419,7 @@ DWORD WINAPI DecodeThread(LPVOID b)
 In_Module mod = 
 {
 	IN_VER,	// defined in IN2.H
-	"Protrekkr Modules Player v1.84b "
+	"Protrekkr Modules Player v1.85 "
 	// winamp runs on both alpha systems and x86 ones. :)
 #ifdef __alpha
 	"(AXP)"
