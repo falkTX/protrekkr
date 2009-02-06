@@ -79,14 +79,28 @@ void AUDIO_Synth_Play(void);
 // Desc: Audio rendering
 #if defined(__MACOSX__)
 static OSStatus AUDIO_Callback(void *inRefCon,
-                               AudioUnitRenderActionFlags inActionFlags,
+                               AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
                                UInt32 inBusNumber,
-                               AudioBuffer *ioData
-                              )
+                               UInt32 inNumberFrames,
+                               AudioBufferList * ioData)
 {
+    if(AUDIO_Play_Flag)
+    {
+        AUDIO_Acknowledge = FALSE;
+        AUDIO_Mixer((Uint8 *) ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize);
 
-    return(0);
+        AUDIO_Samples += ioData->mBuffers[0].mDataByteSize;
+        AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
+    }
+    else
+    {
+        AUDIO_Acknowledge = TRUE;
+    }
+//    usleep(10);
+// MxMixSamples(ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize / 4);
+
+    return(noErr);
 }
 #endif
 
@@ -165,6 +179,7 @@ DWORD WINAPI AUDIO_Thread(LPVOID lpParameter)
         if(AUDIO_Play_Flag && AUDIO_Sound_Buffer)
         {
             AUDIO_Acknowledge = FALSE;
+
             AUDIO_Sound_Buffer->GetCurrentPosition(&AUDIO_Buffer_Pos, NULL);
             Bytes_To_Lock = AUDIO_Buffer_Pos - AUDIO_Old_Buffer_Pos;
             if(Bytes_To_Lock < 0) Bytes_To_Lock += AUDIO_Latency;
@@ -204,9 +219,9 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
     Component comp;
     ComponentDescription desc;
 
-    desc.componentType = kAudioUnitComponentType;
-    desc.componentSubType = kAudioUnitSubType_Output;
-    desc.componentManufacturer = kAudioUnitID_DefaultOutput;
+    desc.componentType =  kAudioUnitType_Output;
+    desc.componentSubType = kAudioUnitSubType_HALOutput;
+    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
 
@@ -215,10 +230,7 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
     {
         if(OpenAComponent(comp, &AUDIO_Device) == noErr)
         {
-            if(AudioUnitInitialize(AUDIO_Device) == noErr)
-            {
-                return(TRUE);
-            }
+            return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
         }
     }
 #endif
@@ -279,7 +291,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 
 #if defined(__MACOSX__)
     OSStatus result = noErr;
-    struct AudioUnitInputCallback callback;
+    struct AURenderCallbackStruct callback;
     AudioStreamBasicDescription requestedDesc;
 
     requestedDesc.mFormatID = kAudioFormatLinearPCM;
@@ -292,33 +304,38 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     requestedDesc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
 #endif
 
-    requestedDesc.mFramesPerPacket = num_fragments; // ???? Not sure
-    // AUDIO_Wave_Format.nBlockAlign
+    requestedDesc.mFramesPerPacket = 1;
     requestedDesc.mBytesPerFrame = (requestedDesc.mBitsPerChannel * requestedDesc.mChannelsPerFrame) >> 3;
-    requestedDesc.mBytesPerPacket = frag_size * requestedDesc.mBytesPerFrame * requestedDesc.mFramesPerPacket;
-    AUDIO_Latency = frag_size * requestedDesc.mBytesPerFrame * num_fragments;
-    AUDIO_SoundBuffer_Size = AUDIO_Latency;
+    requestedDesc.mBytesPerPacket = requestedDesc.mBytesPerFrame;
 
-    AudioUnitSetProperty(AUDIO_Device,
-                         kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Input,
-                         0,
-                         &requestedDesc,
-                         sizeof (requestedDesc)
-                        );
+    // I don't know how to set that on Mac OSX
+    AUDIO_Latency = 2;
 
-    callback.inputProc = AUDIO_Callback;
-    callback.inputProcRefCon = NULL;
-    AudioUnitSetProperty(AUDIO_Device, 
-                         kAudioUnitProperty_SetInputCallback, 
-                         kAudioUnitScope_Input, 
-                         0,
-                         &callback,
-                         sizeof(callback)
-                        );
+    if(AudioUnitSetProperty(AUDIO_Device,
+                            kAudioUnitProperty_StreamFormat,
+                            kAudioUnitScope_Input,
+                            0,
+                            &requestedDesc,
+                            sizeof (requestedDesc)
+                           ) == noErr)
+    {
+        callback.inputProc = AUDIO_Callback;
+        callback.inputProcRefCon = NULL;
 
-    AUDIO_SoundBuffer = (short *) malloc(AUDIO_SoundBuffer_Size << 1);
-
+        if(AudioUnitSetProperty(AUDIO_Device, 
+                                kAudioUnitProperty_SetRenderCallback, 
+                                kAudioUnitScope_Input, 
+                                0,
+                                &callback,
+                                sizeof(callback)
+                               ) == noErr)
+        {
+            if(AudioUnitInitialize(AUDIO_Device) == noErr)
+            {
+                return(TRUE);
+            }
+        }
+    }
 #endif
 
 #if defined(__LINUX__)
@@ -529,8 +546,7 @@ void AUDIO_Stop_Sound_Buffer(void)
     AUDIO_Stop();
 
 #if defined(__MACOSX)
-    if(AUDIO_SoundBuffer) free(AUDIO_SoundBuffer);
-    AUDIO_SoundBuffer = NULL;
+     AudioUnitUninitialize(AUDIO_Device);
 #endif
 
 #if defined(__LINUX__)
@@ -557,7 +573,6 @@ void AUDIO_Stop_Sound_Buffer(void)
     }
     if(AUDIO_Sound_Buffer)
     {
-        AUDIO_Sound_Buffer->Stop();
         AUDIO_Sound_Buffer->Release();
         AUDIO_Sound_Buffer = NULL;
     }
@@ -578,11 +593,11 @@ void AUDIO_Stop_Driver(void)
     {
         callback.inputProc = 0;
         callback.inputProcRefCon = 0;
-        AudioUnitSetProperty(AUDIO_Device, 
-                             kAudioUnitProperty_SetInputCallback, 
-                             kAudioUnitScope_Input, 
+        AudioUnitSetProperty(AUDIO_Device,
+                             kAudioUnitProperty_SetRenderCallback,
+                             kAudioUnitScope_Input,
                              0,
-                             &callback, 
+                             &callback,
                              sizeof(callback)
                             );
         CloseComponent(AUDIO_Device);

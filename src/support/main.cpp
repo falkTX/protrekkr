@@ -733,6 +733,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         // Flush all pending blits
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 
+        SDL_Flip(Main_Screen);
+
         Mouse.old_x = Mouse.x;
         Mouse.old_y = Mouse.y;
 

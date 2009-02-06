@@ -1,5 +1,5 @@
 // Constants for Round A Bout.ptp module
-// Generated for ProTrekkr v1.84 replay routine
+// Generated for ProTrekkr v1.84b replay routine
 // Use this file to compile a custom PtkReplay library
 
 // #define PTK_303
@@ -40,9 +40,9 @@
 #define PTK_SYNTH_FILTER
 // #define PTK_SYNTH_WHITENOISE
 // #define PTK_SYNTH_PINKNOISE
-#define PTK_GSM
-#define PTK_MP3
-#define PTK_TRUESPEECH
+// #define PTK_GSM
+// #define PTK_MP3
+// #define PTK_TRUESPEECH
 // #define PTK_AT3
 // #define PTK_LIMITER
 #define PTK_TRACKFILTERS

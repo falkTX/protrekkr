@@ -203,7 +203,7 @@ char grown;
 float currsignal;
 float currsignal2;
 unsigned int res_dec;
-unsigned int Currentpointer;
+unsigned int Current_Pointer;
 
 char Synth_Was[MAX_TRACKS];//[MAX_POLYPHONY];
 short *Player_WL[MAX_TRACKS];//[MAX_POLYPHONY];
@@ -1364,6 +1364,7 @@ void Post_Song_Init(void)
 // Main Player Routine
 void Sp_Player(void)
 {
+    unsigned int Old_Pointer;
 
 #if !defined(__STAND_ALONE__)
     int i;
@@ -1632,9 +1633,11 @@ void Sp_Player(void)
 				if(ped_line_delay == patternLines[pSequence[cPosition_delay]])
                 {
                     ped_line_delay = 0;
+
 #if !defined(__STAND_ALONE__)
                     if(!plx)
 #endif
+
                     {
                         cPosition_delay++;
                     }
@@ -1643,6 +1646,7 @@ void Sp_Player(void)
             }
 
 #endif // __WINAMP__
+
         }
     }
 
@@ -1679,16 +1683,19 @@ ByPass_Wav:
 
                 gotsome = TRUE;
 
-                Currentpointer = sp_Position[c].half.first;
+                Current_Pointer = sp_Position[c].half.first;
+    
+                if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
+                else Old_Pointer = 0;
 
                 if(Player_WL[c])
                 {
                     currsignal = Cubic_Work(
-                                    *(Player_WL[c] + Currentpointer - 1),
-                                    *(Player_WL[c] + Currentpointer),
-                                    *(Player_WL[c] + Currentpointer + 1),
-                                    *(Player_WL[c] + Currentpointer + 2),
-                                    res_dec, Currentpointer,
+                                    *(Player_WL[c] + Old_Pointer),
+                                    *(Player_WL[c] + Current_Pointer),
+                                    *(Player_WL[c] + Current_Pointer + 1),
+                                    *(Player_WL[c] + Current_Pointer + 2),
+                                    res_dec, Current_Pointer,
                                     Rns[c]) * sp_Cvol[c] * Player_SV[c];
                 }
 
@@ -1696,11 +1703,11 @@ ByPass_Wav:
                 if(Player_SC[c] == 2)
                 {
                     grown = TRUE;
-                    currsignal2 = Cubic_Work(*(Player_WR[c]+ Currentpointer - 1),
-                                                *(Player_WR[c] + Currentpointer),
-                                                *(Player_WR[c] + Currentpointer + 1),
-                                                *(Player_WR[c] + Currentpointer + 2),
-                                                res_dec, Currentpointer,
+                    currsignal2 = Cubic_Work(*(Player_WR[c]+ Old_Pointer),
+                                                *(Player_WR[c] + Current_Pointer),
+                                                *(Player_WR[c] + Current_Pointer + 1),
+                                                *(Player_WR[c] + Current_Pointer + 2),
+                                                res_dec, Current_Pointer,
                                                 Rns[c]) * sp_Cvol[c] * Player_SV[c];
                 }
 
@@ -1827,7 +1834,7 @@ ByPass_Wav:
             { // Track filter actived
                 float const dfi = TCut[c] - CCut[c];
 
-                if(dfi < -1.0 || dfi > 1.0f) CCut[c] += dfi * ICut[c];
+                if(dfi < -1.0f || dfi > 1.0f) CCut[c] += dfi * ICut[c];
 
                 if(FType[c] < 4)
                 {
@@ -1849,7 +1856,6 @@ ByPass_Wav:
                 }
                 else
                 {
-
                     float const realcut = ApplyLfo(CCut[c] - ramper[c], c);
 
                     ramper[c] += Player_FD[c] * realcut * 0.015625f;
@@ -2120,8 +2126,8 @@ ByPass_Wav:
             Cscope[c] &= 127;
         }
 #endif
-
     }
+
 }
 
 // ------------------------------------------------------
@@ -2967,7 +2973,7 @@ void GetPlayerValues(float master_coef)
 #endif
 
 #if defined(__LINUX__)
-    // It looks like the maximum range for OSS are -8192 +8192
+    // It looks like the maximum range for OSS is -8192 +8192
     // (but i'm not sure about that)
     left_float *= 8192.0f;
     right_float *= 8192.0f;

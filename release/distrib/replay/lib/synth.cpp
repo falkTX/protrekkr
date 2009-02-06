@@ -559,7 +559,8 @@ float CSynth::GetSample(short *Left_Samples,
                         unsigned int Length,
                         unsigned int Loop_Sub,
                         float *Right_Signal,
-                        unsigned int Rns, float vol,
+                        unsigned int Rns,
+                        float vol,
                         int *track, 
                         int *track2,
                         Uint64 *position_osc1,
@@ -582,6 +583,7 @@ float CSynth::GetSample(short *Left_Samples,
     unsigned int i_POSITION;
     unsigned int res_dec;
 
+    unsigned int Old_Pointer;
     int64 osc_speed1;
     int64 osc_speed1b;
     int64 osc_speed2;
@@ -594,7 +596,7 @@ float CSynth::GetSample(short *Left_Samples,
 
     if(ENV1_STAGE)
     {
-        /* Oscillator1 On */
+        // Oscillator1 On
         if(OSC1_WAVEFORM != 4)
         {
             T_OSC1_VOLUME = ((LFO1_VALUE * LFO1_OSC1_VOLUME + LFO2_VALUE * LFO2_OSC1_VOLUME) + ENV1_MIN)
@@ -679,8 +681,11 @@ float CSynth::GetSample(short *Left_Samples,
                         if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 
+                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
+                    else Old_Pointer = 0;
+
                     GS_VAL = (Cubic_Work(
-                                (float) (*(Left_Samples1 + i_POSITION - 1)) * mul_datL,
+                                (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL, res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME;
@@ -689,7 +694,7 @@ float CSynth::GetSample(short *Left_Samples,
                     if(Stereo == 2)
                     {
                         GS_VAL2 = (Cubic_Work(
-                                        (float) (*(Right_Samples + i_POSITION - 1)) * mul_datR,
+                                        (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                         (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                         (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
                                         (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME;
@@ -742,7 +747,7 @@ float CSynth::GetSample(short *Left_Samples,
 
     if(ENV2_STAGE)
     {
-        /* Oscillator2 On */
+        // Oscillator2 On 
         if(OSC2_WAVEFORM != 4)
         {
             if(*track2)
@@ -827,8 +832,11 @@ float CSynth::GetSample(short *Left_Samples,
                         if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 
+                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
+                    else Old_Pointer = 0;
+
                     GS_VAL += (Cubic_Work(
-                                (float) (*(Left_Samples + i_POSITION - 1)) * mul_datL,
+                                (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
@@ -838,7 +846,7 @@ float CSynth::GetSample(short *Left_Samples,
                     if(Stereo == 2)
                     {
                         GS_VAL2 += (Cubic_Work(
-                                    (float) (*(Right_Samples + i_POSITION - 1)) * mul_datR,
+                                    (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
@@ -894,7 +902,7 @@ float CSynth::GetSample(short *Left_Samples,
     if(OSC3_SWITCH)
     {
 
-        /* SubOscillator On */
+        // SubOscillator On
         if(OSC1_WAVEFORM != 4)
         {
 
@@ -940,8 +948,11 @@ float CSynth::GetSample(short *Left_Samples,
                         if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 
+                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
+                    else Old_Pointer = 0;
+
                     GS_VAL += (Cubic_Work(
-                                (float) (*(Left_Samples1 + i_POSITION - 1)) * mul_datL,
+                                (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
@@ -950,7 +961,7 @@ float CSynth::GetSample(short *Left_Samples,
                     if(Stereo == 2)
                     {
                         GS_VAL2 += (Cubic_Work(
-                                (float) (*(Right_Samples + i_POSITION - 1)) * mul_datR,
+                                (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                 (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                 (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
                                 (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
@@ -1059,11 +1070,11 @@ float CSynth::GetSample(short *Left_Samples,
         *Right_Signal += GS_VAL2 * GLOBAL_VOLUME;
     }
 
-    /* Advance all, oscillator, envelopes, and lfo's */
+    // Advance all, oscillator, envelopes, and lfo's
     EnvRun(track, track2);
     LfoAdvance();
 
-    /* Return value */
+    // Return value
     return GS_VAL * GLOBAL_VOLUME;
 }
 

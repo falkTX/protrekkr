@@ -1,6 +1,6 @@
 LIBFLAGS = -c
-LIBOBJS_PPC = replay_ppc.o cubic_spline_ppc.o synth_ppc.o tb_303_ppc.o samples_unpack_ppc.o sounddriver_ppc.o
-LIBOBJS_X86 = replay_x86.o cubic_spline_x86.o synth_x86.o tb_303_x86.o samples_unpack_x86.o sounddriver_x86.o
+LIBOBJS_PPC = endianness_ppc.o replay_ppc.o cubic_spline_ppc.o synth_ppc.o tb_303_ppc.o samples_unpack_ppc.o sounddriver_ppc.o
+LIBOBJS_X86 = endianness_x86.o replay_x86.o cubic_spline_x86.o synth_x86.o tb_303_x86.o samples_unpack_x86.o sounddriver_x86.o
 
 all: ptkreplay
 clean: remlibobj
@@ -35,6 +35,8 @@ cubic_spline_ppc.o: lib/cubic_spline.cpp
 replay_ppc.o: lib/replay.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/replay.cpp
 
+endianness_ppc.o: lib/endianness.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/endianness.cpp
 
 sounddriver_x86.o: lib/sounddriver/sounddriver.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/sounddriver/sounddriver.cpp
@@ -53,3 +55,6 @@ cubic_spline_x86.o: lib/cubic_spline.cpp
 
 replay_x86.o: lib/replay.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/replay.cpp
+
+endianness_x86.o: lib/endianness.cpp
+	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/endianness.cpp

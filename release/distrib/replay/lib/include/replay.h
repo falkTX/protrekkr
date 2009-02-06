@@ -55,8 +55,13 @@
 // SAMPLE COUNTER
 struct smpos
 {
+#if defined(__BIG_ENDIAN__)
+    Uint32 first;
+    Uint32 last;
+#else
     Uint32 last;
     Uint32 first;
+#endif
 };
 
 union s_access
