@@ -14,8 +14,8 @@
 int __Swap_32(int Value);
 short __Swap_16(short Value);
 
-#define Swap_32(x) __Swap_32((int) x);
-#define Swap_16(x) __Swap_16((int) x);
+#define Swap_32(x) __Swap_32((int) x)
+#define Swap_16(x) __Swap_16((int) x)
 
 #else
 

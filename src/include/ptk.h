@@ -38,6 +38,8 @@
 
 #include "../midi/include/midi.h"
 
+#include "../../release/distrib/replay/lib/include/endianness.h"
+
 #include <string>
 #include <list>
 #include <sstream>

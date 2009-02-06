@@ -10,7 +10,7 @@
 
 // ------------------------------------------------------
 // Variables
-bool fld_chan = false;
+char fld_chan = FALSE;
 
 // ------------------------------------------------------
 // Functions
@@ -131,12 +131,12 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_DELAY[ped_track] > 4096) FLANGER_DELAY[ped_track] = 4096;
             if(FLANGER_DELAY[ped_track] < 0) FLANGER_DELAY[ped_track] = 0;
-            if(fld_chan == true)
+            if(fld_chan == TRUE)
             {
                 FLANGER_OFFSET[ped_track] = 8192;
                 foff2[ped_track] = float(FLANGER_OFFSET[ped_track] - FLANGER_DELAY[ped_track]);
                 foff1[ped_track] = float(FLANGER_OFFSET[ped_track] - FLANGER_DELAY[ped_track]);  
-                fld_chan = false;
+                fld_chan = FALSE;
             }
             Realslider(298, 551, FLANGER_DELAY[ped_track] / 32, TRUE);
             outlong(448, 551, long(FLANGER_DELAY[ped_track] / 44.1f), 2);
@@ -196,7 +196,7 @@ void Mouse_Sliders_Track_Fx_Ed(void)
         {
             FLANGER_DELAY[ped_track] = (Mouse.x - 308) * 32;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
-            fld_chan = true;
+            fld_chan = TRUE;
             teac = 8;
         }
     }

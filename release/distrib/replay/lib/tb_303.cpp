@@ -36,7 +36,7 @@ gear303::gear303()
     tbSample = 0.0f;
     tbOscPosition = 0.0f;
     tbOscSpeed = 0.0f;
-    hpf = false;
+    hpf = 0;
     tbWaveform = 0;
 }
 #endif
@@ -126,10 +126,10 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
         tbLine2 = 0;
     }
     if(tbLine < 0) tbLine = PARAT303->patternlength[tbPattern] - 1;
-    bool forcefault = true;
+    char forcefault = 1;
     if(PARAT303->flag[tbPattern][tbLine2].slide_flag)
     {
-        forcefault = false;
+        forcefault = 0;
         frune = float(PARAT303->tone[tbPattern][tbLine2]) - 17;
         if(PARAT303->flag[tbPattern][tbLine2].transposeup_flag) frune += 12;
         if(PARAT303->flag[tbPattern][tbLine2].transposedown_flag) frune -= 12;

@@ -124,8 +124,8 @@ extern float lchorus_feedback;
 extern float rchorus_feedback;
 extern int shuffle;
 
-extern bool SACTIVE[256][16];
-extern bool SHISTORY[256][16];
+extern char SACTIVE[256][16];
+extern char SHISTORY[256][16];
 extern float CCoef[MAX_TRACKS];
 extern int TRACKMIDICHANNEL[MAX_TRACKS];
 
@@ -147,12 +147,12 @@ extern float foff2[MAX_TRACKS];
 extern float foff1[MAX_TRACKS];
 
 extern int TRACKSTATE[MAX_TRACKS]; // 0->Normal 1->Muted
-extern bool Disclap[MAX_TRACKS];
+extern char Disclap[MAX_TRACKS];
 
 extern char artist[20];
 extern char style[20];
 
-extern bool beatsync[128];
+extern char beatsync[128];
 extern short beatlines[128];
 
 extern float REVERBFILTER;

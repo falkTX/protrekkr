@@ -213,10 +213,10 @@ void Actualize_Instrument_Ed(int typex, char gode)
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #else
-                        Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                        Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #endif
-                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_DISABLED);
+                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_NORMAL | BUTTON_DISABLED);
 #if !defined(__NO_MIDI__)
                     }
                     else
@@ -255,10 +255,10 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     if(strlen(SampleName[ped_patsam][ped_split])) RF.OpenForWrite(SampleName[ped_patsam][ped_split], 44100, 16, SampleChannels[ped_patsam][ped_split]);
                     else RF.OpenForWrite("Untitled.wav", 44100, 16, SampleChannels[ped_patsam][ped_split]);
 
-                    bool t_stereo;
+                    char t_stereo;
 
-                    if(SampleChannels[ped_patsam][ped_split] == 1) t_stereo = false;
-                    else t_stereo = true;
+                    if(SampleChannels[ped_patsam][ped_split] == 1) t_stereo = FALSE;
+                    else t_stereo = TRUE;
 
                     Uint32 woff = 0;
 
@@ -309,6 +309,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     switch(SampleCompression[ped_patsam])
                     {
+
 #if !defined(__NO_CODEC__)
                         case SMP_PACK_GSM:
                             Gui_Draw_Button_Box(640, 484, 88, 16, "Gsm 6.10", Allow_Global_Pushed);
@@ -338,7 +339,6 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 88, 16, "At3 (PSP only)", Allow_Global_Pushed | BUTTON_DISABLED);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 88, 16, "None", Allow_Global);
                             break;*/
-#endif
                         case SMP_PACK_NONE:
                             Gui_Draw_Button_Box(640, 484, 88, 16, "Gsm 6.10", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + 18, 88, 16, "Mp3", Allow_Global);
@@ -346,6 +346,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 88, 16, "At3 (PSP only)", Allow_Global | BUTTON_DISABLED);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 88, 16, "None", Allow_Global_Pushed);
                             break;
+#endif
+
                     }
                 }
 
@@ -504,13 +506,13 @@ void Mouse_Left_Instrument_Ed(void)
         {
             if(zcheckMouse(144, 492, 28, 16))
             {
-                beatsync[ped_patsam] = false;
+                beatsync[ped_patsam] = FALSE;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 12;
             }
             if(zcheckMouse(176, 492, 28, 16))
             {
-                beatsync[ped_patsam] = true;
+                beatsync[ped_patsam] = TRUE;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 12;
             }
@@ -620,21 +622,21 @@ void Mouse_Left_Instrument_Ed(void)
                 LoopType[ped_patsam][ped_split] = SMP_LOOP_FORWARD;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
             if(zcheckMouse(448 + 62, 520, 58, 16))
             {
                 LoopType[ped_patsam][ped_split] = SMP_LOOP_PINGPONG;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
             if(zcheckMouse(448 + 62 * 2 - 2, 520, 60, 16))
             {
                 LoopType[ped_patsam][ped_split] = SMP_LOOP_NONE;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
         }
     }

@@ -162,10 +162,10 @@ void Actualize_Track_Ed(char gode)
             else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL);
         }
 
-        if(trkchan == true)
+        if(trkchan == TRUE)
         {
             Actupated(0);
-            trkchan = false;
+            trkchan = FALSE;
         }
     } // Userscreen match found
 }
@@ -193,14 +193,14 @@ void Mouse_Left_Track_Ed(void)
             ped_track--;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-            trkchan = true;
+            trkchan = TRUE;
         }
         if(zcheckMouse(552, 486, 16, 16))
         {
             ped_track++;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-            trkchan = true;
+            trkchan = TRUE;
         }  
         if(zcheckMouse(570, 486, 16, 16))
         {
@@ -261,7 +261,7 @@ void Mouse_Left_Track_Ed(void)
             else TRACKSTATE[ped_track] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 10;
-            trkchan = true;
+            trkchan = TRUE;
         }  
 
         // Solo track
@@ -273,7 +273,7 @@ void Mouse_Left_Track_Ed(void)
             }
             TRACKSTATE[ped_track] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-            trkchan = true;
+            trkchan = TRUE;
             teac = 10;
         }  
 
@@ -285,7 +285,7 @@ void Mouse_Left_Track_Ed(void)
                 TRACKSTATE[solify] = 0;
             }
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-            trkchan = true;
+            trkchan = TRUE;
             teac = 10;
         }  
     } // Userscreen 1

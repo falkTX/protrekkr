@@ -94,18 +94,18 @@ struct SynthParameters
     unsigned char lfo1_osc1_pitch;
     unsigned char lfo1_osc2_pitch;
     unsigned char lfo1_osc1_volume;
-    unsigned char lfo1_osc2_volume;  
+    unsigned char lfo1_osc2_volume;
     unsigned char lfo1_vcf_cutoff;
-    unsigned char lfo1_vcf_resonance;   
+    unsigned char lfo1_vcf_resonance;
 
     unsigned char lfo2_osc1_pw;
     unsigned char lfo2_osc2_pw;
     unsigned char lfo2_osc1_pitch;
     unsigned char lfo2_osc2_pitch;
     unsigned char lfo2_osc1_volume;
-    unsigned char lfo2_osc2_volume;  
+    unsigned char lfo2_osc2_volume;
     unsigned char lfo2_vcf_cutoff;
-    unsigned char lfo2_vcf_resonance;   
+    unsigned char lfo2_vcf_resonance;
 
     unsigned char env1_osc1_pw;
     unsigned char env1_osc2_pw;
@@ -114,7 +114,7 @@ struct SynthParameters
     unsigned char env1_osc1_volume;
     unsigned char env1_osc2_volume;  
     unsigned char env1_vcf_cutoff;
-    unsigned char env1_vcf_resonance;   
+    unsigned char env1_vcf_resonance;
 
     unsigned char env2_osc1_pw;
     unsigned char env2_osc2_pw;
@@ -126,10 +126,11 @@ struct SynthParameters
     unsigned char env2_vcf_resonance;
 
     unsigned char osc3_volume;
-    bool osc3_switch;
+    unsigned char osc3_switch;
 
     unsigned char ptc_glide;
     unsigned char glb_volume;
+
     unsigned char disto;
 
     int lfo1_attack;
@@ -377,7 +378,7 @@ class CSynth
 
 #if defined(PTK_SYNTH_OSC3)
         float OSC3_VOLUME;
-        bool OSC3_SWITCH;
+        unsigned char OSC3_SWITCH;
 #endif
 
         float sbuf0L;

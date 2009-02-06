@@ -247,8 +247,8 @@ extern float lchorus_feedback;
 extern float rchorus_feedback;
 extern int shuffle;
 
-extern bool SACTIVE[256][16];
-extern bool SHISTORY[256][16];
+extern char SACTIVE[256][16];
+extern char SHISTORY[256][16];
 extern float CCoef[MAX_TRACKS];
 extern int TRACKMIDICHANNEL[MAX_TRACKS];
 
@@ -272,14 +272,14 @@ extern float foff1[MAX_TRACKS];
 extern int TRACKSTATE[MAX_TRACKS]; // 0->Normal 1->Muted
 
 extern char Songtracks;
-extern bool Disclap[MAX_TRACKS];
+extern char Disclap[MAX_TRACKS];
 
 extern char cur_input_name[1024];
 
 extern char artist[20];
 extern char style[20];
 
-extern bool beatsync[128];
+extern char beatsync[128];
 extern short beatlines[128];
 
 extern float REVERBFILTER;
@@ -319,9 +319,9 @@ extern int Pos_Tbl_Synth_LFO2;
 extern int Pos_Tbl_Synth_ENV1;
 extern int Pos_Tbl_Synth_ENV2;
 
-extern bool draw_sampled_wave;
-extern bool draw_sampled_wave2;
-extern bool draw_sampled_wave3;
+extern char draw_sampled_wave;
+extern char draw_sampled_wave2;
+extern char draw_sampled_wave3;
 extern char ped_split;
 extern int resty;
 extern int rs_coef;
@@ -390,7 +390,7 @@ extern char artist[20];
 
 extern char style[20];
 
-extern bool trkchan;
+extern char trkchan;
 
 extern char seditor;
 extern char actuloop;
@@ -434,9 +434,9 @@ extern int fsize;
 extern unsigned int SamplesPerSub;
 
 // Render as .wav
-extern bool rawrender;
+extern char rawrender;
 
-extern bool sas;
+extern char sas;
 
 extern float Scope_Dats[MAX_TRACKS][128];
 extern float Scope_Dats_LeftRight[2][128];
@@ -471,7 +471,7 @@ void DoEffects_tick0(void);
 void DoEffects(void);
 void Newmod(void);
 void GetBackMouse(void);
-void SeqFill(int st, int en, bool n);
+void SeqFill(int st, int en, char n);
 void PutBackMouse(void);
 void Read_SMPT(void);
 void DumpList(int xr, int yr, int y);

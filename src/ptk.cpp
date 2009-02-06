@@ -6,7 +6,7 @@
 
 // ------------------------------------------------------
 // Includes
-#include "include/main.h"
+#include "include/ptk.h"
 
 // ------------------------------------------------------
 // Variables
@@ -17,7 +17,7 @@ int CONSOLE_HEIGHT = 600;
 int CONSOLE_HEIGHT2 = 600;
 int fluzy = -1;
 int Scopish = SCOPE_ZONE_MOD_DIR;
-bool Scopish_LeftRight = false;
+char Scopish_LeftRight = FALSE;
 int rev_counter2 = 0;
 char visiblecolums = 0;
 int rs_coef = 32768;
@@ -32,7 +32,7 @@ int liveparam = 0;
 int livevalue = 0;
 int poskeynote = 0;
 int poskeyval;
-bool trkchan = true;
+char trkchan = TRUE;
 int pos_space = 0;
 int multifactor = 4;
 char seditor = 0;
@@ -42,7 +42,7 @@ char ped_split = 0;
 
 int player_pos = -1;
 int xew = 0;
-bool sas = false;
+char sas = FALSE;
 int flagger = 0;
 int ltretnote = 0;
 int ltretnote_raw = 0;
@@ -75,16 +75,16 @@ int ped_patsam = 0;
 int restx = 0;
 int resty = 0;
 int fsize = 0;
-bool draw_sampled_wave = false;
-bool draw_sampled_wave2 = false;
-bool draw_sampled_wave3 = false;
+char draw_sampled_wave = FALSE;
+char draw_sampled_wave2 = FALSE;
+char draw_sampled_wave3 = FALSE;
 
 int redraw_everything = 0;
-bool boing = false;
+char boing = FALSE;
 int LastPedRow = -1;
-bool po_ctrl2 = true;
-bool po_alt = true;
-bool po_alt2 = true;
+char po_ctrl2 = TRUE;
+char po_alt = TRUE;
+char po_alt2 = TRUE;
 int TRACKMIDICHANNEL[MAX_TRACKS];
 
 int sp_TickCounter = 0;
@@ -397,13 +397,13 @@ int Screen_Update(void)
 
     if(sp_Stage[ped_track] == PLAYING_SAMPLE && ped_patsam == sp_channelsample[ped_track] && ped_split == sp_split[ped_track])
     {
-        draw_sampled_wave2 = true;
-        boing = true;
+        draw_sampled_wave2 = TRUE;
+        boing = TRUE;
     }
     else if(boing)
     {
-        boing = false;
-        draw_sampled_wave3 = true;
+        boing = FALSE;
+        draw_sampled_wave3 = TRUE;
     }
 
     if(display_title)
@@ -1317,7 +1317,7 @@ void LoadFile(int Freeindex, const char *str)
         found_mod = 0;
         for(i = 0; i < sizeof(mt_tags) / sizeof(int); i++)
         {
-            if(mt_tags[i] == modext)
+            if(Swap_32(mt_tags[i]) == modext)
             {
                 found_mod = mt_channels[i];
                 break;
@@ -1342,7 +1342,8 @@ void LoadFile(int Freeindex, const char *str)
         if(strcmp(extension, "TWNNINS0") == 0 ||
            strcmp(extension, "TWNNINS1") == 0 ||
            strcmp(extension, "TWNNINS2") == 0 ||
-           strcmp(extension, "TWNNINS3") == 0)
+           strcmp(extension, "TWNNINS3") == 0 ||
+           strcmp(extension, "TWNNINS4") == 0)
         {
            sprintf(instrname, "%s", Wavfile);
             LoadInst(instrname);
@@ -1356,18 +1357,21 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNG7") == 0 ||
                 strcmp(extension, "TWNNSNG8") == 0 ||
                 strcmp(extension, "TWNNSNG9") == 0 ||
+                strcmp(extension, "TWNNSNGA") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
             LoadMod(name);
             NewWav();
         }
-        else if(strcmp(extension, "TWNNSYN0") == 0)
+        else if(strcmp(extension, "TWNNSYN0") == 0 ||
+                strcmp(extension, "TWNNSYN1") == 0)
         {
             sprintf(synthname, "%s", Wavfile);
             LoadSynth(synthname);
         }
-        else if(strcmp(extension, "TWNN3030") == 0)
+        else if(strcmp(extension, "TWNN3030") == 0 ||
+                strcmp(extension, "TWNN3031") == 0)
         {
             sprintf(name303, "%s", Wavfile);
             Load303(name303);
@@ -1800,7 +1804,7 @@ void WavRenderizer(void)
         SongPlay();
 
         long filesize = 0;
-        bool bru = false;
+        char bru = FALSE;
 
         for(i = 0; i < MAX_TRACKS; i++)
         {
@@ -1808,9 +1812,9 @@ void WavRenderizer(void)
             TRACKSTATE[i] = Tracks_To_Render[i];
         }
 
-        while(cPosition > 0 || ped_line > 0 || bru == false)
+        while(cPosition > 0 || ped_line > 0 || bru == FALSE)
         {
-            if(ped_line > 0) bru = true;
+            if(ped_line > 0) bru = TRUE;
             GetPlayerValues(mas_vol); // <-- L INT
             RF.WriteStereoSample(left_value, right_value);
             filesize += 4;
@@ -1844,7 +1848,7 @@ void WavRenderizer(void)
         SDL_Delay(500);
         Actupated(0);
     }
-    rawrender = false;
+    rawrender = FALSE;
 }
 
 // ------------------------------------------------------
@@ -1856,7 +1860,7 @@ void DeleteInstrument(void)
     StopIfSp();
     SDL_Delay(256);
 
-    beatsync[ped_patsam] = false;
+    beatsync[ped_patsam] = FALSE;
     beatlines[ped_patsam] = 16;
     sprintf(nameins[ped_patsam], "Untitled");
     ResetSynthParameters(&PARASynth[ped_patsam]);
@@ -3135,25 +3139,25 @@ void Keyboard_Handler(void)
         if(Keys[SDLK_RCTRL] && snamesel == 0 && po_ctrl2)
         {
             plx = 0;
-            po_ctrl2 = false;
+            po_ctrl2 = FALSE;
             gui_action = GUI_CMD_PLAY_SONG;
         }
-        if(!Keys[SDLK_RCTRL] && !po_ctrl2) po_ctrl2 = true;
+        if(!Keys[SDLK_RCTRL] && !po_ctrl2) po_ctrl2 = TRUE;
 
         if(Keys[SDLK_RALT] && snamesel == 0 && po_alt2)
         {
             plx = 1;
-            po_alt2 = false;
+            po_alt2 = FALSE;
             gui_action = GUI_CMD_PLAY_SONG;
         }
-        if(!Keys[SDLK_RALT] && !po_alt2) po_alt2 = true;
+        if(!Keys[SDLK_RALT] && !po_alt2) po_alt2 = TRUE;
 
         // Play song
         if(Get_LAlt() && snamesel == 0 && !po_alt)
         {
-            po_alt = true;
+            po_alt = TRUE;
         }
-        if(!Get_LAlt() && po_alt) po_alt = false;
+        if(!Get_LAlt() && po_alt) po_alt = FALSE;
 
 
 // This is a nasty hack: we should have a specific ASCII buffer
@@ -3730,7 +3734,7 @@ void Mouse_Handler(void)
     else
     {
         // leftbutton
-        sas = false;
+        sas = FALSE;
     }
 
     // Check Zones for GUI clicks -----------------------------------
@@ -3770,7 +3774,7 @@ void Mouse_Handler(void)
             if(zcheckMouse(728, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_SCOPE;
-                Scopish_LeftRight ^= true;
+                Scopish_LeftRight ^= TRUE;
                 Draw_Scope_Files_Button();
             }
         }

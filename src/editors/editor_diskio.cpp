@@ -80,7 +80,7 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Disk Operations / Module Credits");
 
-    Gui_Draw_Button_Box(254, 488, 80, 16, "Calc Final", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(254, 488, 80, 16, "Calc .ptp size", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     outlong(254, 506, Final_Mod_Length, 7);
 
     Gui_Draw_Button_Box(254, 524, 80, 16, "Calc Length", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -106,12 +106,12 @@ void Actualize_DiskIO_Ed(void)
         if(allow_save)
         {
             Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL);
-            Gui_Draw_Button_Box(254, 470, 80, 16, "Save Final", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(254, 470, 80, 16, "Save .ptp", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
         else
         {
             Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(254, 470, 80, 16, "Save Final", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(254, 470, 80, 16, "Save .ptp", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
 
         if(snamesel == 1)
@@ -218,7 +218,7 @@ void Mouse_Left_DiskIO_Ed(void)
         }
         if(zcheckMouse(90, 488, 80, 16))
         {
-            rawrender = true;
+            rawrender = TRUE;
             gui_action = GUI_CMD_RENDER_WAV;
         }
 

@@ -51,7 +51,6 @@ void Free_Samples(void);
 
 Uint8 *Pack_Data(Uint8 *Memory, int *Len);
 Uint8 *Depack_Data(Uint8 *Memory, int Size);
-void Read_Mod_Datas(void *Datas, int Unit, int Length, FILE *Handle);
 int Get_File_Size(FILE *Handle);
 
 #endif

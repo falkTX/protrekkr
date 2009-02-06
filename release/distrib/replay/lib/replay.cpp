@@ -96,7 +96,7 @@ float RVol[MAX_TRACKS];
 int FType[MAX_TRACKS];
 int FRez[MAX_TRACKS];
 float DThreshold[MAX_TRACKS];
-bool Disclap[MAX_TRACKS];
+char Disclap[MAX_TRACKS];
 float DClamp[MAX_TRACKS];
 float CCoef[MAX_TRACKS];
 float lbuff_chorus[131072];
@@ -120,7 +120,7 @@ float right_chorus;
 float delay_left_final;
 float delay_right_final;
 int PosInTick;
-bool rawrender;
+char rawrender;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float mas_vol = 1.0f;
@@ -199,7 +199,7 @@ int repeat_loop_pos;
 int repeat_loop_counter;
 
 short patternLines[128];
-bool grown;
+char grown;
 float currsignal;
 float currsignal2;
 unsigned int res_dec;
@@ -234,10 +234,10 @@ unsigned int Player_NS[MAX_TRACKS];//[MAX_POLYPHONY];
     float mas_ratio;
 #endif
 
-bool SACTIVE[256][MAX_TRACKS];
+char SACTIVE[256][MAX_TRACKS];
 
 #if !defined(__STAND_ALONE__)
-    bool SHISTORY[256][MAX_TRACKS];
+    char SHISTORY[256][MAX_TRACKS];
 #endif
 
 int gco;
@@ -251,7 +251,7 @@ char LoopType[128][16];
 Uint32 LoopStart[128][16];
 Uint32 LoopEnd[128][16];
 Uint32 SampleNumSamples[128][16];
-bool beatsync[128];
+char beatsync[128];
 short beatlines[128];
 int64 sp_Step[MAX_TRACKS];//[MAX_POLYPHONY];
 float SampleVol[128][16];
@@ -699,6 +699,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
     Ptk_Stop();
 
+    // .ptp modules aren't portable from big endian platform to
+    // little endian ones
+    // (so that header will be saved a PRTK on little endian platforms but KTRP on the other ones)
     if(dwModule[0] == 'KTRP')
     {
         Cur_Module += 4;
@@ -970,8 +973,8 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].tbVolume, sizeof(float));
         if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].tbVolume, sizeof(float));
-        if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].hpf, sizeof(bool));
-        if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].hpf, sizeof(bool));
+        if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].hpf, sizeof(char));
+        if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].hpf, sizeof(char));
 #endif
 
         cPosition = start_position;
@@ -1048,7 +1051,7 @@ void PTKEXPORT Ptk_Play(void)
     {
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            SHISTORY[j][i] = false;
+            SHISTORY[j][i] = FALSE;
         }
     }
 #endif
@@ -1563,7 +1566,7 @@ void Sp_Player(void)
 #if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
-                    SHISTORY[cPosition][i] = false;
+                    SHISTORY[cPosition][i] = FALSE;
                 }
 #endif
 
@@ -1597,7 +1600,7 @@ void Sp_Player(void)
 #if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
-                    SHISTORY[cPosition][i] = false;
+                    SHISTORY[cPosition][i] = FALSE;
                 }
 #endif
 
@@ -1648,10 +1651,10 @@ void Sp_Player(void)
 
     for(char c = 0; c < Songtracks; c++)
     {
-        grown = false;
+        grown = FALSE;
         currsignal = 0;
         currsignal2 = 0;
-        bool gotsome = false;
+        char gotsome = FALSE;
 
         // If wav is selected in the synth we don't play it directly but through the synth.
 
@@ -1677,7 +1680,7 @@ ByPass_Wav:
                 if(sp_Cvol[c] > sp_Tvol[c]) sp_Cvol[c] -= 0.005f;
                 else sp_Cvol[c] += 0.005f;
 
-                gotsome = true;
+                gotsome = TRUE;
 
                 Currentpointer = sp_Position[c].half.first;
 
@@ -1695,7 +1698,7 @@ ByPass_Wav:
                 // Stereo sample
                 if(Player_SC[c] == 2)
                 {
-                    grown = true;
+                    grown = TRUE;
                     currsignal2 = Cubic_Work(*(Player_WR[c]+ Currentpointer - 1),
                                                 *(Player_WR[c] + Currentpointer),
                                                 *(Player_WR[c] + Currentpointer + 1),
@@ -1755,12 +1758,12 @@ ByPass_Wav:
         if(track3031 == c)
         {
             currsignal += tb303engine[0].tbGetSample();
-            gotsome = true;
+            gotsome = TRUE;
         }
         if(track3032 == c)
         {
             currsignal += tb303engine[1].tbGetSample();
-            gotsome = true;
+            gotsome = TRUE;
         }
 #endif
 
@@ -1785,9 +1788,9 @@ ByPass_Wav:
 
             if((Synthesizer[c].OSC1_WAVEFORM == 5 || Synthesizer[c].OSC2_WAVEFORM == 5))
             {
-                if(Player_SC[c] == 2) grown = true;
+                if(Player_SC[c] == 2) grown = TRUE;
             }
-            gotsome = true;
+            gotsome = TRUE;
         }
 
         // Send a note off if the channel is being turned off
@@ -1801,7 +1804,7 @@ ByPass_Wav:
         {
 
 #if !defined(__STAND_ALONE__)
-            SHISTORY[cPosition][c] = true;
+            SHISTORY[cPosition][c] = TRUE;
 #endif
 
             Synthesizer[c].NoteOff();
@@ -3417,10 +3420,10 @@ void init_sample_bank(void)
         // All tracks activated on entire song (1-Active 0-Inactive)
         for(int inico2 = 0; inico2 < MAX_TRACKS; inico2++)
         {
-            SACTIVE[inico][inico2] = true;
+            SACTIVE[inico][inico2] = TRUE;
 
 #if !defined(__STAND_ALONE__)
-            SHISTORY[inico][inico2] = false;
+            SHISTORY[inico][inico2] = FALSE;
 #endif
 
         }
@@ -3428,7 +3431,7 @@ void init_sample_bank(void)
 
         if(inico < 128)
         {
-            beatsync[inico] = false;
+            beatsync[inico] = FALSE;
             beatlines[inico] = 16;
 
 #if !defined(__STAND_ALONE__)
@@ -3552,7 +3555,7 @@ void ResetSynthParameters(SynthParameters *TSP)
     TSP->env2_vcf_cutoff = 64;
     TSP->env2_vcf_resonance = 64; 
     TSP->osc3_volume = 128;
-    TSP->osc3_switch = false;
+    TSP->osc3_switch = FALSE;
     TSP->ptc_glide = 0;
     TSP->glb_volume = 128;
     TSP->disto = 0;

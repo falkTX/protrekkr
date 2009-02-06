@@ -22,7 +22,7 @@ Uint32 sed_display_start = 0;
 Uint32 sed_display_length = 0;
 Uint32 sed_range_start = 0;
 Uint32 sed_range_end = 0;
-bool sed_range_mode = false;
+char sed_range_mode = FALSE;
 
 // ------------------------------------------------------
 // Functions
@@ -221,7 +221,7 @@ void Draw_Sampled_Wave(void)
                 }
             }
 
-            draw_sampled_wave = false;
+            draw_sampled_wave = FALSE;
         }
         Draw_Sampled_Wave2();
         Draw_Sampled_Wave3();
@@ -230,12 +230,12 @@ void Draw_Sampled_Wave(void)
 
 void NewWav(void)
 {
-    draw_sampled_wave = true;
+    draw_sampled_wave = TRUE;
     sed_display_start = 0;
     sed_display_length = SampleNumSamples[ped_patsam][ped_split];
     sed_range_start = 0;
     sed_range_end = 0;
-    sed_range_mode = false;
+    sed_range_mode = FALSE;
     Actualize_Wave_Ed(0);
 }
 
@@ -329,7 +329,7 @@ void Draw_Sampled_Wave2(void)
 
         } // IF CHECK SAMPLE
 
-        draw_sampled_wave2 = false;
+        draw_sampled_wave2 = FALSE;
     }
 }
 
@@ -338,8 +338,8 @@ void Draw_Sampled_Wave3(void)
 {
     if(draw_sampled_wave3)
     {
-        draw_sampled_wave = true;
-        draw_sampled_wave3 = false;
+        draw_sampled_wave = TRUE;
+        draw_sampled_wave3 = FALSE;
         Draw_Sampled_Wave();
     }
 }
@@ -453,10 +453,10 @@ void Actualize_Wave_Ed(char gode)
                         sed_display_start = SampleNumSamples[ped_patsam][ped_split] - sed_display_length;
                     }
 
-                    sed_range_mode = false;
+                    sed_range_mode = FALSE;
                     sed_range_start = 0;
                     sed_range_end = 0;
-                    draw_sampled_wave = true;
+                    draw_sampled_wave = TRUE;
                     outlong(712, 530, sed_display_start, 10);
                     outlong(712, 548, sed_display_length, 12);
                     outlong(650, 530, sed_range_start, 10);
@@ -517,7 +517,7 @@ void Actualize_Wave_Ed(char gode)
                     }
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
 
                 mess_box("Selection calibrated...");
             }
@@ -573,7 +573,7 @@ void Actualize_Wave_Ed(char gode)
                     }
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 mess_box("Selection maximized...");
             }
 
@@ -609,7 +609,7 @@ void Actualize_Wave_Ed(char gode)
                     c_vol += coef_vol;
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 mess_box("Finished...");
             }
 
@@ -645,7 +645,7 @@ void Actualize_Wave_Ed(char gode)
 
                     c_vol -= coef_vol;
                 }
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 mess_box("Finished...");
             }
 
@@ -673,7 +673,7 @@ void Actualize_Wave_Ed(char gode)
                     }
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 mess_box("Finished...");
             }
 
@@ -697,18 +697,18 @@ void Mouse_Right_Sample_Ed(void)
                 // Unselect all
                 sed_range_start = 0;
                 sed_range_end = 0;
-                sed_range_mode = false;
-                draw_sampled_wave = true;
+                sed_range_mode = FALSE;
+                draw_sampled_wave = TRUE;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
                 teac = 4;
             }
             else
             {
                 // Select all
-                sed_range_mode = true;
+                sed_range_mode = TRUE;
                 sed_range_start = sed_display_start;
                 sed_range_end = sed_display_start + sed_display_length - 1;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 0;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
@@ -745,7 +745,7 @@ void Mouse_Left_Sample_Ed(void)
                     LoopEnd[ped_patsam][ped_split] = SampleNumSamples[ped_patsam][ped_split] - 1;
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
                 {
                     gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -783,7 +783,7 @@ void Mouse_Left_Sample_Ed(void)
                     LoopEnd[ped_patsam][ped_split] = 0;
                 }
 
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
 
                 if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
                 {
@@ -828,7 +828,7 @@ void Mouse_Left_Sample_Ed(void)
                 rs_coef = 32768;
                 sed_display_start = 0;
                 sed_display_length = SampleNumSamples[ped_patsam][ped_split];
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 3;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
@@ -836,22 +836,22 @@ void Mouse_Left_Sample_Ed(void)
             if(zcheckMouse(582, 530, 60, 16))
             {
                 rs_coef /= 2;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
 
             if(zcheckMouse(582, 548, 60, 16))
             {
                 rs_coef *= 2;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
 
             // Unselect
             if(zcheckMouse(582, 494, 60, 16))
             {
-                sed_range_mode = false;
+                sed_range_mode = FALSE;
                 sed_range_start = 0;
                 sed_range_end = 0;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 0;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
@@ -859,17 +859,17 @@ void Mouse_Left_Sample_Ed(void)
             // Select all
             if(zcheckMouse(582, 476, 60, 16))
             {
-                sed_range_mode = true;
+                sed_range_mode = TRUE;
                 sed_range_start = sed_display_start;
                 sed_range_end = sed_display_start + sed_display_length - 1;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 0;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
 
             if(zcheckMouse(650, 476, 60, 16) && sed_range_mode)
             {
-                sed_range_mode = false;
+                sed_range_mode = FALSE;
                 if((int) sed_range_end < (int) sed_range_start)
                 {
                     int swap_range = sed_range_start;
@@ -878,7 +878,7 @@ void Mouse_Left_Sample_Ed(void)
                 }
                 sed_display_start = sed_range_start;
                 sed_display_length = (sed_range_end - sed_range_start) + 1;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 3;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
@@ -899,7 +899,7 @@ void Mouse_Left_Sample_Ed(void)
                 {
                     sed_display_start = SampleNumSamples[ped_patsam][ped_split] - sed_display_length;
                 }
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
                 teac = 3;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
@@ -923,7 +923,7 @@ void Mouse_Sliders_Sample_Ed(void)
                 if(Mouse_Pos < 0) Mouse_Pos = 0;
                 if(Mouse_Pos > 512) Mouse_Pos = 512;
                 axswave = SampleNumSamples[ped_patsam][ped_split] - 1;
-                sed_range_mode = true;
+                sed_range_mode = TRUE;
                 test = ((Mouse_Pos) * sed_display_length) / 512;
                 sed_range_end = sed_display_start + (Uint32) test;
                 teac = 4;
@@ -951,8 +951,8 @@ void Mouse_Sliders_Sample_Ed(void)
                     sed_range_end = axswave;
                 }
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
-                draw_sampled_wave = true;
-                sas = true;
+                draw_sampled_wave = TRUE;
+                sas = TRUE;
             } // SAMPLETYPE
         } // MOUSEBOX
 
@@ -972,7 +972,7 @@ void Mouse_Sliders_Sample_Ed(void)
                 if(s_offset < 0) s_offset = 0;
                 sed_display_start = (Uint32) s_offset;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
-                draw_sampled_wave = true;
+                draw_sampled_wave = TRUE;
             }
         }
     }

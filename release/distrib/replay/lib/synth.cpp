@@ -108,7 +108,7 @@ void CSynth::Reset(void)
     ENV2_VCF_CUTOFF = 0;
     ENV2_VCF_RESONANCE = 0; 
 
-    OSC3_SWITCH = false;
+    OSC3_SWITCH = FALSE;
 
     OSC1_STEP = 0;
     OSC2_STEP = 0;

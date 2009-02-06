@@ -415,7 +415,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     int cur_color;
     char *ptr_table_decimal;
     int high_color;
-    bool multip;
+    char multip;
     int dover;
     int synchro_fx = FALSE;
     int Fx_Color;
@@ -424,10 +424,10 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     if(!In_Prev_Next) Shadow_Pattern = 0;
     else Shadow_Pattern = 1;
 
-    multip = false;
+    multip = FALSE;
     if(patt_highlight > 1)
     {
-        if(rel % patt_highlight == 0) multip = true;
+        if(rel % patt_highlight == 0) multip = TRUE;
     }
     cur_column = (track * 11);
 

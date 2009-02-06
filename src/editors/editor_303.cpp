@@ -764,8 +764,8 @@ void Mouse_Left_303_Ed(void)
         // hipass filter on/off
         if(zcheckMouse(176, 536, 15, 10))
         {
-            if(tb303engine[sl3].hpf) tb303engine[sl3].hpf = false;
-            else tb303engine[sl3].hpf = true;
+            if(tb303engine[sl3].hpf) tb303engine[sl3].hpf = FALSE;
+            else tb303engine[sl3].hpf = TRUE;
             teac = 16;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }

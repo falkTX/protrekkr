@@ -13,7 +13,7 @@
 typedef struct
 {
     int pattern;
-    bool active_state[16];
+    char active_state[16];
 } SEQ_POS, *LPSEQ_POS;
 
 // ------------------------------------------------------
@@ -22,10 +22,10 @@ int Cur_Seq_Buffer = 0;
 
 SEQ_POS Seq_Buffers[4] =
 {
-    { 0, { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, } },
-    { 0, { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, } },
-    { 0, { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, } },
-    { 0, { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, } },
+    { 0, { TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, } },
+    { 0, { TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, } },
+    { 0, { TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, } },
+    { 0, { TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, } },
 };
 
 int cur_seq_buffer[] =
@@ -38,7 +38,7 @@ int cur_seq_buffer[] =
 
 // ------------------------------------------------------
 // Functions
-void SeqFill(int st, int en, bool n);
+void SeqFill(int st, int en, char n);
 void SeqDelete(int st);
 void SeqInsert(int st);
 void SeqCopy(int st);
@@ -131,28 +131,28 @@ void Mouse_Left_Sequencer_Ed(void)
         // Clear all
         if(zcheckMouse(4, 466, 80, 16))
         {
-            SeqFill(0, 256, false);
+            SeqFill(0, 256, FALSE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Clear position
         if(zcheckMouse(4, 484, 80, 16))
         {
-            SeqFill(Cur_Position, Cur_Position + 1, false);
+            SeqFill(Cur_Position, Cur_Position + 1, FALSE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Reset all
         if(zcheckMouse(4, 522, 80, 16))
         {
-            SeqFill(0, 256, true);
+            SeqFill(0, 256, TRUE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Reset position
         if(zcheckMouse(4, 540, 80, 16))
         {
-            SeqFill(Cur_Position, Cur_Position + 1, true);
+            SeqFill(Cur_Position, Cur_Position + 1, TRUE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
@@ -359,13 +359,13 @@ void Mouse_Left_Sequencer_Ed(void)
                 if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
                 if(!SACTIVE[posindex][seqindex])
                 {
-                    SACTIVE[posindex][seqindex] = true;
-                    SHISTORY[posindex][seqindex] = false;
+                    SACTIVE[posindex][seqindex] = TRUE;
+                    SHISTORY[posindex][seqindex] = FALSE;
                 }
                 else
                 {
-                    SACTIVE[posindex][seqindex] = false;
-                    SHISTORY[posindex][seqindex] = false;
+                    SACTIVE[posindex][seqindex] = FALSE;
+                    SHISTORY[posindex][seqindex] = FALSE;
                 }
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
             }
@@ -465,28 +465,28 @@ void Mouse_Right_Sequencer_Ed(void)
                     Already_Solo = 0;
                     for(int alphac = 0; alphac < Songtracks; alphac++)
                     {
-                        if(SACTIVE[posindex][alphac] == true) Already_Solo++;
+                        if(SACTIVE[posindex][alphac] == TRUE) Already_Solo++;
                     }
                     if(Already_Solo == 1)
                     {
                         for(int alphac = 0; alphac < Songtracks; alphac++)
                         {
-                            SACTIVE[posindex][alphac] = true;
-                            SHISTORY[posindex][alphac] = false;
+                            SACTIVE[posindex][alphac] = TRUE;
+                            SHISTORY[posindex][alphac] = FALSE;
                         }
                     }
                     else
                     {
                         for(int alphac = 0; alphac < Songtracks; alphac++)
                         {
-                            SACTIVE[posindex][alphac] = false;
-                            SHISTORY[posindex][alphac] = false;
+                            SACTIVE[posindex][alphac] = FALSE;
+                            SHISTORY[posindex][alphac] = FALSE;
                         }
                     }
                 }
                 // Active it
-                SACTIVE[posindex][seqindex] = true;
-                SHISTORY[posindex][seqindex] = false;
+                SACTIVE[posindex][seqindex] = TRUE;
+                SHISTORY[posindex][seqindex] = FALSE;
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
             }
         }
@@ -537,7 +537,7 @@ void Actualize_Sequencer(void)
         }
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            SHISTORY[cPosition][i] = false;
+            SHISTORY[cPosition][i] = FALSE;
         }
     }
     else
@@ -568,14 +568,14 @@ void Actualize_Sequencer(void)
     if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed();
 }
 
-void SeqFill(int st, int en, bool n)
+void SeqFill(int st, int en, char n)
 {
     for(int cl = st; cl < en; cl++)
     {
         for(char trk = 0; trk < Songtracks; trk++)
         {
             SACTIVE[cl][trk] = n;
-            SHISTORY[cl][trk] = false;
+            SHISTORY[cl][trk] = FALSE;
         }
     }
 }     
@@ -599,8 +599,8 @@ void SeqDelete(int st)
         pSequence[cl] = 0;
         for(char trk = 0; trk < Songtracks; trk++)
         {
-            SACTIVE[cl][trk] = true;
-            SHISTORY[cl][trk] = false;
+            SACTIVE[cl][trk] = TRUE;
+            SHISTORY[cl][trk] = FALSE;
         }
         sLength--;
     }
@@ -625,8 +625,8 @@ void SeqInsert(int st)
         pSequence[st] = 0;
         for(char trk = 0; trk < Songtracks; trk++)
         {
-            SACTIVE[st][trk] = true;
-            SHISTORY[st][trk] = false;
+            SACTIVE[st][trk] = TRUE;
+            SHISTORY[st][trk] = FALSE;
         }
     sLength++;
     }
@@ -657,7 +657,7 @@ void SeqPaste(int st)
     for(char trk = 0; trk < Songtracks; trk++)
     {
         SACTIVE[st][trk] = Seq_Buffers[Cur_Seq_Buffer].active_state[trk];
-        SHISTORY[st][trk] = false;
+        SHISTORY[st][trk] = FALSE;
     }
 }     
 

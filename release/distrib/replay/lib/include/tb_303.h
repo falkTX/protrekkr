@@ -56,7 +56,8 @@ struct flag303
     unsigned reserved4_flag : 1;
 };
 
-struct para303 {
+struct para303
+{
     unsigned char enabled;           //Enabled                 UBYTE           0       0x00 = off, 0x01 = on (pattern mode)
     unsigned char selectedpattern;   //Selected pattern        UBYTE           1       0x00 to 0x20 (pattern mode)
     unsigned char tune;              //Tune                    UBYTE           2       0x00 to 0x7f (pattern mode)
@@ -66,6 +67,7 @@ struct para303 {
     unsigned char decay;             //Decay                   UBYTE           6       0x00 to 0x7f (pattern mode)
     unsigned char accent;            //Accent                  UBYTE           7       0x00 to 0x7f (pattern mode)
     unsigned char waveform;          //Waveform                UBYTE           8       0x00 = triangle, 0x01 = square (pattern mode)
+    
     unsigned char patternlength[32]; // 32 = 4 bank * 8 patterns
     unsigned char tone[32][16];
     struct flag303 flag[32][16];
@@ -108,7 +110,7 @@ class gear303
         void tbNoteOn(int tbNote, para303 *PARAT303);
 
         float tbGetSample(void);
-        bool hpf;
+        char hpf;
         float tbBuf0;
         float tbBuf1;
         float tbVolume;

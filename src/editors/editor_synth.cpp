@@ -1236,13 +1236,13 @@ void Mouse_Left_Synth_Ed(void)
             // Sub oscillator switch
             if(zcheckMouse(237, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc3_switch = true;
+                PARASynth[ped_patsam].osc3_switch = TRUE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(264, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc3_switch = false;
+                PARASynth[ped_patsam].osc3_switch = FALSE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }

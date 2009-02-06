@@ -264,7 +264,7 @@ void Actualize_Master_Ed(char gode)
             }
 
 #if defined(__WIN32__)
-            Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #else
             Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif            
@@ -272,7 +272,7 @@ void Actualize_Master_Ed(char gode)
             Gui_Draw_Button_Box(520 + 62 + 2 + 18, 475, 106, 16, Get_Keyboard_Label(), BUTTON_NORMAL | BUTTON_DISABLED);
 
 #if defined(__WIN32__)
-            Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #else
             Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
@@ -579,7 +579,7 @@ void Mouse_Left_Master_Ed(void)
         {
             c_midiout--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiout_changed = true;
+            midiout_changed = TRUE;
             teac = 12;
         }
         // Next midi out device
@@ -587,7 +587,7 @@ void Mouse_Left_Master_Ed(void)
         {
             c_midiout++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiout_changed = true;
+            midiout_changed = TRUE;
             teac = 12;
         }
 #endif

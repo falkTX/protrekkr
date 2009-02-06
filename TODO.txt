@@ -2,7 +2,7 @@ TODO:
 
 Concerning the MacOSX port:
  - Finish to implement the sound callback.
- - There's probably a lot of nasty endianness insanity in files handling.
+ - Fix the loading and saving of .wav files for big endian configs.
 ------------------------------------------------------------------
 
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
