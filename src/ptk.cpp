@@ -1282,7 +1282,6 @@ void LoadFile(int Freeindex, const char *str)
     int ld2 = 0;
     int ld3 = 0;
     int Freeindex2 = 0;
-    int idchk = 0;
     FILE *in;
     WaveFile Wav_File;
 
@@ -1294,7 +1293,6 @@ void LoadFile(int Freeindex, const char *str)
     int fmtchklen = 0;
 
     const char *Wavfile = str;
-    idchk = 0;
 
     if(Wavfile != NULL && (in = fopen(Wavfile, "rb")) != NULL)
     {
@@ -1380,9 +1378,6 @@ void LoadFile(int Freeindex, const char *str)
         {
             mess_box("Attempting of loading a wav file...");   
 
-            fseek(in, 8, SEEK_SET);
-            idchk = fgetc(in) * fgetc(in) * fgetc(in) * fgetc(in);
-
             // We need the length
             if(Wav_File.OpenForRead(Wavfile) == DDC_SUCCESS)
             {
@@ -1428,7 +1423,6 @@ void LoadFile(int Freeindex, const char *str)
                 }
 
                 Wav_File.Close();
-
             }
             else
             {

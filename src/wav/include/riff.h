@@ -23,6 +23,8 @@
 #ifndef __DDC_RIFF_H
 #define __DDC_RIFF_H
 
+#include "../../../release/distrib/replay/lib/include/endianness.h"
+
 typedef unsigned int UINT32;
 typedef int INT32;
 
@@ -54,11 +56,13 @@ class RiffFile
    RiffChunkHeader riff_header;      // header for whole file
 
     protected:
+
         RiffFileMode fmode;     // current file I/O mode
         FILE *file;             // I/O stream to use
         DDCRET Seek(long offset);
 
     public:
+
         RiffFile();
         ~RiffFile();
 
@@ -120,7 +124,7 @@ struct WaveFormat_Chunk
     WaveFormat_Chunk()
     {
         header.ckID = FourCC("fmt ");
-        header.ckSize = sizeof(WaveFormat_ChunkData);
+        header.ckSize = Swap_32(sizeof(WaveFormat_ChunkData));
     }
 
     dBOOLEAN VerifyValidity()
@@ -180,7 +184,7 @@ struct WaveSmpl_Chunk
     WaveSmpl_Chunk()
     {
         header.ckID = FourCC("smpl");
-        header.ckSize = sizeof(WaveSmpl_ChunkData);
+        header.ckSize = Swap_32(sizeof(WaveSmpl_ChunkData));
     }
 };
 
@@ -193,72 +197,75 @@ struct WaveFileSample
 
 class WaveFile: private RiffFile
 {
-    WaveFormat_Chunk wave_format;
-    WaveSmpl_Chunk wave_Smpl;
-    RiffChunkHeader pcm_data;
-    long pcm_data_offset;  // offset of 'pcm_data' in output file
-    UINT32 num_samples;
+        WaveFormat_Chunk wave_format;
+        WaveSmpl_Chunk wave_Smpl;
+        RiffChunkHeader pcm_data;
+        long pcm_data_offset;  // offset of 'pcm_data' in output file
+        UINT32 num_samples;
 
-public:
-    WaveFile();
+    public:
 
-    DDCRET OpenForWrite(const char  *Filename,
-                        UINT32 SamplingRate = 44100,
-                        UINT16 BitsPerSample = 16,
-                        UINT16 NumChannels = 2);
+        WaveFile();
 
-    DDCRET OpenForRead(const char *Filename);
-
-    DDCRET WriteSample(const INT16 Sample [MAX_WAVE_CHANNELS]);
-    DDCRET SeekToSample(unsigned long SampleIndex);
-
-    DDCRET WriteData(const void *data, UINT32 numData);
-
-    DDCRET WriteData(const INT32 *data, UINT32 numData);
-
-    // The following work only with 16-bit audio
-    DDCRET WriteData(const INT16 *data, UINT32 numData);
-    DDCRET ReadData(INT16 *data, UINT32 numData);
-
-    // The following work only with 8-bit audio
-    DDCRET WriteData(const UINT8 *data, UINT32 numData);
-    DDCRET ReadData(UINT8 *data, UINT32 numData);
-
-    DDCRET WriteMonoSample(INT16 ChannelData);
-    DDCRET WriteStereoSample(INT16 LeftChannelData, INT16 RightChannelData);
-
-    DDCRET ReadMonoSample(INT16 *ChannelData);
-    DDCRET ReadStereoSample(INT16 *LeftSampleData, INT16 *RightSampleData);
-
-    DDCRET Close();
-
-    UINT32   SamplingRate() const;    // [Hz]
-    UINT16   BitsPerSample() const;
-    UINT16   NumChannels() const;
-    UINT32   NumSamples() const;
-    UINT16   SampleFormat() const; // one of WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM
-
-    UINT32   LoopType() const;
-    UINT32   LoopStart() const;
-    UINT32   LoopEnd() const;
-
-   // Open for write using another wave file's parameters...
-
-    DDCRET OpenForWrite(const char *Filename,
-                         WaveFile &OtherWave
-                       )
-    {
-        return OpenForWrite(Filename,
-                            OtherWave.SamplingRate(),
-                            OtherWave.BitsPerSample(),
-                            OtherWave.NumChannels()
+        DDCRET OpenForWrite(const char  *Filename,
+                            UINT32 SamplingRate = 44100,
+                            UINT16 BitsPerSample = 16,
+                            UINT16 NumChannels = 2
                            );
-    }
 
-    long CurrentFilePosition() const
-    {
-        return RiffFile::CurrentFilePosition();
-    }
+        DDCRET OpenForRead(const char *Filename);
+
+        DDCRET SeekToSample(unsigned long SampleIndex);
+
+        DDCRET WriteData(const void *data, UINT32 numData);
+
+        DDCRET WriteData(const INT32 *data, UINT32 numData);
+
+        // The following work only with 16-bit audio
+        DDCRET WriteData(const INT16 *data, UINT32 numData);
+
+        // The following work only with 8-bit audio
+        DDCRET WriteData(const UINT8 *data, UINT32 numData);
+
+        DDCRET WriteMonoSample(INT16 ChannelData);
+        DDCRET WriteStereoSample(INT16 LeftChannelData, INT16 RightChannelData);
+
+        DDCRET ReadMonoSample(INT16 *ChannelData);
+        DDCRET ReadStereoSample(INT16 *LeftSampleData, INT16 *RightSampleData);
+
+        DDCRET Close();
+
+        UINT32   SamplingRate() const;    // [Hz]
+        UINT16   BitsPerSample() const;
+        UINT16   NumChannels() const;
+        UINT32   NumSamples() const;
+        UINT16   SampleFormat() const; // one of WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM
+
+        UINT32   LoopType() const;
+        UINT32   LoopStart() const;
+        UINT32   LoopEnd() const;
+
+       // Open for write using another wave file's parameters...
+
+        DDCRET OpenForWrite(const char *Filename,
+                             WaveFile &OtherWave
+                           )
+        {
+            return OpenForWrite(Filename,
+                                OtherWave.SamplingRate(),
+                                OtherWave.BitsPerSample(),
+                                OtherWave.NumChannels()
+                               );
+        }
+
+        long CurrentFilePosition() const
+        {
+            return RiffFile::CurrentFilePosition();
+        }
+
+    private:
+
+        void IntToFloat(int *Dest, int Source);
 };
 
 #pragma pack(pop)

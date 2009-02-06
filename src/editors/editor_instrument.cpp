@@ -9,6 +9,8 @@
 #include "include/editor_instrument.h"
 #include "include/editor_sample.h"
 
+#include "../../release/distrib/replay/lib/include/endianness.h"
+
 // ------------------------------------------------------
 // Variables
 int Allow_Buttons;
@@ -207,6 +209,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 }
                 if(gode == 0 || gode == 10)
                 {
+
 #if !defined(__NO_MIDI__)
                     if(Midiprg[ped_patsam] == -1)
                     {
@@ -216,7 +219,9 @@ void Actualize_Instrument_Ed(int typex, char gode)
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #endif
+
                         Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_NORMAL | BUTTON_DISABLED);
+
 #if !defined(__NO_MIDI__)
                     }
                     else
@@ -224,6 +229,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                         value_box(570, 502, Midiprg[ped_patsam] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     }
 #endif
+
                 }
                 if(gode == 0 || gode == 12)
                 {
@@ -252,8 +258,20 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                     WaveFile RF;
 
-                    if(strlen(SampleName[ped_patsam][ped_split])) RF.OpenForWrite(SampleName[ped_patsam][ped_split], 44100, 16, SampleChannels[ped_patsam][ped_split]);
-                    else RF.OpenForWrite("Untitled.wav", 44100, 16, SampleChannels[ped_patsam][ped_split]);
+                    if(strlen(SampleName[ped_patsam][ped_split]))
+                    {
+                        RF.OpenForWrite(SampleName[ped_patsam][ped_split],
+                                        44100,
+                                        16,
+                                        SampleChannels[ped_patsam][ped_split]);
+                    }
+                    else
+                    {
+                        RF.OpenForWrite("Untitled.wav",
+                                        44100,
+                                        16,
+                                        SampleChannels[ped_patsam][ped_split]);
+                    }
 
                     char t_stereo;
 
@@ -277,12 +295,21 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     {
                         RiffChunkHeader header;
                         WaveSmpl_ChunkData datas;
-                        header.ckID = 'lpms';
+
+                        header.ckID = FourCC("smpl");
                         header.ckSize = 0x3c;
+
                         memset(&datas, 0, sizeof(datas));
                         datas.Num_Sample_Loops = 1;
                         datas.Start = LoopStart[ped_patsam][ped_split];
                         datas.End = LoopEnd[ped_patsam][ped_split];
+
+                        header.ckSize = Swap_32(header.ckSize);
+
+                        datas.Num_Sample_Loops = Swap_32(datas.Num_Sample_Loops);
+                        datas.Start = Swap_32(datas.Start);
+                        datas.End = Swap_32(datas.End);
+
                         RF.WriteData((void *) &header, sizeof(header));
                         RF.WriteData((void *) &datas, sizeof(datas));
                     }

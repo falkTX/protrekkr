@@ -6,35 +6,14 @@
 --------------------Configuration: ProTrekkr - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP124.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP21A.tmp" with contents
 [
 /nologo /ML /W3 /Gm /GX /ZI /Od /D "__WIN32__" /D "_DEBUG" /D "_WINDOWS" /Fo"Debug/" /Fd"Debug/" /FD /Zm500 /GZ /c 
-"Z:\ptk\src\support\main.cpp"
-"Z:\ptk\src\Editors\Editor_303.cpp"
-"Z:\ptk\src\Editors\Editor_DiskIO.cpp"
-"Z:\ptk\src\Editors\Editor_Fx_Setup.cpp"
 "Z:\ptk\src\Editors\Editor_Instrument.cpp"
-"Z:\ptk\src\Editors\Editor_Pattern.cpp"
-"Z:\ptk\src\Editors\Editor_Sample.cpp"
-"Z:\ptk\src\Editors\Editor_Sequencer.cpp"
-"Z:\ptk\src\Editors\Editor_Setup.cpp"
-"Z:\ptk\src\Editors\Editor_Synth.cpp"
-"Z:\ptk\src\Editors\Editor_Track.cpp"
-"Z:\ptk\src\Editors\Editor_Track_Fx.cpp"
-"Z:\ptk\src\Editors\Patterns_Blocks.cpp"
-"Z:\ptk\Release\Distrib\Replay\lib\Replay.cpp"
-"Z:\ptk\Release\Distrib\Replay\lib\Synth.cpp"
-"Z:\ptk\Release\Distrib\Replay\lib\TB_303.cpp"
-"Z:\ptk\src\UI\Misc_Draw.cpp"
-"Z:\ptk\src\UI\xml.cpp"
-"Z:\ptk\src\Files\Files.cpp"
-"Z:\ptk\src\Files\Files_List.cpp"
-"Z:\ptk\src\midi\midi.cpp"
-"Z:\ptk\src\midi\midi_drv_windows.cpp"
-"Z:\ptk\src\ptk.cpp"
+"Z:\ptk\src\Wav\Riff.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP124.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP125.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP21A.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP21B.tmp" with contents
 [
 kernel32.lib user32.lib sdl.lib sdl_draw.lib dsound.lib msacm32.lib winmm.lib advapi32.lib zlib.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib /nologo /subsystem:windows /pdb:none /debug /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
 .\Debug\main.obj
@@ -69,36 +48,11 @@ kernel32.lib user32.lib sdl.lib sdl_draw.lib dsound.lib msacm32.lib winmm.lib ad
 .\Debug\ptk.obj
 .\Debug\Resources.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP125.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP21B.tmp"
 <h3>Output Window</h3>
 Compiling...
-Files.cpp
-Generating Code...
-Compiling...
-main.cpp
-Editor_303.cpp
-Editor_DiskIO.cpp
-Editor_Fx_Setup.cpp
 Editor_Instrument.cpp
-Editor_Pattern.cpp
-Editor_Sample.cpp
-Editor_Sequencer.cpp
-Editor_Setup.cpp
-Editor_Synth.cpp
-Editor_Track.cpp
-Editor_Track_Fx.cpp
-Patterns_Blocks.cpp
-Replay.cpp
-Synth.cpp
-TB_303.cpp
-Misc_Draw.cpp
-xml.cpp
-Files_List.cpp
-midi.cpp
-Generating Code...
-Compiling...
-midi_drv_windows.cpp
-ptk.cpp
+Riff.cpp
 Generating Code...
 Linking...
 

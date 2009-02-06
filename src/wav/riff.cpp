@@ -29,6 +29,10 @@
      Corrected the samples calculation.
      Handling for loop informations.
 
+2009 February 6 [Franck Charlet]
+     Handling for big endian platforms.
+     Removed some unnecessary functions.
+
 ------------------------------------------------------ */
 
 // Standard includes
@@ -42,8 +46,6 @@
 
 // DDCLIB includes
 #include "include/riff.h"
-
-#include "../../release/distrib/replay/lib/include/endianness.h"
 
 unsigned long FourCC(const char *ChunkName)
 {
@@ -99,8 +101,8 @@ DDCRET RiffFile::Open(const char *Filename, RiffFileMode NewMode)
                 
                     // Write the RIFF header...
                     // We will have to come back later and patch it!
+                    // (endianness doesn't matter here)
 
-// ::PATCH HERE::
                     if(fwrite(&riff_header, sizeof(riff_header), 1, file) != 1)
                     {
                         fclose(file);
@@ -125,8 +127,6 @@ DDCRET RiffFile::Open(const char *Filename, RiffFileMode NewMode)
                 if(file)
                 {
                     // Try to read the RIFF header...
-
-// ::PATCH HERE::
                     if(fread(&riff_header, sizeof(riff_header), 1, file) != 1)
                     {
                         fclose(file);
@@ -137,6 +137,8 @@ DDCRET RiffFile::Open(const char *Filename, RiffFileMode NewMode)
                     {
                         fmode = RFM_READ;
                     }
+
+                    riff_header.ckSize = Swap_32(riff_header.ckSize);
                 }
                 else
                 {
@@ -160,7 +162,6 @@ DDCRET RiffFile::Write(const void *Data, unsigned NumBytes)
         return DDC_INVALID_CALL;
     }
 
-// ::PATCH HERE::
     if(fwrite(Data, NumBytes, 1, file) != 1)
     {
         return DDC_FILE_ERROR;
@@ -178,9 +179,11 @@ DDCRET RiffFile::Close()
     switch(fmode)
     {
         case RFM_WRITE:
+
+            riff_header.ckSize = Swap_32(riff_header.ckSize);
+
             if(fflush(file) ||
                fseek(file,0,SEEK_SET) ||
-// ::PATCH HERE::
                fwrite(&riff_header, sizeof(riff_header), 1, file) != 1 ||
                fclose(file)
               )
@@ -260,7 +263,6 @@ DDCRET RiffFile::Read(void *Data, unsigned NumBytes)
 {
     DDCRET retcode = DDC_SUCCESS;
 
-// ::PATCH HERE::
     if(fread(Data, NumBytes, 1, file) != 1)
     {
         retcode = DDC_FILE_ERROR;
@@ -282,6 +284,7 @@ int RiffFile::SeekChunk(const char *ChunkName)
         Chunk = 0;
         Seek(i);
         Read(&Chunk, 4);
+
         if(Chunk == Chunk_To_Find)
         {
 
@@ -306,6 +309,9 @@ int RiffFile::SeekChunk(const char *ChunkName)
 #endif
         {
             Read(&data_size, 4);
+
+            data_size = Swap_32(data_size);
+
             i += data_size + 4 + 4 - 1;
         }
         i++;
@@ -337,7 +343,6 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
     if(retcode == DDC_SUCCESS)
     {
         retcode = Expect("WAVE", 4);
-
         if(retcode == DDC_SUCCESS)
         {
             if(!SeekChunk("fmt "))
@@ -347,11 +352,17 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
             }
             retcode = Read(&wave_format, sizeof(wave_format));
 
+            wave_format.data.wFormatTag = Swap_16(wave_format.data.wFormatTag);
+            wave_format.data.nChannels = Swap_16(wave_format.data.nChannels);
+            wave_format.data.nSamplesPerSec = Swap_32(wave_format.data.nSamplesPerSec);
+            wave_format.data.nAvgBytesPerSec = Swap_32(wave_format.data.nAvgBytesPerSec);
+            wave_format.data.nBlockAlign = Swap_16(wave_format.data.nBlockAlign);
+            wave_format.data.nBitsPerSample = Swap_16(wave_format.data.nBitsPerSample);
+
             if(retcode == DDC_SUCCESS &&
                !wave_format.VerifyValidity())
             {
                 // This isn't standard PCM, so we don't know what it is!
-
                 retcode = DDC_FILE_ERROR;
                 return(retcode);
             }
@@ -365,16 +376,40 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
                 // WAVE header.
 
                 retcode = Read(&pcm_data, sizeof(pcm_data));
+
+                pcm_data.ckSize = Swap_32(pcm_data.ckSize);
             }
 
             if(SeekChunk("smpl"))
             {
                 retcode = Read(&wave_Smpl, sizeof(wave_Smpl));
+
+                wave_Smpl.header.ckSize = Swap_32(wave_Smpl.header.ckSize);
+
+                wave_Smpl.data.Manufacturer = Swap_32(wave_Smpl.data.Manufacturer);
+                wave_Smpl.data.Product = Swap_32(wave_Smpl.data.Product);
+                wave_Smpl.data.Sample_Period = Swap_32(wave_Smpl.data.Sample_Period);
+                wave_Smpl.data.MIDI_Unity_Note = Swap_32(wave_Smpl.data.MIDI_Unity_Note);
+                wave_Smpl.data.MIDI_Pitch_Fraction = Swap_32(wave_Smpl.data.MIDI_Pitch_Fraction);
+                wave_Smpl.data.SMPTE_Format = Swap_32(wave_Smpl.data.SMPTE_Format);
+                wave_Smpl.data.SMPTE_Offset = Swap_32(wave_Smpl.data.SMPTE_Offset);
+                wave_Smpl.data.Num_Sample_Loops = Swap_32(wave_Smpl.data.Num_Sample_Loops);
+                wave_Smpl.data.Sampler_Data = Swap_32(wave_Smpl.data.Sampler_Data);
+                wave_Smpl.data.Cue_Point_ID = Swap_32(wave_Smpl.data.Cue_Point_ID);
+                wave_Smpl.data.Type = Swap_32(wave_Smpl.data.Type);
+                wave_Smpl.data.Start = Swap_32(wave_Smpl.data.Start);
+                wave_Smpl.data.End = Swap_32(wave_Smpl.data.End);
+                wave_Smpl.data.Fraction = Swap_32(wave_Smpl.data.Fraction);
+                wave_Smpl.data.Play_Count = Swap_32(wave_Smpl.data.Play_Count);
+
             }
             Seek(0);
             SeekChunk("data");
+
             retcode = Read(&data_length, sizeof(data_length));
-         
+
+            data_length = Swap_32(data_length);
+
             num_samples = data_length;
             num_samples /= NumChannels();
             num_samples /= (BitsPerSample() / 8);
@@ -408,12 +443,26 @@ DDCRET WaveFile::OpenForWrite(const char  *Filename,
 
         if(retcode == DDC_SUCCESS)
         {
+            wave_format.data.wFormatTag = Swap_16(wave_format.data.wFormatTag);
+            wave_format.data.nChannels = Swap_16(wave_format.data.nChannels);
+            wave_format.data.nSamplesPerSec = Swap_32(wave_format.data.nSamplesPerSec);
+            wave_format.data.nAvgBytesPerSec = Swap_32(wave_format.data.nAvgBytesPerSec);
+            wave_format.data.nBlockAlign = Swap_16(wave_format.data.nBlockAlign);
+            wave_format.data.nBitsPerSample = Swap_16(wave_format.data.nBitsPerSample);
+
             retcode = Write(&wave_format, sizeof(wave_format));
+
+            wave_format.data.wFormatTag = Swap_16(wave_format.data.wFormatTag);
+            wave_format.data.nChannels = Swap_16(wave_format.data.nChannels);
+            wave_format.data.nSamplesPerSec = Swap_32(wave_format.data.nSamplesPerSec);
+            wave_format.data.nAvgBytesPerSec = Swap_32(wave_format.data.nAvgBytesPerSec);
+            wave_format.data.nBlockAlign = Swap_16(wave_format.data.nBlockAlign);
+            wave_format.data.nBitsPerSample = Swap_16(wave_format.data.nBitsPerSample);
 
             if(retcode == DDC_SUCCESS)
             {
                 pcm_data_offset = CurrentFilePosition();
-                retcode = Write (&pcm_data, sizeof(pcm_data));
+                retcode = Write(&pcm_data, sizeof(pcm_data));
             }
         }
     }
@@ -427,7 +476,9 @@ DDCRET WaveFile::Close()
    
     if(fmode == RFM_WRITE)
     {
-        rc = Backpatch ( pcm_data_offset, &pcm_data, sizeof(pcm_data) );
+        pcm_data.ckSize = Swap_32(pcm_data.ckSize);
+
+        rc = Backpatch(pcm_data_offset, &pcm_data, sizeof(pcm_data));
     }
 
     if(rc == DDC_SUCCESS)
@@ -437,79 +488,19 @@ DDCRET WaveFile::Close()
     return rc;
 }
 
-DDCRET WaveFile::WriteSample(const INT16 Sample [MAX_WAVE_CHANNELS])
-{
-    DDCRET retcode = DDC_SUCCESS;
-
-    switch(wave_format.data.nChannels)
-    {
-        case 1:
-            switch(wave_format.data.nBitsPerSample)
-            {
-                case 8:
-                    pcm_data.ckSize += 1;
-                    retcode = Write(&Sample[0], 1);
-                    break;
-
-                case 16:
-                    pcm_data.ckSize += 2;
-                    retcode = Write(&Sample[0], 2);
-                    break;
-
-                default:
-                    retcode = DDC_INVALID_CALL;
-            }
-            break;
-
-        case 2:
-            switch(wave_format.data.nBitsPerSample)
-            {
-                case 8:
-                    retcode = Write(&Sample[0], 1);
-                    if(retcode == DDC_SUCCESS)
-                    {
-                        retcode = Write(&Sample[1], 1);
-                        if(retcode == DDC_SUCCESS)
-                        {
-                            pcm_data.ckSize += 2;
-                        }
-                    }
-                    break;
-
-                case 16:
-                    retcode = Write(&Sample[0], 2);
-                    if(retcode == DDC_SUCCESS)
-                    {
-                        retcode = Write(&Sample[1], 2);
-                        if(retcode == DDC_SUCCESS)
-                        {
-                            pcm_data.ckSize += 4;
-                        }
-                    }
-                    break;
-
-                default:
-                    retcode = DDC_INVALID_CALL;
-            }
-            break;
-
-        default:
-            retcode = DDC_INVALID_CALL;
-    }
-
-    return retcode;
-}
-
 DDCRET WaveFile::WriteMonoSample(INT16 SampleData)
 {
     switch(wave_format.data.nBitsPerSample)
     {
         case 8:
-            pcm_data.ckSize += 1;
+            pcm_data.ckSize++;
             return Write(&SampleData, 1);
 
         case 16:
            pcm_data.ckSize += 2;
+
+           SampleData = Swap_16(SampleData);
+
            return Write(&SampleData, 2);
     }
 
@@ -527,22 +518,30 @@ DDCRET WaveFile::WriteStereoSample(INT16 LeftSample,
             retcode = Write(&LeftSample, 1);
             if(retcode == DDC_SUCCESS)
             {
+                pcm_data.ckSize++;
+
                 retcode = Write(&RightSample, 1);
                 if(retcode == DDC_SUCCESS)
                 {
-                    pcm_data.ckSize += 2;
+                    pcm_data.ckSize++;
                 }
             }
             break;
 
         case 16:
+
+            LeftSample = Swap_16(LeftSample);
+            RightSample = Swap_16(RightSample);
+
             retcode = Write(&LeftSample, 2);
             if(retcode == DDC_SUCCESS)
             {
+                pcm_data.ckSize += 2;
+
                 retcode = Write(&RightSample, 2);
                 if(retcode == DDC_SUCCESS)
                 {
-                    pcm_data.ckSize += 4;
+                    pcm_data.ckSize += 2;
                 }
             }
             break;
@@ -567,12 +566,19 @@ DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
             break;
 
         case 16:
-            retcode = Read ( Sample, 2 );
+            retcode = Read(Sample, 2);
+            *Sample = Swap_16(*Sample);
             break;
 
         case 32:
             float y;
-            retcode = Read ( &y, 4 );
+            UINT32 int_y;
+
+            retcode = Read(&int_y, 4);
+
+            int_y = Swap_32(int_y);
+            IntToFloat((int *) &y, int_y);
+
             *Sample = (short) (y * 32767.0f);
             break;
 
@@ -589,6 +595,7 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
     UINT8 x[2];
     INT16 y[2];
     float z[2];
+    INT32 int_z[2];
 
     switch(wave_format.data.nBitsPerSample)
     {
@@ -600,12 +607,23 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
 
         case 16:
             retcode = Read(y, 4);
+
+            y[0] = Swap_16(y[0]);
+            y[1] = Swap_16(y[1]);
+
             *L = INT16(y[0]);
             *R = INT16(y[1]);
             break;
 
         case 32:
-            retcode = Read ( z, 8 );
+            retcode = Read(int_z, 8);
+
+            int_z[0] = Swap_32(int_z[0]);
+            int_z[1] = Swap_32(int_z[1]);
+
+            IntToFloat((int *) &z[0], int_z[0]);
+            IntToFloat((int *) &z[1], int_z[1]);
+
             *L = (short) (z[0] * 32767.0f);
             *R = (short) (z[1] * 32767.0f);
             break;
@@ -668,6 +686,8 @@ UINT32 WaveFile::LoopEnd() const
     return wave_Smpl.data.End;
 }
 
+// PATCH THAT
+
 DDCRET WaveFile::WriteData(const void *data, UINT32 numData)
 {
     UINT32 extraBytes = numData;
@@ -694,14 +714,9 @@ DDCRET WaveFile::WriteData(const UINT8 *data, UINT32 numData)
     return RiffFile::Write(data, numData);
 }
 
-DDCRET WaveFile::ReadData(INT16 *data, UINT32 numData)
+void WaveFile::IntToFloat(int *Dest, int Source)
 {
-    return RiffFile::Read(data, numData * sizeof(INT16));
-}
-
-DDCRET WaveFile::ReadData(UINT8 *data, UINT32 numData)
-{
-    return RiffFile::Read(data, numData);
+    *Dest = Source;
 }
 
 /*--- end of file riff.cpp ---*/
