@@ -1,9 +1,5 @@
 TODO:
 
-Concerning the MacOSX port:
- - Finish to implement the sound callback.
-------------------------------------------------------------------
-
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating systems.
  - Create a decent gadgets system (events based).

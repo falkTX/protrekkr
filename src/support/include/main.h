@@ -28,7 +28,7 @@
 
 #define TITLE "ProTrekkr"
 #define VER_VER "1"
-#define VER_REV "84b"
+#define VER_REV "85"
 #define VERSION TITLE " v"VER_VER"."VER_REV
 
 // ------------------------------------------------------
