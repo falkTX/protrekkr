@@ -387,7 +387,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     // Maybe a better (?) solution would be to use:
     // sprintf(ExeProc, "/proc/$d/exe", getpid());
     // readlink(ExeProc, ExePath, sizeof(ExePath));
-    readlink("/proc/self/exe", ExePath, sizeof(ExePath));
+    readlink("/proc/self/exe", ExePath, ExePath_Size);
+    printf("%s\n", ExePath);
     int exename_len = strlen(ExePath);
     while(exename_len--)
     {
