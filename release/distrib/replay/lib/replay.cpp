@@ -2968,14 +2968,15 @@ void GetPlayerValues(float master_coef)
 #if !defined(__STAND_ALONE__) && defined(__WINAMP__)
     if(mas_comp_ratio > 0.01f)
     {
+#else
+    if(mas_ratio > 0.01f)
+    {
 #endif
 
         left_float = Mas_Compressor(left_float, &rms_sumL, mas_comp_bufferL, &mas_envL);
         right_float = Mas_Compressor(right_float, &rms_sumR, mas_comp_bufferR, &mas_envR);
 
-#if !defined(__STAND_ALONE__) && defined(__WINAMP__)
     }
-#endif
 
 #endif
 

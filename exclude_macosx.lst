@@ -12,3 +12,7 @@
 *.cfg*
 *.linux*
 *lame*
+*.o*
+*.obj*
+*.a*
+*.lib*

@@ -12,3 +12,7 @@
 *.cfg*
 *.macosx*
 *lame*
+*.o*
+*.obj*
+*.a*
+*.lib*
