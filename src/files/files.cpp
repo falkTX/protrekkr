@@ -3862,7 +3862,7 @@ void SaveConfig(void)
         Write_Data(extension, sizeof(char), 9, in);
         Write_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
         Write_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
-        Write_Data(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+        Write_Data_Swap(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
 
 #if defined(__NO_MIDI__)
         Write_Data(&phony, sizeof(phony), 1, in);

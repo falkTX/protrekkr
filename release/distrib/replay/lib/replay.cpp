@@ -441,7 +441,11 @@ float Do_RMS(float input, float *rms_sum, float *buffer);
 // Audio mixer
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 {
+#if defined(__MACOSX__)
+    float *pSamples = (float *) Buffer;
+#else
     short *pSamples = (short *) Buffer;
+#endif
     int i;
 
 #if !defined(__STAND_ALONE__)
@@ -453,12 +457,29 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
     if(!rawrender)
     {
 #endif
+
+#if defined(__MACOSX__)
+        for(i = Len - 1; i >= 0; i -= 8)
+#else
         for(i = Len - 1; i >= 0; i -= 4)
+#endif
         {
             GetPlayerValues(mas_vol);
 
+#if defined(__MACOSX__)
+            *pSamples++ = left_float;
+            *pSamples++ = right_float;
+
+            left_float *= 32767.0f;
+            right_float *= 32767.0f;
+
+            left_value = f2i(left_float);
+            right_value = f2i(right_float);
+#else
+
             *pSamples++ = left_value;
             *pSamples++ = right_value;
+#endif
 
 #if !defined(__STAND_ALONE__)
             // Gather datas for the scopes and the vumeters
@@ -2972,12 +2993,9 @@ void GetPlayerValues(float master_coef)
     if(mas_ratio > 0.01f)
     {
 #endif
-
         left_float = Mas_Compressor(left_float, &rms_sumL, mas_comp_bufferL, &mas_envL);
         right_float = Mas_Compressor(right_float, &rms_sumR, mas_comp_bufferR, &mas_envR);
-
     }
-
 #endif
 
 #if defined(__LINUX__)
@@ -2986,9 +3004,24 @@ void GetPlayerValues(float master_coef)
     left_float *= 8192.0f;
     right_float *= 8192.0f;
 #else
+
+#if !defined(__MACOSX__)
     left_float *= 32767.0f;
     right_float *= 32767.0f;
 #endif
+
+#endif
+
+#if defined(__MACOSX__)
+    left_float *= master_coef;
+    right_float *= master_coef;
+
+    if(left_float > 1.0f) left_float = 1.0f;
+    if(left_float < -1.0f) left_float = -1.0f;
+    if(right_float > 1.0f) right_float = 1.0f;
+    if(right_float < -1.0f) right_float = -1.0f;
+
+#else
 
     left_value = f2i(left_float * master_coef);
     right_value = f2i(right_float * master_coef);
@@ -3004,6 +3037,8 @@ void GetPlayerValues(float master_coef)
     if(right_value > 32767) right_value = 32767;
     if(right_value < -32767) right_value = -32767;
 #endif
+
+#endif // __MACOSX__
 }
 
 // ------------------------------------------------------

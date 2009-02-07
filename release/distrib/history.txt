@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.85c:
+
+- Removed the Audio unit code from the Mac OS X port and went to device level,
+  the result should be is faster.
+- Fixed a couple of bugs in the Mac OS X port.
+
 v1.85b:
 
 - Compressor wasn't triggered in the stand alone replay.
