@@ -1,0 +1,14 @@
+*.svn*
+*.DS_Store*
+*.dll
+*install*
+*.mingw*
+*.dsw*
+*.dsp*
+*.sln*
+*.vcproj*
+*.exe*
+*.asm*
+*.cfg*
+*.linux*
+*lame*
