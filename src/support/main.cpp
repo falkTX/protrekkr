@@ -20,7 +20,6 @@
 
 #if defined(__MACOSX__)
 #include <mach-o/dyld.h>
-//typedef int (*NSGetExecutablePathProcPtr)(char *buf, size_t *bufsize);
 #endif
 
 #include "../include/ptk.h"
@@ -388,7 +387,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     // sprintf(ExeProc, "/proc/$d/exe", getpid());
     // readlink(ExeProc, ExePath, sizeof(ExePath));
     readlink("/proc/self/exe", ExePath, ExePath_Size);
-    printf("%s\n", ExePath);
     int exename_len = strlen(ExePath);
     while(exename_len--)
     {
@@ -621,10 +619,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Symbol = Events[i].key.keysym.sym;
                     Keys_Sym[Symbol] = FALSE;
 
-// Don't even bother
-//                    Uni_Trans = Events[i].key.keysym.unicode;
-//                    if(Uni_Trans) Symbol = Uni_Trans;
-                    
                     Scancode = Translate_Locale_Key(Symbol);
                     Keys_Raw[Scancode] = FALSE;
                     Keys_Raw_Off[Scancode] = TRUE;

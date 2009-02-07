@@ -41,8 +41,8 @@ int volatile Thread_Running;
 
 #if defined(__PSP__)
 SceUID AUDIO_thid;
-short *AUDIO_Buffer1;//[AUDIO_OUTPUT_SAMPLE * AUDIO_STEREO * sizeof(short)];
-short *AUDIO_Buffer2;//[AUDIO_OUTPUT_SAMPLE * AUDIO_STEREO * sizeof(short)];
+short *AUDIO_Buffer1;
+short *AUDIO_Buffer2;
 #endif
 
 int AUDIO_SoundBuffer_Size;
@@ -97,9 +97,6 @@ static OSStatus AUDIO_Callback(void *inRefCon,
     {
         AUDIO_Acknowledge = TRUE;
     }
-//    usleep(10);
-// MxMixSamples(ioData->mBuffers[0].mData, ioData->mBuffers[0].mDataByteSize / 4);
-
     return(noErr);
 }
 #endif
@@ -363,7 +360,6 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     AUDIO_Latency = AUDIO_SoundBuffer_Size;
 
     AUDIO_SoundBuffer = (short *) malloc(AUDIO_SoundBuffer_Size << 1);
-    //memset(AUDIO_SoundBuffer, 0, AUDIO_SoundBuffer_Size << 1);
 
     p.sched_priority = 1;
     Thread_Running = 1;

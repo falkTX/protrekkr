@@ -2985,22 +2985,17 @@ void GetPlayerValues(float master_coef)
     left_value = f2i(left_float * master_coef);
     right_value = f2i(right_float * master_coef);
 
-    if(left_value > 32767)
-    {
-        left_value = 32767;
-    }
-    if(left_value < -32767)
-    {
-        left_value = -32767;
-    }
-    if(right_value > 32767)
-    {
-        right_value = 32767;
-    }
-    if(right_value < -32767)
-    {
-        right_value = -32767;
-    }
+#if defined(__LINUX__)
+    if(left_value > 8192)left_value = 8192;
+    if(left_value < -8192) left_value = -8192;
+    if(right_value > 8192) right_value = 8192;
+    if(right_value < -8192) right_value = -8192;
+#else
+    if(left_value > 32767)left_value = 32767;
+    if(left_value < -32767) left_value = -32767;
+    if(right_value > 32767) right_value = 32767;
+    if(right_value < -32767) right_value = -32767;
+#endif
 }
 
 // ------------------------------------------------------
