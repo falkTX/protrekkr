@@ -867,7 +867,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 
         // Reading mod properties
-        Mod_Dat_Read(&compressor, sizeof(int));
+        Mod_Dat_Read(&compressor, sizeof(char));
         Mod_Dat_Read(&c_threshold, sizeof(int));
         Mod_Dat_Read(&BeatsPerMin, sizeof(int));
         Mod_Dat_Read(&TicksPerBeat, sizeof(int));
@@ -2965,11 +2965,18 @@ void GetPlayerValues(float master_coef)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
 
+#if !defined(__STAND_ALONE__) && defined(__WINAMP__)
     if(mas_comp_ratio > 0.01f)
     {
+#endif
+
         left_float = Mas_Compressor(left_float, &rms_sumL, mas_comp_bufferL, &mas_envL);
         right_float = Mas_Compressor(right_float, &rms_sumR, mas_comp_bufferR, &mas_envR);
+
+#if !defined(__STAND_ALONE__) && defined(__WINAMP__)
     }
+#endif
+
 #endif
 
 #if defined(__LINUX__)

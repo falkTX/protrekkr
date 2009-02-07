@@ -8,6 +8,8 @@ clean: remlibobj
 remlibobj:
 	-rm -f $(LIBOBJS_PPC)
 	-rm -f $(LIBOBJS_X86)
+	-rm libptkreplay_ppc.a
+	-rm libptkreplay_x86.a
 	
 ptkreplay: $(LIBOBJS_PPC) $(LIBOBJS_X86)
 	-rm libptkreplay_ppc.a

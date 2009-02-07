@@ -6,7 +6,8 @@ clean: remlibobj
 
 remlibobj:
 	-rm -f $(LIBOBJS)
-	
+	-rm -f libptkreplay.a
+
 ptkreplay: $(LIBOBJS)
 	ar -d libptkreplay.a
 	ar -r libptkreplay.a $(LIBOBJS)

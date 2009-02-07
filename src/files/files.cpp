@@ -2828,7 +2828,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     }
 
     // Writing mod properties
-    Write_Mod_Data(&compressor, sizeof(int), 1, in);
+    Write_Mod_Data(&compressor, sizeof(char), 1, in);
     Write_Mod_Data(&c_threshold, sizeof(int), 1, in);
     Write_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
     Write_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
@@ -2851,6 +2851,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         ratio *= 0.01f;
         Comp_Flag = 1;
         Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+
         Write_Mod_Data(&threshold, sizeof(float), 1, in);
         Write_Mod_Data(&ratio, sizeof(float), 1, in);
         Save_Constant("PTK_LIMITER", TRUE);

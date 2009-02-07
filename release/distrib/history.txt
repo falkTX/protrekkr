@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.85b:
+
+- Compressor wasn't triggered in the stand alone replay.
+
 v1.85:
 
 - First PARTIAL and EXPERIMENTAL test port for Mac OSX (ppc & x86)
