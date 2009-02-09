@@ -1190,6 +1190,9 @@ void Pre_Song_Init(void)
 
 #if !defined(__STAND_ALONE__)
         CHAN_MIDI_PRG[ini] = ini;
+#endif
+
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
         CHAN_MUTE_STATE[ini] = 0;
 #endif
 
@@ -2128,7 +2131,7 @@ ByPass_Wav:
             } // Filter end
 #endif // PTK_TRACKFILTERS
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
             if(CHAN_MUTE_STATE[c])
             {
                 All_Signal_L = 0;
@@ -2150,7 +2153,7 @@ ByPass_Wav:
             All_Signal_L *= LVol[c];
             All_Signal_R *= RVol[c];
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
             if(CHAN_MUTE_STATE[c])
             {
                 All_Signal_L = 0;
@@ -2217,7 +2220,7 @@ ByPass_Wav:
             }
 #endif
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
             if(CHAN_MUTE_STATE[c])
             {
                 All_Signal_L = 0;
@@ -3201,7 +3204,7 @@ void GetPlayerValues(float master_coef)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
 
-#if !defined(__STAND_ALONE__) && defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     if(mas_comp_ratio > 0.01f)
     {
 #else
