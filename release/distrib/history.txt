@@ -13,6 +13,7 @@ v1.86:
 - Added C-masters.ptk by Rhino.
 - Keyboard polyphony improved (notes don't "spread" on other tracks).
 - Removed some clicks due to channels filters.
+- Fixed a bug in .ptk depacking process which could lead to a crash.
 
 v1.85c:
 

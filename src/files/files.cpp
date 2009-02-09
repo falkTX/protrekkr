@@ -698,6 +698,7 @@ void LoadMod(char *FileName)
     int twrite;
     int fake_value;
     int Packed_Size;
+    int UnPacked_Size;
     unsigned char *Packed_Module = NULL;
 
     Mod_Simulate = LOAD_READ;
@@ -783,8 +784,16 @@ Read_Mod_File:
                 Packed_Module = (unsigned char *) malloc(Packed_Size);
                 if(Packed_Module)
                 {
+                    if(Poly)
+                    {
+                        Read_Data_Swap(&UnPacked_Size, sizeof(int), 1, in);
+                    }
+                    else
+                    {
+                        UnPacked_Size = Packed_Size * 10;
+                    }
                     Read_Data(Packed_Module, sizeof(char), Packed_Size, in);
-                    Mod_Memory = Depack_Data(Packed_Module, Packed_Size);
+                    Mod_Memory = Depack_Data(Packed_Module, Packed_Size, UnPacked_Size);
                     Mod_Mem_Pos = 0;
                     free(Packed_Module);
                 }
@@ -3759,18 +3768,18 @@ Uint8 *Pack_Data(Uint8 *Memory, int *Size)
 
 // ------------------------------------------------------
 // Depack a compressed module
-Uint8 *Depack_Data(Uint8 *Memory, int Size)
+Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
 {
     z_stream d_stream;
 
-    Uint8 *Test_Mem = (Uint8 *) malloc(Size * 10);
+    Uint8 *Test_Mem = (Uint8 *) malloc(Size_Out);
     if(Test_Mem)
     {
         memset(&d_stream, 0, sizeof(d_stream));
         d_stream.next_in = (Uint8 *) Memory;
-        d_stream.avail_in = Size;
+        d_stream.avail_in = Size_Out;
         d_stream.next_out = Test_Mem;
-        d_stream.avail_out = 0xffffffff;
+        d_stream.avail_out = -1;
         inflateInit(&d_stream);
         inflate(&d_stream, Z_FULL_FLUSH);
         inflateEnd(&d_stream);
@@ -3787,10 +3796,13 @@ int Pack_Module(char *FileName)
     char extension[10];
     char Temph[96];
     Uint8 *Final_Mem_Out;
+    int Depack_Size;
 
     sprintf(Temph, "%s.ptk", FileName);
 
     int Len = SaveMod("", FALSE, SAVE_CALCLEN, NULL);
+
+    Depack_Size = Len;
 
     Uint8 *Final_Mem = (Uint8 *) malloc(Len);
     SaveMod(FileName, FALSE, SAVE_WRITEMEM, Final_Mem);
@@ -3802,6 +3814,7 @@ int Pack_Module(char *FileName)
     {
         sprintf(extension, "TWNNSNGB");
         Write_Data(extension, sizeof(char), 9, output);
+        Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
         fclose(output);
         sprintf(name, "Module '%s.ptk' saved succesfully...", FileName);

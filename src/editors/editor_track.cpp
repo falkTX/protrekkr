@@ -38,7 +38,7 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(640, 468, 130, 54, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(640, 468, 130, 52, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(714, 493, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
 }
    

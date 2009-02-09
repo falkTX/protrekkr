@@ -50,7 +50,7 @@ void SongStop(void);
 void Free_Samples(void);
 
 Uint8 *Pack_Data(Uint8 *Memory, int *Len);
-Uint8 *Depack_Data(Uint8 *Memory, int Size);
+Uint8 *Depack_Data(Uint8 *Memory, int Size, int size_out);
 int Get_File_Size(FILE *Handle);
 
 #endif
