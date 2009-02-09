@@ -7,7 +7,7 @@
 </h3>
 <h3>Command Lines</h3>
 Creating command line "rc.exe /l 0x407 /fo"Release/Resources.res" /i "src\Support" /d "NDEBUG" "C:\Src\Pc\ptk\src\Support\Resources.rc"" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D7.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D.tmp" with contents
 [
 /nologo /ML /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\Src\Pc\ptk\src\support\main.cpp"
@@ -41,8 +41,8 @@ Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D7.tmp" with conte
 "C:\Src\Pc\ptk\src\midi\midi_drv_windows.cpp"
 "C:\Src\Pc\ptk\src\ptk.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D7.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D8.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1E.tmp" with contents
 [
 kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi32.lib sdl_draw.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
 .\Release\main.obj
@@ -77,7 +77,7 @@ kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi
 .\Release\ptk.obj
 .\Release\Resources.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1D8.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1E.tmp"
 <h3>Output Window</h3>
 Compiling resources...
 Compiling...
