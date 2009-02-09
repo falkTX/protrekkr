@@ -116,16 +116,16 @@ int Get_File_Size(FILE *Handle)
 // ---------------------------------------------------------------------------
 // Depack a compressed module
 // ---------------------------------------------------------------------------
-BYTE *Depack_Data(BYTE *Memory, int Size)
+Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
 {
     z_stream d_stream;
 
-    BYTE *Test_Mem = (BYTE *) malloc(Size * 10);
+    Uint8 *Test_Mem = (Uint8 *) malloc(Size_Out);
     if(Test_Mem)
     {
         memset(&d_stream, 0, sizeof(d_stream));
-        d_stream.next_in = (BYTE *) Memory;
-        d_stream.avail_in = Size;
+        d_stream.next_in = (Uint8 *) Memory;
+        d_stream.avail_in = Size_Out;
         d_stream.next_out = Test_Mem;
         d_stream.avail_out = -1;
         inflateInit(&d_stream);
@@ -137,7 +137,7 @@ BYTE *Depack_Data(BYTE *Memory, int Size)
 
 int check_file_type(char *extension)
 {
-    if(strcmp(extension, "TWNNSNGA"))
+    if(strcmp(extension, "TWNNSNGB"))
     {
         return(FALSE);
     }
@@ -337,6 +337,7 @@ int LoadMod(char *FileName)
     int fake_value;
     int Packed_Size;
     unsigned char *Packed_Module = NULL;
+    int Unpacked_Size;
 
     Mod_Simulate = LOAD_READ;
     Mod_Mem_Pos = 0;
@@ -387,8 +388,9 @@ int LoadMod(char *FileName)
             Packed_Module = (unsigned char *) malloc(Packed_Size);
             if(Packed_Module)
             {
+                Read_Data(&Unpacked_Size, sizeof(int), 1, in);
                 Read_Data(Packed_Module, sizeof(char), Packed_Size, in);
-                Mod_Memory = Depack_Data(Packed_Module, Packed_Size);
+                Mod_Memory = Depack_Data(Packed_Module, Packed_Size, Unpacked_Size);
                 Mod_Mem_Pos = 0;
                 free(Packed_Module);
             }
@@ -498,6 +500,7 @@ int LoadMod(char *FileName)
             Read_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
             Read_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
             Read_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
+            Read_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
         }
 
         // Reading mod properties
@@ -540,7 +543,7 @@ int LoadMod(char *FileName)
         {
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
             {
-                Read_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
+                Read_Mod_Data(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char), 1, in);
             }
         }
 
@@ -579,7 +582,7 @@ int LoadMod(char *FileName)
 
         for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
         {
-            Read_Mod_Data(&TRACKSTATE[tps_trk], sizeof(int), 1, in);
+            Read_Mod_Data(&CHAN_MUTE_STATE[tps_trk], sizeof(int), 1, in);
         }
         Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
         for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)

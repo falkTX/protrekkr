@@ -117,6 +117,7 @@ extern float DThreshold[MAX_TRACKS];
 extern float DClamp[MAX_TRACKS];
 extern float DSend[MAX_TRACKS]; 
 extern int CSend[MAX_TRACKS];
+extern char Channels_Polyphony[MAX_TRACKS];
 extern char compressor; // 0-->Off 1-->On
 extern int c_threshold;
 extern int BeatsPerMin;
