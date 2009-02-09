@@ -3,4 +3,4 @@
 
                 global __PTK_MODULE
 
-__PTK_MODULE:   incbin "money.ptp"
+__PTK_MODULE:   incbin "C-masters.ptp"

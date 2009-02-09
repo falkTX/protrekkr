@@ -1230,7 +1230,7 @@ Read_Mod_File:
                 }
 
                 // Reading mod properties
-                Read_Mod_Data(&compressor, sizeof(int), 1, in);
+                Read_Mod_Data(&compressor, sizeof(char), 1, in);
                 Read_Mod_Data(&c_threshold, sizeof(int), 1, in);
                 Read_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
                 Read_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
@@ -2835,7 +2835,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 case 23:
                     Store_Filter_Hp24M = TRUE;
                     break;
-                }
             }
             Write_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
             Write_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
@@ -2843,6 +2842,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             Write_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
             Write_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
             Write_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
+        }
     }
 
     // Writing mod properties

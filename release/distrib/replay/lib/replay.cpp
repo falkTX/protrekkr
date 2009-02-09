@@ -1136,9 +1136,8 @@ void Pre_Song_Init(void)
 
 #if defined(PTK_FX_ARPEGGIO)
             Arpeggio_BaseNote[ini][i] = 0;
-#endif
-
             Vstep_arp[ini][i] = 0;
+#endif
 
             Synth_Was[ini][i] = 0;
             Player_WL[ini][i] = 0;
@@ -1340,8 +1339,10 @@ void Pre_Song_Init(void)
 // Init the replayer datas
 void Post_Song_Init(void)
 {
+#if defined(PTK_FX_ARPEGGIO)
     int i;
     int j;
+#endif
 
     allPassInit((float) c_threshold);
 
@@ -1408,9 +1409,7 @@ void Sp_Player(void)
     unsigned int Old_Pointer;
     unsigned int res_dec;
 
-#if !defined(__STAND_ALONE__)
     int i;
-#endif
 
     left_float = 0;
     right_float = 0;
