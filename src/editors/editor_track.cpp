@@ -37,6 +37,9 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_NORMAL);
     Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(640, 468, 130, 54, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(714, 493, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
 }
    
 void Actualize_Track_Ed(char gode)
@@ -160,6 +163,13 @@ void Actualize_Track_Ed(char gode)
         {
             if(Disclap[ped_track]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED);
             else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL);
+        }
+
+        if(gode == 0 || gode == 13)
+        {
+            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
+            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
+            Gui_Draw_Arrows_Number_Box2(650, 493, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(trkchan == TRUE)
@@ -288,6 +298,23 @@ void Mouse_Left_Track_Ed(void)
             trkchan = TRUE;
             teac = 10;
         }
+
+        // Channels polyphony
+        if(zcheckMouse(650, 493, 16, 16) == 1)
+        {
+            Channels_Polyphony[ped_track]--;
+            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 13;
+        }
+        if(zcheckMouse(650 + 44, 493, 16, 16) == 1)
+        {
+            Channels_Polyphony[ped_track]++;
+            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 13;
+        }
+
     } // Userscreen 1
 }
 
@@ -319,6 +346,22 @@ void Mouse_Right_Track_Ed(void)
             FType[ped_track] += 16;
             teac = 4;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
+        }
+
+        // Channels polyphony
+        if(zcheckMouse(650, 493, 16, 16) == 1)
+        {
+            Channels_Polyphony[ped_track] -= 10;
+            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 13;
+        }
+        if(zcheckMouse(650 + 44, 493, 16, 16) == 1)
+        {
+            Channels_Polyphony[ped_track] += 10;
+            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 13;
         }
     }
 }

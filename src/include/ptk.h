@@ -99,5 +99,6 @@ int Screen_Update(void);
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
 SDL_Surface *Load_Skin_Picture(char *name);
 LPJAZZ_KEY Get_Jazz_Key_Off(int Note);
+void Set_Default_Channels_Polyphony(void);
 
 #endif

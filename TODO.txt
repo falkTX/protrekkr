@@ -1,7 +1,5 @@
 TODO:
 
-	See to re-introduce the volume cross fading.
-	Each channel should have it's own polyphony amount
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating systems.
@@ -25,10 +23,11 @@ TODO:
  - Undo function for samples and patterns.
  - Click on numbers & move the mouse to modify them (or use the wheel).
  - More shortcuts.
- - Small / big fonts for patterns.
+ - Small / big fonts view for patterns.
  - Alternate way to enter notes (a la fruity loops).
  
- - Use more xml scripting to completely customize the interface.
+ - Use more xml scripting to completely customize the interface
+   (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
  - Add requesters (especially before overwriting files and before exiting).
  - Auto update (checks some web site's version file eventually).

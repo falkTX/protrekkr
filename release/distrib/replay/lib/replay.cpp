@@ -67,6 +67,8 @@ char FLANGER_ON[MAX_TRACKS];
     float FLANGE_RIGHTBUFFER[MAX_TRACKS][16400];
 #endif
 
+float sp_Filtervol[MAX_TRACKS];
+int Done_CVol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Cvol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Tvol[MAX_TRACKS][MAX_POLYPHONY];
 float DSend[MAX_TRACKS];   
@@ -105,6 +107,12 @@ float coef[5];
 float coeftab[5][128][128][4];
 
 int Songplaying;
+
+int New_Instrument[MAX_TRACKS];
+int Pos_Segue[MAX_TRACKS];
+float Segue_Volume[MAX_TRACKS];
+float Segue_SamplesL[MAX_TRACKS];
+float Segue_SamplesR[MAX_TRACKS];
 
 #if defined(PTK_303)
     gear303 tb303engine[2];
@@ -156,7 +164,7 @@ int Subicounter;
     char Songtracks;
 #endif
 
-char Channels_Polyphony = 8;
+char Channels_Polyphony[MAX_TRACKS];
 
 int ped_line;
 unsigned char pSequence[256];
@@ -881,6 +889,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&DClamp[twrite], sizeof(float));
             Mod_Dat_Read(&DSend[twrite], sizeof(float));
             Mod_Dat_Read(&CSend[twrite], sizeof(int));
+            Mod_Dat_Read(&Channels_Polyphony[twrite], sizeof(char));
         }
 
         // Reading mod properties
@@ -906,8 +915,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&lchorus_feedback, sizeof(float));
         Mod_Dat_Read(&rchorus_feedback, sizeof(float));
         Mod_Dat_Read(&shuffle, sizeof(int));
-
-        Mod_Dat_Read(&Channels_Polyphony, sizeof(char));
 
         // Reading track part sequence
         for(int tps_pos = 0; tps_pos < sLength; tps_pos++)
@@ -1241,6 +1248,12 @@ void Pre_Song_Init(void)
 #endif
 
         CCut[ini] = 126.0f;
+
+        New_Instrument[ini] = 0;
+        Pos_Segue[ini] = 0;
+        Segue_Volume[ini] = 0;
+        Segue_SamplesL[ini] = 0;
+        Segue_SamplesR[ini] = 0;
     }
 
 #if defined(PTK_FLANGER)
@@ -1436,7 +1449,7 @@ void Sp_Player(void)
 
                 if(pl_vol_row <= 64)
                 {
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    for(i = 0; i < Channels_Polyphony[ct]; i++)
                     {
                         sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f; // Setting volume.
                     }
@@ -1445,7 +1458,7 @@ void Sp_Player(void)
 #if defined(PTK_FX_SETVOLUME)
                 if(pl_eff_row == 3)
                 {
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    for(i = 0; i < Channels_Polyphony[ct]; i++)
                     {
                         sp_Tvol[ct][i] = (float) pl_dat_row * 0.0039062f; // Setting volume.
                     }
@@ -1519,8 +1532,8 @@ void Sp_Player(void)
                         // in the volume column of no 0x3 fx
                         Play_Instrument(ct, free_sub_channel, (float) pl_note, pl_sample, CustomVol[pl_sample], toffset, glide, FALSE, ct);
                     }
-                    // Now remove all other notes on every channel but the one we just started
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    // Now remove all other notes on every channel but the one we just triggered
+                    for(i = 0; i < Channels_Polyphony[ct]; i++)
                     {
                         if(free_sub_channel != i)
                         {
@@ -1533,10 +1546,10 @@ void Sp_Player(void)
                     }
                 }
 
-                // Trigger a note off
+                // Trigger a note off on all sub channels
                 if(pl_note == 120)
                 {
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    for(i = 0; i < Channels_Polyphony[ct]; i++)
                     {
                         if(sp_Stage[ct][i] == PLAYING_SAMPLE) sp_Stage[ct][i] = PLAYING_SAMPLE_NOTEOFF;
                         Synthesizer[ct][i].NoteOff();
@@ -1551,6 +1564,7 @@ void Sp_Player(void)
                     Midi_NoteOff(ct);
 #endif
 #endif
+
                 }
             } // For loop
 
@@ -1715,15 +1729,18 @@ void Sp_Player(void)
         All_Signal_L = 0;
         All_Signal_R = 0;
 
+        sp_Filtervol[c] = 0.0f;
+
         // If wav is selected in the synth we don't play it directly but through the synth.
 
         // -------------------------------------------
 
         // Interpolation algorithm
-        for(i = 0; i < MAX_POLYPHONY; i++)
+        for(i = 0; i < Channels_Polyphony[c]; i++)
         {
             Curr_Signal_L[i] = 0;
             Curr_Signal_R[i] = 0;
+            Done_CVol[c][i] = FALSE;
 
             if(sp_Stage[c][i] == PLAYING_SAMPLE || sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
             {
@@ -1737,8 +1754,18 @@ ByPass_Wav:
                         sp_Tvol[c][i] = 0.0f;
                         if(sp_Cvol[c][i] < 0.01f) sp_Stage[c][i] = PLAYING_NOSAMPLE;
                     }
-                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
-                    else sp_Cvol[c][i] += 0.005f;
+                    if(sp_Cvol[c][i] > sp_Tvol[c][i])
+                    {
+                        sp_Cvol[c][i] -= 0.005f;
+                        Done_CVol[c][i] = TRUE;
+                    }
+                    else
+                    {
+                        sp_Cvol[c][i] += 0.005f;
+                        Done_CVol[c][i] = TRUE;
+                    }
+                    if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
+                    else if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
 
                     res_dec = sp_Position[c][i].half.last;
 
@@ -1814,6 +1841,14 @@ ByPass_Wav:
 
             if(Synthesizer[c][i].ENV1_STAGE || Synthesizer[c][i].ENV2_STAGE)
             {
+                if(!Done_CVol[c][i])
+                {
+                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
+                    else sp_Cvol[c][i] += 0.005f;
+                    if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
+                    else if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
+                }
+
                 Curr_Signal_L[i] += Synthesizer[c][i].GetSample(Player_WL[c][i],
                                                                 Player_WR[c][i],
                                                                 Player_SC[c][i],
@@ -1833,9 +1868,6 @@ ByPass_Wav:
                                                                 Vstep1[c][i]
                                                          );
 
-                if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
-                else sp_Cvol[c][i] += 0.005f;
-
                 if((Synthesizer[c][i].OSC1_WAVEFORM == 5 || Synthesizer[c][i].OSC2_WAVEFORM == 5))
                 {
                     if(Player_SC[c][i] == 2) grown = TRUE;
@@ -1843,9 +1875,15 @@ ByPass_Wav:
                 gotsome = TRUE;
             }
 
-            // Gather the signal of the sub channels
+            // Gather the signals of all the sub channels
             All_Signal_L += Curr_Signal_L[i];
             All_Signal_R += Curr_Signal_R[i];
+
+            // Store the volume to ramp the filters signal
+            if(sp_Cvol[c][i] > sp_Filtervol[c])
+            {
+                sp_Filtervol[c] = sp_Cvol[c][i];
+            }
         }
 
             // We have no adsr for those
@@ -1884,7 +1922,7 @@ ByPass_Wav:
 #endif
 
             // We send a note off to all sub channels
-            for(i = 0; i < MAX_POLYPHONY; i++)
+            for(i = 0; i < Channels_Polyphony[c]; i++)
             {
                 Synthesizer[c][i].NoteOff();
             }
@@ -1925,6 +1963,7 @@ ByPass_Wav:
                     coef[2] = coeftab[2][gco][FRez[c]][FType[c]];
                     coef[3] = coeftab[3][gco][FRez[c]][FType[c]];
                     coef[4] = coeftab[4][gco][FRez[c]][FType[c]];
+
                     All_Signal_L = Filter(All_Signal_L + 1.0f, c);
                     if(grown) All_Signal_R = Filter(All_Signal_R + 1.0f, c);
 #endif
@@ -2084,6 +2123,9 @@ ByPass_Wav:
 
                     } //SWITCHCASE [FILTERS]
                 }
+
+                All_Signal_L *= sp_Filtervol[c];
+                All_Signal_R *= sp_Filtervol[c];
             } // Filter end
 #endif // PTK_TRACKFILTERS
 
@@ -2116,9 +2158,33 @@ ByPass_Wav:
                 All_Signal_R = 0;
             }
 #endif
-            // 32-Bit HQ Interpolated System Flanger
+
+            // If there's no polyphony we use a rather clumsy cross fading
+            // to avoid the most outrageous clicks
+            // (i also tried with splines but didn't hear any differences)
+            if(Channels_Polyphony[c] == 1 || Player_FD[c] != 0.0f)
+            {
+                if(New_Instrument[c])
+                {
+                    All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
+                    All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
+                    Pos_Segue[c]++;
+                    Segue_Volume[c] -= 1.0f / 127.0f;
+                    if(Pos_Segue[c] >= 128)
+                    {
+                        New_Instrument[c] = FALSE;
+                    }
+                }
+                else
+                {
+                    // Store the transition
+                    Segue_SamplesL[c] = All_Signal_L;
+                    Segue_SamplesR[c] = All_Signal_R;
+                }
+            }
 
 #if defined(PTK_FLANGER)
+            // 32-Bit HQ Interpolated System Flanger
             if(FLANGER_ON[c])
             {
                 FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
@@ -2207,7 +2273,7 @@ int Get_Free_Sub_Channel(int channel)
 {
     int i;
 
-    for(i = 0; i < Channels_Polyphony; i++)
+    for(i = 0; i < Channels_Polyphony[channel]; i++)
     {
         if(sp_Stage[channel][i] == PLAYING_NOSAMPLE &&
            sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
@@ -2490,6 +2556,12 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
         }
+        if(Channels_Polyphony[channel] == 1 || Player_FD[channel] != 0.0f)
+        {
+            Pos_Segue[channel] = 0;
+            Segue_Volume[channel] = 1.0f;
+            New_Instrument[channel] = TRUE;
+        }
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
@@ -2610,7 +2682,7 @@ void DoEffects_tick0(void)
                 Arpeggio_Switch[trackef] = pltr_dat_row;
                 if(!pltr_dat_row)
                 {
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
                     {
                         Vstep1[trackef][i] = Vstep_arp[trackef][i];
                     }
@@ -2643,7 +2715,7 @@ void DoEffects(void)
         {
             if(pltr_note == 121 && pltr_sample != 255)
             {
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] = CustomVol[pltr_sample];
                 }
@@ -2655,7 +2727,7 @@ void DoEffects(void)
         switch(FADEMODE[trackef])
         {
             case 1:
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] += FADECOEF[trackef];
 
@@ -2668,7 +2740,7 @@ void DoEffects(void)
                 break;
 
             case 2:
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] -= FADECOEF[trackef];
 
@@ -2690,7 +2762,7 @@ void DoEffects(void)
             unsigned char kinder = pltr_vol_row & 0xf;
             if(Subicounter == kinder)
             {
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
                     {
@@ -2719,7 +2791,7 @@ void DoEffects(void)
             // $01 Pitch Up
             case 0x1:
 
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
 #if defined(__GCC__)
                     if(Vstep1[trackef][i] < 137438953472ll) Vstep1[trackef][i] += pltr_dat_row << 21;
@@ -2735,7 +2807,7 @@ void DoEffects(void)
             // $02 Pitch Down
             case 0x2:
 
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     Vstep1[trackef][i] -= pltr_dat_row << 21;
                     if(Vstep1[trackef][i] < 16) Vstep1[trackef][i] = 16;
@@ -2747,7 +2819,7 @@ void DoEffects(void)
             // $03 Set volume
             case 0x3:
 
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] = pltr_dat_row * 0.0039062f;
                 }
@@ -2757,7 +2829,7 @@ void DoEffects(void)
 #if defined(PTK_FX_TRANCESLICER)
             // $04 Trance slicer
             case 0x4:
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     if(Subicounter == 0) sp_Tvol[trackef][i] = 1.0f;
 
@@ -2771,7 +2843,7 @@ void DoEffects(void)
             case 0x5:
                 if(pltr_dat_row) glidestep[trackef] = pltr_dat_row << 21;
 
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     if(Vstep1[trackef][i] < sp_Step[trackef][i])
                     {
@@ -2871,7 +2943,7 @@ void DoEffects(void)
                         Play_Instrument(trackef, free_sub_channel, (float) pltr_note, pltr_sample, CustomVol[pltr_sample], 0, 0, FALSE, trackef);
                     }
 
-                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
                     {
                         if(free_sub_channel != i)
                         {
@@ -2999,7 +3071,7 @@ void DoEffects(void)
 #if defined(PTK_FX_VOLUMESLIDEUP)
             // $19 Volume slide up
             case 0x19:
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] += pltr_dat_row * 0.0039062f;
                     if(sp_Tvol[trackef][i] > 1.0f) sp_Tvol[trackef][i] = 1.0f;
@@ -3010,7 +3082,7 @@ void DoEffects(void)
 #if defined(PTK_FX_VOLUMESLIDEDOWN)
             // $1a Volume slide down
             case 0x1a: 
-                for(i = 0; i < MAX_POLYPHONY; i++)
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
                     sp_Tvol[trackef][i] -= pltr_dat_row * 0.0039062f;
                     if(sp_Tvol[trackef][i] < 0.0f) sp_Tvol[trackef][i] = 0.0f;
@@ -3029,7 +3101,7 @@ void DoEffects(void)
 
         if(Arpeggio_Switch[trackef])
         {
-            for(i = 0; i < MAX_POLYPHONY; i++)
+            for(i = 0; i < Channels_Polyphony[trackef]; i++)
             {
                 switch((Subicounter % 3))
                 {

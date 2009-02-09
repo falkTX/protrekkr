@@ -1141,6 +1141,8 @@ Read_Mod_File:
 
             mess_box("Loading song -> Track info, patterns and sequence.");   
 
+            Set_Default_Channels_Polyphony();
+
             if(Ptk_Format)
             {
                 // Reading Track Properties
@@ -1159,6 +1161,7 @@ Read_Mod_File:
                     Read_Mod_Data_Swap(&DClamp[twrite], sizeof(float), 1, in);
                     Read_Mod_Data_Swap(&DSend[twrite], sizeof(float), 1, in);
                     Read_Mod_Data_Swap(&CSend[twrite], sizeof(int), 1, in);
+                    if(Poly) Read_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
                 }
 
                 // Reading mod properties
@@ -1195,8 +1198,6 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
 
-                Channels_Polyphony = 8;
-                if(Poly) Read_Mod_Data(&Channels_Polyphony, sizeof(char), 1, in);
             }
             else
             {
@@ -1216,6 +1217,7 @@ Read_Mod_File:
                     Read_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
                     Read_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
                     Read_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
                 }
 
                 // Reading mod properties
@@ -1251,9 +1253,6 @@ Read_Mod_File:
                 Read_Mod_Data(&lchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data(&shuffle, sizeof(int), 1, in);
-
-                Channels_Polyphony = 8;
-                if(Poly) Read_Mod_Data(&Channels_Polyphony, sizeof(char), 1, in);
             }
 
             // Reading track part sequence
@@ -2828,12 +2827,13 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     Store_Filter_Hp24M = TRUE;
                     break;
                 }
-                Write_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
-                Write_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
-                Write_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
-                Write_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
-                Write_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
             }
+            Write_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
+            Write_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
+            Write_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
+            Write_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+            Write_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
+            Write_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
     }
 
     // Writing mod properties
@@ -3187,6 +3187,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 Write_Mod_Data_Swap(&DClamp[twrite], sizeof(float), 1, in);
                 Write_Mod_Data_Swap(&DSend[twrite], sizeof(float), 1, in);
                 Write_Mod_Data_Swap(&CSend[twrite], sizeof(int), 1, in);
+                Write_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
             }
 
             // Writing mod properties

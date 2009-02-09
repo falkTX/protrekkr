@@ -12,6 +12,7 @@ v1.86:
   due to a re-generation of the reverb buffers.
 - Added C-masters.ptk by Rhino.
 - Keyboard polyphony improved (notes don't "spread" on other tracks).
+- Removed some clicks due to channels filters.
 
 v1.85c:
 

@@ -463,7 +463,7 @@ extern char *ExePath;
 
 extern int allow_save;
 
-extern char Channels_Polyphony;
+extern char Channels_Polyphony[MAX_TRACKS];
 
 // ------------------------------------------------------
 // Functions

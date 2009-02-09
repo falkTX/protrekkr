@@ -37,9 +37,6 @@ void Draw_Fx_Ed(void)
 
     Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL);
     Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL);
-
-    Gui_Draw_Button_Box(640, 464, 130, 56, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
 }
 
 void Actualize_Fx_Ed(char gode)
@@ -158,12 +155,6 @@ void Actualize_Fx_Ed(char gode)
             Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
-        if(gode == 0 || gode == 12)
-        {
-            if(Channels_Polyphony < 1) Channels_Polyphony = 1;
-            if(Channels_Polyphony > MAX_POLYPHONY) Channels_Polyphony = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-        }
     }
 }
 
@@ -252,22 +243,6 @@ void Mouse_Right_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 11;
         }
-
-        // Channels polyphony
-        if(zcheckMouse(650, 489, 16, 16) == 1)
-        {
-            Channels_Polyphony -= 10;
-            if(Channels_Polyphony < 1) Channels_Polyphony = 1;
-            gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 12;
-        }
-        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
-        {
-            Channels_Polyphony += 10;
-            if(Channels_Polyphony > MAX_POLYPHONY) Channels_Polyphony = MAX_POLYPHONY;
-            gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 12;
-        }
     }
 }
 
@@ -317,22 +292,6 @@ void Mouse_Left_Fx_Ed(void)
             Ticks_Synchro_Right++;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 11;
-        }
-
-        // Channels polyphony
-        if(zcheckMouse(650, 489, 16, 16) == 1)
-        {
-            Channels_Polyphony--;
-            if(Channels_Polyphony < 1) Channels_Polyphony = 1;
-            gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 12;
-        }
-        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
-        {
-            Channels_Polyphony++;
-            if(Channels_Polyphony > MAX_POLYPHONY) Channels_Polyphony = MAX_POLYPHONY;
-            gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 12;
         }
 
         if(zcheckMouse(596, 480, 32, 16) == 1)
