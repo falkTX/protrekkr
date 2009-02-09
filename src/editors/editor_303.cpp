@@ -210,7 +210,7 @@ void Actualize_303_Ed(char gode)
         {
             // volume background
             Skincopy(529, 485, 449, 25, 19, 88);
-            int tb303v = f2i(tb303engine[sl3].tbVolume * 72);
+            int tb303v = (int) (tb303engine[sl3].tbVolume * 72.0f);
             // Volume slider
             Skincopy(531, 558 - tb303v, 0, 116, 13, 11);
         }

@@ -549,7 +549,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
         memset(Keys, 0, sizeof(Keys));
         memset(Keys_Sym, 0, sizeof(Keys_Sym));
-        memset(Keys_Raw, 0, sizeof(Keys_Raw));
         memset(Keys_Unicode, 0, sizeof(Keys_Raw));
 
         SDL_PumpEvents();
@@ -620,7 +619,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Keys_Sym[Symbol] = FALSE;
 
                     Scancode = Translate_Locale_Key(Symbol);
-                    Keys_Raw[Scancode] = FALSE;
                     Keys_Raw_Off[Scancode] = TRUE;
                     break;
 

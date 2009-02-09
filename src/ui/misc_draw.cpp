@@ -416,7 +416,7 @@ void Gui_Draw_Arrows_Number_Box2(int x, int y, int val, int flags)
 void value_box4(int x, int y, int val)
 {
     Gui_Draw_Button_Box(x, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    out_hexchar(x + 5, y + 1, val, 0, 0);
+    out_hexchar(x + 7, y + 2, val, 0, 0);
 }
 
 void value_box3(int x, int y, char val, int flags)
@@ -427,7 +427,7 @@ void value_box3(int x, int y, char val, int flags)
     out_note(x + 21, y + 2, val, 0xFFFFFF);
 }
 
-void outlong_small(int x, int y, long cant, int mode, int size, int flags)
+void outlong_small(int x, int y, int cant, int mode, int size, int flags)
 {
     char xstr[40];
 
@@ -446,7 +446,7 @@ void outlong_small(int x, int y, long cant, int mode, int size, int flags)
     Gui_Draw_Button_Box(x, y, size - 1, 16, xstr, flags);
 }
 
-void outlong(int x, int y, long cant, int mode)
+void outlong(int x, int y, int cant, int mode)
 {
     char xstr[40];
 
@@ -616,54 +616,57 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
     int x2 = x + sx;
     int y2 = y + sy;
 
-    if(pushed & BUTTON_NORMAL)
+    if(!(pushed & BUTTON_NOBORDER))
     {
-        if(pushed & BUTTON_DISABLED)
+        if(pushed & BUTTON_NORMAL)
         {
-            SetColor(COL_STATIC_MED);
-            Fillrect(x, y, x2, y2 + 1);
-            SetColor(COL_STATIC_HI);
-            DrawLine(x, y, x2 - 1, y);
-            DrawLine(x, y, x, y2);
-            SetColor(COL_STATIC_LO);
-            DrawLine(x, y2, x2, y2);
-            DrawLine(x2, y, x2, y2);
+            if(pushed & BUTTON_DISABLED)
+            {
+                SetColor(COL_STATIC_MED);
+                Fillrect(x, y, x2, y2 + 1);
+                SetColor(COL_STATIC_HI);
+                DrawLine(x, y, x2 - 1, y);
+                DrawLine(x, y, x, y2);
+                SetColor(COL_STATIC_LO);
+                DrawLine(x, y2, x2, y2);
+                DrawLine(x2, y, x2, y2);
+            }
+            else
+            {
+                SetColor(COL_MED);
+                Fillrect(x, y, x2, y2 + 1);
+                SetColor(COL_HI);
+                DrawLine(x, y, x2 - 1, y);
+                DrawLine(x, y, x, y2);
+                SetColor(COL_LO);
+                DrawLine(x, y2, x2, y2);
+                DrawLine(x2, y, x2, y2);
+            }
         }
         else
         {
-            SetColor(COL_MED);
-            Fillrect(x, y, x2, y2 + 1);
-            SetColor(COL_HI);
-            DrawLine(x, y, x2 - 1, y);
-            DrawLine(x, y, x, y2);
-            SetColor(COL_LO);
-            DrawLine(x, y2, x2, y2);
-            DrawLine(x2, y, x2, y2);
-        }
-    }
-    else
-    {
-        if(pushed & BUTTON_DISABLED)
-        {
-            SetColor(COL_STATIC_MED);
-            Fillrect(x, y, x2, y2 + 1);
-            SetColor(COL_STATIC_LO);
-            DrawLine(x, y, x2 - 1, y);
-            DrawLine(x, y, x, y2);
-            SetColor(COL_STATIC_HI);
-            DrawLine(x, y2, x2, y2);
-            DrawLine(x2, y, x2, y2);
-        }
-        else
-        {
-            SetColor(COL_PUSHED_MED);
-            Fillrect(x, y, x2, y2 + 1);
-            SetColor(COL_PUSHED_LO);
-            DrawLine(x, y, x2 - 1, y);
-            DrawLine(x, y, x, y2);
-            SetColor(COL_PUSHED_HI);
-            DrawLine(x, y2, x2, y2);
-            DrawLine(x2, y, x2, y2);
+            if(pushed & BUTTON_DISABLED)
+            {
+                SetColor(COL_STATIC_MED);
+                Fillrect(x, y, x2, y2 + 1);
+                SetColor(COL_STATIC_LO);
+                DrawLine(x, y, x2 - 1, y);
+                DrawLine(x, y, x, y2);
+                SetColor(COL_STATIC_HI);
+                DrawLine(x, y2, x2, y2);
+                DrawLine(x2, y, x2, y2);
+            }
+            else
+            {
+                SetColor(COL_PUSHED_MED);
+                Fillrect(x, y, x2, y2 + 1);
+                SetColor(COL_PUSHED_LO);
+                DrawLine(x, y, x2 - 1, y);
+                DrawLine(x, y, x, y2);
+                SetColor(COL_PUSHED_HI);
+                DrawLine(x, y2, x2, y2);
+                DrawLine(x2, y, x2, y2);
+            }
         }
     }
     if(pushed & BUTTON_TEXT_CENTERED)

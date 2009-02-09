@@ -129,10 +129,10 @@ extern float lchorus_feedback;
 extern float rchorus_feedback;
 extern int shuffle;
 
-extern char SACTIVE[256][16];
-extern char SHISTORY[256][16];
+extern char CHAN_ACTIVE_STATE[256][16];
+extern char CHAN_HISTORY_STATE[256][16];
 extern float CCoef[MAX_TRACKS];
-extern int TRACKMIDICHANNEL[MAX_TRACKS];
+extern int CHAN_MIDI_PRG[MAX_TRACKS];
 
 extern char LFO_ON[MAX_TRACKS];
 extern float LFO_RATE[MAX_TRACKS];
@@ -151,7 +151,7 @@ extern int FLANGER_OFFSET[MAX_TRACKS];
 extern float foff2[MAX_TRACKS];
 extern float foff1[MAX_TRACKS];
 
-extern int TRACKSTATE[MAX_TRACKS]; // 0->Normal 1->Muted
+extern int CHAN_MUTE_STATE[MAX_TRACKS]; // 0->Normal 1->Muted
 extern char Disclap[MAX_TRACKS];
 
 extern char artist[20];
@@ -168,20 +168,20 @@ extern float CustomVol[128];
 extern unsigned int SubCounter;
 extern int PosInTick;
 extern int plx;
-extern int sp_Stage[MAX_TRACKS];//[MAX_POLYPHONY];
-extern int sp_Stage2[MAX_TRACKS];//[MAX_POLYPHONY];
-extern int sp_Stage3[MAX_TRACKS];//[MAX_POLYPHONY];
+extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
+extern int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
 extern int L_MaxLevel;
 extern int R_MaxLevel;
-extern CSynth Synthesizer[MAX_TRACKS];//[MAX_POLYPHONY];
+extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 extern float Player_FD[MAX_TRACKS];
-extern char sp_channelsample[MAX_TRACKS];
-extern char sp_split[MAX_TRACKS];
+extern char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
+extern char sp_split[MAX_TRACKS][MAX_POLYPHONY];
 extern int Songplaying;
 extern int left_value;
 extern int right_value;
 extern SynthParameters PARASynth[128];
-extern float ramper[MAX_TRACKS];//[MAX_POLYPHONY];
+extern float ramper[MAX_TRACKS];
 extern unsigned char nPatterns;
 extern int delay_time;
 extern int DelayType;
@@ -191,7 +191,10 @@ extern int DelayType;
 // Functions
 void Pre_Song_Init(void);
 void Sp_Player(void);
-void Sp_Playwave(int channel, float note, int sample, float vol, unsigned int offset, int glide, int Play_Entire);
+void Play_Instrument(int channel, int sub_channel,
+                     float note, int sample,
+                     float vol, unsigned int offset,
+                     int glide, int Play_Selection, int midi_channel);
 void ResetFilters(char tr);
 void ComputeStereo(char channel);
 void GetPlayerValues(float master_coef);
@@ -202,5 +205,6 @@ void Post_Song_Init(void);
 void ResetSynthParameters(SynthParameters *TSP);
 void Free_Samples(void);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
+int Get_Free_Sub_Channel(int channel);
 
 #endif

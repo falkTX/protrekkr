@@ -105,7 +105,7 @@ struct para303
 
 // ------------------------------------------------------
 // Variables
-extern long SamplesPerTick;
+extern int SamplesPerTick;
 
 // ------------------------------------------------------
 // Classes

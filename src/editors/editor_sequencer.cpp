@@ -105,7 +105,7 @@ void Actualize_Seq_Ed(void)
 
                 for(int rel2 = 0; rel2 < Songtracks; rel2++)
                 {
-                    if(SACTIVE[rel][rel2]) out_nibble(124 + rel2 * 8, 505 + lseq * 12, USE_FONT, rel2);
+                    if(CHAN_ACTIVE_STATE[rel][rel2]) out_nibble(124 + rel2 * 8, 505 + lseq * 12, USE_FONT, rel2);
                     else out_nibble(124 + rel2 * 8, 505 + lseq * 12, USE_FONT_LOW, rel2);
                 } // sub for
             }
@@ -357,15 +357,15 @@ void Mouse_Left_Sequencer_Ed(void)
                 int seqindex = (Mouse.x - 123) / 8;
                 if(seqindex < 0) seqindex = 0;
                 if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
-                if(!SACTIVE[posindex][seqindex])
+                if(!CHAN_ACTIVE_STATE[posindex][seqindex])
                 {
-                    SACTIVE[posindex][seqindex] = TRUE;
-                    SHISTORY[posindex][seqindex] = FALSE;
+                    CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
+                    CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
                 }
                 else
                 {
-                    SACTIVE[posindex][seqindex] = FALSE;
-                    SHISTORY[posindex][seqindex] = FALSE;
+                    CHAN_ACTIVE_STATE[posindex][seqindex] = FALSE;
+                    CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
                 }
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
             }
@@ -460,33 +460,33 @@ void Mouse_Right_Sequencer_Ed(void)
                 if(seqindex < 0) seqindex = 0;
                 if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
 
-                if(SACTIVE[posindex][seqindex])
+                if(CHAN_ACTIVE_STATE[posindex][seqindex])
                 {
                     Already_Solo = 0;
                     for(int alphac = 0; alphac < Songtracks; alphac++)
                     {
-                        if(SACTIVE[posindex][alphac] == TRUE) Already_Solo++;
+                        if(CHAN_ACTIVE_STATE[posindex][alphac] == TRUE) Already_Solo++;
                     }
                     if(Already_Solo == 1)
                     {
                         for(int alphac = 0; alphac < Songtracks; alphac++)
                         {
-                            SACTIVE[posindex][alphac] = TRUE;
-                            SHISTORY[posindex][alphac] = FALSE;
+                            CHAN_ACTIVE_STATE[posindex][alphac] = TRUE;
+                            CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
                         }
                     }
                     else
                     {
                         for(int alphac = 0; alphac < Songtracks; alphac++)
                         {
-                            SACTIVE[posindex][alphac] = FALSE;
-                            SHISTORY[posindex][alphac] = FALSE;
+                            CHAN_ACTIVE_STATE[posindex][alphac] = FALSE;
+                            CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
                         }
                     }
                 }
                 // Active it
-                SACTIVE[posindex][seqindex] = TRUE;
-                SHISTORY[posindex][seqindex] = FALSE;
+                CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
+                CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
             }
         }
@@ -537,7 +537,7 @@ void Actualize_Sequencer(void)
         }
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            SHISTORY[cPosition][i] = FALSE;
+            CHAN_HISTORY_STATE[cPosition][i] = FALSE;
         }
     }
     else
@@ -574,8 +574,8 @@ void SeqFill(int st, int en, char n)
     {
         for(char trk = 0; trk < Songtracks; trk++)
         {
-            SACTIVE[cl][trk] = n;
-            SHISTORY[cl][trk] = FALSE;
+            CHAN_ACTIVE_STATE[cl][trk] = n;
+            CHAN_HISTORY_STATE[cl][trk] = FALSE;
         }
     }
 }     
@@ -592,15 +592,15 @@ void SeqDelete(int st)
             pSequence[cl] = pSequence[cl + 1];
             for(char trk = 0; trk < Songtracks; trk++)
             {
-                SACTIVE[cl][trk] = SACTIVE[cl + 1][trk];
-                SHISTORY[cl][trk] = SHISTORY[cl + 1][trk];
+                CHAN_ACTIVE_STATE[cl][trk] = CHAN_ACTIVE_STATE[cl + 1][trk];
+                CHAN_HISTORY_STATE[cl][trk] = CHAN_HISTORY_STATE[cl + 1][trk];
             }
         }
         pSequence[cl] = 0;
         for(char trk = 0; trk < Songtracks; trk++)
         {
-            SACTIVE[cl][trk] = TRUE;
-            SHISTORY[cl][trk] = FALSE;
+            CHAN_ACTIVE_STATE[cl][trk] = TRUE;
+            CHAN_HISTORY_STATE[cl][trk] = FALSE;
         }
         sLength--;
     }
@@ -618,15 +618,15 @@ void SeqInsert(int st)
             pSequence[cl + 1] = pSequence[cl];
             for(char trk = 0; trk < Songtracks; trk++)
             {
-                SACTIVE[cl + 1][trk] = SACTIVE[cl][trk];
-                SHISTORY[cl + 1][trk] = SHISTORY[cl][trk];
+                CHAN_ACTIVE_STATE[cl + 1][trk] = CHAN_ACTIVE_STATE[cl][trk];
+                CHAN_HISTORY_STATE[cl + 1][trk] = CHAN_HISTORY_STATE[cl][trk];
             }
         }
         pSequence[st] = 0;
         for(char trk = 0; trk < Songtracks; trk++)
         {
-            SACTIVE[st][trk] = TRUE;
-            SHISTORY[st][trk] = FALSE;
+            CHAN_ACTIVE_STATE[st][trk] = TRUE;
+            CHAN_HISTORY_STATE[st][trk] = FALSE;
         }
     sLength++;
     }
@@ -646,7 +646,7 @@ void SeqCopy(int st)
     Seq_Buffers[Cur_Seq_Buffer].pattern = pSequence[st];
     for(char trk = 0; trk < Songtracks; trk++)
     {
-        Seq_Buffers[Cur_Seq_Buffer].active_state[trk] = SACTIVE[st][trk];
+        Seq_Buffers[Cur_Seq_Buffer].active_state[trk] = CHAN_ACTIVE_STATE[st][trk];
     }
 }     
 
@@ -656,8 +656,8 @@ void SeqPaste(int st)
     pSequence[st] = Seq_Buffers[Cur_Seq_Buffer].pattern;
     for(char trk = 0; trk < Songtracks; trk++)
     {
-        SACTIVE[st][trk] = Seq_Buffers[Cur_Seq_Buffer].active_state[trk];
-        SHISTORY[st][trk] = FALSE;
+        CHAN_ACTIVE_STATE[st][trk] = Seq_Buffers[Cur_Seq_Buffer].active_state[trk];
+        CHAN_HISTORY_STATE[st][trk] = FALSE;
     }
 }     
 

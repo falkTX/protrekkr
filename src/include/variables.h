@@ -195,7 +195,7 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
-extern long SamplesPerTick;
+extern int SamplesPerTick;
 
 extern unsigned char *RawPatterns;
 extern unsigned char nPatterns;
@@ -247,10 +247,10 @@ extern float lchorus_feedback;
 extern float rchorus_feedback;
 extern int shuffle;
 
-extern char SACTIVE[256][16];
-extern char SHISTORY[256][16];
+extern char CHAN_ACTIVE_STATE[256][16];
+extern char CHAN_HISTORY_STATE[256][16];
 extern float CCoef[MAX_TRACKS];
-extern int TRACKMIDICHANNEL[MAX_TRACKS];
+extern int CHAN_MIDI_PRG[MAX_TRACKS];
 
 extern char LFO_ON[MAX_TRACKS];
 extern float LFO_RATE[MAX_TRACKS];
@@ -269,7 +269,7 @@ extern int FLANGER_OFFSET[MAX_TRACKS];
 extern float foff2[MAX_TRACKS];
 extern float foff1[MAX_TRACKS];
 
-extern int TRACKSTATE[MAX_TRACKS]; // 0->Normal 1->Muted
+extern int CHAN_MUTE_STATE[MAX_TRACKS]; // 0->Normal 1->Muted
 
 extern char Songtracks;
 extern char Disclap[MAX_TRACKS];
@@ -463,6 +463,8 @@ extern char *ExePath;
 
 extern int allow_save;
 
+extern char Channels_Polyphony;
+
 // ------------------------------------------------------
 // Functions
 void ResetFilters(char tr);
@@ -495,8 +497,6 @@ void Go303(void);
 void knob(int x, int y, unsigned char number);
 void Fire303(unsigned char number, char unit);
 void number303(unsigned char number, int x, int y);
-void LoadRebirthMod(void);
-void noteoff303(char strack);
 void ShowInfo(void);
 void guiDial2(const char *str);
 
@@ -516,7 +516,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row);
 void draw_tracked(void);
 void DeleteInstrument(void);
 void Sp_Player(void);             
-void Sp_Playwave(int channel, float note, int sample, float vol, unsigned int offset, int glide, int Play_Entire);
 void Pre_Song_Init(void);
 void Compressor_work(void);
 void StartRec(void);
@@ -530,7 +529,6 @@ float Kutoff(int v);
 float Reonance(float v);
 float Bandwidth(int v);
 float ApplyLfo(float cy, char trcy);
-int f2i(float d);
 int GetFreeWave(void);
 char zcheckMouse_nobutton(int x, int y, int xs, int ys);
 char zcheckMouse(int x, int y, int xs, int ys);
@@ -583,7 +581,7 @@ void Insert_Pattern_Line(int Position);
 void Remove_Track_Line(int track, int Position);
 void Remove_Pattern_Line(int Position);
 void Calc_selection(void);
-void Next_Line_Pattern_Auto(void);
+int Next_Line_Pattern_Auto(void);
 int Get_Free_Channel(void);
 int Search_Corresponding_Channel(Uint32 Datas);
 int Get_Midi_Channel(int midi_channel);

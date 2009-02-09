@@ -2,6 +2,17 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.86:
+
+- Fixed a bug with channels that could be heard faintly even when being muted
+  (was also present in wav rendering).
+- Channels polyphony (up to 16) implemented.
+  Value for a module can be changed in FX Setup tab.
+- Switching to FX Setup tab produced a small sound glitch
+  due to a re-generation of the reverb buffers.
+- Added C-masters.ptk by Rhino.
+- Keyboard polyphony improved (notes don't "spread" on other tracks).
+
 v1.85c:
 
 - Removed the Audio unit code from the Mac OS X port and went to device level,

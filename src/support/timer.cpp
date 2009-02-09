@@ -11,13 +11,13 @@
 
 // ------------------------------------------------------
 // Variables
-int Ref_Ticks;
+float Ref_Ticks;
 
 // ------------------------------------------------------
 // Init the frames counter
 void Set_Frames_Counter(void)
 {
-    Ref_Ticks = SDL_GetTicks();
+    Ref_Ticks = ((float) SDL_GetTicks());
 }
 
 // ------------------------------------------------------
@@ -25,7 +25,7 @@ void Set_Frames_Counter(void)
 float Get_Frames_Delay(void)
 {
     float Delay;
-    int Cur_Ticks = SDL_GetTicks();
+    float Cur_Ticks = ((float) SDL_GetTicks());
 
     Delay = (float) (Cur_Ticks - Ref_Ticks);
     Ref_Ticks = Cur_Ticks;

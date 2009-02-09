@@ -49,6 +49,7 @@
 #define BUTTON_PUSHED 2
 #define BUTTON_TEXT_CENTERED 4
 #define BUTTON_DISABLED 8
+#define BUTTON_NOBORDER 16
 
 // ------------------------------------------------------
 // Structures
@@ -77,8 +78,8 @@ void Gui_Draw_Arrows_Number_Box(int x, int y, int val, int flags);
 void Gui_Draw_Arrows_Number_Box2(int x, int y, int val, int flags);
 void value_box4(int x, int y, int val);
 void value_box3(int x, int y, char val, int flags);
-void outlong(int x, int y, long cant, int mode);
-void outlong_small(int x, int y, long cant, int mode, int size, int flags);
+void outlong(int x, int y, int cant, int mode);
+void outlong_small(int x, int y, int cant, int mode, int size, int flags);
 void outfloat(int x, int y, float cant, int mode);
 void outfloat_small(int x, int y, float cant, int mode, int size, int flags);
 

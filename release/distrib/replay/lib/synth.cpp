@@ -439,7 +439,7 @@ void CSynth::EnvRun(int *track, int *track2)
                 ENV1_STAGE = 0; /* Stop the rock ENV1 */
                 OSC1_SPEED = 0;
                 OSC3_SPEED = 0;
-                *track = 0;
+                *track = PLAYING_NOSAMPLE;
             }
             break;
     }
@@ -487,7 +487,7 @@ void CSynth::EnvRun(int *track, int *track2)
                 ENV2_COUNTER = 0;
                 ENV2_STAGE = 0; /* Stop the rock ENV2 */
                 OSC2_SPEED = 0;
-                *track2 = 0;
+                *track2 = PLAYING_NOSAMPLE;
             }
             break;
     }
@@ -561,7 +561,7 @@ float CSynth::GetSample(short *Left_Samples,
                         float *Right_Signal,
                         unsigned int Rns,
                         float vol,
-                        int *track, 
+                        int *track,
                         int *track2,
                         Uint64 *position_osc1,
                         Uint64 *position_osc2,
@@ -712,7 +712,7 @@ float CSynth::GetSample(short *Left_Samples,
                             if(pos_osc1->half.first >= Length)
                             {
                                 pos_osc1->half.first = Length;
-                                *track = 0;
+                                *track = PLAYING_NOSAMPLE;
                             }
                             break;
                         case SMP_LOOP_FORWARD:
@@ -865,7 +865,7 @@ float CSynth::GetSample(short *Left_Samples,
                             if(pos_osc2->half.first >= Length)
                             {
                                 pos_osc2->half.first = Length;
-                                *track2 = 0;
+                                *track2 = PLAYING_NOSAMPLE;
                             }
                             break;
                         case SMP_LOOP_FORWARD:
@@ -908,7 +908,6 @@ float CSynth::GetSample(short *Left_Samples,
 
             if(*track)
             {
-
                 osc_speed2 = OSC1_SPEED / 2;
                 osc_speed1 = ((int64) ((double) (
                                 + LFO1_VALUE * LFO1_OSC1_PITCH
@@ -981,7 +980,7 @@ float CSynth::GetSample(short *Left_Samples,
                         if(pos_osc3->half.first >= Length)
                         {
                             pos_osc3->half.first = Length;
-                            *track = 0;
+                            *track = PLAYING_NOSAMPLE;
                         }
                         break;
                     case SMP_LOOP_FORWARD:
@@ -1112,10 +1111,10 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     if(ENV2_RELEASE < 0.15f) ENV2_RELEASE = 0.15f;
   
     LFO1_PERIOD = (float) (TSP.lfo1_period * 2) + 1;
-    LFO1_SUBGRMAX = f2i(((float) SamplesPerTick * 0.000277f) * LFO1_PERIOD);
+    LFO1_SUBGRMAX = (int) (((float) SamplesPerTick * 0.000277f * LFO1_PERIOD));
 
     LFO2_PERIOD = (float) (TSP.lfo2_period * 2) + 1;
-    LFO2_SUBGRMAX = f2i(((float) SamplesPerTick * 0.000277f) * LFO2_PERIOD);
+    LFO2_SUBGRMAX = (int) ((float) SamplesPerTick * 0.000277f * LFO2_PERIOD);
 
     /* Envelopes and LFO's matrix modulation variables */
     LFO1_OSC1_PW =       ((float) TSP.lfo1_osc1_pw - 64) * 0.015625f;

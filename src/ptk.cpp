@@ -85,7 +85,7 @@ int LastPedRow = -1;
 char po_ctrl2 = TRUE;
 char po_alt = TRUE;
 char po_alt2 = TRUE;
-int TRACKMIDICHANNEL[MAX_TRACKS];
+int CHAN_MIDI_PRG[MAX_TRACKS];
 
 int sp_TickCounter = 0;
 int LVColor = 0;
@@ -146,6 +146,8 @@ void Draw_Scope(void);
 void Draw_Scope_Files_Button(void);
 void Display_Tracks_To_Render(void);
 void Solo_Track(int track_to_solo);
+
+JAZZ_KEY Sub_Channels_Jazz[MAX_TRACKS][MAX_POLYPHONY];
 
 int wait_AutoSave;
 extern char AutoSave;
@@ -387,6 +389,7 @@ void Destroy_Context(void)
 int Screen_Update(void)
 {
     int FineTune_Value;
+    int i;
 
     redraw_everything = 0;
     if(Env_Change)
@@ -395,15 +398,20 @@ int Screen_Update(void)
         Env_Change = FALSE;
     }
 
-    if(sp_Stage[ped_track] == PLAYING_SAMPLE && ped_patsam == sp_channelsample[ped_track] && ped_split == sp_split[ped_track])
+    for(i = 0; i < MAX_POLYPHONY; i++)
     {
-        draw_sampled_wave2 = TRUE;
-        boing = TRUE;
-    }
-    else if(boing)
-    {
-        boing = FALSE;
-        draw_sampled_wave3 = TRUE;
+        if(sp_Stage[ped_track][i] == PLAYING_SAMPLE && ped_patsam == sp_channelsample[ped_track][i] && ped_split == sp_split[ped_track][i])
+        {
+            draw_sampled_wave2 = TRUE;
+            boing = TRUE;
+            break;
+        }
+        else if(boing)
+        {
+            boing = FALSE;
+            draw_sampled_wave3 = TRUE;
+            break;
+        }
     }
 
     if(display_title)
@@ -658,8 +666,8 @@ int Screen_Update(void)
         {
             int tmp_track = Get_Track_Over_Mouse();
 
-            if(TRACKSTATE[tmp_track] == 0) TRACKSTATE[tmp_track] = 1;
-            else TRACKSTATE[tmp_track] = 0;
+            if(CHAN_MUTE_STATE[tmp_track] == 0) CHAN_MUTE_STATE[tmp_track] = 1;
+            else CHAN_MUTE_STATE[tmp_track] = 0;
 
             if(userscreen == USER_SCREEN_TRACK_EDIT) Actualize_Track_Ed(10);
             Actupated(0);
@@ -1356,6 +1364,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNG8") == 0 ||
                 strcmp(extension, "TWNNSNG9") == 0 ||
                 strcmp(extension, "TWNNSNGA") == 0 ||
+                strcmp(extension, "TWNNSNGB") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -1512,6 +1521,12 @@ void StartEdit(void)
     {
         Gui_Draw_Button_Box(8, 98, 80, 16, "Edit/Record", BUTTON_NORMAL);
     }
+
+#if !defined(__NO_MIDI__)
+    extern int first_midi_time;
+    if(is_editing) first_midi_time = FALSE;
+#endif
+
 }
 
 // ------------------------------------------------------
@@ -1777,7 +1792,7 @@ void WavRenderizer(void)
     plx = 0;
     char buffer[80];
     sprintf(buffer, "%s.wav", name);
-    int Save_TRACKSTATE[MAX_TRACKS];
+    int Save_CHAN_MUTE_STATE[MAX_TRACKS];
     int i;
 
     if(!hd_isrecording)
@@ -1802,8 +1817,8 @@ void WavRenderizer(void)
 
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            Save_TRACKSTATE[i] = TRACKSTATE[i];
-            TRACKSTATE[i] = Tracks_To_Render[i];
+            Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
+            CHAN_MUTE_STATE[i] = Tracks_To_Render[i];
         }
 
         while(cPosition > 0 || ped_line > 0 || bru == FALSE)
@@ -1816,7 +1831,7 @@ void WavRenderizer(void)
 
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            TRACKSTATE[i] = Save_TRACKSTATE[i];
+            CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
         }
 
         RF.Close();
@@ -1870,15 +1885,20 @@ void DeleteInstrument(void)
 
 void StopIfSp(void)
 {
-   for(char u = 0; u < MAX_TRACKS; u++)
-   {
-      if(sp_channelsample[u] == ped_patsam)
-      {
-         sp_Stage[u] = PLAYING_NOSAMPLE;
-         Player_FD[u] = 0;
-         ramper[u] = 0;
-      }
-   }
+    int i;
+
+    for(char u = 0; u < MAX_TRACKS; u++)
+    {
+        for(i = 0; i < MAX_POLYPHONY; i++)
+        {
+            if(sp_channelsample[u][i] == ped_patsam)
+            {
+                sp_Stage[u][i] = PLAYING_NOSAMPLE;
+            }
+        }
+        Player_FD[u] = 0;
+        ramper[u] = 0;
+    }
 }
 
 // ------------------------------------------------------
@@ -1983,6 +2003,27 @@ void Actualize_Input(void)
             break;
     }
 }
+
+// ------------------------------------------------------
+// Return the channel and sub channel of a played note
+LPJAZZ_KEY Get_Jazz_Key_Off(int Note)
+{
+    int i;
+    int j;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            if(Sub_Channels_Jazz[i][j].Note == Note)
+            {
+                return(&Sub_Channels_Jazz[i][j]);
+            }
+        }
+    }
+    return(NULL);
+}
+
 
 // ------------------------------------------------------
 // KeyBoard ShortCut Handler
@@ -2918,45 +2959,6 @@ void Keyboard_Handler(void)
             Record_Keys[36] = 16 + 1;
         }
 
-        // Key jazz release
-        if(Keys_Raw_Off[0x10]) { Record_Keys[0] = (12 + 1) | 0x80;  Keys_Raw_Off[0x10] = FALSE; }
-        if(Keys_Raw_Off[3])    { Record_Keys[1] = (13 + 1) | 0x80;  Keys_Raw_Off[3] = FALSE; }
-        if(Keys_Raw_Off[0x11]) { Record_Keys[2] = (14 + 1) | 0x80;  Keys_Raw_Off[0x11] = FALSE; }
-        if(Keys_Raw_Off[4])    { Record_Keys[3] = (15 + 1) | 0x80;  Keys_Raw_Off[4] = FALSE; }
-        if(Keys_Raw_Off[0x12]) { Record_Keys[4] = (16 + 1) | 0x80;  Keys_Raw_Off[0x12] = FALSE; }
-        if(Keys_Raw_Off[0x13]) { Record_Keys[5] = (17 + 1) | 0x80;  Keys_Raw_Off[0x13] = FALSE; }
-        if(Keys_Raw_Off[6])    { Record_Keys[6] = (18 + 1) | 0x80;  Keys_Raw_Off[6] = FALSE; }
-        if(Keys_Raw_Off[0x14]) { Record_Keys[7] = (19 + 1) | 0x80;  Keys_Raw_Off[0x14] = FALSE; }
-        if(Keys_Raw_Off[7])    { Record_Keys[8] = (20 + 1) | 0x80;  Keys_Raw_Off[7] = FALSE; }
-        if(Keys_Raw_Off[0x15]) { Record_Keys[9] = (21 + 1) | 0x80;  Keys_Raw_Off[0x15] = FALSE; }
-        if(Keys_Raw_Off[8])    { Record_Keys[10] = (22 + 1) | 0x80; Keys_Raw_Off[8] = FALSE; }
-        if(Keys_Raw_Off[0x16]) { Record_Keys[11] = (23 + 1) | 0x80; Keys_Raw_Off[0x16] = FALSE; }
-        if(Keys_Raw_Off[0x17]) { Record_Keys[12] = (24 + 1) | 0x80; Keys_Raw_Off[0x17] = FALSE; }
-        if(Keys_Raw_Off[0xa])  { Record_Keys[13] = (25 + 1) | 0x80; Keys_Raw_Off[0xa] = FALSE; }
-        if(Keys_Raw_Off[0x18]) { Record_Keys[14] = (26 + 1) | 0x80; Keys_Raw_Off[0x18] = FALSE; }
-        if(Keys_Raw_Off[0xb])  { Record_Keys[15] = (27 + 1) | 0x80; Keys_Raw_Off[0xb] = FALSE; }
-        if(Keys_Raw_Off[0x19]) { Record_Keys[16] = (28 + 1) | 0x80; Keys_Raw_Off[0x19] = FALSE; }
-        if(Keys_Raw_Off[0x1a]) { Record_Keys[17] = (29 + 1) | 0x80; Keys_Raw_Off[0x1a] = FALSE; }
-        if(Keys_Raw_Off[0xd])  { Record_Keys[18] = (30 + 1) | 0x80; Keys_Raw_Off[0xd] = FALSE; }
-        if(Keys_Raw_Off[0x1b]) { Record_Keys[19] = (31 + 1) | 0x80; Keys_Raw_Off[0x1b] = FALSE; }
-        if(Keys_Raw_Off[0x2c]) { Record_Keys[20] = (0 + 1) | 0x80;  Keys_Raw_Off[0x2c] = FALSE; }
-        if(Keys_Raw_Off[0x1f]) { Record_Keys[21] = (1 + 1) | 0x80;  Keys_Raw_Off[0x1f] = FALSE; }
-        if(Keys_Raw_Off[0x2d]) { Record_Keys[22] = (2 + 1) | 0x80;  Keys_Raw_Off[0x2d] = FALSE; }
-        if(Keys_Raw_Off[0x20]) { Record_Keys[23] = (3 + 1) | 0x80;  Keys_Raw_Off[0x20] = FALSE; }
-        if(Keys_Raw_Off[0x2e]) { Record_Keys[24] = (4 + 1) | 0x80;  Keys_Raw_Off[0x2e] = FALSE; }
-        if(Keys_Raw_Off[0x2f]) { Record_Keys[25] = (5 + 1) | 0x80;  Keys_Raw_Off[0x2f] = FALSE; }
-        if(Keys_Raw_Off[0x22]) { Record_Keys[26] = (6 + 1) | 0x80;  Keys_Raw_Off[0x22] = FALSE; }
-        if(Keys_Raw_Off[0x30]) { Record_Keys[27] = (7 + 1) | 0x80;  Keys_Raw_Off[0x30] = FALSE; }
-        if(Keys_Raw_Off[0x23]) { Record_Keys[28] = (8 + 1) | 0x80;  Keys_Raw_Off[0x23] = FALSE; }
-        if(Keys_Raw_Off[0x31]) { Record_Keys[29] = (9 + 1) | 0x80;  Keys_Raw_Off[0x31] = FALSE; }
-        if(Keys_Raw_Off[0x24]) { Record_Keys[30] = (10 + 1) | 0x80; Keys_Raw_Off[0x24] = FALSE; }
-        if(Keys_Raw_Off[0x32]) { Record_Keys[31] = (11 + 1) | 0x80; Keys_Raw_Off[0x32] = FALSE; }
-        if(Keys_Raw_Off[0x33]) { Record_Keys[32] = (12 + 1) | 0x80; Keys_Raw_Off[0x33] = FALSE; }
-        if(Keys_Raw_Off[0x26]) { Record_Keys[33] = (13 + 1) | 0x80; Keys_Raw_Off[0x26] = FALSE; }
-        if(Keys_Raw_Off[0x34]) { Record_Keys[34] = (14 + 1) | 0x80; Keys_Raw_Off[0x34] = FALSE; }
-        if(Keys_Raw_Off[0x27]) { Record_Keys[35] = (15 + 1) | 0x80; Keys_Raw_Off[0x27] = FALSE; }
-        if(Keys_Raw_Off[0x35]) { Record_Keys[36] = (16 + 1) | 0x80; Keys_Raw_Off[0x35] = FALSE; }
-
         // Data columns
         if(Keys_Unicode['0']) retvalue = 0;
         if(Keys[SDLK_KP0]) retvalue = 0;
@@ -3036,28 +3038,44 @@ void Keyboard_Handler(void)
 
                         if(is_recording_2)
                         {
-                            key_ticks = Get_Frames_Delay() * 16.0f;
+                            // Ticks per minute
+                            float Time_Unit = (BeatsPerMin * TicksPerBeat);
+                            // Ticks per seconds
+                            Time_Unit /= 60.0f;
+                            // Ticks per milliseconds
+                            Time_Unit /= 1000.0f;
+                            key_ticks = Get_Frames_Delay() * Time_Unit;
                             frac_part = modf(key_ticks, &int_part);
                             iTicks = (int) fabs(int_part);
                             ped_line += (int) iTicks;
 
-                            Next_Line_Pattern_Auto();
+                            Cur_Position = Next_Line_Pattern_Auto();
 
                             xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[Cur_Position] * 12288;
                             *(RawPatterns + xoffseted) = tmp_note;
                             *(RawPatterns + xoffseted + 1) = ped_patsam;
                         }
 
+                        Alloc_midi_Channels[Track_Number] = ((tmp_note + 1) << 8);
                         if(!is_editing || ped_row == 0)
                         {
-                            // Set the select here
-                            Sp_Playwave(Track_Number, (float) tmp_note, ped_patsam, CustomVol[ped_patsam], 0, 0, TRUE);
+                            int Chan = Track_Number;
+                            if(!is_recording)
+                            {
+                                Chan = ped_track;
+                            }
+
+                            int Sub_Channel = Get_Free_Sub_Channel(Chan);
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Note = ((tmp_note + 1) << 8);
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Chan;
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Sub_Channel = Sub_Channel;
+                            Play_Instrument(Chan, Sub_Channel, (float) tmp_note, ped_patsam, CustomVol[ped_patsam], 0, 0, !is_recording, Track_Number);
                         }
-                        Alloc_midi_Channels[Track_Number] = ((tmp_note + 1) << 8);
                     }
                 }
                 else
                 {
+                    // Note off
                     if(Record_Keys_State[i] == TRUE)
                     {
                         Record_Keys_State[i] = FALSE;
@@ -3072,23 +3090,42 @@ void Keyboard_Handler(void)
 
                         if(is_recording_2)
                         {
-                            key_ticks = Get_Frames_Delay() * 16.0f;// / 1000.0 * 1000.0f; //(((((Get_Frames_Delay() / 1000.0) / 60.0) * (double) BeatsPerMin) * TicksPerBeat)) * 3;
+                            // Ticks per minute
+                            float Time_Unit = (BeatsPerMin * TicksPerBeat);
+                            // Ticks per seconds
+                            Time_Unit /= 60.0f;
+                            // Ticks per milliseconds
+                            Time_Unit /= 1000.0f;
+                            key_ticks = Get_Frames_Delay() * Time_Unit;
                             frac_part = modf(key_ticks, &int_part);
                             iTicks = (int) fabs(int_part);
-                            if(iTicks == 0) iTicks = 1;
+                            //if(iTicks == 0) iTicks = 1;
                             ped_line += (int) iTicks;
 
-                            Next_Line_Pattern_Auto();
+                            Cur_Position = Next_Line_Pattern_Auto();
 
                             xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[Cur_Position] * 12288;
-
+                            // Put a note off in the pattern
                             *(RawPatterns + xoffseted) = 120;
                             *(RawPatterns + xoffseted + 1) = 0xff;
                         }
 
-                        Synthesizer[Track_Number].NoteOff();
-                        noteoff303(Track_Number); // 303 Note Off...
-                        if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
+                        LPJAZZ_KEY Channel = Get_Jazz_Key_Off((tmp_note + 1) << 8);
+                        if(Channel)
+                        {
+                            Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
+                            if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
+                            {
+                                sp_Stage[Channel->Channel][Channel->Sub_Channel] = PLAYING_SAMPLE_NOTEOFF;
+                            }
+
+                            // That's a possibility
+                            noteoff303(Channel->Channel);
+
+                            Channel->Note = 0;
+                            Channel->Channel = 0;
+                            Channel->Sub_Channel = 0;
+                        }
 
 #if !defined(__NO_MIDI__)
                         Midi_NoteOff(Track_Number);
@@ -3108,6 +3145,45 @@ void Keyboard_Handler(void)
             }
             old_key_ped_line = ped_line;
         }
+
+        // Key jazz release
+        if(Keys_Raw_Off[0x10]) { Record_Keys[0] = (12 + 1) | 0x80;  Keys_Raw_Off[0x10] = FALSE; Keys_Raw[0x10] = FALSE; }
+        if(Keys_Raw_Off[3])    { Record_Keys[1] = (13 + 1) | 0x80;  Keys_Raw_Off[3] = FALSE; Keys_Raw[3] = FALSE; }
+        if(Keys_Raw_Off[0x11]) { Record_Keys[2] = (14 + 1) | 0x80;  Keys_Raw_Off[0x11] = FALSE; Keys_Raw[0x11] = FALSE; }
+        if(Keys_Raw_Off[4])    { Record_Keys[3] = (15 + 1) | 0x80;  Keys_Raw_Off[4] = FALSE; Keys_Raw[4] = FALSE; }
+        if(Keys_Raw_Off[0x12]) { Record_Keys[4] = (16 + 1) | 0x80;  Keys_Raw_Off[0x12] = FALSE; Keys_Raw[0x12] = FALSE; }
+        if(Keys_Raw_Off[0x13]) { Record_Keys[5] = (17 + 1) | 0x80;  Keys_Raw_Off[0x13] = FALSE; Keys_Raw[0x13] = FALSE; }
+        if(Keys_Raw_Off[6])    { Record_Keys[6] = (18 + 1) | 0x80;  Keys_Raw_Off[6] = FALSE; Keys_Raw[6] = FALSE; }
+        if(Keys_Raw_Off[0x14]) { Record_Keys[7] = (19 + 1) | 0x80;  Keys_Raw_Off[0x14] = FALSE; Keys_Raw[0x14] = FALSE; }
+        if(Keys_Raw_Off[7])    { Record_Keys[8] = (20 + 1) | 0x80;  Keys_Raw_Off[7] = FALSE; Keys_Raw[7] = FALSE; }
+        if(Keys_Raw_Off[0x15]) { Record_Keys[9] = (21 + 1) | 0x80;  Keys_Raw_Off[0x15] = FALSE; Keys_Raw[0x15] = FALSE; }
+        if(Keys_Raw_Off[8])    { Record_Keys[10] = (22 + 1) | 0x80; Keys_Raw_Off[8] = FALSE; Keys_Raw[8] = FALSE; }
+        if(Keys_Raw_Off[0x16]) { Record_Keys[11] = (23 + 1) | 0x80; Keys_Raw_Off[0x16] = FALSE; Keys_Raw[0x16] = FALSE; }
+        if(Keys_Raw_Off[0x17]) { Record_Keys[12] = (24 + 1) | 0x80; Keys_Raw_Off[0x17] = FALSE; Keys_Raw[0x17] = FALSE; }
+        if(Keys_Raw_Off[0xa])  { Record_Keys[13] = (25 + 1) | 0x80; Keys_Raw_Off[0xa] = FALSE; Keys_Raw[0xa] = FALSE; }
+        if(Keys_Raw_Off[0x18]) { Record_Keys[14] = (26 + 1) | 0x80; Keys_Raw_Off[0x18] = FALSE; Keys_Raw[0x18] = FALSE; }
+        if(Keys_Raw_Off[0xb])  { Record_Keys[15] = (27 + 1) | 0x80; Keys_Raw_Off[0xb] = FALSE; Keys_Raw[0xb] = FALSE; }
+        if(Keys_Raw_Off[0x19]) { Record_Keys[16] = (28 + 1) | 0x80; Keys_Raw_Off[0x19] = FALSE; Keys_Raw[0x19] = FALSE; }
+        if(Keys_Raw_Off[0x1a]) { Record_Keys[17] = (29 + 1) | 0x80; Keys_Raw_Off[0x1a] = FALSE; Keys_Raw[0x1a] = FALSE; }
+        if(Keys_Raw_Off[0xd])  { Record_Keys[18] = (30 + 1) | 0x80; Keys_Raw_Off[0xd] = FALSE; Keys_Raw[0xd] = FALSE; }
+        if(Keys_Raw_Off[0x1b]) { Record_Keys[19] = (31 + 1) | 0x80; Keys_Raw_Off[0x1b] = FALSE; Keys_Raw[0x1b] = FALSE; }
+        if(Keys_Raw_Off[0x2c]) { Record_Keys[20] = (0 + 1) | 0x80;  Keys_Raw_Off[0x2c] = FALSE; Keys_Raw[0x2c] = FALSE; }
+        if(Keys_Raw_Off[0x1f]) { Record_Keys[21] = (1 + 1) | 0x80;  Keys_Raw_Off[0x1f] = FALSE; Keys_Raw[0x1f] = FALSE; }
+        if(Keys_Raw_Off[0x2d]) { Record_Keys[22] = (2 + 1) | 0x80;  Keys_Raw_Off[0x2d] = FALSE; Keys_Raw[0x2d] = FALSE; }
+        if(Keys_Raw_Off[0x20]) { Record_Keys[23] = (3 + 1) | 0x80;  Keys_Raw_Off[0x20] = FALSE; Keys_Raw[0x20] = FALSE; }
+        if(Keys_Raw_Off[0x2e]) { Record_Keys[24] = (4 + 1) | 0x80;  Keys_Raw_Off[0x2e] = FALSE; Keys_Raw[0x2e] = FALSE; }
+        if(Keys_Raw_Off[0x2f]) { Record_Keys[25] = (5 + 1) | 0x80;  Keys_Raw_Off[0x2f] = FALSE; Keys_Raw[0x2f] = FALSE; }
+        if(Keys_Raw_Off[0x22]) { Record_Keys[26] = (6 + 1) | 0x80;  Keys_Raw_Off[0x22] = FALSE; Keys_Raw[0x22] = FALSE; }
+        if(Keys_Raw_Off[0x30]) { Record_Keys[27] = (7 + 1) | 0x80;  Keys_Raw_Off[0x30] = FALSE; Keys_Raw[0x30] = FALSE; }
+        if(Keys_Raw_Off[0x23]) { Record_Keys[28] = (8 + 1) | 0x80;  Keys_Raw_Off[0x23] = FALSE; Keys_Raw[0x23] = FALSE; }
+        if(Keys_Raw_Off[0x31]) { Record_Keys[29] = (9 + 1) | 0x80;  Keys_Raw_Off[0x31] = FALSE; Keys_Raw[0x31] = FALSE; }
+        if(Keys_Raw_Off[0x24]) { Record_Keys[30] = (10 + 1) | 0x80; Keys_Raw_Off[0x24] = FALSE; Keys_Raw[0x24] = FALSE; }
+        if(Keys_Raw_Off[0x32]) { Record_Keys[31] = (11 + 1) | 0x80; Keys_Raw_Off[0x32] = FALSE; Keys_Raw[0x32] = FALSE; }
+        if(Keys_Raw_Off[0x33]) { Record_Keys[32] = (12 + 1) | 0x80; Keys_Raw_Off[0x33] = FALSE; Keys_Raw[0x33] = FALSE; }
+        if(Keys_Raw_Off[0x26]) { Record_Keys[33] = (13 + 1) | 0x80; Keys_Raw_Off[0x26] = FALSE; Keys_Raw[0x26] = FALSE; }
+        if(Keys_Raw_Off[0x34]) { Record_Keys[34] = (14 + 1) | 0x80; Keys_Raw_Off[0x34] = FALSE; Keys_Raw[0x34] = FALSE; }
+        if(Keys_Raw_Off[0x27]) { Record_Keys[35] = (15 + 1) | 0x80; Keys_Raw_Off[0x27] = FALSE; Keys_Raw[0x27] = FALSE; }
+        if(Keys_Raw_Off[0x35]) { Record_Keys[36] = (16 + 1) | 0x80; Keys_Raw_Off[0x35] = FALSE; Keys_Raw[0x35] = FALSE; }
     }
 
     // Turn edit mode on/off
@@ -3170,8 +3246,8 @@ void Keyboard_Handler(void)
             {
                 if(Keys[SDLK_m - UNICODE_OFFSET1])
                 {
-                    if(TRACKSTATE[ped_track] == 0) TRACKSTATE[ped_track] = 1;
-                    else TRACKSTATE[ped_track] = 0;
+                    if(CHAN_MUTE_STATE[ped_track] == 0) CHAN_MUTE_STATE[ped_track] = 1;
+                    else CHAN_MUTE_STATE[ped_track] = 0;
                     if(userscreen == USER_SCREEN_TRACK_EDIT) Actualize_Track_Ed(10);
                     Actupated(0);
                 }
@@ -3208,8 +3284,8 @@ void Keyboard_Handler(void)
                     {
                         Solo_Track(ped_track);
                         // Will unmute the correct track
-                        if(TRACKSTATE[ped_track] == 0) TRACKSTATE[ped_track] = 1;
-                        else TRACKSTATE[ped_track] = 0;
+                        if(CHAN_MUTE_STATE[ped_track] == 0) CHAN_MUTE_STATE[ped_track] = 1;
+                        else CHAN_MUTE_STATE[ped_track] = 0;
                         if(userscreen == USER_SCREEN_TRACK_EDIT) Actualize_Track_Ed(10);
                         Actupated(0);
                     }
@@ -4197,7 +4273,7 @@ int Search_Free_Pattern(void)
 
 // ------------------------------------------------------
 // Next pattern/position
-void Next_Line_Pattern_Auto(void)
+int Next_Line_Pattern_Auto(void)
 {
     int new_pattern;
     int max_value;
@@ -4221,6 +4297,7 @@ void Next_Line_Pattern_Auto(void)
             if(new_pattern > -1) pSequence[cPosition] = new_pattern;
         }
     }
+    return(cPosition);
 }
 
 // ------------------------------------------------------
@@ -4231,7 +4308,7 @@ int Get_Midi_Channel(int midi_channel)
 
     for(i = 0; i < MAX_TRACKS; i++)
     {
-        if(midi_channel == TRACKMIDICHANNEL[i])
+        if(midi_channel == CHAN_MIDI_PRG[i])
         {
             return(i);
         }
@@ -4276,7 +4353,7 @@ int Search_Corresponding_Channel(Uint32 Datas)
 void Display_Beat_Time(void)
 {
     char String[64];
-    sprintf(String, "1/4 Beat Time: %d ms.", f2i(15000 / (float) BeatsPerMin));
+    sprintf(String, "1/4 Beat Time: %d ms.", (int) (15000.0f / (float) BeatsPerMin));
     Gui_Clear_Array(268, 102, 120, 16);
     PrintXY(268, 102, USE_FONT, String);
 }
@@ -4290,26 +4367,26 @@ void Display_Master_Comp(void)
     if(display_title)
     {
         Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider_Size(159 + 54, 6, 50, f2i(mas_comp_threshold * 0.5f), TRUE);
+        Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
             sprintf(tt, "Off");
         }
         else
         {
-            sprintf(tt, "%d%%", f2i(mas_comp_threshold));
+            sprintf(tt, "%d%%", (int) (mas_comp_threshold));
         }
         Print_String(tt, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
 
         Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider_Size(283 + 41, 6, 50, f2i(mas_comp_ratio * 0.5f), TRUE);
+        Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
             sprintf(tt, "Off");
         }
         else
         {
-            sprintf(tt, "%d%%", f2i(mas_comp_ratio));
+            sprintf(tt, "%d%%", (int) (mas_comp_ratio));
         }
         Print_String(tt, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
     }
@@ -4326,8 +4403,8 @@ void Display_Master_Volume(void)
         if(mas_vol < 0.01f) mas_vol = 0.01f;
         if(mas_vol > 1.0f) mas_vol = 1.0f;
         Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider(394 + 44, 6, f2i(mas_vol * 128.0f), TRUE);
-        sprintf(tt, "%d%%", f2i(mas_vol * 100.0f));
+        Realslider(394 + 44, 6, (int) (mas_vol * 128.0f), TRUE);
+        sprintf(tt, "%d%%", (int) (mas_vol * 100.0f));
         Print_String(tt, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
     }
 }
@@ -4813,14 +4890,14 @@ void Draw_Scope_Files_Button(void)
 void Solo_Track(int track_to_solo)
 {
     // Unmute all if the user clicked on a solo track
-    if(TRACKSTATE[track_to_solo] == 0)
+    if(CHAN_MUTE_STATE[track_to_solo] == 0)
     {
         int Was_Solo = FALSE;
         
         // Check if all other tracks are muted
         for(int solify = 0; solify < MAX_TRACKS; solify++)
         {
-            if((solify != track_to_solo) && TRACKSTATE[solify] == 0)
+            if((solify != track_to_solo) && CHAN_MUTE_STATE[solify] == 0)
             {
                 Was_Solo = TRUE;
             }
@@ -4830,16 +4907,16 @@ void Solo_Track(int track_to_solo)
             // Unmute all
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
-                TRACKSTATE[solify] = 0;
+                CHAN_MUTE_STATE[solify] = 0;
             }
-            TRACKSTATE[track_to_solo] = 1;
+            CHAN_MUTE_STATE[track_to_solo] = 1;
         }
         else
         {
             // Else mute all
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
-                TRACKSTATE[solify] = 1;
+                CHAN_MUTE_STATE[solify] = 1;
             }
         }
     }
@@ -4848,7 +4925,7 @@ void Solo_Track(int track_to_solo)
         // Else mute all
         for(int solify = 0; solify < MAX_TRACKS; solify++)
         {
-            TRACKSTATE[solify] = 1;
+            CHAN_MUTE_STATE[solify] = 1;
         }
     }
 }

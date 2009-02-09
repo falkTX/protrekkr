@@ -25,7 +25,8 @@ double first_midi_timer;
 double ticks_elapsed;
 extern int Track_Number; 
 int Midi_Track_Notes[MAX_TRACKS];
-extern CSynth Synthesizer[MAX_TRACKS];//[MAX_POLYPHONY];
+extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
+extern JAZZ_KEY Sub_Channels_Jazz[MAX_TRACKS][MAX_POLYPHONY];
 
 // ------------------------------------------------------
 // Return the instrument associated with the midi program
@@ -147,7 +148,13 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 // Nasty hack with the timing but i have no idea how to handle this correctly
                 if(!is_recording)
                 {
-                    ticks = Get_Frames_Delay() * 16.0f;
+                    // Ticks per minute
+                    float Time_Unit = (BeatsPerMin * TicksPerBeat);
+                    // Ticks per seconds
+                    Time_Unit /= 60.0f;
+                    // Ticks per milliseconds
+                    Time_Unit /= 1000.0f;
+                    ticks = Get_Frames_Delay() * Time_Unit;
                 }
                 else
                 {
@@ -198,6 +205,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
 
                 if(Track_Number > -1)
                 {
+
                     // Channel already allocated (multi notes) ?
                     if(Alloc_midi_Channels[Track_Number] != 0 && Midi_Velocity)
                     {
@@ -213,13 +221,18 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                             *(RawPatterns + xoffseted) = tmp_note;             // Note
                             *(RawPatterns + xoffseted + 1) = ped_patsam;       // Instrument
                             *(RawPatterns + xoffseted + 2) = Midi_Velocity;    // Volume
-                            Sp_Playwave(Track_Number, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE);
+
+                            int Sub_Channel = Get_Free_Sub_Channel(Track_Number);
+                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Note = (Param1 & 0x00ff00) + 0x100;
+                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Channel = Track_Number;
+                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Sub_Channel = Sub_Channel;
+                            Play_Instrument(Track_Number, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE, Track_Number);
                         }
                         else
                         {
                             // (Some devices send "note on" as "note off" with velocity 0)
                             // Search if we know the note
-                            Track_Number = Search_Corresponding_Channel(Param1 + 0x100);
+                            Track_Number = Search_Corresponding_Channel((Param1 & 0x00ff00) + 0x100);
                             // Not found: get the one that was mentioned
                             if(Track_Number == -1)
                             {
@@ -231,9 +244,23 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                             *(RawPatterns + xoffseted + 1) = 0xff;             // no instrument
                             *(RawPatterns + xoffseted + 2) = 0xff;             // no volume
 
-                            Synthesizer[Track_Number].NoteOff();
-                            noteoff303(Track_Number); // 303 Note Off...
-                            if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
+                            LPJAZZ_KEY Channel = Get_Jazz_Key_Off((Param1 & 0x00ff00) + 0x100);
+                            if(Channel)
+                            {
+                                Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
+                                if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
+                                {
+                                    sp_Stage[Channel->Channel][Channel->Sub_Channel] = PLAYING_SAMPLE_NOTEOFF;
+                                }
+                                
+                                // That's a possibility
+                                noteoff303(Channel->Channel);
+
+                                Channel->Note = 0;
+                                Channel->Channel = 0;
+                                Channel->Sub_Channel = 0;
+                            }
+
                             Midi_NoteOff(Track_Number);
                         }
                     }
@@ -300,7 +327,12 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                         if(Midi_Velocity)
                         {
                             Alloc_midi_Channels[Track_Number] = (Param1 & 0x00ff00) + 0x100;
-                            Sp_Playwave(Track_Number, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE);
+                            int Chan = ped_track;
+                            int Sub_Channel = Get_Free_Sub_Channel(Chan);
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Note = (Param1 & 0x00ff00) + 0x100;
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Track_Number;
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Sub_Channel = Sub_Channel;
+                            Play_Instrument(Chan, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE, Track_Number);
                         }
                         else
                         {
@@ -314,9 +346,23 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                             }
                             Alloc_midi_Channels[Track_Number] = 0;
 
-                            Synthesizer[Track_Number].NoteOff();
-                            noteoff303(Track_Number);
-                            if(sp_Stage[Track_Number]) sp_Stage[Track_Number] = PLAYING_SAMPLE_NOTEOFF;
+                            LPJAZZ_KEY Channel = Get_Jazz_Key_Off((Param1 & 0x00ff00) + 0x100);
+                            if(Channel)
+                            {
+                                Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
+                                if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
+                                {
+                                    sp_Stage[Channel->Channel][Channel->Sub_Channel] = PLAYING_SAMPLE_NOTEOFF;
+                                }
+                                
+                                // That's a possibility
+                                noteoff303(Channel->Channel);
+
+                                Channel->Note = 0;
+                                Channel->Channel = 0;
+                                Channel->Sub_Channel = 0;
+                            }
+
                             Midi_NoteOff(Track_Number);
                         }
                     }

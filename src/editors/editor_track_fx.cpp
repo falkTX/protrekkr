@@ -45,7 +45,7 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_AMOUNT[ped_track] > 1.0f) FLANGER_AMOUNT[ped_track] = 1.0f;
             if(FLANGER_AMOUNT[ped_track] < -1.0f) FLANGER_AMOUNT[ped_track] = -1.0f;
-            Realslider(298, 479, 64 + f2i(FLANGER_AMOUNT[ped_track] * 64.0f), TRUE);
+            Realslider(298, 479, 64 + (int) (FLANGER_AMOUNT[ped_track] * 64.0f), TRUE);
             outlong(448, 479, long(FLANGER_AMOUNT[ped_track] * 100.0f), 1);
         }
 
@@ -53,7 +53,7 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_FEEDBACK[ped_track] > 1.0f) FLANGER_FEEDBACK[ped_track] = 1.0f;
             if(FLANGER_FEEDBACK[ped_track] < -1.0f) FLANGER_FEEDBACK[ped_track] = -1.0f;
-            Realslider(298, 533, 64 + f2i(FLANGER_FEEDBACK[ped_track] * 64.0f), TRUE);
+            Realslider(298, 533, 64 + (int) (FLANGER_FEEDBACK[ped_track] * 64.0f), TRUE);
             outlong(448, 533, long(FLANGER_FEEDBACK[ped_track] * 100.0f), 1);
         }
 
@@ -61,15 +61,15 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_DEPHASE[ped_track] > 3.1415927f) FLANGER_DEPHASE[ped_track] = 3.1415927f;
             if(FLANGER_DEPHASE[ped_track] < 0.0f) FLANGER_DEPHASE[ped_track] = 0.0f;
-            Realslider2(74, 544, f2i(FLANGER_DEPHASE[ped_track] * 20.371833f), TRUE);
-            outlong(159, 544, f2i(FLANGER_DEPHASE[ped_track] * 57.29578f), 6);
+            Realslider2(74, 544, (int) (FLANGER_DEPHASE[ped_track] * 20.371833f), TRUE);
+            outlong(159, 544, (int) (FLANGER_DEPHASE[ped_track] * 57.29578f), 6);
         }
 
         if(gode == 0 || gode == 5)
         {
             if(FLANGER_RATE[ped_track] < 0.000001f) FLANGER_RATE[ped_track] = 0.000001f;
             if(FLANGER_RATE[ped_track] > 0.0001363f) FLANGER_RATE[ped_track] = 0.0001363f;
-            Realslider(298, 497, f2i(FLANGER_RATE[ped_track] * 939104.92f), TRUE);
+            Realslider(298, 497, (int) (FLANGER_RATE[ped_track] * 939104.92f), TRUE);
             outlong(448, 497, long(0.1424758f / FLANGER_RATE[ped_track]), 2);
         }
 
@@ -77,15 +77,15 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_AMPL[ped_track] > 0.01f) FLANGER_AMPL[ped_track] = 0.01f;
             if(FLANGER_AMPL[ped_track] < 0.0f) FLANGER_AMPL[ped_track] = 0.0f;
-            Realslider(298, 515, f2i(FLANGER_AMPL[ped_track] * 12800.0f), TRUE);
-            outlong(448, 515, f2i(FLANGER_AMPL[ped_track] * 10000.0f), 1);
+            Realslider(298, 515, (int) (FLANGER_AMPL[ped_track] * 12800.0f), TRUE);
+            outlong(448, 515, (int) (FLANGER_AMPL[ped_track] * 10000.0f), 1);
         }
 
         if(gode == 0 || gode == 2)
         {
             if(LFO_RATE[ped_track] < 0.0001f) LFO_RATE[ped_track] = 0.0001f;
             if(LFO_RATE[ped_track] > 0.0078125f) LFO_RATE[ped_track] = 0.0078125f;
-            Realslider(74, 490, f2i(LFO_RATE[ped_track] * 16384.0f), TRUE);
+            Realslider(74, 490, (int) (LFO_RATE[ped_track] * 16384.0f), TRUE);
             float tmprate = (8.1632653f / LFO_RATE[ped_track]);
             outlong(76, 526, (long) tmprate, 2);
             tmprate = 1000.0f / tmprate;
@@ -96,7 +96,7 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(LFO_AMPL[ped_track] < 0) LFO_AMPL[ped_track] = 0;
             if(LFO_AMPL[ped_track] > 128) LFO_AMPL[ped_track] = 128;
-            Realslider(74, 508, f2i(LFO_AMPL[ped_track]), TRUE);
+            Realslider(74, 508, (int) (LFO_AMPL[ped_track]), TRUE);
         }
 
         if(gode == 0 || gode == 9)

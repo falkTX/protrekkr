@@ -11,10 +11,10 @@
 
 // ------------------------------------------------------
 // Variables
-extern s_access sp_Position[MAX_TRACKS];
-extern s_access sp_Position_osc1[MAX_TRACKS];
-extern s_access sp_Position_osc2[MAX_TRACKS];
-extern s_access sp_Position_osc3[MAX_TRACKS];
+extern s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
+extern s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
+extern s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
+extern s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
 
 Uint32 axswave = 0;
 
@@ -245,10 +245,7 @@ void Draw_Sampled_Wave2(void)
     Uint32 sed_real_range_start;
     Uint32 sed_real_range_end;
     Uint32 pos_in_sample;
-
-    pos_in_sample = sp_Position[ped_track].half.first;
-    //if(Synthesizer[ped_track].OSC1_WAVEFORM == 5) pos_in_sample = sp_Position_osc1[ped_track].half.first;
-    //if(Synthesizer[ped_track].OSC2_WAVEFORM == 5) pos_in_sample = sp_Position_osc2[ped_track].half.first;
+    int i;
 
     if(draw_sampled_wave2)
     {
@@ -259,6 +256,18 @@ void Draw_Sampled_Wave2(void)
             int s_ey2 = s_ey + ((resty / strober) * 2);
             int rcolor3;
             int rcolor4;
+
+            pos_in_sample = 0;
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                if(sp_Position[ped_track][i].half.first > pos_in_sample)
+                {
+                    if(sp_Stage[ped_track][i] == PLAYING_SAMPLE)
+                    {
+                        pos_in_sample = sp_Position[ped_track][i].half.first;
+                    }
+                }
+            }
 
             sed_real_range_start = sed_range_start;
             sed_real_range_end = sed_range_end;

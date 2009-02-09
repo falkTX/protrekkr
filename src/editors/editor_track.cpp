@@ -69,7 +69,7 @@ void Actualize_Track_Ed(char gode)
         {
             if(ICut[ped_track] > 0.0078125f) ICut[ped_track] = 0.0078125f;
             if(ICut[ped_track] < 0.00006103515625f) ICut[ped_track] = 0.00006103515625f;
-            Realslider(77, 538, f2i(ICut[ped_track] * 16384.0f), TRUE);
+            Realslider(77, 538, (int) (ICut[ped_track] * 16384.0f), TRUE);
         }
 
         if(gode == 0 || gode == 4)
@@ -140,20 +140,20 @@ void Actualize_Track_Ed(char gode)
             if(TPan[ped_track] < 0.0f) TPan[ped_track] = 0.0f;
             if(TPan[ped_track] > 1.0f) TPan[ped_track] = 1.0f;
             ComputeStereo(ped_track);
-            Realslider(308, 538, f2i(TPan[ped_track] * 127.0f), TRUE);
+            Realslider(308, 538, (int) (TPan[ped_track] * 127.0f), TRUE);
         }
 
         if(gode == 0 || gode == 10)
         {
-            if(TRACKSTATE[ped_track]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED);
+            if(CHAN_MUTE_STATE[ped_track]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED);
             else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL);
         }
 
         if(gode == 0 || gode == 11)
         {
-            if(TRACKMIDICHANNEL[ped_track] > 15) TRACKMIDICHANNEL[ped_track] = 0;
-            if(TRACKMIDICHANNEL[ped_track] < 0) TRACKMIDICHANNEL[ped_track] = 15;
-            Gui_Draw_Arrows_Number_Box2(570, 530, TRACKMIDICHANNEL[ped_track] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(CHAN_MIDI_PRG[ped_track] > 15) CHAN_MIDI_PRG[ped_track] = 0;
+            if(CHAN_MIDI_PRG[ped_track] < 0) CHAN_MIDI_PRG[ped_track] = 15;
+            Gui_Draw_Arrows_Number_Box2(570, 530, CHAN_MIDI_PRG[ped_track] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 12)
@@ -201,7 +201,7 @@ void Mouse_Left_Track_Ed(void)
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
-        }  
+        }
         if(zcheckMouse(570, 486, 16, 16))
         {
             CSend[ped_track]--;
@@ -213,39 +213,39 @@ void Mouse_Left_Track_Ed(void)
             CSend[ped_track]++;
             teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-        }  
+        }
 
         if(zcheckMouse(456, 484, 40, 16))
         {
             DThreshold[ped_track] = DClamp[ped_track];
             teac = 7;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-        }  
+        }
         if(zcheckMouse(456, 502, 40, 16))
         {
             DClamp[ped_track] = DThreshold[ped_track];
             teac = 8;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-        }  
+        }
         if(zcheckMouse(456, 538, 40, 16))
         {
             TPan[ped_track] = 0.5f;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 9;
-        }  
+        }
 
         if(zcheckMouse(570, 530, 16, 16))
         {
-            TRACKMIDICHANNEL[ped_track]--;
+            CHAN_MIDI_PRG[ped_track]--;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 11;
-        }  
+        }
         if(zcheckMouse(614, 530, 16, 16))
         {
-            TRACKMIDICHANNEL[ped_track]++;
+            CHAN_MIDI_PRG[ped_track]++;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 11;
-        }  
+        }
 
         // Mute track
         if(zcheckMouse(570, 548, 60, 16))
@@ -257,37 +257,37 @@ void Mouse_Left_Track_Ed(void)
 
         if(zcheckMouse(508, 512, 64, 16))
         {
-            if(TRACKSTATE[ped_track] == 0) TRACKSTATE[ped_track] = 1;
-            else TRACKSTATE[ped_track] = 0;
+            if(CHAN_MUTE_STATE[ped_track] == 0) CHAN_MUTE_STATE[ped_track] = 1;
+            else CHAN_MUTE_STATE[ped_track] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 10;
             trkchan = TRUE;
-        }  
+        }
 
         // Solo track
         if(zcheckMouse(508, 530, 64, 16))
         {
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
-                TRACKSTATE[solify] = 1;
+                CHAN_MUTE_STATE[solify] = 1;
             }
-            TRACKSTATE[ped_track] = 0;
+            CHAN_MUTE_STATE[ped_track] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
             teac = 10;
-        }  
+        }
 
         // Unmute all tracks
         if(zcheckMouse(508, 548, 88, 16))
         {
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
-                TRACKSTATE[solify] = 0;
+                CHAN_MUTE_STATE[solify] = 0;
             }
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
             teac = 10;
-        }  
+        }
     } // Userscreen 1
 }
 
@@ -304,7 +304,7 @@ void Mouse_Right_Track_Ed(void)
         {
             CSend[ped_track] += 16;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-        }  
+        }
 
         if(zcheckMouse(77, 520, 16, 16) && FType[ped_track] > 0)
         {

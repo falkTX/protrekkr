@@ -114,8 +114,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(SampleVol[ped_patsam][ped_split] > 4.0f) SampleVol[ped_patsam][ped_split] = 4.0f;
                     if(SampleVol[ped_patsam][ped_split] < 0) SampleVol[ped_patsam][ped_split] = 0;
-                    Realslider(426, 538, f2i(SampleVol[ped_patsam][ped_split] * 32.0f), Allow_Sliders);
-                    outlong_small(575, 538, f2i(SampleVol[ped_patsam][ped_split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
+                    Realslider(426, 538, (int) (SampleVol[ped_patsam][ped_split] * 32.0f), Allow_Sliders);
+                    outlong_small(575, 538, (int) (SampleVol[ped_patsam][ped_split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
                 }
 
                 if(gode == 0 || gode == 2)
@@ -137,8 +137,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(FDecay[ped_patsam][ped_split] > 0.015625f) FDecay[ped_patsam][ped_split] = 0.015625f;
                     if(FDecay[ped_patsam][ped_split] < 0.0f) FDecay[ped_patsam][ped_split] = 0.0f;
-                    Realslider(52, 528, f2i(FDecay[ped_patsam][ped_split] * 8192.0f), Allow_Sliders);
-                    outlong(201, 528, f2i(FDecay[ped_patsam][ped_split] * 8192.0f), 0);
+                    Realslider(52, 528, (int) (FDecay[ped_patsam][ped_split] * 8192.0f), Allow_Sliders);
+                    outlong(201, 528, (int) (FDecay[ped_patsam][ped_split] * 8192.0f), 0);
                 }
 
                 char temprout[256];
@@ -328,8 +328,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(CustomVol[ped_patsam] > 1.0f) CustomVol[ped_patsam] = 1.0f;
                     if(CustomVol[ped_patsam] < 0.0f) CustomVol[ped_patsam] = 0.0f;
-                    Realslider(52, 546, f2i(CustomVol[ped_patsam] * 128.0f), Allow_Global_Sliders);
-                    outlong(201, 546, f2i(CustomVol[ped_patsam] * 100.0f), 1);
+                    Realslider(52, 546, (int) (CustomVol[ped_patsam] * 128.0f), Allow_Global_Sliders);
+                    outlong(201, 546, (int) (CustomVol[ped_patsam] * 100.0f), 1);
                 }
 
                 if(gode == 0 || gode == 16)

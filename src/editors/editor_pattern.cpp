@@ -285,10 +285,10 @@ void draw_pated(int track, int line, int petrack, int row)
         bjbox(29 + color, 187, 52, 7);
 
         // On / off
-        if(SACTIVE[Cur_Position][track + liner]) Letter(120 + color, 187, 23, 0, 0);
+        if(CHAN_ACTIVE_STATE[Cur_Position][track + liner]) Letter(120 + color, 187, 23, 0, 0);
         else Letter(120 + color, 187, 24, 0, 0);
 
-        if(TRACKSTATE[track + liner]) Letter(91 + color, 187, 25, 0, 0);
+        if(CHAN_MUTE_STATE[track + liner]) Letter(91 + color, 187, 25, 0, 0);
         else Letter(91 + color, 187, 26, 0, 0);
 
         Letter(82 + color, 187, liner + track, 0, 7);

@@ -56,6 +56,15 @@ extern list <skin_file> skin_files;
 extern SDL_Surface *POINTER;
 
 // ------------------------------------------------------
+// Structures
+typedef struct
+{
+    int Channel;
+    int Sub_Channel;
+    int Note;
+} JAZZ_KEY, *LPJAZZ_KEY;
+
+// ------------------------------------------------------
 // Variables
 extern SDL_Surface *Main_Screen;
 extern MOUSE Mouse;
@@ -89,5 +98,6 @@ void Destroy_Context(void);
 int Screen_Update(void);
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
 SDL_Surface *Load_Skin_Picture(char *name);
+LPJAZZ_KEY Get_Jazz_Key_Off(int Note);
 
 #endif

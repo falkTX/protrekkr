@@ -1,5 +1,8 @@
 TODO:
 
+	See to re-introduce the volume cross fading.
+	Each channel should have it's own polyphony amount
+----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating systems.
  - Create a decent gadgets system (events based).
@@ -23,7 +26,6 @@ TODO:
  - Click on numbers & move the mouse to modify them (or use the wheel).
  - More shortcuts.
  - Small / big fonts for patterns.
- - Channels polyphony.
  - Alternate way to enter notes (a la fruity loops).
  
  - Use more xml scripting to completely customize the interface.

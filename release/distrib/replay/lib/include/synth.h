@@ -150,7 +150,7 @@ struct SynthParameters
 
 // ------------------------------------------------------
 // Variables
-extern long SamplesPerTick;
+extern int SamplesPerTick;
 
 /* Sine float-precalculated table, in absolute degrees. */
 extern float SIN[360];
@@ -433,7 +433,6 @@ class rFilter
 
 // ------------------------------------------------------
 // Functions
-int f2i(float d);
 void Initreverb();
 
 #endif

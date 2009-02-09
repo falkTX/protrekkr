@@ -677,6 +677,8 @@ void LoadMod(char *FileName)
     int New_adsr = FALSE;
     int New_Comp = FALSE;
     int Portable = FALSE;
+    int Poly = FALSE;
+
     char Comp_Flag;
 
     int i;
@@ -717,6 +719,8 @@ void LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'B':
+                Poly = TRUE;
             case 'A':
                 Portable = TRUE;
             case '9':
@@ -1190,6 +1194,9 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+
+                Channels_Polyphony = 8;
+                if(Poly) Read_Mod_Data(&Channels_Polyphony, sizeof(char), 1, in);
             }
             else
             {
@@ -1244,6 +1251,9 @@ Read_Mod_File:
                 Read_Mod_Data(&lchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data(&shuffle, sizeof(int), 1, in);
+
+                Channels_Polyphony = 8;
+                if(Poly) Read_Mod_Data(&Channels_Polyphony, sizeof(char), 1, in);
             }
 
             // Reading track part sequence
@@ -1254,8 +1264,8 @@ Read_Mod_File:
                 {
                     for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
                     {
-                        Read_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
-                        SHISTORY[tps_pos][tps_trk] = FALSE;
+                        Read_Mod_Data(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char), 1, in);
+                        CHAN_HISTORY_STATE[tps_pos][tps_trk] = FALSE;
                     }
                 }
             }
@@ -1266,16 +1276,16 @@ Read_Mod_File:
                 {
                     for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
                     {
-                        SACTIVE[tps_pos][tps_trk] = TRUE;
-                        SHISTORY[tps_pos][tps_trk] = FALSE;
+                        CHAN_ACTIVE_STATE[tps_pos][tps_trk] = TRUE;
+                        CHAN_HISTORY_STATE[tps_pos][tps_trk] = FALSE;
                     }
                 }
                 for(tps_pos = 0; tps_pos < sLength; tps_pos++)
                 {
                     for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
                     {
-                        Read_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
-                        SHISTORY[tps_pos][tps_trk] = FALSE;
+                        Read_Mod_Data(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char), 1, in);
+                        CHAN_HISTORY_STATE[tps_pos][tps_trk] = FALSE;
                     }
                 }
             }
@@ -1289,7 +1299,7 @@ Read_Mod_File:
             {
                 for(twrite = 0; twrite < Songtracks; twrite++)
                 {
-                    Read_Mod_Data_Swap(&TRACKMIDICHANNEL[twrite], sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&CHAN_MIDI_PRG[twrite], sizeof(int), 1, in);
                 }
             }
 
@@ -1352,7 +1362,7 @@ Read_Mod_File:
 
                 for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
                 {
-                    Read_Mod_Data_Swap(&TRACKSTATE[tps_trk], sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&CHAN_MUTE_STATE[tps_trk], sizeof(int), 1, in);
                 }
                 Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
                 for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
@@ -2016,7 +2026,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     // Check which tracks are muted
     for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
     {
-        if(TRACKSTATE[tps_trk])
+        if(CHAN_MUTE_STATE[tps_trk])
         {
             Muted_Tracks[nbr_muted] = tps_trk;
             nbr_muted++;
@@ -2506,7 +2516,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Write_Mod_Data(&nbr_User_Instr, sizeof(int), 1, in);
 
     // Writing sample data
-    // TODO: check Synthprg to determine the real waves used
     for(i = 0; i < 128; i++)
     {
         // Check if it was used at pattern level
@@ -2919,7 +2928,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         {
             if(!Track_Is_Muted(tps_trk))
             {
-                Write_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
+                Write_Mod_Data(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char), 1, in);
             }
         }
     }
@@ -3205,13 +3214,13 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
                 {
-                    Write_Mod_Data(&SACTIVE[tps_pos][tps_trk], sizeof(char), 1, in);
+                    Write_Mod_Data(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char), 1, in);
                 }
             }
 
             for(twrite = 0; twrite < MAX_TRACKS; twrite++)
             {
-                Write_Mod_Data_Swap(&TRACKMIDICHANNEL[twrite], sizeof(int), 1, in);
+                Write_Mod_Data_Swap(&CHAN_MIDI_PRG[twrite], sizeof(int), 1, in);
             }
 
             for(twrite = 0; twrite < MAX_TRACKS; twrite++)
@@ -3237,7 +3246,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
             {
-                Write_Mod_Data_Swap(&TRACKSTATE[tps_trk], sizeof(int), 1, in);
+                Write_Mod_Data_Swap(&CHAN_MUTE_STATE[tps_trk], sizeof(int), 1, in);
             }
             Write_Mod_Data(&Songtracks, sizeof(char), 1, in);
 
@@ -3790,7 +3799,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGA");
+        sprintf(extension, "TWNNSNGB");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
         fclose(output);

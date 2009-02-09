@@ -16,7 +16,7 @@
 
 // ------------------------------------------------------
 // Variables
-long SamplesPerTick;
+int SamplesPerTick;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int BeatsPerMin = 125;
@@ -35,11 +35,11 @@ long SamplesPerTick;
     float FADECOEF[MAX_TRACKS];
 #endif
 
-CSynth Synthesizer[MAX_TRACKS];//[MAX_POLYPHONY];
+CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 float Player_FD[MAX_TRACKS];
-char sp_channelsample[MAX_TRACKS];
-char sp_split[MAX_TRACKS];
-int TRACKSTATE[MAX_TRACKS];   // 0->Normal 1->Muted
+char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
+char sp_split[MAX_TRACKS][MAX_POLYPHONY];
+int CHAN_MUTE_STATE[MAX_TRACKS];   // 0->Normal 1->Muted
 float oldspawn[MAX_TRACKS];
 float roldspawn[MAX_TRACKS];
 char LFO_ON[MAX_TRACKS];
@@ -57,7 +57,7 @@ char FLANGER_ON[MAX_TRACKS];
     float FLANGER_DEPHASE[MAX_TRACKS];
     float FLANGER_RATE[MAX_TRACKS];
     float FLANGER_AMPL[MAX_TRACKS];
-    float FLANGER_GR[MAX_TRACKS];//[MAX_POLYPHONY];
+    float FLANGER_GR[MAX_TRACKS];
     float FLANGER_FEEDBACK[MAX_TRACKS];
     int FLANGER_DELAY[MAX_TRACKS];
     int FLANGER_OFFSET[MAX_TRACKS];
@@ -67,11 +67,11 @@ char FLANGER_ON[MAX_TRACKS];
     float FLANGE_RIGHTBUFFER[MAX_TRACKS][16400];
 #endif
 
-float sp_Cvol[MAX_TRACKS];
-float sp_Tvol[MAX_TRACKS];
+float sp_Cvol[MAX_TRACKS][MAX_POLYPHONY];
+float sp_Tvol[MAX_TRACKS][MAX_POLYPHONY];
 float DSend[MAX_TRACKS];   
 int CSend[MAX_TRACKS];
-int64 Vstep1[MAX_TRACKS];
+int64 Vstep1[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_FX_TRANCEGLIDER)
     int64 glidestep[MAX_TRACKS];
@@ -80,12 +80,12 @@ int64 Vstep1[MAX_TRACKS];
 float TPan[MAX_TRACKS];
 int old_note[MAX_TRACKS];
 
-s_access sp_Position[MAX_TRACKS];
-s_access sp_Position_osc1[MAX_TRACKS];
-s_access sp_Position_osc2[MAX_TRACKS];
+s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
+s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
+s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH_OSC3)
-    s_access sp_Position_osc3[MAX_TRACKS];
+    s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
 float CCut[MAX_TRACKS];
@@ -156,6 +156,8 @@ int Subicounter;
     char Songtracks;
 #endif
 
+char Channels_Polyphony = 8;
+
 int ped_line;
 unsigned char pSequence[256];
 int cPosition;
@@ -189,9 +191,9 @@ int shuffleswitch;
 #endif
 
 #if defined(PTK_FX_ARPEGGIO)
-    int64 Vstep_arp[MAX_TRACKS];
+    int64 Vstep_arp[MAX_TRACKS][MAX_POLYPHONY];
     int Arpeggio_Switch[MAX_TRACKS];
-    float Arpeggio_BaseNote[MAX_TRACKS];
+    float Arpeggio_BaseNote[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
 int repeat_loop_pos;
@@ -200,23 +202,24 @@ int repeat_loop_counter;
 
 short patternLines[128];
 char grown;
-float currsignal;
-float currsignal2;
-unsigned int res_dec;
+float Curr_Signal_L[MAX_POLYPHONY];
+float Curr_Signal_R[MAX_POLYPHONY];
+float All_Signal_L;
+float All_Signal_R;
 unsigned int Current_Pointer;
 
-char Synth_Was[MAX_TRACKS];//[MAX_POLYPHONY];
-short *Player_WL[MAX_TRACKS];//[MAX_POLYPHONY];
-short *Player_WR[MAX_TRACKS];//[MAX_POLYPHONY];
-unsigned int Rns[MAX_TRACKS];//[MAX_POLYPHONY];
-float Player_SV[MAX_TRACKS];//[MAX_POLYPHONY];
-char Player_SC[MAX_TRACKS];//[MAX_POLYPHONY];
-char Player_LT[MAX_TRACKS];//[MAX_POLYPHONY];
-char Player_LW[MAX_TRACKS];//[MAX_POLYPHONY];
-unsigned int Player_LS[MAX_TRACKS];//[MAX_POLYPHONY];
-unsigned int Player_LE[MAX_TRACKS];//[MAX_POLYPHONY];
-unsigned int Player_LL[MAX_TRACKS];//[MAX_POLYPHONY];
-unsigned int Player_NS[MAX_TRACKS];//[MAX_POLYPHONY];
+char Synth_Was[MAX_TRACKS][MAX_POLYPHONY];
+short *Player_WL[MAX_TRACKS][MAX_POLYPHONY];
+short *Player_WR[MAX_TRACKS][MAX_POLYPHONY];
+unsigned int Rns[MAX_TRACKS][MAX_POLYPHONY];
+float Player_SV[MAX_TRACKS][MAX_POLYPHONY];
+char Player_SC[MAX_TRACKS][MAX_POLYPHONY];
+char Player_LT[MAX_TRACKS][MAX_POLYPHONY];
+char Player_LW[MAX_TRACKS][MAX_POLYPHONY];
+unsigned int Player_LS[MAX_TRACKS][MAX_POLYPHONY];
+unsigned int Player_LE[MAX_TRACKS][MAX_POLYPHONY];
+unsigned int Player_LL[MAX_TRACKS][MAX_POLYPHONY];
+unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_LIMITER)
     #define MAS_COMPRESSOR_SECONDS 0.1f
@@ -234,14 +237,14 @@ unsigned int Player_NS[MAX_TRACKS];//[MAX_POLYPHONY];
     float mas_ratio;
 #endif
 
-char SACTIVE[256][MAX_TRACKS];
+char CHAN_ACTIVE_STATE[256][MAX_TRACKS];
 
 #if !defined(__STAND_ALONE__)
-    char SHISTORY[256][MAX_TRACKS];
+    char CHAN_HISTORY_STATE[256][MAX_TRACKS];
 #endif
 
 int gco;
-float ramper[MAX_TRACKS];//[MAX_POLYPHONY];
+float ramper[MAX_TRACKS];
 char Basenote[128][16];
 char SampleType[128][16];
 char Finetune[128][16];
@@ -253,7 +256,7 @@ Uint32 LoopEnd[128][16];
 Uint32 SampleNumSamples[128][16];
 char beatsync[128];
 short beatlines[128];
-int64 sp_Step[MAX_TRACKS];//[MAX_POLYPHONY];
+int64 sp_Step[MAX_TRACKS][MAX_POLYPHONY];
 float SampleVol[128][16];
 char SampleChannels[128][16];
 float FDecay[128][16];
@@ -329,9 +332,9 @@ char compressor;
     float REVERBFILTER;
 #endif
 
-int sp_Stage[MAX_TRACKS];//[MAX_POLYPHONY];
-int sp_Stage2[MAX_TRACKS];//[MAX_POLYPHONY];
-int sp_Stage3[MAX_TRACKS];//[MAX_POLYPHONY];
+int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
+int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
 char SampleCompression[128];
 int delay_time;
 int DelayType;
@@ -343,16 +346,10 @@ int DelayType;
     float Flanger_sbuf1R;
 #endif
 
-int new_instrument[MAX_TRACKS];//[MAX_POLYPHONY];
-int Pos_Segue[MAX_TRACKS];
-float segue_volume[MAX_TRACKS];
-float Segue_SamplesL[MAX_TRACKS];
-float Segue_SamplesR[MAX_TRACKS];
-
 #if !defined(__STAND_ALONE__)
     int L_MaxLevel;
     int R_MaxLevel;
-    extern int TRACKMIDICHANNEL[MAX_TRACKS];
+    extern int CHAN_MIDI_PRG[MAX_TRACKS];
     float Scope_Dats[MAX_TRACKS][128];
     float Scope_Dats_LeftRight[2][128];
     int Cscope[MAX_TRACKS];
@@ -412,7 +409,6 @@ float filterDelta(char ch, float input, float f, float q);
 float int_filter2p(char ch, float input, float f, float q, float q2);
 float filterhp(char ch, float input, float f, float q);
 float filterhp2(char ch, float input, float f, float q);
-int f2i(float d);
 
 #if defined(PTK_303)
     void live303(int pltr_eff_row, int pltr_dat_row);
@@ -473,8 +469,8 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             left_float *= 32767.0f;
             right_float *= 32767.0f;
 
-            left_value = f2i(left_float);
-            right_value = f2i(right_float);
+            left_value = (int) (left_float);
+            right_value = (int) (right_float);
 #else
 
             *pSamples++ = left_value;
@@ -911,12 +907,14 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&rchorus_feedback, sizeof(float));
         Mod_Dat_Read(&shuffle, sizeof(int));
 
+        Mod_Dat_Read(&Channels_Polyphony, sizeof(char));
+
         // Reading track part sequence
         for(int tps_pos = 0; tps_pos < sLength; tps_pos++)
         {
             for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
             {
-                Mod_Dat_Read(&SACTIVE[tps_pos][tps_trk], sizeof(char));
+                Mod_Dat_Read(&CHAN_ACTIVE_STATE[tps_pos][tps_trk], sizeof(char));
             }
         }
 
@@ -1069,7 +1067,7 @@ void PTKEXPORT Ptk_Play(void)
     {
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            SHISTORY[j][i] = FALSE;
+            CHAN_HISTORY_STATE[j][i] = FALSE;
         }
     }
 #endif
@@ -1094,13 +1092,12 @@ void PTKEXPORT Ptk_Stop(void)
 
     for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
     {
-    //  for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++) {
-        sp_Stage[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
-        sp_Stage2[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
-        sp_Stage3[stopper]/*[stopper_poly]*/ = PLAYING_NOSAMPLE;
-        Synthesizer[stopper]/*[stopper_poly]*/.NoteOff();
-        sp_channelsample[stopper] = -1;
-    //}
+        for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++)
+        {
+            Synthesizer[stopper][stopper_poly].NoteOff();
+            if(sp_Stage[stopper][stopper_poly] == PLAYING_SAMPLE) sp_Stage[stopper][stopper_poly] = PLAYING_SAMPLE_NOTEOFF;
+            sp_channelsample[stopper][stopper_poly] = -1;
+        }
     }
 }
 
@@ -1125,22 +1122,56 @@ void Pre_Song_Init(void)
 
 #if defined(PTK_FX_ARPEGGIO)
         Arpeggio_Switch[ini] = 0;
-        Arpeggio_BaseNote[ini] = 0;
-        Vstep_arp[ini] = 0;
 #endif
 
-        Synth_Was[ini] = 0;
-        Player_WL[ini] = 0;
-        Player_WR[ini] = 0;
-        Rns[ini] = 0;
-        Player_SV[ini] = 0;
-        Player_SC[ini] = 0;
-        Player_LT[ini] = 0;
-        Player_LW[ini] = 0;
-        Player_LS[ini] = 0;
-        Player_LE[ini] = 0;
-        Player_LL[ini] = 0;
-        Player_NS[ini] = 0;
+        for(i = 0; i < MAX_POLYPHONY; i++)
+        {
+
+#if defined(PTK_FX_ARPEGGIO)
+            Arpeggio_BaseNote[ini][i] = 0;
+#endif
+
+            Vstep_arp[ini][i] = 0;
+
+            Synth_Was[ini][i] = 0;
+            Player_WL[ini][i] = 0;
+            Player_WR[ini][i] = 0;
+            Rns[ini][i] = 0;
+            Player_SV[ini][i] = 0;
+            Player_SC[ini][i] = 0;
+            Player_LT[ini][i] = 0;
+            Player_LW[ini][i] = 0;
+            Player_LS[ini][i] = 0;
+            Player_LE[ini][i] = 0;
+            Player_LL[ini][i] = 0;
+            Player_NS[ini][i] = 0;
+            Synthesizer[ini][i].Reset();
+
+            sp_Step[ini][i] = 0;
+            sp_Stage[ini][i] = 0;
+            sp_Stage2[ini][i] = 0;
+            sp_Stage3[ini][i] = 0;
+
+            sp_Position[ini][i].absolu = 0;
+            sp_Position_osc1[ini][i].absolu = 0;
+            sp_Position_osc2[ini][i].absolu = 0;
+
+#if defined(PTK_SYNTH_OSC3)
+            sp_Position_osc3[ini][i].absolu = 0;
+#endif
+
+            Vstep1[ini][i] = 0;
+
+            sp_Cvol[ini][i] = 0.0f;
+
+            sp_channelsample[ini][i] = -1;
+            sp_split[ini][i] = 0;
+
+            sp_Tvol[ini][i] = 0.0f;
+        
+        }
+
+        Player_FD[ini] = 0.0f;
 
 #if defined(PTK_FX_AUTOFADEMODE)
         FADEMODE[ini] = 0;
@@ -1148,26 +1179,12 @@ void Pre_Song_Init(void)
 #endif
 
         old_note[ini] = 0;
-        Synthesizer[ini]/*[poly]*/.Reset();
-        
-        sp_Position[ini].absolu = 0;
-        sp_Position_osc1[ini].absolu = 0;
-        sp_Position_osc2[ini].absolu = 0;
-
-#if defined(PTK_SYNTH_OSC3)
-        sp_Position_osc3[ini].absolu = 0;
-#endif
-        
-        Player_FD[ini] = 0.0f;
 
         ResetFilters(ini);
 
-        sp_channelsample[ini] = -1;
-        sp_split[ini] = 0;
-
 #if !defined(__STAND_ALONE__)
-        TRACKMIDICHANNEL[ini] = ini;
-        TRACKSTATE[ini] = 0;
+        CHAN_MIDI_PRG[ini] = ini;
+        CHAN_MUTE_STATE[ini] = 0;
 #endif
 
         oldspawn[ini] = 0;
@@ -1202,11 +1219,6 @@ void Pre_Song_Init(void)
         Disclap[ini] = 0;
 #endif
 
-        sp_Step[ini] = 0;
-        sp_Stage[ini] = 0;
-        sp_Stage2[ini] = 0;
-        sp_Stage3[ini] = 0;
-
         ramper[ini] = 0;
 
 #if defined(PTK_FLANGER)
@@ -1219,29 +1231,17 @@ void Pre_Song_Init(void)
         }
 #endif
 
-        sp_Cvol[ini] = 0.0f;
-        sp_Tvol[ini] = 0.0f;
-        
 #if !defined(__STAND_ALONE__)
         DSend[ini] = 0;
         CSend[ini] = 0;
 #endif
-
-        Vstep1[ini] = 0;
 
 #if defined(PTK_FX_TRANCEGLIDER)
         glidestep[ini] = 0;
 #endif
 
         CCut[ini] = 126.0f;
-
-        new_instrument[ini] = 0;
-        Pos_Segue[ini] = 0;
-        segue_volume[ini] = 0;
-        Segue_SamplesL[ini] = 0;
-        Segue_SamplesR[ini] = 0;
     }
-
 
 #if defined(PTK_FLANGER)
     Flanger_sbuf0L = 0;
@@ -1327,6 +1327,9 @@ void Pre_Song_Init(void)
 // Init the replayer datas
 void Post_Song_Init(void)
 {
+    int i;
+    int j;
+
     allPassInit((float) c_threshold);
 
 #if defined(PTK_SHUFFLE)
@@ -1339,11 +1342,15 @@ void Post_Song_Init(void)
     repeat_loop_counter = -1;
 
 #if defined(PTK_FX_ARPEGGIO)
-    for(int i = 0; i < MAX_TRACKS; i++)
+    for(i = 0; i < MAX_TRACKS; i++)
     {
         Arpeggio_Switch[i] = 0;
-        Arpeggio_BaseNote[i] = 0;
-        Vstep_arp[i] = 0;
+        
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            Arpeggio_BaseNote[i][j] = 0;
+            Vstep_arp[i][j] = 0;
+        }
     }
 #endif
 
@@ -1386,6 +1393,7 @@ void Post_Song_Init(void)
 void Sp_Player(void)
 {
     unsigned int Old_Pointer;
+    unsigned int res_dec;
 
 #if !defined(__STAND_ALONE__)
     int i;
@@ -1426,10 +1434,22 @@ void Sp_Player(void)
                 pl_eff_row2 = *(RawPatterns + efactor2 + 4);
                 pl_dat_row2 = *(RawPatterns + efactor2 + 5);
 
-                if(pl_vol_row <= 64) sp_Tvol[ct] = (float) pl_vol_row * 0.015625f; // Setting volume.
+                if(pl_vol_row <= 64)
+                {
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f; // Setting volume.
+                    }
+                }
 
 #if defined(PTK_FX_SETVOLUME)
-                if(pl_eff_row == 3) sp_Tvol[ct] = (float) pl_dat_row * 0.0039062f; // Setting volume.
+                if(pl_eff_row == 3)
+                {
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        sp_Tvol[ct][i] = (float) pl_dat_row * 0.0039062f; // Setting volume.
+                    }
+                }
 #endif
 
                 if(pl_pan_row <= 128)
@@ -1465,12 +1485,12 @@ void Sp_Player(void)
                 /* MidiController commands */
                 if(pl_pan_row == 144 && c_midiout != -1 && pl_eff_row < 128)
                 {
-                    Midi_Send(176 + TRACKMIDICHANNEL[ct], pl_eff_row, pl_dat_row);
+                    Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row, pl_dat_row);
                 }
 
                 if(pl_eff_row == 128 && c_midiout != -1 && pl_dat_row < 128)
                 {
-                    Midi_Send(176 + TRACKMIDICHANNEL[ct], 0, pl_dat_row);
+                    Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row);
                 }
 #endif
 #endif
@@ -1482,29 +1502,45 @@ void Sp_Player(void)
 
                 if(pl_note < 120)
                 {
-
                     int toffset = 0;
+                    int free_sub_channel;
                     glide = 0;
                     if(pl_eff_row == 9) toffset = pl_dat_row;
                     else if(pl_eff_row == 5) glide = 1;
 
+                    free_sub_channel = Get_Free_Sub_Channel(ct);
                     if(pl_vol_row <= 64 || pl_eff_row == 3)
                     {
-                        Sp_Playwave(ct, (float) pl_note, pl_sample, sp_Tvol[ct], toffset, glide, FALSE);
+                        Play_Instrument(ct, free_sub_channel, (float) pl_note, pl_sample, sp_Tvol[ct][free_sub_channel], toffset, glide, FALSE, ct);
                     }
                     else
                     {
-                        Sp_Playwave(ct, (float) pl_note, pl_sample, CustomVol[pl_sample], toffset, glide, FALSE);
+                        // Use the default sample volume if there's nothing
+                        // in the volume column of no 0x3 fx
+                        Play_Instrument(ct, free_sub_channel, (float) pl_note, pl_sample, CustomVol[pl_sample], toffset, glide, FALSE, ct);
+                    }
+                    // Now remove all other notes on every channel but the one we just started
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        if(free_sub_channel != i)
+                        {
+                            if(sp_Stage[ct][i] == PLAYING_SAMPLE)
+                            {
+                                sp_Stage[ct][i] = PLAYING_SAMPLE_NOTEOFF;
+                            }
+                            Synthesizer[ct][i].NoteOff();
+                        }
                     }
                 }
 
+                // Trigger a note off
                 if(pl_note == 120)
                 {
-                    // Note OFF on track ct
-                    //for(i = 0; i < MAX_POLYPHONY; i++) {
-                    if(sp_Stage[ct]/*[i]*/ == PLAYING_SAMPLE) sp_Stage[ct]/*[i]*/ = PLAYING_SAMPLE_NOTEOFF;
-                    Synthesizer[ct]/*[i]*/.NoteOff();
-                    //}
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        if(sp_Stage[ct][i] == PLAYING_SAMPLE) sp_Stage[ct][i] = PLAYING_SAMPLE_NOTEOFF;
+                        Synthesizer[ct][i].NoteOff();
+                    }
 
 #if defined(PTK_303)
                     noteoff303(ct); // 303 Note Off...
@@ -1585,7 +1621,7 @@ void Sp_Player(void)
 #if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
-                    SHISTORY[cPosition][i] = FALSE;
+                    CHAN_HISTORY_STATE[cPosition][i] = FALSE;
                 }
 #endif
 
@@ -1619,7 +1655,7 @@ void Sp_Player(void)
 #if !defined(__STAND_ALONE__)
                 for(i = 0; i < MAX_TRACKS; i++)
                 {
-                    SHISTORY[cPosition][i] = FALSE;
+                    CHAN_HISTORY_STATE[cPosition][i] = FALSE;
                 }
 #endif
 
@@ -1674,174 +1710,193 @@ void Sp_Player(void)
     for(char c = 0; c < Songtracks; c++)
     {
         grown = FALSE;
-        currsignal = 0;
-        currsignal2 = 0;
         char gotsome = FALSE;
+
+        All_Signal_L = 0;
+        All_Signal_R = 0;
 
         // If wav is selected in the synth we don't play it directly but through the synth.
 
         // -------------------------------------------
 
         // Interpolation algorithm
-        //    for(i = 0; i < MAX_POLYPHONY; i++) {
-        res_dec = sp_Position[c].half.last;
-
-        if(sp_Stage[c] == PLAYING_SAMPLE || sp_Stage[c] == PLAYING_SAMPLE_NOTEOFF)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            if(!Synth_Was[c]) goto ByPass_Wav;
-            if((Synthesizer[c].OSC1_WAVEFORM != 5 && Synthesizer[c].OSC2_WAVEFORM != 5))
+            Curr_Signal_L[i] = 0;
+            Curr_Signal_R[i] = 0;
+
+            if(sp_Stage[c][i] == PLAYING_SAMPLE || sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
             {
+                if(!Synth_Was[c][i]) goto ByPass_Wav;
+                if((Synthesizer[c][i].OSC1_WAVEFORM != 5 && Synthesizer[c][i].OSC2_WAVEFORM != 5))
+                {
 ByPass_Wav:
-                if(sp_Stage[c] == PLAYING_SAMPLE_NOTEOFF)
-                {
-                    // Note Stop
-                    sp_Tvol[c] = 0.0f;
-                    if(sp_Cvol[c] < 0.01f) sp_Stage[c] = PLAYING_NOSAMPLE;
-                }
-
-                if(sp_Cvol[c] > sp_Tvol[c]) sp_Cvol[c] -= 0.005f;
-                else sp_Cvol[c] += 0.005f;
-
-                gotsome = TRUE;
-
-                Current_Pointer = sp_Position[c].half.first;
-    
-                if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
-                else Old_Pointer = 0;
-
-                if(Player_WL[c])
-                {
-                    currsignal = Cubic_Work(
-                                    *(Player_WL[c] + Old_Pointer),
-                                    *(Player_WL[c] + Current_Pointer),
-                                    *(Player_WL[c] + Current_Pointer + 1),
-                                    *(Player_WL[c] + Current_Pointer + 2),
-                                    res_dec, Current_Pointer,
-                                    Rns[c]) * sp_Cvol[c] * Player_SV[c];
-                }
-
-                // Stereo sample
-                if(Player_SC[c] == 2)
-                {
-                    grown = TRUE;
-                    currsignal2 = Cubic_Work(*(Player_WR[c]+ Old_Pointer),
-                                                *(Player_WR[c] + Current_Pointer),
-                                                *(Player_WR[c] + Current_Pointer + 1),
-                                                *(Player_WR[c] + Current_Pointer + 2),
-                                                res_dec, Current_Pointer,
-                                                Rns[c]) * sp_Cvol[c] * Player_SV[c];
-                }
-
-                // End of Interpolation algo
-                if(Player_LW[c] == SMP_LOOPING_BACKWARD)
-                {
-                    sp_Position[c].absolu -= Vstep1[c];
-                }
-                else
-                {
-                    sp_Position[c].absolu += Vstep1[c];
-                }
-
-                if(Player_LT[c] == SMP_LOOP_PINGPONG)
-                {
-                    if(Player_LW[c] == SMP_LOOPING_FORWARD)
+                    if(sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
                     {
-                        if(sp_Position[c].half.first >= Player_LE[c])
-                        {
-                            Player_LW[c] = SMP_LOOPING_BACKWARD;
-                        }
+                        // Note Stop
+                        sp_Tvol[c][i] = 0.0f;
+                        if(sp_Cvol[c][i] < 0.01f) sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                    }
+                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
+                    else sp_Cvol[c][i] += 0.005f;
+
+                    res_dec = sp_Position[c][i].half.last;
+
+                    // We had some signal (on any channel)
+                    gotsome = TRUE;
+
+                    Current_Pointer = sp_Position[c][i].half.first;
+    
+                    if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
+                    else Old_Pointer = 0;
+
+                    if(Player_WL[c][i])
+                    {
+                        Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
+                                                      *(Player_WL[c][i] + Current_Pointer),
+                                                      *(Player_WL[c][i] + Current_Pointer + 1),
+                                                      *(Player_WL[c][i] + Current_Pointer + 2),
+                                                      res_dec, Current_Pointer,
+                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                    }
+
+                    // Stereo sample
+                    if(Player_SC[c][i] == 2)
+                    {
+                        grown = TRUE;
+                        Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
+                                                      *(Player_WR[c][i] + Current_Pointer),
+                                                      *(Player_WR[c][i] + Current_Pointer + 1),
+                                                      *(Player_WR[c][i] + Current_Pointer + 2),
+                                                      res_dec, Current_Pointer,
+                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                    }
+
+                    // End of Interpolation algo
+                    if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
+                    {
+                        sp_Position[c][i].absolu -= Vstep1[c][i];
                     }
                     else
                     {
-                        if(sp_Position[c].half.first <= Player_LS[c])
+                        sp_Position[c][i].absolu += Vstep1[c][i];
+                    }
+
+                    if(Player_LT[c][i] == SMP_LOOP_PINGPONG)
+                    {
+                        if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                         {
-                            Player_LW[c] = SMP_LOOPING_FORWARD;
+                            if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                            {
+                                Player_LW[c][i] = SMP_LOOPING_BACKWARD;
+                            }
+                        }
+                        else
+                        {
+                            if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                            {
+                                Player_LW[c][i] = SMP_LOOPING_FORWARD;
+                            }
                         }
                     }
-                }
-                if(Player_LT[c] == SMP_LOOP_FORWARD &&
-                   sp_Position[c].half.first >= Player_LE[c])
-                {
-                    sp_Position[c].half.first -= Player_LL[c];
-                }
-                if(Player_LT[c] == SMP_LOOP_NONE &&
-                   sp_Position[c].half.first >= Player_NS[c])
-                {
-                    sp_Stage[c] = PLAYING_NOSAMPLE;
+                    if(Player_LT[c][i] == SMP_LOOP_FORWARD &&
+                       sp_Position[c][i].half.first >= Player_LE[c][i])
+                    {
+                        sp_Position[c][i].half.first -= Player_LL[c][i];
+                    }
+                    if(Player_LT[c][i] == SMP_LOOP_NONE &&
+                       sp_Position[c][i].half.first >= Player_NS[c][i])
+                    {
+                        sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                    }
                 }
             }
 
-            // We have no adsr for those
-            if(!SACTIVE[cPosition][c])
+            if(Synthesizer[c][i].ENV1_STAGE || Synthesizer[c][i].ENV2_STAGE)
             {
-                currsignal = 0;
-                currsignal2 = 0;
+                Curr_Signal_L[i] += Synthesizer[c][i].GetSample(Player_WL[c][i],
+                                                                Player_WR[c][i],
+                                                                Player_SC[c][i],
+                                                                Player_LT[c][i],
+                                                                Player_LT[c][i] > SMP_LOOP_NONE ? Player_LE[c][i]: Player_NS[c][i],
+                                                                Player_LT[c][i] > SMP_LOOP_NONE ? Player_LL[c][i]: 0,
+                                                                &All_Signal_R,
+                                                                Rns[c][i],
+                                                                sp_Cvol[c][i] * Player_SV[c][i],
+                                                                &sp_Stage2[c][i],
+                                                                &sp_Stage3[c][i],
+                                                                (Uint64 *) &sp_Position_osc1[c][i],
+                                                                (Uint64 *) &sp_Position_osc2[c][i],
+#if defined(PTK_SYNTH_OSC3)
+                                                                (Uint64 *) &sp_Position_osc3[c][i],
+#endif
+                                                                Vstep1[c][i]
+                                                         );
+
+                if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
+                else sp_Cvol[c][i] += 0.005f;
+
+                if((Synthesizer[c][i].OSC1_WAVEFORM == 5 || Synthesizer[c][i].OSC2_WAVEFORM == 5))
+                {
+                    if(Player_SC[c][i] == 2) grown = TRUE;
+                }
+                gotsome = TRUE;
             }
-        } // sp!!0
+
+            // Gather the signal of the sub channels
+            All_Signal_L += Curr_Signal_L[i];
+            All_Signal_R += Curr_Signal_R[i];
+        }
+
+            // We have no adsr for those
+/*            if(!CHAN_ACTIVE_STATE[cPosition][c])
+            {
+                All_Signal_L = 0;
+                All_Signal_R = 0;
+            }
+*/
 
 #if defined(PTK_303)
         if(track3031 == c)
         {
-            currsignal += tb303engine[0].tbGetSample();
+            All_Signal_L += tb303engine[0].tbGetSample();
             gotsome = TRUE;
         }
         if(track3032 == c)
         {
-            currsignal += tb303engine[1].tbGetSample();
+            All_Signal_R += tb303engine[1].tbGetSample();
             gotsome = TRUE;
         }
 #endif
-
-        if(Synthesizer[c].ENV1_STAGE || Synthesizer[c].ENV2_STAGE)
-        {
-            currsignal += Synthesizer[c].GetSample(Player_WL[c], Player_WR[c],
-                                                      Player_SC[c],
-                                                      Player_LT[c],
-                                                      Player_LT[c] > SMP_LOOP_NONE ? Player_LE[c]: Player_NS[c],
-                                                      Player_LT[c] > SMP_LOOP_NONE ? Player_LL[c]: 0,
-                                                      &currsignal2,
-                                                      Rns[c], sp_Cvol[c] * Player_SV[c], &sp_Stage2[c], &sp_Stage3[c],
-                                                      (Uint64 *) &sp_Position_osc1[c],
-                                                      (Uint64 *) &sp_Position_osc2[c],
-#if defined(PTK_SYNTH_OSC3)
-                                                      (Uint64 *) &sp_Position_osc3[c],
-#endif
-                                                      Vstep1[c]);
-
-            if(sp_Cvol[c] > sp_Tvol[c]) sp_Cvol[c] -= 0.005f;
-            else sp_Cvol[c] += 0.005f;
-
-            if((Synthesizer[c].OSC1_WAVEFORM == 5 || Synthesizer[c].OSC2_WAVEFORM == 5))
-            {
-                if(Player_SC[c] == 2) grown = TRUE;
-            }
-            gotsome = TRUE;
-        }
 
         // Send a note off if the channel is being turned off
-        if(!SACTIVE[cPosition][c]
+        if(!CHAN_ACTIVE_STATE[cPosition][c]
 
 #if !defined(__STAND_ALONE__)
-           && !SHISTORY[cPosition][c]
+           && !CHAN_HISTORY_STATE[cPosition][c]
 #endif
 
           )
         {
 
 #if !defined(__STAND_ALONE__)
-            SHISTORY[cPosition][c] = TRUE;
+            CHAN_HISTORY_STATE[cPosition][c] = TRUE;
 #endif
 
-            Synthesizer[c].NoteOff();
-
-#if !defined(__STAND_ALONE__)
-#if !defined(__NO_MIDI__)
-            Midi_NoteOff(c);
-#endif
-#endif
+            // We send a note off to all sub channels
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Synthesizer[c][i].NoteOff();
+            }
 
 #if defined(PTK_303)
             noteoff303(c);
+#endif
+
+#if !defined(__STAND_ALONE__)
+    #if !defined(__NO_MIDI__)
+            Midi_NoteOff(c);
+    #endif
 #endif
 
         }
@@ -1861,7 +1916,7 @@ ByPass_Wav:
                 {
 
 #if defined(PTK_FILTER_LOHIBAND)
-                    gco = f2i(ApplyLfo(CCut[c] - ramper[c], c));
+                    gco = (int) (ApplyLfo(CCut[c] - ramper[c], c));
 
                     ramper[c] += Player_FD[c] * gco * 0.015625f;
 
@@ -1870,8 +1925,8 @@ ByPass_Wav:
                     coef[2] = coeftab[2][gco][FRez[c]][FType[c]];
                     coef[3] = coeftab[3][gco][FRez[c]][FType[c]];
                     coef[4] = coeftab[4][gco][FRez[c]][FType[c]];
-                    currsignal = Filter(currsignal + 1, c);
-                    if(grown) currsignal2 = Filter(currsignal2 + 1, c);
+                    All_Signal_L = Filter(All_Signal_L + 1.0f, c);
+                    if(grown) All_Signal_R = Filter(All_Signal_R + 1.0f, c);
 #endif
 
                 }
@@ -1886,143 +1941,143 @@ ByPass_Wav:
 
 #if defined(PTK_FILTER_LO24)
                         case 5:
-                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
-                            if(grown) currsignal2 = filter2p(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filter2p(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_LO48)
                         case 6:
-                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
-                            currsignal = filter2p24d(c, currsignal + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p24d(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                currsignal2 = filter2p(c, currsignal2 + 1, realcut, (float) FRez[c]);
-                                currsignal2 = filter2p24d(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                                All_Signal_R = filter2p(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
 
 #if defined(PTK_FILTER_LP24)
                         case 7:
-                            currsignal = filter2p(c, currsignal + 1, realcut, (float) FRez[c]);
-                            currsignal2 = filter2p24d(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_AMODM)
                         case 8:
-                            currsignal = filterRingMod(c, currsignal, realcut, (float) FRez[c]);
-                            if(grown) currsignal2 = filterRingMod(c, currsignal2, realcut, (float) FRez[c]);
+                            All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterRingMod(c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_AMODS)
                         case 9:
-                            currsignal = filterRingMod(c, currsignal, realcut, (float) FRez[c]);
-                            currsignal2 = filterRingModStereo(c, currsignal2);
+                            All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
+                            All_Signal_R = filterRingModStereo(c, All_Signal_R);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLEM)
                         case 10:
-                            currsignal = filterWater(c, currsignal, realcut, (float) FRez[c]);
-                            if(grown) currsignal2 = filterWater(c, currsignal2, realcut, (float) FRez[c]);
+                            All_Signal_L = filterWater(c, All_Signal_L, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterWater(c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLES)
                         case 11:
-                            currsignal = filterWater(c, currsignal, realcut, (float) FRez[c]);
-                            currsignal2 = filterWaterStereo(c, currsignal2, realcut, (float) FRez[c]);
+                            All_Signal_L = filterWater(c, All_Signal_L, realcut, (float) FRez[c]);
+                            All_Signal_R = filterWaterStereo(c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM15)
                         case 12:
-                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], -15);
-                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], -15);
+                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], -15);
+                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], -15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM6)
                         case 13:
-                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], -6);
-                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], -6);
+                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], -6);
+                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], -6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP6)
                         case 14:
-                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], 6);
-                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], 6);
+                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], 6);
+                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], 6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP15)
                         case 15:
-                            currsignal = filterBellShaped(c, currsignal, realcut, (float) FRez[c], 15);
-                            if(grown) currsignal2 = filterBellShaped(c, currsignal2, realcut, (float) FRez[c], 15);
+                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], 15);
+                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], 15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DELTA)
                         case 16:
-                            currsignal = filterDelta(c, currsignal, realcut, (float) FRez[c]);
-                            if(grown) currsignal2 = filterDelta(c, currsignal2, realcut, (float) FRez[c]);
+                            All_Signal_L = filterDelta(c, All_Signal_L, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterDelta(c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTL)
                         case 17:
-                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.25f);
-                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.25f);
+                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.25f);
+                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.25f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTM)
                         case 18:
-                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.56f);
-                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.56f);
+                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.56f);
+                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.56f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTH)
                         case 19:
-                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.78f);
-                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.78f);
+                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.78f);
+                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.78f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DIST)
                         case 20:
-                            currsignal = int_filter2p(c, currsignal, realcut, (float) FRez[c], 0.96f);
-                            if(grown) currsignal2 = int_filter2p(c, currsignal2, realcut, (float) FRez[c], 0.96f);
+                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.96f);
+                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.96f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12M)
                         case 21:
-                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
-                            if(grown) currsignal2 = filterhp(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterhp(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12S)
                         case 22:
-                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
-                            currsignal2 = filterhp2(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP24M)
                         case 23:
-                            currsignal = filterhp(c, currsignal + 1, realcut, (float) FRez[c]);
-                            currsignal = filterhp2(c, currsignal + 1, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp2(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                currsignal2 = filterhp(c, currsignal2 + 1, realcut, (float) FRez[c]);
-                                currsignal2 = filterhp2(c, currsignal2 + 1, realcut, (float) FRez[c]);
+                                All_Signal_R = filterhp(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
@@ -2032,45 +2087,42 @@ ByPass_Wav:
             } // Filter end
 #endif // PTK_TRACKFILTERS
 
-            if(!grown) currsignal2 = currsignal;
-
-            if(new_instrument[c])
+#if !defined(__STAND_ALONE__)
+            if(CHAN_MUTE_STATE[c])
             {
-                currsignal = (currsignal * (1.0f - segue_volume[c])) + (Segue_SamplesL[c] * segue_volume[c]);
-                currsignal2 = (currsignal2 * (1.0f - segue_volume[c])) + (Segue_SamplesR[c] * segue_volume[c]);
-                Pos_Segue[c]++;
-                segue_volume[c] -= 1.0f / 127.0f;
-                if(Pos_Segue[c] >= 128)
-                {
-                    new_instrument[c] = FALSE;
-                }
+                All_Signal_L = 0;
             }
-            else
-            {
-                // Store the transition
-                Segue_SamplesL[c] = currsignal;
-                Segue_SamplesR[c] = currsignal2;
-            }
+#endif
+            // Duplicate the mono signal if necessary
+            if(!grown) All_Signal_R = All_Signal_L;
 
+            // Dry Send
             if(Disclap[c])
-            { // Distortion
-                if(currsignal > DThreshold[c]) currsignal = DClamp[c];
-                else if(currsignal < -DThreshold[c]) currsignal = -DClamp[c];
+            {   // Distortion
+                if(All_Signal_L > DThreshold[c]) All_Signal_L = DClamp[c];
+                else if(All_Signal_L < -DThreshold[c]) All_Signal_L = -DClamp[c];
 
-                if(currsignal2 > DThreshold[c]) currsignal2 = DClamp[c];
-                else if(currsignal2 < -DThreshold[c]) currsignal2 = -DClamp[c];
+                if(All_Signal_R > DThreshold[c]) All_Signal_R = DClamp[c];
+                else if(All_Signal_R < -DThreshold[c]) All_Signal_R = -DClamp[c];
             }
 
-            currsignal *= LVol[c];
-            currsignal2 *= RVol[c];
+            All_Signal_L *= LVol[c];
+            All_Signal_R *= RVol[c];
 
+#if !defined(__STAND_ALONE__)
+            if(CHAN_MUTE_STATE[c])
+            {
+                All_Signal_L = 0;
+                All_Signal_R = 0;
+            }
+#endif
             // 32-Bit HQ Interpolated System Flanger
 
 #if defined(PTK_FLANGER)
             if(FLANGER_ON[c])
             {
-                FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = currsignal * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
-                FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = currsignal2 * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
+                FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
+                FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
 
                 float fstep1 = powf(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
                 float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
@@ -2083,10 +2135,10 @@ ByPass_Wav:
                 if(foff2[c] < 0.0f) foff2[c] = 0.0f;
                 if(foff1[c] < 0.0f) foff1[c] = 0.0f;
 
-                oldspawn[c] = FLANGE_LEFTBUFFER[c][f2i(foff2[c])];
-                roldspawn[c] = FLANGE_RIGHTBUFFER[c][f2i(foff1[c])];
-                currsignal += Filter_FlangerL(oldspawn[c]);
-                currsignal2 += Filter_FlangerR(roldspawn[c]);
+                oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (foff2[c])];
+                roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (foff1[c])];
+                All_Signal_L += Filter_FlangerL(oldspawn[c]);
+                All_Signal_R += Filter_FlangerR(roldspawn[c]);
 
                 if(++FLANGER_OFFSET[c] > 16383) FLANGER_OFFSET[c] = 0;
                 FLANGER_GR[c] += FLANGER_RATE[c];
@@ -2101,43 +2153,41 @@ ByPass_Wav:
 #endif
 
 #if !defined(__STAND_ALONE__)
-            if(!TRACKSTATE[c])
-#endif
+            if(CHAN_MUTE_STATE[c])
             {
-                // Dry Send
+                All_Signal_L = 0;
+                All_Signal_R = 0;
+            }
+#endif
 
-                left_float += currsignal;
-                right_float += currsignal2;
+            left_float += All_Signal_L;
+            right_float += All_Signal_R;
 
-                // Sending to delay...
+            // Sending to delay...
+            float const DS = DSend[c];
 
-                float const DS = DSend[c];
+            if(DS > 0.008f)
+            {
+                delay_left_final += All_Signal_L * DS;
+                delay_right_final += All_Signal_R * DS;
+            }
 
-                if(DS > 0.008f)
-                {
-                    delay_left_final += currsignal * DS;
-                    delay_right_final += currsignal2 * DS;
-                }
+            // Sending to chorus
+            float const DC = CCoef[c];
 
-                // Sending to chorus
-
-                float const DC = CCoef[c];
-
-                if(DC > 0.008f)
-                {
-                    left_chorus += currsignal * DC;
-                    right_chorus += currsignal2 * DC;
-                }
-
-            } // Close trackstate
+            if(DC > 0.008f)
+            {
+                left_chorus += All_Signal_L * DC;
+                right_chorus += All_Signal_R * DC;
+            }
         }
 
 #if !defined(__STAND_ALONE__)
         if(Songplaying_Pattern)
         {
-            if(!TRACKSTATE[c])
+            if(!CHAN_MUTE_STATE[c])
             {
-                Scope_Dats[c][Cscope[c]] = (currsignal + currsignal2) * 0.15f;
+                Scope_Dats[c][Cscope[c]] = (All_Signal_L + All_Signal_R) * 0.15f;
             }
             else
             {
@@ -2152,9 +2202,30 @@ ByPass_Wav:
 }
 
 // ------------------------------------------------------
+// Look for a free sub channel
+int Get_Free_Sub_Channel(int channel)
+{
+    int i;
+
+    for(i = 0; i < Channels_Polyphony; i++)
+    {
+        if(sp_Stage[channel][i] == PLAYING_NOSAMPLE &&
+           sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
+           sp_Stage3[channel][i] == PLAYING_NOSAMPLE)
+        {
+            return(i);
+        }
+    }
+    // None found
+    return(0);
+}
+
+// ------------------------------------------------------
 // Play a waveform
-void Sp_Playwave(int channel, float note, int sample, float vol,
-                 unsigned int offset, int glide, int Play_Entire)
+void Play_Instrument(int channel, int sub_channel,
+                     float note, int sample,
+                     float vol, unsigned int offset,
+                     int glide, int Play_Selection, int midi_channel)
 {
 
 #if defined(PTK_FX_AUTOFADEMODE)
@@ -2169,8 +2240,8 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
     // Empty row ? Take the current one.
     if(sample == 255)
     {
-        sample = (unsigned char) sp_channelsample[channel];
-        vol = sp_Tvol[channel];
+        sample = (unsigned char) sp_channelsample[channel][sub_channel];
+        vol = sp_Tvol[channel][sub_channel];
         if(glide) no_retrig_adsr = TRUE;
     }
 
@@ -2187,25 +2258,25 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
 
     Cur_Position = cPosition;
 
-    // sp_Stage2[channel] = PLAYING_STOCK;
-    if(Synthesizer[channel].OSC1_WAVEFORM == 5)
+
+    if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM == 5)
     {
-        sp_Position[channel].absolu = 0;
-        sp_Position_osc1[channel].absolu = 0;
+        sp_Position[channel][sub_channel].absolu = 0;
+        sp_Position_osc1[channel][sub_channel].absolu = 0;
 
 #if defined(PTK_SYNTH_OSC3)
-        sp_Position_osc3[channel].absolu = 0;
+        sp_Position_osc3[channel][sub_channel].absolu = 0;
 #endif
 
     }
-    if(Synthesizer[channel].OSC2_WAVEFORM == 5)
+    if(Synthesizer[channel][sub_channel].OSC2_WAVEFORM == 5)
     {
-        sp_Position[channel].absolu = 0;
-        sp_Position_osc2[channel].absolu = 0;
+        sp_Position[channel][sub_channel].absolu = 0;
+        sp_Position_osc2[channel][sub_channel].absolu = 0;
     }
 
     // Check if the channel have to be played
-    if(SACTIVE[Cur_Position][channel])
+    if(CHAN_ACTIVE_STATE[Cur_Position][channel])
     {
         char split = 0;
         int mnote = int(note);
@@ -2218,7 +2289,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 split = revo;
             }
         }
-        if(sample != sp_channelsample[channel])
+        if(sample != sp_channelsample[channel][sub_channel])
         {
             glide = 0;
         }
@@ -2230,71 +2301,74 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
 
         if(!no_retrig_adsr)
         {
-            Synthesizer[channel].OSC1_WAVEFORM = 4;
-            Synthesizer[channel].OSC2_WAVEFORM = 4;
+            Synthesizer[channel][sub_channel].OSC1_WAVEFORM = 4;
+            Synthesizer[channel][sub_channel].OSC2_WAVEFORM = 4;
             if(Synthprg[sample])
             {
-                Synthesizer[channel].ChangeParameters(PARASynth[sample]);
-                Synthesizer[channel].NoteOn(note2, vol, LoopType[associated_sample][split],
-                                            LoopType[associated_sample][split] > SMP_LOOP_NONE ? LoopEnd[associated_sample][split]: (SampleNumSamples[associated_sample][split] - 2), LoopEnd[associated_sample][split] - LoopStart[associated_sample][split],
-                                            note);
+                Synthesizer[channel][sub_channel].ChangeParameters(PARASynth[sample]);
+                Synthesizer[channel][sub_channel].NoteOn(note2,
+                                                         vol,
+                                                         LoopType[associated_sample][split],
+                                                         LoopType[associated_sample][split] > SMP_LOOP_NONE ? LoopEnd[associated_sample][split]: (SampleNumSamples[associated_sample][split] - 2),
+                                                         LoopEnd[associated_sample][split] - LoopStart[associated_sample][split],
+                                                         note);
             }
         }
 
         // Fix a bug as this can also be used for synth
         // which isn't correct
-        Player_SC[channel] = 0;
+        Player_SC[channel][sub_channel] = 0;
 
-        sp_Tvol[channel] = vol;
+        sp_Tvol[channel][sub_channel] = vol;
         double spreadnote = (double) powf(2.0f, note2 / 12.0f);
         spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
-        Vstep_arp[channel] = (int64) spreadnote;
-        Arpeggio_BaseNote[channel] = note2;
+        Vstep_arp[channel][sub_channel] = (int64) spreadnote;
+        Arpeggio_BaseNote[channel][sub_channel] = note2;
 #endif
 
         if(glide)
         {
-            sp_Step[channel] = (int64) spreadnote;
+            sp_Step[channel][sub_channel] = (int64) spreadnote;
         }
         else
         {
-            Vstep1[channel] = (int64) spreadnote;
-            sp_Step[channel] = (int64) spreadnote;
+            Vstep1[channel][sub_channel] = (int64) spreadnote;
+            sp_Step[channel][sub_channel] = (int64) spreadnote;
         }
 
         // Only synth
-        sp_Stage[channel] = PLAYING_NOSAMPLE;
-        sp_Stage2[channel] = PLAYING_STOCK;
-        sp_Stage3[channel] = PLAYING_STOCK;
+        sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+        sp_Stage2[channel][sub_channel] = PLAYING_STOCK;
+        sp_Stage3[channel][sub_channel] = PLAYING_STOCK;
 
-        sp_channelsample[channel] = sample;
+        sp_channelsample[channel][sub_channel] = sample;
 
         if(SampleType[associated_sample][split])
         {
             if(Synthprg[sample])
             {
                 // Synth + sample if both are != wav
-                if(Synthesizer[channel].OSC1_WAVEFORM != 5 &&
-                   Synthesizer[channel].OSC2_WAVEFORM != 5)
+                if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM != 5 &&
+                   Synthesizer[channel][sub_channel].OSC2_WAVEFORM != 5)
                 {
-                    sp_Stage[channel] = PLAYING_SAMPLE;
+                    sp_Stage[channel][sub_channel] = PLAYING_SAMPLE;
                 }
             }
             else
             {
                 // Only sample
-                sp_Stage[channel] = PLAYING_SAMPLE;
-                sp_Stage2[channel] = PLAYING_NOSAMPLE;
-                sp_Stage3[channel] = PLAYING_NOSAMPLE;
+                sp_Stage[channel][sub_channel] = PLAYING_SAMPLE;
+                sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
+                sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
             }
 
-            if(!offset) sp_Cvol[channel] = vol;
-            else sp_Cvol[channel] = 0;
+            if(!offset) sp_Cvol[channel][sub_channel] = vol;
+            else sp_Cvol[channel][sub_channel] = 0;
 
 #if defined(PTK_FX_ARPEGGIO)
-            Arpeggio_BaseNote[channel] = note;
+            Arpeggio_BaseNote[channel][sub_channel] = note;
 #endif
 
             if(beatsync[associated_sample])
@@ -2303,11 +2377,11 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
-                Vstep_arp[channel] = (int64) spreadnote;
+                Vstep_arp[channel][sub_channel] = (int64) spreadnote;
 #endif
 
-                Vstep1[channel] = (int64) spreadnote;
-                sp_Step[channel] = (int64) spreadnote;
+                Vstep1[channel][sub_channel] = (int64) spreadnote;
+                sp_Step[channel][sub_channel] = (int64) spreadnote;
             }
             else
             {
@@ -2315,23 +2389,23 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                 spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
-                Vstep_arp[channel] = (int64) spreadnote;
+                Vstep_arp[channel][sub_channel] = (int64) spreadnote;
 #endif
 
                 if(glide)
                 {
-                    sp_Step[channel] = (int64) spreadnote;
+                    sp_Step[channel][sub_channel] = (int64) spreadnote;
                 }
                 else
                 {
-                    Vstep1[channel] = (int64) spreadnote;
-                    sp_Step[channel] = (int64) spreadnote;
+                    Vstep1[channel][sub_channel] = (int64) spreadnote;
+                    sp_Step[channel][sub_channel] = (int64) spreadnote;
                 }
             }
 
-            Synth_Was[channel] = Synthprg[sample];
+            Synth_Was[channel][sub_channel] = Synthprg[sample];
 
-            sp_split[channel] = split;
+            sp_split[channel][sub_channel] = split;
 
             // Player Pointer Assignment
 
@@ -2341,7 +2415,7 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
             
             // Only play the selection
             if(userscreen == USER_SCREEN_SAMPLE_EDIT &&
-               sed_range_start != sed_range_end && Play_Entire)
+               sed_range_start != sed_range_end && Play_Selection)
             {
                 Sel_Start = sed_range_start;
                 Sel_End = sed_range_end;
@@ -2350,92 +2424,93 @@ void Sp_Playwave(int channel, float note, int sample, float vol,
                     Sel_End = sed_range_start;
                     Sel_Start = sed_range_end;
                 }
-                Player_LS[channel] = Sel_Start;
-                Player_LE[channel] = Sel_End;
-                sp_Position[channel].half.first = Sel_Start;
-                Player_NS[channel] = Sel_End;
-                if(!glide) sp_Position[channel].half.first += offset << 8;
+                Player_LS[channel][sub_channel] = Sel_Start;
+                Player_LE[channel][sub_channel] = Sel_End;
+                sp_Position[channel][sub_channel].half.first = Sel_Start;
+                Player_NS[channel][sub_channel] = Sel_End;
+                if(!glide) sp_Position[channel][sub_channel].half.first += offset << 8;
             }
             else
             {
-                Player_LS[channel] = LoopStart[associated_sample][split];
-                Player_LE[channel] = LoopEnd[associated_sample][split];
-                Player_NS[channel] = SampleNumSamples[associated_sample][split] - 2;
-                if(!glide) sp_Position[channel].half.first = offset << 8;
+                Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
+                Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
+                Player_NS[channel][sub_channel] = SampleNumSamples[associated_sample][split] - 2;
+                if(!glide) sp_Position[channel][sub_channel].half.first = offset << 8;
             }
 #else
-            Player_LS[channel] = LoopStart[associated_sample][split];
-            Player_LE[channel] = LoopEnd[associated_sample][split];
-            Player_NS[channel] = SampleNumSamples[associated_sample][split] - 2;
-            if(!glide) sp_Position[channel].half.first = offset << 8;
+            Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
+            Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
+            Player_NS[channel][sub_channel] = SampleNumSamples[associated_sample][split] - 2;
+            if(!glide) sp_Position[channel][sub_channel].half.first = offset << 8;
 #endif
-            Player_LL[channel] = Player_LE[channel] - Player_LS[channel];
+            Player_LL[channel][sub_channel] = Player_LE[channel][sub_channel] - Player_LS[channel][sub_channel];
 
-            Rns[channel] = SampleNumSamples[associated_sample][split];
-            Player_SV[channel] = SampleVol[associated_sample][split];
-            Player_LT[channel] = LoopType[associated_sample][split];
-            Player_LW[channel] = SMP_LOOPING_FORWARD;
-            Player_SC[channel] = SampleChannels[associated_sample][split];
+            Rns[channel][sub_channel] = SampleNumSamples[associated_sample][split];
+            Player_SV[channel][sub_channel] = SampleVol[associated_sample][split];
+            Player_LT[channel][sub_channel] = LoopType[associated_sample][split];
+            Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
+            Player_SC[channel][sub_channel] = SampleChannels[associated_sample][split];
+
+            // I know this isn't exactly correct but using a sub channel for this
+            // would mean that we'd have to maintain 1 filters state / sub channel which would be insane.
             Player_FD[channel] = FDecay[associated_sample][split];
-            Player_WL[channel] = RawSamples[associated_sample][0][split];
+
+            Player_WL[channel][sub_channel] = RawSamples[associated_sample][0][split];
 
             if(SampleChannels[associated_sample][split] == 2)
             {
-                Player_WR[channel] = RawSamples[associated_sample][1][split];
+                Player_WR[channel][sub_channel] = RawSamples[associated_sample][1][split];
             }
             if(!glide) ramper[channel] = 0;
 
             // Sample is out of range
-            if((int) sp_Position[channel].half.first >= SampleNumSamples[associated_sample][split])
+            if((int) sp_Position[channel][sub_channel].half.first >= SampleNumSamples[associated_sample][split])
             {
-                sp_Stage[channel] = PLAYING_NOSAMPLE;
-                sp_Stage2[channel] = PLAYING_NOSAMPLE;
+                sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+                sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
             }
         }
         else
         {
-            sp_Cvol[channel] = 1.0f;
-            Player_SV[channel] = 1.0f;
+            sp_Cvol[channel][sub_channel] = 1.0f;
+            Player_SV[channel][sub_channel] = 1.0f;
             if(!glide)
             {
                 ramper[channel] = 0;
-                sp_Position[channel].half.first = offset << 8;
+                sp_Position[channel][sub_channel].half.first = offset << 8;
             }
         }
         if(!no_retrig_adsr)
         {
-            sp_Position_osc1[channel] = sp_Position[channel];
-            sp_Position_osc2[channel] = sp_Position[channel];
+            sp_Position_osc1[channel][sub_channel] = sp_Position[channel][sub_channel];
+            sp_Position_osc2[channel][sub_channel] = sp_Position[channel][sub_channel];
 
 #if defined(PTK_SYNTH_OSC3)
-            sp_Position_osc3[channel] = sp_Position[channel];
+            sp_Position_osc3[channel][sub_channel] = sp_Position[channel][sub_channel];
 #endif
 
         }
-        Pos_Segue[channel] = 0;
-        segue_volume[channel] = 1.0f;
-        new_instrument[channel] = TRUE;
-        
+
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-        if(TRACKSTATE[channel] == 0 &&
+        if(CHAN_MUTE_STATE[midi_channel] == 0 &&
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
-            Midi_NoteOff(channel);
+            Midi_NoteOff(midi_channel);
 
             // Set the midi program if it was modified
-            if(LastProgram[TRACKMIDICHANNEL[channel]] != Midiprg[associated_sample])
+            if(LastProgram[CHAN_MIDI_PRG[midi_channel]] != Midiprg[associated_sample])
             {
-                Midi_Send(192 + TRACKMIDICHANNEL[channel], Midiprg[associated_sample], 127);
-                LastProgram[TRACKMIDICHANNEL[channel]] = Midiprg[associated_sample];
+                Midi_Send(192 + CHAN_MIDI_PRG[midi_channel], Midiprg[associated_sample], 127);
+                LastProgram[CHAN_MIDI_PRG[midi_channel]] = Midiprg[associated_sample];
             }
 
             // Send the note to the midi device
             float veloc = vol * mas_vol;
 
-            Midi_Track_Notes[TRACKMIDICHANNEL[channel]] = mnote;
-            Midi_Send(144 + TRACKMIDICHANNEL[channel], mnote, f2i(veloc * 127));
+            Midi_Track_Notes[CHAN_MIDI_PRG[midi_channel]] = mnote;
+            Midi_Send(144 + CHAN_MIDI_PRG[midi_channel], mnote, (int) (veloc * 127));
         }
 #endif // __NO_MIDI
 #endif // __STAND_ALONE__
@@ -2481,6 +2556,7 @@ void allPassInit(float miliSecs)
 void DoEffects_tick0(void)
 {
     int temp_ped_line = ped_line;
+    int i;
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
@@ -2534,7 +2610,10 @@ void DoEffects_tick0(void)
                 Arpeggio_Switch[trackef] = pltr_dat_row;
                 if(!pltr_dat_row)
                 {
-                    Vstep1[trackef] = Vstep_arp[trackef];
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        Vstep1[trackef][i] = Vstep_arp[trackef][i];
+                    }
                 }
                 break;
 #endif
@@ -2548,6 +2627,8 @@ void DoEffects_tick0(void)
 // Process ticks X effects
 void DoEffects(void)
 {
+    int i;
+
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
         int tefactor = trackef * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
@@ -2560,7 +2641,13 @@ void DoEffects(void)
 
         if(Subicounter == 0)
         {
-            if(pltr_note == 121 && pltr_sample != 255) sp_Tvol[trackef] = CustomVol[pltr_sample];
+            if(pltr_note == 121 && pltr_sample != 255)
+            {
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    sp_Tvol[trackef][i] = CustomVol[pltr_sample];
+                }
+            }
         }
 
 #if defined(PTK_FX_AUTOFADEMODE)
@@ -2568,22 +2655,28 @@ void DoEffects(void)
         switch(FADEMODE[trackef])
         {
             case 1:
-                sp_Tvol[trackef] += FADECOEF[trackef];
-
-                if(sp_Tvol[trackef] > 1.0f)
+                for(i = 0; i < MAX_POLYPHONY; i++)
                 {
-                    sp_Tvol[trackef] = 1.0f;
-                    FADEMODE[trackef] = 0;
+                    sp_Tvol[trackef][i] += FADECOEF[trackef];
+
+                    if(sp_Tvol[trackef][i] > 1.0f)
+                    {
+                        sp_Tvol[trackef][i] = 1.0f;
+                        FADEMODE[trackef] = 0;
+                    }
                 }
                 break;
 
             case 2:
-                sp_Tvol[trackef] -= FADECOEF[trackef];
-
-                if(sp_Tvol[trackef] < 0.0f)
+                for(i = 0; i < MAX_POLYPHONY; i++)
                 {
-                    sp_Tvol[trackef] = 0.0f;
-                    FADEMODE[trackef] = 0;
+                    sp_Tvol[trackef][i] -= FADECOEF[trackef];
+
+                    if(sp_Tvol[trackef][i] < 0.0f)
+                    {   
+                        sp_Tvol[trackef][i] = 0.0f;
+                        FADEMODE[trackef] = 0;
+                    }
                 }
                 break;
         }
@@ -2597,12 +2690,15 @@ void DoEffects(void)
             unsigned char kinder = pltr_vol_row & 0xf;
             if(Subicounter == kinder)
             {
-                if(sp_Stage[trackef] == PLAYING_SAMPLE)
+                for(i = 0; i < MAX_POLYPHONY; i++)
                 {
-                    if(FType[trackef] == 4) sp_Stage[trackef] = PLAYING_SAMPLE_NOTEOFF;
-                    else sp_Tvol[trackef] = 0.001f;
+                    if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
+                    {
+                        if(FType[trackef] == 4) sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
+                        else sp_Tvol[trackef][i] = 0.001f;
+                    }
+                    Synthesizer[trackef][i].NoteOff();
                 }
-                Synthesizer[trackef].NoteOff();
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
@@ -2613,42 +2709,60 @@ void DoEffects(void)
         }
 #endif
 
+
 #if defined(PTK_FX_0)
+
         switch(pltr_eff_row)
         {
 
 #if defined(PTK_FX_PITCHUP)
-            // $01 Pitch Up 
+            // $01 Pitch Up
             case 0x1:
+
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
 #if defined(__GCC__)
-                if(Vstep1[trackef] < 137438953472ll) Vstep1[trackef] += pltr_dat_row << 21;
+                    if(Vstep1[trackef][i] < 137438953472ll) Vstep1[trackef][i] += pltr_dat_row << 21;
 #else
-                if(Vstep1[trackef] < 137438953472) Vstep1[trackef] += pltr_dat_row << 21;
+                    if(Vstep1[trackef][i] < 137438953472) Vstep1[trackef][i] += pltr_dat_row << 21;
 #endif
+                }
+            
                 break;
 #endif  // PTK_FX_PITCHUP
 
 #if defined(PTK_FX_PITCHDOWN)
-            // $02 Pitch Down 
+            // $02 Pitch Down
             case 0x2:
-                Vstep1[trackef] -= pltr_dat_row << 21;
-                if(Vstep1[trackef] < 16) Vstep1[trackef] = 16;
+
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    Vstep1[trackef][i] -= pltr_dat_row << 21;
+                    if(Vstep1[trackef][i] < 16) Vstep1[trackef][i] = 16;
+                }
                 break;
 #endif
 
 #if defined(PTK_FX_SETVOLUME)
             // $03 Set volume
             case 0x3:
-                sp_Tvol[trackef] = pltr_dat_row * 0.0039062f;
+
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    sp_Tvol[trackef][i] = pltr_dat_row * 0.0039062f;
+                }
                 break;
 #endif
 
 #if defined(PTK_FX_TRANCESLICER)
             // $04 Trance slicer
             case 0x4:
-                if(Subicounter == 0) sp_Tvol[trackef] = 1.0f;
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    if(Subicounter == 0) sp_Tvol[trackef][i] = 1.0f;
 
-                if(Subicounter >= pltr_dat_row) sp_Tvol[trackef] = 0;
+                    if(Subicounter >= pltr_dat_row) sp_Tvol[trackef][i] = 0;
+                }
                 break;
 #endif
 
@@ -2657,26 +2771,30 @@ void DoEffects(void)
             case 0x5:
                 if(pltr_dat_row) glidestep[trackef] = pltr_dat_row << 21;
 
-                if(Vstep1[trackef] < sp_Step[trackef])
+                for(i = 0; i < MAX_POLYPHONY; i++)
                 {
-                    Vstep1[trackef] += glidestep[trackef];
-                    if(Vstep1[trackef] > sp_Step[trackef])
+                    if(Vstep1[trackef][i] < sp_Step[trackef][i])
                     {
-                        Vstep1[trackef] = sp_Step[trackef];
+                        Vstep1[trackef][i] += glidestep[trackef];
+                        if(Vstep1[trackef][i] > sp_Step[trackef][i])
+                        {
+                            Vstep1[trackef][i] = sp_Step[trackef][i];
+                        }
                     }
-                }
-                else
-                {
-                    if(Vstep1[trackef] > sp_Step[trackef])
+                    else
                     {
-                        Vstep1[trackef] -= glidestep[trackef];
-                        if(Vstep1[trackef] < sp_Step[trackef]) Vstep1[trackef] = sp_Step[trackef];
+                        if(Vstep1[trackef][i] > sp_Step[trackef][i])
+                        {
+                            Vstep1[trackef][i] -= glidestep[trackef];
+                            if(Vstep1[trackef][i] < sp_Step[trackef][i]) Vstep1[trackef][i] = sp_Step[trackef][i];
+                        }
                     }
                 }
                 break;
 #endif
 
         } // SWITCH CASES
+
 #endif  // PTK_FX_0
 
 #if defined(PTK_FX_X)
@@ -2735,17 +2853,34 @@ void DoEffects(void)
 #if defined(PTK_FX_NOTERETRIGGER)
             // $0e Note retrigger
             case 0xe: 
+
+                int free_sub_channel;
+                
                 if(pltr_note == 121) pltr_note = old_note[trackef];
                 old_note[trackef] = pltr_note;
                 if(pltr_dat_row > 0 && (Subicounter % pltr_dat_row) == 0)
                 {
+                    free_sub_channel = Get_Free_Sub_Channel(trackef);
+                    // Retrigger all playing sub channels
                     if(pltr_vol_row <= 64)
                     {
-                        Sp_Playwave(trackef, (float) pltr_note, pltr_sample, pltr_vol_row * 0.015625f, 0, 0, FALSE);
+                        Play_Instrument(trackef, free_sub_channel, (float) pltr_note, pltr_sample, pltr_vol_row * 0.015625f, 0, 0, FALSE, trackef);
                     }
                     else
                     {
-                        Sp_Playwave(trackef, (float) pltr_note, pltr_sample, CustomVol[pltr_sample], 0, 0, FALSE);
+                        Play_Instrument(trackef, free_sub_channel, (float) pltr_note, pltr_sample, CustomVol[pltr_sample], 0, 0, FALSE, trackef);
+                    }
+
+                    for(i = 0; i < MAX_POLYPHONY; i++)
+                    {
+                        if(free_sub_channel != i)
+                        {
+                            if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
+                            {
+                                sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
+                            }
+                            Synthesizer[trackef][i].NoteOff();
+                        }
                     }
                 }
                 break;
@@ -2852,7 +2987,7 @@ void DoEffects(void)
 
 #if defined(PTK_FX_AUTOFADEOUT)
             // $18 Auto fade out xx ticks
-            case 0x18: 
+            case 0x18:
                 if(pltr_dat_row > 0)
                 {
                     FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row;
@@ -2864,16 +2999,22 @@ void DoEffects(void)
 #if defined(PTK_FX_VOLUMESLIDEUP)
             // $19 Volume slide up
             case 0x19:
-                sp_Tvol[trackef] += pltr_dat_row * 0.0039062f;
-                if(sp_Tvol[trackef] > 1.0f) sp_Tvol[trackef] = 1.0f;
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    sp_Tvol[trackef][i] += pltr_dat_row * 0.0039062f;
+                    if(sp_Tvol[trackef][i] > 1.0f) sp_Tvol[trackef][i] = 1.0f;
+                }
                 break;
 #endif
 
 #if defined(PTK_FX_VOLUMESLIDEDOWN)
             // $1a Volume slide down
             case 0x1a: 
-                sp_Tvol[trackef] -= pltr_dat_row * 0.0039062f;
-                if(sp_Tvol[trackef] < 0.0f) sp_Tvol[trackef] = 0.0f;
+                for(i = 0; i < MAX_POLYPHONY; i++)
+                {
+                    sp_Tvol[trackef][i] -= pltr_dat_row * 0.0039062f;
+                    if(sp_Tvol[trackef][i] < 0.0f) sp_Tvol[trackef][i] = 0.0f;
+                }
                 break;
 #endif
 
@@ -2888,21 +3029,24 @@ void DoEffects(void)
 
         if(Arpeggio_Switch[trackef])
         {
-            switch((Subicounter % 3))
+            for(i = 0; i < MAX_POLYPHONY; i++)
             {
-                case 0:
-                    Vstep1[trackef] = Vstep_arp[trackef];
-                    break;
-                case 1:
-                    arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
-                    arpnote *= 4294967296.0f;
-                    Vstep1[trackef] = (int64) arpnote;
-                    break;
-                case 2:
-                    arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
-                    arpnote *= 4294967296.0f;
-                    Vstep1[trackef] = (int64) arpnote;
-                    break;
+                switch((Subicounter % 3))
+                {
+                    case 0:
+                        Vstep1[trackef][i] = Vstep_arp[trackef][i];
+                        break;
+                    case 1:
+                        arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
+                        arpnote *= 4294967296.0f;
+                        Vstep1[trackef][i] = (int64) arpnote;
+                        break;
+                    case 2:
+                        arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
+                        arpnote *= 4294967296.0f;
+                        Vstep1[trackef][i] = (int64) arpnote;
+                        break;
+                }
             }
         }
 #endif
@@ -2935,7 +3079,7 @@ float ApplyLfo(float cy, char trcy)
 #if defined(PTK_LFO)
     if(LFO_ON[trcy] == 1)
     {
-        cy += SIN[f2i(LFOGR[trcy])] * LFO_AMPL[trcy];
+        cy += SIN[(int) (LFOGR[trcy])] * LFO_AMPL[trcy];
         LFOGR[trcy] += LFO_RATE[trcy];
         if(LFOGR[trcy] >= 360.0f) LFOGR[trcy] -= 360.0f;
     }
@@ -3000,7 +3144,7 @@ void GetPlayerValues(float master_coef)
 
 #if defined(__LINUX__)
     // It looks like the maximum range for OSS is -8192 +8192
-    // (but i'm not sure about that)
+    // (higher than that will produce heavily satured signals)
     left_float *= 8192.0f;
     right_float *= 8192.0f;
 #else
@@ -3023,8 +3167,8 @@ void GetPlayerValues(float master_coef)
 
 #else
 
-    left_value = f2i(left_float * master_coef);
-    right_value = f2i(right_float * master_coef);
+    left_value = (int) (left_float * master_coef);
+    right_value = (int) (right_float * master_coef);
 
 #if defined(__LINUX__)
     if(left_value > 8192)left_value = 8192;
@@ -3137,11 +3281,6 @@ float Bandwidth(int v)
     return powf(v / 127.0f, 4.0f) * 4.0f + 0.1f;
 }
 
-int f2i(float d)
-{
-    return((int) d);
-}
-
 #if defined(PTK_PROC_FILTER2P)
 float filter2p(char ch, float input, float f, float q)
 {
@@ -3206,7 +3345,7 @@ float filterRingMod(char ch, float input, float f, float q)
     buf0[ch] += f * (q * 0.125f);
     if(buf0[ch] >= 360.0f) buf0[ch] -= 360.0f;
 
-    return input * SIN[f2i(buf0[ch])];
+    return input * SIN[(int) buf0[ch]];
 }
 #endif
 
@@ -3321,9 +3460,9 @@ float int_filter2p(char ch, float input, float f, float q, float q2)
 float filter2px(char ch, float input, float f, float q)
 {
     f *= 0.0078125f;
-    float fa = float(1.0f - f); 
+    float fa = float(1.0f - f);
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf0[ch] = fa * buf0[ch] + f * (input + fb * (buf0[ch] - buf1[ch])); 
+    buf0[ch] = fa * buf0[ch] + f * (input + fb * (buf0[ch] - buf1[ch]));
     buf1[ch] = fa * buf1[ch] + f * buf0[ch];
     return buf1[ch];
 }
@@ -3461,10 +3600,10 @@ void init_sample_bank(void)
         // All tracks activated on entire song (1-Active 0-Inactive)
         for(int inico2 = 0; inico2 < MAX_TRACKS; inico2++)
         {
-            SACTIVE[inico][inico2] = TRUE;
+            CHAN_ACTIVE_STATE[inico][inico2] = TRUE;
 
 #if !defined(__STAND_ALONE__)
-            SHISTORY[inico][inico2] = FALSE;
+            CHAN_HISTORY_STATE[inico][inico2] = FALSE;
 #endif
 
         }
