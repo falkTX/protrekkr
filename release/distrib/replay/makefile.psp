@@ -11,7 +11,7 @@ ASFLAGS = -c $(CFLAGS)
 
 LIBDIR =
 LDFLAGS = -g -nostartfiles -mno-crt0 
-LIBS= -lptkreplay -lpspaudio -lpsprtc -lpsppower -lm
+LIBS= -lptkreplay -lpspaudio -lpsprtc -lpsppower -lm -lpspmath
 
 CC       = psp-gcc
 CXX      = psp-g++

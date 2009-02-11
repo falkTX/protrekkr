@@ -6,6 +6,17 @@ v1.86b:
 
 - Fixed a bug with the 303 data loading in the replay routine.
 - Fx 0A (Set random cutoff) was disabled due to a typo in the fx constants.
+- Added the first version of a replay routine for the PSP,
+  
+  It uses the 2nd processor so the main CPU time occupation is really minimal.
+  
+  Keep in mind that this is an experiment and that this console isn't a PC
+  so you'd better go very easy on the dsp effects and channels polyphony,
+  especially the flanger is a really heavy toll because the media engine
+  doesn't have any integrated hardware sin/cos or pow instructions).
+
+  Samples depacking with the PSP codecs isn't implemented yet
+  (so samples packing should be set to "none" in that case).
 
 v1.86:
 

@@ -29,22 +29,8 @@ extern "C"
     int sceKernelPowerTick(int type);
 }
 
-#define DISPLAY_FPS
-
-#ifdef DISPLAY_FPS
-    #include <psprtc.h>
-    float curr_ms = 1.0f;
-    float curr_fps;
-    double time_span;
-    u32 tick_res;
-    u64 last_tick;
-    u64 curr_tick;
-#endif
-extern int AUDIO_Samples;
-
-// Initialize with 500 milliseconds of latency
-// (the PSP needs much more time than a PC)
-#define LATENCY 300
+// If the PSP isn't fast enough to render a module, this value won't save anything anyway.
+#define LATENCY 180
 
 void ptk_start(void)
 {
@@ -61,27 +47,17 @@ void ptk_start(void)
             // Start playing it
             Ptk_Play();
         
-#ifdef DISPLAY_FPS
+/*#ifdef DISPLAY_FPS
     sceRtcGetCurrentTick(&last_tick);
     tick_res = sceRtcGetTickResolution();
-#endif
+#endif*/
             // Quit with home button
             while(1)
             {
-
-#ifdef DISPLAY_FPS
-                sceRtcGetCurrentTick(&curr_tick);
-                curr_fps = 1.0f / curr_ms;
-                pspDebugScreenSetXY(1, 32);
-                pspDebugScreenPrintf("%d.%03d", (int) curr_fps, (int) ((curr_fps - (int) curr_fps) * 1000.0f));
-                time_span = ((curr_tick - last_tick)) / (float) tick_res;
-                curr_ms = time_span;
-                sceRtcGetCurrentTick(&last_tick);
-#endif
                 sceCtrlPeekBufferPositive(&Ctrl_Buf, 1);
                 if(Ctrl_Buf.Buttons & PSP_CTRL_HOME) break;
 
-                sceKernelPowerTick(0);
+                sceKernelPowerTick(6);
             }
             Ptk_Stop();
         }
