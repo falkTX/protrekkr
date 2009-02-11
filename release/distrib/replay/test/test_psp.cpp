@@ -18,9 +18,6 @@
 #include "../lib/include/ptkreplay.h"
 
 PSP_MODULE_INFO("", PSP_MODULE_KERNEL, 1, 1);
-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_VFPU);
-
-#include <stdio.h>
 
 extern "C"
 {
@@ -29,7 +26,8 @@ extern "C"
     int sceKernelPowerTick(int type);
 }
 
-// If the PSP isn't fast enough to render a module, this value won't save anything anyway.
+// If the PSP isn't fast enough to render a module,
+// this value won't save anything anyway.
 #define LATENCY 180
 
 void ptk_start(void)
@@ -47,11 +45,7 @@ void ptk_start(void)
             // Start playing it
             Ptk_Play();
         
-/*#ifdef DISPLAY_FPS
-    sceRtcGetCurrentTick(&last_tick);
-    tick_res = sceRtcGetTickResolution();
-#endif*/
-            // Quit with home button
+            // Quit with the home button
             while(1)
             {
                 sceCtrlPeekBufferPositive(&Ctrl_Buf, 1);
