@@ -32,11 +32,11 @@ replaytest: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 #	-rm -f $(EXEOBJS_PPC)
 #	-rm -f $(EXEOBJS_X86)
 
-test_x86.o: test/test.cpp
-	g++ -c -o $(@) $(FLAGS_X86) test/test.cpp
+test_x86.o: test/test_macosx.cpp
+	g++ -c -o $(@) $(FLAGS_X86) test/test_macosx.cpp
 
-test_ppc.o: test/test.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) test/test.cpp
+test_ppc.o: test/test_macosx.cpp
+	g++ -c -o $(@) $(FLAGS_PPC) test/test_macosx.cpp
 
 module_x86.o: module.cpp
 	g++ -c -o $(@) -arch i386 module.cpp

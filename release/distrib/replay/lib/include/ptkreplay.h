@@ -14,7 +14,7 @@
 #define PTKEXPORT __stdcall
 #endif
 
-#if defined(__LINUX__) || defined(__MACOSX__)
+#if defined(__LINUX__) || defined(__MACOSX__) || defined(__PSP__)
 #define PTKEXPORT
 #endif
 
@@ -25,10 +25,10 @@
 int PTKEXPORT Ptk_InitDriver(HWND hWnd, int Latency);
 #else
 int PTKEXPORT Ptk_InitDriver(int Latency);
-#endif
+#endif // __WIN32__
 #else
 int PTKEXPORT Ptk_InitDriver(void);
-#endif
+#endif // __WINAMP__
 int PTKEXPORT Ptk_InitModule(unsigned char *Module, int start_position);
 int PTKEXPORT Ptk_GetRow(void);
 int PTKEXPORT Ptk_GetPosition(void);

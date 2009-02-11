@@ -12,7 +12,7 @@
 
 // ------------------------------------------------------
 // Constructor, 303 initialization
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+//#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 gear303::gear303()
 {
     tbPattern = 255;
@@ -39,7 +39,7 @@ gear303::gear303()
     hpf = 0;
     tbWaveform = 0;
 }
-#endif
+//#endif
 
 // ------------------------------------------------------
 // Render 1 32bit-float sample
@@ -116,7 +116,7 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
     if(PARAT303->flag[tbPattern][tbLine].slide_flag) tbDecay = 0.0f;
 
     // Aqui se mira el glide de atras...
-    char tbLine2 = tbLine - 1;
+    int tbLine2 = (tbLine - 1);
     if(tbLine2 < 0)
     {
         tbLine2 = PARAT303->patternlength[tbPattern] - 2;

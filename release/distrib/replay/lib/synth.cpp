@@ -901,7 +901,6 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_OSC3)
     if(OSC3_SWITCH)
     {
-
         // SubOscillator On
         if(OSC1_WAVEFORM != 4)
         {
@@ -928,7 +927,6 @@ float CSynth::GetSample(short *Left_Samples,
 
                 if(Left_Samples1)
                 {
-
                     res_dec = pos_osc3->half.last;
                     i_POSITION = pos_osc3->half.first;
                     if(Loop_Type == SMP_LOOP_NONE) if(i_POSITION > Length - 2) i_POSITION = Length - 2;

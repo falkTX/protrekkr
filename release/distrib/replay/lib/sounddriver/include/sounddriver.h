@@ -26,6 +26,13 @@
 #include <unistd.h>
 #endif
 
+#if defined(__PSP__)
+#include <pspkernel.h>
+#include <pspaudio.h>
+#include <malloc.h>
+#include <string.h>
+#endif
+
 #if defined(__WIN32__)
 #if !defined(__GCC__)
 #define _WIN32_WINNT 0x0500
@@ -49,8 +56,8 @@
 #define AUDIO_PCM_FREQ 44100
 
 #if defined(__PSP__)
-#define AUDIO_THREAD_STACKSIZE (1024 * 32)
-#define AUDIO_THREAD_PRIORITY (SCE_KERNEL_USER_HIGHEST_PRIORITY + 2)
+#define AUDIO_THREAD_STACKSIZE (1024 * 4)
+#define AUDIO_THREAD_PRIORITY 2
 #endif
 
 #define AUDIO_DBUF_CHANNELS 2

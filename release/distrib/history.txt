@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.86b:
+
+- Fixed a bug with the 303 data loading in the replay routine.
+- Fx 0A (Set random cutoff) was disabled due to a typo in the fx constants.
+
 v1.86:
 
 - Fixed a bug with channels that could be heard faintly even when being muted

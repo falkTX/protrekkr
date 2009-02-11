@@ -2484,7 +2484,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_PATTERNLOOP", Store_FX_PatternLoop);
     Save_Constant("PTK_FX_SETCUTOFF", Store_FX_SetCutOff);
     Save_Constant("PTK_FX_SETSAMPLEOFFSET", Store_FX_SetSampleOffset);
-    Save_Constant("PTK_FX_SETRANDCOMCUTOFF", Store_FX_SetRandomCutOff);
+    Save_Constant("PTK_FX_SETRANDOMCUTOFF", Store_FX_SetRandomCutOff);
     Save_Constant("PTK_FX_SLIDEUPCUTOFF", Store_FX_SlideUpCutOff);
     Save_Constant("PTK_FX_SLIDEDOWNCUTOFF", Store_FX_SlideDownCutOff);
     Save_Constant("PTK_FX_PATTERNBREAK", Store_FX_PatternBreak);
@@ -3020,6 +3020,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         Write_Mod_Data(&tb303[1].tone, sizeof(char), 32 * 16, in);
         Write_Mod_Data(&tb303[1].flag, sizeof(struct flag303), 32 * 16, in);
     }
+    
     if(Store_303_1) Write_Mod_Data(&tb303engine[0].tbVolume, sizeof(float), 1, in);
     if(Store_303_2) Write_Mod_Data(&tb303engine[1].tbVolume, sizeof(float), 1, in);
     if(Store_303_1) Write_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);

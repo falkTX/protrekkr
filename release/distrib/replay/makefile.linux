@@ -1,5 +1,9 @@
+CC = g++
+AS = as
+AR = ar
+STRIP = strip
 LIBS = -lptkreplay -lpthread
-FLAGS = -O3 -mms-bitfields -D __LINUX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__
+FLAGS = -O3 -D __LINUX__ -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__
 EXEOBJS = test.o module.o
 
 all: ptkreplay replaytest
@@ -7,17 +11,17 @@ clean: remobj
 
 remobj:
 	-rm -f $(EXEOBJS)
-	
+
 replaytest: $(EXEOBJS)
-	g++ -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
-	strip -s -x $(@)
+	$(CC) -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	$(STRIP) -s -x $(@)
 	-rm -f $(EXEOBJS)
 
-test.o: test/test.cpp
-	g++ -c -o $(@) $(FLAGS) test/test.cpp
+test.o: test/test_linux.cpp
+	$(CC) -c -o $(@) $(FLAGS) test/test_linux.cpp
 
 module.o: test/module.s
-	as -o $(@) test/module.s
+	$(AS) -o $(@) test/module.s
 
 # the library itself #
 include lib/makefile

@@ -9,6 +9,11 @@
 #include "include/replay.h"
 #include "include/endianness.h"
 
+#if defined(__PSP__)
+#include <stdlib.h>
+#include <string.h>
+#endif
+
 #if !defined(__STAND_ALONE__)
 #include "../../../../src/midi/include/midi.h"
 #include "../../../../src/include/variables.h"
@@ -106,7 +111,11 @@ float rbuff_chorus[131072];
 float coef[5];
 float coeftab[5][128][128][4];
 
+#if defined(__PSP__)
+volatile int Songplaying;
+#else
 int Songplaying;
+#endif
 
 int New_Instrument[MAX_TRACKS];
 int Pos_Segue[MAX_TRACKS];
@@ -380,6 +389,7 @@ int DelayType;
     unsigned char nPatterns;
 #endif
 
+#if defined(PTK_SYNTH_PINKNOISE)
 unsigned int dice[7];
 static unsigned long ctz[64] =
 {
@@ -392,11 +402,12 @@ static unsigned long ctz[64] =
     4, 0, 1, 0, 2, 0, 1, 0,
     3, 0, 1, 0, 2, 0, 1, 0,
 };
+#endif
 
 // ------------------------------------------------------
 // Functions
 void allPassInit(float miliSecs);
-float ApplyLfo(float cy, char trcy);
+float ApplyLfo(float cy, int trcy);
 void ComputeCoefs(int freq, int r, int t);
 
 #if defined(PTK_FX_TICK0)
@@ -405,26 +416,26 @@ void ComputeCoefs(int freq, int r, int t);
 
 void DoEffects(void);
 float Filter(float x, char i);
-float filter2p(char ch, float input, float f, float q);
-float filter2px(char ch, float input, float f, float q);
-float filter2p24d(char ch, float input, float f, float q);
-float filterRingMod(char ch, float input, float f, float q);
-float filterRingModStereo(char ch, float input);
-float filterWater(char ch, float input, float f, float q);
-float filterWaterStereo(char ch, float input, float f, float q);
-float filterBellShaped(char ch, float input, float f, float q, float g);
-float filterDelta(char ch, float input, float f, float q);
-float int_filter2p(char ch, float input, float f, float q, float q2);
-float filterhp(char ch, float input, float f, float q);
-float filterhp2(char ch, float input, float f, float q);
+float filter2p(int ch, float input, float f, float q);
+float filter2px(int ch, float input, float f, float q);
+float filter2p24d(int ch, float input, float f, float q);
+float filterRingMod(int ch, float input, float f, float q);
+float filterRingModStereo(int ch, float input);
+float filterWater(int ch, float input, float f, float q);
+float filterWaterStereo(int ch, float input, float f, float q);
+float filterBellShaped(int ch, float input, float f, float q, float g);
+float filterDelta(int ch, float input, float f, float q);
+float int_filter2p(int ch, float input, float f, float q, float q2);
+float filterhp(int ch, float input, float f, float q);
+float filterhp2(int ch, float input, float f, float q);
 
 #if defined(PTK_303)
     void live303(int pltr_eff_row, int pltr_dat_row);
-    void Fire303(unsigned char number,char unit);
+    void Fire303(unsigned char number, int unit);
     void Go303(void);
 #endif
 
-float Kutoff( int v);
+float Kutoff(int v);
 float Resonance(float v);
 float Bandwidth(int v);
 void Compressor_work(void);
@@ -564,10 +575,9 @@ int STDCALL Ptk_InitDriver(void)
     unsigned int newrand;
     unsigned int prevrand;
     unsigned int k;
-#endif
-
     unsigned int seed = 0x12345678;
     unsigned int total = 0;
+#endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     Mas_Compressor_Set_Variables(100.0f, 0.0f);
@@ -726,7 +736,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
     // .ptp modules aren't portable from big endian platform to
     // little endian ones
-    // (so that header will be saved a PRTK on little endian platforms but KTRP on the other ones)
+    // (so that header will be saved as PRTK on little endian platforms and as KTRP on the other ones)
     if(dwModule[0] == 'KTRP')
     {
         Cur_Module += 4;
@@ -899,7 +909,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&TicksPerBeat, sizeof(int));
         Mod_Dat_Read(&mas_vol, sizeof(float));
 
-        int Comp_Flag;
+        char Comp_Flag;
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 
 #if defined(PTK_LIMITER)
@@ -981,19 +991,23 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&tb303_1_enabled, sizeof(char));
 
 #if defined(PTK_303)
+        tb303[0].enabled = tb303_1_enabled;
         if(tb303_1_enabled)
         {
-            Mod_Dat_Read(&tb303[0], sizeof(para303));
+            Mod_Dat_Read(&tb303[0].selectedpattern, sizeof(para303) - sizeof(char));
         }
 #endif
 
         Mod_Dat_Read(&tb303_2_enabled, sizeof(char));
 
+
 #if defined(PTK_303)
+        tb303[1].enabled = tb303_2_enabled;
         if(tb303_2_enabled)
         {
-            Mod_Dat_Read(&tb303[1], sizeof(para303));
+            Mod_Dat_Read(&tb303[1].selectedpattern, sizeof(para303) - sizeof(char));
         }
+
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].tbVolume, sizeof(float));
         if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].tbVolume, sizeof(float));
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].hpf, sizeof(char));
@@ -1080,6 +1094,10 @@ void PTKEXPORT Ptk_Play(void)
 #endif
 
     Songplaying = 1;
+
+#if defined(__PSP__)
+    sceKernelDcacheWritebackInvalidateAll();	
+#endif
 }
 
 // ------------------------------------------------------
@@ -1199,11 +1217,10 @@ void Pre_Song_Init(void)
         oldspawn[ini] = 0;
         roldspawn[ini] = 0;
         
+#if defined(PTK_LFO)
         LFO_ON[ini] = 0;
         LFO_RATE[ini] = 0.0001f;
         LFO_AMPL[ini] = 0;
-
-#if defined(PTK_LFO)
         LFOGR[ini] = 0;
 #endif
 
@@ -1320,7 +1337,7 @@ void Pre_Song_Init(void)
 #if defined(__STAND_ALONE__)
     for(int freer = 0; freer < 128; freer++)
     {
-        for(char pedsplit = 0; pedsplit < 16; pedsplit++)
+        for(int pedsplit = 0; pedsplit < 16; pedsplit++)
         {
             if(SampleType[freer][pedsplit] != 0)
             {
@@ -1347,7 +1364,9 @@ void Post_Song_Init(void)
     int j;
 #endif
 
+#if defined(PTK_COMPRESSOR)
     allPassInit((float) c_threshold);
+#endif
 
 #if defined(PTK_SHUFFLE)
     shufflestep = shuffle;
@@ -1723,7 +1742,7 @@ void Sp_Player(void)
         }
     }
 
-    for(char c = 0; c < Songtracks; c++)
+    for(int c = 0; c < Songtracks; c++)
     {
         grown = FALSE;
         char gotsome = FALSE;
@@ -2164,25 +2183,22 @@ ByPass_Wav:
             // If there's no polyphony we use a rather clumsy cross fading
             // to avoid the most outrageous clicks
             // (i also tried with splines but didn't hear any differences)
-            if(Channels_Polyphony[c] == 1 || Player_FD[c] != 0.0f)
+            if(New_Instrument[c])
             {
-                if(New_Instrument[c])
+                All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
+                All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
+                Pos_Segue[c]++;
+                Segue_Volume[c] -= 1.0f / 127.0f;
+                if(Pos_Segue[c] >= 128)
                 {
-                    All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
-                    All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
-                    Pos_Segue[c]++;
-                    Segue_Volume[c] -= 1.0f / 127.0f;
-                    if(Pos_Segue[c] >= 128)
-                    {
-                        New_Instrument[c] = FALSE;
-                    }
+                    New_Instrument[c] = FALSE;
                 }
-                else
-                {
-                    // Store the transition
-                    Segue_SamplesL[c] = All_Signal_L;
-                    Segue_SamplesR[c] = All_Signal_R;
-                }
+            }
+            else
+            {
+                // Store the transition
+                Segue_SamplesL[c] = All_Signal_L;
+                Segue_SamplesR[c] = All_Signal_R;
             }
 
 #if defined(PTK_FLANGER)
@@ -2346,10 +2362,15 @@ void Play_Instrument(int channel, int sub_channel,
     // Check if the channel have to be played
     if(CHAN_ACTIVE_STATE[Cur_Position][channel])
     {
-        char split = 0;
-        int mnote = int(note);
+        int split = 0;
 
-        for(char revo = 0; revo < 16; revo++)
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
+        int mnote = int(note);
+#endif
+#endif
+
+        for(int revo = 0; revo < 16; revo++)
         {
             if(note >= Basenote[associated_sample][revo] &&
                SampleType[associated_sample][revo] != 0)
@@ -2532,7 +2553,7 @@ void Play_Instrument(int channel, int sub_channel,
             if(!glide) ramper[channel] = 0;
 
             // Sample is out of range
-            if((int) sp_Position[channel][sub_channel].half.first >= SampleNumSamples[associated_sample][split])
+            if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
             {
                 sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
                 sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
@@ -2558,12 +2579,9 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
         }
-        if(Channels_Polyphony[channel] == 1 || Player_FD[channel] != 0.0f)
-        {
-            Pos_Segue[channel] = 0;
-            Segue_Volume[channel] = 1.0f;
-            New_Instrument[channel] = TRUE;
-        }
+        Pos_Segue[channel] = 0;
+        Segue_Volume[channel] = 1.0f;
+        New_Instrument[channel] = TRUE;
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
@@ -2708,9 +2726,15 @@ void DoEffects(void)
         int tefactor = trackef * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
         int pltr_note = *(RawPatterns + tefactor);
         int pltr_sample = *(RawPatterns + tefactor + 1);
+
+#if defined(PTK_FX_NOTECUT) || defined(PTK_FX_NOTERETRIGGER)
         unsigned char pltr_vol_row = *(RawPatterns + tefactor + 2);
-        int pltr_pan_row = *(RawPatterns + tefactor + 3);
+#endif
+
+#if defined(PTK_FX_0) || defined(PTK_FX_X)
         int64 pltr_eff_row = *(RawPatterns + tefactor + 4);
+#endif
+
         int64 pltr_dat_row = *(RawPatterns + tefactor + 5);
 
         if(Subicounter == 0)
@@ -2783,9 +2807,7 @@ void DoEffects(void)
         }
 #endif
 
-
 #if defined(PTK_FX_0)
-
         switch(pltr_eff_row)
         {
 
@@ -3096,7 +3118,6 @@ void DoEffects(void)
 
 #endif  // PTK_FX_X
 
-
 #if defined(PTK_FX_ARPEGGIO)
         // Let's do the arpeggio
         double arpnote;
@@ -3130,7 +3151,7 @@ void DoEffects(void)
 
 // ------------------------------------------------------
 // Reset the tracks filters
-void ResetFilters(char tr)
+void ResetFilters(int tr)
 {
     buf024[tr] = 0.0f;
     buf124[tr] = 0.0f;
@@ -3147,7 +3168,7 @@ void ResetFilters(char tr)
 
 // ------------------------------------------------------
 // Process LFO
-float ApplyLfo(float cy, char trcy)
+float ApplyLfo(float cy, int trcy)
 {
 
 #if defined(PTK_LFO)
@@ -3166,7 +3187,7 @@ float ApplyLfo(float cy, char trcy)
 
 // ------------------------------------------------------
 // Stereo volume table
-void ComputeStereo(char channel)
+void ComputeStereo(int channel)
 {
     LVol[channel] = 1.0f - TPan[channel];
     RVol[channel] = 1.0f - LVol[channel];
@@ -3279,6 +3300,7 @@ void ComputeCoefs(int freq, int r, int t)
 
     switch(t)
     {
+        default:
         case 0: // LP
             b0 =  (1.0f - cs) / 2.0f;
             b1 =   1.0f - cs;
@@ -3340,7 +3362,7 @@ float Filter(float x, char i)
 }
 #endif
 
-float Kutoff( int v)
+float Kutoff(int v)
 {
     return powf((v + 5.0f) / (127.0f + 5.0f), 1.7f) * 13000.0f + 30.0f;
 }
@@ -3356,7 +3378,7 @@ float Bandwidth(int v)
 }
 
 #if defined(PTK_PROC_FILTER2P)
-float filter2p(char ch, float input, float f, float q)
+float filter2p(int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
@@ -3370,7 +3392,7 @@ float filter2p(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERHP2)
-float filterhp2(char ch, float input, float f, float q)
+float filterhp2(int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
@@ -3384,7 +3406,7 @@ float filterhp2(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERHP)
-float filterhp(char ch, float input, float f, float q)
+float filterhp(int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
@@ -3398,7 +3420,7 @@ float filterhp(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTER2P24D)
-float filter2p24d(char ch, float input, float f, float q)
+float filter2p24d(int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
@@ -3411,7 +3433,7 @@ float filter2p24d(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERRINGMOD)
-float filterRingMod(char ch, float input, float f, float q)
+float filterRingMod(int ch, float input, float f, float q)
 {
     q++;
 
@@ -3424,14 +3446,14 @@ float filterRingMod(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERRINGMODSTEREO)
-float filterRingModStereo(char ch, float input)
+float filterRingModStereo(int ch, float input)
 {
     return float(input * cosf(buf0[ch] * 0.0174532f));
 }
 #endif
 
 #if defined(PTK_PROC_FILTERWATER)
-float filterWater(char ch, float input, float f, float q)
+float filterWater(int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     float ad = input - buf0[ch];
@@ -3442,7 +3464,7 @@ float filterWater(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERWATERSTEREO)
-float filterWaterStereo(char ch, float input, float f, float q)
+float filterWaterStereo(int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     float ad = input - buf1[ch];
@@ -3453,7 +3475,7 @@ float filterWaterStereo(char ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERDELTA)
-float filterDelta(char ch, float input, float f, float q)
+float filterDelta(int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     q *= 0.007874f;
@@ -3472,7 +3494,7 @@ float filterDelta(char ch, float input, float f, float q)
 }
 #endif
 
-/*float filterDeltaStereo(char ch, float input, float f, float q)
+/*float filterDeltaStereo(int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     q *= 0.007874f;
@@ -3492,7 +3514,7 @@ float filterDelta(char ch, float input, float f, float q)
 */
 
 #if defined(PTK_PROC_FILTERBELLSHAPED)
-float filterBellShaped(char ch, float input, float f, float q, float g)
+float filterBellShaped(int ch, float input, float f, float q, float g)
 {
     input++;
     q *= 0.007874f;
@@ -3524,14 +3546,14 @@ float filterBellShaped(char ch, float input, float f, float q, float g)
 #endif
 
 #if defined(PTK_PROC_FILTERINT2P)
-float int_filter2p(char ch, float input, float f, float q, float q2)
+float int_filter2p(int ch, float input, float f, float q, float q2)
 {
     q *= 0.0787401f;
     input = filter2px(ch, input, f, q2);
     return float(32767.0f * powf(fabsf(input) / 32767.0f, 1.0f - q / 11.0f));
 }
 
-float filter2px(char ch, float input, float f, float q)
+float filter2px(int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     float fa = float(1.0f - f);
@@ -3570,7 +3592,7 @@ void live303(int pltr_eff_row, int pltr_dat_row)
 
 }
 
-void Fire303(unsigned char number,char unit)
+void Fire303(unsigned char number, int unit)
 {
     tb303engine[unit].tbLine = 0;
    
@@ -4033,7 +4055,6 @@ void Compressor_work(void)
     if(compressor)
     {
         float l_rout = 0;
-        float r_rout = 0;
 
         // Comb filter
         for(int i = 0; i < num_echoes; i++)

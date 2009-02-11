@@ -11,70 +11,39 @@
          to avoid lags and stuttering.
 */
 
-#ifdef __WIN32__
-#define _WIN32_WINNT 0x0500
-#include <Windows.h>
-#endif
-
-#if defined(__LINUX__) || defined(__MACOSX__)
 #include <unistd.h>
-#endif
+#include <stdio.h>
 
 #include "../lib/include/ptkreplay.h"
-
-#include <stdio.h>
 
 extern "C"
 {
     extern unsigned int _PTK_MODULE;
 }
 
-/* Initialize with 20 milliseconds of latency */
+// Initialize with 20 milliseconds of latency
 #define LATENCY 20
 
 int main(void)
 {
-    /* Init the sound driver and the various tables */
-#if defined(__WIN32__)
-    if(!Ptk_InitDriver(GetConsoleWindow(), LATENCY)) return(0);
-#else
     if(!Ptk_InitDriver(LATENCY)) return(0);
-#endif
 
-    /* Load it */
+    // Load it
     if(!Ptk_InitModule((unsigned char *) &_PTK_MODULE, 0))
     {
         Ptk_ReleaseDriver();
         return(0);
     }
 
-    /* Start playing it */
+    // Start playing it
     Ptk_Play();
 
-#if defined(__WIN32__)
-    while(!GetAsyncKeyState(VK_ESCAPE))
-    {
-        printf("   :   ");
-        printf("\r");
-        printf("%.2d:%.2d", Ptk_GetPosition(), Ptk_GetRow());
-        printf("\r");
-
-        Sleep(10);
-    }
-#endif
-
-#if defined(__LINUX__) || defined(__MACOSX__)
+    // Ctrl+C to quit
     while(1)
     {
         usleep(10);
     }
 
-#endif
-
     Ptk_Stop();
     Ptk_ReleaseDriver();
-
-#if defined(__WIN32__)
-    ExitProcess(0);
-#endif
 }

@@ -17,4 +17,4 @@
 *.a*
 *.lib*
 *.ptp*
-*.s*
+*module.s*

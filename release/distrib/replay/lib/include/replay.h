@@ -179,7 +179,11 @@ extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 extern float Player_FD[MAX_TRACKS];
 extern char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
 extern char sp_split[MAX_TRACKS][MAX_POLYPHONY];
+#if defined(__PSP__)
+extern volatile int Songplaying;
+#else
 extern int Songplaying;
+#endif
 extern int left_value;
 extern int right_value;
 extern SynthParameters PARASynth[128];
@@ -197,8 +201,8 @@ void Play_Instrument(int channel, int sub_channel,
                      float note, int sample,
                      float vol, unsigned int offset,
                      int glide, int Play_Selection, int midi_channel);
-void ResetFilters(char tr);
-void ComputeStereo(char channel);
+void ResetFilters(int tr);
+void ComputeStereo(int channel);
 void GetPlayerValues(float master_coef);
 void noteoff303(char strack);
 void init_sample_bank(void);

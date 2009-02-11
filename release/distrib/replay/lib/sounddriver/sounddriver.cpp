@@ -3,6 +3,7 @@
 // Written by Franck Charlet
 // Based on the work of Juan Antonio Arguelles Rius
 // ------------------------------------------------------
+// TODO: split all this, it's starting to become a bit messy
 
 // ------------------------------------------------------
 // Includes
@@ -19,12 +20,19 @@
 
 // ------------------------------------------------------
 // Variables
-int AUDIO_Play_Flag;
 
 unsigned int AUDIO_To_Fill;
+#if defined(__PSP__)
+int AUDIO_Samples __attribute__((aligned(64)));
+int AUDIO_Play_Flag __attribute__((aligned(64)));
+float AUDIO_Timer __attribute__((aligned(64)));
+#else
 int AUDIO_Samples;
-int volatile AUDIO_Acknowledge;
+int AUDIO_Play_Flag;
 float AUDIO_Timer;
+#endif
+
+int volatile AUDIO_Acknowledge;
 
 #if defined(__MACOSX__)
 AudioDeviceID AUDIO_Device;
@@ -42,8 +50,16 @@ int volatile Thread_Running;
 
 #if defined(__PSP__)
 SceUID AUDIO_thid;
-short *AUDIO_Buffer1;
-short *AUDIO_Buffer2;
+int AUDIO_HWChannel;
+extern int Songplaying;
+extern "C"
+{
+    void me_stub(void);
+    void me_stub_end(void);
+    void me_disable_int(void);
+    void me_sceKernelDcacheWritebackInvalidateAll(void);
+}
+void Me_Handler(void) __attribute__((aligned(64)));
 #endif
 
 int AUDIO_SoundBuffer_Size;
@@ -126,41 +142,82 @@ void *AUDIO_Thread(void *arg)
 #endif
 
 #if defined(__PSP__)
-SceInt32 AUDIO_Thread(SceSize args, ScePVoid argp)
+short *ptrAudio_BufferPlay1;
+short *ptrAudio_BufferPlay2;
+int AUDIO_FlipFlop = FALSE;
+int Mutex;
+
+void Me_Handler(void)
 {
-    short *ptrAudio_BufferCalc = (short *) args;        // Phony shit
-    short *ptrAudio_BufferPlay = (short *) argp;
-    int Sound_Buffer_FlipFlop = FALSE;
+    volatile int *ptrAUDIO_Samples = (int *) (((int) &AUDIO_Samples) | 0x40000000);
+    me_sceKernelDcacheWritebackInvalidateAll();
+    me_disable_int();
     for(;;)
     {
-        if(AUDIO_Play_Flag)
+        volatile int *ptrAUDIO_Samples = (int *) (((int) &AUDIO_Samples) | 0x40000000);
+        volatile int *ptrAUDIO_Timer = (int *) (((int) &AUDIO_Timer) | 0x40000000);
+        volatile int *ptrAUDIO_SoundBuffer_Size = (int *) (((int) &AUDIO_SoundBuffer_Size) | 0x40000000);
+        volatile int *ptrAUDIO_FlipFlop = (int *) (((int) &AUDIO_FlipFlop) | 0x40000000);
+        volatile int *ptrAUDIO_Play_Flag = (int *) (((int) &AUDIO_Play_Flag) | 0x40000000);
+        volatile int *ptrSongplaying = (int *) (((int) &Songplaying) | 0x40000000);
+        volatile short *ptrBuffer1 = (short *) (((int) ptrAudio_BufferPlay1) | 0x40000000);
+        volatile short *ptrBuffer2 = (short *) (((int) ptrAudio_BufferPlay2) | 0x40000000);
+        volatile int *ptrMutex = (int *) (((int) &Mutex) | 0x40000000);
+    
+        if(*ptrAUDIO_Play_Flag && *ptrSongplaying)
         {
-            AUDIO_Acknowledge = FALSE;
-
-            Sound_Buffer_FlipFlop ^= TRUE;
-            if(Sound_Buffer_FlipFlop)
+            if(*ptrMutex == 0)
             {
-                ptrAudio_BufferCalc = AUDIO_Buffer2;
-                ptrAudio_BufferPlay = AUDIO_Buffer1;
+                if(*ptrAUDIO_FlipFlop)
+                {
+                    AUDIO_Mixer((Uint8 *) ptrBuffer1, *ptrAUDIO_SoundBuffer_Size);
+                }
+                else
+                {
+                    AUDIO_Mixer((Uint8 *) ptrBuffer2, *ptrAUDIO_SoundBuffer_Size);
+                }
+                *ptrAUDIO_Samples += *ptrAUDIO_SoundBuffer_Size;
+                *ptrAUDIO_Timer = ((((float) *ptrAUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
+                *ptrMutex = TRUE;
+                asm volatile ( "sync\n" );
             }
-            else
-            {
-                ptrAudio_BufferCalc = AUDIO_Buffer1;
-                ptrAudio_BufferPlay = AUDIO_Buffer2;
-            }
-            sceWaveAudioWriteBlocking(0, SCE_WAVE_AUDIO_VOL_MAX, SCE_WAVE_AUDIO_VOL_MAX, ptrAudio_BufferPlay);
-            AUDIO_Mixer(ptrAudio_BufferCalc, AUDIO_SoundBuffer_Size << 2);
+        }    
+    }
+}
 
-            AUDIO_Samples += AUDIO_SoundBuffer_Size << 2;
-            AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);  
-        }
-        else
+SceInt32 AUDIO_Thread(SceSize args, ScePVoid argp)
+{
+    for(;;)
+    {
+        volatile int *ptrAUDIO_FlipFlop = (int *) (((int) &AUDIO_FlipFlop) | 0x40000000);
+        volatile short *ptrBuffer1 = (short *) (((int) ptrAudio_BufferPlay1) | 0x40000000);
+        volatile short *ptrBuffer2 = (short *) (((int) ptrAudio_BufferPlay2) | 0x40000000);
+        volatile int *ptrMutex = (int *) (((int) &Mutex) | 0x40000000);
+
+        volatile int *ptrAUDIO_Samples = (int *) (((int) &AUDIO_Samples) | 0x40000000);
+        if(AUDIO_Play_Flag && Songplaying)
         {
-            AUDIO_Acknowledge = TRUE;
+            if(sceAudioGetChannelRestLen(AUDIO_HWChannel) <= 0)
+            {
+                if(*ptrMutex)
+                {
+                    if(*ptrAUDIO_FlipFlop)
+                    {
+                        sceAudioOutput(AUDIO_HWChannel, PSP_AUDIO_VOLUME_MAX, (void *) ptrBuffer1);
+                    }
+                    else
+                    {
+                        sceAudioOutput(AUDIO_HWChannel, PSP_AUDIO_VOLUME_MAX, (void *) ptrBuffer2);
+                    }
+                    *ptrAUDIO_FlipFlop ^= TRUE;
+                    *ptrMutex = FALSE;
+                    asm volatile ( "sync\n" );
+                }
+            }
         }
         sceKernelDelayThread(10);
     }
-    return(SCE_KERNEL_EXIT_SUCCESS);
+    return(0);
 }
 #endif
 
@@ -238,7 +295,6 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 #endif
 
 #if defined(__PSP__)
-    sceWaveInit();
     return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
 #endif
 
@@ -258,11 +314,11 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 // ------------------------------------------------------
 // Name: AUDIO_malloc_64()
 // Desc: Create an audio buffer of given milliseconds
-void *AUDIO_malloc_64(int size)
+void *AUDIO_malloc_64(int *size)
 {
-    int mod_64 = size & 0x3f;
-    if(mod_64 != 0) size += 64 - mod_64;
-    return((void *) memalign(64, size));
+    int mod_64 = *size & 0x3f;
+    if(mod_64 != 0) *size += 64 - mod_64;
+    return((void *) memalign(64, *size));
 }
 #endif
 
@@ -404,18 +460,51 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 #endif
 
 #if defined(__PSP__)
-    sceWaveAudioSetFormat(0, SCE_WAVE_AUDIO_FMT_S16_STEREO);
+    AUDIO_SoundBuffer_Size = frag_size * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3);
+    AUDIO_SoundBuffer_Size = PSP_AUDIO_SAMPLE_ALIGN(AUDIO_SoundBuffer_Size);
 
-    AUDIO_SoundBuffer_Size = frag_size * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3) * num_fragments;
+    AUDIO_HWChannel = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL, AUDIO_SoundBuffer_Size, PSP_AUDIO_FORMAT_STEREO);
+    AUDIO_SoundBuffer_Size <<= 2;
+
     AUDIO_Latency = AUDIO_SoundBuffer_Size;
-    AUDIO_Buffer1 = (short *) AUDIO_malloc_64(AUDIO_SoundBuffer_Size * AUDIO_STEREO * sizeof(short));
-    AUDIO_Buffer2 = (short *) AUDIO_malloc_64(AUDIO_SoundBuffer_Size * AUDIO_STEREO * sizeof(short));
-    sceWaveAudioSetSample(0, AUDIO_SoundBuffer_Size);
-    AUDIO_thid = sceKernelCreateThread("PTK Audio thread", AUDIO_Thread, AUDIO_THREAD_PRIORITY, AUDIO_THREAD_STACKSIZE, 0, NULL);
-    if(AUDIO_thid > 0)
+    int buf_size = AUDIO_SoundBuffer_Size;
+    ptrAudio_BufferPlay1 = (short *) (((int) AUDIO_malloc_64(&buf_size)) | 0x40000000);
+    sceKernelDcacheWritebackInvalidateAll();
+    memset((void *) ptrAudio_BufferPlay1, 0, buf_size);
+
+    if((int) ptrAudio_BufferPlay1 != 0x40000000)
     {
-        sceKernelStartThread(AUDIO_thid, 0, NULL);
-        return(TRUE);
+        buf_size = AUDIO_SoundBuffer_Size;
+        ptrAudio_BufferPlay2 = (short *) (((int) AUDIO_malloc_64(&buf_size)) | 0x40000000);
+        sceKernelDcacheWritebackInvalidateAll();
+        memset((void *) ptrAudio_BufferPlay2, 0, buf_size);
+
+        if((int) ptrAudio_BufferPlay2 != 0x40000000)
+        {
+            // Install the code for the media engine handler
+            me_sceKernelDcacheWritebackInvalidateAll();
+            sceKernelDcacheWritebackInvalidateAll();
+            int i;
+            u8 *Src = (u8 *) &me_stub;
+	        u8 *Dest = (u8 *) 0xbfc00040;
+	        for(i = 0; i < (int) ((int) &me_stub_end - (int) &me_stub); i++)
+            {
+		        Dest[i] = Src[i];
+	        }
+	        _sw(((u32) Me_Handler) | 0x40000000, 0xbfc00600);
+            me_sceKernelDcacheWritebackInvalidateAll();
+	        sceKernelDcacheWritebackAll();
+            sceSysregMeResetEnable();
+	        sceSysregMeBusClockEnable();
+	        sceSysregMeResetDisable();
+            
+            AUDIO_thid = sceKernelCreateThread("Ptk Audio Thread", AUDIO_Thread, AUDIO_THREAD_PRIORITY, AUDIO_THREAD_STACKSIZE, 0, NULL);
+            if(AUDIO_thid > 0)
+            {
+                sceKernelStartThread(AUDIO_thid, 0, NULL);
+                return(TRUE);
+            }
+        }
     }
 #endif
 
@@ -444,9 +533,6 @@ void AUDIO_Wait_For_Thread(void)
 #if defined(__LINUX__) 
             usleep(10);
 #endif
-#if defined(__PSP__)
-            sceKernelDelayThread(10);
-#endif
 
         };
     }
@@ -460,9 +546,6 @@ void AUDIO_Wait_For_Thread(void)
 #endif
 #if defined(__LINUX__) || defined(__MACOSX__)
             usleep(10);
-#endif
-#if defined(__PSP__)
-            sceKernelDelayThread(10);
 #endif
 
         };
@@ -481,17 +564,20 @@ void AUDIO_Play(void)
     AudioDeviceStart(AUDIO_Device, AUDIO_Callback);
 #endif
 
-#if defined(__PSP__)
-    sceWaveStart(SCE_KERNEL_USER_HIGHEST_PRIORITY);
-#endif
-
 #if defined(__WIN32__)
     AUDIO_Sound_Buffer->Play(0, 0, DSBPLAY_LOOPING);
 #endif
 
     AUDIO_ResetTimer();
+
     AUDIO_Play_Flag = TRUE;
+
+#if !defined(__PSP__)
     AUDIO_Wait_For_Thread();
+#else
+    sceKernelDcacheWritebackInvalidateAll();
+#endif
+
 }
 
 // ------------------------------------------------------
@@ -509,6 +595,11 @@ void AUDIO_ResetTimer(void)
 {
     AUDIO_Samples = 0;
     AUDIO_Timer = 0.0f;
+
+#if defined(__PSP__)
+    sceKernelDcacheWritebackInvalidateAll();
+#endif
+
 }
 
 // ------------------------------------------------------
@@ -533,7 +624,10 @@ int AUDIO_GetSamples(void)
 void AUDIO_Stop(void)
 {
     AUDIO_Play_Flag = FALSE;
+
+#if !defined(__PSP__)
     AUDIO_Wait_For_Thread();
+#endif
 
 #if defined(__MACOSX__)
     AudioDeviceStop(AUDIO_Device, AUDIO_Callback);
@@ -563,7 +657,9 @@ void AUDIO_Stop_Sound_Buffer(void)
 
 #if defined(__PSP__)
     if(AUDIO_thid > 0) sceKernelDeleteThread(AUDIO_thid);
-    sceWaveEnd();
+    if(AUDIO_HWChannel) sceAudioChRelease(AUDIO_HWChannel);
+    if(ptrAudio_BufferPlay1) free((void *) ptrAudio_BufferPlay1);
+    if(ptrAudio_BufferPlay2) free((void *) ptrAudio_BufferPlay2);
 #endif
 
 #if defined(__WIN32__)
@@ -599,7 +695,9 @@ void AUDIO_Stop_Driver(void)
 #endif
 
 #if defined(__PSP__)
-    sceWaveExit();
+    me_sceKernelDcacheWritebackInvalidateAll();	
+    sceSysregMeResetEnable();
+    sceSysregMeBusClockDisable();
 #endif
 
 #if defined(__WIN32__)

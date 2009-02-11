@@ -467,7 +467,7 @@ extern char Channels_Polyphony[MAX_TRACKS];
 
 // ------------------------------------------------------
 // Functions
-void ResetFilters(char tr);
+void ResetFilters(int tr);
 void WavRenderizer(void);
 void DoEffects_tick0(void);
 void DoEffects(void);
@@ -495,8 +495,6 @@ void Check_Loops(void);
 void Skincopy(int xd, int yd, int xs, int ys, int w, int h);
 void Go303(void);
 void knob(int x, int y, unsigned char number);
-void Fire303(unsigned char number, char unit);
-void number303(unsigned char number, int x, int y);
 void ShowInfo(void);
 void guiDial2(const char *str);
 
@@ -532,19 +530,19 @@ float ApplyLfo(float cy, char trcy);
 int GetFreeWave(void);
 char zcheckMouse_nobutton(int x, int y, int xs, int ys);
 char zcheckMouse(int x, int y, int xs, int ys);
-float int_filter2p(char ch, float input, float f, float q, float q2);
-float filter2p(char ch, float input, float f, float q);
-float filterhp(char ch, float input, float f, float q);
-float filterhp2(char ch, float input, float f, float q);
-float filter2px(char ch, float input, float f, float q);
-float filter2p24d(char ch, float input, float f, float q);
-float filterRingMod(char ch, float input, float f, float q);
-float filterRingModStereo(char ch, float input);
-float filterWater(char ch, float input, float f, float q);
-float filterWaterStereo(char ch ,float input, float f, float q);
-float filterBellShaped(char ch, float input, float f, float q, float g);
-float filterDelta(char ch, float input, float f, float q);
-//float filterDeltaStereo(char ch, float input, float f, float q);
+float int_filter2p(int ch, float input, float f, float q, float q2);
+float filter2p(int ch, float input, float f, float q);
+float filterhp(int ch, float input, float f, float q);
+float filterhp2(int ch, float input, float f, float q);
+float filter2px(int ch, float input, float f, float q);
+float filter2p24d(int ch, float input, float f, float q);
+float filterRingMod(int ch, float input, float f, float q);
+float filterRingModStereo(int ch, float input);
+float filterWater(int ch, float input, float f, float q);
+float filterWaterStereo(int ch ,float input, float f, float q);
+float filterBellShaped(int ch, float input, float f, float q, float g);
+float filterDelta(int ch, float input, float f, float q);
+//float filterDeltaStereo(int ch, float input, float f, float q);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
 
 void FadeToBlack(void);

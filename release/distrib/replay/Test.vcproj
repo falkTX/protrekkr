@@ -155,7 +155,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Test\Test.cpp">
+				RelativePath=".\test\test_windows.cpp">
 			</File>
 		</Filter>
 		<Filter

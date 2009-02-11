@@ -1,5 +1,9 @@
+CC = g++
+AS = as
+AR = ar
+STRIP = strip
 LIBS = -lptkreplay -ldsound -lmsacm32
-FLAGS = -O2 -mms-bitfields -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __STAND_ALONE__
+FLAGS = -O3 -mms-bitfields -fno-rtti -fno-exceptions -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __STAND_ALONE__
 EXEOBJS = test.o module.o
 
 all: ptkreplay replaytest
@@ -9,15 +13,15 @@ remobj:
 	-rm -f $(EXEOBJS)
 	
 replaytest: $(EXEOBJS)
-	g++ -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
-	strip -s -x $(@).exe
+	$(CC) -o $(@) -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	$(STRIP) -s -x $(@).exe
 	-rm -f $(EXEOBJS)
 
-test.o: test/test.cpp
-	g++ -c -o $(@) $(FLAGS) test/test.cpp
+test.o: test/test_windows.cpp
+	$(CC) -c -o $(@) $(FLAGS) test/test_windows.cpp
 
 module.o: test/module.s
-	as -o $(@) test/module.s
+	$(AS) -o $(@) test/module.s
 
 # the library itself #
 include lib/makefile
