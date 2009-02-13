@@ -345,9 +345,13 @@ void ltActualize(int modeac)
                     }
                 }
 
+                SetColor(COL_SLIDER_LO);
+                bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
+                SetColor(COL_SLIDER_HI);
+                bjbox(395, 59, 15 + 1, 101 + 1);
                 SetColor(COL_SLIDER_MED);
-                bjbox(394, 58, 17, 103);
-                Gui_Draw_Button_Box(394, 58 + lt_ykar, 16, 32, "", BUTTON_NORMAL);
+                bjbox(395, 59, 15, 101);
+                Gui_Draw_Button_Box(394 + 1, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
                 if(last_index != lt_index)
                 {
                     DumpList(413, 41, lt_index);

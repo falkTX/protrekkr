@@ -16,12 +16,12 @@ extern s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
 extern s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 extern s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
 
-Uint32 axswave = 0;
+int32 axswave = 0;
 
-Uint32 sed_display_start = 0;
-Uint32 sed_display_length = 0;
-Uint32 sed_range_start = 0;
-Uint32 sed_range_end = 0;
+int32 sed_display_start = 0;
+int32 sed_display_length = 0;
+int32 sed_range_start = 0;
+int32 sed_range_end = 0;
 char sed_range_mode = FALSE;
 
 // ------------------------------------------------------
@@ -64,12 +64,11 @@ void Draw_Sample_Ed(void)
 
 void Draw_Sampled_Wave(void)
 {
-    Uint32 sed_real_range_start;
-    Uint32 sed_real_range_end;
+    int32 sed_real_range_start;
+    int32 sed_real_range_end;
 
     if(userscreen == USER_SCREEN_SAMPLE_EDIT)
     {
-
         sed_real_range_start = sed_range_start;
         sed_real_range_end = sed_range_end;
 
@@ -82,7 +81,7 @@ void Draw_Sampled_Wave(void)
 
         if(draw_sampled_wave)
         {
-            Realslider3(0, 559, sed_display_start, sed_display_length, SampleNumSamples[ped_patsam][ped_split], 512, TRUE);
+            Realslider_Horiz(0, 559, sed_display_start, sed_display_length, SampleNumSamples[ped_patsam][ped_split], 512, TRUE);
 
             if(SampleType[ped_patsam][ped_split] > 0)
             { // Any Sample Out There?
@@ -109,9 +108,9 @@ void Draw_Sampled_Wave(void)
 
                 if(SampleChannels[ped_patsam][ped_split] == 1)
                 {
-                    for(Uint32 s_ex = 0; s_ex < 512; s_ex++)
+                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
-                        Uint32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
+                        int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
                         int h = *(RawSamples[ped_patsam][0][ped_split] + s_offset) / rs_coef;
                         if(h > s_size) h = s_size;
                         if(h < -s_size) h = -s_size;
@@ -140,9 +139,9 @@ void Draw_Sampled_Wave(void)
                 // STEREO DISPLAY
                 if(SampleChannels[ped_patsam][ped_split] == 2)
                 {
-                    for(Uint32 s_ex = 0; s_ex < 512; s_ex++)
+                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
-                        Uint32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
+                        int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
                         int h = *(RawSamples[ped_patsam][0][ped_split] + s_offset) / rs_coef;
                         int h2 = *(RawSamples[ped_patsam][1][ped_split] + s_offset) / rs_coef;
                         if(h > s_size) h = s_size;
@@ -183,8 +182,8 @@ void Draw_Sampled_Wave(void)
                 // Loop bars
                 if(LoopType[ped_patsam][ped_split])
                 {
-                    Uint32 LSX = LoopStart[ped_patsam][ped_split] - sed_display_start;
-                    Uint32 LEX = LoopEnd[ped_patsam][ped_split] - sed_display_start;
+                    int32 LSX = (int32) LoopStart[ped_patsam][ped_split] - sed_display_start;
+                    int32 LEX = (int32) LoopEnd[ped_patsam][ped_split] - sed_display_start;
 
                     LSX = (LSX * 512) / sed_display_length;
                     LEX = (LEX * 512) / sed_display_length;
@@ -242,9 +241,9 @@ void NewWav(void)
 // Draw the current playback position
 void Draw_Sampled_Wave2(void)
 {
-    Uint32 sed_real_range_start;
-    Uint32 sed_real_range_end;
-    Uint32 pos_in_sample;
+    int32 sed_real_range_start;
+    int32 sed_real_range_end;
+    int32 pos_in_sample;
     int i;
 
     if(draw_sampled_wave2)
@@ -260,7 +259,7 @@ void Draw_Sampled_Wave2(void)
             pos_in_sample = 0;
             for(i = 0; i < MAX_POLYPHONY; i++)
             {
-                if(sp_Position[ped_track][i].half.first > pos_in_sample)
+                if((int32) sp_Position[ped_track][i].half.first > pos_in_sample)
                 {
                     if(sp_Stage[ped_track][i] == PLAYING_SAMPLE)
                     {
@@ -281,9 +280,9 @@ void Draw_Sampled_Wave2(void)
 
             if(SampleChannels[ped_patsam][ped_split] == 1)
             {
-                for(Uint32 s_ex = 0; s_ex < 512; s_ex++)
+                for(int32 s_ex = 0; s_ex < 512; s_ex++)
                 {
-                    Uint32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
+                    int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
 
                     if(pos_in_sample > s_offset)
                     {
@@ -307,9 +306,9 @@ void Draw_Sampled_Wave2(void)
             // STEREO DISPLAY
             if(SampleChannels[ped_patsam][ped_split] == 2)
             {
-                for(Uint32 s_ex = 0; s_ex < 512; s_ex++)
+                for(int32 s_ex = 0; s_ex < 512; s_ex++)
                 {
-                    Uint32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
+                    int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
 
                     if(pos_in_sample > s_offset)
                     {
@@ -355,9 +354,9 @@ void Draw_Sampled_Wave3(void)
 
 void Actualize_Wave_Ed(char gode)
 {
-    Uint32 sed_real_range_start;
-    Uint32 sed_real_range_end;
-    Uint32 wao;
+    int32 sed_real_range_start;
+    int32 sed_real_range_end;
+    int32 wao;
 
     if(userscreen == USER_SCREEN_SAMPLE_EDIT)
     {
@@ -399,7 +398,6 @@ void Actualize_Wave_Ed(char gode)
             // Cut Sample
             if(gode == 20)
             {
-
                 long cutsize = (sed_real_range_end - sed_real_range_start) + 1;
                 long newsize = SampleNumSamples[ped_patsam][ped_split] - cutsize;
 
@@ -434,7 +432,7 @@ void Actualize_Wave_Ed(char gode)
 
                     if(SampleNumSamples[ped_patsam][ped_split] - sed_real_range_end > 1)
                     {
-                        for(wao = sed_real_range_end + 1; wao < SampleNumSamples[ped_patsam][ped_split]; wao++)
+                        for(wao = sed_real_range_end + 1; wao < (int32) SampleNumSamples[ped_patsam][ped_split]; wao++)
                         {
                             *(Mono + p_s) = *(RawSamples[ped_patsam][0][ped_split] + wao);
                             if(nc == 2) *(Stereo + p_s) = *(RawSamples[ped_patsam][1][ped_split] + wao);
@@ -453,11 +451,11 @@ void Actualize_Wave_Ed(char gode)
 
                     SampleNumSamples[ped_patsam][ped_split] = newsize;
 
-                    if(sed_display_length > SampleNumSamples[ped_patsam][ped_split])
+                    if(sed_display_length > (int32) SampleNumSamples[ped_patsam][ped_split])
                     {
                         sed_display_length = SampleNumSamples[ped_patsam][ped_split];
                     }
-                    if(sed_display_length + sed_display_start > SampleNumSamples[ped_patsam][ped_split])
+                    if(sed_display_length + sed_display_start > (int32) SampleNumSamples[ped_patsam][ped_split])
                     {
                         sed_display_start = SampleNumSamples[ped_patsam][ped_split] - sed_display_length;
                     }
@@ -733,7 +731,6 @@ void Mouse_Left_Sample_Ed(void)
         {
             if(zcheckMouse(712, 476, 60, 16) && sed_range_mode)
             {
-
                 if(sed_range_start > sed_range_end)
                 {
                     LoopStart[ped_patsam][ped_split] = sed_range_end;
@@ -876,6 +873,7 @@ void Mouse_Left_Sample_Ed(void)
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
 
+            // Zoom in
             if(zcheckMouse(650, 476, 60, 16) && sed_range_mode)
             {
                 sed_range_mode = FALSE;
@@ -892,6 +890,7 @@ void Mouse_Left_Sample_Ed(void)
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
             }
 
+            // Zoom out
             if(zcheckMouse(650, 494, 60, 16))
             {
                 int start_test;
@@ -900,11 +899,11 @@ void Mouse_Left_Sample_Ed(void)
                 if(start_test < 0) sed_display_start = 0;
                 sed_display_length *= 3;
 
-                if(sed_display_length > SampleNumSamples[ped_patsam][ped_split])
+                if(sed_display_length > (int32) SampleNumSamples[ped_patsam][ped_split])
                 {
                     sed_display_length = SampleNumSamples[ped_patsam][ped_split];
                 }
-                if(sed_display_length + sed_display_start > SampleNumSamples[ped_patsam][ped_split])
+                if(sed_display_length + sed_display_start > (int32) SampleNumSamples[ped_patsam][ped_split])
                 {
                     sed_display_start = SampleNumSamples[ped_patsam][ped_split] - sed_display_length;
                 }
@@ -934,7 +933,7 @@ void Mouse_Sliders_Sample_Ed(void)
                 axswave = SampleNumSamples[ped_patsam][ped_split] - 1;
                 sed_range_mode = TRUE;
                 test = ((Mouse_Pos) * sed_display_length) / 512;
-                sed_range_end = sed_display_start + (Uint32) test;
+                sed_range_end = sed_display_start + (int32) test;
                 teac = 4;
 
                 if(!sas)
@@ -970,16 +969,18 @@ void Mouse_Sliders_Sample_Ed(void)
         {
             if(SampleNumSamples[ped_patsam][ped_split])
             {
-                int Center = Get_Slider_Center(sed_display_length, SampleNumSamples[ped_patsam][ped_split]);
+                int max_length = SampleNumSamples[ped_patsam][ped_split];
+                int Center = Slider_Get_Center(sed_display_length, max_length, 512);
                 float Pos_Mouse = ((float) (Mouse.x - (Center / 2))) / 512.0f;
                 if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
-                float s_offset = (Pos_Mouse * SampleNumSamples[ped_patsam][ped_split]);
-                if(s_offset > SampleNumSamples[ped_patsam][ped_split] - sed_display_length)
+                float s_offset = (Pos_Mouse * max_length);
+
+                if(s_offset > (float) (max_length - sed_display_length))
                 {
-                    s_offset = (float) SampleNumSamples[ped_patsam][ped_split] - sed_display_length;
+                    s_offset = (float) (max_length - sed_display_length);
                 }
                 if(s_offset < 0) s_offset = 0;
-                sed_display_start = (Uint32) s_offset;
+                sed_display_start = (int32) s_offset;
                 gui_action = GUI_CMD_REFRESH_WAVE_ED;
                 draw_sampled_wave = TRUE;
             }

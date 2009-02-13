@@ -93,15 +93,33 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL);
     Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL);
 
+    Gui_Draw_Button_Box(342, 470, 184, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
+
     PrintXY(350, 472, USE_FONT, "Tracks To Render As WAV:");
     Display_Tracks_To_Render();
+
+    Gui_Draw_Button_Box(350, 532, 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
-void Actualize_DiskIO_Ed(void)
+void Actualize_DiskIO_Ed(int gode)
 {
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
     {
         char tname[32];
+
+        if(gode == 0 || gode == 1)
+        {
+            if(rawrender_32float)
+            {
+                Gui_Draw_Button_Box(458, 532, 29, 16, "32", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(458, 532, 29, 16, "32", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            }
+        }
 
         if(allow_save)
         {
@@ -220,6 +238,22 @@ void Mouse_Left_DiskIO_Ed(void)
         {
             rawrender = TRUE;
             gui_action = GUI_CMD_RENDER_WAV;
+        }
+
+        // Render as 32 bit on
+        if(zcheckMouse(458, 532, 29, 16))
+        {
+            rawrender_32float = TRUE;
+            teac = 1;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        // Render as 32 bit off
+        if(zcheckMouse(458 + 31, 532, 29, 16))
+        {
+            rawrender_32float = FALSE;
+            teac = 1;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
         }
 
         Check_Tracks_To_Render();

@@ -103,7 +103,6 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
         switch(seditor)
         {
-
             case 0:
                 Gui_Draw_Button_Box(268, 466, 88, 16, "Loop Fine Editor", Allow_Buttons);
                 Gui_Draw_Button_Box(268, 492, 88, 16, "Save Instrument", Allow_Global);
@@ -742,7 +741,7 @@ void Afloop(void)
             if(ose < SampleNumSamples[ped_patsam][ped_split])
             {
                 int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
-                DrawVLine(a + 220, 552, 520 - v, COL_SCOPESSAMPLES);
+                DrawVLine(a + 220, 552, 520 - v, COL_VUMETER);
                 DrawVLine(a + 220, 520 - v, 488, COL_BACKGROUND);
             }
             else
@@ -761,7 +760,7 @@ void Afloop(void)
             if(iose > -1 && ose < SampleNumSamples[ped_patsam][ped_split])
             {
                 int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
-                DrawVLine(b + 20, 552, 520 - v, COL_SCOPESSAMPLES);
+                DrawVLine(b + 20, 552, 520 - v, COL_VUMETERPEAK);
                 DrawVLine(b + 20, 520 - v, 488, COL_BACKGROUND);
             }
             else
@@ -775,12 +774,11 @@ void Afloop(void)
 
 void Mouse_Left_Repeat_Instrument_Ed(void)
 {
-    Uint32 *Cur_Loop_Start = &LoopStart[ped_patsam][ped_split];
-    Uint32 *Cur_Loop_End = &LoopEnd[ped_patsam][ped_split];
+    int32 *Cur_Loop_Start = (int32 *) &LoopStart[ped_patsam][ped_split];
+    int32 *Cur_Loop_End = (int32 *) &LoopEnd[ped_patsam][ped_split];
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 1)
     {
-
         gui_action = GUI_CMD_NOP;
 
         if(zcheckMouse(78, 470, 16, 16) && *Cur_Loop_Start > 0)
@@ -801,7 +799,7 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < SampleNumSamples[ped_patsam][ped_split] - 1)
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split] - 1)
         {
             *Cur_Loop_End += 1;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
@@ -812,8 +810,8 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
 
 void Mouse_Right_Repeat_Instrument_Ed(void)
 {
-    Uint32 *Cur_Loop_Start = &LoopStart[ped_patsam][ped_split];
-    Uint32 *Cur_Loop_End = &LoopEnd[ped_patsam][ped_split];
+    int32 *Cur_Loop_Start = (int32 *) &LoopStart[ped_patsam][ped_split];
+    int32 *Cur_Loop_End = (int32 *) &LoopEnd[ped_patsam][ped_split];
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 1)
     {
@@ -840,10 +838,10 @@ void Mouse_Right_Repeat_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < SampleNumSamples[ped_patsam][ped_split] - 1)
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split] - 1)
         {
             *Cur_Loop_End += 10;
-            if(*Cur_Loop_End > SampleNumSamples[ped_patsam][ped_split] - 1) *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split] - 1;
+            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split] - 1) *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split] - 1;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }

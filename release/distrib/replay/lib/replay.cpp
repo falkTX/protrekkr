@@ -132,12 +132,15 @@ float Segue_SamplesR[MAX_TRACKS];
 
 float left_float;
 float right_float;
+float left_float_render;
+float right_float_render;
 float left_chorus;
 float right_chorus;
 float delay_left_final;
 float delay_right_final;
 int PosInTick;
 char rawrender;
+char rawrender_32float;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float mas_vol = 1.0f;
@@ -349,6 +352,7 @@ char compressor;
     float REVERBFILTER;
 #endif
 
+int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
@@ -383,8 +387,8 @@ int DelayType;
     unsigned char nPatterns = 1;
     void Actualize_303_Ed(char gode);
     extern char sr_isrecording;
-    extern Uint32 sed_range_start;
-    extern Uint32 sed_range_end;
+    extern int32 sed_range_start;
+    extern int32 sed_range_end;
 #else
     unsigned char nPatterns;
 #endif
@@ -482,16 +486,17 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             GetPlayerValues(mas_vol);
 
 #if defined(__MACOSX__)
+            // Send them to the driver first
             *pSamples++ = left_float;
             *pSamples++ = right_float;
 
+            // Prepare them for display now
             left_float *= 32767.0f;
             right_float *= 32767.0f;
 
             left_value = (int) (left_float);
             right_value = (int) (right_float);
 #else
-
             *pSamples++ = left_value;
             *pSamples++ = right_value;
 #endif
@@ -1173,6 +1178,7 @@ void Pre_Song_Init(void)
 
             sp_Step[ini][i] = 0;
             sp_Stage[ini][i] = 0;
+            Reserved_Sub_Channels[ini][i] = FALSE;
             sp_Stage2[ini][i] = 0;
             sp_Stage3[ini][i] = 0;
 
@@ -1194,6 +1200,9 @@ void Pre_Song_Init(void)
             sp_Tvol[ini][i] = 0.0f;
         
         }
+
+        // First channel of all tracks is always reserved
+        Reserved_Sub_Channels[ini][0] = TRUE;
 
         Player_FD[ini] = 0.0f;
 
@@ -1876,7 +1885,7 @@ ByPass_Wav:
                                                                 Player_LT[c][i],
                                                                 Player_LT[c][i] > SMP_LOOP_NONE ? Player_LE[c][i]: Player_NS[c][i],
                                                                 Player_LT[c][i] > SMP_LOOP_NONE ? Player_LL[c][i]: 0,
-                                                                &All_Signal_R,
+                                                                &Curr_Signal_R[i],
                                                                 Rns[c][i],
                                                                 sp_Cvol[c][i] * Player_SV[c][i],
                                                                 &sp_Stage2[c][i],
@@ -2297,6 +2306,7 @@ int Get_Free_Sub_Channel(int channel)
            sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
            sp_Stage3[channel][i] == PLAYING_NOSAMPLE)
         {
+
             return(i);
         }
     }
@@ -3237,21 +3247,6 @@ void GetPlayerValues(float master_coef)
     }
 #endif
 
-#if defined(__LINUX__)
-    // It looks like the maximum range for OSS is -8192 +8192
-    // (higher than that will produce heavily satured signals)
-    left_float *= 8192.0f;
-    right_float *= 8192.0f;
-#else
-
-#if !defined(__MACOSX__)
-    left_float *= 32767.0f;
-    right_float *= 32767.0f;
-#endif
-
-#endif
-
-#if defined(__MACOSX__)
     left_float *= master_coef;
     right_float *= master_coef;
 
@@ -3260,22 +3255,23 @@ void GetPlayerValues(float master_coef)
     if(right_float > 1.0f) right_float = 1.0f;
     if(right_float < -1.0f) right_float = -1.0f;
 
-#else
+    left_float_render = left_float;
+    right_float_render = right_float;
 
-    left_value = (int) (left_float * master_coef);
-    right_value = (int) (right_float * master_coef);
+#if !defined(__MACOSX__) // Only float32 on mac
 
-#if defined(__LINUX__)
-    if(left_value > 8192)left_value = 8192;
-    if(left_value < -8192) left_value = -8192;
-    if(right_value > 8192) right_value = 8192;
-    if(right_value < -8192) right_value = -8192;
-#else
-    if(left_value > 32767)left_value = 32767;
-    if(left_value < -32767) left_value = -32767;
-    if(right_value > 32767) right_value = 32767;
-    if(right_value < -32767) right_value = -32767;
-#endif
+    #if defined(__LINUX__)
+        // It looks like the maximum range for OSS is -8192 +8192
+        // (higher than that will produce heavily satured signals)
+        left_float *= 8192.0f;
+        right_float *= 8192.0f;
+    #else
+        left_float *= 32767.0f;
+        right_float *= 32767.0f;
+    #endif
+
+    left_value = (int) left_float;
+    right_value = (int) right_float;
 
 #endif // __MACOSX__
 }

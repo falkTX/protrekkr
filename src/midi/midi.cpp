@@ -28,6 +28,8 @@ int Midi_Track_Notes[MAX_TRACKS];
 extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 extern JAZZ_KEY Sub_Channels_Jazz[MAX_TRACKS][MAX_POLYPHONY];
 
+PtkTimer Midi_Timer;
+
 // ------------------------------------------------------
 // Return the instrument associated with the midi program
 int Midi_GetProgram(int midi_program)
@@ -139,7 +141,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
 
                 if(!first_midi_time)
                 {
-                    if(!is_recording) Set_Frames_Counter();
+                    if(!is_recording) Midi_Timer.Set_Frames_Counter();
                     first_midi_time = TRUE;
                     first_midi_timer = (double) Param2;
                     old_ped_line = ped_line;
@@ -154,7 +156,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                     Time_Unit /= 60.0f;
                     // Ticks per milliseconds
                     Time_Unit /= 1000.0f;
-                    ticks = Get_Frames_Delay() * Time_Unit;
+                    ticks = Midi_Timer.Get_Frames_Delay() * Time_Unit;
                 }
                 else
                 {

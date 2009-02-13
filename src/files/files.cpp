@@ -3347,7 +3347,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
         if(snamesel == 1 || snamesel == 4 || snamesel == 5)
         {
             snamesel = 0;
-            Actualize_DiskIO_Ed();
+            Actualize_DiskIO_Ed(0);
         }
     }
     return(Mod_Length);
@@ -3404,7 +3404,7 @@ Read_Synth:
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
 
             Actualize_Instrument_Ed(0, 0);
-            Actualize_DiskIO_Ed();
+            Actualize_DiskIO_Ed(0);
             Actualize_Patterned();
             mess_box("Synthesizer program loaded ok.");
         }
@@ -3585,7 +3585,7 @@ Read_Inst:
     if(snamesel == 1 || snamesel == 4 || snamesel == 5)
     {
         snamesel = 0;
-        Actualize_DiskIO_Ed();
+        Actualize_DiskIO_Ed(0);
     }
 }
 
@@ -3669,7 +3669,7 @@ void SaveInst(void)
 
     if(snamesel == 1 || snamesel == 4 || snamesel == 5) {
         snamesel = 0;
-        Actualize_DiskIO_Ed();
+        Actualize_DiskIO_Ed(0);
     }
 }
 
@@ -3830,7 +3830,7 @@ int Pack_Module(char *FileName)
     if(snamesel == 1 || snamesel == 4 || snamesel == 5)
     {
         snamesel = 0;
-        Actualize_DiskIO_Ed();
+        Actualize_DiskIO_Ed(0);
     }
     mess_box(name);
     Read_SMPT();
@@ -3868,7 +3868,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG1");
+    sprintf(extension, "TWNNCFG2");
     mess_box("Saving 'ptk.cfg' on current directory...");
 
 #if defined(__WIN32__)
@@ -3920,6 +3920,9 @@ void SaveConfig(void)
         Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
         Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
         Write_Data(KeyboardName, MAX_PATH, 1, in);
+
+        Write_Data(&rawrender_32float, sizeof(char), 1, in);
+
         fclose(in);
 
         Read_SMPT();
@@ -3960,7 +3963,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG1") == 0)
+        if(strcmp(extension, "TWNNCFG2") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -3998,6 +4001,8 @@ void LoadConfig(void)
             Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
             Read_Data(KeyboardName, MAX_PATH, 1, in);
+
+            Read_Data(&rawrender_32float, sizeof(char), 1, in);
         }
         fclose(in);
     }

@@ -96,8 +96,9 @@ void mess_box(char const *str);
 void Realslider(int x, int y, int val, int Enabled);
 void Realslider_Size(int x, int y, int size, int val, int Enabled);
 void Realslider2(int x, int y, int val, int Enabled);
-int Get_Slider_Center(unsigned int Size, unsigned int Maximum);
-void Realslider3(int x, int y, int value, int displayed, int maximum, int size, int enable);
+int Slider_Get_Center(unsigned int Size, unsigned int Maximum, int Pixels);
+void Realslider_Horiz(int x, int y, int value, int displayed, int maximum, int size, int enable);
+void Realslider_Vert(int x, int y, int value, int displayed, int maximum, int size, int enable);
 
 void Coolwrite(int x, int y, int colour, char *txt);
 void Refresh_UI_Context(void);

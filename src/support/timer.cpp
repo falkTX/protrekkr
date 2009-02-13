@@ -10,19 +10,22 @@
 #include "include/timer.h"
 
 // ------------------------------------------------------
-// Variables
-float Ref_Ticks;
+// Constructor
+PtkTimer::PtkTimer()
+{
+    Set_Frames_Counter();
+}
 
 // ------------------------------------------------------
 // Init the frames counter
-void Set_Frames_Counter(void)
+void PtkTimer::Set_Frames_Counter(void)
 {
     Ref_Ticks = ((float) SDL_GetTicks());
 }
 
 // ------------------------------------------------------
 // Amount of milliseconds between 2 frames
-float Get_Frames_Delay(void)
+float PtkTimer::Get_Frames_Delay(void)
 {
     float Delay;
     float Cur_Ticks = ((float) SDL_GetTicks());

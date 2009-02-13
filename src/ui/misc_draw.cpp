@@ -28,7 +28,7 @@ int FgColor;
 int max_colors_logo;
 int max_colors_303;
 SDL_Surface *Temp_PFONT;
-int Beveled = FALSE;
+int Beveled = TRUE;
 
 int Nbr_Letters;
 int Font_Height = 11;
@@ -184,7 +184,7 @@ SDL_Color Default_Palette[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
 
     { 0x24, 0x9c, 0x76, 0x00 },      // 14 vumeter
-    { 0xee, 0x3e, 0x26, 0x00 },      // 15 vumeter peak
+    { 0xee, 0xae, 0x86, 0x00 },      // 15 vumeter peak
     { 0x6a, 0xff, 0xc2, 0x00 },      // 16 scopes / samples
 
     { 0xff, 0xff, 0xff, 0x00 },      // 17 Font hi
@@ -578,7 +578,7 @@ void Refresh_UI_Context(void)
             Draw_Track_Fx_Ed();
             break;
     }
-    Actualize_DiskIO_Ed();
+    Actualize_DiskIO_Ed(0);
     Actualize_303_Ed(0);
     seditor = 0;
     Actualize_Instrument_Ed(0, 0);
@@ -713,7 +713,7 @@ void mess_box(char const *str)
 }
       
 // ------------------------------------------------------
-// Display a slider
+// Display a horizontal slider
 void Realslider(int x, int y, int val, int Enabled)
 {
     y--;
@@ -811,35 +811,101 @@ void Realslider2(int x, int y, int val, int Enabled)
 
 // ------------------------------------------------------
 // Get the center position of a slider
-int Get_Slider_Center(unsigned int Size, unsigned int Maximum)
+int Slider_Get_Center(unsigned int Size, unsigned int Maximum, int Pixels)
 {
     // Normalize
     float ratio = (float) Maximum / (float) Size;
-    int caret_size = (int) ((float) (512) / ratio);
-    if(caret_size == 512) caret_size--;
+    int caret_size = (int) ((float) Pixels / ratio);
+    if(caret_size == Pixels) caret_size--;
     return(caret_size);
 }
 
-void Realslider3(int x, int y, int value, int displayed, int maximum, int size, int enable)
+// ------------------------------------------------------
+// Calculate the caret size of a slider
+float Slider_Calc_Size(int displayed, int maximum, int size)
 {
-    size -= 2;
+    float caret_size;
+    float ratio;
+
     if(maximum < displayed) displayed = maximum;
-    float ratio = (float) maximum / (float) displayed;
-    float Pos_slider = (float) value * (((size) - ((float) (size) / ratio)) / (maximum - (float) displayed));
-    int caret_size = (int) ((float) (size) / ratio);
-   
-    if(caret_size == size) caret_size--;
+    ratio = (float) maximum / (float) displayed;
+    caret_size = ((float) size / (float) ratio);
+    return(caret_size);
+}
+
+// ------------------------------------------------------
+// Calculate the caret position of a slider
+float Slider_Calc_Pos(int displayed, int maximum, int size, int value)
+{
+    float Pos_Slider;
+    float ratio;
+
+    if(maximum < displayed) displayed = maximum;
+    ratio = (float) maximum / (float) displayed;
+    if(maximum == displayed) Pos_Slider = 0.0f;
+    else Pos_Slider = (float) value * ((((float) size) - ((float) (size) / (float) ratio)) / ((float) maximum - (float) displayed));
+    return(Pos_Slider);
+}
+
+// ------------------------------------------------------
+// Display a horizontal slider
+void Realslider_Horiz(int x, int y, int value, int displayed, int maximum, int size, int enable)
+{
+    float caret_size;
+    float Pos_slider;
+
+    size -= 2;
+
+    Pos_slider = Slider_Calc_Pos(displayed, maximum, size, value);
+
+    caret_size = Slider_Calc_Size(displayed, maximum, size);
+
+    if((caret_size + Pos_slider) > (size - 1)) caret_size -= (caret_size + Pos_slider) - (size - 1);
    
     if(enable)
     {
         SetColor(COL_SLIDER_LO);
-        bjbox(x, y, size + 1, 16 + 1);
+        bjbox(x, y, size + 2, 16 + 1);
         SetColor(COL_SLIDER_HI);
         bjbox(x + 1, y + 1, size + 1, 16);
         SetColor(COL_SLIDER_MED);
         bjbox(x + 1, y + 1, size, 16 - 1);
 
         Gui_Draw_Button_Box(x + 1 + (int) Pos_slider, y + 1, caret_size, 16 - 2, "", BUTTON_NORMAL);
+    }
+    else
+    {
+        SetColor(0);
+        bjbox(x, y, size + 1, 16 + 1);
+        bjbox(x + 1, y + 1, size + 1, 16);
+        bjbox(x + 1, y + 1, size, 16 - 1);
+    }
+}
+
+// ------------------------------------------------------
+// Display a vertical slider
+void Realslider_Vert(int x, int y, int value, int displayed, int maximum, int size, int enable)
+{
+    float caret_size;
+    float Pos_slider;
+
+    Pos_slider = Slider_Calc_Pos(displayed, maximum, size, value);
+
+    size -= 2;
+
+    caret_size = Slider_Calc_Size(displayed, maximum, size);
+
+    if((caret_size + Pos_slider) > size) caret_size -= (caret_size + Pos_slider) - size;
+
+    if(enable)
+    {
+        SetColor(COL_SLIDER_LO);
+        bjbox(x, y, 16 + 1, size + 2);
+        SetColor(COL_SLIDER_HI);
+        bjbox(x + 1, y + 1, 16, size + 1);
+        SetColor(COL_SLIDER_MED);
+        bjbox(x + 1, y + 1, 16 - 1, size);
+        Gui_Draw_Button_Box(x + 1, y + 1 + (int) Pos_slider, 16 - 2, (int) caret_size, "", BUTTON_NORMAL);
     }
     else
     {
@@ -1426,7 +1492,7 @@ void Create_Pattern_font(void)
             Surface_offset = (j * Temp_PFONT->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_SEL_BACK)
             {
-                Pix2[Surface_offset] = COL_PATTERN_SEL_FORE;
+                Pix2[Surface_offset] = COL_VUMETERPEAK;
             }
             else
             {

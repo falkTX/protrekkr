@@ -364,7 +364,6 @@ void Mouse_Wheel_303_Ed(int roll_amount)
 {
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
-
         // Volume Knob
         if(zcheckMouse(529, 485, 19, 88))
         {

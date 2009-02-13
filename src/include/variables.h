@@ -178,9 +178,7 @@
 #define LARG_VUMETER 208
 #define MIN_PEAK MAX_VUMETER - 12
 
-#if defined(__LINUX__) || defined(__MACOSX__)
 #define MAX_PATH 260
-#endif
 
 // ------------------------------------------------------
 // Structures
@@ -308,6 +306,7 @@ extern int snamesel;
 extern int last_index;
 
 extern int CONSOLE_WIDTH;
+extern int CHANNELS_WIDTH;
 extern int CONSOLE_HEIGHT;
 extern int Scopish;
 
@@ -361,6 +360,9 @@ extern int currentCounter;
 extern float left_float;
 extern float right_float;
 
+extern float left_float_render;
+extern float right_float_render;
+
 extern unsigned char track3031;
 extern unsigned char track3032;
 
@@ -395,7 +397,7 @@ extern char trkchan;
 extern char seditor;
 extern char actuloop;
 
-extern char visiblecolums;
+extern char Visible_Columns;
 extern int VIEWLINE;
 extern int VIEWLINE2;
 extern int YVIEW; 
@@ -435,6 +437,7 @@ extern unsigned int SamplesPerSub;
 
 // Render as .wav
 extern char rawrender;
+extern char rawrender_32float;
 
 extern char sas;
 
@@ -510,7 +513,6 @@ void Actupated(int modac);
 void KillInst(int inst_nbr);
 void StopIfSp(void);
 void draw_lfoed(void);
-void draw_pated_highlight(int track, int line, int petrack, int row);
 void draw_tracked(void);
 void DeleteInstrument(void);
 void Sp_Player(void);             

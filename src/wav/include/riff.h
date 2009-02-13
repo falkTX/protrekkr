@@ -25,8 +25,18 @@
 
 #include "../../../release/distrib/replay/lib/include/endianness.h"
 
+#define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#define WAVE_FORMAT_PCM 1
+#define WAVE_FORMAT_EXTENSIBLE 0xfffe
+
 typedef unsigned int UINT32;
 typedef int INT32;
+
+#if defined(__WIN32__) && !defined(__GCC__)
+typedef unsigned __int64 UINT64;
+#else
+typedef unsigned long long UINT64;
+#endif
 
 #if !defined(__GCC__)
 #pragma pack(push)
@@ -88,6 +98,47 @@ class RiffFile
                         );
 };
 
+#ifndef _WAVEFORMATEX_
+#define _WAVEFORMATEX_
+typedef struct tWAVEFORMATEX
+{
+    UINT16   wFormatTag;        /* format type */
+    UINT16   nChannels;         /* number of channels (i.e. mono, stereo...) */
+    UINT32   nSamplesPerSec;    /* sample rate */
+    UINT32   nAvgBytesPerSec;   /* for buffer estimation */
+    UINT16   nBlockAlign;       /* block size of data */
+    UINT16   wBitsPerSample;    /* Number of bits per sample of mono data */
+    UINT16   cbSize;            /* The count in bytes of the size of
+                                  extra information (after cbSize) */
+} WAVEFORMATEX;
+#endif
+
+#ifndef GUID_DEFINED
+#define GUID_DEFINED
+typedef struct _GUID
+{
+    unsigned long Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char Data4[8];
+} GUID;
+#endif /* GUID_DEFINED */
+
+#ifndef _WAVEFORMATEXTENSIBLE_
+#define _WAVEFORMATEXTENSIBLE_
+typedef struct
+{
+    union
+    {
+        UINT16 wValidBitsPerSample; /* bits of precision */
+        UINT16 wSamplesPerBlock;   /* valid if wBitsPerSample==0 */
+        UINT16 wReserved;         /* If neither applies, set to zero. */
+    } Samples;
+    UINT32 dwChannelMask; /* which channels are present in stream */
+    GUID SubFormat;
+} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
+#endif
+
 struct WaveFormat_ChunkData
 {
     UINT16 wFormatTag;       // Format category (PCM=1)
@@ -111,7 +162,7 @@ struct WaveFormat_ChunkData
 
     WaveFormat_ChunkData()
     {
-        wFormatTag = 1;     // PCM
+        wFormatTag = WAVE_FORMAT_PCM;
         Config();
     }
 };
@@ -134,8 +185,8 @@ struct WaveFormat_Chunk
                 data.nAvgBytesPerSec == (data.nChannels *
                                          data.nSamplesPerSec *
                                          data.nBitsPerSample) / 8 &&
-                data.nBlockAlign == (data.nChannels *
-                                     data.nBitsPerSample) / 8;
+                data.nBlockAlign == (data.nChannels * data.nBitsPerSample) / 8 ||
+                data.nBitsPerSample == 12;
     }
 };
 
@@ -229,6 +280,7 @@ class WaveFile: private RiffFile
 
         DDCRET WriteMonoSample(INT16 ChannelData);
         DDCRET WriteStereoSample(INT16 LeftChannelData, INT16 RightChannelData);
+        DDCRET WriteStereoFloatSample(float LeftSample, float RightSample);
 
         DDCRET ReadMonoSample(INT16 *ChannelData);
         DDCRET ReadStereoSample(INT16 *LeftSampleData, INT16 *RightSampleData);
@@ -265,7 +317,11 @@ class WaveFile: private RiffFile
 
     private:
 
+        int Flip12;
+
         void IntToFloat(int *Dest, int Source);
+        void Int64ToDouble(UINT64 *Dest, UINT64 Source);
+        int FloatToInt(int *Source);
 };
 
 #pragma pack(pop)

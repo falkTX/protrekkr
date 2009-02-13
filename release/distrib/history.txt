@@ -2,6 +2,27 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.87:
+
+- Added a scrollbar for patterns.
+- The tracker can now load all these .wav file formats (mono or stereo) :
+  - 8-bit integer.
+  - 12-bit integer.
+  - 16-bit integer.
+  - 24-bit integer.
+  - 32-bit integer.
+  - 32-bit float.
+  - 64-bit float.
+- Added an option to render a module as 32 bit (float) .wav file.
+- Inverted the right and left mouse buttons functions in patterns.
+- Fixed an issue with the loop editor.
+- Patterns now automatically scroll when selecting a block 
+- Added multi notes channels, they can be used to trigger several notes / track
+  at the same time in order to make chords or to play several instruments
+  in the same track and route them to the same row effect / dsp effect
+  (thus allowing to considerably reduce the dsp usage).
+  Note that these channels are shared with the polyphony ones.
+
 v1.86b:
 
 - Fixed a bug with the 303 data loading in the replay routine.

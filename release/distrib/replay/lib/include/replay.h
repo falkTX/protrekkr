@@ -29,7 +29,7 @@
 #define SMP_PACK_TRUESPEECH 2
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
-#define PBLEN 1572864
+#define PBLEN 128 * 12288
 #define SAMPLESPERSEC 44100
 
 #define FLANGER_LOPASS_CUTOFF 0.1f
@@ -170,6 +170,7 @@ extern float CustomVol[128];
 extern unsigned int SubCounter;
 extern int PosInTick;
 extern int plx;
+extern int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];

@@ -33,6 +33,10 @@
      Handling for big endian platforms.
      Removed some unnecessary functions.
 
+2009 February 13 [Franck Charlet]
+     Added handling for 12, 24, 32-bit integer and 64-bit float formats.
+     32 bit float samples writing.
+
 ------------------------------------------------------ */
 
 // Standard includes
@@ -98,7 +102,6 @@ DDCRET RiffFile::Open(const char *Filename, RiffFileMode NewMode)
                 file = fopen(Filename, "wb");
                 if(file)
                 {
-                
                     // Write the RIFF header...
                     // We will have to come back later and patch it!
                     // (endianness doesn't matter here)
@@ -331,6 +334,8 @@ WaveFile::WaveFile()
 DDCRET WaveFile::OpenForRead(const char *Filename)
 {
     UINT32 data_length;
+    WAVEFORMATEXTENSIBLE Extra_Infos;
+    short Pad;
 
     // Verify filename parameter as best we can...
     if(!Filename)
@@ -358,6 +363,16 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
             wave_format.data.nAvgBytesPerSec = Swap_32(wave_format.data.nAvgBytesPerSec);
             wave_format.data.nBlockAlign = Swap_16(wave_format.data.nBlockAlign);
             wave_format.data.nBitsPerSample = Swap_16(wave_format.data.nBitsPerSample);
+            if(wave_format.data.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+            {
+                retcode = Read(&Pad, sizeof(short));
+                retcode = Read(&Extra_Infos, sizeof(WAVEFORMATEXTENSIBLE));
+                wave_format.data.wFormatTag = Swap_32(Extra_Infos.SubFormat.Data1);
+                wave_format.data.nBitsPerSample = Swap_16(Extra_Infos.Samples.wValidBitsPerSample);
+            }
+            if(wave_format.data.nBitsPerSample == 12) wave_format.data.nBitsPerSample = 16;
+
+            Flip12 = 0;
 
             if(retcode == DDC_SUCCESS &&
                !wave_format.VerifyValidity())
@@ -401,7 +416,6 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
                 wave_Smpl.data.End = Swap_32(wave_Smpl.data.End);
                 wave_Smpl.data.Fraction = Swap_32(wave_Smpl.data.Fraction);
                 wave_Smpl.data.Play_Count = Swap_32(wave_Smpl.data.Play_Count);
-
             }
             Seek(0);
             SeekChunk("data");
@@ -427,13 +441,15 @@ DDCRET WaveFile::OpenForWrite(const char  *Filename,
     // Verify parameters...
 
     if(!Filename ||
-       (BitsPerSample != 8 && BitsPerSample != 16) ||
+       (BitsPerSample != 8 && BitsPerSample != 16 && BitsPerSample != 32) ||
         NumChannels < 1 || NumChannels > 2)
     {
         return DDC_INVALID_CALL;
     }
 
     wave_format.data.Config(SamplingRate, BitsPerSample, NumChannels);
+
+    if(BitsPerSample == 32) wave_format.data.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 
     DDCRET retcode = Open(Filename, RFM_WRITE);
 
@@ -497,13 +513,11 @@ DDCRET WaveFile::WriteMonoSample(INT16 SampleData)
             return Write(&SampleData, 1);
 
         case 16:
-           pcm_data.ckSize += 2;
+            pcm_data.ckSize += 2;
 
-           SampleData = Swap_16(SampleData);
-
-           return Write(&SampleData, 2);
+            SampleData = Swap_16(SampleData);
+            return Write(&SampleData, 2);
     }
-
     return DDC_INVALID_CALL;
 }
 
@@ -529,7 +543,6 @@ DDCRET WaveFile::WriteStereoSample(INT16 LeftSample,
             break;
 
         case 16:
-
             LeftSample = Swap_16(LeftSample);
             RightSample = Swap_16(RightSample);
 
@@ -553,9 +566,50 @@ DDCRET WaveFile::WriteStereoSample(INT16 LeftSample,
     return retcode;
 }
 
+
+DDCRET WaveFile::WriteStereoFloatSample(float LeftSample,
+                                        float RightSample)
+{
+    DDCRET retcode = DDC_SUCCESS;
+    UINT32 iSampleL;
+    UINT32 iSampleR;
+
+    switch(wave_format.data.nBitsPerSample)
+    {
+        case 32:
+            iSampleL = FloatToInt((int *) &LeftSample);
+            iSampleL = Swap_32(iSampleL);
+            iSampleR = FloatToInt((int *) &RightSample);
+            iSampleR = Swap_32(iSampleR);
+
+            retcode = Write(&iSampleL, 4);
+            if(retcode == DDC_SUCCESS)
+            {
+                pcm_data.ckSize += 4;
+
+                retcode = Write(&iSampleR, 4);
+                if(retcode == DDC_SUCCESS)
+                {
+                    pcm_data.ckSize += 4;
+                }
+            }
+            break;
+
+        default:
+            retcode = DDC_INVALID_CALL;
+    }
+
+    return retcode;
+}
+
+
 DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
 {
     DDCRET retcode = DDC_SUCCESS;
+    float y;
+    UINT32 int_y;
+    double y64;
+    UINT64 int_y64;
 
     switch(wave_format.data.nBitsPerSample)
     {
@@ -565,21 +619,43 @@ DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
             *Sample = (INT16(x) << 8) - 32768;
             break;
 
+        case 12:
         case 16:
             retcode = Read(Sample, 2);
             *Sample = Swap_16(*Sample);
             break;
 
-        case 32:
-            float y;
-            UINT32 int_y;
-
-            retcode = Read(&int_y, 4);
-
+        case 24:
+            int_y = 0;
+            retcode = Read(&int_y, 3);
             int_y = Swap_32(int_y);
-            IntToFloat((int *) &y, int_y);
 
-            *Sample = (short) (y * 32767.0f);
+            if(int_y & 0x800000) int_y |= 0xff000000;
+
+            *Sample = (short) (int_y / 256);
+            break;
+
+        case 32:
+            retcode = Read(&int_y, 4);
+            int_y = Swap_32(int_y);
+
+            if(wave_format.data.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+            {
+                IntToFloat((int *) &y, int_y);
+                *Sample = (short) (y * 32767.0f);
+            }
+            else
+            {
+                *Sample = (short) (int_y / 65535);
+            }
+            break;
+
+        case 64:
+            retcode = Read(&int_y64, 8);
+            int_y64 = Swap_64(int_y64);
+
+            Int64ToDouble((UINT64 *) &y64, int_y64);
+            *Sample = (short) (y64 * 32767.0);
             break;
 
         default:
@@ -595,7 +671,9 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
     UINT8 x[2];
     INT16 y[2];
     float z[2];
+    double z64[2];
     INT32 int_z[2];
+    UINT64 int_z64[2];
 
     switch(wave_format.data.nBitsPerSample)
     {
@@ -605,6 +683,7 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
             *R = (INT16 (x[1]) << 8) - 32768;
             break;
 
+        case 12:
         case 16:
             retcode = Read(y, 4);
 
@@ -615,17 +694,52 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
             *R = INT16(y[1]);
             break;
 
+        case 24:
+            int_z[0] = 0;
+            int_z[1] = 0;
+            retcode = Read(&int_z[0], 3);
+            retcode = Read(&int_z[1], 3);
+
+            int_z[0] = Swap_32(int_z[0]);
+            int_z[1] = Swap_32(int_z[1]);
+
+            if(int_z[0] & 0x800000) int_z[0] |= 0xff000000;
+            if(int_z[1] & 0x800000) int_z[1] |= 0xff000000;
+
+            *L = (short) (int_z[0] / 256);
+            *R = (short) (int_z[1] / 256);
+            break;
+
         case 32:
             retcode = Read(int_z, 8);
 
             int_z[0] = Swap_32(int_z[0]);
             int_z[1] = Swap_32(int_z[1]);
 
-            IntToFloat((int *) &z[0], int_z[0]);
-            IntToFloat((int *) &z[1], int_z[1]);
+            if(wave_format.data.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+            {
+                IntToFloat((int *) &z[0], int_z[0]);
+                IntToFloat((int *) &z[1], int_z[1]);
+                *L = (short) (z[0] * 32767.0f);
+                *R = (short) (z[1] * 32767.0f);
+            }
+            else
+            {
+                *L = (short) (int_z[0] / 65535);
+                *R = (short) (int_z[1] / 65535);
+            }
+            break;
 
-            *L = (short) (z[0] * 32767.0f);
-            *R = (short) (z[1] * 32767.0f);
+        case 64:
+            retcode = Read(int_z64, 16);
+
+            int_z64[0] = Swap_64(int_z64[0]);
+            int_z64[1] = Swap_64(int_z64[1]);
+
+            Int64ToDouble((UINT64 *) &z64[0], int_z64[0]);
+            Int64ToDouble((UINT64 *) &z64[1], int_z64[1]);
+            *L = (short) (z64[0] * 32767.0);
+            *R = (short) (z64[1] * 32767.0);
             break;
 
         default:
@@ -715,6 +829,16 @@ DDCRET WaveFile::WriteData(const UINT8 *data, UINT32 numData)
 }
 
 void WaveFile::IntToFloat(int *Dest, int Source)
+{
+    *Dest = Source;
+}
+
+int WaveFile::FloatToInt(int *Source)
+{
+    return(*Source);
+}
+
+void WaveFile::Int64ToDouble(UINT64 *Dest, UINT64 Source)
 {
     *Dest = Source;
 }
