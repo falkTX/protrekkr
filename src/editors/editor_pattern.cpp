@@ -1712,6 +1712,7 @@ void Mouse_Sliders_Pattern_Ed(void)
         Actupated(1);
     }
 
+    // Rows slider
     if(zcheckMouse(781, 212, 16 + 1, 200) & !Songplaying)
     {
         int final_row;
@@ -1728,7 +1729,8 @@ void Mouse_Sliders_Pattern_Ed(void)
         final_row = (int32) s_offset;
         if(final_row < 0) final_row = 0;
         if(final_row > patternLines[pSequence[Cur_Position]] - 1) final_row = patternLines[pSequence[Cur_Position]] - 1;
-        Goto_Row(final_row);
+        ped_line = final_row;
+        Actupated(0);
     }
 }
 
@@ -1742,15 +1744,23 @@ void Mouse_Left_Pattern_Ed(void)
         Mark_Block_Start(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse());
     }
 
+    // Next/Prev rows buttons
     if(zcheckMouse(781, 196, 16 + 1, 14) & !Songplaying)
     {
-        Goto_Previous_Row();
+        int Cur_Position = Get_Current_Position();
+
+        ped_line--;
+        if(Continuous_Scroll && !Cur_Position) if(ped_line < 0) ped_line = 0;
+        Actupated(0);
     }
     if(zcheckMouse(781, 413, 16 + 1, 14) & !Songplaying)
     {
-        Goto_Next_Row();
-    }
+        int Cur_Position = Get_Current_Position();
 
+        ped_line++;
+        if(Continuous_Scroll && (Cur_Position == sLength - 1)) if(ped_line >= patternLines[pSequence[Cur_Position]]) ped_line = patternLines[pSequence[Cur_Position]] - 1;
+        Actupated(0);
+    }
 }
 
 // ------------------------------------------------------
