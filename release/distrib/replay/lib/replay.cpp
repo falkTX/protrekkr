@@ -72,7 +72,6 @@ char FLANGER_ON[MAX_TRACKS];
     float FLANGE_RIGHTBUFFER[MAX_TRACKS][16400];
 #endif
 
-float sp_Filtervol[MAX_TRACKS];
 int Done_CVol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Cvol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Tvol[MAX_TRACKS][MAX_POLYPHONY];
@@ -1759,8 +1758,6 @@ void Sp_Player(void)
         All_Signal_L = 0;
         All_Signal_R = 0;
 
-        sp_Filtervol[c] = 0.0f;
-
         // If wav is selected in the synth we don't play it directly but through the synth.
 
         // -------------------------------------------
@@ -1782,16 +1779,19 @@ ByPass_Wav:
                     {
                         // Note Stop
                         sp_Tvol[c][i] = 0.0f;
-                        if(sp_Cvol[c][i] < 0.01f) sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                        if(sp_Cvol[c][i] < 0.01f)
+                        {
+                            sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                        }
                     }
                     if(sp_Cvol[c][i] > sp_Tvol[c][i])
                     {
-                        sp_Cvol[c][i] -= 0.005f;
+                        sp_Cvol[c][i] -= 0.004f;
                         Done_CVol[c][i] = TRUE;
                     }
                     else
                     {
-                        sp_Cvol[c][i] += 0.005f;
+                        sp_Cvol[c][i] += 0.004f;
                         Done_CVol[c][i] = TRUE;
                     }
                     if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
@@ -1873,8 +1873,8 @@ ByPass_Wav:
             {
                 if(!Done_CVol[c][i])
                 {
-                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.005f;
-                    else sp_Cvol[c][i] += 0.005f;
+                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.004f;
+                    else sp_Cvol[c][i] += 0.004f;
                     if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
                     else if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
                 }
@@ -1908,12 +1908,6 @@ ByPass_Wav:
             // Gather the signals of all the sub channels
             All_Signal_L += Curr_Signal_L[i];
             All_Signal_R += Curr_Signal_R[i];
-
-            // Store the volume to ramp the filters signal
-            if(sp_Cvol[c][i] > sp_Filtervol[c])
-            {
-                sp_Filtervol[c] = sp_Cvol[c][i];
-            }
         }
 
             // We have no adsr for those
@@ -1967,6 +1961,26 @@ ByPass_Wav:
     #endif
 #endif
 
+        }
+
+        // A rather clumsy cross fading to avoid the most outrageous clicks
+        // (i also tried with splines but didn't hear any difference)
+        if(New_Instrument[c])
+        {
+            All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
+            All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
+            Pos_Segue[c]++;
+            Segue_Volume[c] -= 1.0f / 127.0f;
+            if(Pos_Segue[c] >= 128)
+            {
+                New_Instrument[c] = FALSE;
+            }
+        }
+        else
+        {
+            // Store the transition
+            Segue_SamplesL[c] = All_Signal_L;
+            Segue_SamplesR[c] = All_Signal_R;
         }
 
         // -----------------------------------------------
@@ -2154,8 +2168,6 @@ ByPass_Wav:
                     } //SWITCHCASE [FILTERS]
                 }
 
-                All_Signal_L *= sp_Filtervol[c];
-                All_Signal_R *= sp_Filtervol[c];
             } // Filter end
 #endif // PTK_TRACKFILTERS
 
@@ -2189,27 +2201,6 @@ ByPass_Wav:
             }
 #endif
 
-            // If there's no polyphony we use a rather clumsy cross fading
-            // to avoid the most outrageous clicks
-            // (i also tried with splines but didn't hear any differences)
-            if(New_Instrument[c])
-            {
-                All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
-                All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
-                Pos_Segue[c]++;
-                Segue_Volume[c] -= 1.0f / 127.0f;
-                if(Pos_Segue[c] >= 128)
-                {
-                    New_Instrument[c] = FALSE;
-                }
-            }
-            else
-            {
-                // Store the transition
-                Segue_SamplesL[c] = All_Signal_L;
-                Segue_SamplesR[c] = All_Signal_R;
-            }
-
 #if defined(PTK_FLANGER)
             // 32-Bit HQ Interpolated System Flanger
             if(FLANGER_ON[c])
@@ -2230,6 +2221,7 @@ ByPass_Wav:
 
                 oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (foff2[c])];
                 roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (foff1[c])];
+
                 All_Signal_L += Filter_FlangerL(oldspawn[c]);
                 All_Signal_R += Filter_FlangerR(roldspawn[c]);
 
@@ -2463,8 +2455,11 @@ void Play_Instrument(int channel, int sub_channel,
                 sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
             }
 
-            if(!offset) sp_Cvol[channel][sub_channel] = vol;
-            else sp_Cvol[channel][sub_channel] = 0;
+            if(!offset) 
+            {
+            //sp_Cvol[channel][sub_channel] = 0;
+            }
+            else sp_Cvol[channel][sub_channel] = vol;
 
 #if defined(PTK_FX_ARPEGGIO)
             Arpeggio_BaseNote[channel][sub_channel] = note;

@@ -23,6 +23,7 @@ v1.87:
   in the same track and route them to the same row effect / dsp effect
   (thus allowing to considerably reduce the dsp usage).
   Note that these channels are shared with the polyphony ones.
+- Improved volume ramping.
 
 v1.86b:
 

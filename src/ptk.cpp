@@ -2224,7 +2224,7 @@ void Keyboard_Handler(void)
         // Previous row
         if(Keys[SDLK_UP] && !Songplaying)
         {
-            Goto_Previous_Page();
+            Goto_Previous_Row();
         }
 
         // Next row
@@ -2236,7 +2236,7 @@ void Keyboard_Handler(void)
         // Previous page (16 rows)
         if(Keys[SDLK_PAGEUP] && !Songplaying)
         {
-            Goto_Previous_Row();
+            Goto_Previous_Page();
         }
 
         // Next page (16 rows)
