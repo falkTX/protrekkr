@@ -226,10 +226,15 @@ int Table_Mouse_Lines[] =
     8 * 28 + 8 + 1,
 };
 
-PtkTimer Pattern_Timer;
-int Pattern_Horiz_Scrolling;
-float Pattern_First_Delay;
-float Pattern_Delay;
+PtkTimer Pattern_Timer_Horiz;
+int Pattern_Scrolling_Horiz;
+float Pattern_First_Delay_Horiz;
+float Pattern_Delay_Horiz;
+
+PtkTimer Pattern_Timer_Vert;
+int Pattern_Scrolling_Vert;
+float Pattern_First_Delay_Vert;
+float Pattern_Delay_Vert;
 
 // ------------------------------------------------------
 // Functions
@@ -1378,10 +1383,10 @@ int Get_Track_Over_Mouse(void)
         // It will scroll
         if(under_mouse >= (gui_track + Visible_Columns - 1))
         {
-            if(Pattern_Horiz_Scrolling)
+            if(Pattern_Scrolling_Horiz)
             {
-                Pattern_Delay += Pattern_Timer.Get_Frames_Delay();
-                if(Pattern_Delay < Pattern_First_Delay)
+                Pattern_Delay_Horiz += Pattern_Timer_Horiz.Get_Frames_Delay();
+                if(Pattern_Delay_Horiz < Pattern_First_Delay_Horiz)
                 {
                     // Wait before scrolling
                     under_mouse--;
@@ -1389,23 +1394,23 @@ int Get_Track_Over_Mouse(void)
                 else
                 {
                     // Scroll it
-                    Pattern_Delay = 0;
-                    Pattern_First_Delay = 150.0f;
+                    Pattern_Delay_Horiz = 0;
+                    Pattern_First_Delay_Horiz = 200.0f;
                 }
             }
             else
             {
-                Pattern_Timer.Set_Frames_Counter();
-                Pattern_Horiz_Scrolling = TRUE;
-                Pattern_Delay = 0;
-                Pattern_First_Delay = 0.0f;
+                Pattern_Timer_Horiz.Set_Frames_Counter();
+                Pattern_Scrolling_Horiz = TRUE;
+                Pattern_Delay_Horiz = 0;
+                Pattern_First_Delay_Horiz = 0.0f;
                 under_mouse--;
             }
         }
         else
         {
-            Pattern_Delay = 0;
-            Pattern_Horiz_Scrolling = FALSE;
+            Pattern_Delay_Horiz = 0;
+            Pattern_Scrolling_Horiz = FALSE;
         }
     }
     else
@@ -1424,10 +1429,10 @@ int Get_Track_Over_Mouse(void)
     }
     if(under_mouse < gui_track)
     {
-        if(Pattern_Horiz_Scrolling)
+        if(Pattern_Scrolling_Horiz)
         {
-            Pattern_Delay += Pattern_Timer.Get_Frames_Delay();
-            if(Pattern_Delay < Pattern_First_Delay)
+            Pattern_Delay_Horiz += Pattern_Timer_Horiz.Get_Frames_Delay();
+            if(Pattern_Delay_Horiz < Pattern_First_Delay_Horiz)
             {
                 // Wait before scrolling
                 under_mouse = gui_track;
@@ -1436,16 +1441,16 @@ int Get_Track_Over_Mouse(void)
             {
                 under_mouse = gui_track - 1;
                 // Scroll it
-                Pattern_Delay = 0;
-                Pattern_First_Delay = 150.0f;
+                Pattern_Delay_Horiz = 0;
+                Pattern_First_Delay_Horiz = 150.0f;
             }
         }
         else
         {
-            Pattern_Timer.Set_Frames_Counter();
-            Pattern_Horiz_Scrolling = TRUE;
-            Pattern_Delay = 0;
-            Pattern_First_Delay = 0.0f;
+            Pattern_Timer_Horiz.Set_Frames_Counter();
+            Pattern_Scrolling_Horiz = TRUE;
+            Pattern_Delay_Horiz = 0;
+            Pattern_First_Delay_Horiz = 0.0f;
             under_mouse = gui_track;
         }
     }
@@ -1639,14 +1644,8 @@ void Set_Track_Slider(int pos)
 
     Realslider_Horiz(726, 429, pixel_visible_pos, pixel_visible_tracks, pixel_size_tracks, 72, TRUE);
 
-    if(ped_track >= gui_track + Visible_Columns - 1)
-    {
-        ped_track = gui_track + Visible_Columns - 1;
-    }
-    if(ped_track < gui_track)
-    {
-        ped_track = gui_track;
-    }
+    if(ped_track >= gui_track + Visible_Columns - 1) ped_track = gui_track + Visible_Columns - 1;
+    if(ped_track < gui_track) ped_track = gui_track;
 }
 
 // ------------------------------------------------------
@@ -1661,10 +1660,12 @@ void Bound_Patt_Pos(void)
 
 // ------------------------------------------------------
 // Reset the mouse scrolling timing
-void Reset_Pattern_Horiz_Scrolling(void)
+void Reset_Pattern_Scrolling_Horiz(void)
 {
-    Pattern_Delay = 0;
-    Pattern_Horiz_Scrolling = FALSE;
+    Pattern_Delay_Horiz = 0;
+    Pattern_Scrolling_Horiz = FALSE;
+    Pattern_Delay_Vert = 0;
+    Pattern_Scrolling_Vert = FALSE;
 }
 
 // ------------------------------------------------------
@@ -1693,7 +1694,55 @@ void Mouse_Wheel_Pattern_Ed(int roll_amount)
 }
 
 // ------------------------------------------------------
-// Handle the sliders event
+// Handle the sliders event (right mouse button)
+void Mouse_Sliders_Right_Pattern_Ed(void)
+{
+    int sched_line;
+
+    // Position the caret on the specified track/column with the mouse
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
+    {
+        ped_track = Get_Track_Over_Mouse();
+        ped_row = Get_Column_Over_Mouse();
+        Actupated(1);
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+    }
+
+    // Go to the row selected with the mouse
+    if(!Songplaying)
+    {
+        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
+        {
+            if(!is_recording)
+            {
+                sched_line = Get_Line_Over_Mouse();
+
+                if(Pattern_Scrolling_Vert)
+                {
+                    Pattern_Delay_Vert += Pattern_Timer_Vert.Get_Frames_Delay();
+                    if(Pattern_Delay_Vert >= Pattern_First_Delay_Vert)
+                    {
+                        // Scroll it
+                        Pattern_Delay_Vert = 0;
+                        Pattern_First_Delay_Vert = 250.0f;
+                        ped_line = sched_line;
+                    }
+                }
+                else
+                {
+                    Pattern_Timer_Vert.Set_Frames_Counter();
+                    Pattern_Scrolling_Vert = TRUE;
+                    Pattern_Delay_Vert = 0;
+                    Pattern_First_Delay_Vert = 0.0f;
+                }
+            }
+            Actupated(1);
+        }
+    }
+}
+
+// ------------------------------------------------------
+// Handle the sliders event (left mouse button)
 void Mouse_Sliders_Pattern_Ed(void)
 {
     // Current track slider
@@ -1732,6 +1781,12 @@ void Mouse_Sliders_Pattern_Ed(void)
         ped_line = final_row;
         Actupated(0);
     }
+
+    // End of the marking stuff
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234) && !Songplaying)
+    {
+        Mark_Block_End(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse(), 3);
+    }
 }
 
 // ------------------------------------------------------
@@ -1767,16 +1822,7 @@ void Mouse_Left_Pattern_Ed(void)
 // Handle the right mouse button event
 void Mouse_Right_Pattern_Ed(void)
 {
-    // Go to the row selected with the mouse
-    if(!Songplaying)
-    {
-        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
-        {
-            if(!is_recording) ped_line = Get_Line_Over_Mouse();
-            Actupated(1);
-        }
-    }
-
+    // Decrease/Increase steps
     if(zcheckMouse(90, 152, 16, 16))
     {
         ped_pattad = 0;

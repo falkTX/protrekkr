@@ -808,7 +808,7 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
     }
 }
 
-void Mouse_Right_Repeat_Instrument_Ed(void)
+void Mouse_Sliders_Right_Instrument_Ed(void)
 {
     int32 *Cur_Loop_Start = (int32 *) &LoopStart[ped_patsam][ped_split];
     int32 *Cur_Loop_End = (int32 *) &LoopEnd[ped_patsam][ped_split];

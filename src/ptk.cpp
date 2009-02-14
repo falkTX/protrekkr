@@ -3733,7 +3733,14 @@ void Mouse_Handler(void)
         Mouse_Wheel_303_Ed(-MouseWheel_Multiplier);
     }
 
-    if(Mouse.button == MOUSE_LEFT_BUTTON)
+    if(Mouse.button & MOUSE_RIGHT_BUTTON)
+    {
+        Mouse_Sliders_Right_Pattern_Ed();
+
+        Mouse_Sliders_Right_Instrument_Ed();
+    }
+
+    if(Mouse.button & MOUSE_LEFT_BUTTON)
     {
         if(Scopish != SCOPE_ZONE_SCOPE)
         {
@@ -3770,7 +3777,7 @@ void Mouse_Handler(void)
 
     // Check Zones for GUI clicks -----------------------------------
 
-    if(Mouse.button_oneshot == MOUSE_LEFT_BUTTON)
+    if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
     {
         if(display_title)
         {
@@ -3809,6 +3816,7 @@ void Mouse_Handler(void)
 
         Mouse_Left_Sample_Ed();
 
+        // Change current instrument name
         if(zcheckMouse(90, 134, 166, 16) && snamesel == 0)
         {
             snamesel = 2;
@@ -3901,14 +3909,14 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_INCREASE_SONG_LENGTH;
         }
 
-        // Decrease number of lines for this pattern
+        // Decrease the number of lines for this pattern
         if(zcheckMouse(188, 98, 16, 16) && patternLines[pSequence[Cur_Position]] > 1)
         {
             patternLines[pSequence[Cur_Position]]--;
             if(ped_line >= patternLines[pSequence[Cur_Position]]) ped_line = patternLines[pSequence[Cur_Position]] - 1;
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;
         }
-        // Increase number of lines for this pattern
+        // Increase the number of lines for this pattern
         if(zcheckMouse(232, 98, 16, 16) && patternLines[pSequence[Cur_Position]] < 128)
         {
             patternLines[pSequence[Cur_Position]]++;
@@ -4015,7 +4023,7 @@ void Mouse_Handler(void)
     }
 
     // Right mouse button
-    if(Mouse.button_oneshot == MOUSE_RIGHT_BUTTON)
+    if(Mouse.button_oneshot & MOUSE_RIGHT_BUTTON)
     {
         gui_action = GUI_CMD_NOP;
 
@@ -4164,32 +4172,9 @@ void Mouse_Handler(void)
 
         Mouse_Right_Master_Ed();
 
-        Reset_Pattern_Horiz_Scrolling();
+        Reset_Pattern_Scrolling_Horiz();
 
     } // RIGHT MOUSE
-
-    if(Mouse.button == MOUSE_RIGHT_BUTTON)
-    {
-        // Position the caret on the specified track/column with the mouse
-        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
-        {
-            ped_track = Get_Track_Over_Mouse();
-            ped_row = Get_Column_Over_Mouse();
-            Actupated(1);
-            gui_action = GUI_CMD_SET_FOCUS_TRACK;
-        }
-
-        Mouse_Right_Repeat_Instrument_Ed();
-    }
-
-    if(Mouse.button == MOUSE_LEFT_BUTTON)
-    {
-        // End of the marking stuff
-        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234) && !Songplaying)
-        {
-            Mark_Block_End(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse(), 3);
-        }
-    }
 }
 
 // ------------------------------------------------------

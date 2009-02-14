@@ -1,8 +1,5 @@
 TODO:
 
- - Horizontal patterns scrolling when selecting a block with the mouse.
- - Vertical patterns scrolling.
-
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating systems.

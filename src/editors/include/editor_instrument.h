@@ -27,7 +27,7 @@ void Mouse_Sliders_Instrument_Ed(void);
 void Mouse_Left_Instrument_Ed(void);
 void Mouse_Right_Instrument_Ed(void);
 void Mouse_Left_Repeat_Instrument_Ed(void);
-void Mouse_Right_Repeat_Instrument_Ed(void);
+void Mouse_Sliders_Right_Instrument_Ed(void);
 void Afloop(void);
 
 #endif

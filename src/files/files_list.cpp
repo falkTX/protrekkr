@@ -232,21 +232,6 @@ void Read_SMPT(void)
 
 #endif
 
-// Display the drives list
-#if defined(__WIN32__)
-    // Save current drive
-    int curdrive = _getdrive();
-
-    for(int drivex = 1; drivex < 16; drivex++)
-    {
-        sprintf(SMPT_LIST[list_counter], "%c:", drivex + 'A' - 1);
-        FILETYPE[list_counter] = _A_SUBDIR;
-        list_counter++;
-        lt_items++;
-    }
-    _chdrive(curdrive);
-#endif
-
 }
 
 void DumpList(int xr, int yr, int y)
