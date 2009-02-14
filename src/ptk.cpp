@@ -1372,6 +1372,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNG9") == 0 ||
                 strcmp(extension, "TWNNSNGA") == 0 ||
                 strcmp(extension, "TWNNSNGB") == 0 ||
+                strcmp(extension, "TWNNSNGC") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -1604,12 +1605,12 @@ void Newmod(void)
 
     Free_Samples();
 
-    for(int api = 0; api < 128; api++)
+    for(int api = 0; api < PATTERN_MAX_ROWS; api++)
     {
         patternLines[api] = 64;
     }
 
-    for(int inicial = 0; inicial < PBLEN; inicial += 6)
+    for(int inicial = 0; inicial < (PATTERN_LEN / 6); inicial += 6)
     {
         *(RawPatterns + inicial) = 121;     // 121
         *(RawPatterns + inicial + 1) = 255; // 255
@@ -1977,7 +1978,7 @@ void Set_Default_Channels_Polyphony(void)
 void ShowInfo(void)
 {
    char tmp[256];
-   int pattsize = nPatterns * 12288;
+   int pattsize = nPatterns * PATTERN_LEN;
    int sampsize = 0;
 
    for(int pp = 0; pp < 128; pp++)
@@ -3095,7 +3096,7 @@ void Keyboard_Handler(void)
 
                             Cur_Position = Next_Line_Pattern_Auto();
 
-                            xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[Cur_Position] * 12288;
+                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
                             *(RawPatterns + xoffseted) = tmp_note;
                             *(RawPatterns + xoffseted + 1) = ped_patsam;
                         }
@@ -3148,7 +3149,7 @@ void Keyboard_Handler(void)
 
                             Cur_Position = Next_Line_Pattern_Auto();
 
-                            xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[Cur_Position] * 12288;
+                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
                             // Put a note off in the pattern
                             *(RawPatterns + xoffseted) = 120;
                             *(RawPatterns + xoffseted + 1) = 0xff;
@@ -3409,9 +3410,9 @@ void Keyboard_Handler(void)
             if(ped_row == 7) ped_cell = 4;
             if(ped_row == 9) ped_cell = 5;
             ltretvalue = retvalue;
-            xoffseted = (ped_track * 6) + (ped_line * 96) + ped_cell;
+            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
 
-            int oldval = *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted);
+            int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
 
             if(retvalue < 16)
             {
@@ -3419,10 +3420,10 @@ void Keyboard_Handler(void)
                 if(oldval == 255 && ped_row == 3) oldval = 0;
                 if(oldval == 255 && ped_row == 5) oldval = 0;
                 oldval = (oldval & 0xf) + retvalue * 16;
-                *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = oldval;
-                if(oldval != 255 && ped_row == 5 && *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) > 144)
+                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+                if(oldval != 255 && ped_row == 5 && *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
                 {
-                    *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = 144;
+                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
                 }     
 
                 if(!is_recording) if(!Songplaying)
@@ -3445,11 +3446,11 @@ void Keyboard_Handler(void)
                     if(ped_row == 1) oldval = 255;
                     if(ped_row == 3) oldval = 255;
                     if(ped_row == 5) oldval = 255;
-                    *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = oldval;
+                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
                     if(oldval != 255 && ped_row == 5 &&
-                       *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) > 144)
+                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
                     {
-                        *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = 144;
+                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
                     }
 
                     if(!is_recording) if(!Songplaying)
@@ -3480,8 +3481,8 @@ void Keyboard_Handler(void)
             if(ped_row == 10) ped_cell = 5;
 
             ltretvalue = retvalue;
-            xoffseted = (ped_track * 6) + (ped_line * 96) + ped_cell;
-            int oldval = *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted);
+            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+            int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
 
             if(retvalue < 16)
             {
@@ -3489,11 +3490,11 @@ void Keyboard_Handler(void)
                 if(oldval == 255 && ped_row == 4) oldval = 0;
                 if(oldval == 255 && ped_row == 6) oldval = 0;
                 oldval = (oldval & 0xf0) + retvalue;
-                *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = oldval;
+                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
                 if(oldval != 255 && ped_row == 6 &&
-                   *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) > 144)
+                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
                 {
-                    *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = 144;
+                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
                 }
     
                 if(!is_recording) if(!Songplaying)
@@ -3516,11 +3517,11 @@ void Keyboard_Handler(void)
                     if(ped_row == 2) oldval = 255;
                     if(ped_row == 4) oldval = 255;
                     if(ped_row == 6) oldval = 255;
-                    *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = oldval;
+                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
                     if(oldval != 255 && ped_row == 6 &&
-                       *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) > 144)
+                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
                     {
-                        *(RawPatterns + pSequence[Cur_Position] * 12288 + xoffseted) = 144;
+                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
                     }
                     if(!is_recording) if(!Songplaying)
                     {
@@ -3544,7 +3545,7 @@ void Keyboard_Handler(void)
         {
             ltretnote_raw = retnote_raw;
 
-            xoffseted = ped_track * 6 + ped_line * 96 + pSequence[Cur_Position] * 12288;
+            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
 
             int tmp_note = retnote_raw + ped_patoct * 12;
             if(tmp_note > 119) tmp_note = 119;

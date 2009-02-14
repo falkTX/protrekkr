@@ -104,7 +104,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
         switch(seditor)
         {
             case 0:
-                Gui_Draw_Button_Box(268, 466, 88, 16, "Loop Fine Editor", Allow_Buttons);
+                Gui_Draw_Button_Box(268, 466, 88, 16, "Fine Loop Editor", Allow_Buttons);
                 Gui_Draw_Button_Box(268, 492, 88, 16, "Save Instrument", Allow_Global);
                 Gui_Draw_Button_Box(268, 510, 88, 16, "Export .Wav File", Allow_Buttons);
 

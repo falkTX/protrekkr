@@ -220,7 +220,7 @@ int repeat_loop_pos;
 
 int repeat_loop_counter;
 
-short patternLines[128];
+short patternLines[PATTERN_MAX_ROWS];
 char grown;
 float Curr_Signal_L[MAX_POLYPHONY];
 float Curr_Signal_R[MAX_POLYPHONY];
@@ -748,7 +748,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         // Allocate the patterns
         if(RawPatterns) free(RawPatterns);
-        RawPatterns = (unsigned char *) malloc(PBLEN);
+        RawPatterns = (unsigned char *) malloc(PATTERN_NBR);
         if(!RawPatterns) return(FALSE);
 
         Pre_Song_Init();
@@ -758,24 +758,29 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&sLength, sizeof(char));
         Mod_Dat_Read(pSequence, sizeof(char) * sLength);
 
+        // Patterns lines
         for(i = 0; i < nPatterns; i++)
         {
             patternLines[i] = 0;
             Mod_Dat_Read(&patternLines[i], sizeof(char));
             patternLines[i] = Swap_16(patternLines[i]);
         }
+
+        // Multi notes
+        Mod_Dat_Read(Channels_MultiNotes, sizeof(char), Songtracks, in);
+
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
         {
-            TmpPatterns_Rows = TmpPatterns + (pwrite * 12288);
-            for(i = 0; i < 6; i++)
+            TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
+            for(i = 0; i < PATTERN_BYTES; i++)
             {   // Bytes / track
                 for(k = 0; k < Songtracks; k++)
                 {   // Tracks
-                    TmpPatterns_Tracks = TmpPatterns_Rows + (k * 6);
+                    TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
                     for(j = 0; j < patternLines[pwrite]; j++)
                     {   // Rows
-                        TmpPatterns_Notes = TmpPatterns_Tracks + (j * (MAX_TRACKS * 6));
+                        TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                         Mod_Dat_Read(TmpPatterns_Notes + i, sizeof(char));
                     }
                 }
@@ -1004,7 +1009,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
 
         Mod_Dat_Read(&tb303_2_enabled, sizeof(char));
-
 
 #if defined(PTK_303)
         tb303[1].enabled = tb303_2_enabled;
@@ -1473,8 +1477,8 @@ void Sp_Player(void)
 
             for(int ct = 0; ct < Songtracks; ct++)
             {
-                int efactor = ct * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
-                int efactor2 = ct * 6 + ped_line_delay * 96 + pSequence[cPosition_delay] * 12288;
+                int efactor = (ct * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + pSequence[cPosition] * PATTERN_LEN;
+                int efactor2 = (ct * PATTERN_BYTES) + (ped_line_delay * PATTERN_ROW_LEN) + pSequence[cPosition_delay] * PATTERN_LEN;
                 pl_note = *(RawPatterns + efactor);
                 arp_pl_note = *(RawPatterns + efactor);
                 pl_sample = *(RawPatterns + efactor + 1);
@@ -2666,7 +2670,7 @@ void DoEffects_tick0(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = trackef * 6 + temp_ped_line * 96 + pSequence[cPosition] * 12288;
+        int tefactor = (trackef * PATTERN_BYTES) + (temp_ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
         int pltr_eff_row = *(RawPatterns + tefactor + 4);
         int pltr_dat_row = *(RawPatterns + tefactor + 5);
 
@@ -2737,7 +2741,7 @@ void DoEffects(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = trackef * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+        int tefactor = (trackef * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
         int pltr_note = *(RawPatterns + tefactor);
         int pltr_sample = *(RawPatterns + tefactor + 1);
 

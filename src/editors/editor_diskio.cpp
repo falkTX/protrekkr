@@ -293,12 +293,12 @@ void Calc_Length(void)
     len = 0;
     for(i = 0; i < sLength; i++)
     {
-        if(have_break < 128) pos_patt = have_break;
+        if(have_break < PATTERN_MAX_ROWS) pos_patt = have_break;
         else pos_patt = 0;
         have_break = 255;
         while(pos_patt < patternLines[pSequence[i]])
         {
-            Cur_Patt = RawPatterns + (pSequence[i] * 12288) + (pos_patt * 6 * MAX_TRACKS);
+            Cur_Patt = RawPatterns + (pSequence[i] * PATTERN_LEN) + (pos_patt * PATTERN_ROW_LEN);
             if(!PosTicks)
             {
                 for(k = 0; k < Songtracks; k++)
@@ -340,7 +340,7 @@ void Calc_Length(void)
                             break;
 
                         case 0xd:
-                            if(patt_datas < 128) have_break = patt_datas;
+                            if(patt_datas < PATTERN_MAX_ROWS) have_break = patt_datas;
                             break;
                         
                         case 0xf:

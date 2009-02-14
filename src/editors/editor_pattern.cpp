@@ -506,7 +506,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     // Browse all tracks to seek synchro markers
     for(tracky = 0; tracky < Songtracks; tracky++)
     {
-        offset_t = (rel * 96 + (tracky * 6)) + pattern * 12288;
+        offset_t = (rel * PATTERN_ROW_LEN + (tracky * PATTERN_BYTES)) + (pattern * PATTERN_LEN);
         unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
         unsigned char p_eh_sync = p_e_sync & 0xf;
 
@@ -519,7 +519,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     {
         cur_track = track + tracky;
         // Read the datas
-        offset_t = (rel * 96 + ((track + tracky) * 6)) + pattern * 12288;
+        offset_t = (rel * PATTERN_ROW_LEN + ((track + tracky) * PATTERN_BYTES)) + pattern * PATTERN_LEN;
         unsigned char p_a = *(RawPatterns + offset_t);
         unsigned char p_b = *(RawPatterns + offset_t + 1);
         unsigned char p_bh = p_b & 0xf;
@@ -746,7 +746,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         // Browse all tracks to seek synchro markers
         for(tracky = 0; tracky < Songtracks; tracky++)
         {
-            offset_t = (line * 96 + (tracky * 6)) + pattern * 12288;
+            offset_t = (line * PATTERN_ROW_LEN + (tracky * PATTERN_BYTES)) + pattern * PATTERN_LEN;
             unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
             unsigned char p_eh_sync = p_e_sync & 0xf;
 
@@ -764,7 +764,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         {
             int tri = track + tracky;
 
-            offset_t = line * 96 + tri * 6 + pattern * 12288;
+            offset_t = (line * PATTERN_ROW_LEN) + (tri * PATTERN_BYTES) + (pattern * PATTERN_LEN);
 
             unsigned char p_a = *(RawPatterns + offset_t);
             unsigned char p_b = *(RawPatterns + offset_t + 1);
@@ -1249,9 +1249,9 @@ int Alloc_Patterns_Pool(void)
 
     nPatterns = 1;
 
-    if((RawPatterns = (unsigned char *) malloc(PBLEN)) != NULL)
-    { // 6144 bytes per pattern
-        for(int inicial = 0; inicial < PBLEN; inicial += 6)
+    if((RawPatterns = (unsigned char *) malloc(PATTERN_NBR)) != NULL)
+    { 
+        for(int inicial = 0; inicial < PATTERN_NBR; inicial += PATTERN_BYTES)
         {
             *(RawPatterns + inicial) = 121;     //121
             *(RawPatterns + inicial + 1) = 255; //255

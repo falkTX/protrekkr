@@ -174,7 +174,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 }
 
                 // See if current track is occupied
-                xoffseted = ped_track * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+                xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                 if(*(RawPatterns + xoffseted) >= 120)
                 {
                     Track_Number = ped_track;
@@ -185,7 +185,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                     for(i_search = 0; i_search < MAX_TRACKS; i_search++)
                     {
                         search_track = Get_Midi_Channel(i_search);
-                        xoffseted = search_track * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+                        xoffseted = (search_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                         if(*(RawPatterns + xoffseted) >= 120)
                         {
                             Track_Number = search_track;
@@ -195,7 +195,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 }
                 if(Track_Number != -1)
                 {
-                    xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+                    xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                     if(*(RawPatterns + xoffseted) < 120)
                     {
                         if(!Midi_Velocity && iTicks == 0) iTicks = 1;
@@ -218,7 +218,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                     {
                         if(Midi_Velocity)
                         {
-                            xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                             Alloc_midi_Channels[Track_Number] = (Param1 & 0x00ff00) + 0x100;
                             *(RawPatterns + xoffseted) = tmp_note;             // Note
                             *(RawPatterns + xoffseted + 1) = ped_patsam;       // Instrument
@@ -240,7 +240,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                             {
                                 Track_Number = Get_Midi_Channel(Midi_Channel_Number);
                             }
-                            xoffseted = Track_Number * 6 + ped_line * 96 + pSequence[cPosition] * 12288;
+                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                             Alloc_midi_Channels[Track_Number] = 0;
                             *(RawPatterns + xoffseted) = 120;
                             *(RawPatterns + xoffseted + 1) = 0xff;             // no instrument

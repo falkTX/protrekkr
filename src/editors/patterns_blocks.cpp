@@ -47,14 +47,14 @@ int Init_Block_Work(void)
 {
     int ipcut;
 
-    BuffPatt = (unsigned char *) malloc(12288);
+    BuffPatt = (unsigned char *) malloc(PATTERN_LEN);
     if(!BuffPatt) return(FALSE);
-    BuffTrack = (unsigned char *) malloc(768);
+    BuffTrack = (unsigned char *) malloc(PATTERN_TRACK_LEN);
     if(!BuffTrack) return(FALSE);
-    BuffBlock = (unsigned char *) malloc(12288);
+    BuffBlock = (unsigned char *) malloc(PATTERN_LEN);
     if(!BuffBlock) return(FALSE);
 
-    for(ipcut = 0; ipcut < 384; ipcut += 6)
+    for(ipcut = 0; ipcut < PATTERN_TRACK_LEN; ipcut += PATTERN_BYTES)
     {
         *(BuffTrack + ipcut) = 121;
         *(BuffTrack + ipcut + 1) = 255;
@@ -64,7 +64,7 @@ int Init_Block_Work(void)
         *(BuffTrack + ipcut + 5) = 0;
     }  
 
-    for(ipcut = 0; ipcut < 12288; ipcut += 6)
+    for(ipcut = 0; ipcut < PATTERN_LEN; ipcut += PATTERN_BYTES)
     {
         *(BuffPatt + ipcut) = 121;
         *(BuffPatt + ipcut + 1) = 255;
@@ -72,6 +72,7 @@ int Init_Block_Work(void)
         *(BuffPatt + ipcut + 3) = 255;
         *(BuffPatt + ipcut + 4) = 0;
         *(BuffPatt + ipcut + 5) = 0;
+
         *(BuffBlock + ipcut) = 121;
         *(BuffBlock + ipcut + 1) = 255;
         *(BuffBlock + ipcut + 2) = 255;
@@ -156,22 +157,22 @@ int Delete_Table[] =
 
 int Get_Pattern_Column(int Position, int xbc, int ybc)
 {
-   return(*(RawPatterns + pSequence[Position] * 12288 + (ybc * 96) + ((xbc / 11) * 6) + Corres_Table[xbc % 11]));
+   return(*(RawPatterns + pSequence[Position] * PATTERN_LEN + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]));
 }
 
 void Set_Pattern_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(RawPatterns + pSequence[Position] * 12288 + (ybc * 96) + ((xbc / 11) * 6) + Corres_Table[xbc % 11]) = Data;
+   *(RawPatterns + pSequence[Position] * PATTERN_LEN + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]) = Data;
 }
 
 void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(BuffBlock + (ybc * 96) + ((xbc / 11) * 6) + Corres_Table[xbc % 11]) = Data;
+   *(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]) = Data;
 }
 
 int Get_Buff_Column(int Position, int xbc, int ybc)
 {
-   return(*(BuffBlock + (ybc * 96) + ((xbc / 11) * 6) + Corres_Table[xbc % 11]));
+   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]));
 }
 
 int Read_Pattern_Column(int Position, int xbc, int ybc)
@@ -362,7 +363,7 @@ void Copy_Selection_From_Buffer(int Position)
         {
             if(min_x >= 0)
             {
-                if(xbc < (16 * 11) && ybc < 128)
+                if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
                 {
                     // We need to check if we're on an odd byte for the instrument/volume or panning
                     // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
@@ -524,7 +525,7 @@ void Interpolate_Block(int Position)
                     tran = end_value - start_value;
                     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
                     {
-                        if(xbc < (16 * 11) && ybc < 128)
+                        if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
                         {
                             int c_val = (cran * tran) / ranlen;
                             Write_Pattern_Column(Position, xbc, ybc, start_value + c_val);
@@ -551,7 +552,7 @@ void Randomize_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < 128)
+            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
             {
                 switch(xbc % 11)
                 {
@@ -601,7 +602,7 @@ void Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < 128)
+            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
             {
                 switch(xbc % 11)
                 {
@@ -634,7 +635,7 @@ void Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < 128)
+            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
             {
                 switch(xbc % 11)
                 {
@@ -668,7 +669,7 @@ void Instrument_Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < 128)
+            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
             {
                 switch(xbc % 11)
                 {
@@ -707,7 +708,7 @@ void Instrument_Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < 128)
+            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
             {
                 switch(xbc % 11)
                 {
@@ -819,7 +820,7 @@ void Insert_Track_Line(int track, int Position)
 
     for(int interval = 126; interval > ped_line - 1; interval--)
     {
-        xoffseted = track * 6 + interval * 96 + pSequence[Position] * 12288;
+        xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + pSequence[Position] * PATTERN_LEN;
         *(RawPatterns + xoffseted + 96) = *(RawPatterns + xoffseted);
         *(RawPatterns + xoffseted + 97) = *(RawPatterns + xoffseted + 1);
         *(RawPatterns + xoffseted + 98) = *(RawPatterns + xoffseted + 2);
@@ -827,7 +828,7 @@ void Insert_Track_Line(int track, int Position)
         *(RawPatterns + xoffseted + 100) = *(RawPatterns + xoffseted + 4);
         *(RawPatterns + xoffseted + 101) = *(RawPatterns + xoffseted + 5);
     }
-    xoffseted = (track * 6) + (ped_line * 96) + pSequence[Position] * 12288;
+    xoffseted = (track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + pSequence[Position] * PATTERN_LEN;
     *(RawPatterns + xoffseted) = 121;
     *(RawPatterns + xoffseted + 1) = 255;
     *(RawPatterns + xoffseted + 2) = 255;
@@ -855,10 +856,10 @@ void Remove_Track_Line(int track, int Position)
 {
     int xoffseted;
 
-    for(int interval = ped_line + 1; interval < 128; interval++)
+    for(int interval = ped_line + 1; interval < PATTERN_MAX_ROWS; interval++)
     {
-        xoffseted = track * 6 + interval * 96 + pSequence[Position] * 12288;
-        int xoffseted2 = pSequence[Position] * 12288 + track * 6 + (interval * 96) - 96;
+        xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
+        int xoffseted2 = (pSequence[Position] * PATTERN_LEN) + (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) - PATTERN_ROW_LEN;
 
         *(RawPatterns + xoffseted2) = *(RawPatterns + xoffseted);
         *(RawPatterns + xoffseted2 + 1) = *(RawPatterns + xoffseted + 1);
@@ -868,7 +869,7 @@ void Remove_Track_Line(int track, int Position)
         *(RawPatterns + xoffseted2 + 5) = *(RawPatterns + xoffseted + 5);
     }
 
-    xoffseted = (track * 6) + 12192 + pSequence[Position] * 12288;
+    xoffseted = (track * PATTERN_BYTES) + (PATTERN_LEN - PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
     *(RawPatterns + xoffseted) = 121;
     *(RawPatterns + xoffseted + 1) = 255;
     *(RawPatterns + xoffseted + 2) = 255;

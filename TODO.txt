@@ -1,9 +1,10 @@
-TODO:
+TODO (in no special order):
 
- - Modify the format to store the sub channels infos.
- - Modify the midi channels.
+ - Modify the format to store the multi notes (also the ptp).
+ - Modify the block functions to handle the multi notes.
+ - Modify the midi channels handling for the multi notes.
  - See to create a panning / instrument & synth.
-
+ 
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating Systems.
@@ -31,10 +32,8 @@ TODO:
  - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
  - User lockable channels from the polyphony channels pool.
  - Add a function to remap instruments in sequencer.
-
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
  - Add requesters (especially before overwriting files and before exiting).
- - Auto update (checks some web site's version file eventually).
  

@@ -29,7 +29,12 @@
 #define SMP_PACK_TRUESPEECH 2
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
-#define PBLEN 128 * 12288
+#define PATTERN_MAX_ROWS 128
+#define PATTERN_BYTES 6
+#define PATTERN_ROW_LEN MAX_TRACKS * PATTERN_BYTES
+#define PATTERN_TRACK_LEN PATTERN_MAX_ROWS * PATTERN_BYTES
+#define PATTERN_LEN PATTERN_ROW_LEN * PATTERN_MAX_ROWS
+#define PATTERN_NBR PATTERN_LEN * 128
 #define SAMPLESPERSEC 44100
 
 #define FLANGER_LOPASS_CUTOFF 0.1f
@@ -91,7 +96,7 @@ extern unsigned char nPatterns;
 extern char Songtracks;
 extern unsigned char sLength;
 extern unsigned char pSequence[256];
-extern short patternLines[128];
+extern short patternLines[PATTERN_MAX_ROWS];
 extern char nameins[128][20];
 extern char Midiprg[128];
 extern unsigned char Synthprg[128];
