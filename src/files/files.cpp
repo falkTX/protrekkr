@@ -2005,7 +2005,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         fprintf(Out_constants, "// Use this file to compile a custom PtkReplay library\n\n", VERSION);
     }
 
-    New_RawPatterns = (unsigned char *) malloc(PATTERN_LEN);
+    New_RawPatterns = (unsigned char *) malloc(PATTERN_NBR);
     if(!New_RawPatterns) return(FALSE);
 
     // Writing header & name...
