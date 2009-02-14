@@ -57,5 +57,6 @@ void Goto_Next_Column(void);
 void Goto_Top_Left(void);
 void Goto_Bottom_Right(void);
 void Goto_Row(int row);
+int Get_Visible_Complete_Tracks(void);
 
 #endif

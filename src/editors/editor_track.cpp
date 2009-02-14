@@ -28,7 +28,7 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(18, 520, 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 538, 56, 16, "Inertia", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(240, 468, 260, 96, "Distorsion/Reverb/Pan", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(240, 468, 260, 96, "Distorsion / Reverb / Pan", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 484, 56, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 502, 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 520, 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -38,12 +38,17 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(640, 468, 130, 52, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(714, 493, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
+    Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
+
+    Gui_Draw_Button_Box(640, 518, 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(714, 539, 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
 }
    
 void Actualize_Track_Ed(char gode)
 {
+    int i;
+
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
 
@@ -169,7 +174,25 @@ void Actualize_Track_Ed(char gode)
         {
             if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
             if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 493, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+
+        if(gode == 0 || gode == 14 || gode == 13)
+        {
+            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
+            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Reserved_Sub_Channels[ped_track][i] = FALSE;
+            }
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+            {
+                Reserved_Sub_Channels[ped_track][i] = TRUE;
+            }
+            //Set_Track_Slider(gui_track);
+            Actupated(0);
         }
 
         if(trkchan == TRUE)
@@ -300,19 +323,40 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Channels polyphony
-        if(zcheckMouse(650, 493, 16, 16) == 1)
+        if(zcheckMouse(650, 489, 16, 16) == 1)
         {
             Channels_Polyphony[ped_track]--;
             if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
+            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
-        if(zcheckMouse(650 + 44, 493, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
         {
             Channels_Polyphony[ped_track]++;
             if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
+        }
+
+        // Multi notes
+        if(zcheckMouse(650, 539, 16, 16) == 1)
+        {
+            Channels_MultiNotes[ped_track]--;
+            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 14;
+        }
+        if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
+        {
+            Channels_MultiNotes[ped_track]++;
+            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track])
+            {
+                Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+            }
+            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 14;
         }
 
     } // Userscreen 1
@@ -349,19 +393,40 @@ void Mouse_Right_Track_Ed(void)
         }
 
         // Channels polyphony
-        if(zcheckMouse(650, 493, 16, 16) == 1)
+        if(zcheckMouse(650, 489, 16, 16) == 1)
         {
             Channels_Polyphony[ped_track] -= 10;
             if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
+            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
-        if(zcheckMouse(650 + 44, 493, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
         {
             Channels_Polyphony[ped_track] += 10;
             if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
+        }
+
+        // Multi notes
+        if(zcheckMouse(650, 539, 16, 16) == 1)
+        {
+            Channels_MultiNotes[ped_track] -= 10;
+            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 14;
+        }
+        if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
+        {
+            Channels_MultiNotes[ped_track] += 10;
+            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track])
+            {
+                Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+            }
+            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            gui_action = GUI_CMD_UPDATE_TRACK_ED;
+            teac = 14;
         }
     }
 }

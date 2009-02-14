@@ -254,7 +254,7 @@ void Init_Tracker_Context_After_ModLoad(void)
     Draw_Scope();
 
     gui_track = 0;
-    Set_Track_Slider(gui_track);
+    //Set_Track_Slider(gui_track);
     lchorus_counter = 44100;
     rchorus_counter = 44100;
     lchorus_counter2 = 44100 - lchorus_delay;
@@ -760,7 +760,7 @@ void LoadMod(char *FileName)
 
 Read_Mod_File:
 
-            mess_box("Loading song -> Header"); 
+            mess_box("Loading song -> Header");
             Free_Samples();
 
             mas_comp_threshold = 100.0f;

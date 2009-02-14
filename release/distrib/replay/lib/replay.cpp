@@ -176,6 +176,7 @@ int Subicounter;
 #endif
 
 char Channels_Polyphony[MAX_TRACKS];
+char Channels_MultiNotes[MAX_TRACKS];
 
 int ped_line;
 unsigned char pSequence[256];
@@ -1177,7 +1178,7 @@ void Pre_Song_Init(void)
 
             sp_Step[ini][i] = 0;
             sp_Stage[ini][i] = 0;
-            Reserved_Sub_Channels[ini][i] = FALSE;
+
             sp_Stage2[ini][i] = 0;
             sp_Stage3[ini][i] = 0;
 
@@ -1197,11 +1198,9 @@ void Pre_Song_Init(void)
             sp_split[ini][i] = 0;
 
             sp_Tvol[ini][i] = 0.0f;
-        
         }
 
-        // First channel of all tracks is always reserved
-        Reserved_Sub_Channels[ini][0] = TRUE;
+        Channels_MultiNotes[ini] = 1;
 
         Player_FD[ini] = 0.0f;
 
@@ -1367,10 +1366,8 @@ void Pre_Song_Init(void)
 // Init the replayer datas
 void Post_Song_Init(void)
 {
-#if defined(PTK_FX_ARPEGGIO)
     int i;
     int j;
-#endif
 
 #if defined(PTK_COMPRESSOR)
     allPassInit((float) c_threshold);
@@ -1380,6 +1377,18 @@ void Post_Song_Init(void)
     shufflestep = shuffle;
     shuffleswitch = -1;
 #endif
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            Reserved_Sub_Channels[i][j] = FALSE;
+        }
+        for(j = 0; j < Channels_MultiNotes[i]; j++)
+        {
+            Reserved_Sub_Channels[i][j] = TRUE;
+        }
+    }
 
     SubCounter = 0;
     repeat_loop_pos = 0;       // No repeat loop

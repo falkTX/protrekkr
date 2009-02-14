@@ -728,7 +728,8 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_CHANGE_TRACKS_NBR)
         {
             Actualize_Master(teac);
-            Set_Track_Slider(gui_track);
+            //Set_Track_Slider(gui_track);
+            Actupated(0);
             Draw_Scope();
             Display_Tracks_To_Render();
         }
@@ -1200,7 +1201,7 @@ int Screen_Update(void)
             Gui_Draw_Button_Box(262, 80, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
             Display_Beat_Time();
 
-            Set_Track_Slider(gui_track);
+            //Set_Track_Slider(gui_track);
 
             NewWav();
 
@@ -2148,7 +2149,7 @@ void Keyboard_Handler(void)
         Unselect_Selection();
         ped_track--;
         ped_row = 0;
-        Actupated(1);
+        Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
 
@@ -2158,7 +2159,7 @@ void Keyboard_Handler(void)
         Unselect_Selection();
         ped_track++;
         ped_row = 0;
-        Actupated(1);
+        Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
 
@@ -3929,6 +3930,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(324, 44, 16, 16) && Songtracks > 1)
         {
             Songtracks--;
+            if(Songtracks < 1) Songtracks = 1;
             gui_action = GUI_CMD_CHANGE_TRACKS_NBR;
             teac = 4;
         }
@@ -3936,6 +3938,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(368, 44, 16, 16) && Songtracks < 16)
         {
             Songtracks++;
+            if(Songtracks > 16) Songtracks = 16;
             gui_action = GUI_CMD_CHANGE_TRACKS_NBR;
             teac = 4;
         }
@@ -4075,6 +4078,23 @@ void Mouse_Handler(void)
                 lt_index += 10;
                 gui_action = GUI_CMD_FILELIST_SCROLL;
             }
+        }
+
+        // Reduce the number of tracks
+        if(zcheckMouse(324, 44, 16, 16) && Songtracks > 1)
+        {
+            Songtracks -= 5;
+            if(Songtracks < 1) Songtracks = 1;
+            gui_action = GUI_CMD_CHANGE_TRACKS_NBR;
+            teac = 4;
+        }
+        // Increase the number of tracks
+        if(zcheckMouse(368, 44, 16, 16) && Songtracks < 16)
+        {
+            Songtracks += 5;
+            if(Songtracks > 16) Songtracks = 16;
+            gui_action = GUI_CMD_CHANGE_TRACKS_NBR;
+            teac = 4;
         }
 
         // Reduce the number of BPM by 16

@@ -2,10 +2,12 @@
 // Protrekkr winamp plugin
 // Written by Franck 'hitchhikr' Charlet
 //
-// TODO: Clean that mess up and create a makefile for mingw !
+// TODO: Clean up that mess and create a makefile for mingw !
 // ----------------------------------------------------------------
 #include <windows.h>
 #include <stdio.h>
+
+#define VERSION "v1.90"
 
 #include "in2.h"
 
@@ -419,7 +421,7 @@ DWORD WINAPI DecodeThread(LPVOID b)
 In_Module mod = 
 {
 	IN_VER,	// defined in IN2.H
-	"Protrekkr Modules Player v1.86b "
+	"Protrekkr Modules Player "VERSION" "
 	// winamp runs on both alpha systems and x86 ones. :)
 #ifdef __alpha
 	"(AXP)"

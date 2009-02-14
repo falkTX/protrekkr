@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.87:
+v1.90:
 
 - Added a scrollbar for patterns.
 - The tracker can now load all these .wav file formats (mono or stereo) :
@@ -21,7 +21,7 @@ v1.87:
 - Added multi notes channels, they can be used to trigger several notes / track
   at the same time in order to make chords or to play several instruments
   in the same track and route them to the same row effect / dsp effect
-  (thus allowing to considerably reduce the dsp usage).
+  (thus allowing to considerably reduce the dsp usage and some modularity).
   Note that these channels are shared with the polyphony ones.
 - Improved volume ramping.
 
