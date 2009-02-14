@@ -1,0 +1,15 @@
+*.svn*
+*.DS_Store*
+*.cfg*
+*.linux*
+*.macosx*
+*.o*
+*.obj*
+*.a
+*.ptp*
+*.ptk*
+*stderr*
+*stdout*
+*.elf*
+*test_macosx*
+*test_linux*

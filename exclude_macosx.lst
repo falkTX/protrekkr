@@ -19,3 +19,8 @@
 *.ptp*
 *module.s*
 *.ptk*
+*stderr*
+*stdout*
+*windows*
+*test_windows*
+*test_linux*

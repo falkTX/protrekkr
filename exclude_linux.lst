@@ -18,3 +18,8 @@
 *.lib*
 *.ptp*
 *.ptk*
+*stderr*
+*stdout*
+*windows*
+*test_windows*
+*test_macosx*
