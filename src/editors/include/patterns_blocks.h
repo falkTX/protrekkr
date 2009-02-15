@@ -33,5 +33,8 @@ void Insert_Pattern_Line(int Position);
 void Insert_Track_Line(int track, int Position);
 void Remove_Pattern_Line(int Position);
 void Remove_Track_Line(int track, int Position);
+void Clear_Patterns_Pool(void);
+void Clear_Track_Data(int offset);
+int Alloc_Patterns_Pool(void);
 
 #endif

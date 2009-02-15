@@ -223,21 +223,6 @@ int Conv_Amiga_Note(int note)
 }
 
 // ------------------------------------------------------
-// Clear all patterns
-void Clean_Up_Patterns_Pool(void)
-{
-    for(int i = 0; i < PATTERN_LEN / 6; i += 6)
-    {
-        *(RawPatterns + i) = 121;
-        *(RawPatterns + i + 1) = 255;
-        *(RawPatterns + i + 2) = 255;
-        *(RawPatterns + i + 3) = 255;
-        *(RawPatterns + i + 4) = 0;
-        *(RawPatterns + i + 5) = 0;
-    }
-}
-
-// ------------------------------------------------------
 // Prepare the tracker interface once a module has been loaded
 void Init_Tracker_Context_After_ModLoad(void)
 {
@@ -306,7 +291,7 @@ void LoadAmigaMod(char *FileName, int channels)
     in = fopen(FileName, "rb");
     if(in != NULL) {
         Free_Samples();
-        Clean_Up_Patterns_Pool();
+        Clear_Patterns_Pool();
 
 #if !defined(__NO_MIDI__)
         Midi_Reset();
@@ -384,7 +369,7 @@ void LoadAmigaMod(char *FileName, int channels)
             {
                 for(pw2 = 0; pw2 < channels; pw2++)
                 {
-                    int tmo = (pwrite * PATTERN_LEN) + (li2 * PATTERN_ROW_LEN) + (pw2 * PATTERN_BYTES);
+                    int tmo = Get_Pattern_Offset(pwrite, pw2, li2);
                     int f_byte = fgetc(in);
                     int t_sample = f_byte >> 4;
                     int t_period = (f_byte - (t_sample << 4)) * 256 + (int) fgetc(in);
@@ -401,8 +386,8 @@ void LoadAmigaMod(char *FileName, int channels)
                     // Period Conversion Table
                     t_note = Conv_Amiga_Note(t_period);
 
-                    *(RawPatterns + tmo) = t_note;
-                    *(RawPatterns + tmo + 1) = t_sample;
+                    *(RawPatterns + tmo + PATTERN_NOTE) = t_note;
+                    *(RawPatterns + tmo + PATTERN_INSTR) = t_sample;
 
                     // Pattern effect adapter:
                     switch(t_command)
@@ -552,7 +537,7 @@ void LoadAmigaMod(char *FileName, int channels)
                             // NOTE CUT
                             if(t_argu > 0xc0 && t_argu < 0xd0)
                             {
-                                *(RawPatterns + tmo + 2) = (t_argu & 0xf) | 0xf0;
+                                *(RawPatterns + tmo + PATTERN_VOLUME) = (t_argu & 0xf) | 0xf0;
                                 t_command = 0;
                                 t_argu = 0;
                             }
@@ -566,8 +551,8 @@ void LoadAmigaMod(char *FileName, int channels)
 
                     } // Pattern FX adapter end.
 
-                    *(RawPatterns + tmo + 4) = t_command;
-                    *(RawPatterns + tmo + 5) = t_argu;
+                    *(RawPatterns + tmo + PATTERN_FX) = t_command;
+                    *(RawPatterns + tmo + PATTERN_FXDATA) = t_argu;
                 }
             }
         }
@@ -771,7 +756,7 @@ Read_Mod_File:
 
             allow_save = Ptk_Format;
 
-            Clean_Up_Patterns_Pool();
+            Clear_Patterns_Pool();
 
 #if !defined(__NO_MIDI__)
             Midi_Reset();
@@ -819,7 +804,7 @@ Read_Mod_File:
                 Read_Mod_Data(pSequence, sizeof(char), sLength, in);
             }
 
-            memset(RawPatterns, 0, (PATTERN_LEN * nPatterns));
+            Clear_Patterns_Pool();
 
             // Load the patterns rows infos
             if(Ptk_Format)
@@ -866,17 +851,17 @@ Read_Mod_File:
                 for(int pwrite = 0; pwrite < nPatterns; pwrite++)
                 {
                     TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
-                    for(i = 0; i < 6; i++)
-                    {   
+                    for(i = 0; i < PATTERN_BYTES; i++)
+                    {
                         // Bytes / track
                         for(k = 0; k < Songtracks; k++)
-                        {   
+                        {
                             // Tracks
-                            TmpPatterns_Tracks = TmpPatterns_Rows + (k * 6);
+                            TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
                             for(j = 0; j < patternLines[pwrite]; j++)
-                            {   
+                            {
                                 // Rows
-                                TmpPatterns_Notes = TmpPatterns_Tracks + (j * (MAX_TRACKS * 6));
+                                TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                                 Read_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                             }
                         }
@@ -2005,7 +1990,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         fprintf(Out_constants, "// Use this file to compile a custom PtkReplay library\n\n", VERSION);
     }
 
-    New_RawPatterns = (unsigned char *) malloc(PATTERN_NBR);
+    New_RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE);
     if(!New_RawPatterns) return(FALSE);
 
     // Writing header & name...
@@ -2020,7 +2005,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     {
         if(!done_pattern[pSequence[i]])
         {
-            memcpy(New_RawPatterns + (int_pattern * PATTERN_LEN), RawPatterns + (pSequence[i] * PATTERN_LEN), PATTERN_LEN);
+            memcpy(New_RawPatterns + (int_pattern * PATTERN_LEN),
+                   RawPatterns + (pSequence[i] * PATTERN_LEN),
+                   PATTERN_LEN);
             New_patternLines[int_pattern] = patternLines[pSequence[i]];
             Old_pSequence[i] = pSequence[i];
             New_pSequence[i] = int_pattern;
@@ -2077,7 +2064,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     // Check the instruments
     nbr_User_Instr = 0;
     TmpPatterns = New_RawPatterns;
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         Used_Instr[i].new_order = -1;
         Used_Instr[i].old_order = -1;
@@ -2175,7 +2162,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                             {   // Rows
                                 TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                if(i == 4)
+                                if(i == PATTERN_FX)
                                 {
                                     // Don't save FX 7
                                     if(TmpPatterns_Notes[i] == 0x7)
@@ -2211,7 +2198,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                                 {   // Rows
                                     TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                    if(i == 4)
+                                    if(i == PATTERN_FX)
                                     {
                                         // Don't save FX 7
                                         if(TmpPatterns_Notes[i] == 0x7)
@@ -2260,7 +2247,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     {   // Rows
                         TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                         // Check the volume column
-                        if(i == 2)
+                        if(i == PATTERN_VOLUME)
                         {
                             if(TmpPatterns_Notes[i] != 0xff)
                             {
@@ -2272,7 +2259,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         }
 
                         // Check the effects column
-                        if(i == 4)
+                        if(i == PATTERN_FX)
                         {
                             switch(TmpPatterns_Notes[i])
                             {
@@ -2425,7 +2412,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         }
                         switch(i)
                         {
-                            case 4:
+                            case PATTERN_FX:
                                 // Don't save FX 7
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -2436,7 +2423,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
                                 break;
-                            case 5:
+                            case PATTERN_FXDATA:
                                 // Don't save Fx 7 datas
                                 if(TmpPatterns_Notes[i - 1] == 0x7)
                                 {
@@ -2447,9 +2434,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
                                 break;
-                            case 1:
+                            case PATTERN_INSTR:
                                 // Replace the instrument order
-                                if(TmpPatterns_Notes[i] < 128)
+                                if(TmpPatterns_Notes[i] < MAX_INSTRS)
                                 {
                                     TmpPatterns_Notes[i] = Get_Instr_New_Order(TmpPatterns_Notes[i]);
                                 }
@@ -3125,11 +3112,11 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             Write_Mod_Data(&nPatterns, sizeof(char), 1, in);
             Write_Mod_Data(&sLength, sizeof(char), 1, in);
-            Write_Mod_Data(pSequence, sizeof(char), 256, in);
+            Write_Mod_Data(pSequence, sizeof(char), MAX_SEQUENCES, in);
 
-            Swap_Short_Buffer(patternLines, 128);
-            Write_Mod_Data(patternLines, sizeof(short), 128, in);
-            Swap_Short_Buffer(patternLines, 128);
+            Swap_Short_Buffer(patternLines, PATTERN_MAX_ROWS);
+            Write_Mod_Data(patternLines, sizeof(short), PATTERN_MAX_ROWS, in);
+            Swap_Short_Buffer(patternLines, PATTERN_MAX_ROWS);
 
             Write_Mod_Data(Channels_MultiNotes, sizeof(char), MAX_TRACKS, in);
 
@@ -3144,12 +3131,12 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                     cur_pattern = cur_pattern_col + (j * PATTERN_LEN);
                     for(k = 0; k < patternLines[j]; k++)
                     {
-                        cur_pattern[0] = 0x79;
-                        cur_pattern[1] = 0xff;
-                        cur_pattern[2] = 0xff;
-                        cur_pattern[3] = 0xff;
-                        cur_pattern[4] = 0x00;
-                        cur_pattern[5] = 0x00;
+                        cur_pattern[PATTERN_NOTE] = 121;
+                        cur_pattern[PATTERN_INSTR] = 255;
+                        cur_pattern[PATTERN_VOLUME] = 255;
+                        cur_pattern[PATTERN_PANNING] = 255;
+                        cur_pattern[PATTERN_FX] = 0;
+                        cur_pattern[PATTERN_FXDATA] = 0;
                         // Next line
                         cur_pattern += PATTERN_ROW_LEN;
                     }
@@ -3162,7 +3149,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             }
 
             // Writing sample data
-            for(int swrite = 0; swrite < 128; swrite++)
+            for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
             {
                 rtrim_string(nameins[swrite], 20);
                 Write_Mod_Data(&nameins[swrite], sizeof(char), 20, in);
@@ -3238,7 +3225,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
 
             // Writing part sequence data
-            for(int tps_pos = 0; tps_pos < 256; tps_pos++)
+            for(int tps_pos = 0; tps_pos < MAX_SEQUENCES; tps_pos++)
             {
                 for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
                 {

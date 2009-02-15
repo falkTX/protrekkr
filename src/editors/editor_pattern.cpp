@@ -506,7 +506,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     // Browse all tracks to seek synchro markers
     for(tracky = 0; tracky < Songtracks; tracky++)
     {
-        offset_t = (rel * PATTERN_ROW_LEN + (tracky * PATTERN_BYTES)) + (pattern * PATTERN_LEN);
+        offset_t = Get_Pattern_Offset(pattern, tracky, rel);
         unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
         unsigned char p_eh_sync = p_e_sync & 0xf;
 
@@ -518,8 +518,10 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     for(tracky = 0; tracky < tVisible_Columns; tracky++)
     {
         cur_track = track + tracky;
+
         // Read the datas
-        offset_t = (rel * PATTERN_ROW_LEN + ((track + tracky) * PATTERN_BYTES)) + pattern * PATTERN_LEN;
+        offset_t = Get_Pattern_Offset(pattern, cur_track, rel);
+
         unsigned char p_a = *(RawPatterns + offset_t);
         unsigned char p_b = *(RawPatterns + offset_t + 1);
         unsigned char p_bh = p_b & 0xf;
@@ -746,7 +748,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         // Browse all tracks to seek synchro markers
         for(tracky = 0; tracky < Songtracks; tracky++)
         {
-            offset_t = (line * PATTERN_ROW_LEN + (tracky * PATTERN_BYTES)) + pattern * PATTERN_LEN;
+            offset_t = Get_Pattern_Offset(pattern, tracky, line);
             unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
             unsigned char p_eh_sync = p_e_sync & 0xf;
 
@@ -764,7 +766,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         {
             int tri = track + tracky;
 
-            offset_t = (line * PATTERN_ROW_LEN) + (tri * PATTERN_BYTES) + (pattern * PATTERN_LEN);
+            offset_t = Get_Pattern_Offset(pattern, tri, line);
 
             unsigned char p_a = *(RawPatterns + offset_t);
             unsigned char p_b = *(RawPatterns + offset_t + 1);
@@ -1237,36 +1239,6 @@ void Actualize_Patterned(void)
 
     //Set_Track_Slider(gui_track);
 }
-
-// ------------------------------------------------------
-// Create a new pattern
-int Alloc_Patterns_Pool(void)
-{
-    for(int api = 0; api < 128; api++)
-    {
-        patternLines[api] = 64;
-    }
-
-    nPatterns = 1;
-
-    if((RawPatterns = (unsigned char *) malloc(PATTERN_NBR)) != NULL)
-    { 
-        for(int inicial = 0; inicial < PATTERN_NBR; inicial += PATTERN_BYTES)
-        {
-            *(RawPatterns + inicial) = 121;     //121
-            *(RawPatterns + inicial + 1) = 255; //255
-            *(RawPatterns + inicial + 2) = 255; //255
-            *(RawPatterns + inicial + 3) = 255; //255
-            *(RawPatterns + inicial + 4) = 0;   //0
-            *(RawPatterns + inicial + 5) = 0;   //0
-        }
-        return TRUE; // Allocated
-    }
-    else
-    {
-        return FALSE; // Not allocated
-    }
-} // End of alloc pattern
 
 // ------------------------------------------------------
 // Return the correct color of a character (select / highlighted or not)

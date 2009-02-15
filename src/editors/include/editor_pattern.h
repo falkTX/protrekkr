@@ -38,7 +38,6 @@ void draw_pated(int track, int line, int petrack, int row);
 void Actupated(int modac);
 void draw_pated_highlight(int track, int line, int petrack, int row);
 void Actualize_Patterned(void);
-int Alloc_Patterns_Pool(void);
 void Bound_Patt_Pos(void);
 void Reset_Pattern_Scrolling_Horiz(void);
 void Mouse_Wheel_Pattern_Ed(int roll_amount);
@@ -58,5 +57,6 @@ void Goto_Top_Left(void);
 void Goto_Bottom_Right(void);
 void Goto_Row(int row);
 int Get_Visible_Complete_Tracks(void);
+int Get_Pattern_Offset(int track, int row, int pattern);
 
 #endif

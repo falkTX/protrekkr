@@ -492,7 +492,7 @@ int Screen_Update(void)
                 if(Get_Current_FileType() != _A_SUBDIR)
                 {
                     AUDIO_Stop();
-                    StopIfSp();
+                    Stop_Current_Sample();
                     LoadFile(ped_patsam, Get_Current_FileName());
                     AUDIO_Play();
                 }
@@ -1600,7 +1600,7 @@ void SongStop(void)
 void Newmod(void)
 {
     SongStop();
-    StopIfSp();
+    Stop_Current_Sample();
     mess_box("Freeing all allocated buffers and restarting...");   
 
     Free_Samples();
@@ -1610,15 +1610,7 @@ void Newmod(void)
         patternLines[api] = 64;
     }
 
-    for(int inicial = 0; inicial < (PATTERN_LEN / 6); inicial += 6)
-    {
-        *(RawPatterns + inicial) = 121;     // 121
-        *(RawPatterns + inicial + 1) = 255; // 255
-        *(RawPatterns + inicial + 2) = 255; // 255
-        *(RawPatterns + inicial + 3) = 255; // 255
-        *(RawPatterns + inicial + 4) = 0;   // 0
-        *(RawPatterns + inicial + 5) = 0;   // 0
-    }
+    Clear_Patterns_Pool();
 
     nPatterns = 1;
 
@@ -1687,7 +1679,6 @@ void Newmod(void)
     Draw_Scope();
 
     mess_box("New song started...");
-    SDL_Delay(300);
     NewWav();
     Actupated(0);
     Reset_Tracks_To_Render();
@@ -1913,7 +1904,7 @@ void DeleteInstrument(void)
 {
     AUDIO_Stop();
     Gui_Draw_Button_Box(320, 134, 64, 16, "Delete", BUTTON_PUSHED);
-    StopIfSp();
+    Stop_Current_Sample();
     SDL_Delay(256);
 
     beatsync[ped_patsam] = FALSE;
@@ -1930,7 +1921,7 @@ void DeleteInstrument(void)
     Actualize_Patterned();
 }
 
-void StopIfSp(void)
+void Stop_Current_Sample(void)
 {
     int i;
 

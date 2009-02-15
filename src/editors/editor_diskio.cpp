@@ -305,8 +305,8 @@ void Calc_Length(void)
                 {
                     // Check if there's a pattern loop command
                     // or a change in the tempo/ticks
-                    patt_cmd = Cur_Patt[4];
-                    patt_datas = Cur_Patt[5];
+                    patt_cmd = Cur_Patt[PATTERN_FX];
+                    patt_datas = Cur_Patt[PATTERN_FXDATA];
                     switch(patt_cmd)
                     {
                         case 0x6:
@@ -351,7 +351,7 @@ void Calc_Length(void)
                             BPM = (float) patt_datas;
                             break;
                     }
-                    Cur_Patt += 6;
+                    Cur_Patt += PATTERN_BYTES;
                 }
             }
             Samples = (int) ((60 * 44100) / (BPM * Ticks));

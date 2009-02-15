@@ -404,7 +404,7 @@ void Actualize_Wave_Ed(char gode)
                 if(newsize != 0)
                 {
                     mess_box("Cutting sample...");
-                    StopIfSp();
+                    Stop_Current_Sample();
                     AUDIO_Stop();
                     SDL_Delay(256);
                     char nc = SampleChannels[ped_patsam][ped_split];

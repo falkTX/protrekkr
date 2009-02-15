@@ -748,7 +748,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         // Allocate the patterns
         if(RawPatterns) free(RawPatterns);
-        RawPatterns = (unsigned char *) malloc(PATTERN_NBR);
+        RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE);
         if(!RawPatterns) return(FALSE);
 
         Pre_Song_Init();
@@ -781,6 +781,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     for(j = 0; j < patternLines[pwrite]; j++)
                     {   // Rows
                         TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
+                        // TODO: multi notes
                         Mod_Dat_Read(TmpPatterns_Notes + i, sizeof(char));
                     }
                 }
@@ -1477,17 +1478,18 @@ void Sp_Player(void)
 
             for(int ct = 0; ct < Songtracks; ct++)
             {
-                int efactor = (ct * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + pSequence[cPosition] * PATTERN_LEN;
-                int efactor2 = (ct * PATTERN_BYTES) + (ped_line_delay * PATTERN_ROW_LEN) + pSequence[cPosition_delay] * PATTERN_LEN;
-                pl_note = *(RawPatterns + efactor);
-                arp_pl_note = *(RawPatterns + efactor);
-                pl_sample = *(RawPatterns + efactor + 1);
-                pl_vol_row = *(RawPatterns + efactor + 2);
-                pl_pan_row = *(RawPatterns + efactor + 3);
-                pl_eff_row = *(RawPatterns + efactor + 4);
-                pl_dat_row = *(RawPatterns + efactor + 5);
-                pl_eff_row2 = *(RawPatterns + efactor2 + 4);
-                pl_dat_row2 = *(RawPatterns + efactor2 + 5);
+                int efactor = Get_Pattern_Offset(pSequence[cPosition], ct, ped_line);
+                int efactor2 = Get_Pattern_Offset(pSequence[cPosition_delay], ct, ped_line_delay);
+                
+                pl_note = *(RawPatterns + efactor + PATTERN_NOTE);
+                arp_pl_note = pl_note;
+                pl_sample = *(RawPatterns + efactor + PATTERN_INSTR);
+                pl_vol_row = *(RawPatterns + efactor + PATTERN_VOLUME);
+                pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
+                pl_eff_row = *(RawPatterns + efactor + PATTERN_FX);
+                pl_dat_row = *(RawPatterns + efactor + PATTERN_FXDATA);
+                pl_eff_row2 = *(RawPatterns + efactor2 + PATTERN_FX);
+                pl_dat_row2 = *(RawPatterns + efactor2 + PATTERN_FXDATA);
 
                 if(pl_vol_row <= 64)
                 {
@@ -2670,9 +2672,9 @@ void DoEffects_tick0(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = (trackef * PATTERN_BYTES) + (temp_ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
-        int pltr_eff_row = *(RawPatterns + tefactor + 4);
-        int pltr_dat_row = *(RawPatterns + tefactor + 5);
+        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, temp_ped_line);
+        int pltr_eff_row = *(RawPatterns + tefactor + PATTERN_FX);
+        int pltr_dat_row = *(RawPatterns + tefactor + PATTERN_FXDATA);
 
         switch(pltr_eff_row)
         {
@@ -2741,19 +2743,20 @@ void DoEffects(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = (trackef * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
-        int pltr_note = *(RawPatterns + tefactor);
-        int pltr_sample = *(RawPatterns + tefactor + 1);
+        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, ped_line);
+        int pltr_note = *(RawPatterns + tefactor + PATTERN_NOTE);
+        
+        int pltr_sample = *(RawPatterns + tefactor + PATTERN_INSTR);
 
 #if defined(PTK_FX_NOTECUT) || defined(PTK_FX_NOTERETRIGGER)
-        unsigned char pltr_vol_row = *(RawPatterns + tefactor + 2);
+        unsigned char pltr_vol_row = *(RawPatterns + tefactor + PATTERN_VOLUME);
 #endif
 
 #if defined(PTK_FX_0) || defined(PTK_FX_X)
-        int64 pltr_eff_row = *(RawPatterns + tefactor + 4);
+        int64 pltr_eff_row = *(RawPatterns + tefactor + PATTERN_FX);
 #endif
 
-        int64 pltr_dat_row = *(RawPatterns + tefactor + 5);
+        int64 pltr_dat_row = *(RawPatterns + tefactor + PATTERN_FXDATA);
 
         if(Subicounter == 0)
         {
@@ -4224,3 +4227,10 @@ float Do_RMS(float input, float *rms_sum, float *buffer)
     return(sqrtf(*rms_sum / (float) MAS_COMPRESSOR_SIZE));
 }
 #endif
+
+// ------------------------------------------------------
+// Return an index in a pattern's module
+int Get_Pattern_Offset(int pattern, int track, int row)
+{
+    return((track * PATTERN_BYTES) + (row * PATTERN_ROW_LEN) + (pattern * PATTERN_LEN));
+}

@@ -1,5 +1,6 @@
 TODO (in no special order):
 
+ - Check all access to rawpatterns.
  - Modify the format to store the multi notes (also the ptp).
  - Modify the block functions to handle the multi notes.
  - Modify the midi channels handling for the multi notes.

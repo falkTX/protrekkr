@@ -7,6 +7,7 @@
 // ------------------------------------------------------
 // Includes
 #include "../include/variables.h"
+#include "include/patterns_blocks.h"
 
 // ------------------------------------------------------
 // Structures
@@ -56,29 +57,29 @@ int Init_Block_Work(void)
 
     for(ipcut = 0; ipcut < PATTERN_TRACK_LEN; ipcut += PATTERN_BYTES)
     {
-        *(BuffTrack + ipcut) = 121;
-        *(BuffTrack + ipcut + 1) = 255;
-        *(BuffTrack + ipcut + 2) = 255;
-        *(BuffTrack + ipcut + 3) = 255;
-        *(BuffTrack + ipcut + 4) = 0;
-        *(BuffTrack + ipcut + 5) = 0;
+        *(BuffTrack + ipcut + PATTERN_NOTE) = 121;
+        *(BuffTrack + ipcut + PATTERN_INSTR) = 255;
+        *(BuffTrack + ipcut + PATTERN_VOLUME) = 255;
+        *(BuffTrack + ipcut + PATTERN_PANNING) = 255;
+        *(BuffTrack + ipcut + PATTERN_FX) = 0;
+        *(BuffTrack + ipcut + PATTERN_FXDATA) = 0;
     }  
 
     for(ipcut = 0; ipcut < PATTERN_LEN; ipcut += PATTERN_BYTES)
     {
-        *(BuffPatt + ipcut) = 121;
-        *(BuffPatt + ipcut + 1) = 255;
-        *(BuffPatt + ipcut + 2) = 255;
-        *(BuffPatt + ipcut + 3) = 255;
-        *(BuffPatt + ipcut + 4) = 0;
-        *(BuffPatt + ipcut + 5) = 0;
+        *(BuffPatt + ipcut + PATTERN_NOTE) = 121;
+        *(BuffPatt + ipcut + PATTERN_INSTR) = 255;
+        *(BuffPatt + ipcut + PATTERN_VOLUME) = 255;
+        *(BuffPatt + ipcut + PATTERN_PANNING) = 255;
+        *(BuffPatt + ipcut + PATTERN_FX) = 0;
+        *(BuffPatt + ipcut + PATTERN_FXDATA) = 0;
 
-        *(BuffBlock + ipcut) = 121;
-        *(BuffBlock + ipcut + 1) = 255;
-        *(BuffBlock + ipcut + 2) = 255;
-        *(BuffBlock + ipcut + 3) = 255;
-        *(BuffBlock + ipcut + 4) = 0;
-        *(BuffBlock + ipcut + 5) = 0;
+        *(BuffBlock + ipcut + PATTERN_NOTE) = 121;
+        *(BuffBlock + ipcut + PATTERN_INSTR) = 255;
+        *(BuffBlock + ipcut + PATTERN_VOLUME) = 255;
+        *(BuffBlock + ipcut + PATTERN_PANNING) = 255;
+        *(BuffBlock + ipcut + PATTERN_FX) = 0;
+        *(BuffBlock + ipcut + PATTERN_FXDATA) = 0;
     }
     return(TRUE);
 }
@@ -87,7 +88,7 @@ int Init_Block_Work(void)
 // Start the block marking stuff
 void Mark_Block_Start(int start_nibble, int start_track, int start_line)
 {
-    swap_block_start_track = start_nibble + (start_track * 11);
+    swap_block_start_track = start_nibble + (start_track * PATTERN_NIBBLES);
     swap_block_end_track = swap_block_start_track;
     swap_block_start = start_line;
     swap_block_end = swap_block_start;
@@ -112,7 +113,7 @@ void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif
 
     if(Modif & BLOCK_MARK_TRACKS)
     {
-        swap_value = start_nibble + (start_track * 11);
+        swap_value = start_nibble + (start_track * PATTERN_NIBBLES);
         if(swap_block_start_track >= swap_value)
         {
             block_start_track = swap_value;
@@ -148,38 +149,41 @@ void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif
 // Blocks routines support stuff
 int Corres_Table[] =
 {
-    0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5
+    0,
+    1, 1, 2, 2, 3, 3, 4, 4, 5, 5
 };
 int Delete_Table[] =
 {
-    0x79, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0, 0, 0, 0
+    121,
+    0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+    0, 0, 0, 0
 };
 
 int Get_Pattern_Column(int Position, int xbc, int ybc)
 {
-   return(*(RawPatterns + pSequence[Position] * PATTERN_LEN + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]));
+   return(*(RawPatterns + (pSequence[Position] * PATTERN_LEN) + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]));
 }
 
 void Set_Pattern_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(RawPatterns + pSequence[Position] * PATTERN_LEN + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]) = Data;
+   *(RawPatterns + (pSequence[Position] * PATTERN_LEN) + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]) = Data;
 }
 
 void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]) = Data;
+   *(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]) = Data;
 }
 
 int Get_Buff_Column(int Position, int xbc, int ybc)
 {
-   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / 11) * PATTERN_BYTES) + Corres_Table[xbc % 11]));
+   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]));
 }
 
 int Read_Pattern_Column(int Position, int xbc, int ybc)
 {
     int datas;
 
-    switch(xbc % 11)
+    switch(xbc % PATTERN_NIBBLES)
     {
         case 0:
             datas = Get_Pattern_Column(Position, xbc, ybc);
@@ -208,7 +212,7 @@ int Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
 
-    switch(xbc % 11)
+    switch(xbc % PATTERN_NIBBLES)
     {
         case 0:
             Set_Pattern_Column(Position, xbc, ybc, datas);
@@ -241,7 +245,7 @@ int Read_Buff_Column(int Position, int xbc, int ybc)
 {
     int datas;
 
-    switch(xbc % 11)
+    switch(xbc % PATTERN_NIBBLES)
     {
         case 0:
             datas = Get_Buff_Column(Position, xbc, ybc);
@@ -270,7 +274,7 @@ int Write_Buff_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
 
-    switch(xbc % 11)
+    switch(xbc % PATTERN_NIBBLES)
     {
         case 0:
             Set_Buff_Column(Position, xbc, ybc, datas);
@@ -330,7 +334,7 @@ void Copy_Selection_To_Buffer(int Position)
     aybc = 0;
     for(int ybc = block_start; ybc < block_end + 1; ybc++)
     {
-        axbc = (block_start_track_nibble % 11);
+        axbc = (block_start_track_nibble % PATTERN_NIBBLES);
         for(int xbc = block_start_track_nibble; xbc < block_end_track_nibble + 1; xbc++)
         {
             Write_Buff_Column(Position, axbc, aybc, Read_Pattern_Column(Position, xbc, ybc));
@@ -346,31 +350,31 @@ void Copy_Selection_From_Buffer(int Position)
 {
     int axbc;
     int aybc;
-    int start_x = (ped_track * 11) + ped_row;
-    int end_x = start_x % 11;
+    int start_x = (ped_track * PATTERN_NIBBLES) + ped_row;
+    int end_x = start_x % PATTERN_NIBBLES;
     int min_x;
     int byte;
     int old_byte;
     int old_byte2;
-    int min_x_start = (end_x - (save_block_start_track_nibble % 11));
+    int min_x_start = (end_x - (save_block_start_track_nibble % PATTERN_NIBBLES));
 
     aybc = 0;
     for(int ybc = ped_line; ybc < ped_line + b_buff_ysize; ybc++)
     {
         axbc = end_x;
-        min_x = (end_x - (save_block_start_track_nibble % 11));
+        min_x = (end_x - (save_block_start_track_nibble % PATTERN_NIBBLES));
         for(int xbc = start_x; xbc < ((start_x + b_buff_xsize)) - min_x_start; xbc++)
         {
             if(min_x >= 0)
             {
-                if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+                if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
                 {
                     // We need to check if we're on an odd byte for the instrument/volume or panning
                     // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
                     byte = Read_Buff_Column(Position, axbc, aybc);
                     if(start_x == xbc)
                     {
-                        switch(xbc % 11)
+                        switch(xbc % PATTERN_NIBBLES)
                         {
                             case 2:
                             case 4:
@@ -441,8 +445,8 @@ SELECTION Get_Real_Selection(void)
     {
         Cur_Sel.y_start = 0;
         Cur_Sel.y_end = patternLines[pSequence[cPosition]] - 1;
-        Cur_Sel.x_start = ped_track * 11;
-        Cur_Sel.x_end = (ped_track * 11) + 10;
+        Cur_Sel.x_start = ped_track * PATTERN_NIBBLES;
+        Cur_Sel.x_end = (ped_track * PATTERN_NIBBLES) + (PATTERN_NIBBLES - 1);
     }
     return(Cur_Sel);
 }
@@ -465,7 +469,7 @@ void Interpolate_Block(int Position)
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % 11)
+        switch(xbc % PATTERN_NIBBLES)
         {
             case 3:
             case 4:
@@ -488,7 +492,7 @@ void Interpolate_Block(int Position)
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % 11)
+        switch(xbc % PATTERN_NIBBLES)
         {
             case 3:
             case 4:
@@ -507,7 +511,7 @@ void Interpolate_Block(int Position)
                 break;
         }
 
-        switch(xbc % 11)
+        switch(xbc % PATTERN_NIBBLES)
         {
             case 3:
             case 4:
@@ -552,9 +556,9 @@ void Randomize_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
             {
-                switch(xbc % 11)
+                switch(xbc % PATTERN_NIBBLES)
                 {
                     case 3:
                     case 4:
@@ -602,9 +606,9 @@ void Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
             {
-                switch(xbc % 11)
+                switch(xbc % PATTERN_NIBBLES)
                 {
                     case 0:
                         note = Read_Pattern_Column(Position, xbc, ybc);
@@ -635,9 +639,9 @@ void Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
             {
-                switch(xbc % 11)
+                switch(xbc % PATTERN_NIBBLES)
                 {
                     case 0:
                         note = Read_Pattern_Column(Position, xbc, ybc);
@@ -669,9 +673,9 @@ void Instrument_Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
             {
-                switch(xbc % 11)
+                switch(xbc % PATTERN_NIBBLES)
                 {
                     case 0:
                         instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
@@ -708,9 +712,9 @@ void Instrument_Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
             {
-                switch(xbc % 11)
+                switch(xbc % PATTERN_NIBBLES)
                 {
                     case 0:
                         instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
@@ -818,23 +822,20 @@ void Insert_Track_Line(int track, int Position)
 {
     int xoffseted;
 
-    for(int interval = 126; interval > ped_line - 1; interval--)
+    for(int interval = (PATTERN_MAX_ROWS - 2); interval > ped_line - 1; interval--)
     {
-        xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + pSequence[Position] * PATTERN_LEN;
-        *(RawPatterns + xoffseted + 96) = *(RawPatterns + xoffseted);
-        *(RawPatterns + xoffseted + 97) = *(RawPatterns + xoffseted + 1);
-        *(RawPatterns + xoffseted + 98) = *(RawPatterns + xoffseted + 2);
-        *(RawPatterns + xoffseted + 99) = *(RawPatterns + xoffseted + 3);
-        *(RawPatterns + xoffseted + 100) = *(RawPatterns + xoffseted + 4);
-        *(RawPatterns + xoffseted + 101) = *(RawPatterns + xoffseted + 5);
+        xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
+
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_NOTE) = *(RawPatterns + xoffseted + PATTERN_NOTE);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_INSTR) = *(RawPatterns + xoffseted + PATTERN_INSTR);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FXDATA) = *(RawPatterns + xoffseted + PATTERN_FXDATA);
     }
-    xoffseted = (track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + pSequence[Position] * PATTERN_LEN;
-    *(RawPatterns + xoffseted) = 121;
-    *(RawPatterns + xoffseted + 1) = 255;
-    *(RawPatterns + xoffseted + 2) = 255;
-    *(RawPatterns + xoffseted + 3) = 255;
-    *(RawPatterns + xoffseted + 4) = 0;
-    *(RawPatterns + xoffseted + 5) = 0;
+    xoffseted = Get_Pattern_Offset(pSequence[Position], track, ped_line);
+ 
+    Clear_Track_Data(xoffseted);
     Actupated(0);
 }
 
@@ -855,27 +856,65 @@ void Remove_Pattern_Line(int Position)
 void Remove_Track_Line(int track, int Position)
 {
     int xoffseted;
+    int xoffseted2;
 
     for(int interval = ped_line + 1; interval < PATTERN_MAX_ROWS; interval++)
     {
-        xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
-        int xoffseted2 = (pSequence[Position] * PATTERN_LEN) + (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) - PATTERN_ROW_LEN;
-
-        *(RawPatterns + xoffseted2) = *(RawPatterns + xoffseted);
-        *(RawPatterns + xoffseted2 + 1) = *(RawPatterns + xoffseted + 1);
-        *(RawPatterns + xoffseted2 + 2) = *(RawPatterns + xoffseted + 2);
-        *(RawPatterns + xoffseted2 + 3) = *(RawPatterns + xoffseted + 3);
-        *(RawPatterns + xoffseted2 + 4) = *(RawPatterns + xoffseted + 4);
-        *(RawPatterns + xoffseted2 + 5) = *(RawPatterns + xoffseted + 5);
+        xoffseted = Get_Pattern_Offset(pSequence[Position], track, interval);
+        xoffseted2 = Get_Pattern_Offset(pSequence[Position], track, interval) - PATTERN_ROW_LEN;
+        
+        *(RawPatterns + xoffseted2 + PATTERN_NOTE) = *(RawPatterns + xoffseted + PATTERN_NOTE);
+        *(RawPatterns + xoffseted2 + PATTERN_INSTR) = *(RawPatterns + xoffseted + PATTERN_INSTR);
+        *(RawPatterns + xoffseted2 + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
+        *(RawPatterns + xoffseted2 + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
+        *(RawPatterns + xoffseted2 + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
+        *(RawPatterns + xoffseted2 + PATTERN_FXDATA) = *(RawPatterns + xoffseted + PATTERN_FXDATA);
     }
 
-    xoffseted = (track * PATTERN_BYTES) + (PATTERN_LEN - PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
-    *(RawPatterns + xoffseted) = 121;
-    *(RawPatterns + xoffseted + 1) = 255;
-    *(RawPatterns + xoffseted + 2) = 255;
-    *(RawPatterns + xoffseted + 3) = 255;
-    *(RawPatterns + xoffseted + 4) = 0;
-    *(RawPatterns + xoffseted + 5) = 0;
+    xoffseted = Get_Pattern_Offset(pSequence[Position], track, 0) + (PATTERN_LEN - PATTERN_ROW_LEN);
+
+    Clear_Track_Data(xoffseted);
 
     Actupated(0);
+}
+
+// ------------------------------------------------------
+// Clear all patterns
+void Clear_Patterns_Pool(void)
+{
+    for(int i = 0; i < PATTERN_FULL_SIZE; i += PATTERN_BYTES)
+    {
+        Clear_Track_Data(i);
+    }
+}
+
+// ------------------------------------------------------
+// Init the data of a note
+void Clear_Track_Data(int offset)
+{
+    *(RawPatterns + offset + PATTERN_NOTE) = 121;
+    *(RawPatterns + offset + PATTERN_INSTR) = 255;
+    *(RawPatterns + offset + PATTERN_VOLUME) = 255;
+    *(RawPatterns + offset + PATTERN_PANNING) = 255;
+    *(RawPatterns + offset + PATTERN_FX) = 0;
+    *(RawPatterns + offset + PATTERN_FXDATA) = 0;
+}
+
+// ------------------------------------------------------
+// Create a new pattern
+int Alloc_Patterns_Pool(void)
+{
+    for(int api = 0; api < PATTERN_MAX_ROWS; api++)
+    {
+        patternLines[api] = DEFAULT_PATTERN_LEN;
+    }
+
+    nPatterns = 1;
+
+    if((RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE)) != NULL)
+    { 
+        Clear_Patterns_Pool();
+        return TRUE;
+    }
+    return FALSE;
 }

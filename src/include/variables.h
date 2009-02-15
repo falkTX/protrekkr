@@ -512,7 +512,7 @@ void draw_pated(int track, int line, int petrack, int row);
 void Actupated(int modac);
 
 void KillInst(int inst_nbr);
-void StopIfSp(void);
+void Stop_Current_Sample(void);
 void draw_lfoed(void);
 void draw_tracked(void);
 void DeleteInstrument(void);

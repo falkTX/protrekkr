@@ -30,11 +30,64 @@
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
 #define PATTERN_MAX_ROWS 128
+#define MAX_SEQUENCES 256
+#define MAX_INSTRS 128
+#define DEFAULT_PATTERN_LEN 64
+
+/*
+#define PATTERN_NOTE1 0
+#define PATTERN_INSTR1 1
+#define PATTERN_NOTE2 2
+#define PATTERN_INSTR2 3
+#define PATTERN_NOTE3 4
+#define PATTERN_INSTR3 5
+#define PATTERN_NOTE4 6
+#define PATTERN_INSTR4 7
+#define PATTERN_NOTE5 8
+#define PATTERN_INSTR5 9
+#define PATTERN_NOTE6 10
+#define PATTERN_INSTR6 11
+#define PATTERN_NOTE7 12
+#define PATTERN_INSTR7 13
+#define PATTERN_NOTE8 14
+#define PATTERN_INSTR8 15
+#define PATTERN_NOTE9 16
+#define PATTERN_INSTR9 17
+#define PATTERN_NOTE10 18
+#define PATTERN_INSTR10 19
+#define PATTERN_NOTE11 20
+#define PATTERN_INSTR11 21
+#define PATTERN_NOTE12 22
+#define PATTERN_INSTR12 23
+#define PATTERN_NOTE13 24
+#define PATTERN_INSTR13 25
+#define PATTERN_NOTE14 26
+#define PATTERN_INSTR14 27
+#define PATTERN_NOTE15 28
+#define PATTERN_INSTR15 29
+#define PATTERN_NOTE16 30
+#define PATTERN_INSTR16 31
+
+#define PATTERN_VOLUME 32
+#define PATTERN_PANNING 33
+#define PATTERN_FX 34
+#define PATTERN_FXDATA 35
+*/
+
+#define PATTERN_NOTE 0
+#define PATTERN_INSTR 1
+#define PATTERN_VOLUME 2
+#define PATTERN_PANNING 3
+#define PATTERN_FX 4
+#define PATTERN_FXDATA 5
+
+#define PATTERN_NIBBLES 11
 #define PATTERN_BYTES 6
 #define PATTERN_ROW_LEN MAX_TRACKS * PATTERN_BYTES
 #define PATTERN_TRACK_LEN PATTERN_MAX_ROWS * PATTERN_BYTES
 #define PATTERN_LEN PATTERN_ROW_LEN * PATTERN_MAX_ROWS
-#define PATTERN_NBR PATTERN_LEN * 128
+#define PATTERN_FULL_SIZE PATTERN_LEN * 128
+
 #define SAMPLESPERSEC 44100
 
 #define FLANGER_LOPASS_CUTOFF 0.1f
@@ -218,5 +271,6 @@ void ResetSynthParameters(SynthParameters *TSP);
 void Free_Samples(void);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
 int Get_Free_Sub_Channel(int channel);
+int Get_Pattern_Offset(int pattern, int track, int row);
 
 #endif
