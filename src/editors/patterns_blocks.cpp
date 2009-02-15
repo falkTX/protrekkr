@@ -47,6 +47,7 @@ unsigned char *BuffTrack;
 int Init_Block_Work(void)
 {
     int ipcut;
+    int i;
 
     BuffPatt = (unsigned char *) malloc(PATTERN_LEN);
     if(!BuffPatt) return(FALSE);
@@ -57,8 +58,11 @@ int Init_Block_Work(void)
 
     for(ipcut = 0; ipcut < PATTERN_TRACK_LEN; ipcut += PATTERN_BYTES)
     {
-        *(BuffTrack + ipcut + PATTERN_NOTE) = 121;
-        *(BuffTrack + ipcut + PATTERN_INSTR) = 255;
+        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        {
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+        }        
         *(BuffTrack + ipcut + PATTERN_VOLUME) = 255;
         *(BuffTrack + ipcut + PATTERN_PANNING) = 255;
         *(BuffTrack + ipcut + PATTERN_FX) = 0;
@@ -67,15 +71,21 @@ int Init_Block_Work(void)
 
     for(ipcut = 0; ipcut < PATTERN_LEN; ipcut += PATTERN_BYTES)
     {
-        *(BuffPatt + ipcut + PATTERN_NOTE) = 121;
-        *(BuffPatt + ipcut + PATTERN_INSTR) = 255;
+        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        {
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+        }        
         *(BuffPatt + ipcut + PATTERN_VOLUME) = 255;
         *(BuffPatt + ipcut + PATTERN_PANNING) = 255;
         *(BuffPatt + ipcut + PATTERN_FX) = 0;
         *(BuffPatt + ipcut + PATTERN_FXDATA) = 0;
 
-        *(BuffBlock + ipcut + PATTERN_NOTE) = 121;
-        *(BuffBlock + ipcut + PATTERN_INSTR) = 255;
+        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        {
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+        }        
         *(BuffBlock + ipcut + PATTERN_VOLUME) = 255;
         *(BuffBlock + ipcut + PATTERN_PANNING) = 255;
         *(BuffBlock + ipcut + PATTERN_FX) = 0;
@@ -367,7 +377,7 @@ void Copy_Selection_From_Buffer(int Position)
         {
             if(min_x >= 0)
             {
-                if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+                if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
                 {
                     // We need to check if we're on an odd byte for the instrument/volume or panning
                     // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
@@ -529,7 +539,7 @@ void Interpolate_Block(int Position)
                     tran = end_value - start_value;
                     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
                     {
-                        if(xbc < (16 * 11) && ybc < PATTERN_MAX_ROWS)
+                        if(xbc < (16 * 11) && ybc < MAX_ROWS)
                         {
                             int c_val = (cran * tran) / ranlen;
                             Write_Pattern_Column(Position, xbc, ybc, start_value + c_val);
@@ -556,7 +566,7 @@ void Randomize_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
             {
                 switch(xbc % PATTERN_NIBBLES)
                 {
@@ -606,7 +616,7 @@ void Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
             {
                 switch(xbc % PATTERN_NIBBLES)
                 {
@@ -639,7 +649,7 @@ void Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
             {
                 switch(xbc % PATTERN_NIBBLES)
                 {
@@ -673,7 +683,7 @@ void Instrument_Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
             {
                 switch(xbc % PATTERN_NIBBLES)
                 {
@@ -712,7 +722,7 @@ void Instrument_Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < PATTERN_MAX_ROWS)
+            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
             {
                 switch(xbc % PATTERN_NIBBLES)
                 {
@@ -821,13 +831,17 @@ void Insert_Pattern_Line(int Position)
 void Insert_Track_Line(int track, int Position)
 {
     int xoffseted;
+    int i;
 
-    for(int interval = (PATTERN_MAX_ROWS - 2); interval > ped_line - 1; interval--)
+    for(int interval = (MAX_ROWS - 2); interval > ped_line - 1; interval--)
     {
         xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
 
-        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_NOTE) = *(RawPatterns + xoffseted + PATTERN_NOTE);
-        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_INSTR) = *(RawPatterns + xoffseted + PATTERN_INSTR);
+        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        {
+            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_NOTE1 + i) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + i);
+            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_INSTR1 + i) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + i);
+        }
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
@@ -857,14 +871,18 @@ void Remove_Track_Line(int track, int Position)
 {
     int xoffseted;
     int xoffseted2;
+    int i;
 
-    for(int interval = ped_line + 1; interval < PATTERN_MAX_ROWS; interval++)
+    for(int interval = ped_line + 1; interval < MAX_ROWS; interval++)
     {
         xoffseted = Get_Pattern_Offset(pSequence[Position], track, interval);
         xoffseted2 = Get_Pattern_Offset(pSequence[Position], track, interval) - PATTERN_ROW_LEN;
         
-        *(RawPatterns + xoffseted2 + PATTERN_NOTE) = *(RawPatterns + xoffseted + PATTERN_NOTE);
-        *(RawPatterns + xoffseted2 + PATTERN_INSTR) = *(RawPatterns + xoffseted + PATTERN_INSTR);
+        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        {
+            *(RawPatterns + xoffseted2 + PATTERN_NOTE1 + i) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + i);
+            *(RawPatterns + xoffseted2 + PATTERN_INSTR1 + i) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + i);
+        }
         *(RawPatterns + xoffseted2 + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
         *(RawPatterns + xoffseted2 + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
         *(RawPatterns + xoffseted2 + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
@@ -882,7 +900,7 @@ void Remove_Track_Line(int track, int Position)
 // Clear all patterns
 void Clear_Patterns_Pool(void)
 {
-    for(int i = 0; i < PATTERN_FULL_SIZE; i += PATTERN_BYTES)
+    for(int i = 0; i < PATTERN_POOL_SIZE; i += PATTERN_BYTES)
     {
         Clear_Track_Data(i);
     }
@@ -892,8 +910,13 @@ void Clear_Patterns_Pool(void)
 // Init the data of a note
 void Clear_Track_Data(int offset)
 {
-    *(RawPatterns + offset + PATTERN_NOTE) = 121;
-    *(RawPatterns + offset + PATTERN_INSTR) = 255;
+    int i;
+
+    for(i = 0; i < MAX_POLYPHONY; i += 2)
+    {
+        *(RawPatterns + offset + PATTERN_NOTE1 + i) = 121;
+        *(RawPatterns + offset + PATTERN_INSTR1 + i) = 255;
+    }
     *(RawPatterns + offset + PATTERN_VOLUME) = 255;
     *(RawPatterns + offset + PATTERN_PANNING) = 255;
     *(RawPatterns + offset + PATTERN_FX) = 0;
@@ -904,14 +927,14 @@ void Clear_Track_Data(int offset)
 // Create a new pattern
 int Alloc_Patterns_Pool(void)
 {
-    for(int api = 0; api < PATTERN_MAX_ROWS; api++)
+    for(int api = 0; api < MAX_ROWS; api++)
     {
         patternLines[api] = DEFAULT_PATTERN_LEN;
     }
 
     nPatterns = 1;
 
-    if((RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE)) != NULL)
+    if((RawPatterns = (unsigned char *) malloc(PATTERN_POOL_SIZE)) != NULL)
     { 
         Clear_Patterns_Pool();
         return TRUE;

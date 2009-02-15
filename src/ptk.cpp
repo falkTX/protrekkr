@@ -1605,7 +1605,7 @@ void Newmod(void)
 
     Free_Samples();
 
-    for(int api = 0; api < PATTERN_MAX_ROWS; api++)
+    for(int api = 0; api < MAX_ROWS; api++)
     {
         patternLines[api] = 64;
     }

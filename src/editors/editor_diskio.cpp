@@ -293,7 +293,7 @@ void Calc_Length(void)
     len = 0;
     for(i = 0; i < sLength; i++)
     {
-        if(have_break < PATTERN_MAX_ROWS) pos_patt = have_break;
+        if(have_break < MAX_ROWS) pos_patt = have_break;
         else pos_patt = 0;
         have_break = 255;
         while(pos_patt < patternLines[pSequence[i]])
@@ -340,7 +340,7 @@ void Calc_Length(void)
                             break;
 
                         case 0xd:
-                            if(patt_datas < PATTERN_MAX_ROWS) have_break = patt_datas;
+                            if(patt_datas < MAX_ROWS) have_break = patt_datas;
                             break;
                         
                         case 0xf:

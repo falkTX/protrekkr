@@ -47,11 +47,8 @@ void Draw_Track_Ed(void)
    
 void Actualize_Track_Ed(char gode)
 {
-    int i;
-
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-
         if(gode == 0)
         {
             if(ped_track > MAX_TRACKS - 1) ped_track = 0;
@@ -183,15 +180,6 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
             Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            for(i = 0; i < MAX_POLYPHONY; i++)
-            {
-                Reserved_Sub_Channels[ped_track][i] = FALSE;
-            }
-            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
-            {
-                Reserved_Sub_Channels[ped_track][i] = TRUE;
-            }
-            //Set_Track_Slider(gui_track);
             Actupated(0);
         }
 

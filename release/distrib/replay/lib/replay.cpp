@@ -84,7 +84,7 @@ int64 Vstep1[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
 float TPan[MAX_TRACKS];
-int old_note[MAX_TRACKS];
+int old_note[MAX_TRACKS][MAX_POLYPHONY];
 
 s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
 s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
@@ -185,9 +185,8 @@ int cPosition_delay;
 int ped_line_delay;
 int pl_eff_row2;
 int pl_dat_row2;
-int pl_note;
-int arp_pl_note;
-int pl_sample;
+int pl_note[MAX_POLYPHONY];
+int pl_sample[MAX_POLYPHONY];
 int pl_vol_row;
 int pl_pan_row;
 unsigned char *RawPatterns;
@@ -220,7 +219,7 @@ int repeat_loop_pos;
 
 int repeat_loop_counter;
 
-short patternLines[PATTERN_MAX_ROWS];
+short patternLines[MAX_ROWS];
 char grown;
 float Curr_Signal_L[MAX_POLYPHONY];
 float Curr_Signal_R[MAX_POLYPHONY];
@@ -748,7 +747,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         // Allocate the patterns
         if(RawPatterns) free(RawPatterns);
-        RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE);
+        RawPatterns = (unsigned char *) malloc(PATTERN_POOL_SIZE);
         if(!RawPatterns) return(FALSE);
 
         Pre_Song_Init();
@@ -781,7 +780,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     for(j = 0; j < patternLines[pwrite]; j++)
                     {   // Rows
                         TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                        // TODO: multi notes
                         Mod_Dat_Read(TmpPatterns_Notes + i, sizeof(char));
                     }
                 }
@@ -802,7 +800,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
 
-            for(int slwrite = 0; slwrite < 16; slwrite++)
+            for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Mod_Dat_Read(&SampleType[swrite][slwrite], sizeof(char));
                 if(SampleType[swrite][slwrite] != 0)
@@ -990,11 +988,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&Disclap[tps_trk], sizeof(char));
         }
 
-        Mod_Dat_Read(beatsync, sizeof(char) * 128);
-        Mod_Dat_Read(beatlines, sizeof(short) * 128);
+        Mod_Dat_Read(beatsync, sizeof(char) * MAX_INSTRS);
+        Mod_Dat_Read(beatlines, sizeof(short) * MAX_INSTRS);
         Mod_Dat_Read(&REVERBFILTER, sizeof(float));
 
-        Mod_Dat_Read(CustomVol, sizeof(float) * 128);
+        Mod_Dat_Read(CustomVol, sizeof(float) * MAX_INSTRS);
 
         char tb303_1_enabled;
         char tb303_2_enabled;
@@ -1182,10 +1180,10 @@ void Pre_Song_Init(void)
             Synthesizer[ini][i].Reset();
 
             sp_Step[ini][i] = 0;
-            sp_Stage[ini][i] = 0;
+            sp_Stage[ini][i] = PLAYING_NOSAMPLE;
 
-            sp_Stage2[ini][i] = 0;
-            sp_Stage3[ini][i] = 0;
+            sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
+            sp_Stage3[ini][i] = PLAYING_NOSAMPLE;
 
             sp_Position[ini][i].absolu = 0;
             sp_Position_osc1[ini][i].absolu = 0;
@@ -1194,6 +1192,8 @@ void Pre_Song_Init(void)
 #if defined(PTK_SYNTH_OSC3)
             sp_Position_osc3[ini][i].absolu = 0;
 #endif
+
+            old_note[ini][i] = 0;
 
             Vstep1[ini][i] = 0;
 
@@ -1213,8 +1213,6 @@ void Pre_Song_Init(void)
         FADEMODE[ini] = 0;
         FADECOEF[ini] = 0.0f;
 #endif
-
-        old_note[ini] = 0;
 
         ResetFilters(ini);
 
@@ -1389,10 +1387,6 @@ void Post_Song_Init(void)
         {
             Reserved_Sub_Channels[i][j] = FALSE;
         }
-        for(j = 0; j < Channels_MultiNotes[i]; j++)
-        {
-            Reserved_Sub_Channels[i][j] = TRUE;
-        }
     }
 
     SubCounter = 0;
@@ -1454,6 +1448,8 @@ void Sp_Player(void)
     unsigned int res_dec;
 
     int i;
+    int j;
+    int trigger_note_off;
 
     left_float = 0;
     right_float = 0;
@@ -1481,9 +1477,12 @@ void Sp_Player(void)
                 int efactor = Get_Pattern_Offset(pSequence[cPosition], ct, ped_line);
                 int efactor2 = Get_Pattern_Offset(pSequence[cPosition_delay], ct, ped_line_delay);
                 
-                pl_note = *(RawPatterns + efactor + PATTERN_NOTE);
-                arp_pl_note = pl_note;
-                pl_sample = *(RawPatterns + efactor + PATTERN_INSTR);
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
+                {
+                    pl_note[i] = *(RawPatterns + efactor + PATTERN_NOTE1 + (i * 2));
+                    pl_sample[i] = *(RawPatterns + efactor + PATTERN_INSTR1 + (i * 2));
+                }
+                
                 pl_vol_row = *(RawPatterns + efactor + PATTERN_VOLUME);
                 pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
                 pl_eff_row = *(RawPatterns + efactor + PATTERN_FX);
@@ -1553,52 +1552,82 @@ void Sp_Player(void)
 #endif
 
 #if defined(PTK_FX_PATTERNBREAK)
-                if(pl_eff_row == 0xd && pl_dat_row < 128) Patbreak = pl_dat_row;
-                if(pl_eff_row2 == 0xd && pl_dat_row2 < 128) Patbreak2 = pl_dat_row2;
+                if(pl_eff_row == 0xd && pl_dat_row < MAX_ROWS) Patbreak = pl_dat_row;
+                if(pl_eff_row2 == 0xd && pl_dat_row2 < MAX_ROWS) Patbreak2 = pl_dat_row2;
 #endif
 
-                if(pl_note < 120)
-                {
-                    int toffset = 0;
-                    int free_sub_channel;
-                    glide = 0;
-                    if(pl_eff_row == 9) toffset = pl_dat_row;
-                    else if(pl_eff_row == 5) glide = 1;
+                int toffset;
+                int free_sub_channel;
 
-                    free_sub_channel = Get_Free_Sub_Channel(ct);
-                    if(pl_vol_row <= 64 || pl_eff_row == 3)
+                toffset = 0;
+                glide = 0;
+                if(pl_eff_row == 9) toffset = pl_dat_row;
+                else if(pl_eff_row == 5) glide = 1;
+
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
+                {
+                    if(pl_note[i] < 120)
                     {
-                        Play_Instrument(ct, free_sub_channel, (float) pl_note, pl_sample, sp_Tvol[ct][free_sub_channel], toffset, glide, FALSE, ct);
-                    }
-                    else
-                    {
-                        // Use the default sample volume if there's nothing
-                        // in the volume column of no 0x3 fx
-                        Play_Instrument(ct, free_sub_channel, (float) pl_note, pl_sample, CustomVol[pl_sample], toffset, glide, FALSE, ct);
-                    }
-                    // Now remove all other notes on every channel but the one we just triggered
-                    for(i = 0; i < Channels_Polyphony[ct]; i++)
-                    {
-                        if(free_sub_channel != i)
+                        // Lock it
+                        Reserved_Sub_Channels[ct][i] = TRUE;
+                        free_sub_channel = Get_Free_Sub_Channel(ct);
+                        pl_note[free_sub_channel] = pl_note[i];
+                        pl_sample[free_sub_channel] = pl_sample[i];
+                        if(pl_vol_row <= 64 || pl_eff_row == 3)
                         {
-                            if(sp_Stage[ct][i] == PLAYING_SAMPLE)
+                            Play_Instrument(ct, free_sub_channel,
+                                            (float) pl_note[i],
+                                            pl_sample[i],
+                                            sp_Tvol[ct][free_sub_channel],
+                                            toffset, glide,
+                                            FALSE, ct);
+                        }
+                        else
+                        {
+                            // Use the default sample volume if there's nothing
+                            // in the volume column of no 0x3 fx
+                            Play_Instrument(ct, free_sub_channel,
+                                            (float) pl_note[i],
+                                            pl_sample[i], CustomVol[pl_sample[i]],
+                                            toffset, glide,
+                                            FALSE, ct);
+                        }
+
+                        // Now remove all other notes on every channel but the one we just triggered
+                        for(j = 0; j < Channels_Polyphony[ct]; j++)
+                        {
+                            if(free_sub_channel != j)
                             {
-                                sp_Stage[ct][i] = PLAYING_SAMPLE_NOTEOFF;
+                                if(Reserved_Sub_Channels[ct][j] == FALSE)
+                                {
+                                    if(sp_Stage[ct][j] == PLAYING_SAMPLE)
+                                    {
+                                        sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                                    }
+                                    Synthesizer[ct][j].NoteOff();
+                                }
                             }
-                            Synthesizer[ct][i].NoteOff();
                         }
                     }
                 }
 
                 // Trigger a note off on all sub channels
-                if(pl_note == 120)
+                trigger_note_off = FALSE;
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
-                    for(i = 0; i < Channels_Polyphony[ct]; i++)
+                    if(pl_note[i] == 120)
                     {
-                        if(sp_Stage[ct][i] == PLAYING_SAMPLE) sp_Stage[ct][i] = PLAYING_SAMPLE_NOTEOFF;
-                        Synthesizer[ct][i].NoteOff();
+                        trigger_note_off = TRUE;
+                        for(j = 0; j < Channels_Polyphony[ct]; j++)
+                        {
+                            if(sp_Stage[ct][j] == PLAYING_SAMPLE) sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                            Synthesizer[ct][j].NoteOff();
+                        }
                     }
+                }
 
+                if(trigger_note_off)
+                {
 #if defined(PTK_303)
                     noteoff303(ct); // 303 Note Off...
 #endif
@@ -1608,9 +1637,9 @@ void Sp_Player(void)
                     Midi_NoteOff(ct);
 #endif
 #endif
-
                 }
-            } // For loop
+
+            } // Channels loop
 
 #if defined(PTK_303)
             Go303();
@@ -1913,6 +1942,7 @@ ByPass_Wav:
                                                                 Vstep1[c][i]
                                                          );
 
+
                 if((Synthesizer[c][i].OSC1_WAVEFORM == 5 || Synthesizer[c][i].OSC2_WAVEFORM == 5))
                 {
                     if(Player_SC[c][i] == 2) grown = TRUE;
@@ -1920,18 +1950,17 @@ ByPass_Wav:
                 gotsome = TRUE;
             }
 
+            if(sp_Stage[c][i] == PLAYING_NOSAMPLE &&
+               sp_Stage2[c][i] == PLAYING_NOSAMPLE &&
+               sp_Stage3[c][i] == PLAYING_NOSAMPLE)
+            {
+                Reserved_Sub_Channels[c][i] = FALSE;
+            }
+
             // Gather the signals of all the sub channels
             All_Signal_L += Curr_Signal_L[i];
             All_Signal_R += Curr_Signal_R[i];
         }
-
-            // We have no adsr for those
-/*            if(!CHAN_ACTIVE_STATE[cPosition][c])
-            {
-                All_Signal_L = 0;
-                All_Signal_R = 0;
-            }
-*/
 
 #if defined(PTK_303)
         if(track3031 == c)
@@ -2311,12 +2340,21 @@ int Get_Free_Sub_Channel(int channel)
     {
         if(sp_Stage[channel][i] == PLAYING_NOSAMPLE &&
            sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
-           sp_Stage3[channel][i] == PLAYING_NOSAMPLE)
+           sp_Stage3[channel][i] == PLAYING_NOSAMPLE &&
+           Reserved_Sub_Channels[channel][i] == FALSE)
         {
-
             return(i);
         }
     }
+
+    for(i = 0; i < Channels_Polyphony[channel]; i++)
+    {
+        if(sp_Stage[channel][i] == PLAYING_SAMPLE_NOTEOFF)
+        {
+            return(i);
+        }
+    }
+    
     // None found
     return(0);
 }
@@ -2740,13 +2778,19 @@ void DoEffects_tick0(void)
 void DoEffects(void)
 {
     int i;
+    int j;
+    int pltr_note[MAX_POLYPHONY];
+    int pltr_sample[MAX_POLYPHONY];
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
         int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, ped_line);
-        int pltr_note = *(RawPatterns + tefactor + PATTERN_NOTE);
-        
-        int pltr_sample = *(RawPatterns + tefactor + PATTERN_INSTR);
+
+        for(i = 0; i < Channels_MultiNotes[trackef]; i++)
+        {
+            pltr_note[i] = *(RawPatterns + tefactor + PATTERN_NOTE1 + (i * 2));
+            pltr_sample[i] = *(RawPatterns + tefactor + PATTERN_INSTR1 + (i * 2));
+        }
 
 #if defined(PTK_FX_NOTECUT) || defined(PTK_FX_NOTERETRIGGER)
         unsigned char pltr_vol_row = *(RawPatterns + tefactor + PATTERN_VOLUME);
@@ -2758,13 +2802,14 @@ void DoEffects(void)
 
         int64 pltr_dat_row = *(RawPatterns + tefactor + PATTERN_FXDATA);
 
+        // Sample only
         if(Subicounter == 0)
         {
-            if(pltr_note == 121 && pltr_sample != 255)
+            for(i = 0; i < Channels_MultiNotes[trackef]; i++)
             {
-                for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                if(pltr_note[i] == 121 && pltr_sample[i] != 255)
                 {
-                    sp_Tvol[trackef][i] = CustomVol[pltr_sample];
+                    sp_Tvol[trackef][i] = CustomVol[pltr_sample[i]];
                 }
             }
         }
@@ -2973,30 +3018,52 @@ void DoEffects(void)
 
                 int free_sub_channel;
                 
-                if(pltr_note == 121) pltr_note = old_note[trackef];
-                old_note[trackef] = pltr_note;
+                // No new note
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                {
+                    if(pltr_note[i] == 121) pltr_note[i] = old_note[trackef][i];
+                    old_note[trackef][i] = pltr_note[i];
+                }
+
                 if(pltr_dat_row > 0 && (Subicounter % pltr_dat_row) == 0)
                 {
-                    free_sub_channel = Get_Free_Sub_Channel(trackef);
-                    // Retrigger all playing sub channels
-                    if(pltr_vol_row <= 64)
+                    for(i = 0; i < Channels_MultiNotes[trackef]; i++)
                     {
-                        Play_Instrument(trackef, free_sub_channel, (float) pltr_note, pltr_sample, pltr_vol_row * 0.015625f, 0, 0, FALSE, trackef);
-                    }
-                    else
-                    {
-                        Play_Instrument(trackef, free_sub_channel, (float) pltr_note, pltr_sample, CustomVol[pltr_sample], 0, 0, FALSE, trackef);
-                    }
-
-                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                    {
-                        if(free_sub_channel != i)
+                        Reserved_Sub_Channels[trackef][i] = TRUE;
+                        free_sub_channel = Get_Free_Sub_Channel(trackef);
+                        // Retrigger all playing sub channels
+                        pltr_note[free_sub_channel] = pltr_note[i];
+                        pltr_sample[free_sub_channel] = pltr_sample[i];
+                        if(pltr_vol_row <= 64)
                         {
-                            if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
+                            Play_Instrument(trackef, free_sub_channel,
+                                            (float) pltr_note[i], pltr_sample[i],
+                                            pltr_vol_row * 0.015625f,
+                                            0, 0,
+                                            FALSE, trackef);
+                        }
+                        else
+                        {
+                            Play_Instrument(trackef, free_sub_channel,
+                                            (float) pltr_note[i], pltr_sample[i],
+                                            CustomVol[pltr_sample[i]],
+                                            0, 0,
+                                            FALSE, trackef);
+                        }
+
+                        for(j = 0; j < Channels_Polyphony[trackef]; j++)
+                        {
+                            if(free_sub_channel != j)
                             {
-                                sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
+                                if(Reserved_Sub_Channels[trackef][j] == FALSE)
+                                {
+                                    if(sp_Stage[trackef][j] == PLAYING_SAMPLE)
+                                    {
+                                        sp_Stage[trackef][j] = PLAYING_SAMPLE_NOTEOFF;
+                                    }
+                                    Synthesizer[trackef][j].NoteOff();
+                                }
                             }
-                            Synthesizer[trackef][i].NoteOff();
                         }
                     }
                 }

@@ -399,19 +399,19 @@ void CSynth::EnvRun(int *track, int *track2)
     switch(ENV1_STAGE)
     {
         /* Attack */
-        case 1:
+        case SYNTH_ATTACK:
             ENV1_VALUE += ENV1_A_COEF;
             ENV1_COUNTER++;
             if(ENV1_COUNTER >= ENV1b_ATTACK)
             {
                 if(ENV1_VALUE > 1.0f) ENV1_VALUE = 1.0f;
                 ENV1_COUNTER = 0;
-                ENV1_STAGE = 2;
+                ENV1_STAGE = SYNTH_DECAY;
             }
             break;
 
         /* Decay */
-        case 2:
+        case SYNTH_DECAY:
             ENV1_VALUE -= ENV1_D_COEF;
             ENV1_COUNTER++;
             if(ENV1_COUNTER >= ENV1b_DECAY)
@@ -419,17 +419,17 @@ void CSynth::EnvRun(int *track, int *track2)
                 if(ENV1_VALUE < 0.0f) ENV1_VALUE = 0.0f;
                 ENV1_VALUE = ENV1_SUSTAIN;
                 ENV1_COUNTER = 0;
-                ENV1_STAGE = 3;
+                ENV1_STAGE = SYNTH_SUSTAIN;
             }
             break;
 
         /* Sustain */
-        case 3:
+        case SYNTH_SUSTAIN:
             ENV1_VALUE = ENV1_SUSTAIN;
             break;
 
         /* Release */
-        case 4:
+        case SYNTH_RELEASE:
             ENV1_VALUE -= ENV1_R_COEF;
             ENV1_COUNTER++;
             if(ENV1_COUNTER > ENV1b_RELEASE)
@@ -448,19 +448,19 @@ void CSynth::EnvRun(int *track, int *track2)
     switch(ENV2_STAGE)
     {
         /* Attack */
-        case 1:
+        case SYNTH_ATTACK:
             ENV2_VALUE += ENV2_A_COEF;
             ENV2_COUNTER++;
             if(ENV2_COUNTER >= ENV2b_ATTACK)
             {
                 if(ENV2_VALUE > 1.0f) ENV2_VALUE = 1.0f;
                 ENV2_COUNTER = 0;
-                ENV2_STAGE = 2;
+                ENV2_STAGE = SYNTH_DECAY;
             }
             break;
 
         /* Decay */
-        case 2:
+        case SYNTH_DECAY:
             ENV2_VALUE -= ENV2_D_COEF;
             ENV2_COUNTER++;
             if(ENV2_COUNTER >= ENV2b_DECAY)
@@ -468,17 +468,17 @@ void CSynth::EnvRun(int *track, int *track2)
                 if(ENV2_VALUE < 0.0f) ENV2_VALUE = 0.0f;
                 ENV2_VALUE = ENV2_SUSTAIN;
                 ENV2_COUNTER = 0;
-                ENV2_STAGE = 3;
+                ENV2_STAGE = SYNTH_SUSTAIN;
             }
             break;
 
         /* Sustain */
-        case 3:
+        case SYNTH_SUSTAIN:
             ENV2_VALUE = ENV2_SUSTAIN;
             break;
 
         /* Release */
-        case 4:
+        case SYNTH_RELEASE:
             ENV2_VALUE -= ENV2_R_COEF;
             ENV2_COUNTER++;
             if(ENV2_COUNTER > ENV2b_RELEASE)
@@ -520,32 +520,32 @@ void CSynth::EnvRun(int *track, int *track2)
 // 'Note Off' message for CSynth class objects
 void CSynth::NoteOff(void)
 {
-    if(ENV1_STAGE > 0 && ENV1_STAGE < 4)
+    if(ENV1_STAGE > PLAYING_NOSAMPLE && ENV1_STAGE < SYNTH_RELEASE)
     {
         ENV1_R_COEF = ENV1_VALUE / (float) ENV1b_RELEASE;
         ENV1_COUNTER = 0;
-        ENV1_STAGE = 4;
+        ENV1_STAGE = SYNTH_RELEASE;
     }
 
-    if(ENV2_STAGE > 0 && ENV2_STAGE < 4)
+    if(ENV2_STAGE > PLAYING_NOSAMPLE && ENV2_STAGE < SYNTH_RELEASE)
     {
         ENV2_R_COEF = ENV2_VALUE / (float) ENV2b_RELEASE;
         ENV2_COUNTER = 0;
-        ENV2_STAGE = 4;
+        ENV2_STAGE = SYNTH_RELEASE;
     }
 
-    if(LFO1_STAGE > 0 && LFO1_STAGE < 4)
+    if(LFO1_STAGE > PLAYING_NOSAMPLE && LFO1_STAGE < SYNTH_RELEASE)
     {
         LFO1_R_COEF = LFO1_ADSR_VALUE / (float) LFO1b_RELEASE;
         LFO1_COUNTER = 0;
-        LFO1_STAGE = 4;
+        LFO1_STAGE = SYNTH_RELEASE;
     }
 
-    if(LFO2_STAGE > 0 && LFO2_STAGE < 4)
+    if(LFO2_STAGE > PLAYING_NOSAMPLE && LFO2_STAGE < SYNTH_RELEASE)
     {
         LFO2_R_COEF = LFO2_ADSR_VALUE / (float) LFO2b_RELEASE;
         LFO2_COUNTER = 0;
-        LFO2_STAGE = 4;
+        LFO2_STAGE = SYNTH_RELEASE;
     }
 }
 

@@ -29,12 +29,13 @@
 #define SMP_PACK_TRUESPEECH 2
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
-#define PATTERN_MAX_ROWS 128
+#define MAX_ROWS 128
 #define MAX_SEQUENCES 256
 #define MAX_INSTRS 128
+#define MAX_PATTERNS 128
+#define MAX_INSTRS_SPLITS 16
 #define DEFAULT_PATTERN_LEN 64
 
-/*
 #define PATTERN_NOTE1 0
 #define PATTERN_INSTR1 1
 #define PATTERN_NOTE2 2
@@ -72,21 +73,23 @@
 #define PATTERN_PANNING 33
 #define PATTERN_FX 34
 #define PATTERN_FXDATA 35
+
+// Old tracks definition
+/*
+#define OLD_PATTERN_NOTE 0
+#define OLD_PATTERN_INSTR 1
+#define OLD_PATTERN_VOLUME 2
+#define OLD_PATTERN_PANNING 3
+#define OLD_PATTERN_FX 4
+#define OLD_PATTERN_FXDATA 5
 */
 
-#define PATTERN_NOTE 0
-#define PATTERN_INSTR 1
-#define PATTERN_VOLUME 2
-#define PATTERN_PANNING 3
-#define PATTERN_FX 4
-#define PATTERN_FXDATA 5
-
 #define PATTERN_NIBBLES 11
-#define PATTERN_BYTES 6
+#define PATTERN_BYTES (PATTERN_FXDATA + 1)
 #define PATTERN_ROW_LEN MAX_TRACKS * PATTERN_BYTES
-#define PATTERN_TRACK_LEN PATTERN_MAX_ROWS * PATTERN_BYTES
-#define PATTERN_LEN PATTERN_ROW_LEN * PATTERN_MAX_ROWS
-#define PATTERN_FULL_SIZE PATTERN_LEN * 128
+#define PATTERN_TRACK_LEN MAX_ROWS * PATTERN_BYTES
+#define PATTERN_LEN PATTERN_ROW_LEN * MAX_ROWS
+#define PATTERN_POOL_SIZE PATTERN_LEN * MAX_PATTERNS
 
 #define SAMPLESPERSEC 44100
 
@@ -107,6 +110,11 @@
 #define PLAYING_SAMPLE 1
 #define PLAYING_SAMPLE_NOTEOFF 2
 #define PLAYING_STOCK 3
+
+#define SYNTH_ATTACK 1
+#define SYNTH_DECAY 2
+#define SYNTH_SUSTAIN 3
+#define SYNTH_RELEASE 4
 
 // ------------------------------------------------------
 // Structures
@@ -149,7 +157,7 @@ extern unsigned char nPatterns;
 extern char Songtracks;
 extern unsigned char sLength;
 extern unsigned char pSequence[256];
-extern short patternLines[PATTERN_MAX_ROWS];
+extern short patternLines[MAX_ROWS];
 extern char nameins[128][20];
 extern char Midiprg[128];
 extern unsigned char Synthprg[128];

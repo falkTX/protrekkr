@@ -313,23 +313,20 @@ void draw_pated(int track, int line, int petrack, int row)
         bjbox(dover + 9 + 29 + 32, 187, 12, 7);
 
         // On / off
-        for(i = 0; i < MAX_POLYPHONY; i++)
+        for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
         {
-            if(Reserved_Sub_Channels[cur_track][i])
-            {
-                dover += PAT_COL_CHAR * 3;
-                if(dover >= MAX_PATT_SCREEN_X) break;
+            dover += PAT_COL_CHAR * 3;
+            if(dover >= MAX_PATT_SCREEN_X) break;
 
-                dover += PAT_COL_SHIFT - 2;
-                if(dover >= MAX_PATT_SCREEN_X) break;
+            dover += PAT_COL_SHIFT - 2;
+            if(dover >= MAX_PATT_SCREEN_X) break;
 
-                dover += PAT_COL_CHAR;
-                if(dover >= MAX_PATT_SCREEN_X) break;
-                dover += PAT_COL_CHAR;
-                if(dover >= MAX_PATT_SCREEN_X) break;
-                dover += 2;
-                if(dover >= MAX_PATT_SCREEN_X) break;
-            }
+            dover += PAT_COL_CHAR;
+            if(dover >= MAX_PATT_SCREEN_X) break;
+            dover += PAT_COL_CHAR;
+            if(dover >= MAX_PATT_SCREEN_X) break;
+            dover += 2;
+            if(dover >= MAX_PATT_SCREEN_X) break;
         }
         if(dover >= MAX_PATT_SCREEN_X) break;
 
@@ -501,7 +498,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     {
         if(rel % patt_highlight == 0) multip = TRUE;
     }
-    cur_column = (track * 11);
+    cur_column = (track * PATTERN_NIBBLES);
 
     // Browse all tracks to seek synchro markers
     for(tracky = 0; tracky < Songtracks; tracky++)
@@ -522,16 +519,17 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         // Read the datas
         offset_t = Get_Pattern_Offset(pattern, cur_track, rel);
 
-        unsigned char p_a = *(RawPatterns + offset_t);
-        unsigned char p_b = *(RawPatterns + offset_t + 1);
-        unsigned char p_bh = p_b & 0xf;
-        unsigned char p_c = *(RawPatterns + offset_t + 2);
+        unsigned char p_a;
+        unsigned char p_b;
+        unsigned char p_bh;
+        
+        unsigned char p_c = *(RawPatterns + offset_t + PATTERN_VOLUME);
         unsigned char p_ch = p_c & 0xf;
-        unsigned char p_d = *(RawPatterns + offset_t + 3);
+        unsigned char p_d = *(RawPatterns + offset_t + PATTERN_PANNING);
         unsigned char p_dh = p_d & 0xf;
-        unsigned char p_e = *(RawPatterns + offset_t + 4);
+        unsigned char p_e = *(RawPatterns + offset_t + PATTERN_FX);
         unsigned char p_eh = p_e & 0xf;
-        unsigned char p_f = *(RawPatterns + offset_t + 5);
+        unsigned char p_f = *(RawPatterns + offset_t + PATTERN_FXDATA);
         unsigned char p_fh = p_f & 0xf;
 
         // Note
@@ -543,43 +541,44 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         dover += 4;
         if(dover >= MAX_PATT_SCREEN_X) break;
 
-        for(i = 0; i < MAX_POLYPHONY; i++)
+        for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
         {
-            if(Reserved_Sub_Channels[cur_track][i])
+            p_a = *(RawPatterns + offset_t + PATTERN_NOTE1 + (i * 2));
+            p_b = *(RawPatterns + offset_t + PATTERN_INSTR1 + (i * 2));
+            p_bh = p_b & 0xf;
+     
+            blitnote(dover, y, p_a, cur_color, cur_color + 7);
+
+            dover += PAT_COL_CHAR * 3;
+            if(dover >= MAX_PATT_SCREEN_X) break;
+
+            cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
+            Letter(dover, y, 29, cur_color, cur_color + 7);
+            dover += PAT_COL_SHIFT - 2;
+            if(dover >= MAX_PATT_SCREEN_X) break;
+            // Instrument
+            if(p_b != 255)
             {
-                blitnote(dover, y, p_a, cur_color, cur_color + 7);
-
-                dover += PAT_COL_CHAR * 3;
+                Letter(dover, y, p_b >> 4, cur_color, cur_color + 7);
+                dover += PAT_COL_CHAR;
                 if(dover >= MAX_PATT_SCREEN_X) break;
-
                 cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
-                Letter(dover, y, 29, cur_color, cur_color + 7);
-                dover += PAT_COL_SHIFT - 2;
+                Letter(dover, y, p_bh, cur_color, cur_color + 7);
+                dover += PAT_COL_CHAR;
                 if(dover >= MAX_PATT_SCREEN_X) break;
-                // Instrument
-                if(p_b != 255)
-                {
-                    Letter(dover, y, p_b >> 4, cur_color, cur_color + 7);
-                    dover += PAT_COL_CHAR;
-                    if(dover >= MAX_PATT_SCREEN_X) break;
-                    cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
-                    Letter(dover, y, p_bh, cur_color, cur_color + 7);
-                    dover += PAT_COL_CHAR;
-                    if(dover >= MAX_PATT_SCREEN_X) break;
-                }
-                else
-                {
-                    Letter(dover, y, 21, cur_color, cur_color + 7);
-                    dover += PAT_COL_CHAR;
-                    if(dover >= MAX_PATT_SCREEN_X) break;
-                    cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
-                    Letter(dover, y, 21, cur_color, cur_color + 7);
-                    dover += PAT_COL_CHAR;
-                    if(dover >= MAX_PATT_SCREEN_X) break;
-                }
-                Letter(dover, y, 29, cur_color, cur_color + 7);
-                dover += 2;
             }
+            else
+            {
+                Letter(dover, y, 21, cur_color, cur_color + 7);
+                dover += PAT_COL_CHAR;
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                cur_color = Get_Nibble_Color(rel, cur_column++, multip, Shadow_Pattern);
+                Letter(dover, y, 21, cur_color, cur_color + 7);
+                dover += PAT_COL_CHAR;
+                if(dover >= MAX_PATT_SCREEN_X) break;
+            }
+            Letter(dover, y, 29, cur_color, cur_color + 7);
+            dover += 2;
         }
         if(dover >= MAX_PATT_SCREEN_X) break;
 
@@ -768,16 +767,17 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
             offset_t = Get_Pattern_Offset(pattern, tri, line);
 
-            unsigned char p_a = *(RawPatterns + offset_t);
-            unsigned char p_b = *(RawPatterns + offset_t + 1);
-            unsigned char p_bh = p_b & 0xf;
-            unsigned char p_c = *(RawPatterns + offset_t + 2);
+            unsigned char p_a;
+            unsigned char p_b;
+            unsigned char p_bh;
+
+            unsigned char p_c = *(RawPatterns + offset_t + PATTERN_VOLUME);
             unsigned char p_ch = p_c & 0xf;
-            unsigned char p_d = *(RawPatterns + offset_t + 3);
+            unsigned char p_d = *(RawPatterns + offset_t + PATTERN_PANNING);
             unsigned char p_dh = p_d & 0xf;
-            unsigned char p_e = *(RawPatterns + offset_t + 4);
+            unsigned char p_e = *(RawPatterns + offset_t + PATTERN_FX);
             unsigned char p_eh = p_e & 0xf;
-            unsigned char p_f = *(RawPatterns + offset_t + 5);
+            unsigned char p_f = *(RawPatterns + offset_t + PATTERN_FXDATA);
             unsigned char p_fh = p_f & 0xf;
 
             // Note
@@ -791,59 +791,60 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
             high_col = 0;
 
-            for(i = 0; i < MAX_POLYPHONY; i++)
+            for(i = 0; i < Channels_MultiNotes[tri]; i++)
             {
-                if(Reserved_Sub_Channels[tri][i])
+                p_a = *(RawPatterns + offset_t + PATTERN_NOTE1 + (i * 2));
+                p_b = *(RawPatterns + offset_t + PATTERN_INSTR1 + (i * 2));
+                p_bh = p_b & 0xf;
+
+                if(row == high_col && tri == petrack) blitnote(dover, YVIEW, p_a, 48, 48 + 15);
+                else blitnote(dover, YVIEW, p_a, cur_color, cur_color + 15);
+                dover += PAT_COL_CHAR * 3;
+                high_col++;
+                if(dover >= MAX_PATT_SCREEN_X) break;
+
+                // Instrument
+                cur_color = Get_Nibble_Color_Highlight(line, cur_column++);
+                Letter(dover, YVIEW, 29, cur_color, cur_color + 15);
+                dover += PAT_COL_SHIFT - 2;
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                if(row == high_col && tri == petrack)
                 {
-                    if(row == high_col && tri == petrack) blitnote(dover, YVIEW, p_a, 48, 48 + 15);
-                    else blitnote(dover, YVIEW, p_a, cur_color, cur_color + 15);
-                    dover += PAT_COL_CHAR * 3;
-                    high_col++;
+                    if(p_b != 255) Letter(dover, YVIEW, p_b >> 4, 48, 48 + 15);
+                    else Letter(dover, YVIEW, 21, 48, 48 + 15);
+                    dover += PAT_COL_CHAR;
                     if(dover >= MAX_PATT_SCREEN_X) break;
-
-                    // Instrument
-                    cur_color = Get_Nibble_Color_Highlight(line, cur_column++);
-                    Letter(dover, YVIEW, 29, cur_color, cur_color + 15);
-                    dover += PAT_COL_SHIFT - 2;
-                    if(dover >= MAX_PATT_SCREEN_X) break;
-                    if(row == high_col && tri == petrack)
-                    {
-                        if(p_b != 255) Letter(dover, YVIEW, p_b >> 4, 48, 48 + 15);
-                        else Letter(dover, YVIEW, 21, 48, 48 + 15);
-                        dover += PAT_COL_CHAR;
-                        if(dover >= MAX_PATT_SCREEN_X) break;
-                    }
-                    else
-                    {
-                        if(p_b != 255) Letter(dover, YVIEW, p_b >> 4, cur_color, cur_color + 15);
-                        else Letter(dover, YVIEW, 21, cur_color, cur_color + 15);
-                        dover += PAT_COL_CHAR;
-                        if(dover >= MAX_PATT_SCREEN_X) break;
-                    }
-                    high_col++;
-
-                    cur_color = Get_Nibble_Color_Highlight(line, cur_column++);
-
-                    if(row == high_col && tri == petrack)
-                    {
-                        if(p_b != 255) Letter(dover, YVIEW, p_bh, 48, 48 + 15);
-                        else Letter(dover, YVIEW, 21, 48, 48 + 15);
-                        dover += PAT_COL_CHAR;
-                        if(dover >= MAX_PATT_SCREEN_X) break;
-                    }
-                    else
-                    {
-                        if(p_b != 255) Letter(dover, YVIEW, p_bh, cur_color, cur_color + 15);
-                        else Letter(dover, YVIEW, 21, cur_color, cur_color + 15);
-                        dover += PAT_COL_CHAR;
-                        if(dover >= MAX_PATT_SCREEN_X) break;
-                    }
-
-                    Letter(dover, YVIEW, 29, cur_color, cur_color + 15);
-                    dover += 2;
-
-                    high_col++;
                 }
+                else
+                {
+                    if(p_b != 255) Letter(dover, YVIEW, p_b >> 4, cur_color, cur_color + 15);
+                    else Letter(dover, YVIEW, 21, cur_color, cur_color + 15);
+                    dover += PAT_COL_CHAR;
+                    if(dover >= MAX_PATT_SCREEN_X) break;
+                }
+                high_col++;
+
+                cur_color = Get_Nibble_Color_Highlight(line, cur_column++);
+
+                if(row == high_col && tri == petrack)
+                {
+                    if(p_b != 255) Letter(dover, YVIEW, p_bh, 48, 48 + 15);
+                    else Letter(dover, YVIEW, 21, 48, 48 + 15);
+                    dover += PAT_COL_CHAR;
+                    if(dover >= MAX_PATT_SCREEN_X) break;
+                }
+                else
+                {
+                    if(p_b != 255) Letter(dover, YVIEW, p_bh, cur_color, cur_color + 15);
+                    else Letter(dover, YVIEW, 21, cur_color, cur_color + 15);
+                    dover += PAT_COL_CHAR;
+                    if(dover >= MAX_PATT_SCREEN_X) break;
+                }
+
+                Letter(dover, YVIEW, 29, cur_color, cur_color + 15);
+                dover += 2;
+
+                high_col++;
             }
             if(dover >= MAX_PATT_SCREEN_X) break;
 
@@ -1291,34 +1292,31 @@ int Get_Track_Size(int Track)
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
 
     // On / off
-    for(i = 0; i < MAX_POLYPHONY; i++)
+    for(i = 0; i < Channels_MultiNotes[Track]; i++)
     {
-        if(Reserved_Sub_Channels[Track][i])
-        {
-            // Note
-            old_dover = dover;
-            dover += PAT_COL_CHAR * 3;
-            if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        // Note
+        old_dover = dover;
+        dover += PAT_COL_CHAR * 3;
+        if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
 
-            // Gap
-            old_dover = dover;
-            dover += PAT_COL_SHIFT - 2;
-            if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        // Gap
+        old_dover = dover;
+        dover += PAT_COL_SHIFT - 2;
+        if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
 
-            // Instrument
-            old_dover = dover;
-            dover += PAT_COL_CHAR;
-            if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        // Instrument
+        old_dover = dover;
+        dover += PAT_COL_CHAR;
+        if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
 
-            old_dover = dover;
-            dover += PAT_COL_CHAR;
-            if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        old_dover = dover;
+        dover += PAT_COL_CHAR;
+        if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
 
-            // Gap
-            old_dover = dover;
-            dover += 2;
-            if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
-        }
+        // Gap
+        old_dover = dover;
+        dover += 2;
+        if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
     }
 
     // Gap
@@ -1520,37 +1518,34 @@ int Get_Column_Idx(int track, int mouse_coord)
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
     // On / off
-    for(i = 0; i < MAX_POLYPHONY; i++)
+    for(i = 0; i < Channels_MultiNotes[track]; i++)
     {
-        if(Reserved_Sub_Channels[track][i])
-        {
-            // Note
-            old_dover = dover;
-            dover += PAT_COL_CHAR * 3;
-            if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+        // Note
+        old_dover = dover;
+        dover += PAT_COL_CHAR * 3;
+        if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
-            ret_value++;
-            // Gap
-            old_dover = dover;
-            dover += PAT_COL_SHIFT - 2;
-            if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+        ret_value++;
+        // Gap
+        old_dover = dover;
+        dover += PAT_COL_SHIFT - 2;
+        if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
-            // Instrument
-            old_dover = dover;
-            dover += PAT_COL_CHAR;
-            if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+        // Instrument
+        old_dover = dover;
+        dover += PAT_COL_CHAR;
+        if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
-            ret_value++;
-            old_dover = dover;
-            dover += PAT_COL_CHAR;
-            if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+        ret_value++;
+        old_dover = dover;
+        dover += PAT_COL_CHAR;
+        if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
-            ret_value++;
-            // Gap
-            old_dover = dover;
-            dover += 2;
-            if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-        }
+        ret_value++;
+        // Gap
+        old_dover = dover;
+        dover += 2;
+        if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
     }
 
     // Gap

@@ -158,10 +158,10 @@ AMIGA_NOTE mt_period_conv[] =
     {   56, 94 },
 }; 
 
-INSTR_ORDER Used_Instr[128];
-INSTR_ORDER Used_Instr2[128];
-INSTR_ORDER Used_Instr3[128];
-unsigned char Old_pSequence[256];
+INSTR_ORDER Used_Instr[MAX_INSTRS];
+INSTR_ORDER Used_Instr2[MAX_INSTRS];
+INSTR_ORDER Used_Instr3[MAX_INSTRS];
+unsigned char Old_pSequence[MAX_SEQUENCES];
 int nbr_User_Instr;
 
 int Muted_Tracks[MAX_TRACKS];
@@ -386,8 +386,8 @@ void LoadAmigaMod(char *FileName, int channels)
                     // Period Conversion Table
                     t_note = Conv_Amiga_Note(t_period);
 
-                    *(RawPatterns + tmo + PATTERN_NOTE) = t_note;
-                    *(RawPatterns + tmo + PATTERN_INSTR) = t_sample;
+                    *(RawPatterns + tmo + PATTERN_NOTE1) = t_note;
+                    *(RawPatterns + tmo + PATTERN_INSTR1) = t_sample;
 
                     // Pattern effect adapter:
                     switch(t_command)
@@ -809,7 +809,7 @@ Read_Mod_File:
             // Load the patterns rows infos
             if(Ptk_Format)
             {
-                for(i = 0; i < PATTERN_MAX_ROWS; i++)
+                for(i = 0; i < MAX_ROWS; i++)
                 {
                     Read_Mod_Data_Swap(&patternLines[i], sizeof(short), 1, in);
                 }
@@ -822,7 +822,7 @@ Read_Mod_File:
             }
             else
             {
-                for(i = 0; i < PATTERN_MAX_ROWS; i++)
+                for(i = 0; i < MAX_ROWS; i++)
                 {
                     patternLines[i] = 64;
                 }
@@ -840,9 +840,44 @@ Read_Mod_File:
             // Load the patterns data
             if(Ptk_Format)
             {
+                int Bytes_Per_Track = PATTERN_BYTES;
+                if(!Multi)
+                {
+                    Bytes_Per_Track = 6;
+                }
+
+                TmpPatterns = RawPatterns;
                 for(int pwrite = 0; pwrite < nPatterns; pwrite++)
                 {
-                    Read_Mod_Data(RawPatterns + pwrite * PATTERN_LEN, sizeof(char), PATTERN_LEN, in);
+                    TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
+                    for(j = 0; j < MAX_ROWS; j++)
+                    {
+                        // Bytes / track
+                        for(k = 0; k < Songtracks; k++)
+                        {
+                            // Tracks
+                            TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
+                            // Rows
+                            TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
+                            if(Multi)
+                            {
+                                for(i = 0; i < MAX_POLYPHONY; i++)
+                                {
+                                    Read_Mod_Data(TmpPatterns_Notes + PATTERN_NOTE1 + (i * 2), sizeof(char), 1, in);
+                                    Read_Mod_Data(TmpPatterns_Notes + PATTERN_INSTR1 + (i * 2), sizeof(char), 1, in);
+                                }
+                            }
+                            else
+                            {
+                                Read_Mod_Data(TmpPatterns_Notes + PATTERN_NOTE1, sizeof(char), 1, in);
+                                Read_Mod_Data(TmpPatterns_Notes + PATTERN_INSTR1, sizeof(char), 1, in);
+                            }
+                            Read_Mod_Data(TmpPatterns_Notes + PATTERN_VOLUME, sizeof(char), 1, in);
+                            Read_Mod_Data(TmpPatterns_Notes + PATTERN_PANNING, sizeof(char), 1, in);
+                            Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX, sizeof(char), 1, in);
+                            Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA, sizeof(char), 1, in);
+                        }
+                    }
                 }
             }
             else
@@ -1809,7 +1844,7 @@ int Get_Instr_New_Order(int instr)
 {
     int i;
 
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         if(Used_Instr[i].old_order == instr) return(Used_Instr[i].new_order);
     }
@@ -1820,7 +1855,7 @@ int Search_Sequence(int sequence_idx)
 {
     int i;
 
-    for(i = 0; i < 256; i++)
+    for(i = 0; i < MAX_SEQUENCES; i++)
     {
         if(Old_pSequence[i] == sequence_idx)
         {
@@ -1990,7 +2025,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         fprintf(Out_constants, "// Use this file to compile a custom PtkReplay library\n\n", VERSION);
     }
 
-    New_RawPatterns = (unsigned char *) malloc(PATTERN_FULL_SIZE);
+    New_RawPatterns = (unsigned char *) malloc(PATTERN_POOL_SIZE);
     if(!New_RawPatterns) return(FALSE);
 
     // Writing header & name...
@@ -2073,37 +2108,53 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     for(pwrite = 0; pwrite < int_pattern; pwrite++)
     {
         TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
-        for(i = 0; i < 6; i++)
+        for(i = 0; i < PATTERN_BYTES; i++)
         {   // Datas
             for(k = 0; k < Songtracks; k++)
             {   // Tracks
                 if(!Track_Is_Muted(k))
                 {
-                    TmpPatterns_Tracks = TmpPatterns_Rows + (k * 6);
+                    TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
                     for(j = 0; j < New_patternLines[pwrite]; j++)
                     {   // Rows
-                        TmpPatterns_Notes = TmpPatterns_Tracks + (j * (MAX_TRACKS * 6));
+                        TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                         // Store the used instrument
-                        if(i == 1)
+                        switch(i)
                         {
-                            if(TmpPatterns_Notes[i] < 128)
-                            {
-                                if(Used_Instr[TmpPatterns_Notes[i]].new_order == -1)
+                            case  PATTERN_INSTR1:
+                            case  PATTERN_INSTR2:
+                            case  PATTERN_INSTR3:
+                            case  PATTERN_INSTR4:
+                            case  PATTERN_INSTR5:
+                            case  PATTERN_INSTR6:
+                            case  PATTERN_INSTR7:
+                            case  PATTERN_INSTR8:
+                            case  PATTERN_INSTR9:
+                            case  PATTERN_INSTR10:
+                            case  PATTERN_INSTR11:
+                            case  PATTERN_INSTR12:
+                            case  PATTERN_INSTR13:
+                            case  PATTERN_INSTR14:
+                            case  PATTERN_INSTR15:
+                            case  PATTERN_INSTR16:
+                                if(TmpPatterns_Notes[i] < MAX_INSTRS)
                                 {
-                                    Used_Instr[TmpPatterns_Notes[i]].new_order = nbr_User_Instr;
-                                    Used_Instr[TmpPatterns_Notes[i]].old_order = TmpPatterns_Notes[i];
-                                    Used_Instr2[nbr_User_Instr].old_order = TmpPatterns_Notes[i];
-                                    nbr_User_Instr++;
+                                    if(Used_Instr[TmpPatterns_Notes[i]].new_order == -1)
+                                    {
+                                        Used_Instr[TmpPatterns_Notes[i]].new_order = nbr_User_Instr;
+                                        Used_Instr[TmpPatterns_Notes[i]].old_order = TmpPatterns_Notes[i];
+                                        Used_Instr2[nbr_User_Instr].old_order = TmpPatterns_Notes[i];
+                                        nbr_User_Instr++;
+                                    }
                                 }
-                            }
-                        }
-                        // Count the number of synchro fxs
-                        if(i == 4)
-                        {
-                            if(TmpPatterns_Notes[i] == 0x7)
-                            {
-                                Number_Fx++;
-                            }
+                                break;
+                            
+                            case PATTERN_FX:
+                                // Count the number of synchro fxs
+                                if(TmpPatterns_Notes[i] == 0x7)
+                                {
+                                    Number_Fx++;
+                                }
                         }
                     }
                 }
@@ -2113,7 +2164,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
     // Add the prgsynth instruments
     int synth_instr_remap;
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         switch(Synthprg[i])
         {
@@ -2434,7 +2485,22 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
                                 break;
-                            case PATTERN_INSTR:
+                            case PATTERN_INSTR1:
+                            case PATTERN_INSTR2:
+                            case PATTERN_INSTR3:
+                            case PATTERN_INSTR4:
+                            case PATTERN_INSTR5:
+                            case PATTERN_INSTR6:
+                            case PATTERN_INSTR7:
+                            case PATTERN_INSTR8:
+                            case PATTERN_INSTR9:
+                            case PATTERN_INSTR10:
+                            case PATTERN_INSTR11:
+                            case PATTERN_INSTR12:
+                            case PATTERN_INSTR13:
+                            case PATTERN_INSTR14:
+                            case PATTERN_INSTR15:
+                            case PATTERN_INSTR16:
                                 // Replace the instrument order
                                 if(TmpPatterns_Notes[i] < MAX_INSTRS)
                                 {
@@ -2510,7 +2576,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_TICK0", Store_FX_Arpeggio | Store_FX_PatternLoop);
 
     // Remap the used instruments
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         switch(Synthprg[i])
         {
@@ -2526,7 +2592,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Write_Mod_Data(&nbr_User_Instr, sizeof(int), 1, in);
 
     // Writing sample data
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         // Check if it was used at pattern level
         swrite = Used_Instr2[i].old_order;
@@ -3055,6 +3121,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     int i;
     int j;
     int k;
+    int l;
     char Temph[96];
     int Ok_Memory = TRUE;
     char Comp_Flag = TRUE;
@@ -3114,9 +3181,9 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data(&sLength, sizeof(char), 1, in);
             Write_Mod_Data(pSequence, sizeof(char), MAX_SEQUENCES, in);
 
-            Swap_Short_Buffer(patternLines, PATTERN_MAX_ROWS);
-            Write_Mod_Data(patternLines, sizeof(short), PATTERN_MAX_ROWS, in);
-            Swap_Short_Buffer(patternLines, PATTERN_MAX_ROWS);
+            Swap_Short_Buffer(patternLines, MAX_ROWS);
+            Write_Mod_Data(patternLines, sizeof(short), MAX_ROWS, in);
+            Swap_Short_Buffer(patternLines, MAX_ROWS);
 
             Write_Mod_Data(Channels_MultiNotes, sizeof(char), MAX_TRACKS, in);
 
@@ -3131,8 +3198,12 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                     cur_pattern = cur_pattern_col + (j * PATTERN_LEN);
                     for(k = 0; k < patternLines[j]; k++)
                     {
-                        cur_pattern[PATTERN_NOTE] = 121;
-                        cur_pattern[PATTERN_INSTR] = 255;
+                        for(l = 0; l < MAX_POLYPHONY; l += 2)
+                        {
+                            cur_pattern[PATTERN_NOTE1 + i] = 121;
+                            cur_pattern[PATTERN_INSTR1 + i] = 255;
+                        }
+
                         cur_pattern[PATTERN_VOLUME] = 255;
                         cur_pattern[PATTERN_PANNING] = 255;
                         cur_pattern[PATTERN_FX] = 0;
