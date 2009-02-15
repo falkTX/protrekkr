@@ -36,5 +36,7 @@ void Remove_Track_Line(int track, int Position);
 void Clear_Patterns_Pool(void);
 void Clear_Track_Data(int offset);
 int Alloc_Patterns_Pool(void);
+int Get_Max_Nibble_Track(int track);
+int Get_Track_Nibble_Start(int track);
 
 #endif

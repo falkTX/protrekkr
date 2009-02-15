@@ -3391,54 +3391,50 @@ void Keyboard_Handler(void)
         }
         if(poskeyval == 0 && retvalue != ltretvalue) poskeyval = 1;
 
-        if((ped_row == 1 || ped_row == 3 ||
-            ped_row == 5 || ped_row == 7 || ped_row == 9) &&
-            retvalue != 120 && poskeyval == 1  && is_editing == 1)
+        // Modify a value
+
+        if(retvalue != NOTE_OFF && poskeyval == 1 && is_editing == 1)
         {
-            int ped_cell = 1;
-            if(ped_row == 3) ped_cell = 2;
-            if(ped_row == 5) ped_cell = 3;
-            if(ped_row == 7) ped_cell = 4;
-            if(ped_row == 9) ped_cell = 5;
-            ltretvalue = retvalue;
-            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
-
-            int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
-
-            if(retvalue < 16)
+            int ped_cell;
+            int i;
+            int j = (Channels_MultiNotes[ped_track] - 1) * 3;
+            // Instrument
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
             {
-                if(oldval == 255 && ped_row == 1) oldval = 0;
-                if(oldval == 255 && ped_row == 3) oldval = 0;
-                if(oldval == 255 && ped_row == 5) oldval = 0;
-                oldval = (oldval & 0xf) + retvalue * 16;
-                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                if(oldval != 255 && ped_row == 5 && *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                if(ped_row == 1 + (i * 3))
                 {
-                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
-                }     
-
-                if(!is_recording) if(!Songplaying)
-                {
-                    ped_line += ped_pattad;
-                    if(!ped_pattad)
-                    {
-                        ped_row++;
-                        Actupated(0);
-                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                    }
+                    i++;
+                    break;
                 }
-                poskeyval = 0;
             }
-            else
+            i--;
+
+            if(ped_row == (1 + (i * 3)) ||
+               ped_row == (3 + j) ||
+               ped_row == (5 + j) ||
+               ped_row == (7 + j) ||
+               ped_row == (9 + j))
             {
-                if(!Delete_Selection(Cur_Position))
+           
+                ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
+                if(ped_row == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
+                if(ped_row == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
+                if(ped_row == (7 + j)) ped_cell = PATTERN_FX;           // fx
+                if(ped_row == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
+            
+                ltretvalue = retvalue;
+                xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+
+                int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
+
+                if(retvalue < 16)
                 {
-                    oldval = 0;
-                    if(ped_row == 1) oldval = 255;
-                    if(ped_row == 3) oldval = 255;
-                    if(ped_row == 5) oldval = 255;
+                    if(oldval == 255 && ped_row == (1 + (i * 3))) oldval = 0;
+                    if(oldval == 255 && ped_row == (3 + j)) oldval = 0;
+                    if(oldval == 255 && ped_row == (5 + j)) oldval = 0;
+                    oldval = (oldval & 0xf) + (retvalue << 4);
                     *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                    if(oldval != 255 && ped_row == 5 &&
+                    if(oldval != 255 && ped_row == (5 + j) &&
                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
                     {
                         *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
@@ -3456,64 +3452,75 @@ void Keyboard_Handler(void)
                     }
                     poskeyval = 0;
                 }
-            }
-            Actupated(0);
-        }
-
-        if((ped_row == 2 || ped_row == 4 || ped_row == 6 || ped_row == 8 || ped_row == 10)
-            && retvalue != 120 && is_editing == 1 && poskeyval == 1)
-        {
-
-            int ped_cell = 1;
-            if(ped_row == 2) ped_cell = 1;
-            if(ped_row == 4) ped_cell = 2;
-            if(ped_row == 6) ped_cell = 3;
-            if(ped_row == 8) ped_cell = 4;
-            if(ped_row == 10) ped_cell = 5;
-
-            ltretvalue = retvalue;
-            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
-            int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
-
-            if(retvalue < 16)
-            {
-                if(oldval == 255 && ped_row == 2) oldval = 0;
-                if(oldval == 255 && ped_row == 4) oldval = 0;
-                if(oldval == 255 && ped_row == 6) oldval = 0;
-                oldval = (oldval & 0xf0) + retvalue;
-                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                if(oldval != 255 && ped_row == 6 &&
-                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                else
                 {
-                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                    if(!Delete_Selection(Cur_Position))
+                    {
+                        oldval = 0;
+                        if(ped_row == (1 + (i * 3))) oldval = 255;
+                        if(ped_row == (3 + j)) oldval = 255;
+                        if(ped_row == (5 + j)) oldval = 255;
+                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+                        if(oldval != 255 && ped_row == (5 + j) &&
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                        {
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                        }
+
+                        if(!is_recording) if(!Songplaying)
+                        {
+                            ped_line += ped_pattad;
+                            if(!ped_pattad)
+                            {
+                                ped_row++;
+                                Actupated(0);
+                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            }
+                        }
+                        poskeyval = 0;
+                    }
                 }
+                Actupated(0);
+            }
+
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+            {
+                if(ped_row == 2 +(i * 3))
+                {
+                    i++;
+                    break;
+                }
+            }
+            i--;
+            if(ped_row == (2 + (i * 3)) ||
+               ped_row == (4 + j) ||
+               ped_row == (6 + j) ||
+               ped_row == (8 + j) ||
+               ped_row == (10 + j))
+            {
+                ped_cell = PATTERN_INSTR1 + (i * 2);
+                if(ped_row == (4 + j)) ped_cell = PATTERN_VOLUME;
+                if(ped_row == (6 + j)) ped_cell = PATTERN_PANNING;
+                if(ped_row == (8 + j)) ped_cell = PATTERN_FX;
+                if(ped_row == (10 + j)) ped_cell = PATTERN_FXDATA;
+
+                ltretvalue = retvalue;
+                xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+                int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
+
+                if(retvalue < 16)
+                {
+                    if(oldval == 255 && ped_row == (2 + (i * 3))) oldval = 0;
+                    if(oldval == 255 && ped_row == (4 + j)) oldval = 0;
+                    if(oldval == 255 && ped_row == (6 + j)) oldval = 0;
+                    oldval = (oldval & 0xf0) + retvalue;
+                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+                    if(oldval != 255 && ped_row == (6 + j) &&
+                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                    {
+                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                    }
     
-                if(!is_recording) if(!Songplaying)
-                {
-                    ped_line += ped_pattad;
-                    if(!ped_pattad)
-                    {
-                        ped_row++;
-                        Actupated(0);
-                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                    }
-                }
-                poskeyval = 0;
-            }
-            else
-            {
-                if(!Delete_Selection(Cur_Position))
-                {
-                    oldval = 0;
-                    if(ped_row == 2) oldval = 255;
-                    if(ped_row == 4) oldval = 255;
-                    if(ped_row == 6) oldval = 255;
-                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                    if(oldval != 255 && ped_row == 6 &&
-                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
-                    {
-                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
-                    }
                     if(!is_recording) if(!Songplaying)
                     {
                         ped_line += ped_pattad;
@@ -3526,27 +3533,93 @@ void Keyboard_Handler(void)
                     }
                     poskeyval = 0;
                 }
+                else
+                {
+                    if(!Delete_Selection(Cur_Position))
+                    {
+                        oldval = 0;
+                        if(ped_row == (2 + (i * 3))) oldval = 255;
+                        if(ped_row == (4 + j)) oldval = 255;
+                        if(ped_row == (6 + j)) oldval = 255;
+                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+                        if(oldval != 255 && ped_row == (6 + j) &&
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                        {
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                        }
+                        if(!is_recording) if(!Songplaying)
+                        {
+                            ped_line += ped_pattad;
+                            if(!ped_pattad)
+                            {
+                                ped_row++;
+                                Actupated(0);
+                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            }
+                        }
+                        poskeyval = 0;
+                    }
+                }
+                Actupated(0);
             }
-            Actupated(0);
         }
 
         if(poskeynote == 0 && retnote_raw != ltretnote_raw) poskeynote = 1;
 
-        if(ped_row == 0 && poskeynote == 1 && (retnote_raw != 120))
+        // Write a note
+        if(poskeynote == 1 && (retnote_raw != NOTE_OFF))
         {
-            ltretnote_raw = retnote_raw;
+            int i;
+            int column = 0;
+            int in_note = FALSE;
 
-            xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
-
-            int tmp_note = retnote_raw + ped_patoct * 12;
-            if(tmp_note > 119) tmp_note = 119;
-
-            if(retnote > -1)
+            // Check if this is a legal note column
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
             {
-                if(is_editing)
+                if(ped_row == (i * 3))
                 {
-                    *(RawPatterns + xoffseted) = tmp_note;       // 121
-                    *(RawPatterns + xoffseted + 1) = ped_patsam; // 121
+                    in_note = TRUE;
+                    break;
+                }
+                column += 2;
+            }
+
+            if(in_note)
+            {
+                ltretnote_raw = retnote_raw;
+
+                xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
+
+                int tmp_note = retnote_raw + ped_patoct * 12;
+                if(tmp_note > NOTE_MAX) tmp_note = NOTE_MAX;
+
+                if(retnote > -1)
+                {
+                    if(is_editing)
+                    {
+                        *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = tmp_note;
+                        *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = ped_patsam;
+                    
+                        if(!is_recording) if(!Songplaying)
+                        {
+                            ped_line += ped_pattad;
+                            if(!ped_pattad)
+                            {
+                                ped_row++;
+                                Actupated(0);
+                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            }
+                        }
+                        Actupated(0);
+                    }
+                }
+
+                // Note off (RSHIFT)
+                if(retnote == -3 && is_editing)
+                {
+                    *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NOTE_OFF;
+                    *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+                
                     if(!is_recording) if(!Songplaying)
                     {
                         ped_line += ped_pattad;
@@ -3559,48 +3632,31 @@ void Keyboard_Handler(void)
                     }
                     Actupated(0);
                 }
-            }
 
-            // Note off (RSHIFT)
-            if(retnote == -3 && is_editing)
-            {
-                *(RawPatterns + xoffseted) = 120;         // 121
-                *(RawPatterns + xoffseted + 1) = 0xff;    // no instrument
-                if(!is_recording) if(!Songplaying)
+                if(retnote == -1 && is_editing)
                 {
-                    ped_line += ped_pattad;
-                    if(!ped_pattad)
+                    if(!Delete_Selection(Cur_Position))
                     {
-                        ped_row++;
-                        Actupated(0);
-                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                    }
-                }
-                Actupated(0);
-            }
-
-            if(retnote == -1 && is_editing)
-            {
-                if(!Delete_Selection(Cur_Position))
-                {
-                    // Delete the note under the caret
-                    *(RawPatterns + xoffseted) = 121;
-                    *(RawPatterns + xoffseted + 1) = 255;
-                    if(!is_recording) if(!Songplaying)
-                    {
-                        ped_line += ped_pattad;
-                        if(!ped_pattad)
+                        // Delete the note under the caret
+                        *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NO_NOTE;
+                        *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+         
+                        if(!is_recording) if(!Songplaying)
                         {
-                            ped_row++;
-                            Actupated(0);
-                            gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            ped_line += ped_pattad;
+                            if(!ped_pattad)
+                            {
+                                ped_row++;
+                                Actupated(0);
+                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            }
                         }
                     }
+                    Actupated(0);
                 }
-                Actupated(0);
-            }
 
-            poskeynote = 0;
+                poskeynote = 0;
+            }
         }
     }
 }

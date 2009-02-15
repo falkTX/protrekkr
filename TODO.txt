@@ -5,6 +5,7 @@ TODO (in no special order):
  - Modify the block functions to handle the multi notes.
  - Modify the midi channels handling for the multi notes.
  - See to create a panning / instrument & synth.
+ - LALT + A to select a note column.
  
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)

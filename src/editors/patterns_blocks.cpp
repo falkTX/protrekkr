@@ -58,10 +58,10 @@ int Init_Block_Work(void)
 
     for(ipcut = 0; ipcut < PATTERN_TRACK_LEN; ipcut += PATTERN_BYTES)
     {
-        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
         *(BuffTrack + ipcut + PATTERN_VOLUME) = 255;
         *(BuffTrack + ipcut + PATTERN_PANNING) = 255;
@@ -71,20 +71,20 @@ int Init_Block_Work(void)
 
     for(ipcut = 0; ipcut < PATTERN_LEN; ipcut += PATTERN_BYTES)
     {
-        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
         *(BuffPatt + ipcut + PATTERN_VOLUME) = 255;
         *(BuffPatt + ipcut + PATTERN_PANNING) = 255;
         *(BuffPatt + ipcut + PATTERN_FX) = 0;
         *(BuffPatt + ipcut + PATTERN_FXDATA) = 0;
 
-        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + i) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + i) = 255;
+            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
         *(BuffBlock + ipcut + PATTERN_VOLUME) = 255;
         *(BuffBlock + ipcut + PATTERN_PANNING) = 255;
@@ -98,7 +98,7 @@ int Init_Block_Work(void)
 // Start the block marking stuff
 void Mark_Block_Start(int start_nibble, int start_track, int start_line)
 {
-    swap_block_start_track = start_nibble + (start_track * PATTERN_NIBBLES);
+    swap_block_start_track = (start_nibble + Get_Track_Nibble_Start(start_track)) + start_track;
     swap_block_end_track = swap_block_start_track;
     swap_block_start = start_line;
     swap_block_end = swap_block_start;
@@ -121,9 +121,11 @@ void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif
 {
     int swap_value;
 
+    start_nibble += Get_Track_Nibble_Start(start_track);
+
     if(Modif & BLOCK_MARK_TRACKS)
     {
-        swap_value = start_nibble + (start_track * PATTERN_NIBBLES);
+        swap_value = start_nibble + start_track;
         if(swap_block_start_track >= swap_value)
         {
             block_start_track = swap_value;
@@ -171,29 +173,37 @@ int Delete_Table[] =
 
 int Get_Pattern_Column(int Position, int xbc, int ybc)
 {
-   return(*(RawPatterns + (pSequence[Position] * PATTERN_LEN) + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]));
+   return(*(RawPatterns + (pSequence[Position] * PATTERN_LEN) +
+          (ybc * PATTERN_ROW_LEN) + ((xbc / Get_Max_Nibble_Track(xbc)) * PATTERN_BYTES) +
+          Corres_Table[xbc % Get_Max_Nibble_Track(xbc)]));
 }
 
 void Set_Pattern_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(RawPatterns + (pSequence[Position] * PATTERN_LEN) + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]) = Data;
+   *(RawPatterns + (pSequence[Position] * PATTERN_LEN) +
+    (ybc * PATTERN_ROW_LEN) + ((xbc / Get_Max_Nibble_Track(xbc)) * PATTERN_BYTES) +
+    Corres_Table[xbc % Get_Max_Nibble_Track(xbc)]) = Data;
 }
 
 void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
 {
-   *(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]) = Data;
+   *(BuffBlock + (ybc * PATTERN_ROW_LEN) +
+    ((xbc / Get_Max_Nibble_Track(xbc)) * PATTERN_BYTES) +
+    Corres_Table[xbc % Get_Max_Nibble_Track(xbc)]) = Data;
 }
 
 int Get_Buff_Column(int Position, int xbc, int ybc)
 {
-   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) + ((xbc / PATTERN_NIBBLES) * PATTERN_BYTES) + Corres_Table[xbc % PATTERN_NIBBLES]));
+   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) +
+          ((xbc / Get_Max_Nibble_Track(xbc)) * Get_Max_Nibble_Track(xbc)) +
+          Corres_Table[xbc % Get_Max_Nibble_Track(xbc)]));
 }
 
 int Read_Pattern_Column(int Position, int xbc, int ybc)
 {
     int datas;
 
-    switch(xbc % PATTERN_NIBBLES)
+    switch(xbc % Get_Max_Nibble_Track(xbc))
     {
         case 0:
             datas = Get_Pattern_Column(Position, xbc, ybc);
@@ -222,7 +232,7 @@ int Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
 
-    switch(xbc % PATTERN_NIBBLES)
+    switch(xbc % Get_Max_Nibble_Track(xbc))
     {
         case 0:
             Set_Pattern_Column(Position, xbc, ybc, datas);
@@ -255,7 +265,7 @@ int Read_Buff_Column(int Position, int xbc, int ybc)
 {
     int datas;
 
-    switch(xbc % PATTERN_NIBBLES)
+    switch(xbc % Get_Max_Nibble_Track(xbc))
     {
         case 0:
             datas = Get_Buff_Column(Position, xbc, ybc);
@@ -284,7 +294,7 @@ int Write_Buff_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
 
-    switch(xbc % PATTERN_NIBBLES)
+    switch(xbc % Get_Max_Nibble_Track(xbc))
     {
         case 0:
             Set_Buff_Column(Position, xbc, ybc, datas);
@@ -324,7 +334,7 @@ int Delete_Selection(int Position)
         {
             for(int xbc = block_start_track; xbc < block_end_track+ 1; xbc++)
             {
-                Write_Pattern_Column(Position, xbc, ybc, Delete_Table[xbc % 11]);
+                Write_Pattern_Column(Position, xbc, ybc, Delete_Table[xbc % Get_Max_Nibble_Track(xbc)]);
             }
         }
         return(TRUE);
@@ -344,7 +354,7 @@ void Copy_Selection_To_Buffer(int Position)
     aybc = 0;
     for(int ybc = block_start; ybc < block_end + 1; ybc++)
     {
-        axbc = (block_start_track_nibble % PATTERN_NIBBLES);
+        axbc = (block_start_track_nibble % Get_Max_Nibble_Track(block_start_track_nibble));
         for(int xbc = block_start_track_nibble; xbc < block_end_track_nibble + 1; xbc++)
         {
             Write_Buff_Column(Position, axbc, aybc, Read_Pattern_Column(Position, xbc, ybc));
@@ -360,31 +370,31 @@ void Copy_Selection_From_Buffer(int Position)
 {
     int axbc;
     int aybc;
-    int start_x = (ped_track * PATTERN_NIBBLES) + ped_row;
-    int end_x = start_x % PATTERN_NIBBLES;
+    int start_x = (ped_track * Get_Max_Nibble_Track(ped_track)) + ped_row;
+    int end_x = start_x % Get_Max_Nibble_Track(start_x);
     int min_x;
     int byte;
     int old_byte;
     int old_byte2;
-    int min_x_start = (end_x - (save_block_start_track_nibble % PATTERN_NIBBLES));
+    int min_x_start = (end_x - (save_block_start_track_nibble % Get_Max_Nibble_Track(save_block_start_track_nibble)));
 
     aybc = 0;
     for(int ybc = ped_line; ybc < ped_line + b_buff_ysize; ybc++)
     {
         axbc = end_x;
-        min_x = (end_x - (save_block_start_track_nibble % PATTERN_NIBBLES));
+        min_x = (end_x - (save_block_start_track_nibble % Get_Max_Nibble_Track(save_block_start_track_nibble)));
         for(int xbc = start_x; xbc < ((start_x + b_buff_xsize)) - min_x_start; xbc++)
         {
             if(min_x >= 0)
             {
-                if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+                if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
                 {
                     // We need to check if we're on an odd byte for the instrument/volume or panning
                     // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
                     byte = Read_Buff_Column(Position, axbc, aybc);
                     if(start_x == xbc)
                     {
-                        switch(xbc % PATTERN_NIBBLES)
+                        switch(xbc % Get_Max_Nibble_Track(xbc))
                         {
                             case 2:
                             case 4:
@@ -455,8 +465,8 @@ SELECTION Get_Real_Selection(void)
     {
         Cur_Sel.y_start = 0;
         Cur_Sel.y_end = patternLines[pSequence[cPosition]] - 1;
-        Cur_Sel.x_start = ped_track * PATTERN_NIBBLES;
-        Cur_Sel.x_end = (ped_track * PATTERN_NIBBLES) + (PATTERN_NIBBLES - 1);
+        Cur_Sel.x_start = ped_track * Get_Max_Nibble_Track(ped_track);
+        Cur_Sel.x_end = (ped_track * Get_Max_Nibble_Track(ped_track)) + (Get_Max_Nibble_Track(ped_track) - 1);
     }
     return(Cur_Sel);
 }
@@ -479,7 +489,7 @@ void Interpolate_Block(int Position)
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % PATTERN_NIBBLES)
+        switch(xbc % Get_Max_Nibble_Track(xbc))
         {
             case 3:
             case 4:
@@ -502,7 +512,7 @@ void Interpolate_Block(int Position)
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % PATTERN_NIBBLES)
+        switch(xbc % Get_Max_Nibble_Track(xbc))
         {
             case 3:
             case 4:
@@ -521,7 +531,7 @@ void Interpolate_Block(int Position)
                 break;
         }
 
-        switch(xbc % PATTERN_NIBBLES)
+        switch(xbc % Get_Max_Nibble_Track(xbc))
         {
             case 3:
             case 4:
@@ -539,7 +549,7 @@ void Interpolate_Block(int Position)
                     tran = end_value - start_value;
                     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
                     {
-                        if(xbc < (16 * 11) && ybc < MAX_ROWS)
+                        if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
                         {
                             int c_val = (cran * tran) / ranlen;
                             Write_Pattern_Column(Position, xbc, ybc, start_value + c_val);
@@ -566,9 +576,9 @@ void Randomize_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
             {
-                switch(xbc % PATTERN_NIBBLES)
+                switch(xbc % Get_Max_Nibble_Track(xbc))
                 {
                     case 3:
                     case 4:
@@ -616,9 +626,9 @@ void Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
             {
-                switch(xbc % PATTERN_NIBBLES)
+                switch(xbc % Get_Max_Nibble_Track(xbc))
                 {
                     case 0:
                         note = Read_Pattern_Column(Position, xbc, ybc);
@@ -649,9 +659,9 @@ void Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
             {
-                switch(xbc % PATTERN_NIBBLES)
+                switch(xbc % Get_Max_Nibble_Track(xbc))
                 {
                     case 0:
                         note = Read_Pattern_Column(Position, xbc, ybc);
@@ -683,9 +693,9 @@ void Instrument_Seminote_Up_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
             {
-                switch(xbc % PATTERN_NIBBLES)
+                switch(xbc % Get_Max_Nibble_Track(xbc))
                 {
                     case 0:
                         instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
@@ -722,9 +732,9 @@ void Instrument_Seminote_Down_Block(int Position)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * PATTERN_NIBBLES) && ybc < MAX_ROWS)
+            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
             {
-                switch(xbc % PATTERN_NIBBLES)
+                switch(xbc % Get_Max_Nibble_Track(xbc))
                 {
                     case 0:
                         instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
@@ -757,7 +767,10 @@ void Select_Track_Block(void)
     {
         Mark_Block_Start(0, ped_track, 0);
         nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(10, ped_track, nlines, BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
+        Mark_Block_End(Get_Max_Nibble_Track(ped_track) - 1,
+                       ped_track,
+                       nlines,
+                       BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
     }
 }
 
@@ -771,7 +784,10 @@ void Select_Pattern_Block(void)
     {
         Mark_Block_Start(0, 0, 0);
         nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(10, Songtracks - 1, nlines, BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
+        Mark_Block_End(Get_Track_Nibble_Start(ped_track) - 1,
+                       Songtracks - 1,
+                       nlines,
+                       BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
     }
 }
 
@@ -837,10 +853,10 @@ void Insert_Track_Line(int track, int Position)
     {
         xoffseted = (track * PATTERN_BYTES) + (interval * PATTERN_ROW_LEN) + (pSequence[Position] * PATTERN_LEN);
 
-        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_NOTE1 + i) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + i);
-            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_INSTR1 + i) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + i);
+            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_NOTE1 + (i * 2)) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + (i * 2));
+            *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_INSTR1 + (i * 2)) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + (i * 2));
         }
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
@@ -878,10 +894,10 @@ void Remove_Track_Line(int track, int Position)
         xoffseted = Get_Pattern_Offset(pSequence[Position], track, interval);
         xoffseted2 = Get_Pattern_Offset(pSequence[Position], track, interval) - PATTERN_ROW_LEN;
         
-        for(i = 0; i < MAX_POLYPHONY; i += 2)
+        for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(RawPatterns + xoffseted2 + PATTERN_NOTE1 + i) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + i);
-            *(RawPatterns + xoffseted2 + PATTERN_INSTR1 + i) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + i);
+            *(RawPatterns + xoffseted2 + PATTERN_NOTE1 + (i * 2)) = *(RawPatterns + xoffseted + PATTERN_NOTE1 + (i * 2));
+            *(RawPatterns + xoffseted2 + PATTERN_INSTR1 + (i * 2)) = *(RawPatterns + xoffseted + PATTERN_INSTR1 + (i * 2));
         }
         *(RawPatterns + xoffseted2 + PATTERN_VOLUME) = *(RawPatterns + xoffseted + PATTERN_VOLUME);
         *(RawPatterns + xoffseted2 + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
@@ -912,10 +928,10 @@ void Clear_Track_Data(int offset)
 {
     int i;
 
-    for(i = 0; i < MAX_POLYPHONY; i += 2)
+    for(i = 0; i < MAX_POLYPHONY; i++)
     {
-        *(RawPatterns + offset + PATTERN_NOTE1 + i) = 121;
-        *(RawPatterns + offset + PATTERN_INSTR1 + i) = 255;
+        *(RawPatterns + offset + PATTERN_NOTE1 + (i * 2)) = 121;
+        *(RawPatterns + offset + PATTERN_INSTR1 + (i * 2)) = 255;
     }
     *(RawPatterns + offset + PATTERN_VOLUME) = 255;
     *(RawPatterns + offset + PATTERN_PANNING) = 255;
@@ -940,4 +956,25 @@ int Alloc_Patterns_Pool(void)
         return TRUE;
     }
     return FALSE;
+}
+
+// ------------------------------------------------------
+// Return the number of nibbles in a track
+int Get_Max_Nibble_Track(int track)
+{
+    return((Channels_MultiNotes[track] * 3) + 8);
+}
+
+// ------------------------------------------------------
+// Return the real nibble from where a track is starting
+int Get_Track_Nibble_Start(int track)
+{
+    int i;
+    int column = 0;
+
+    for(i = 0; i < track; i++)
+    {
+        column += Get_Max_Nibble_Track(i) - 1;
+    }
+    return(column);
 }
