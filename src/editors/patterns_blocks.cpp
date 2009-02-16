@@ -73,8 +73,8 @@ int Init_Block_Work(void)
     {
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
+            *(BuffPatt + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffPatt + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
         *(BuffPatt + ipcut + PATTERN_VOLUME) = 255;
         *(BuffPatt + ipcut + PATTERN_PANNING) = 255;
@@ -83,8 +83,8 @@ int Init_Block_Work(void)
 
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
+            *(BuffBlock + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffBlock + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
         *(BuffBlock + ipcut + PATTERN_VOLUME) = 255;
         *(BuffBlock + ipcut + PATTERN_PANNING) = 255;
@@ -202,8 +202,9 @@ int Get_Buff_Column(int Position, int xbc, int ybc)
 int Read_Pattern_Column(int Position, int xbc, int ybc)
 {
     int datas;
+    int track = Get_Track_From_Nibble(xbc);
 
-    switch(xbc % Get_Max_Nibble_Track(xbc))
+    switch(xbc % Get_Max_Nibble_Track(track))
     {
         case 0:
             datas = Get_Pattern_Column(Position, xbc, ybc);
@@ -231,12 +232,14 @@ int Read_Pattern_Column(int Position, int xbc, int ybc)
 int Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
+    int track = Get_Track_From_Nibble(xbc);
 
-    switch(xbc % Get_Max_Nibble_Track(xbc))
+    switch(xbc % Get_Max_Nibble_Track(track))
     {
         case 0:
             Set_Pattern_Column(Position, xbc, ybc, datas);
             break;
+
         case 1:
         case 3:
         case 5:
@@ -614,23 +617,27 @@ void Randomize_Block(int Position)
 }
 
 // ------------------------------------------------------
-// Transpose a block to 1 seminote higher
-void Seminote_Up_Block(int Position)
+// Transpose a block to 1 semitone higher
+void Semitone_Up_Block(int Position)
 {
     int ybc;
     int xbc;
     int note;
+    int i;
+    int track;
 
     SELECTION Sel = Get_Real_Selection();
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * Get_Max_Nibble_Track(xbc)) && ybc < MAX_ROWS)
+            track = Get_Track_From_Nibble(xbc);
+            if(xbc < (16 * Get_Max_Nibble_Track(track)) && ybc < MAX_ROWS)
             {
-                switch(xbc % Get_Max_Nibble_Track(xbc))
+                for(i = 0; i < Channels_MultiNotes[track]; i++)
                 {
-                    case 0:
+                    if(xbc % Get_Max_Nibble_Track(track) == (i * 3))
+                    {
                         note = Read_Pattern_Column(Position, xbc, ybc);
                         if(note < 120)
                         {
@@ -638,7 +645,7 @@ void Seminote_Up_Block(int Position)
                             if(note > 119) note = 119;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, note);
-                        break;
+                    }
                 }
             }
         }
@@ -647,8 +654,8 @@ void Seminote_Up_Block(int Position)
 }
 
 // ------------------------------------------------------
-// Transpose a block to 1 seminote lower
-void Seminote_Down_Block(int Position)
+// Transpose a block to 1 semitone lower
+void Semitone_Down_Block(int Position)
 {
     int ybc;
     int xbc;
@@ -680,8 +687,8 @@ void Seminote_Down_Block(int Position)
 }
 
 // ------------------------------------------------------
-// Transpose a block to 1 seminote higher for the current instrument
-void Instrument_Seminote_Up_Block(int Position)
+// Transpose a block to 1 semitone higher for the current instrument
+void Instrument_Semitone_Up_Block(int Position)
 {
     int ybc;
     int xbc;
@@ -719,8 +726,8 @@ void Instrument_Seminote_Up_Block(int Position)
 }
 
 // ------------------------------------------------------
-// Transpose a block to 1 seminote lower for the current instrument
-void Instrument_Seminote_Down_Block(int Position)
+// Transpose a block to 1 semitone lower for the current instrument
+void Instrument_Semitone_Down_Block(int Position)
 {
     int ybc;
     int xbc;
@@ -978,3 +985,24 @@ int Get_Track_Nibble_Start(int track)
     }
     return(column);
 }
+
+// ------------------------------------------------------
+// Return the index of a track from a nibble/Column
+int Get_Track_From_Nibble(int nibble)
+{
+    int i;
+    int min_nibble = 0;
+    int max_nibble = 0;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        max_nibble += Get_Max_Nibble_Track(i);
+        if(nibble >= min_nibble && nibble < max_nibble)
+        {
+            return(i);
+        }
+        min_nibble = max_nibble;
+    }
+    return(0);
+}
+

@@ -24,6 +24,7 @@ v1.90:
   (thus allowing to considerably reduce the dsp usage and some modularity).
   Note that these channels are shared with the polyphony ones.
 - Improved volume ramping.
+- Keys repeat was disabled when editing note columns.
 
 v1.86b:
 

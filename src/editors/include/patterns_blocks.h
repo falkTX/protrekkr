@@ -20,10 +20,10 @@ void Copy_Selection(int Position);
 void Paste_Block(int Position);
 void Interpolate_Block(int Position);
 void Randomize_Block(int Position);
-void Seminote_Up_Block(int Position);
-void Seminote_Down_Block(int Position);
-void Instrument_Seminote_Up_Block(int Position);
-void Instrument_Seminote_Down_Block(int Position);
+void Semitone_Up_Block(int Position);
+void Semitone_Down_Block(int Position);
+void Instrument_Semitone_Up_Block(int Position);
+void Instrument_Semitone_Down_Block(int Position);
 void Select_Track_Block(void);
 void Select_Pattern_Block(void);
 void Calc_selection(void);
@@ -38,5 +38,6 @@ void Clear_Track_Data(int offset);
 int Alloc_Patterns_Pool(void);
 int Get_Max_Nibble_Track(int track);
 int Get_Track_Nibble_Start(int track);
+int Get_Track_From_Nibble(int nibble);
 
 #endif

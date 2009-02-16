@@ -699,6 +699,8 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_EDIT_MODE)
         {
+            is_recording = 0;
+            is_recording_2 = 0;
             SongStop();
             Actupated(0);
             StartEdit();
@@ -2285,9 +2287,9 @@ void Keyboard_Handler(void)
         Keys_Sym[SDLK_KP_MULTIPLY] = FALSE;
     }
 
-    int retnote = 120;      // NO NOTE
-    int retnote_raw = 120;  // NO NOTE
-    int retvalue = 120;     // NOVALUE
+    int retnote = NOTE_OFF;
+    int retnote_raw = NOTE_OFF;
+    int retvalue = NOTE_OFF;
     int reelletter = FALSE;
 
     // -------------------------------------------
@@ -2807,192 +2809,87 @@ void Keyboard_Handler(void)
             retnote_raw = -3;
         }
 
-        // Key jazz
-        if(Keys_Raw[0x10])
+        if(is_editing && !is_recording)
         {
-            retnote_raw = 12;       // Do
-            Record_Keys[0] = 12 + 1;
+            // Key editing
+            if(Keys_Raw_Repeat[0x10]) { retnote_raw = 12; Record_Keys[0] = 12 + 1; }
+            if(Keys_Raw_Repeat[3])    { retnote_raw = 13; Record_Keys[1] = 13 + 1; }
+            if(Keys_Raw_Repeat[0x11]) { retnote_raw = 14; Record_Keys[2] = 14 + 1; }
+            if(Keys_Raw_Repeat[4])    { retnote_raw = 15; Record_Keys[3] = 15 + 1; }
+            if(Keys_Raw_Repeat[0x12]) { retnote_raw = 16; Record_Keys[4] = 16 + 1; }
+            if(Keys_Raw_Repeat[0x13]) { retnote_raw = 17; Record_Keys[5] = 17 + 1; }
+            if(Keys_Raw_Repeat[6])    { retnote_raw = 18; Record_Keys[6] = 18 + 1; }
+            if(Keys_Raw_Repeat[0x14]) { retnote_raw = 19; Record_Keys[7] = 19 + 1; }
+            if(Keys_Raw_Repeat[7])    { retnote_raw = 20; Record_Keys[8] = 20 + 1; }
+            if(Keys_Raw_Repeat[0x15]) { retnote_raw = 21; Record_Keys[9] = 21 + 1; }
+            if(Keys_Raw_Repeat[8])    { retnote_raw = 22; Record_Keys[10] = 22 + 1; }
+            if(Keys_Raw_Repeat[0x16]) { retnote_raw = 23; Record_Keys[11] = 23 + 1; }
+            if(Keys_Raw_Repeat[0x17]) { retnote_raw = 24; Record_Keys[12] = 24 + 1; }
+            if(Keys_Raw_Repeat[0xa])  { retnote_raw = 25; Record_Keys[13] = 25 + 1; }
+            if(Keys_Raw_Repeat[0x18]) { retnote_raw = 26; Record_Keys[14] = 26 + 1; }
+            if(Keys_Raw_Repeat[0xb])  { retnote_raw = 27; Record_Keys[15] = 27 + 1; }
+            if(Keys_Raw_Repeat[0x19]) { retnote_raw = 28; Record_Keys[16] = 28 + 1; }
+            if(Keys_Raw_Repeat[0x1a]) { retnote_raw = 29; Record_Keys[17] = 29 + 1; }
+            if(Keys_Raw_Repeat[0xd])  { retnote_raw = 30; Record_Keys[18] = 30 + 1; }
+            if(Keys_Raw_Repeat[0x1b]) { retnote_raw = 31; Record_Keys[19] = 31 + 1; }
+            if(Keys_Raw_Repeat[0x2c]) { retnote_raw = 0; Record_Keys[20] = 0 + 1; }
+            if(Keys_Raw_Repeat[0x1f]) { retnote_raw = 1; Record_Keys[21] = 1 + 1; }
+            if(Keys_Raw_Repeat[0x2d]) { retnote_raw = 2; Record_Keys[22] = 2 + 1; }
+            if(Keys_Raw_Repeat[0x20]) { retnote_raw = 3; Record_Keys[23] = 3 + 1; }
+            if(Keys_Raw_Repeat[0x2e]) { retnote_raw = 4; Record_Keys[24] = 4 + 1; }
+            if(Keys_Raw_Repeat[0x2f]) { retnote_raw = 5; Record_Keys[25] = 5 + 1; }
+            if(Keys_Raw_Repeat[0x22]) { retnote_raw = 6; Record_Keys[26] = 6 + 1; }
+            if(Keys_Raw_Repeat[0x30]) { retnote_raw = 7; Record_Keys[27] = 7 + 1; }
+            if(Keys_Raw_Repeat[0x23]) { retnote_raw = 8; Record_Keys[28] = 8 + 1; }
+            if(Keys_Raw_Repeat[0x31]) { retnote_raw = 9; Record_Keys[29] = 9 + 1; }
+            if(Keys_Raw_Repeat[0x24]) { retnote_raw = 10; Record_Keys[30] = 10 + 1; }
+            if(Keys_Raw_Repeat[0x32]) { retnote_raw = 11; Record_Keys[31] = 11 + 1; }
+            if(Keys_Raw_Repeat[0x33]) { retnote_raw = 12; Record_Keys[32] = 12 + 1; }
+            if(Keys_Raw_Repeat[0x26]) { retnote_raw = 13; Record_Keys[33] = 13 + 1; }
+            if(Keys_Raw_Repeat[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
+            if(Keys_Raw_Repeat[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
+            if(Keys_Raw_Repeat[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
         }
-        if(Keys_Raw[3])
+        else
         {
-            retnote_raw = 13;       // Do#
-            Record_Keys[1] = 13 + 1;
-        }
-        if(Keys_Raw[0x11])
-        {
-            retnote_raw = 14;       // Re
-            Record_Keys[2] = 14 + 1;
-        }
-        if(Keys_Raw[4])
-        {
-            retnote_raw = 15;       // Re#
-            Record_Keys[3] = 15 + 1;
-        }
-        if(Keys_Raw[0x12])
-        {
-            retnote_raw = 16;       // Mi
-            Record_Keys[4] = 16 + 1;
-        }
-        if(Keys_Raw[0x13])
-        {
-            retnote_raw = 17;       // Fa
-            Record_Keys[5] = 17 + 1;
-        }
-        if(Keys_Raw[6])
-        {
-            retnote_raw = 18;       // Fa#
-            Record_Keys[6] = 18 + 1;
-        }
-        if(Keys_Raw[0x14])
-        {
-            retnote_raw = 19;       // Sol
-            Record_Keys[7] = 19 + 1;
-        }
-        if(Keys_Raw[7])
-        {
-            retnote_raw = 20;       // Sol#
-            Record_Keys[8] = 20 + 1;
-        }
-        if(Keys_Raw[0x15])
-        {
-            retnote_raw = 21;       // La
-            Record_Keys[9] = 21 + 1;
-        }     
-        if(Keys_Raw[8])
-        {
-            retnote_raw = 22;       // La#
-            Record_Keys[10] = 22 + 1;
-        }
-        if(Keys_Raw[0x16])
-        {
-            retnote_raw = 23;       // Si
-            Record_Keys[11] = 23 + 1;
-        }
-        if(Keys_Raw[0x17])
-        {
-            retnote_raw = 24;       // Do
-            Record_Keys[12] = 24 + 1;
-        }
-        if(Keys_Raw[0xa])
-        {
-            retnote_raw = 25;       // Do#
-            Record_Keys[13] = 25 + 1;
-        }
-        if(Keys_Raw[0x18])
-        {
-            retnote_raw = 26;       // Re
-            Record_Keys[14] = 26 + 1;
-        }
-        if(Keys_Raw[0xb])
-        {
-            retnote_raw = 27;       // Re#
-            Record_Keys[15] = 27 + 1;
-        }
-        if(Keys_Raw[0x19])
-        {
-            retnote_raw = 28;       // Mi
-            Record_Keys[16] = 28 + 1;
-        }
-        if(Keys_Raw[0x1a])
-        {
-            retnote_raw = 29;       // Fa
-            Record_Keys[17] = 29 + 1;
-        }
-        if(Keys_Raw[0xd])
-        {
-            retnote_raw = 30;       // Fa#
-            Record_Keys[18] = 30 + 1;
-        }
-        if(Keys_Raw[0x1b])
-        {
-            retnote_raw = 31;       // Sol
-            Record_Keys[19] = 31 + 1;
-        }
-
-        if(Keys_Raw[0x2c])
-        {
-            retnote_raw = 0;        // Do
-            Record_Keys[20] = 0 + 1;
-        }
-        if(Keys_Raw[0x1f])
-        {
-            retnote_raw = 1;        // Do#
-            Record_Keys[21] = 1 + 1;
-        }
-        if(Keys_Raw[0x2d])
-        {
-            retnote_raw = 2;        // Re
-            Record_Keys[22] = 2 + 1;
-        }
-        if(Keys_Raw[0x20])
-        {
-            retnote_raw = 3;        // Re#
-            Record_Keys[23] = 3 + 1;
-        }
-        if(Keys_Raw[0x2e])
-        {
-            retnote_raw = 4;        // Mi
-            Record_Keys[24] = 4 + 1;
-        }
-        if(Keys_Raw[0x2f])
-        {
-            retnote_raw = 5;        // Fa
-            Record_Keys[25] = 5 + 1;
-        }
-        if(Keys_Raw[0x22])
-        {
-            retnote_raw = 6;        // Fa#
-            Record_Keys[26] = 6 + 1;
-        }
-        if(Keys_Raw[0x30])
-        {
-            retnote_raw = 7;        // Sol
-            Record_Keys[27] = 7 + 1;
-        }
-        if(Keys_Raw[0x23])
-        {
-            retnote_raw = 8;        // Sol#
-            Record_Keys[28] = 8 + 1;
-        }
-        if(Keys_Raw[0x31])
-        {
-            retnote_raw = 9;        // La
-            Record_Keys[29] = 9 + 1;
-        }
-        if(Keys_Raw[0x24])
-        {
-            retnote_raw = 10;       // La#
-            Record_Keys[30] = 10 + 1;
-        }
-        if(Keys_Raw[0x32])
-        {
-            retnote_raw = 11;       // Si
-            Record_Keys[31] = 11 + 1;
-        }
-        if(Keys_Raw[0x33])
-        {
-            retnote_raw = 12;       // Do
-            Record_Keys[32] = 12 + 1;
-        }
-        if(Keys_Raw[0x26])
-        {
-            retnote_raw = 13;       // Do#
-            Record_Keys[33] = 13 + 1;
-        }
-        if(Keys_Raw[0x34])
-        {
-            retnote_raw = 14;       // Re
-            Record_Keys[34] = 14 + 1;
-        }
-        if(Keys_Raw[0x27])
-        {
-            retnote_raw = 15;       // Re#
-            Record_Keys[35] = 15 + 1;
-        }
-        if(Keys_Raw[0x35])
-        {
-            retnote_raw = 16;       // Mi
-            Record_Keys[36] = 16 + 1;
+            // Key jazz
+            if(Keys_Raw[0x10]) { retnote_raw = 12; Record_Keys[0] = 12 + 1; }
+            if(Keys_Raw[3])    { retnote_raw = 13; Record_Keys[1] = 13 + 1; }
+            if(Keys_Raw[0x11]) { retnote_raw = 14; Record_Keys[2] = 14 + 1; }
+            if(Keys_Raw[4])    { retnote_raw = 15; Record_Keys[3] = 15 + 1; }
+            if(Keys_Raw[0x12]) { retnote_raw = 16; Record_Keys[4] = 16 + 1; }
+            if(Keys_Raw[0x13]) { retnote_raw = 17; Record_Keys[5] = 17 + 1; }
+            if(Keys_Raw[6])    { retnote_raw = 18; Record_Keys[6] = 18 + 1; }
+            if(Keys_Raw[0x14]) { retnote_raw = 19; Record_Keys[7] = 19 + 1; }
+            if(Keys_Raw[7])    { retnote_raw = 20; Record_Keys[8] = 20 + 1; }
+            if(Keys_Raw[0x15]) { retnote_raw = 21; Record_Keys[9] = 21 + 1; }
+            if(Keys_Raw[8])    { retnote_raw = 22; Record_Keys[10] = 22 + 1; }
+            if(Keys_Raw[0x16]) { retnote_raw = 23; Record_Keys[11] = 23 + 1; }
+            if(Keys_Raw[0x17]) { retnote_raw = 24; Record_Keys[12] = 24 + 1; }
+            if(Keys_Raw[0xa])  { retnote_raw = 25; Record_Keys[13] = 25 + 1; }
+            if(Keys_Raw[0x18]) { retnote_raw = 26; Record_Keys[14] = 26 + 1; }
+            if(Keys_Raw[0xb])  { retnote_raw = 27; Record_Keys[15] = 27 + 1; }
+            if(Keys_Raw[0x19]) { retnote_raw = 28; Record_Keys[16] = 28 + 1; }
+            if(Keys_Raw[0x1a]) { retnote_raw = 29; Record_Keys[17] = 29 + 1; }
+            if(Keys_Raw[0xd])  { retnote_raw = 30; Record_Keys[18] = 30 + 1; }
+            if(Keys_Raw[0x1b]) { retnote_raw = 31; Record_Keys[19] = 31 + 1; }
+            if(Keys_Raw[0x2c]) { retnote_raw = 0; Record_Keys[20] = 0 + 1; }
+            if(Keys_Raw[0x1f]) { retnote_raw = 1; Record_Keys[21] = 1 + 1; }
+            if(Keys_Raw[0x2d]) { retnote_raw = 2; Record_Keys[22] = 2 + 1; }
+            if(Keys_Raw[0x20]) { retnote_raw = 3; Record_Keys[23] = 3 + 1; }
+            if(Keys_Raw[0x2e]) { retnote_raw = 4; Record_Keys[24] = 4 + 1; }
+            if(Keys_Raw[0x2f]) { retnote_raw = 5; Record_Keys[25] = 5 + 1; }
+            if(Keys_Raw[0x22]) { retnote_raw = 6; Record_Keys[26] = 6 + 1; }
+            if(Keys_Raw[0x30]) { retnote_raw = 7; Record_Keys[27] = 7 + 1; }
+            if(Keys_Raw[0x23]) { retnote_raw = 8; Record_Keys[28] = 8 + 1; }
+            if(Keys_Raw[0x31]) { retnote_raw = 9; Record_Keys[29] = 9 + 1; }
+            if(Keys_Raw[0x24]) { retnote_raw = 10; Record_Keys[30] = 10 + 1; }
+            if(Keys_Raw[0x32]) { retnote_raw = 11; Record_Keys[31] = 11 + 1; }
+            if(Keys_Raw[0x33]) { retnote_raw = 12; Record_Keys[32] = 12 + 1; }
+            if(Keys_Raw[0x26]) { retnote_raw = 13; Record_Keys[33] = 13 + 1; }
+            if(Keys_Raw[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
+            if(Keys_Raw[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
+            if(Keys_Raw[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
         }
 
         // Data columns
@@ -3084,16 +2981,30 @@ void Keyboard_Handler(void)
                             frac_part = modf(key_ticks, &int_part);
                             iTicks = (int) fabs(int_part);
                             ped_line += (int) iTicks;
-
                             Cur_Position = Next_Line_Pattern_Auto();
 
-                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
+                            // Write the note
+                            xoffseted = (Track_Number * PATTERN_BYTES) +
+                                        (ped_line * PATTERN_ROW_LEN) +
+                                        (pSequence[Cur_Position] * PATTERN_LEN);
                             *(RawPatterns + xoffseted) = tmp_note;
                             *(RawPatterns + xoffseted + 1) = ped_patsam;
                         }
 
+                        // Play the note
                         Alloc_midi_Channels[Track_Number] = ((tmp_note + 1) << 8);
-                        if(!is_editing || ped_row == 0)
+                        
+                        int in_note = FALSE;
+                        for(i = 0; i < Channels_MultiNotes[Track_Number]; i++)
+                        {
+                            if(ped_row == (i * 3))
+                            {
+                                in_note = TRUE;
+                                break;
+                            }
+                        }
+
+                        if(!is_editing || in_note)
                         {
                             int Chan = Track_Number;
                             if(!is_recording)
@@ -3102,10 +3013,15 @@ void Keyboard_Handler(void)
                             }
 
                             int Sub_Channel = Get_Free_Sub_Channel(Chan);
+                            if(Sub_Channel == -1) Sub_Channel = 0;
                             Sub_Channels_Jazz[Chan][Sub_Channel].Note = ((tmp_note + 1) << 8);
                             Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Chan;
                             Sub_Channels_Jazz[Chan][Sub_Channel].Sub_Channel = Sub_Channel;
-                            Play_Instrument(Chan, Sub_Channel, (float) tmp_note, ped_patsam, CustomVol[ped_patsam], 0, 0, !is_recording, Track_Number);
+                            Play_Instrument(Chan, Sub_Channel,
+                                            (float) tmp_note,
+                                            ped_patsam,
+                                            CustomVol[ped_patsam],
+                                            0, 0, !is_recording, Track_Number);
                         }
                     }
                 }
@@ -3181,6 +3097,7 @@ void Keyboard_Handler(void)
             }
             old_key_ped_line = ped_line;
         }
+
     }
 
     // Turn edit mode on/off
@@ -3332,14 +3249,14 @@ void Keyboard_Handler(void)
 
                 if(Keys[SDLK_u - UNICODE_OFFSET2] && is_editing)
                 {
-                    if(Get_LShift()) Instrument_Seminote_Up_Block(Cur_Position);
-                    else Seminote_Up_Block(Cur_Position);
+                    if(Get_LShift()) Instrument_Semitone_Up_Block(Cur_Position);
+                    else Semitone_Up_Block(Cur_Position);
                 }
 
                 if(Keys[SDLK_d - UNICODE_OFFSET2] && is_editing)
                 {
-                    if(Get_LShift()) Instrument_Seminote_Down_Block(Cur_Position);
-                    else Seminote_Down_Block(Cur_Position);
+                    if(Get_LShift()) Instrument_Semitone_Down_Block(Cur_Position);
+                    else Semitone_Down_Block(Cur_Position);
                 }
 
                 if(Keys[SDLK_a - UNICODE_OFFSET2])
@@ -3606,7 +3523,6 @@ void Keyboard_Handler(void)
                             if(!ped_pattad)
                             {
                                 ped_row++;
-                                Actupated(0);
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
@@ -3626,7 +3542,6 @@ void Keyboard_Handler(void)
                         if(!ped_pattad)
                         {
                             ped_row++;
-                            Actupated(0);
                             gui_action = GUI_CMD_SET_FOCUS_TRACK;
                         }
                     }
@@ -3647,7 +3562,6 @@ void Keyboard_Handler(void)
                             if(!ped_pattad)
                             {
                                 ped_row++;
-                                Actupated(0);
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }

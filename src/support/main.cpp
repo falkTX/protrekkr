@@ -52,9 +52,10 @@ int Prog_End;
 MOUSE Mouse;
 unsigned short Keys[SDLK_LAST];
 unsigned short Keys_Sym[SDLK_LAST];
-unsigned short Keys_Raw_Off[SDLK_LAST];
-unsigned short Keys_Raw[SDLK_LAST];
-unsigned short Keys_Unicode[SDLK_LAST];
+unsigned short Keys_Raw_Off[65535];
+unsigned short Keys_Raw_Repeat[65535];
+unsigned short Keys_Raw[65535];
+unsigned short Keys_Unicode[65535];
 int Key_Unicode;
 char FullScreen = FALSE;
 char AutoSave;
@@ -550,6 +551,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         memset(Keys, 0, sizeof(Keys));
         memset(Keys_Sym, 0, sizeof(Keys_Sym));
         memset(Keys_Unicode, 0, sizeof(Keys_Raw));
+        //memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw));
 
         SDL_PumpEvents();
         int Nbr_Events = SDL_PeepEvents(Events, MAX_EVENTS, SDL_GETEVENT, 0xffffff);
@@ -588,6 +590,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
                         Keys_Raw[Scancode] = TRUE;
                         Keys_Raw_Off[Scancode] = FALSE;
+                        Keys_Raw_Repeat[Scancode] = TRUE;
                     }
 
                     // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY
@@ -620,6 +623,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
                     Scancode = Translate_Locale_Key(Symbol);
                     Keys_Raw_Off[Scancode] = TRUE;
+                    Keys_Raw_Repeat[Scancode] = FALSE;
                     break;
 
                 case SDL_MOUSEBUTTONUP:
@@ -709,7 +713,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     {
                         memset(Keys, 0, sizeof(Keys));
                         memset(Keys_Sym, 0, sizeof(Keys_Sym));
-                        memset(Keys_Raw, 0, sizeof(Keys_Raw));
                     }
                     break;
 
