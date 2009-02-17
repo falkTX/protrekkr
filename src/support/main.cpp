@@ -56,6 +56,8 @@ unsigned short Keys_Raw_Off[65535];
 unsigned short Keys_Raw_Repeat[65535];
 unsigned short Keys_Raw[65535];
 unsigned short Keys_Unicode[65535];
+int Keyboard_Nbr_Events;
+int Keyboard_Events[256];
 int Key_Unicode;
 char FullScreen = FALSE;
 char AutoSave;
@@ -558,6 +560,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         int Symbol;
         int Scancode;
 
+        Keyboard_Nbr_Events = 0;
+        memset(Keyboard_Events, 0, sizeof(Keyboard_Events));
         for(int i = 0; i < Nbr_Events; i++)
         {
             switch(Events[i].type)
@@ -574,7 +578,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         // This is only used for the digits on all systems
                         // (especially on kb configs where they can only
                         //  be accessed by pressing shift).
-                        // Otherwise it doesn't work on Mac OSX
+                        // Otherwise it doesn't work under Mac OSX
                         Keys_Unicode[Uni_Trans] = TRUE;
 
 #if !defined(__MACOSX__)
@@ -591,6 +595,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         Keys_Raw[Scancode] = TRUE;
                         Keys_Raw_Off[Scancode] = FALSE;
                         Keys_Raw_Repeat[Scancode] = TRUE;
+                        Keyboard_Events[Keyboard_Nbr_Events] = Scancode;
+                        Keyboard_Nbr_Events++;
                     }
 
                     // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY

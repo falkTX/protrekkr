@@ -53,6 +53,8 @@ extern unsigned short Keys_Raw[65535];
 extern unsigned short Keys_Raw_Off[65535];
 extern unsigned short Keys_Raw_Repeat[65535];
 extern unsigned short Keys_Unicode[65535];
+extern int Keyboard_Nbr_Events;
+extern int Keyboard_Events[256];
 extern int Env_Change;
 extern int key_on;
 extern char Keyboard_Name[];

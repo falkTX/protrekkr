@@ -460,7 +460,7 @@ extern MARKER Patterns_Marker;
 
 extern int LastProgram[MAX_TRACKS];
 
-extern Uint32 Alloc_midi_Channels[MAX_TRACKS];
+extern Uint32 Alloc_midi_Channels[MAX_TRACKS][MAX_POLYPHONY];
 
 extern char *ExePath;
 
@@ -573,8 +573,6 @@ void Semitone_Up_Block(int Position);
 void Semitone_Down_Block(int Position);
 void Instrument_Semitone_Up_Block(int Position);
 void Instrument_Semitone_Down_Block(int Position);
-void Select_Track_Block(void);
-void Select_Pattern_Block(void);
 void Unselect_Selection(void);
 void Select_Block_Keyboard(int Type);
 void Insert_Track_Line(int track, int Position);
@@ -582,9 +580,9 @@ void Insert_Pattern_Line(int Position);
 void Remove_Track_Line(int track, int Position);
 void Remove_Pattern_Line(int Position);
 void Calc_selection(void);
-int Next_Line_Pattern_Auto(void);
-int Get_Free_Channel(void);
-int Search_Corresponding_Channel(Uint32 Datas);
+int Next_Line_Pattern_Auto(int *position, int lines, int *line);
+int Get_Free_Midi_Sub_Channel(int track);
+int Search_Corresponding_Midi_Sub_Channel(int track, Uint32 Datas);
 int Get_Midi_Channel(int midi_channel);
 void Draw_Scope_Files_Button(void);
 

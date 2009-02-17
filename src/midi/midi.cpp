@@ -23,8 +23,8 @@ int last_ped_line;
 int first_midi_time;
 double first_midi_timer;
 double ticks_elapsed;
-extern int Track_Number; 
-int Midi_Track_Notes[MAX_TRACKS];
+extern int Midi_Sub_Channel_Number; 
+int Midi_Track_Notes[MAX_TRACKS][MAX_POLYPHONY];
 extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 extern JAZZ_KEY Sub_Channels_Jazz[MAX_TRACKS][MAX_POLYPHONY];
 
@@ -81,6 +81,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
             first_midi_time = FALSE;
             is_editing = 1;
             is_recording_2 = 1;
+            Nbr_Sub_NoteOff = 0;
             midi_start_playing = 0;
         }
     }
@@ -177,25 +178,25 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                 if(*(RawPatterns + xoffseted) >= 120)
                 {
-                    Track_Number = ped_track;
+                    Midi_Sub_Channel_Number = ped_track;
                 }
                 else
                 {
-                    Track_Number = -1;
+                    Midi_Sub_Channel_Number = -1;
                     for(i_search = 0; i_search < MAX_TRACKS; i_search++)
                     {
                         search_track = Get_Midi_Channel(i_search);
                         xoffseted = (search_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                         if(*(RawPatterns + xoffseted) >= 120)
                         {
-                            Track_Number = search_track;
+                            Midi_Sub_Channel_Number = search_track;
                             break;
                         }
                     }
                 }
-                if(Track_Number != -1)
+                if(Midi_Sub_Channel_Number != -1)
                 {
-                    xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
+                    xoffseted = (Midi_Sub_Channel_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
                     if(*(RawPatterns + xoffseted) < 120)
                     {
                         if(!Midi_Velocity && iTicks == 0) iTicks = 1;
@@ -203,45 +204,44 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 }
                 ped_line += (int) iTicks;
 
-                Next_Line_Pattern_Auto();
+//                Next_Line_Pattern_Auto();
 
-                if(Track_Number > -1)
+                if(Midi_Sub_Channel_Number > -1)
                 {
-
                     // Channel already allocated (multi notes) ?
-                    if(Alloc_midi_Channels[Track_Number] != 0 && Midi_Velocity)
+                    if(Midi_Velocity)
                     {
-                        Track_Number = Get_Free_Channel();
+                        Midi_Sub_Channel_Number = Get_Free_Midi_Sub_Channel(ped_track);
                     }
                     // Record nothing if there's no more channels
-                    if(Track_Number > -1)
+                    if(Midi_Sub_Channel_Number > -1)
                     {
                         if(Midi_Velocity)
                         {
-                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
-                            Alloc_midi_Channels[Track_Number] = (Param1 & 0x00ff00) + 0x100;
+                            xoffseted = (Midi_Sub_Channel_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
+                            Alloc_midi_Channels[Midi_Sub_Channel_Number] = (Param1 & 0x00ff00) + 0x100;
                             *(RawPatterns + xoffseted) = tmp_note;             // Note
                             *(RawPatterns + xoffseted + 1) = ped_patsam;       // Instrument
                             *(RawPatterns + xoffseted + 2) = Midi_Velocity;    // Volume
 
-                            int Sub_Channel = Get_Free_Sub_Channel(Track_Number);
-                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Note = (Param1 & 0x00ff00) + 0x100;
-                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Channel = Track_Number;
-                            Sub_Channels_Jazz[Track_Number][Sub_Channel].Sub_Channel = Sub_Channel;
-                            Play_Instrument(Track_Number, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE, Track_Number);
+                            int Sub_Channel = Get_Free_Sub_Channel(Midi_Sub_Channel_Number);
+                            Sub_Channels_Jazz[Midi_Sub_Channel_Number][Sub_Channel].Note = (Param1 & 0x00ff00) + 0x100;
+                            Sub_Channels_Jazz[Midi_Sub_Channel_Number][Sub_Channel].Channel = Midi_Sub_Channel_Number;
+                            Sub_Channels_Jazz[Midi_Sub_Channel_Number][Sub_Channel].Sub_Channel = Sub_Channel;
+                            Play_Instrument(Midi_Sub_Channel_Number, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE);
                         }
                         else
                         {
                             // (Some devices send "note on" as "note off" with velocity 0)
                             // Search if we know the note
-                            Track_Number = Search_Corresponding_Channel((Param1 & 0x00ff00) + 0x100);
+                            Midi_Sub_Channel_Number = Search_Corresponding_Midi_Sub_Channel(ped_track, (Param1 & 0x00ff00) + 0x100);
                             // Not found: get the one that was mentioned
-                            if(Track_Number == -1)
+                            if(Midi_Sub_Channel_Number == -1)
                             {
-                                Track_Number = Get_Midi_Channel(Midi_Channel_Number);
+                                Midi_Sub_Channel_Number = Get_Midi_Channel(Midi_Channel_Number);
                             }
-                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
-                            Alloc_midi_Channels[Track_Number] = 0;
+                            xoffseted = (Midi_Sub_Channel_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[cPosition] * PATTERN_LEN);
+                            Alloc_midi_Channels[Midi_Sub_Channel_Number] = 0;
                             *(RawPatterns + xoffseted) = 120;
                             *(RawPatterns + xoffseted + 1) = 0xff;             // no instrument
                             *(RawPatterns + xoffseted + 2) = 0xff;             // no volume
@@ -263,7 +263,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                                 Channel->Sub_Channel = 0;
                             }
 
-                            Midi_NoteOff(Track_Number);
+                            Midi_NoteOff(Midi_Sub_Channel_Number);
                         }
                     }
                 }
@@ -314,39 +314,39 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                 tmp_note = (Param1 >> 8) & 0xff;
                 if(tmp_note > 119) tmp_note = 119;
 
-                Track_Number = Get_Midi_Channel(Midi_Channel_Number);
+                Midi_Sub_Channel_Number = Get_Midi_Channel(Midi_Channel_Number);
 
-                if(Track_Number > -1)
+                if(Midi_Sub_Channel_Number > -1)
                 {
                     // Channel already allocated (multi notes) ?
-                    if(Alloc_midi_Channels[Track_Number] != 0 && Midi_Velocity)
+                    if(Alloc_midi_Channels[Midi_Sub_Channel_Number] != 0 && Midi_Velocity)
                     {
-                        Track_Number = Get_Free_Channel();
+                        Midi_Sub_Channel_Number = Get_Free_Midi_Sub_Channel(ped_track);
                     }
                     // Record nothing if there's no more channels available
-                    if(Track_Number > -1)
+                    if(Midi_Sub_Channel_Number > -1)
                     {
                         if(Midi_Velocity)
                         {
-                            Alloc_midi_Channels[Track_Number] = (Param1 & 0x00ff00) + 0x100;
+                            Alloc_midi_Channels[Midi_Sub_Channel_Number] = (Param1 & 0x00ff00) + 0x100;
                             int Chan = ped_track;
                             int Sub_Channel = Get_Free_Sub_Channel(Chan);
                             Sub_Channels_Jazz[Chan][Sub_Channel].Note = (Param1 & 0x00ff00) + 0x100;
-                            Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Track_Number;
+                            Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Midi_Sub_Channel_Number;
                             Sub_Channels_Jazz[Chan][Sub_Channel].Sub_Channel = Sub_Channel;
-                            Play_Instrument(Chan, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE, Track_Number);
+                            Play_Instrument(Chan, Sub_Channel, (float) tmp_note, ped_patsam, (Midi_Velocity / 128.0f), 0, 0, FALSE);
                         }
                         else
                         {
                             // (Some devices send "note on" as "note off" with velocity 0)
                             // Search if we know the note
-                            Track_Number = Search_Corresponding_Channel(Param1 + 0x100);
+                            Midi_Sub_Channel_Number = Search_Corresponding_Midi_Sub_Channel(ped_track, Param1 + 0x100);
                             // Not found: get the one that was mentioned
-                            if(Track_Number == -1)
+                            if(Midi_Sub_Channel_Number == -1)
                             {
-                                Track_Number = Get_Midi_Channel(Midi_Channel_Number);
+                                Midi_Sub_Channel_Number = Get_Midi_Channel(Midi_Channel_Number);
                             }
-                            Alloc_midi_Channels[Track_Number] = 0;
+                            Alloc_midi_Channels[Midi_Sub_Channel_Number] = 0;
 
                             LPJAZZ_KEY Channel = Get_Jazz_Key_Off((Param1 & 0x00ff00) + 0x100);
                             if(Channel)
@@ -365,7 +365,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
                                 Channel->Sub_Channel = 0;
                             }
 
-                            Midi_NoteOff(Track_Number);
+                            Midi_NoteOff(Midi_Sub_Channel_Number);
                         }
                     }
                 }

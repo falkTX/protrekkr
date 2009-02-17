@@ -506,7 +506,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     for(tracky = 0; tracky < Songtracks; tracky++)
     {
         offset_t = Get_Pattern_Offset(pattern, tracky, rel);
-        unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
+        unsigned char p_e_sync = *(RawPatterns + offset_t + PATTERN_FX);
         unsigned char p_eh_sync = p_e_sync & 0xf;
 
         if((p_e_sync >> 4) == 0) if(p_eh_sync == 0x07) synchro_fx = TRUE;
@@ -641,7 +641,6 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         Letter(dover, y, 29, cur_color, cur_color + 7);
         dover += PAT_COL_SHIFT;
         if(dover >= MAX_PATT_SCREEN_X) break;
-        
         Letter(dover, y, p_e >> 4, cur_color, cur_color + 7);
         dover += PAT_COL_CHAR;
         if(dover >= MAX_PATT_SCREEN_X) break;
@@ -752,7 +751,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         for(tracky = 0; tracky < Songtracks; tracky++)
         {
             offset_t = Get_Pattern_Offset(pattern, tracky, line);
-            unsigned char p_e_sync = *(RawPatterns + offset_t + 4);
+            unsigned char p_e_sync = *(RawPatterns + offset_t + PATTERN_FX);
             unsigned char p_eh_sync = p_e_sync & 0xf;
 
             if((p_e_sync >> 4) == 0) if(p_eh_sync == 0x07) synchro_fx = TRUE;

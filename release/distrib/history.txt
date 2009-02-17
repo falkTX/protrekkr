@@ -25,6 +25,10 @@ v1.90:
   Note that these channels are shared with the polyphony ones.
 - Improved volume ramping.
 - Keys repeat was disabled when editing note columns.
+- Added LCTRL+TAB and LCTRL+LSHIFT+TAB to cycle through the notes of a track.
+- Added LALT+A and LALT+LSHIFT+A
+  to select one or all notes/instruments columns of a track.
+- Modified the record function (for a better one, i hope).
 
 v1.86b:
 

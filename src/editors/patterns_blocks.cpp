@@ -799,6 +799,69 @@ void Select_Pattern_Block(void)
 }
 
 // ------------------------------------------------------
+// Select a note/instrument columns
+int Table_Select_Notes[] =
+{
+    0, 0, 0,
+    3, 3, 3,
+    6, 6, 6,
+    9, 9, 9,
+    12, 12, 12,
+    15, 15, 15,
+    18, 18, 18,
+    21, 21, 21,
+    24, 24, 24,
+    27, 27, 27,
+    30, 30, 30,
+    33, 33, 33,
+    36, 36, 36,
+    39, 39, 39,
+    42, 42, 42,
+    45, 45, 45
+};
+
+void Select_Note_Block(void)
+{
+    int nlines;
+    int i;
+    int column_to_select;
+
+    if(!Songplaying)
+    {
+        for(i = 0; i < Channels_MultiNotes[ped_track] * 3; i++)
+        {
+            if(ped_row == i)
+            {
+                column_to_select = Table_Select_Notes[i];
+                Mark_Block_Start(column_to_select, ped_track, 0);
+                nlines = patternLines[pSequence[cPosition]];
+                Mark_Block_End(column_to_select + 2,
+                               ped_track,
+                               nlines,
+                               BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
+            }
+        }
+    }
+}
+
+// ------------------------------------------------------
+// Select all note/instrument columns of a track
+void Select_All_Notes_Block(void)
+{
+    int nlines;
+
+    if(!Songplaying)
+    {
+        Mark_Block_Start(0, ped_track, 0);
+        nlines = patternLines[pSequence[cPosition]];
+        Mark_Block_End(Get_Max_Nibble_Track(ped_track) - 1 - 8,
+                       ped_track,
+                       nlines,
+                       BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
+    }
+}
+
+// ------------------------------------------------------
 // Calculate the selected range
 void Calc_selection(void)
 {

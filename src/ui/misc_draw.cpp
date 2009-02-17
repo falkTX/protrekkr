@@ -962,9 +962,9 @@ void Letter(int x, int y, char ltr, int ys, int y2)
         case 29: Copy(PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
 
-        case 31: Copy(PFONT, x, y, 111, 64, 111 + 3, 64 + 6); break; // FX ARROW LO BACK
-        case 32: Copy(PFONT, x, y, 138, 64, 138 + 3, 64 + 6); break; // FX ARROW HI BACK
-        case 33: Copy(PFONT, x, y, 165, 64, 165 + 3, 64 + 6); break; // FX ARROW SEL BACK
+        case 31: Copy(PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
     }
 }
 

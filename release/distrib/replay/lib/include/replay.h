@@ -273,7 +273,7 @@ void Sp_Player(void);
 void Play_Instrument(int channel, int sub_channel,
                      float note, int sample,
                      float vol, unsigned int offset,
-                     int glide, int Play_Selection, int midi_channel);
+                     int glide, int Play_Selection);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
 void GetPlayerValues(float master_coef);

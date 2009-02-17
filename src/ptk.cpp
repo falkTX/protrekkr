@@ -132,10 +132,10 @@ int display_title = 0;
 int key_record_first_time;
 double key_ticks;
 int old_key_ped_line;
-Uint32 Alloc_midi_Channels[MAX_TRACKS];
+Uint32 Alloc_midi_Channels[MAX_TRACKS][MAX_POLYPHONY];
 int Record_Keys[37];
 int Record_Keys_State[37];
-int Track_Number;
+int Midi_Sub_Channel_Number;
 
 void Mouse_Sliders_Master_Shuffle(void);
 void Display_Beat_Time(void);
@@ -171,6 +171,50 @@ char Prog_Path[MAX_PATH];
 int LOGO_WIDTH;
 int LOGO_HEIGHT;
 int LOGO_BKCOL;
+
+int Table_Right_Tab_Notes[] =
+{
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+    3, 2, 1,
+};
+
+int Table_Left_Tab_Notes[] =
+{
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+    3, 1, 2,
+};
+
+int Keyboard_Events_Channels[256];
+JAZZ_KEY Sub_Channels_NoteOff[MAX_TRACKS][MAX_POLYPHONY];
+int Nbr_Sub_NoteOff;
 
 // ------------------------------------------------------
 // Load a skin picture according to the xml script
@@ -686,6 +730,7 @@ int Screen_Update(void)
         {
             is_recording = 0;
             is_recording_2 = 0;
+            Nbr_Sub_NoteOff = 0;
             is_editing = 0;
             StartEdit();
             SongStop();
@@ -701,6 +746,7 @@ int Screen_Update(void)
         {
             is_recording = 0;
             is_recording_2 = 0;
+            Nbr_Sub_NoteOff = 0;
             SongStop();
             Actupated(0);
             StartEdit();
@@ -711,12 +757,10 @@ int Screen_Update(void)
             SongStop();
             is_recording ^= 1;
             is_recording_2 = 0;
+            Nbr_Sub_NoteOff = 0;
             is_editing = 0;
             key_record_first_time = TRUE;
-            for(int i = 0; i < MAX_TRACKS; i++)
-            {
-                Alloc_midi_Channels[i] = 0;
-            }
+            Clear_Midi_Channels_Pool();
             Actupated(0);
             StartEdit();
         }
@@ -1588,11 +1632,8 @@ void SongStop(void)
     Midi_AllNotesOff();
 #endif
 
-    // Clear all channels
-    for(int i = 0; i < MAX_TRACKS; i++)
-    {
-        Alloc_midi_Channels[i] = 0;
-    }
+    // Clear all midi channels
+    Clear_Midi_Channels_Pool();
 
     Ptk_Stop();
 }
@@ -2058,7 +2099,7 @@ void Actualize_Input(void)
 
 // ------------------------------------------------------
 // Return the channel and sub channel of a played note
-LPJAZZ_KEY Get_Jazz_Key_Off(int Note)
+LPJAZZ_KEY Get_Jazz_Key_Off(JAZZ_KEY Pool[MAX_TRACKS][MAX_POLYPHONY], int Note)
 {
     int i;
     int j;
@@ -2067,15 +2108,79 @@ LPJAZZ_KEY Get_Jazz_Key_Off(int Note)
     {
         for(j = 0; j < MAX_POLYPHONY; j++)
         {
-            if(Sub_Channels_Jazz[i][j].Note == Note)
+            if(Pool[i][j].Note == Note)
             {
-                return(&Sub_Channels_Jazz[i][j]);
+                return(&Pool[i][j]);
             }
         }
     }
     return(NULL);
 }
 
+// ------------------------------------------------------
+// Return the channel and sub channel of a played note
+int Discard_Key_Note_Off(JAZZ_KEY Pool[MAX_TRACKS][MAX_POLYPHONY], int Channel, int Sub_Channel)
+{
+    int i;
+    int j;
+    int discarded = 0;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            if(Pool[i][j].Channel == Channel && Pool[i][j].Sub_Channel == Sub_Channel)
+            {
+                Pool[i][j].Sub_Channel = 0;
+                Pool[i][j].Channel = 0;
+                Pool[i][j].Note = 0;
+                discarded++;
+            }
+        }
+    }
+    return(discarded);
+}
+
+int Raw_Keys_to_Send[] =
+{
+    0x10,
+    3,
+    0x11,
+    4,
+    0x12,
+    0x13,
+    6,
+    0x14,
+    7,
+    0x15,
+    8,
+    0x16,
+    0x17,
+    0xa,
+    0x18,
+    0xb,
+    0x19,
+    0x1a,
+    0xd,
+    0x1b,
+    0x2c,
+    0x1f,
+    0x2d,
+    0x20,
+    0x2e,
+    0x2f,
+    0x22,
+    0x30,
+    0x23,
+    0x31,
+    0x24,
+    0x32,
+    0x33,
+    0x26,
+    0x34,
+    0x27,
+    0x35
+};
 
 // ------------------------------------------------------
 // KeyBoard ShortCut Handler
@@ -2138,7 +2243,7 @@ void Keyboard_Handler(void)
     }
 
     // Previous track
-    if(Get_LShift() && Keys[SDLK_TAB])
+    if(Get_LShift() && !Get_LCtrl() && Keys[SDLK_TAB])
     {
         Unselect_Selection();
         ped_track--;
@@ -2155,6 +2260,24 @@ void Keyboard_Handler(void)
         ped_row = 0;
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
+    }
+
+    // Next note
+    if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
+    {
+        Unselect_Selection();
+        ped_row += Table_Right_Tab_Notes[ped_row];
+        if(ped_row >= (Channels_MultiNotes[ped_track] * 3)) ped_row = 0;
+        Actupated(0);
+    }
+
+    // Previous note
+    if(Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
+    {
+        Unselect_Selection();
+        ped_row -= Table_Left_Tab_Notes[ped_row];
+        if(ped_row < 0) ped_row = (Channels_MultiNotes[ped_track] * 3) - 3;
+        Actupated(0);
     }
 
     if(!is_recording)
@@ -2718,7 +2841,7 @@ void Keyboard_Handler(void)
 
     // ------------------------------------------
     //&& po_ctrl == 1 
-    if(!Keys[SDLK_MENU] && !Get_LCtrl() && !Get_LShift() && snamesel == 0)
+    if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0)
     {
         // Key jazz release
         if(Keys_Raw_Off[0x10]) { Record_Keys[0] = (12 + 1) | 0x80;  Keys_Raw_Off[0x10] = FALSE; Keys_Raw[0x10] = FALSE; }
@@ -2809,88 +2932,44 @@ void Keyboard_Handler(void)
             retnote_raw = -3;
         }
 
-        if(is_editing && !is_recording)
-        {
-            // Key editing
-            if(Keys_Raw_Repeat[0x10]) { retnote_raw = 12; Record_Keys[0] = 12 + 1; }
-            if(Keys_Raw_Repeat[3])    { retnote_raw = 13; Record_Keys[1] = 13 + 1; }
-            if(Keys_Raw_Repeat[0x11]) { retnote_raw = 14; Record_Keys[2] = 14 + 1; }
-            if(Keys_Raw_Repeat[4])    { retnote_raw = 15; Record_Keys[3] = 15 + 1; }
-            if(Keys_Raw_Repeat[0x12]) { retnote_raw = 16; Record_Keys[4] = 16 + 1; }
-            if(Keys_Raw_Repeat[0x13]) { retnote_raw = 17; Record_Keys[5] = 17 + 1; }
-            if(Keys_Raw_Repeat[6])    { retnote_raw = 18; Record_Keys[6] = 18 + 1; }
-            if(Keys_Raw_Repeat[0x14]) { retnote_raw = 19; Record_Keys[7] = 19 + 1; }
-            if(Keys_Raw_Repeat[7])    { retnote_raw = 20; Record_Keys[8] = 20 + 1; }
-            if(Keys_Raw_Repeat[0x15]) { retnote_raw = 21; Record_Keys[9] = 21 + 1; }
-            if(Keys_Raw_Repeat[8])    { retnote_raw = 22; Record_Keys[10] = 22 + 1; }
-            if(Keys_Raw_Repeat[0x16]) { retnote_raw = 23; Record_Keys[11] = 23 + 1; }
-            if(Keys_Raw_Repeat[0x17]) { retnote_raw = 24; Record_Keys[12] = 24 + 1; }
-            if(Keys_Raw_Repeat[0xa])  { retnote_raw = 25; Record_Keys[13] = 25 + 1; }
-            if(Keys_Raw_Repeat[0x18]) { retnote_raw = 26; Record_Keys[14] = 26 + 1; }
-            if(Keys_Raw_Repeat[0xb])  { retnote_raw = 27; Record_Keys[15] = 27 + 1; }
-            if(Keys_Raw_Repeat[0x19]) { retnote_raw = 28; Record_Keys[16] = 28 + 1; }
-            if(Keys_Raw_Repeat[0x1a]) { retnote_raw = 29; Record_Keys[17] = 29 + 1; }
-            if(Keys_Raw_Repeat[0xd])  { retnote_raw = 30; Record_Keys[18] = 30 + 1; }
-            if(Keys_Raw_Repeat[0x1b]) { retnote_raw = 31; Record_Keys[19] = 31 + 1; }
-            if(Keys_Raw_Repeat[0x2c]) { retnote_raw = 0; Record_Keys[20] = 0 + 1; }
-            if(Keys_Raw_Repeat[0x1f]) { retnote_raw = 1; Record_Keys[21] = 1 + 1; }
-            if(Keys_Raw_Repeat[0x2d]) { retnote_raw = 2; Record_Keys[22] = 2 + 1; }
-            if(Keys_Raw_Repeat[0x20]) { retnote_raw = 3; Record_Keys[23] = 3 + 1; }
-            if(Keys_Raw_Repeat[0x2e]) { retnote_raw = 4; Record_Keys[24] = 4 + 1; }
-            if(Keys_Raw_Repeat[0x2f]) { retnote_raw = 5; Record_Keys[25] = 5 + 1; }
-            if(Keys_Raw_Repeat[0x22]) { retnote_raw = 6; Record_Keys[26] = 6 + 1; }
-            if(Keys_Raw_Repeat[0x30]) { retnote_raw = 7; Record_Keys[27] = 7 + 1; }
-            if(Keys_Raw_Repeat[0x23]) { retnote_raw = 8; Record_Keys[28] = 8 + 1; }
-            if(Keys_Raw_Repeat[0x31]) { retnote_raw = 9; Record_Keys[29] = 9 + 1; }
-            if(Keys_Raw_Repeat[0x24]) { retnote_raw = 10; Record_Keys[30] = 10 + 1; }
-            if(Keys_Raw_Repeat[0x32]) { retnote_raw = 11; Record_Keys[31] = 11 + 1; }
-            if(Keys_Raw_Repeat[0x33]) { retnote_raw = 12; Record_Keys[32] = 12 + 1; }
-            if(Keys_Raw_Repeat[0x26]) { retnote_raw = 13; Record_Keys[33] = 13 + 1; }
-            if(Keys_Raw_Repeat[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
-            if(Keys_Raw_Repeat[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
-            if(Keys_Raw_Repeat[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
-        }
-        else
-        {
-            // Key jazz
-            if(Keys_Raw[0x10]) { retnote_raw = 12; Record_Keys[0] = 12 + 1; }
-            if(Keys_Raw[3])    { retnote_raw = 13; Record_Keys[1] = 13 + 1; }
-            if(Keys_Raw[0x11]) { retnote_raw = 14; Record_Keys[2] = 14 + 1; }
-            if(Keys_Raw[4])    { retnote_raw = 15; Record_Keys[3] = 15 + 1; }
-            if(Keys_Raw[0x12]) { retnote_raw = 16; Record_Keys[4] = 16 + 1; }
-            if(Keys_Raw[0x13]) { retnote_raw = 17; Record_Keys[5] = 17 + 1; }
-            if(Keys_Raw[6])    { retnote_raw = 18; Record_Keys[6] = 18 + 1; }
-            if(Keys_Raw[0x14]) { retnote_raw = 19; Record_Keys[7] = 19 + 1; }
-            if(Keys_Raw[7])    { retnote_raw = 20; Record_Keys[8] = 20 + 1; }
-            if(Keys_Raw[0x15]) { retnote_raw = 21; Record_Keys[9] = 21 + 1; }
-            if(Keys_Raw[8])    { retnote_raw = 22; Record_Keys[10] = 22 + 1; }
-            if(Keys_Raw[0x16]) { retnote_raw = 23; Record_Keys[11] = 23 + 1; }
-            if(Keys_Raw[0x17]) { retnote_raw = 24; Record_Keys[12] = 24 + 1; }
-            if(Keys_Raw[0xa])  { retnote_raw = 25; Record_Keys[13] = 25 + 1; }
-            if(Keys_Raw[0x18]) { retnote_raw = 26; Record_Keys[14] = 26 + 1; }
-            if(Keys_Raw[0xb])  { retnote_raw = 27; Record_Keys[15] = 27 + 1; }
-            if(Keys_Raw[0x19]) { retnote_raw = 28; Record_Keys[16] = 28 + 1; }
-            if(Keys_Raw[0x1a]) { retnote_raw = 29; Record_Keys[17] = 29 + 1; }
-            if(Keys_Raw[0xd])  { retnote_raw = 30; Record_Keys[18] = 30 + 1; }
-            if(Keys_Raw[0x1b]) { retnote_raw = 31; Record_Keys[19] = 31 + 1; }
-            if(Keys_Raw[0x2c]) { retnote_raw = 0; Record_Keys[20] = 0 + 1; }
-            if(Keys_Raw[0x1f]) { retnote_raw = 1; Record_Keys[21] = 1 + 1; }
-            if(Keys_Raw[0x2d]) { retnote_raw = 2; Record_Keys[22] = 2 + 1; }
-            if(Keys_Raw[0x20]) { retnote_raw = 3; Record_Keys[23] = 3 + 1; }
-            if(Keys_Raw[0x2e]) { retnote_raw = 4; Record_Keys[24] = 4 + 1; }
-            if(Keys_Raw[0x2f]) { retnote_raw = 5; Record_Keys[25] = 5 + 1; }
-            if(Keys_Raw[0x22]) { retnote_raw = 6; Record_Keys[26] = 6 + 1; }
-            if(Keys_Raw[0x30]) { retnote_raw = 7; Record_Keys[27] = 7 + 1; }
-            if(Keys_Raw[0x23]) { retnote_raw = 8; Record_Keys[28] = 8 + 1; }
-            if(Keys_Raw[0x31]) { retnote_raw = 9; Record_Keys[29] = 9 + 1; }
-            if(Keys_Raw[0x24]) { retnote_raw = 10; Record_Keys[30] = 10 + 1; }
-            if(Keys_Raw[0x32]) { retnote_raw = 11; Record_Keys[31] = 11 + 1; }
-            if(Keys_Raw[0x33]) { retnote_raw = 12; Record_Keys[32] = 12 + 1; }
-            if(Keys_Raw[0x26]) { retnote_raw = 13; Record_Keys[33] = 13 + 1; }
-            if(Keys_Raw[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
-            if(Keys_Raw[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
-            if(Keys_Raw[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
-        }
+        // Key jazz
+        if(Keys_Raw[0x10]) { retnote_raw = 12; Record_Keys[0] = 12 + 1; }
+        if(Keys_Raw[3])    { retnote_raw = 13; Record_Keys[1] = 13 + 1; }
+        if(Keys_Raw[0x11]) { retnote_raw = 14; Record_Keys[2] = 14 + 1; }
+        if(Keys_Raw[4])    { retnote_raw = 15; Record_Keys[3] = 15 + 1; }
+        if(Keys_Raw[0x12]) { retnote_raw = 16; Record_Keys[4] = 16 + 1; }
+        if(Keys_Raw[0x13]) { retnote_raw = 17; Record_Keys[5] = 17 + 1; }
+        if(Keys_Raw[6])    { retnote_raw = 18; Record_Keys[6] = 18 + 1; }
+        if(Keys_Raw[0x14]) { retnote_raw = 19; Record_Keys[7] = 19 + 1; }
+        if(Keys_Raw[7])    { retnote_raw = 20; Record_Keys[8] = 20 + 1; }
+        if(Keys_Raw[0x15]) { retnote_raw = 21; Record_Keys[9] = 21 + 1; }
+        if(Keys_Raw[8])    { retnote_raw = 22; Record_Keys[10] = 22 + 1; }
+        if(Keys_Raw[0x16]) { retnote_raw = 23; Record_Keys[11] = 23 + 1; }
+        if(Keys_Raw[0x17]) { retnote_raw = 24; Record_Keys[12] = 24 + 1; }
+        if(Keys_Raw[0xa])  { retnote_raw = 25; Record_Keys[13] = 25 + 1; }
+        if(Keys_Raw[0x18]) { retnote_raw = 26; Record_Keys[14] = 26 + 1; }
+        if(Keys_Raw[0xb])  { retnote_raw = 27; Record_Keys[15] = 27 + 1; }
+        if(Keys_Raw[0x19]) { retnote_raw = 28; Record_Keys[16] = 28 + 1; }
+        if(Keys_Raw[0x1a]) { retnote_raw = 29; Record_Keys[17] = 29 + 1; }
+        if(Keys_Raw[0xd])  { retnote_raw = 30; Record_Keys[18] = 30 + 1; }
+        if(Keys_Raw[0x1b]) { retnote_raw = 31; Record_Keys[19] = 31 + 1; }
+        if(Keys_Raw[0x2c]) { retnote_raw = 0; Record_Keys[20] = 0 + 1; }
+        if(Keys_Raw[0x1f]) { retnote_raw = 1; Record_Keys[21] = 1 + 1; }
+        if(Keys_Raw[0x2d]) { retnote_raw = 2; Record_Keys[22] = 2 + 1; }
+        if(Keys_Raw[0x20]) { retnote_raw = 3; Record_Keys[23] = 3 + 1; }
+        if(Keys_Raw[0x2e]) { retnote_raw = 4; Record_Keys[24] = 4 + 1; }
+        if(Keys_Raw[0x2f]) { retnote_raw = 5; Record_Keys[25] = 5 + 1; }
+        if(Keys_Raw[0x22]) { retnote_raw = 6; Record_Keys[26] = 6 + 1; }
+        if(Keys_Raw[0x30]) { retnote_raw = 7; Record_Keys[27] = 7 + 1; }
+        if(Keys_Raw[0x23]) { retnote_raw = 8; Record_Keys[28] = 8 + 1; }
+        if(Keys_Raw[0x31]) { retnote_raw = 9; Record_Keys[29] = 9 + 1; }
+        if(Keys_Raw[0x24]) { retnote_raw = 10; Record_Keys[30] = 10 + 1; }
+        if(Keys_Raw[0x32]) { retnote_raw = 11; Record_Keys[31] = 11 + 1; }
+        if(Keys_Raw[0x33]) { retnote_raw = 12; Record_Keys[32] = 12 + 1; }
+        if(Keys_Raw[0x26]) { retnote_raw = 13; Record_Keys[33] = 13 + 1; }
+        if(Keys_Raw[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
+        if(Keys_Raw[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
+        if(Keys_Raw[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
 
         // Data columns
         if(Keys_Unicode['0']) retvalue = 0;
@@ -2921,10 +3000,6 @@ void Keyboard_Handler(void)
         if(Keys[SDLK_f]) retvalue = 15;
         if(Keys[SDLK_DELETE]) retvalue = 16;
 
-        double int_part;
-        double frac_part;
-        int iTicks;
-        int tmp_note;
         int i;
 
         if(is_recording)
@@ -2934,170 +3009,79 @@ void Keyboard_Handler(void)
             {
                 // Start recording
                 is_recording_2 = 1;
+                Nbr_Sub_NoteOff = 0;
                 is_record_key = FALSE;
+                is_editing = TRUE;
+                Songplaying = TRUE;
                 key_record_first_time = FALSE;
                 Main_Timer.Set_Frames_Counter();
                 old_key_ped_line = ped_line;
-                for(i = 0; i < MAX_TRACKS; i++)
-                {
-                    Alloc_midi_Channels[Track_Number] = 0;
-                }
+                Clear_Midi_Channels_Pool();
             }
         }
         else
         {
             if(!is_recording_2 && key_on == 1)
             {
-                Track_Number = ped_track;
+                Midi_Sub_Channel_Number = ped_track;
             }
         }
 
+        int Record_Key_Pressed = FALSE;
         for(i = 0; i < 37; i++)
         {
             if(Record_Keys[i])
             {
-                //key_on = 2;
-                if(!(Record_Keys[i] & 0x80))
-                {
-                    if(Record_Keys_State[i] == FALSE)
-                    {
-                        Record_Keys_State[i] = TRUE;
-                        if(Alloc_midi_Channels[Track_Number] != 0)
-                        {
-                            Track_Number = Get_Free_Channel();
-                        }
-                        tmp_note = (Record_Keys[i] - 1) + ped_patoct * 12;
-                        if(tmp_note > 119) tmp_note = 119;
-
-                        if(is_recording_2)
-                        {
-                            // Ticks per minute
-                            float Time_Unit = (BeatsPerMin * TicksPerBeat);
-                            // Ticks per seconds
-                            Time_Unit /= 60.0f;
-                            // Ticks per milliseconds
-                            Time_Unit /= 1000.0f;
-                            key_ticks = Main_Timer.Get_Frames_Delay() * Time_Unit;
-                            frac_part = modf(key_ticks, &int_part);
-                            iTicks = (int) fabs(int_part);
-                            ped_line += (int) iTicks;
-                            Cur_Position = Next_Line_Pattern_Auto();
-
-                            // Write the note
-                            xoffseted = (Track_Number * PATTERN_BYTES) +
-                                        (ped_line * PATTERN_ROW_LEN) +
-                                        (pSequence[Cur_Position] * PATTERN_LEN);
-                            *(RawPatterns + xoffseted) = tmp_note;
-                            *(RawPatterns + xoffseted + 1) = ped_patsam;
-                        }
-
-                        // Play the note
-                        Alloc_midi_Channels[Track_Number] = ((tmp_note + 1) << 8);
-                        
-                        int in_note = FALSE;
-                        for(i = 0; i < Channels_MultiNotes[Track_Number]; i++)
-                        {
-                            if(ped_row == (i * 3))
-                            {
-                                in_note = TRUE;
-                                break;
-                            }
-                        }
-
-                        if(!is_editing || in_note)
-                        {
-                            int Chan = Track_Number;
-                            if(!is_recording)
-                            {
-                                Chan = ped_track;
-                            }
-
-                            int Sub_Channel = Get_Free_Sub_Channel(Chan);
-                            if(Sub_Channel == -1) Sub_Channel = 0;
-                            Sub_Channels_Jazz[Chan][Sub_Channel].Note = ((tmp_note + 1) << 8);
-                            Sub_Channels_Jazz[Chan][Sub_Channel].Channel = Chan;
-                            Sub_Channels_Jazz[Chan][Sub_Channel].Sub_Channel = Sub_Channel;
-                            Play_Instrument(Chan, Sub_Channel,
-                                            (float) tmp_note,
-                                            ped_patsam,
-                                            CustomVol[ped_patsam],
-                                            0, 0, !is_recording, Track_Number);
-                        }
-                    }
-                }
-                else
-                {
-                    // Note off
-                    if(Record_Keys_State[i] == TRUE)
-                    {
-                        Record_Keys_State[i] = FALSE;
-
-                        tmp_note = ((Record_Keys[i] - 1) & 0x7f) + ped_patoct * 12;
-                        if(tmp_note > 119) tmp_note = 119;
-                        Record_Keys[i] = 0;
-
-                        Track_Number = Search_Corresponding_Channel((tmp_note + 1) << 8);
-                        // Kick it (not a very good solution)
-                        if(Track_Number == -1) Track_Number = 0;
-
-                        if(is_recording_2)
-                        {
-                            // Ticks per minute
-                            float Time_Unit = (BeatsPerMin * TicksPerBeat);
-                            // Ticks per seconds
-                            Time_Unit /= 60.0f;
-                            // Ticks per milliseconds
-                            Time_Unit /= 1000.0f;
-                            key_ticks = Main_Timer.Get_Frames_Delay() * Time_Unit;
-                            frac_part = modf(key_ticks, &int_part);
-                            iTicks = (int) fabs(int_part);
-                            //if(iTicks == 0) iTicks = 1;
-                            ped_line += (int) iTicks;
-
-                            Cur_Position = Next_Line_Pattern_Auto();
-
-                            xoffseted = (Track_Number * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + (pSequence[Cur_Position] * PATTERN_LEN);
-                            // Put a note off in the pattern
-                            *(RawPatterns + xoffseted) = 120;
-                            *(RawPatterns + xoffseted + 1) = 0xff;
-                        }
-
-                        LPJAZZ_KEY Channel = Get_Jazz_Key_Off((tmp_note + 1) << 8);
-                        if(Channel)
-                        {
-                            Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
-                            if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
-                            {
-                                sp_Stage[Channel->Channel][Channel->Sub_Channel] = PLAYING_SAMPLE_NOTEOFF;
-                            }
-
-                            // That's a possibility
-                            noteoff303(Channel->Channel);
-
-                            Channel->Note = 0;
-                            Channel->Channel = 0;
-                            Channel->Sub_Channel = 0;
-                        }
-
-#if !defined(__NO_MIDI__)
-                        Midi_NoteOff(Track_Number);
-#endif
-
-                        Alloc_midi_Channels[Track_Number] = 0;
-                    }
-                }
+                Record_Key_Pressed = TRUE;
             }
         }
-        if(is_recording_2)
+
+        if(Record_Key_Pressed)
         {
-            if(old_key_ped_line != ped_line)
+            if(is_recording_2)
             {
-                Actualize_Sequencer();
-                Actupated(0);
+                Keyboard_Nbr_Events = 0;
             }
-            old_key_ped_line = ped_line;
-        }
+            for(i = 0; i < 37; i++)
+            {
+                if(Record_Keys[i])
+                {
+                    int tmp_note = ((Record_Keys[i] & 0x7f) - 1) + ped_patoct * 12;
+                    if(tmp_note > NOTE_MAX) tmp_note = NOTE_MAX;
 
+                    if(!(Record_Keys[i] & 0x80))
+                    {
+                        if(Record_Keys_State[i] == FALSE)
+                        {
+                            Record_Keys_State[i] = TRUE;
+
+                            if(is_recording_2)
+                            {
+                                Send_Note(Raw_Keys_to_Send[i]);
+                            }
+
+                            Note_Jazz(ped_track, tmp_note);
+                        }
+                    }
+                    else
+                    {
+                        if(Record_Keys_State[i] == TRUE)
+                        {
+                            Record_Keys_State[i] = FALSE;
+                            Record_Keys[i] = 0;
+
+                            // Do not reach that point
+                            if(is_recording_2)
+                            {
+                                Send_Note(Raw_Keys_to_Send[i] | 0x80);
+                            }
+
+                            Note_Jazz_Off(tmp_note);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Turn edit mode on/off
@@ -3194,6 +3178,7 @@ void Keyboard_Handler(void)
             {
                 if(Get_LShift())
                 {
+                    // Solo track
                     if(Keys[SDLK_m - UNICODE_OFFSET2])
                     {
                         Solo_Track(ped_track);
@@ -3205,60 +3190,57 @@ void Keyboard_Handler(void)
                     }
                 }
 
+                // Save
                 if(Keys[SDLK_s - UNICODE_OFFSET2])
                 {
                     gui_action = GUI_CMD_SAVE_MODULE;
                 }
 
-                // Ctrl+B
-                if(Keys[SDLK_b - UNICODE_OFFSET2] && !Songplaying)
-                {
-                    Mark_Block_Start(ped_row, ped_track, ped_line);
-                }
-
-                // Ctrl+E
-                if(Keys[SDLK_e - UNICODE_OFFSET2] && !Songplaying)
-                {
-                    Mark_Block_End(ped_row, ped_track, ped_line, 3);
-                }
-
-                if(Keys[SDLK_c - UNICODE_OFFSET2] && block_start_track != -1 && block_end_track != -1)
-                {
-                    Copy_Selection(Cur_Position);
-                }
-
+                // Cut selected block
                 if(Keys[SDLK_x - UNICODE_OFFSET2] && block_start_track != -1 && block_end_track != -1)
                 {
                     Cut_Selection(Cur_Position);
                 }
 
+                // Copy selected block
+                if(Keys[SDLK_c - UNICODE_OFFSET2] && block_start_track != -1 && block_end_track != -1)
+                {
+                    Copy_Selection(Cur_Position);
+                }
+
+                // Interpolate the values of a selected block
                 if(Keys[SDLK_i - UNICODE_OFFSET2] && is_editing)
                 {
                     Interpolate_Block(Cur_Position);
                 }
 
+                // Randomize the values of a selected block
                 if(Keys[SDLK_r - UNICODE_OFFSET2] && is_editing)
                 {
                     Randomize_Block(Cur_Position);
                 }
 
+                // Paste the block buffer into a pattern
                 if(Keys[SDLK_v - UNICODE_OFFSET2] && block_start_track_nibble != -1 && block_end_track_nibble != -1 && is_editing)
                 {
                     Paste_Block(Cur_Position);
                 }
 
+                // Transpose the selection 1 semitone higher
                 if(Keys[SDLK_u - UNICODE_OFFSET2] && is_editing)
                 {
                     if(Get_LShift()) Instrument_Semitone_Up_Block(Cur_Position);
                     else Semitone_Up_Block(Cur_Position);
                 }
 
+                // Transpose the selection 1 semitone lower
                 if(Keys[SDLK_d - UNICODE_OFFSET2] && is_editing)
                 {
                     if(Get_LShift()) Instrument_Semitone_Down_Block(Cur_Position);
                     else Semitone_Down_Block(Cur_Position);
                 }
 
+                // Select the current track or the current pattern
                 if(Keys[SDLK_a - UNICODE_OFFSET2])
                 {
                     if(Get_LShift()) Select_Pattern_Block();
@@ -3271,15 +3253,14 @@ void Keyboard_Handler(void)
         {
             if(Get_LCtrl())
             {
-
-                // Next pos
+                // Previous position in sequence
                 if(Keys[SDLK_LEFT])
                 {
                     gui_action = GUI_CMD_PREVIOUS_POSITION;
                     Keys[SDLK_LEFT] = FALSE;
                 }
 
-                // Previous pos
+                // Next position in sequence
                 if(Keys[SDLK_RIGHT])
                 {
                     gui_action = GUI_CMD_NEXT_POSITION;
@@ -3288,100 +3269,99 @@ void Keyboard_Handler(void)
             }
             else
             {
+                // Previous instrument
                 if(Keys[SDLK_LEFT])
                 {
                     gui_action = GUI_CMD_PREV_INSTR;
                     Keys[SDLK_LEFT] = FALSE;
                 }
+
+                // Next instrument
                 if(Keys[SDLK_RIGHT])
                 {
                     gui_action = GUI_CMD_NEXT_INSTR;
                     Keys[SDLK_RIGHT] = FALSE;
                 }
-            }
-        }
 
-        if(Get_LShift())
-        {
-            poskeynote = 1;
-            poskeyval = 1;
-        }
-        if(poskeyval == 0 && retvalue != ltretvalue) poskeyval = 1;
-
-        // Modify a value
-
-        if(retvalue != NOTE_OFF && poskeyval == 1 && is_editing == 1)
-        {
-            int ped_cell;
-            int i;
-            int j = (Channels_MultiNotes[ped_track] - 1) * 3;
-            // Instrument
-            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
-            {
-                if(ped_row == 1 + (i * 3))
+                // Select the current note/instrument
+                if(Keys[SDLK_a])
                 {
-                    i++;
-                    break;
+                    Select_Note_Block();
                 }
-            }
-            i--;
 
-            if(ped_row == (1 + (i * 3)) ||
-               ped_row == (3 + j) ||
-               ped_row == (5 + j) ||
-               ped_row == (7 + j) ||
-               ped_row == (9 + j))
+                // Select the current track or the current pattern
+                if(Keys[SDLK_a - UNICODE_OFFSET1])
+                {
+                    if(Get_LShift()) Select_All_Notes_Block();
+                }
+
+            }
+        }
+
+        if(!Get_LAlt())
+        {
+            if(Get_LShift())
             {
-           
-                ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
-                if(ped_row == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
-                if(ped_row == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
-                if(ped_row == (7 + j)) ped_cell = PATTERN_FX;           // fx
-                if(ped_row == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
+                poskeynote = 1;
+                poskeyval = 1;
+            }
+            if(poskeyval == 0 && retvalue != ltretvalue) poskeyval = 1;
+
+            // Modify a value
+
+            if(retvalue != NOTE_OFF && poskeyval == 1 && is_editing == 1)
+            {
+                int ped_cell;
+                int i;
+                int j = (Channels_MultiNotes[ped_track] - 1) * 3;
+                // Instrument
+                for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+                {
+                    if(ped_row == 1 + (i * 3))
+                    {
+                        i++;
+                        break;
+                    }
+                }
+                i--;
+
+                if(ped_row == (1 + (i * 3)) ||
+                   ped_row == (3 + j) ||
+                   ped_row == (5 + j) ||
+                   ped_row == (7 + j) ||
+                   ped_row == (9 + j))
+                {
+                    ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
+                    if(ped_row == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
+                    if(ped_row == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
+                    if(ped_row == (7 + j)) ped_cell = PATTERN_FX;           // fx
+                    if(ped_row == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
             
-                ltretvalue = retvalue;
-                xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+                    ltretvalue = retvalue;
+                    xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
 
-                int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
+                    int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
 
-                if(retvalue < 16)
-                {
-                    if(oldval == 255 && ped_row == (1 + (i * 3))) oldval = 0;
-                    if(oldval == 255 && ped_row == (3 + j)) oldval = 0;
-                    if(oldval == 255 && ped_row == (5 + j)) oldval = 0;
-                    oldval = (oldval & 0xf) + (retvalue << 4);
-                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                    if(oldval != 255 && ped_row == (5 + j) &&
-                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                    if(retvalue < 16)
                     {
-                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
-                    }
-
-                    if(!is_recording) if(!Songplaying)
-                    {
-                        ped_line += ped_pattad;
-                        if(!ped_pattad)
-                        {
-                            ped_row++;
-                            Actupated(0);
-                            gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                        }
-                    }
-                    poskeyval = 0;
-                }
-                else
-                {
-                    if(!Delete_Selection(Cur_Position))
-                    {
-                        oldval = 0;
-                        if(ped_row == (1 + (i * 3))) oldval = 255;
-                        if(ped_row == (3 + j)) oldval = 255;
-                        if(ped_row == (5 + j)) oldval = 255;
+                        if(oldval == 255 && ped_row == (1 + (i * 3))) oldval = 0;
+                        if(oldval == 255 && ped_row == (3 + j)) oldval = 0;
+                        if(oldval == 255 && ped_row == (5 + j)) oldval = 0;
+                        oldval = (oldval & 0xf) + (retvalue << 4);
                         *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+
+                        // Max panning
                         if(oldval != 255 && ped_row == (5 + j) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                         {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                        }
+
+                        // Max instrument
+                        if(oldval != 255 && ped_row == (1 + (i * 3)) &&
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                        {
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
                         }
 
                         if(!is_recording) if(!Songplaying)
@@ -3396,74 +3376,93 @@ void Keyboard_Handler(void)
                         }
                         poskeyval = 0;
                     }
-                }
-                Actupated(0);
-            }
-
-            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
-            {
-                if(ped_row == 2 +(i * 3))
-                {
-                    i++;
-                    break;
-                }
-            }
-            i--;
-            if(ped_row == (2 + (i * 3)) ||
-               ped_row == (4 + j) ||
-               ped_row == (6 + j) ||
-               ped_row == (8 + j) ||
-               ped_row == (10 + j))
-            {
-                ped_cell = PATTERN_INSTR1 + (i * 2);
-                if(ped_row == (4 + j)) ped_cell = PATTERN_VOLUME;
-                if(ped_row == (6 + j)) ped_cell = PATTERN_PANNING;
-                if(ped_row == (8 + j)) ped_cell = PATTERN_FX;
-                if(ped_row == (10 + j)) ped_cell = PATTERN_FXDATA;
-
-                ltretvalue = retvalue;
-                xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
-                int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
-
-                if(retvalue < 16)
-                {
-                    if(oldval == 255 && ped_row == (2 + (i * 3))) oldval = 0;
-                    if(oldval == 255 && ped_row == (4 + j)) oldval = 0;
-                    if(oldval == 255 && ped_row == (6 + j)) oldval = 0;
-                    oldval = (oldval & 0xf0) + retvalue;
-                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-                    if(oldval != 255 && ped_row == (6 + j) &&
-                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                    else
                     {
-                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
-                    }
-    
-                    if(!is_recording) if(!Songplaying)
-                    {
-                        ped_line += ped_pattad;
-                        if(!ped_pattad)
+                        if(!Delete_Selection(Cur_Position))
                         {
-                            ped_row++;
-                            Actupated(0);
-                            gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            oldval = 0;
+                            if(ped_row == (1 + (i * 3))) oldval = 255;
+                            if(ped_row == (3 + j)) oldval = 255;
+                            if(ped_row == (5 + j)) oldval = 255;
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+
+                            // Max panning
+                            if(oldval != 255 && ped_row == (5 + j) &&
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            }
+
+                            // Max instrument
+                            if(oldval != 255 && ped_row == (1 + (i * 3)) &&
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                            }
+
+                            if(!is_recording) if(!Songplaying)
+                            {
+                                ped_line += ped_pattad;
+                                if(!ped_pattad)
+                                {
+                                    ped_row++;
+                                    Actupated(0);
+                                    gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                }
+                            }
+                            poskeyval = 0;
                         }
                     }
-                    poskeyval = 0;
+                    Actupated(0);
                 }
-                else
+
+                for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
                 {
-                    if(!Delete_Selection(Cur_Position))
+                    if(ped_row == 2 +(i * 3))
                     {
-                        oldval = 0;
-                        if(ped_row == (2 + (i * 3))) oldval = 255;
-                        if(ped_row == (4 + j)) oldval = 255;
-                        if(ped_row == (6 + j)) oldval = 255;
+                        i++;
+                        break;
+                    }
+                }
+                i--;
+                if(ped_row == (2 + (i * 3)) ||
+                   ped_row == (4 + j) ||
+                   ped_row == (6 + j) ||
+                   ped_row == (8 + j) ||
+                   ped_row == (10 + j))
+                {
+                    ped_cell = PATTERN_INSTR1 + (i * 2);
+                    if(ped_row == (4 + j)) ped_cell = PATTERN_VOLUME;
+                    if(ped_row == (6 + j)) ped_cell = PATTERN_PANNING;
+                    if(ped_row == (8 + j)) ped_cell = PATTERN_FX;
+                    if(ped_row == (10 + j)) ped_cell = PATTERN_FXDATA;
+
+                    ltretvalue = retvalue;
+                    xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+                    int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
+
+                    if(retvalue < 16)
+                    {
+                        if(oldval == 255 && ped_row == (2 + (i * 3))) oldval = 0;
+                        if(oldval == 255 && ped_row == (4 + j)) oldval = 0;
+                        if(oldval == 255 && ped_row == (6 + j)) oldval = 0;
+                        oldval = (oldval & 0xf0) + retvalue;
                         *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+
+                        // Max panning
                         if(oldval != 255 && ped_row == (6 + j) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 144)
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                         {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 144;
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
                         }
+
+                        // Max instrument
+                        if(oldval != 255 && ped_row == (2 + (i * 3)) &&
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                        {
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                        }
+    
                         if(!is_recording) if(!Songplaying)
                         {
                             ped_line += ped_pattad;
@@ -3476,17 +3475,108 @@ void Keyboard_Handler(void)
                         }
                         poskeyval = 0;
                     }
+                    else
+                    {
+                        if(!Delete_Selection(Cur_Position))
+                        {
+                            oldval = 0;
+                            if(ped_row == (2 + (i * 3))) oldval = 255;
+                            if(ped_row == (4 + j)) oldval = 255;
+                            if(ped_row == (6 + j)) oldval = 255;
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+
+                            // Max panning
+                            if(oldval != 255 && ped_row == (6 + j) &&
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            }
+
+                            // Max instrument
+                            if(oldval != 255 && ped_row == (2 + (i * 3)) &&
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                            }
+
+                            if(!is_recording) if(!Songplaying)
+                            {
+                                ped_line += ped_pattad;
+                                if(!ped_pattad)
+                                {
+                                    ped_row++;
+                                    Actupated(0);
+                                    gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                }
+                            }
+                            poskeyval = 0;
+                        }
+                    }
+                    Actupated(0);
                 }
-                Actupated(0);
+            }
+            poskeynote = 0;
+        }
+    }
+
+    // --------------------------------------------
+    // Enter one or several notes (used for midi and record as well as simple editing)
+    if(!Get_LAlt())
+    {
+        int go_note = FALSE;
+
+        int i;
+        for(i = 0; i < Keyboard_Nbr_Events; i++)
+        {
+            int Idx = Keyboard_Events[i];
+
+            // Key editing
+            switch(Idx & 0x7f)
+            {
+                case 0x10: 
+                case 3:
+                case 0x11:
+                case 4:
+                case 0x12:
+                case 0x13:
+                case 6:
+                case 0x14:
+                case 7:
+                case 0x15:
+                case 8:
+                case 0x16:
+                case 0x17:
+                case 0xa:
+                case 0x18:
+                case 0xb:
+                case 0x19:
+                case 0x1a:
+                case 0xd:
+                case 0x1b:
+                case 0x2c:
+                case 0x1f:
+                case 0x2d:
+                case 0x20:
+                case 0x2e:
+                case 0x2f:
+                case 0x22:
+                case 0x30:
+                case 0x23:
+                case 0x31:
+                case 0x24:
+                case 0x32:
+                case 0x33:
+                case 0x26:
+                case 0x34:
+                case 0x27:
+                case 0x35:
+                    go_note = TRUE;
+                    break;
             }
         }
-
-        if(poskeynote == 0 && retnote_raw != ltretnote_raw) poskeynote = 1;
-
         // Write a note
-        if(poskeynote == 1 && (retnote_raw != NOTE_OFF))
+        if(go_note)
         {
-            int i;
             int column = 0;
             int in_note = FALSE;
 
@@ -3503,40 +3593,126 @@ void Keyboard_Handler(void)
 
             if(in_note)
             {
-                ltretnote_raw = retnote_raw;
-
-                xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
-
-                int tmp_note = retnote_raw + ped_patoct * 12;
-                if(tmp_note > NOTE_MAX) tmp_note = NOTE_MAX;
-
-                if(retnote > -1)
+                int i;
+                for(i = 0; i < Keyboard_Nbr_Events; i++)
                 {
-                    if(is_editing)
+                    int Idx = Keyboard_Events[i];
+                    int pos;
+                    int tmp_note;
+                    int line;
+
+                    // Key editing
+                    switch(Idx & 0x7f)
                     {
-                        *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = tmp_note;
-                        *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = ped_patsam;
-                    
-                        if(!is_recording) if(!Songplaying)
+                        case 0x10: { retnote_raw = 12; break; }
+                        case 3:    { retnote_raw = 13; break; }
+                        case 0x11: { retnote_raw = 14; break; }
+                        case 4:    { retnote_raw = 15; break; }
+                        case 0x12: { retnote_raw = 16; break; }
+                        case 0x13: { retnote_raw = 17; break; }
+                        case 6:    { retnote_raw = 18; break; }
+                        case 0x14: { retnote_raw = 19; break; }
+                        case 7:    { retnote_raw = 20; break; }
+                        case 0x15: { retnote_raw = 21; break; }
+                        case 8:    { retnote_raw = 22; break; }
+                        case 0x16: { retnote_raw = 23; break; }
+                        case 0x17: { retnote_raw = 24; break; }
+                        case 0xa:  { retnote_raw = 25; break; }
+                        case 0x18: { retnote_raw = 26; break; }
+                        case 0xb:  { retnote_raw = 27; break; }
+                        case 0x19: { retnote_raw = 28; break; }
+                        case 0x1a: { retnote_raw = 29; break; }
+                        case 0xd:  { retnote_raw = 30; break; }
+                        case 0x1b: { retnote_raw = 31; break; }
+                        case 0x2c: { retnote_raw = 0; break; }
+                        case 0x1f: { retnote_raw = 1; break; }
+                        case 0x2d: { retnote_raw = 2; break; }
+                        case 0x20: { retnote_raw = 3; break; }
+                        case 0x2e: { retnote_raw = 4; break; }
+                        case 0x2f: { retnote_raw = 5; break; }
+                        case 0x22: { retnote_raw = 6; break; }
+                        case 0x30: { retnote_raw = 7; break; }
+                        case 0x23: { retnote_raw = 8; break; }
+                        case 0x31: { retnote_raw = 9; break; }
+                        case 0x24: { retnote_raw = 10; break; }
+                        case 0x32: { retnote_raw = 11; break; }
+                        case 0x33: { retnote_raw = 12; break; }
+                        case 0x26: { retnote_raw = 13; break; }
+                        case 0x34: { retnote_raw = 14; break; }
+                        case 0x27: { retnote_raw = 15; break; }
+                        case 0x35: { retnote_raw = 16; break; }
+                        default:
+                            goto No_Key;
+                    }
+     
+                    line = ped_line;
+                    if(is_recording_2) line = ped_line_delay;
+
+                    tmp_note = retnote_raw + ped_patoct * 12;
+                    if(tmp_note > NOTE_MAX) tmp_note = NOTE_MAX;
+
+                    if(!(Idx & 0x80))
+                    {
+                        // Note
+                        if(retnote > -1)
                         {
-                            ped_line += ped_pattad;
-                            if(!ped_pattad)
+                            xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, line);
+
+                            // Select the sub channel
+                            pos = i;
+
+                            if(is_recording_2)
                             {
-                                ped_row++;
-                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                // Store the note column where it was entered
+                                Sub_Channels_NoteOff[ped_track][Nbr_Sub_NoteOff].Note = ((tmp_note + 1) << 8);
+                                Sub_Channels_NoteOff[ped_track][Nbr_Sub_NoteOff].Channel = ped_track;
+                                Sub_Channels_NoteOff[ped_track][Nbr_Sub_NoteOff].Sub_Channel = Nbr_Sub_NoteOff;
+                                pos = Nbr_Sub_NoteOff;
+
+                                if(Nbr_Sub_NoteOff < 14) Nbr_Sub_NoteOff++;
+                                else Nbr_Sub_NoteOff = 0;
+                            }
+
+                            if(pos <= (Channels_MultiNotes[ped_track] - 1))
+                            {
+                                if(pos > (Channels_MultiNotes[ped_track] - 1)) pos = 0;
+                                xoffseted += (pos * 2);
+                            }
+
+                            if(is_editing)
+                            {
+                                *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = tmp_note;
+                                *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = ped_patsam;
                             }
                         }
-                        Actupated(0);
                     }
-                }
+                    else
+                    {
+                        // Note off
+                        if(is_editing)
+                        {
+                            if(is_recording_2)
+                            {
+                                LPJAZZ_KEY Channel = Get_Jazz_Key_Off(Sub_Channels_NoteOff, (tmp_note + 1) << 8);
+                                if(Channel)
+                                {
+                                    xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], Channel->Channel, line);
+                                    *(RawPatterns + xoffseted + PATTERN_NOTE1 + (Channel->Sub_Channel * 2)) = NOTE_OFF;
+                                    *(RawPatterns + xoffseted + PATTERN_INSTR1 + (Channel->Sub_Channel * 2)) = NO_INSTR;
 
-                // Note off (RSHIFT)
-                if(retnote == -3 && is_editing)
+                                    // Now discard any remaining note off for that channel/sub channel
+                                    Nbr_Sub_NoteOff -= Discard_Key_Note_Off(Sub_Channels_NoteOff, Channel->Channel, Channel->Sub_Channel);
+                                    if(Nbr_Sub_NoteOff < 0) Nbr_Sub_NoteOff = 0;
+                                }
+                            }
+                        }
+                    }
+No_Key:;
+                }
+                Keyboard_Nbr_Events = 0;
+                if(is_editing)
                 {
-                    *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NOTE_OFF;
-                    *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
-                
-                    if(!is_recording) if(!Songplaying)
+                    if(!Songplaying)
                     {
                         ped_line += ped_pattad;
                         if(!ped_pattad)
@@ -3545,32 +3721,93 @@ void Keyboard_Handler(void)
                             gui_action = GUI_CMD_SET_FOCUS_TRACK;
                         }
                     }
-                    Actupated(0);
                 }
-
-                if(retnote == -1 && is_editing)
+                if(is_recording_2)
                 {
-                    if(!Delete_Selection(Cur_Position))
+                    if(old_key_ped_line != ped_line)
                     {
-                        // Delete the note under the caret
-                        *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NO_NOTE;
-                        *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
-         
-                        if(!is_recording) if(!Songplaying)
-                        {
-                            ped_line += ped_pattad;
-                            if(!ped_pattad)
-                            {
-                                ped_row++;
-                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                            }
-                        }
+                        Actualize_Sequencer();
                     }
-                    Actupated(0);
+                    old_key_ped_line = ped_line;
                 }
-
-                poskeynote = 0;
+                Actupated(0);
             }
+        }
+
+        // Note off (RSHIFT)
+        if(retnote == -3 && is_editing && !is_recording_2)
+        {
+            int column = 0;
+            int in_note = FALSE;
+            int i;
+
+            // Check if this is a legal note column
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+            {
+                if(ped_row == (i * 3))
+                {
+                    in_note = TRUE;
+                    break;
+                }
+                column += 2;
+            }
+
+            if(in_note)
+            {
+                xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
+
+                *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NOTE_OFF;
+                *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+    
+                if(!is_recording) if(!Songplaying)
+                {
+                    ped_line += ped_pattad;
+                    if(!ped_pattad)
+                    {
+                        ped_row++;
+                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                    }
+                }
+                Actupated(0);
+            }
+        }
+
+        if(retnote == -1 && is_editing && !is_recording_2)
+        {
+            int column = 0;
+            int in_note = FALSE;
+            int i;
+
+            // Check if this is a legal note column
+            for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+            {
+                if(ped_row == (i * 3))
+                {
+                    in_note = TRUE;
+                    break;
+                }
+                column += 2;
+            }
+
+            xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
+
+            if(!Delete_Selection(Cur_Position))
+            {
+                // Delete the note under the caret
+                *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NO_NOTE;
+                *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+
+                if(!is_recording) if(!Songplaying)
+                {
+                    ped_line += ped_pattad;
+                    if(!ped_pattad)
+                    {
+                        ped_row++;
+                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                    }
+                }
+            }
+            Actupated(0);
         }
     }
 }
@@ -4185,17 +4422,17 @@ int Search_Free_Pattern(void)
 
 // ------------------------------------------------------
 // Next pattern/position
-int Next_Line_Pattern_Auto(void)
+int Next_Line_Pattern_Auto(int *position, int lines, int *line)
 {
     int new_pattern;
     int max_value;
-    
-    if(ped_line >= patternLines[pSequence[cPosition]])
+
+    if(*line >= lines) //patternLines[pSequence[*position]])
     {
         // Normal end of pattern
-        ped_line = ped_line - patternLines[pSequence[cPosition]];
-        cPosition++;
-        if(cPosition >= sLength - 1)
+        *line = *line - lines; //patternLines[pSequence[*position]];
+        *position += 1;
+        if(*position >= sLength - 1)
         {
             sLength++;
             max_value = sLength;
@@ -4206,10 +4443,10 @@ int Next_Line_Pattern_Auto(void)
             }
             // Alloc a new pattern position
             new_pattern = Search_Free_Pattern();
-            if(new_pattern > -1) pSequence[cPosition] = new_pattern;
+            if(new_pattern > -1) pSequence[*position] = new_pattern;
         }
     }
-    return(cPosition);
+    return(*position);
 }
 
 // ------------------------------------------------------
@@ -4230,29 +4467,25 @@ int Get_Midi_Channel(int midi_channel)
 
 // ------------------------------------------------------
 // Return the first track which isn't allocated in the midi channels pool
-int Get_Free_Channel(void)
+int Get_Free_Midi_Sub_Channel(int track)
 {
     int i;
-    int j;
-    j = ped_track;
-    for(i = 0; i < MAX_TRACKS; i++)
+    for(i = 0; i < MAX_POLYPHONY; i++)
     {
-        if(Alloc_midi_Channels[j] == 0) return(j);
-        j++;
-        if(j >= MAX_TRACKS) j = 0;
+        if(Alloc_midi_Channels[track][i] == 0) return(i);
     }
     return(-1);
 }
 
 // ------------------------------------------------------
 // Search & return the midi channel corresponding to the given data
-int Search_Corresponding_Channel(Uint32 Datas)
+int Search_Corresponding_Midi_Sub_Channel(int track, Uint32 Datas)
 {
     int i;
 
     for(i = 0; i < MAX_TRACKS; i++)
     {
-        if(Alloc_midi_Channels[i] == (Datas & 0x00ff00))
+        if(Alloc_midi_Channels[track][i] == (Datas & 0x00ff00))
         {
             return(i);
         }
@@ -4794,5 +5027,74 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
+    }
+}
+
+// ------------------------------------------------------
+// Free all allocated midi channels and sub channels
+void Clear_Midi_Channels_Pool(void)
+{
+    int i;
+    int j;
+
+    for(j = 0; j < MAX_POLYPHONY; j++)
+    {
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            Alloc_midi_Channels[i][j] = 0;
+        }
+    }
+}
+
+// ------------------------------------------------------
+// Schedule a note
+void Send_Note(int Note)
+{
+    // Provision to send
+    Keyboard_Events[Keyboard_Nbr_Events] = Note;
+    Keyboard_Nbr_Events++;
+}
+
+// ------------------------------------------------------
+// Jazz a note man
+void Note_Jazz(int track, int note)
+{
+    // Play the note
+    int Sub_Channel = Get_Free_Sub_Channel(track);
+    if(Sub_Channel == -1) Sub_Channel = 0;
+    Sub_Channels_Jazz[track][Sub_Channel].Note = ((note + 1) << 8);
+    Sub_Channels_Jazz[track][Sub_Channel].Channel = track;
+    Sub_Channels_Jazz[track][Sub_Channel].Sub_Channel = Sub_Channel;
+    if(!is_editing || is_recording_2)
+    {
+        Play_Instrument(track, Sub_Channel,
+                        (float) note,
+                        ped_patsam,
+                        CustomVol[ped_patsam],
+                        0, 0, !is_recording);
+    }
+}
+
+// ------------------------------------------------------
+// Jazz a note off man
+void Note_Jazz_Off(int note)
+{
+    // Play a note off
+    LPJAZZ_KEY Channel = Get_Jazz_Key_Off(Sub_Channels_Jazz, (note + 1) << 8);
+    if(Channel)
+    {
+        if(!is_editing || is_recording_2)
+        {
+            Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
+            if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
+            {
+                sp_Stage[Channel->Channel][Channel->Sub_Channel] = PLAYING_SAMPLE_NOTEOFF;
+            }
+            // That's a possibility
+            noteoff303(Channel->Channel);
+        }
+        Channel->Note = 0;
+        Channel->Channel = 0;
+        Channel->Sub_Channel = 0;
     }
 }

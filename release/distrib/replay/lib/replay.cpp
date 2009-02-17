@@ -380,7 +380,7 @@ int DelayType;
     char Midiprg[128];
     int LastProgram[MAX_TRACKS];
     int wait_level;
-    extern int Midi_Track_Notes[MAX_TRACKS];
+    extern int Midi_Track_Notes[MAX_TRACKS][MAX_POLYPHONY];
     char nameins[128][20];
     char SampleName[128][16][64];
     unsigned char nPatterns = 1;
@@ -1593,22 +1593,27 @@ void Sp_Player(void)
 
                         if(pl_vol_row <= 64 || pl_eff_row == 3)
                         {
-                            Play_Instrument(ct, free_sub_channel,
+                            Play_Instrument(ct,
+                                            free_sub_channel,
                                             (float) pl_note[i],
                                             pl_sample[i],
                                             sp_Tvol[ct][free_sub_channel],
-                                            toffset, glide,
-                                            FALSE, ct);
+                                            toffset,
+                                            glide,
+                                            FALSE);
                         }
                         else
                         {
                             // Use the default sample volume if there's nothing
                             // in the volume column of no 0x3 fx
-                            Play_Instrument(ct, free_sub_channel,
+                            Play_Instrument(ct,
+                                            free_sub_channel,
                                             (float) pl_note[i],
-                                            pl_sample[i], CustomVol[pl_sample[i]],
-                                            toffset, glide,
-                                            FALSE, ct);
+                                            pl_sample[i],
+                                            CustomVol[pl_sample[i]],
+                                            toffset,
+                                            glide,
+                                            FALSE);
                         }
 
                     }
@@ -1692,22 +1697,38 @@ void Sp_Player(void)
             }
             else
             {
+
+#if !defined(__STAND_ALONE__)
+                if(is_recording_2)
+                {
+                    Next_Line_Pattern_Auto(&cPosition, Patbreak, &ped_line);
+                }
+                else
+#endif
+                {
+
+#if !defined(__STAND_ALONE__)
+                    if(!plx)
+#endif
+                    {
+                        cPosition++;
+                    }
+                }
+
                 // Pattern break
                 ped_line = Patbreak;
 
 #if !defined(__STAND_ALONE__)
-                if(!plx) 
+                if(!is_recording_2)
 #endif
                 {
-                    cPosition++;
-                }
-
-                if(cPosition >= sLength)
-                {
-                    cPosition = 0;
+                    if(cPosition >= sLength)
+                    {
+                        cPosition = 0;
 #if defined(__WINAMP__)
-                    done = 1;
+                        done = 1;
 #endif
+                    }
                 }
 
 #if !defined(__STAND_ALONE__)
@@ -1726,22 +1747,38 @@ void Sp_Player(void)
 
             if(ped_line == patternLines[pSequence[cPosition]])
             {
+
+#if !defined(__STAND_ALONE__)
+                if(is_recording_2)
+                {
+                    Next_Line_Pattern_Auto(&cPosition, patternLines[pSequence[cPosition]], &ped_line);
+                }
+                else
+#endif
+                {
+
+#if !defined(__STAND_ALONE__)
+                    if(!plx)
+#endif
+                    {
+                        cPosition++;
+                    }
+                }
+
                 // Normal end of pattern
                 ped_line = 0;
 
 #if !defined(__STAND_ALONE__)
-                if(!plx)
+                if(!is_recording_2)
 #endif
                 {
-                    cPosition++;
-                }
-
-                if(cPosition >= sLength)
-                {
-                    cPosition = 0;
+                    if(cPosition >= sLength)
+                    {
+                        cPosition = 0;
 #if defined(__WINAMP__)
-                    done = 1;
+                        done = 1;
 #endif
+                    }
                 }
 
 #if !defined(__STAND_ALONE__)
@@ -1755,6 +1792,8 @@ void Sp_Player(void)
                 repeat_loop_pos = 0;
             }
 
+            // Delayed pattern
+
 #if !defined(__WINAMP__)
             if(Songplaying_Pattern)
             {
@@ -1766,7 +1805,7 @@ void Sp_Player(void)
                 }
                 else
                 {
-                    ped_line_delay = Patbreak2;
+
 #if !defined(__STAND_ALONE__)
                     if(!plx)
 #endif
@@ -1774,6 +1813,8 @@ void Sp_Player(void)
                         cPosition_delay++;
                     }
                     if(cPosition_delay >= sLength) cPosition_delay = 0;
+
+                    ped_line_delay = Patbreak2;
                 }
 #else
                 ped_line_delay++;
@@ -1781,7 +1822,6 @@ void Sp_Player(void)
 
 				if(ped_line_delay == patternLines[pSequence[cPosition_delay]])
                 {
-                    ped_line_delay = 0;
 
 #if !defined(__STAND_ALONE__)
                     if(!plx)
@@ -1791,6 +1831,8 @@ void Sp_Player(void)
                         cPosition_delay++;
                     }
                     if(cPosition_delay >= sLength) cPosition_delay = 0;
+
+                    ped_line_delay = 0;
                 }
             }
 
@@ -2361,7 +2403,7 @@ int Get_Free_Sub_Channel(int channel)
 void Play_Instrument(int channel, int sub_channel,
                      float note, int sample,
                      float vol, unsigned int offset,
-                     int glide, int Play_Selection, int midi_channel)
+                     int glide, int Play_Selection)
 {
 
 #if defined(PTK_FX_AUTOFADEMODE)
@@ -2644,6 +2686,7 @@ void Play_Instrument(int channel, int sub_channel,
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
+            int midi_channel = channel;
             Midi_NoteOff(midi_channel);
 
             // Set the midi program if it was modified
@@ -2656,8 +2699,8 @@ void Play_Instrument(int channel, int sub_channel,
             // Send the note to the midi device
             float veloc = vol * mas_vol;
 
-            Midi_Track_Notes[CHAN_MIDI_PRG[midi_channel]] = mnote;
-            Midi_Send(144 + CHAN_MIDI_PRG[midi_channel], mnote, (int) (veloc * 127));
+            Midi_Track_Notes[CHAN_MIDI_PRG[channel]][sub_channel] = mnote;
+            Midi_Send(144 + CHAN_MIDI_PRG[channel], mnote, (int) (veloc * 127));
         }
 #endif // __NO_MIDI
 #endif // __STAND_ALONE__
@@ -3050,7 +3093,7 @@ void DoEffects(void)
                                             (float) pltr_note[i], pltr_sample[i],
                                             pltr_vol_row * 0.015625f,
                                             0, 0,
-                                            FALSE, trackef);
+                                            FALSE);
                         }
                         else
                         {
@@ -3058,7 +3101,7 @@ void DoEffects(void)
                                             (float) pltr_note[i], pltr_sample[i],
                                             CustomVol[pltr_sample[i]],
                                             0, 0,
-                                            FALSE, trackef);
+                                            FALSE);
                         }
                     }
                 }

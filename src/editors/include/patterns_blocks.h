@@ -26,6 +26,7 @@ void Instrument_Semitone_Up_Block(int Position);
 void Instrument_Semitone_Down_Block(int Position);
 void Select_Track_Block(void);
 void Select_Pattern_Block(void);
+void Select_Note_Block(void);
 void Calc_selection(void);
 void Unselect_Selection(void);
 void Select_Block_Keyboard(int Type);
@@ -39,5 +40,6 @@ int Alloc_Patterns_Pool(void);
 int Get_Max_Nibble_Track(int track);
 int Get_Track_Nibble_Start(int track);
 int Get_Track_From_Nibble(int nibble);
+void Select_All_Notes_Block(void);
 
 #endif

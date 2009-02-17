@@ -98,7 +98,12 @@ void Destroy_Context(void);
 int Screen_Update(void);
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
 SDL_Surface *Load_Skin_Picture(char *name);
-LPJAZZ_KEY Get_Jazz_Key_Off(int Note);
+LPJAZZ_KEY Get_Jazz_Key_Off(JAZZ_KEY Pool[MAX_TRACKS][MAX_POLYPHONY], int Note);
+int Discard_Key_Note_Off(JAZZ_KEY Pool[MAX_TRACKS][MAX_POLYPHONY], int Channel, int Sub_Channel);
 void Set_Default_Channels_Polyphony(void);
+void Clear_Midi_Channels_Pool(void);
+void Send_Note(int Note);
+void Note_Jazz(int track, int note);
+void Note_Jazz_Off(int note);
 
 #endif

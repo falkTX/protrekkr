@@ -1,11 +1,16 @@
 TODO (in no special order):
 
- - Check all access to rawpatterns.
- - Modify the format to store the multi notes (also the ptp).
- - Modify the block functions to handle the multi notes.
- - Modify the midi channels handling for the multi notes.
- - See to create a panning / instrument & synth.
- - LALT + A to select a note column.
+ + Editing.
+ + Live rec.
+ + Key jazz.
+ + Ptp format.
+ + Record mode (multi-notes off lacking).
+ 
+ - Block operations.
+ - Midi channels.
+ 
+ + See to add a metronome.
+ + See to create a panning / instrument & synth.
  
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
@@ -21,7 +26,7 @@ TODO (in no special order):
  - Import .mid.
  - Save the synchro data as milliseconds too (+ add a Ptk_GetTime function).
  - Ability to record a selected range of patterns to WAV.
- - Add an option to play a packed sample in order to test it.
+ - Add an option to play a packed sample in order to test it inside the tracker.
  - Add customization for the keys shortcuts in the xml file (may be ok like that).
  - Add a large patterns view mode (more rows).
  - Small / big fonts view for patterns.
@@ -32,10 +37,9 @@ TODO (in no special order):
  - More shortcuts.
  - Alternate way to enter notes (a la fruity loops).
  - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
- - User lockable channels from the polyphony channels pool.
- - Add a function to remap instruments in sequencer.
+ - Add a set of functions to remap instruments in sequencer (from -> to).
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
  - Add requesters (especially before overwriting files and before exiting).
- 
+ - Chords editor.

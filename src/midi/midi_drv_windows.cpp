@@ -162,12 +162,12 @@ void Midi_FreeAll(void)
 
 // ------------------------------------------------------
 // Turn a midi channel off
-void Midi_NoteOff(int track)
+void Midi_NoteOff(int channel, int sub_channel)
 {
     if(c_midiout != -1)
     {
-        midiOutShortMsg(midiout_handle, (176 + CHAN_MIDI_PRG[track]) | (0x40 << 8) | (0 << 16)); 
-        midiOutShortMsg(midiout_handle, (0x80 + CHAN_MIDI_PRG[track]) | (Midi_Track_Notes[CHAN_MIDI_PRG[track]] << 8) | (127 << 16)); 
+        midiOutShortMsg(midiout_handle, (176 + CHAN_MIDI_PRG[channel]) | (0x40 << 8) | (0 << 16)); 
+        midiOutShortMsg(midiout_handle, (0x80 + CHAN_MIDI_PRG[channel]) | (Midi_Track_Notes[CHAN_MIDI_PRG[channel]][sub_channel] << 8) | (127 << 16)); 
     }
 }
 
