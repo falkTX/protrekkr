@@ -1650,7 +1650,7 @@ int Set_Pictures_Colors(void)
         Palette_Logo[i].unused = Pic_Palette->colors[i].unused;
     }
 
-    Temp_PFONT = SDL_AllocSurface(SDL_HWSURFACE, 192, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 192, 87 * 2, 8, 0, 0, 0, 0xff);
 
     Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
     memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));

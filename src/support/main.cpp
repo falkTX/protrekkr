@@ -775,7 +775,7 @@ int Switch_FullScreen(void)
 {
     Env_Change = TRUE;
     if((Main_Screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                       SCREEN_BPP, SDL_SWSURFACE | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+                                       SCREEN_BPP, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
     {
         return(FALSE);
     }

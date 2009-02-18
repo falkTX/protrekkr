@@ -4,7 +4,7 @@ ProTrekkr releases history
 
 v1.90:
 
-- Added a scrollbar for patterns.
+- Added a scrollbar beside patterns.
 - The tracker can now load all these .wav file formats (mono or stereo) :
   - 8-bit integer.
   - 12-bit integer.
@@ -29,6 +29,7 @@ v1.90:
 - Added LALT+A and LALT+LSHIFT+A
   to select one or all notes/instruments columns of a track.
 - Modified the record function (for a better one, i hope).
+- Some edition commands weren't working on last track.
 
 v1.86b:
 

@@ -8,13 +8,30 @@
 #define _PATTERNS_BLOCKS_H_
 
 // ------------------------------------------------------
+// Enumerations
+enum COLUMN_TYPE
+{
+    NOTE,
+    INSTRHI,
+    INSTRLO,
+    VOLUMEHI,
+    VOLUMELO,
+    PANNINGHI,
+    PANNINGLO,
+    EFFECTHI,
+    EFFECTLO,
+    EFFECTDATHI,
+    EFFECTDATLO
+};
+
+// ------------------------------------------------------
 // Functions
 int Init_Block_Work(void);
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
 void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif);
 int Delete_Selection(int Position);
 void Copy_Selection_To_Buffer(int Position);
-void Copy_Selection_From_Buffer(int Position);
+void Paste_Selection_From_Buffer(int Position);
 void Cut_Selection(int Position);
 void Copy_Selection(int Position);
 void Paste_Block(int Position);
@@ -41,5 +58,10 @@ int Get_Max_Nibble_Track(int track);
 int Get_Track_Nibble_Start(int track);
 int Get_Track_From_Nibble(int nibble);
 void Select_All_Notes_Block(void);
+int Get_Max_Nibble_Track_From_Nibble(int nibble);
+int Get_Byte_From_Column(int nibble);
+COLUMN_TYPE Get_Column_Type(int column);
+int Get_Track_Relative_Column(int column);
+int Get_Max_Nibble_All_Tracks(void);
 
 #endif

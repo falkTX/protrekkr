@@ -2840,7 +2840,6 @@ void Keyboard_Handler(void)
     // -------------------------------------------
 
     // ------------------------------------------
-    //&& po_ctrl == 1 
     if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0)
     {
         // Key jazz release
@@ -3127,7 +3126,6 @@ void Keyboard_Handler(void)
         }
         if(!Get_LAlt() && po_alt) po_alt = FALSE;
 
-
 // This is a nasty hack: we should have a specific ASCII buffer
 // instead of using the unicode one.
 #if !defined(__MACOSX__)
@@ -3370,7 +3368,6 @@ void Keyboard_Handler(void)
                             if(!ped_pattad)
                             {
                                 ped_row++;
-                                Actupated(0);
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
@@ -3406,7 +3403,6 @@ void Keyboard_Handler(void)
                                 if(!ped_pattad)
                                 {
                                     ped_row++;
-                                    Actupated(0);
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
@@ -3469,7 +3465,6 @@ void Keyboard_Handler(void)
                             if(!ped_pattad)
                             {
                                 ped_row++;
-                                Actupated(0);
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
@@ -3505,7 +3500,6 @@ void Keyboard_Handler(void)
                                 if(!ped_pattad)
                                 {
                                     ped_row++;
-                                    Actupated(0);
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
@@ -3521,7 +3515,7 @@ void Keyboard_Handler(void)
 
     // --------------------------------------------
     // Enter one or several notes (used for midi and record as well as simple editing)
-    if(!Get_LAlt())
+    if(!Get_LAlt() && !Get_LCtrl())
     {
         int go_note = FALSE;
 
@@ -3772,6 +3766,7 @@ No_Key:;
             }
         }
 
+        // Delete a note
         if(retnote == -1 && is_editing && !is_recording_2)
         {
             int column = 0;
@@ -3789,25 +3784,28 @@ No_Key:;
                 column += 2;
             }
 
-            xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
-
-            if(!Delete_Selection(Cur_Position))
+            if(in_note)
             {
-                // Delete the note under the caret
-                *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NO_NOTE;
-                *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+                xoffseted = Get_Pattern_Offset(pSequence[Cur_Position], ped_track, ped_line);
 
-                if(!is_recording) if(!Songplaying)
+                if(!Delete_Selection(Cur_Position))
                 {
-                    ped_line += ped_pattad;
-                    if(!ped_pattad)
+                    // Delete the note under the caret
+                    *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NO_NOTE;
+                    *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
+
+                    if(!is_recording) if(!Songplaying)
                     {
-                        ped_row++;
-                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                        ped_line += ped_pattad;
+                        if(!ped_pattad)
+                        {
+                            ped_row++;
+                            gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                        }
                     }
                 }
+                Actupated(0);
             }
-            Actupated(0);
         }
     }
 }
