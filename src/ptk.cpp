@@ -2263,7 +2263,7 @@ void Keyboard_Handler(void)
     }
 
     // Next note
-    if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
+    if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB] && !Key_Unicode)
     {
         Unselect_Selection();
         ped_row += Table_Right_Tab_Notes[ped_row];

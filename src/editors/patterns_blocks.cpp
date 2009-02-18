@@ -1,8 +1,6 @@
 /* LEFT:
 void Copy_Selection_To_Buffer(int Position)
 void Paste_Selection_From_Buffer(int Position)
-void Interpolate_Block(int Position)
-void Randomize_Block(int Position)
 */
 
 // ------------------------------------------------------
@@ -524,27 +522,30 @@ void Interpolate_Block(int Position)
     int end_value;
     int xbc;
     int ybc;
+    int type;
+    int max_columns = Get_Max_Nibble_All_Tracks();
 
     SELECTION Sel = Get_Real_Selection();
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % Get_Max_Nibble_Track_From_Nibble(xbc))
+        type = Get_Column_Type(xbc);
+        switch(type)
         {
-            case 3:
-            case 4:
+            case VOLUMEHI:
+            case VOLUMELO:
                 startvalue[0] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
                 endvalue[0] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
 
-            case 5:
-            case 6:
+            case PANNINGHI:
+            case PANNINGLO:
                 startvalue[1] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
                 endvalue[1] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
 
-            case 9:
-            case 10:
+            case EFFECTDATHI:
+            case EFFECTDATLO:
                 startvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
                 endvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
@@ -553,52 +554,61 @@ void Interpolate_Block(int Position)
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
-        switch(xbc % Get_Max_Nibble_Track_From_Nibble(xbc))
+        type = Get_Column_Type(xbc);
+        switch(type)
         {
-            case 3:
-            case 4:
+            case VOLUMEHI:
+            case VOLUMELO:
                 start_value = startvalue[0];
                 end_value = endvalue[0];
                 break;
-            case 5:
-            case 6:
+            
+            case PANNINGHI:
+            case PANNINGLO:
                 start_value = startvalue[1];
                 end_value = endvalue[1];
                 break;
-            case 9:
-            case 10:
+
+            case EFFECTDATHI:
+            case EFFECTDATLO:
                 start_value = startvalue[2];
                 end_value = endvalue[2];
                 break;
         }
 
-        switch(xbc % Get_Max_Nibble_Track_From_Nibble(xbc))
+        if(start_value != 0xff || end_value != 0xff)
         {
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-                if(start_value == 0xff) start_value = 0;
-                if(end_value == 0xff) end_value = 0;
-            case 9:
-            case 10:
-                if(start_value != 0xff || end_value != 0xff)
-                {
-                    ranlen = Sel.y_end - Sel.y_start;
-                    if(ranlen == 0) ranlen = 1;
-                    cran = 0;
-                    tran = end_value - start_value;
-                    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+            switch(type)
+            {
+                case VOLUMEHI:
+                case VOLUMELO:
+                case PANNINGHI:
+                case PANNINGLO:
+                    if(start_value == 0xff) start_value = 0;
+                    if(end_value == 0xff) end_value = 0;
+
+                    // No break
+
+                case EFFECTDATHI:
+                case EFFECTDATLO:
+                    if(start_value != 0xff || end_value != 0xff)
                     {
-                        if(xbc < (16 * Get_Max_Nibble_Track_From_Nibble(xbc)) && ybc < MAX_ROWS)
+                        ranlen = Sel.y_end - Sel.y_start;
+                        if(ranlen == 0) ranlen = 1;
+                        cran = 0;
+                        tran = end_value - start_value;
+                        for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
                         {
-                            int c_val = (cran * tran) / ranlen;
-                            Write_Pattern_Column(Position, xbc, ybc, start_value + c_val);
-                            cran++;
+                            if(xbc < max_columns && ybc < MAX_ROWS)
+                            {
+                                int c_val = (cran * tran) / ranlen;
+                                Write_Pattern_Column(Position, xbc, ybc, start_value + c_val);
+                                cran++;
+                            }
                         }
                     }
-                }
-                break;
+                    break;
+            }
         }
     }
     Actupated(0);
@@ -611,40 +621,47 @@ void Randomize_Block(int Position)
     int ybc;
     int xbc;
     int value;
+    int type;
+    int max_columns = Get_Max_Nibble_All_Tracks();
 
     SELECTION Sel = Get_Real_Selection();
+
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
         {
-            if(xbc < (16 * Get_Max_Nibble_Track_From_Nibble(xbc)) && ybc < MAX_ROWS)
+            if(xbc < max_columns && ybc < MAX_ROWS)
             {
-                switch(xbc % Get_Max_Nibble_Track_From_Nibble(xbc))
+                type = Get_Column_Type(xbc);
+                switch(type)
                 {
-                    case 3:
-                    case 4:
-                        Write_Pattern_Column(Position, xbc, ybc, (rand() / 128));
+                    case VOLUMEHI:
+                    case VOLUMELO:
+                        Write_Pattern_Column(Position, xbc, ybc, (rand() & 0x7f));
                         break;
-                    case 5:
+
+                    case PANNINGHI:
                         value = (rand() / 128) & 0xf0;
-                        if(value > 0x90) value = 0x90;
+                        if(value > 0x80) value = 0x80;
                         if((Read_Pattern_Column(Position, xbc + 1, ybc) & 0xf) > 0 &&
-                                                value == 0x90)
+                                                value == 0x80)
                         {
                             value = 0x80;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, value & 0xf0);
                         break;
-                    case 6:
+
+                    case PANNINGLO:
                         value = rand() / 128;
-                        if((Read_Pattern_Column(Position, xbc - 1, ybc) & 0xf0) == 0x90)
+                        if((Read_Pattern_Column(Position, xbc - 1, ybc) & 0xf0) > 0x80)
                         {
                             value = 0;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, value & 0xf);
                         break;
-                    case 9:
-                    case 10:
+
+                    case EFFECTDATHI:
+                    case EFFECTDATLO:
                         Write_Pattern_Column(Position, xbc, ybc, (rand() / 128));
                         break;
                 }
