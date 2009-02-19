@@ -33,7 +33,7 @@ v1.90:
 - Some edition commands weren't working on last track.
 - Midi channels polyphony implemented.
 - Improved Mac OS X keyboard handling a bit.
-- Compressor was set right when loading .ptp files.
+- Compressor wasn't set right when loading .ptp files.
 
 v1.86b:
 
