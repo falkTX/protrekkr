@@ -2254,6 +2254,9 @@ void Keyboard_Handler(void)
     // Next note
 #if defined(__WIN32__)
     if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB] && !Key_Unicode)
+#endif
+#if defined(__LINUX__)
+    if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB] && Keys_Sym[SDLK_TAB])
 #else
     if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
 #endif
@@ -3005,6 +3008,8 @@ void Keyboard_Handler(void)
                 is_record_key = FALSE;
                 is_editing = TRUE;
                 Songplaying = TRUE;
+                ped_line = 0;
+                ped_line_delay = 0;
                 key_record_first_time = FALSE;
                 old_key_ped_line = ped_line;
                 Clear_Midi_Channels_Pool();
@@ -3202,7 +3207,6 @@ void Keyboard_Handler(void)
                 // Paste the block buffer into a pattern
                 if(Keys[SDLK_v - UNICODE_OFFSET2] && block_start_track_nibble != -1 && block_end_track_nibble != -1 && is_editing)
                 {
-                    printf("fuck\n");
                     Paste_Block(Cur_Position);
                 }
 
@@ -3307,7 +3311,7 @@ void Keyboard_Handler(void)
                     if(ped_col == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
                     if(ped_col == (7 + j)) ped_cell = PATTERN_FX;           // fx
                     if(ped_col == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
-            
+
                     ltretvalue = retvalue;
                     xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
 
