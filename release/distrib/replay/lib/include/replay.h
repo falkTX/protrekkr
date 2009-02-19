@@ -273,7 +273,7 @@ void Sp_Player(void);
 void Play_Instrument(int channel, int sub_channel,
                      float note, int sample,
                      float vol, unsigned int offset,
-                     int glide, int Play_Selection);
+                     int glide, int Play_Selection, int midi_sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
 void GetPlayerValues(float master_coef);
@@ -284,7 +284,7 @@ void Post_Song_Init(void);
 void ResetSynthParameters(SynthParameters *TSP);
 void Free_Samples(void);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
-int Get_Free_Sub_Channel(int channel);
+int Get_Free_Sub_Channel(int channel, int polyphony);
 int Get_Pattern_Offset(int pattern, int track, int row);
 
 #endif

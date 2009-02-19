@@ -30,6 +30,7 @@ v1.90:
   to select one or all notes/instruments columns of a track.
 - Modified the record function (for a better one, i hope).
 - Some edition commands weren't working on last track.
+- Midi channels polyphony implemented.
 
 v1.86b:
 

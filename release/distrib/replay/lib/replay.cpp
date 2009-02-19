@@ -380,7 +380,6 @@ int DelayType;
     char Midiprg[128];
     int LastProgram[MAX_TRACKS];
     int wait_level;
-    extern int Midi_Track_Notes[MAX_TRACKS][MAX_POLYPHONY];
     char nameins[128][20];
     char SampleName[128][16][64];
     unsigned char nPatterns = 1;
@@ -406,6 +405,9 @@ static unsigned long ctz[64] =
     3, 0, 1, 0, 2, 0, 1, 0,
 };
 #endif
+
+extern int Midi_Notes_History[MAX_TRACKS][256];
+extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 
 // ------------------------------------------------------
 // Functions
@@ -766,7 +768,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 
         // Multi notes
-        Mod_Dat_Read(Channels_MultiNotes, sizeof(char), Songtracks, in);
+        Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
 
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
@@ -1574,7 +1576,7 @@ void Sp_Player(void)
                     {
                         // Get a new virtual channel to associate with the note
                         int old_channel = Reserved_Sub_Channels[ct][i];
-                        free_sub_channel = Get_Free_Sub_Channel(ct);
+                        free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
                         if(free_sub_channel == -1) free_sub_channel = i;
                         // Save it for later
 
@@ -1600,7 +1602,7 @@ void Sp_Player(void)
                                             sp_Tvol[ct][free_sub_channel],
                                             toffset,
                                             glide,
-                                            FALSE);
+                                            FALSE, i + 1);
                         }
                         else
                         {
@@ -1613,7 +1615,7 @@ void Sp_Player(void)
                                             CustomVol[pl_sample[i]],
                                             toffset,
                                             glide,
-                                            FALSE);
+                                            FALSE, i + 1);
                         }
 
                     }
@@ -1633,6 +1635,17 @@ void Sp_Player(void)
                             Synthesizer[ct][j].NoteOff();
                             Reserved_Sub_Channels[ct][i] = -1;
                         }
+
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
+                        if(Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i])
+                        {
+                            Midi_NoteOff(ct, Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i]);
+                            Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i] = 0;
+                        }
+#endif
+#endif
+
                     }
                 }
 
@@ -1640,12 +1653,6 @@ void Sp_Player(void)
                 {
 #if defined(PTK_303)
                     noteoff303(ct); // 303 Note Off...
-#endif
-
-#if !defined(__STAND_ALONE__)
-#if !defined(__NO_MIDI__)
-                    Midi_NoteOff(ct);
-#endif
 #endif
                 }
 
@@ -2041,7 +2048,7 @@ ByPass_Wav:
 
 #if !defined(__STAND_ALONE__)
     #if !defined(__NO_MIDI__)
-            Midi_NoteOff(c);
+            Midi_NoteOff(c, -1);
     #endif
 #endif
 
@@ -2372,11 +2379,11 @@ ByPass_Wav:
 
 // ------------------------------------------------------
 // Look for a free sub channel
-int Get_Free_Sub_Channel(int channel)
+int Get_Free_Sub_Channel(int channel, int polyphony)
 {
     int i;
 
-    for(i = 0; i < Channels_Polyphony[channel]; i++)
+    for(i = 0; i < polyphony; i++)
     {
         if(sp_Stage[channel][i] == PLAYING_NOSAMPLE &&
            sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
@@ -2386,7 +2393,7 @@ int Get_Free_Sub_Channel(int channel)
         }
     }
 
-    for(i = 0; i < Channels_Polyphony[channel]; i++)
+    for(i = 0; i < polyphony; i++)
     {
         if(sp_Stage[channel][i] == PLAYING_SAMPLE_NOTEOFF)
         {
@@ -2403,7 +2410,7 @@ int Get_Free_Sub_Channel(int channel)
 void Play_Instrument(int channel, int sub_channel,
                      float note, int sample,
                      float vol, unsigned int offset,
-                     int glide, int Play_Selection)
+                     int glide, int Play_Selection, int midi_sub_channel)
 {
 
 #if defined(PTK_FX_AUTOFADEMODE)
@@ -2523,8 +2530,16 @@ void Play_Instrument(int channel, int sub_channel,
 
         // Only synth
         sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
-        sp_Stage2[channel][sub_channel] = PLAYING_STOCK;
-        sp_Stage3[channel][sub_channel] = PLAYING_STOCK;
+        if(Synthprg[sample] == 0)
+        {
+            sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
+            sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
+        }
+        else
+        {
+            sp_Stage2[channel][sub_channel] = PLAYING_STOCK;
+            sp_Stage3[channel][sub_channel] = PLAYING_STOCK;
+        }
 
         sp_channelsample[channel][sub_channel] = sample;
 
@@ -2682,25 +2697,30 @@ void Play_Instrument(int channel, int sub_channel,
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-        if(CHAN_MUTE_STATE[midi_channel] == 0 &&
+        if(CHAN_MUTE_STATE[channel] == 0 &&
            c_midiout != -1 &&
            Midiprg[associated_sample] != -1)
         {
-            int midi_channel = channel;
-            Midi_NoteOff(midi_channel);
+            // Remove the previous note
+            if(midi_sub_channel >= 1 && Midi_Current_Notes[CHAN_MIDI_PRG[channel]][midi_sub_channel - 1])
+            {
+                Midi_NoteOff(channel, Midi_Current_Notes[CHAN_MIDI_PRG[channel]][midi_sub_channel - 1]);
+                Midi_Current_Notes[CHAN_MIDI_PRG[channel]][midi_sub_channel - 1] = 0;
+            }
 
             // Set the midi program if it was modified
-            if(LastProgram[CHAN_MIDI_PRG[midi_channel]] != Midiprg[associated_sample])
+            if(LastProgram[CHAN_MIDI_PRG[channel]] != Midiprg[associated_sample])
             {
-                Midi_Send(192 + CHAN_MIDI_PRG[midi_channel], Midiprg[associated_sample], 127);
-                LastProgram[CHAN_MIDI_PRG[midi_channel]] = Midiprg[associated_sample];
+                Midi_Send(192 + CHAN_MIDI_PRG[channel], Midiprg[associated_sample], 127);
+                LastProgram[CHAN_MIDI_PRG[channel]] = Midiprg[associated_sample];
             }
 
             // Send the note to the midi device
             float veloc = vol * mas_vol;
 
-            Midi_Track_Notes[CHAN_MIDI_PRG[channel]][sub_channel] = mnote;
             Midi_Send(144 + CHAN_MIDI_PRG[channel], mnote, (int) (veloc * 127));
+            if(midi_sub_channel < 0) Midi_Current_Notes[CHAN_MIDI_PRG[channel]][(-midi_sub_channel) - 1] = mnote;
+            else Midi_Current_Notes[CHAN_MIDI_PRG[channel]][midi_sub_channel - 1] = mnote;
         }
 #endif // __NO_MIDI
 #endif // __STAND_ALONE__
@@ -2901,13 +2921,17 @@ void DoEffects(void)
                         else sp_Tvol[trackef][i] = 0.001f;
                     }
                     Synthesizer[trackef][i].NoteOff();
-                }
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-                Midi_NoteOff(trackef);
+                    if(Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][i])
+                    {
+                        Midi_NoteOff(trackef, Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][i]);
+                        Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][i] = 0;
+                    }
 #endif
 #endif
+                }
             }
         }
 #endif
@@ -3071,7 +3095,7 @@ void DoEffects(void)
                     {
                         int old_channel = Reserved_Sub_Channels[trackef][i];
                         // Get a new virtual channel to associate with the note
-                        free_sub_channel = Get_Free_Sub_Channel(trackef);
+                        free_sub_channel = Get_Free_Sub_Channel(trackef, Channels_Polyphony[trackef]);
                         if(free_sub_channel == -1) free_sub_channel = i;
 
                         // Check if that sub channel was playing a note
@@ -3093,7 +3117,7 @@ void DoEffects(void)
                                             (float) pltr_note[i], pltr_sample[i],
                                             pltr_vol_row * 0.015625f,
                                             0, 0,
-                                            FALSE);
+                                            FALSE, i + 1);
                         }
                         else
                         {
@@ -3101,7 +3125,7 @@ void DoEffects(void)
                                             (float) pltr_note[i], pltr_sample[i],
                                             CustomVol[pltr_sample[i]],
                                             0, 0,
-                                            FALSE);
+                                            FALSE, i + 1);
                         }
                     }
                 }

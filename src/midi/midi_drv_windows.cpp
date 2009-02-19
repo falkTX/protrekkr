@@ -29,7 +29,9 @@ signed char c_midiout = -1;
 signed char n_midioutdevices = 0;
 signed char n_midiindevices = 0;
 
-extern int Midi_Track_Notes[MAX_TRACKS];
+int Midi_Notes_History[MAX_TRACKS][256];
+int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+int Midi_Notes_History_Amount;
 
 // ------------------------------------------------------
 // Functions
@@ -162,12 +164,34 @@ void Midi_FreeAll(void)
 
 // ------------------------------------------------------
 // Turn a midi channel off
-void Midi_NoteOff(int channel, int sub_channel)
+void Midi_NoteOff(int channel, int note)
 {
+    int i;
     if(c_midiout != -1)
     {
+        note++;
         midiOutShortMsg(midiout_handle, (176 + CHAN_MIDI_PRG[channel]) | (0x40 << 8) | (0 << 16)); 
-        midiOutShortMsg(midiout_handle, (0x80 + CHAN_MIDI_PRG[channel]) | (Midi_Track_Notes[CHAN_MIDI_PRG[channel]][sub_channel] << 8) | (127 << 16)); 
+        if(note != -1)
+        {
+            for(i = 0; i < 256; i++)
+            {
+                if(Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] == note)
+                {
+                    midiOutShortMsg(midiout_handle, (0x80 + CHAN_MIDI_PRG[channel]) | ((note - 1) << 8) | (127 << 16)); 
+                    Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] = 0;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(i = 0; i < 256; i++)
+            {
+                midiOutShortMsg(midiout_handle, (0x80 + CHAN_MIDI_PRG[channel]) | ((Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] - 1) << 8) | (127 << 16)); 
+                Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] = 0;
+            }
+            Midi_Notes_History_Amount = 0;
+        }
     }
 }
 
@@ -175,8 +199,21 @@ void Midi_NoteOff(int channel, int sub_channel)
 // Send a command to the midi out device
 void Midi_Send(int nbr_track, int eff_dat, int row_dat)
 {
+    int i;
     if(c_midiout != -1)
     {
+        if((nbr_track & 0xfff0) == 144)
+        {
+            for(i = 0; i < 256; i++)
+            {
+                // First empty channel
+                if(Midi_Notes_History[nbr_track & 0xf][i] == 0)
+                {
+                    Midi_Notes_History[nbr_track & 0xf][i] = eff_dat + 1;
+                    break;
+                }
+            }
+        }
         midiOutShortMsg(midiout_handle, nbr_track | (eff_dat << 8) | (row_dat << 16)); 
     }
 }

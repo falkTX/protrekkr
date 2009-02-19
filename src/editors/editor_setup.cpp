@@ -25,6 +25,8 @@ extern int Keyboard_Idx;
 
 int current_palette_idx;
 
+extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+
 char *Labels_AutoSave[] =
 {
     "Off",
@@ -548,7 +550,12 @@ void Mouse_Left_Master_Ed(void)
 #if !defined(__NO_MIDI__)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
-            Midi_NoteOff(ped_track);
+            Midi_NoteOff(ped_track, -1);
+            int i;
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Midi_Current_Notes[CHAN_MIDI_PRG[ped_track]][i] = 0;
+            }
             gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
         }
 #endif

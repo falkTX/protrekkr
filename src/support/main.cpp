@@ -58,6 +58,8 @@ unsigned short Keys_Raw[65535];
 unsigned short Keys_Unicode[65535];
 int Keyboard_Nbr_Events;
 int Keyboard_Events[256];
+int Keyboard_Notes_Type[256];
+int Keyboard_Notes_Bound[256];
 int Key_Unicode;
 char FullScreen = FALSE;
 char AutoSave;
@@ -553,15 +555,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         memset(Keys, 0, sizeof(Keys));
         memset(Keys_Sym, 0, sizeof(Keys_Sym));
         memset(Keys_Unicode, 0, sizeof(Keys_Raw));
-        //memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw));
 
         SDL_PumpEvents();
         int Nbr_Events = SDL_PeepEvents(Events, MAX_EVENTS, SDL_GETEVENT, 0xffffff);
         int Symbol;
         int Scancode;
 
-        Keyboard_Nbr_Events = 0;
-        memset(Keyboard_Events, 0, sizeof(Keyboard_Events));
         for(int i = 0; i < Nbr_Events; i++)
         {
             switch(Events[i].type)
@@ -595,8 +594,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         Keys_Raw[Scancode] = TRUE;
                         Keys_Raw_Off[Scancode] = FALSE;
                         Keys_Raw_Repeat[Scancode] = TRUE;
-                        Keyboard_Events[Keyboard_Nbr_Events] = Scancode;
-                        Keyboard_Nbr_Events++;
+
+                        if(!is_recording_2 && is_editing)
+                        {
+                            Send_Note(Scancode, FALSE, TRUE);
+                        }
                     }
 
                     // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY
@@ -630,6 +632,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Scancode = Translate_Locale_Key(Symbol);
                     Keys_Raw_Off[Scancode] = TRUE;
                     Keys_Raw_Repeat[Scancode] = FALSE;
+
+                    if(!is_recording_2 && is_editing)
+                    {
+                        Send_Note(Scancode | 0x80, FALSE, TRUE);
+                    }
                     break;
 
                 case SDL_MOUSEBUTTONUP:
