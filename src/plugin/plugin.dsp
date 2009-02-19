@@ -92,11 +92,15 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\Files.cpp
+SOURCE=..\files\files.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\MAIN.Cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\editors\patterns_blocks.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"

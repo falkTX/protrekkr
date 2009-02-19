@@ -35,11 +35,20 @@ BOOL WINAPI _DllMainCRTStartup(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lp
 extern unsigned char *RawPatterns;
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
 int LoadMod(char *FileName);
-int calc_length(void);
+int Calc_Length(void);
+int Alloc_Patterns_Pool(void);
 extern float mas_vol;
-extern char modname[22];
-extern char artist[20];
-extern char style[20];
+
+char modname[22];
+char artist[20];
+char style[20];
+char SampleName[128][16][64];
+char Midiprg[128];
+char nameins[128][20];
+
+int CHAN_MIDI_PRG[MAX_TRACKS];
+char CHAN_HISTORY_STATE[256][16];
+
 int check_file_type(char *extension);
 // ----------------------------------------------------------------
 
@@ -78,26 +87,32 @@ void about(HWND hwndParent)
 		                  MB_OK | MB_ICONINFORMATION);
 }
 
-void init() { 
-    /* any one-time initialization goes here (configuration reading, etc) */ 
-    if((RawPatterns = (unsigned char *) malloc(PBLEN)) != NULL) { // 6144 bytes per pattern
-        for(int inicial = 0; inicial < PBLEN; inicial += 6) {
-            *(RawPatterns + inicial) = 121;     //121
-            *(RawPatterns + inicial + 1) = 255; //255
-            *(RawPatterns + inicial + 2) = 255; //255
-            *(RawPatterns + inicial + 3) = 255; //255
-            *(RawPatterns + inicial + 4) = 0;   //0
-            *(RawPatterns + inicial + 5) = 0;   //0
-        }
+// ------------------------------------------------------
+// Reset the channels polyphonies  to their default state
+void Set_Default_Channels_Polyphony(void)
+{
+    int i;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        Channels_Polyphony[i] = DEFAULT_POLYPHONY;
     }
 }
 
-void quit() { 
+void init()
+{ 
+    Ptk_InitDriver();
+    Alloc_Patterns_Pool();
+}
+
+void quit()
+{ 
     /* one-time deinit, such as memory freeing */ 
     if(RawPatterns) free(RawPatterns);
 }
 
-int isourfile(const char *fn) { 
+int isourfile(const char *fn)
+{
 // used for detecting URL streams.. unused here. 
 // return !strncmp(fn,"http://",7); to detect HTTP streams, etc
     return 0; 
@@ -113,42 +128,38 @@ int play(const char *fn)
 	decode_pos_ms = 0;
 	seek_needed = -1;
 
-//    init_sample_bank();
- //   Pre_Song_Init();
-//    Post_Song_Init();
-
     if(!LoadMod((char *) fn))
     {
 		// we return error. 1 means to keep going in the playlist, -1
 		// means to stop the playlist.
 		return 1;
 	}
-	file_length=calc_length();
+	file_length = Calc_Length();
 
-	strcpy(lastfn,fn);
+	strcpy(lastfn, fn);
 
 	// -1 and -1 are to specify buffer and prebuffer lengths.
 	// -1 means to use the default, which all input plug-ins should
 	// really do.
-	maxlatency = mod.outMod->Open(SAMPLERATE,NCH,BPS, -1,-1); 
+	maxlatency = mod.outMod->Open(SAMPLERATE, NCH, BPS, -1, -1); 
 
 	// maxlatency is the maxium latency between a outMod->Write() call and
 	// when you hear those samples. In ms. Used primarily by the visualization
 	// system.
 
-	if (maxlatency < 0) // error opening device
+	if(maxlatency < 0) // error opening device
 	{
 		//CloseHandle(input_file);
-		input_file=INVALID_HANDLE_VALUE;
+		input_file = INVALID_HANDLE_VALUE;
 		return 1;
 	}
 	// dividing by 1000 for the first parameter of setinfo makes it
 	// display 'H'... for hundred.. i.e. 14H Kbps.
-	mod.SetInfo((SAMPLERATE*BPS*NCH)/1000,SAMPLERATE/1000,NCH,1);
+	mod.SetInfo((SAMPLERATE * BPS * NCH) / 1000, SAMPLERATE / 1000, NCH, 1);
 
 	// initialize visualization stuff
-	mod.SAVSAInit(maxlatency,SAMPLERATE);
-	mod.VSASetInfo(SAMPLERATE,NCH);
+	mod.SAVSAInit(maxlatency, SAMPLERATE);
+	mod.VSASetInfo(SAMPLERATE, NCH);
 
 	// set the output plug-ins default volume.
 	// volume is 0-255, -666 is a token for
@@ -159,26 +170,26 @@ int play(const char *fn)
     done = 0;
 
 	// launch decode thread
-	killDecodeThread=0;
-	thread_handle = (HANDLE) 
-		CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) DecodeThread,NULL,0,&thread_id);
+	killDecodeThread = 0;
+	thread_handle = (HANDLE) CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) DecodeThread, NULL, 0, &thread_id);
 	
 	return 0; 
 }
 
 // standard pause implementation
-void pause() { paused=1; mod.outMod->Pause(1); }
-void unpause() { paused=0; mod.outMod->Pause(0); }
+void pause() { paused = 1; mod.outMod->Pause(1); }
+void unpause() { paused = 0; mod.outMod->Pause(0); }
 int ispaused() { return paused; }
 
 
 // stop playing.
-void stop() { 
+void stop()
+{
 
 	if (thread_handle != INVALID_HANDLE_VALUE)
 	{
 		killDecodeThread=1;
-		if (WaitForSingleObject(thread_handle,10000) == WAIT_TIMEOUT)
+		if (WaitForSingleObject(thread_handle, 10000) == WAIT_TIMEOUT)
 		{
 			MessageBox(mod.hMainWindow,
 			            "error asking thread to die!\n",
@@ -196,11 +207,7 @@ void stop() {
 	// deinitialize visualization
 	mod.SAVSADeInit();
 	
-
-	// CHANGEME! Write your own file closing code here
     Ptk_Stop();
-    Ptk_InitDriver();
-
 }
 
 // returns length of playing track
@@ -282,7 +289,7 @@ void getfileinfo(const char *filename, char *title, int *length_in_ms)
 		{
 			//char *p=lastfn+strlen(lastfn);
 			//while (*p != '\\' && p >= lastfn) p--;
-			strcpy(title,modname);
+			strcpy(title, modname);
 		}
 	}
 	else // some other file
@@ -431,7 +438,7 @@ In_Module mod =
 	,
 	0,	// hMainWindow (filled in by winamp)
 	0,  // hDllInstance (filled in by winamp)
-	"PTK\0Protrekkr Module File (*.PTK)\0"
+	"PTK\0Protrekkr Module File (*.PTK)\0PTP\0Protrekkr Packed Module File (*.PTP)\0"
 	// this is a double-null limited list. "EXT\0Description\0EXT\0Description\0" etc.
 	,
 	1,	// is_seekable

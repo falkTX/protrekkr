@@ -208,6 +208,52 @@ void Save_303_Data(int (*Write_Function)(void *, int ,int, FILE *),
                    FILE *in, int unit, int pattern);
 
 // ------------------------------------------------------
+// Prepare the tracker interface once a module has been loaded
+void Init_Tracker_Context_After_ModLoad(void)
+{
+#if !defined(__WINAMP__)
+    ped_track = 0;
+    ped_patsam = 0;
+    ped_col = 0;
+#endif
+
+    ped_line_delay = 0;
+    cPosition = 0;
+    cPosition_delay = 0;
+
+    Final_Mod_Length = 0;
+
+    Post_Song_Init();
+
+#if !defined(__WINAMP__)
+    Draw_Scope();
+    gui_track = 0;
+#endif
+
+    lchorus_counter = 44100;
+    rchorus_counter = 44100;
+    lchorus_counter2 = 44100 - lchorus_delay;
+    rchorus_counter2 = 44100 - rchorus_delay;
+    Initreverb();
+
+    Mas_Compressor_Set_Variables(mas_comp_threshold, mas_comp_ratio);
+    Reset_Song_Length();
+
+#if !defined(__WINAMP__)
+    Display_Song_Length();
+
+    Scopish = SCOPE_ZONE_MOD_DIR;
+    Draw_Scope_Files_Button();
+
+    Reset_Tracks_To_Render();
+
+    Refresh_UI_Context();
+#endif
+
+}
+
+#if !defined(__WINAMP__)
+// ------------------------------------------------------
 // Convert an amiga note for our own purpose
 int Conv_Amiga_Note(int note)
 {
@@ -220,42 +266,6 @@ int Conv_Amiga_Note(int note)
         }
     }
     return(121);
-}
-
-// ------------------------------------------------------
-// Prepare the tracker interface once a module has been loaded
-void Init_Tracker_Context_After_ModLoad(void)
-{
-    ped_track = 0;
-    ped_patsam = 0;
-    ped_col = 0;
-    ped_line_delay = 0;
-    cPosition = 0;
-    cPosition_delay = 0;
-
-    Final_Mod_Length = 0;
-
-    Post_Song_Init();
-    Draw_Scope();
-
-    gui_track = 0;
-    //Set_Track_Slider(gui_track);
-    lchorus_counter = 44100;
-    rchorus_counter = 44100;
-    lchorus_counter2 = 44100 - lchorus_delay;
-    rchorus_counter2 = 44100 - rchorus_delay;
-    Initreverb();
-
-    Mas_Compressor_Set_Variables(mas_comp_threshold, mas_comp_ratio);
-    Reset_Song_Length();
-    Display_Song_Length();
-
-    Scopish = SCOPE_ZONE_MOD_DIR;
-    Draw_Scope_Files_Button();
-
-    Reset_Tracks_To_Render();
-
-    Refresh_UI_Context();
 }
 
 // ------------------------------------------------------
@@ -293,7 +303,7 @@ void LoadAmigaMod(char *FileName, int channels)
         Free_Samples();
         Clear_Patterns_Pool();
 
-#if !defined(__NO_MIDI__)
+#if !defined(__NO_MIDI__) && !defined(__WINAMP__)
         Midi_Reset();
 #endif
 
@@ -651,11 +661,12 @@ void LoadAmigaMod(char *FileName, int channels)
 
     if(snamesel == 1 || snamesel == 4 || snamesel == 5) snamesel = 0;
 }
+#endif // __WINAMP__
 
 // ------------------------------------------------------
 // Load a module file
 // TODO: split this one in 2
-void LoadMod(char *FileName)
+int LoadMod(char *FileName)
 {
     int Ye_Old_Phony_Value;
     int Ptk_Format = FALSE;
@@ -691,8 +702,11 @@ void LoadMod(char *FileName)
     Mod_Mem_Pos = 0;
     Mod_Memory = NULL;
 
+#if !defined(__WINAMP__)
     SongStop();
+
     mess_box("Attempting to load the song file...");
+#endif
 
     FILE *in;
     in = fopen(FileName, "rb");
@@ -748,17 +762,21 @@ void LoadMod(char *FileName)
 
 Read_Mod_File:
 
+#if !defined(__WINAMP__)
             mess_box("Loading song -> Header");
+#endif
             Free_Samples();
 
             mas_comp_threshold = 100.0f;
             mas_comp_ratio = 0.0f;
 
+#if !defined(__WINAMP__)
             allow_save = Ptk_Format;
+#endif
 
             Clear_Patterns_Pool();
 
-#if !defined(__NO_MIDI__)
+#if !defined(__NO_MIDI__) && !defined(__WINAMP__)
             Midi_Reset();
 #endif
 
@@ -904,7 +922,10 @@ Read_Mod_File:
                 }
             }
 
+#if !defined(__WINAMP__)
             mess_box("Loading song -> Sample data");
+#endif
+
             if(Ptk_Format)
             {
                 for(int swrite = 0; swrite < 128; swrite++)
@@ -1180,7 +1201,9 @@ Read_Mod_File:
                 }
             }
 
+#if !defined(__WINAMP__)
             mess_box("Loading song -> Track info, patterns and sequence.");   
+#endif
 
             Set_Default_Channels_Polyphony();
 
@@ -1223,7 +1246,7 @@ Read_Mod_File:
                         Read_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
                         if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
                         if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
-                    
+
                         Read_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
                         if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
                         if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
@@ -1277,10 +1300,12 @@ Read_Mod_File:
                     if(Comp_Flag)
                     {
                         Read_Mod_Data(&mas_comp_threshold, sizeof(float), 1, in);
+                        mas_comp_threshold *= 1000.0f;
                         if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
                         if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
                     
                         Read_Mod_Data(&mas_comp_ratio, sizeof(float), 1, in);
+                        mas_comp_ratio *= 100.0f;
                         if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
                         if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
                     }
@@ -1555,20 +1580,37 @@ Read_Mod_File:
             // Init the tracker context
             Init_Tracker_Context_After_ModLoad();
 
+#if !defined(__WINAMP__)
             mess_box("Module loaded sucessfully...");
+#endif
+
         }
         else
         {
+
+#if !defined(__WINAMP__)
             mess_box("That file is not a suitable module file...");
+#endif
+
+            return(FALSE);
         }
     }
     else
     {
+
+#if !defined(__WINAMP__)
         mess_box("Module loading failed. (Probably: file not found)");
+#endif
+
+        return(FALSE);
     }
 
+#if !defined(__WINAMP__)
     if(snamesel == 1 || snamesel == 4 || snamesel == 5) snamesel = 0;
     if(Mod_Memory) free(Mod_Memory);
+#endif
+
+    return(TRUE);
 }
 
 // ------------------------------------------------------
@@ -1628,6 +1670,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 
 // ------------------------------------------------------
 // Save a packed sample
+#if !defined(__WINAMP__)
 void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
 {
     int PackedLen = 0;
@@ -1766,6 +1809,7 @@ int Write_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle)
     }
     return(0);
 }
+#endif // __WINAMP__
 
 // ------------------------------------------------------
 // Read data from a module file
@@ -1838,6 +1882,7 @@ int Get_File_Size(FILE *Handle)
     return(File_Size);
 }
 
+#if !defined(__WINAMP__)
 // ------------------------------------------------------
 // module saving related functions
 int Get_Instr_New_Order(int instr)
@@ -3841,6 +3886,7 @@ Uint8 *Pack_Data(Uint8 *Memory, int *Size)
     *Size = c_stream.total_out;
     return(Final_Mem_Out);
 }
+#endif // __WINAMP__
 
 // ------------------------------------------------------
 // Depack a compressed module
@@ -3865,6 +3911,7 @@ Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
 
 // ------------------------------------------------------
 // Save a packed .ptk module
+#if !defined(__WINAMP__)
 int Pack_Module(char *FileName)
 {
     FILE *output;
@@ -4120,6 +4167,7 @@ void LoadConfig(void)
 
     cur_dir = Dir_Mods;
 }
+#endif // __WINAMP__
 
 // ------------------------------------------------------
 // Switch the endianness of a 16 bit buffer
@@ -4533,3 +4581,159 @@ int Read_Data_Swap(void *value, int size, int amount, FILE *handle)
     }
     return(0);
 }
+
+// -------------------------------------
+// Calculate the length of the song in hours:minutes:seconds
+int song_Seconds;
+int song_Minutes;
+int song_Hours;
+
+int Calc_Length(void)
+{
+    int i;
+    int k;
+    int pos_patt;
+    int patt_cmd;
+    int patt_datas;
+    Uint8 *Cur_Patt;
+    float Ticks = (float) TicksPerBeat;
+    float BPM = (float) BeatsPerMin;
+    int rep_pos = 0;
+    int rep_counter = -1;
+    int have_break = 255;
+    int PosTicks;
+    int shuffle_switch;
+    int shuffle_stp = shuffle;
+    double len;
+    int nbr_ticks;
+    int Samples;
+    int ilen;
+
+    shuffle_switch = -1;
+    Samples = (int) ((60 * 44100) / (BeatsPerMin * TicksPerBeat));
+    if(shuffle_switch == 1) shuffle_stp = -((Samples * shuffle) / 200);
+    else shuffle_stp = (Samples * shuffle) / 200;
+
+    PosTicks = 0;
+    nbr_ticks = 0;
+    len = 0;
+    for(i = 0; i < sLength; i++)
+    {
+        if(have_break < MAX_ROWS) pos_patt = have_break;
+        else pos_patt = 0;
+        have_break = 255;
+        while(pos_patt < patternLines[pSequence[i]])
+        {
+            Cur_Patt = RawPatterns + (pSequence[i] * PATTERN_LEN) + (pos_patt * PATTERN_ROW_LEN);
+            if(!PosTicks)
+            {
+                for(k = 0; k < Songtracks; k++)
+                {
+                    // Check if there's a pattern loop command
+                    // or a change in the tempo/ticks
+                    patt_cmd = Cur_Patt[PATTERN_FX];
+                    patt_datas = Cur_Patt[PATTERN_FXDATA];
+                    switch(patt_cmd)
+                    {
+                        case 0x6:
+                            if(!patt_datas)
+                            {
+                                rep_counter = -1;
+                                rep_pos = pos_patt;
+                            }
+                            else
+                            {
+                                if(rep_counter == -1)
+                                {
+                                    rep_counter = (int) patt_datas;
+                                    pos_patt = rep_pos;
+                                }
+                                else
+                                {
+                                    // count
+                                    rep_counter--;
+                                    if(rep_counter)
+                                    {
+                                        pos_patt = rep_pos;
+                                    }
+                                    else
+                                    {
+                                        rep_counter = -1;
+                                        rep_pos = 0;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 0xd:
+                            if(patt_datas < MAX_ROWS) have_break = patt_datas;
+                            break;
+                        
+                        case 0xf:
+                            Ticks = (float) patt_datas;
+                            break;
+    
+                        case 0xf0:
+                            BPM = (float) patt_datas;
+                            break;
+                    }
+                    Cur_Patt += PATTERN_BYTES;
+                }
+            }
+            Samples = (int) ((60 * 44100) / (BPM * Ticks));
+
+            PosTicks++;
+            if(PosTicks > Samples + shuffle_stp)
+            {
+
+                shuffle_switch = -shuffle_switch;
+
+                if(shuffle_switch == 1)
+                {
+                    shuffle_stp = -((Samples * shuffle) / 200);
+                }
+                else
+                {
+                    shuffle_stp = (Samples * shuffle) / 200;
+                }
+                len += PosTicks - 1;
+
+                nbr_ticks++;
+                PosTicks = 0;
+                if(have_break > 127)
+                {
+                    pos_patt++;
+                }
+                else
+                {
+                    // End the pattern here
+                    pos_patt = patternLines[pSequence[i]];
+                    rep_counter = -1;
+                    rep_pos = 0;
+                }
+            }
+        }
+    }
+    len /= 44100;
+
+    ilen = (int) len;
+
+    song_Seconds = (int) ilen;
+    song_Seconds %= 60;
+    song_Minutes = (ilen / 60);
+    song_Hours = ilen / 60 / 24;
+
+#if !defined(__WINAMP__)
+    Display_Song_Length();
+#endif
+
+    return((int) (len * 1000));
+}
+
+void Reset_Song_Length(void)
+{
+    song_Hours = 0;
+    song_Minutes = 0;
+    song_Seconds = 0;
+}
+

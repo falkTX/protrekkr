@@ -11,6 +11,7 @@
 
 // ------------------------------------------------------
 // Structures
+#if !defined(__WINAMP__)
 typedef struct
 {
     int x_start;
@@ -39,8 +40,6 @@ int swap_block_end_track_nibble = -1;
 int swap_block_start = 0;
 int swap_block_end = 0;
 unsigned char *BuffBlock;
-//unsigned char *BuffPatt;
-//unsigned char *BuffTrack;
 
 int start_buff_nibble;
 char Buff_MultiNotes[MAX_TRACKS];
@@ -49,30 +48,10 @@ char Buff_MultiNotes[MAX_TRACKS];
 // Init the blocks datas and buffers
 int Init_Block_Work(void)
 {
-//    int i;
-
-    //BuffPatt = (unsigned char *) malloc(PATTERN_LEN);
-    //if(!BuffPatt) return(FALSE);
-//    BuffTrack = (unsigned char *) malloc(PATTERN_TRACK_LEN);
-    //if(!BuffTrack) return(FALSE);
     BuffBlock = (unsigned char *) malloc(PATTERN_LEN);
     if(!BuffBlock) return(FALSE);
 
-  /*  for(ipcut = 0; ipcut < PATTERN_TRACK_LEN; ipcut += PATTERN_BYTES)
-    {
-        for(i = 0; i < MAX_POLYPHONY; i++)
-        {
-            *(BuffTrack + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
-            *(BuffTrack + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
-        }        
-        *(BuffTrack + ipcut + PATTERN_VOLUME) = 255;
-        *(BuffTrack + ipcut + PATTERN_PANNING) = 255;
-        *(BuffTrack + ipcut + PATTERN_FX) = 0;
-        *(BuffTrack + ipcut + PATTERN_FXDATA) = 0;
-    }  
-*/
     Clear_Buff();
-
     return(TRUE);
 }
 
@@ -85,16 +64,6 @@ void Clear_Buff(void)
 
     for(ipcut = 0; ipcut < PATTERN_LEN; ipcut += PATTERN_BYTES)
     {
-  /*      for(i = 0; i < MAX_POLYPHONY; i++)
-        {
-            *(BuffPatt + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
-            *(BuffPatt + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
-        }        
-        *(BuffPatt + ipcut + PATTERN_VOLUME) = 255;
-        *(BuffPatt + ipcut + PATTERN_PANNING) = 255;
-        *(BuffPatt + ipcut + PATTERN_FX) = 0;
-        *(BuffPatt + ipcut + PATTERN_FXDATA) = 0;
-*/
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
             *(BuffBlock + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
@@ -1132,6 +1101,7 @@ void Remove_Track_Line(int track, int Position)
 
     Actupated(0);
 }
+#endif // __WINAMP__
 
 // ------------------------------------------------------
 // Clear all patterns

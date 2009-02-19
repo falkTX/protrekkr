@@ -504,7 +504,10 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 
 #if !defined(__STAND_ALONE__)
             // Gather datas for the scopes and the vumeters
+
+#if !defined(__WINAMP__)
             if(Songplaying_Pattern)
+#endif
             {
                 clamp_left_value = (float) left_value;
                 clamp_right_value = (float) right_value;
@@ -534,6 +537,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             }
 #endif
         }
+
 #if !defined(__WINAMP__)
         if(AUDIO_GetSamples() > ((AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3)) / 4))
         {
@@ -2359,7 +2363,9 @@ ByPass_Wav:
         }
 
 #if !defined(__STAND_ALONE__)
+#if !defined(__WINAMP__)
         if(Songplaying_Pattern)
+#endif
         {
             if(!CHAN_MUTE_STATE[c])
             {
@@ -3722,7 +3728,7 @@ void live303(int pltr_eff_row, int pltr_dat_row)
         case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
     }
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
     if(!sr_isrecording) Actualize_303_Ed(0);
 #endif
 
@@ -3773,7 +3779,7 @@ void Fire303(unsigned char number, int unit)
             break;
     }
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
     if(!sr_isrecording) Actualize_303_Ed(0);
 #endif
 

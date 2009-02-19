@@ -12,9 +12,9 @@
 // Variables
 extern char CpuStr[80];
 int allow_save = TRUE;
-int song_Seconds;
-int song_Minutes;
-int song_Hours;
+extern int song_Seconds;
+extern int song_Minutes;
+extern int song_Hours;
 
 int Tracks_To_Render[MAX_TRACKS];
 char *Tracks_Labels[MAX_TRACKS] =
@@ -66,8 +66,9 @@ TRACK_POS Tracks_Position[MAX_TRACKS] =
 
 // ------------------------------------------------------
 // Functions
+int Calc_Length(void);
+void Reset_Song_Length(void);
 void Display_Song_Length(void);
-void Calc_Length(void);
 void Display_Tracks_To_Render(void);
 void Check_Tracks_To_Render(void);
 int Is_Track_To_Render_Solo(int nbr);
@@ -258,152 +259,6 @@ void Mouse_Left_DiskIO_Ed(void)
 
         Check_Tracks_To_Render();
     }
-}
-
-// -------------------------------------
-// Calculate the length of the song in hours:minutes:seconds
-void Calc_Length(void)
-{
-    int i;
-    int k;
-    int pos_patt;
-    int patt_cmd;
-    int patt_datas;
-    Uint8 *Cur_Patt;
-    float Ticks = (float) TicksPerBeat;
-    float BPM = (float) BeatsPerMin;
-    int rep_pos = 0;
-    int rep_counter = -1;
-    int have_break = 255;
-    int PosTicks;
-    int shuffle_switch;
-    int shuffle_stp = shuffle;
-    double len;
-    int nbr_ticks;
-    int Samples;
-    int ilen;
-
-    shuffle_switch = -1;
-    Samples = (int) ((60 * 44100) / (BeatsPerMin * TicksPerBeat));
-    if(shuffle_switch == 1) shuffle_stp = -((Samples * shuffle) / 200);
-    else shuffle_stp = (Samples * shuffle) / 200;
-
-    PosTicks = 0;
-    nbr_ticks = 0;
-    len = 0;
-    for(i = 0; i < sLength; i++)
-    {
-        if(have_break < MAX_ROWS) pos_patt = have_break;
-        else pos_patt = 0;
-        have_break = 255;
-        while(pos_patt < patternLines[pSequence[i]])
-        {
-            Cur_Patt = RawPatterns + (pSequence[i] * PATTERN_LEN) + (pos_patt * PATTERN_ROW_LEN);
-            if(!PosTicks)
-            {
-                for(k = 0; k < Songtracks; k++)
-                {
-                    // Check if there's a pattern loop command
-                    // or a change in the tempo/ticks
-                    patt_cmd = Cur_Patt[PATTERN_FX];
-                    patt_datas = Cur_Patt[PATTERN_FXDATA];
-                    switch(patt_cmd)
-                    {
-                        case 0x6:
-                            if(!patt_datas)
-                            {
-                                rep_counter = -1;
-                                rep_pos = pos_patt;
-                            }
-                            else
-                            {
-                                if(rep_counter == -1)
-                                {
-                                    rep_counter = (int) patt_datas;
-                                    pos_patt = rep_pos;
-                                }
-                                else
-                                {
-                                    // count
-                                    rep_counter--;
-                                    if(rep_counter)
-                                    {
-                                        pos_patt = rep_pos;
-                                    }
-                                    else
-                                    {
-                                        rep_counter = -1;
-                                        rep_pos = 0;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case 0xd:
-                            if(patt_datas < MAX_ROWS) have_break = patt_datas;
-                            break;
-                        
-                        case 0xf:
-                            Ticks = (float) patt_datas;
-                            break;
-    
-                        case 0xf0:
-                            BPM = (float) patt_datas;
-                            break;
-                    }
-                    Cur_Patt += PATTERN_BYTES;
-                }
-            }
-            Samples = (int) ((60 * 44100) / (BPM * Ticks));
-
-            PosTicks++;
-            if(PosTicks > Samples + shuffle_stp)
-            {
-
-                shuffle_switch = -shuffle_switch;
-
-                if(shuffle_switch == 1)
-                {
-                    shuffle_stp = -((Samples * shuffle) / 200);
-                }
-                else
-                {
-                    shuffle_stp = (Samples * shuffle) / 200;
-                }
-                len += PosTicks - 1;
-
-                nbr_ticks++;
-                PosTicks = 0;
-                if(have_break > 127)
-                {
-                    pos_patt++;
-                }
-                else
-                {
-                    // End the pattern here
-                    pos_patt = patternLines[pSequence[i]];
-                    rep_counter = -1;
-                    rep_pos = 0;
-                }
-            }
-        }
-    }
-    len /= 44100;
-
-    ilen = (int) len;
-    song_Seconds = (int) ilen;
-    song_Seconds %= 60;
-    song_Minutes = (ilen / 60);
-    song_Hours = ilen / 60 / 24;
-
-    Display_Song_Length();
-}
-
-void Reset_Song_Length(void)
-{
-    song_Hours = 0;
-    song_Minutes = 0;
-    song_Seconds = 0;
 }
 
 void Display_Song_Length(void)

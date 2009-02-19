@@ -28,7 +28,6 @@ void Actualize_DiskIO_Ed(int gode);
 void Mouse_Right_DiskIO_Ed(void);
 void Mouse_Left_DiskIO_Ed(void);
 void Display_Song_Length(void);
-void Reset_Song_Length(void);
 void Reset_Tracks_To_Render(void);
 
 #endif

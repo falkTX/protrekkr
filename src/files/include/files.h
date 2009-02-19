@@ -30,7 +30,7 @@ extern int mt_channels[13];
 // ------------------------------------------------------
 // Functions
 void LoadAmigaMod(char *FileName, int channels);
-void LoadMod(char *FileName);
+int LoadMod(char *FileName);
 int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory);
 int Pack_Module(char *FileName);
 int TestMod(void);
@@ -52,5 +52,8 @@ void Free_Samples(void);
 Uint8 *Pack_Data(Uint8 *Memory, int *Len);
 Uint8 *Depack_Data(Uint8 *Memory, int Size, int size_out);
 int Get_File_Size(FILE *Handle);
+
+int Calc_Length(void);
+void Reset_Song_Length(void);
 
 #endif

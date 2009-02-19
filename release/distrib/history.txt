@@ -21,7 +21,8 @@ v1.90:
 - Added multi notes channels, they can be used to trigger several notes / track
   at the same time in order to make chords or to play several instruments
   in the same track and route them to the same row effect / dsp effect
-  (thus allowing to considerably reduce the dsp usage and some modularity).
+  (thus allowing to considerably reduce the dsp usage and also introduce some
+   modularity which could be useful, especially for the PSP replay).
   Note that these channels are shared with the polyphony ones.
 - Improved volume ramping.
 - Keys repeat was disabled when editing note columns.
@@ -31,6 +32,8 @@ v1.90:
 - Modified the record function (for a better one, i hope).
 - Some edition commands weren't working on last track.
 - Midi channels polyphony implemented.
+- Improved Mac OS X keyboard handling a bit.
+- Compressor was set right when loading .ptp files.
 
 v1.86b:
 

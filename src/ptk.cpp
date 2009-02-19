@@ -134,7 +134,7 @@ int Record_Keys_State[37];
 
 void Mouse_Sliders_Master_Shuffle(void);
 void Display_Beat_Time(void);
-void Calc_Length(void);
+int Calc_Length(void);
 
 extern int Ticks_Synchro_Left;
 extern int Ticks_Synchro_Right;
