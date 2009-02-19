@@ -228,7 +228,7 @@ void Init_Tracker_Context_After_ModLoad(void)
 {
     ped_track = 0;
     ped_patsam = 0;
-    ped_row = 0;
+    ped_col = 0;
     ped_line_delay = 0;
     cPosition = 0;
     cPosition_delay = 0;

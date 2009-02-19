@@ -54,14 +54,15 @@ void Remove_Track_Line(int track, int Position);
 void Clear_Patterns_Pool(void);
 void Clear_Track_Data(int offset);
 int Alloc_Patterns_Pool(void);
-int Get_Max_Nibble_Track(int track);
-int Get_Track_Nibble_Start(int track);
-int Get_Track_From_Nibble(int nibble);
+int Get_Max_Nibble_Track(char *Buffer, int track);
+int Get_Track_Nibble_Start(char *Buffer, int track);
+int Get_Track_From_Nibble(char *Buffer, int nibble);
 void Select_All_Notes_Block(void);
-int Get_Max_Nibble_Track_From_Nibble(int nibble);
-int Get_Byte_From_Column(int nibble);
-COLUMN_TYPE Get_Column_Type(int column);
-int Get_Track_Relative_Column(int column);
+int Get_Max_Nibble_Track_From_Nibble(char *Buffer, int nibble);
+int Get_Byte_From_Column(char *Buffer, int column);
+COLUMN_TYPE Get_Column_Type(char *Buffer, int column);
+int Get_Track_Relative_Column(char *Buffer, int column);
 int Get_Max_Nibble_All_Tracks(void);
+void Clear_Buff(void);
 
 #endif

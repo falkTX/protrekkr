@@ -53,7 +53,7 @@ int tretletter = 0;
 int posletter = 0;
 int last_index = -1;
 int gui_action = GUI_CMD_NOP;
-int ped_row = 0;
+int ped_col = 0;
 int ped_track = 0;
 int gui_track = 0;
 int xoffseted;
@@ -1682,7 +1682,7 @@ void Newmod(void)
     mas_comp_ratio = 0.0f;
     ped_track = 0;
     ped_patsam = 0;
-    ped_row = 0;
+    ped_col = 0;
     ped_line = 0;
     ped_line_delay = 0;
     cPosition = 0;
@@ -2247,7 +2247,7 @@ void Keyboard_Handler(void)
     {
         Unselect_Selection();
         ped_track--;
-        ped_row = 0;
+        ped_col = 0;
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
@@ -2257,7 +2257,7 @@ void Keyboard_Handler(void)
     {
         Unselect_Selection();
         ped_track++;
-        ped_row = 0;
+        ped_col = 0;
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
@@ -2266,8 +2266,8 @@ void Keyboard_Handler(void)
     if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB] && !Key_Unicode)
     {
         Unselect_Selection();
-        ped_row += Table_Right_Tab_Notes[ped_row];
-        if(ped_row >= (Channels_MultiNotes[ped_track] * 3)) ped_row = 0;
+        ped_col += Table_Right_Tab_Notes[ped_col];
+        if(ped_col >= (Channels_MultiNotes[ped_track] * 3)) ped_col = 0;
         Actupated(0);
     }
 
@@ -2275,8 +2275,8 @@ void Keyboard_Handler(void)
     if(Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
     {
         Unselect_Selection();
-        ped_row -= Table_Left_Tab_Notes[ped_row];
-        if(ped_row < 0) ped_row = (Channels_MultiNotes[ped_track] * 3) - 3;
+        ped_col -= Table_Left_Tab_Notes[ped_col];
+        if(ped_col < 0) ped_col = (Channels_MultiNotes[ped_track] * 3) - 3;
         Actupated(0);
     }
 
@@ -2364,13 +2364,13 @@ void Keyboard_Handler(void)
         }
 
         // Previous pattern
-        if((Keys[SDLK_KP_MINUS]) && pSequence[Cur_Position] > 0)
+        if((Keys_Sym[SDLK_KP_MINUS]) && pSequence[Cur_Position] > 0)
         {
             gui_action = GUI_CMD_PREV_PATT;
         }
 
         // Next pattern
-        if((Keys[SDLK_KP_PLUS]) && pSequence[Cur_Position] < 254)
+        if((Keys_Sym[SDLK_KP_PLUS]) && pSequence[Cur_Position] < 254)
         {
             gui_action = GUI_CMD_NEXT_PATT;
         }
@@ -3315,7 +3315,7 @@ void Keyboard_Handler(void)
                 // Instrument
                 for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
                 {
-                    if(ped_row == 1 + (i * 3))
+                    if(ped_col == 1 + (i * 3))
                     {
                         i++;
                         break;
@@ -3323,17 +3323,17 @@ void Keyboard_Handler(void)
                 }
                 i--;
 
-                if(ped_row == (1 + (i * 3)) ||
-                   ped_row == (3 + j) ||
-                   ped_row == (5 + j) ||
-                   ped_row == (7 + j) ||
-                   ped_row == (9 + j))
+                if(ped_col == (1 + (i * 3)) ||
+                   ped_col == (3 + j) ||
+                   ped_col == (5 + j) ||
+                   ped_col == (7 + j) ||
+                   ped_col == (9 + j))
                 {
                     ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
-                    if(ped_row == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
-                    if(ped_row == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
-                    if(ped_row == (7 + j)) ped_cell = PATTERN_FX;           // fx
-                    if(ped_row == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
+                    if(ped_col == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
+                    if(ped_col == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
+                    if(ped_col == (7 + j)) ped_cell = PATTERN_FX;           // fx
+                    if(ped_col == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
             
                     ltretvalue = retvalue;
                     xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
@@ -3342,21 +3342,21 @@ void Keyboard_Handler(void)
 
                     if(retvalue < 16)
                     {
-                        if(oldval == 255 && ped_row == (1 + (i * 3))) oldval = 0;
-                        if(oldval == 255 && ped_row == (3 + j)) oldval = 0;
-                        if(oldval == 255 && ped_row == (5 + j)) oldval = 0;
+                        if(oldval == 255 && ped_col == (1 + (i * 3))) oldval = 0;
+                        if(oldval == 255 && ped_col == (3 + j)) oldval = 0;
+                        if(oldval == 255 && ped_col == (5 + j)) oldval = 0;
                         oldval = (oldval & 0xf) + (retvalue << 4);
                         *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
 
                         // Max panning
-                        if(oldval != 255 && ped_row == (5 + j) &&
+                        if(oldval != 255 && ped_col == (5 + j) &&
                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                         {
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
                         }
 
                         // Max instrument
-                        if(oldval != 255 && ped_row == (1 + (i * 3)) &&
+                        if(oldval != 255 && ped_col == (1 + (i * 3)) &&
                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
                         {
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
@@ -3367,7 +3367,7 @@ void Keyboard_Handler(void)
                             ped_line += ped_pattad;
                             if(!ped_pattad)
                             {
-                                ped_row++;
+                                ped_col++;
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
@@ -3378,20 +3378,20 @@ void Keyboard_Handler(void)
                         if(!Delete_Selection(Cur_Position))
                         {
                             oldval = 0;
-                            if(ped_row == (1 + (i * 3))) oldval = 255;
-                            if(ped_row == (3 + j)) oldval = 255;
-                            if(ped_row == (5 + j)) oldval = 255;
+                            if(ped_col == (1 + (i * 3))) oldval = 255;
+                            if(ped_col == (3 + j)) oldval = 255;
+                            if(ped_col == (5 + j)) oldval = 255;
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
 
                             // Max panning
-                            if(oldval != 255 && ped_row == (5 + j) &&
+                            if(oldval != 255 && ped_col == (5 + j) &&
                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                             {
                                 *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
                             }
 
                             // Max instrument
-                            if(oldval != 255 && ped_row == (1 + (i * 3)) &&
+                            if(oldval != 255 && ped_col == (1 + (i * 3)) &&
                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
                             {
                                 *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
@@ -3402,7 +3402,7 @@ void Keyboard_Handler(void)
                                 ped_line += ped_pattad;
                                 if(!ped_pattad)
                                 {
-                                    ped_row++;
+                                    ped_col++;
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
@@ -3414,24 +3414,24 @@ void Keyboard_Handler(void)
 
                 for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
                 {
-                    if(ped_row == 2 +(i * 3))
+                    if(ped_col == 2 +(i * 3))
                     {
                         i++;
                         break;
                     }
                 }
                 i--;
-                if(ped_row == (2 + (i * 3)) ||
-                   ped_row == (4 + j) ||
-                   ped_row == (6 + j) ||
-                   ped_row == (8 + j) ||
-                   ped_row == (10 + j))
+                if(ped_col == (2 + (i * 3)) ||
+                   ped_col == (4 + j) ||
+                   ped_col == (6 + j) ||
+                   ped_col == (8 + j) ||
+                   ped_col == (10 + j))
                 {
                     ped_cell = PATTERN_INSTR1 + (i * 2);
-                    if(ped_row == (4 + j)) ped_cell = PATTERN_VOLUME;
-                    if(ped_row == (6 + j)) ped_cell = PATTERN_PANNING;
-                    if(ped_row == (8 + j)) ped_cell = PATTERN_FX;
-                    if(ped_row == (10 + j)) ped_cell = PATTERN_FXDATA;
+                    if(ped_col == (4 + j)) ped_cell = PATTERN_VOLUME;
+                    if(ped_col == (6 + j)) ped_cell = PATTERN_PANNING;
+                    if(ped_col == (8 + j)) ped_cell = PATTERN_FX;
+                    if(ped_col == (10 + j)) ped_cell = PATTERN_FXDATA;
 
                     ltretvalue = retvalue;
                     xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
@@ -3439,21 +3439,21 @@ void Keyboard_Handler(void)
 
                     if(retvalue < 16)
                     {
-                        if(oldval == 255 && ped_row == (2 + (i * 3))) oldval = 0;
-                        if(oldval == 255 && ped_row == (4 + j)) oldval = 0;
-                        if(oldval == 255 && ped_row == (6 + j)) oldval = 0;
+                        if(oldval == 255 && ped_col == (2 + (i * 3))) oldval = 0;
+                        if(oldval == 255 && ped_col == (4 + j)) oldval = 0;
+                        if(oldval == 255 && ped_col == (6 + j)) oldval = 0;
                         oldval = (oldval & 0xf0) + retvalue;
                         *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
 
                         // Max panning
-                        if(oldval != 255 && ped_row == (6 + j) &&
+                        if(oldval != 255 && ped_col == (6 + j) &&
                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                         {
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
                         }
 
                         // Max instrument
-                        if(oldval != 255 && ped_row == (2 + (i * 3)) &&
+                        if(oldval != 255 && ped_col == (2 + (i * 3)) &&
                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
                         {
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
@@ -3464,7 +3464,7 @@ void Keyboard_Handler(void)
                             ped_line += ped_pattad;
                             if(!ped_pattad)
                             {
-                                ped_row++;
+                                ped_col++;
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
@@ -3475,20 +3475,20 @@ void Keyboard_Handler(void)
                         if(!Delete_Selection(Cur_Position))
                         {
                             oldval = 0;
-                            if(ped_row == (2 + (i * 3))) oldval = 255;
-                            if(ped_row == (4 + j)) oldval = 255;
-                            if(ped_row == (6 + j)) oldval = 255;
+                            if(ped_col == (2 + (i * 3))) oldval = 255;
+                            if(ped_col == (4 + j)) oldval = 255;
+                            if(ped_col == (6 + j)) oldval = 255;
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
 
                             // Max panning
-                            if(oldval != 255 && ped_row == (6 + j) &&
+                            if(oldval != 255 && ped_col == (6 + j) &&
                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
                             {
                                 *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
                             }
 
                             // Max instrument
-                            if(oldval != 255 && ped_row == (2 + (i * 3)) &&
+                            if(oldval != 255 && ped_col == (2 + (i * 3)) &&
                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
                             {
                                 *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
@@ -3499,7 +3499,7 @@ void Keyboard_Handler(void)
                                 ped_line += ped_pattad;
                                 if(!ped_pattad)
                                 {
-                                    ped_row++;
+                                    ped_col++;
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
@@ -3515,7 +3515,7 @@ void Keyboard_Handler(void)
 
     // --------------------------------------------
     // Enter one or several notes (used for midi and record as well as simple editing)
-    if(!Get_LAlt() && !Get_LCtrl())
+    if(!Get_LAlt() && !Get_LCtrl() && !Get_LShift())
     {
         int go_note = FALSE;
 
@@ -3577,7 +3577,7 @@ void Keyboard_Handler(void)
             // Check if this is a legal note column
             for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
             {
-                if(ped_row == (i * 3))
+                if(ped_col == (i * 3))
                 {
                     in_note = TRUE;
                     break;
@@ -3711,7 +3711,7 @@ No_Key:;
                         ped_line += ped_pattad;
                         if(!ped_pattad)
                         {
-                            ped_row++;
+                            ped_col++;
                             gui_action = GUI_CMD_SET_FOCUS_TRACK;
                         }
                     }
@@ -3738,7 +3738,7 @@ No_Key:;
             // Check if this is a legal note column
             for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
             {
-                if(ped_row == (i * 3))
+                if(ped_col == (i * 3))
                 {
                     in_note = TRUE;
                     break;
@@ -3758,7 +3758,7 @@ No_Key:;
                     ped_line += ped_pattad;
                     if(!ped_pattad)
                     {
-                        ped_row++;
+                        ped_col++;
                         gui_action = GUI_CMD_SET_FOCUS_TRACK;
                     }
                 }
@@ -3776,7 +3776,7 @@ No_Key:;
             // Check if this is a legal note column
             for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
             {
-                if(ped_row == (i * 3))
+                if(ped_col == (i * 3))
                 {
                     in_note = TRUE;
                     break;
@@ -3799,7 +3799,7 @@ No_Key:;
                         ped_line += ped_pattad;
                         if(!ped_pattad)
                         {
-                            ped_row++;
+                            ped_col++;
                             gui_action = GUI_CMD_SET_FOCUS_TRACK;
                         }
                     }

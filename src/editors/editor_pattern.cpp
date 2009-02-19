@@ -500,7 +500,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         if(rel % patt_highlight == 0) multip = TRUE;
     }
 
-    cur_column = Get_Track_Nibble_Start(track) + track;
+    cur_column = Get_Track_Nibble_Start(Channels_MultiNotes, track) + track;
 
     // Browse all tracks to seek synchro markers
     for(tracky = 0; tracky < Songtracks; tracky++)
@@ -762,7 +762,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
         dover = PAT_COL_NOTE;
 
-        cur_column = Get_Track_Nibble_Start(track) + track;
+        cur_column = Get_Track_Nibble_Start(Channels_MultiNotes, track) + track;
 
         for(tracky = 0; tracky < tVisible_Columns; tracky++)
         {
@@ -1144,24 +1144,24 @@ void Actupated(int modac)
         }
     }
 
-    int max_channel_dat = Get_Max_Nibble_Track(ped_track) - 1;
-    if(ped_row > max_channel_dat)
+    int max_channel_dat = Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1;
+    if(ped_col > max_channel_dat)
     {
-        ped_row = 0;
+        ped_col = 0;
         ped_track++;
     }
-    if(ped_row < 0)
+    if(ped_col < 0)
     {
         ped_track--;
         if(ped_track < 0)
         {
-            max_channel_dat = Get_Max_Nibble_Track(Songtracks - 1) - 1;
+            max_channel_dat = Get_Max_Nibble_Track(Channels_MultiNotes, Songtracks - 1) - 1;
         }
         else
         {
-            max_channel_dat = Get_Max_Nibble_Track(ped_track) - 1;
+            max_channel_dat = Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1;
         }
-        ped_row = max_channel_dat;
+        ped_col = max_channel_dat;
     }
     if(ped_track > Songtracks - 1)
     {
@@ -1231,8 +1231,8 @@ void Actupated(int modac)
         Cur_Position = cPosition;
     }
 
-    draw_pated(gui_track, cur_line, ped_track, ped_row);
-    draw_pated_highlight(gui_track, cur_line, ped_track, ped_row);
+    draw_pated(gui_track, cur_line, ped_track, ped_col);
+    draw_pated_highlight(gui_track, cur_line, ped_track, ped_col);
 
     Realslider_Vert(781, 212, cur_line, DISPLAYED_LINES, patternLines[pSequence[Cur_Position]] + DISPLAYED_LINES, 200, TRUE);
     Gui_Draw_Button_Box(781, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -1773,7 +1773,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
     {
         ped_track = Get_Track_Over_Mouse();
-        ped_row = Get_Column_Over_Mouse();
+        ped_col = Get_Column_Over_Mouse();
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
@@ -2036,7 +2036,7 @@ void Goto_Next_Page(void)
 void Goto_Previous_Column(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_TRACKS);
-    ped_row--;
+    ped_col--;
     Actupated(0);
     Select_Block_Keyboard(BLOCK_MARK_TRACKS);
     gui_action = GUI_CMD_SET_FOCUS_TRACK;
@@ -2047,7 +2047,7 @@ void Goto_Previous_Column(void)
 void Goto_Next_Column(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_TRACKS);
-    ped_row++;
+    ped_col++;
     Actupated(0);
     Select_Block_Keyboard(BLOCK_MARK_TRACKS);
     gui_action = GUI_CMD_SET_FOCUS_TRACK;
@@ -2058,7 +2058,7 @@ void Goto_Next_Column(void)
 void Goto_Top_Left(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
-    ped_row = 0;
+    ped_col = 0;
     ped_track = 0;
     if(Get_LCtrl()) ped_line = 0;
     Actupated(0);
@@ -2071,7 +2071,7 @@ void Goto_Top_Left(void)
 void Goto_Bottom_Right(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
-    ped_row = 0;
+    ped_col = 0;
     ped_track = Songtracks - 1;
     if(Get_LCtrl()) ped_line = patternLines[pSequence[cPosition_delay]] - 1;
     Actupated(0);

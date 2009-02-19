@@ -585,7 +585,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         if(!Uni_Trans) Uni_Trans = Symbol;
 #else
                         Uni_Trans = Symbol;
-                        Key_Unicode = 0;
 #endif
                         Keys[Uni_Trans] = TRUE;
 

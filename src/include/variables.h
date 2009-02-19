@@ -287,7 +287,7 @@ extern float CustomVol[128];
 extern int ped_track;
 
 extern int ped_patsam;
-extern int ped_row;
+extern int ped_col;
 extern int ped_line;
 extern int ped_line_delay;
 extern int cPosition;
@@ -409,6 +409,7 @@ extern char is_record_key;
 extern int block_start_track;
 extern int block_start_track_nibble;
 extern int save_block_start_track_nibble;
+extern int save_block_end_track_nibble;
 extern int block_end_track;
 extern int block_end_track_nibble;
 extern int block_start;

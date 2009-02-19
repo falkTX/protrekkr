@@ -6,13 +6,13 @@
 --------------------Configuration: ProTrekkr - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP38E.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP2DC.tmp" with contents
 [
 /nologo /ML /W3 /Gm /GX /ZI /Od /D "__WIN32__" /D "_DEBUG" /D "_WINDOWS" /D "__NO_MIDI__" /Fo"Debug/" /Fd"Debug/" /FD /Zm500 /GZ /c 
 "C:\Src\Pc\ptk\src\Editors\Patterns_Blocks.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP38E.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP38F.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP2DC.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP2DD.tmp" with contents
 [
 kernel32.lib user32.lib sdl.lib sdl_draw.lib dsound.lib msacm32.lib winmm.lib advapi32.lib zlib.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib /nologo /subsystem:windows /pdb:none /debug /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
 .\Debug\main.obj
@@ -47,7 +47,7 @@ kernel32.lib user32.lib sdl.lib sdl_draw.lib dsound.lib msacm32.lib winmm.lib ad
 .\Debug\ptk.obj
 .\Debug\Resources.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP38F.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP2DD.tmp"
 <h3>Output Window</h3>
 Compiling...
 Patterns_Blocks.cpp
