@@ -31,8 +31,6 @@ int gui_pushed = 0;
 char teac = 0;
 int liveparam = 0;
 int livevalue = 0;
-int poskeynote = 0;
-int poskeyval;
 char trkchan = TRUE;
 int pos_space = 0;
 int multifactor = 4;
@@ -133,7 +131,6 @@ int old_key_ped_line;
 Uint32 Alloc_midi_Channels[MAX_TRACKS][MAX_POLYPHONY];
 int Record_Keys[37];
 int Record_Keys_State[37];
-int Midi_Sub_Channel_Number;
 
 void Mouse_Sliders_Master_Shuffle(void);
 void Display_Beat_Time(void);
@@ -2255,7 +2252,11 @@ void Keyboard_Handler(void)
     }
 
     // Next note
+#if defined(__WIN32__)
     if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB] && !Key_Unicode)
+#else
+    if(!Get_LShift() && Get_LCtrl() && Keys[SDLK_TAB])
+#endif
     {
         Unselect_Selection();
         ped_col += Table_Right_Tab_Notes[ped_col];
@@ -2996,7 +2997,7 @@ void Keyboard_Handler(void)
         if(is_recording)
         {
             // Start the real recording
-            if(!is_recording_2 && key_on == 1 && key_record_first_time)
+            if(!is_recording_2 && (retnote_raw < NOTE_OFF && retnote_raw > 0) && key_record_first_time)
             {
                 // Start recording
                 is_recording_2 = 1;
@@ -3007,13 +3008,6 @@ void Keyboard_Handler(void)
                 key_record_first_time = FALSE;
                 old_key_ped_line = ped_line;
                 Clear_Midi_Channels_Pool();
-            }
-        }
-        else
-        {
-            if(!is_recording_2 && key_on == 1)
-            {
-                Midi_Sub_Channel_Number = ped_track;
             }
         }
 
@@ -3208,6 +3202,7 @@ void Keyboard_Handler(void)
                 // Paste the block buffer into a pattern
                 if(Keys[SDLK_v - UNICODE_OFFSET2] && block_start_track_nibble != -1 && block_end_track_nibble != -1 && is_editing)
                 {
+                    printf("fuck\n");
                     Paste_Block(Cur_Position);
                 }
 
@@ -3285,16 +3280,7 @@ void Keyboard_Handler(void)
 
         if(!Get_LAlt())
         {
-            if(Get_LShift())
-            {
-                poskeynote = 1;
-                poskeyval = 1;
-            }
-            if(poskeyval == 0 && retvalue != ltretvalue) poskeyval = 1;
-
-            // Modify a value
-
-            if(retvalue != NOTE_OFF && poskeyval == 1 && is_editing == 1)
+            if(retvalue != NOTE_OFF && is_editing == 1)
             {
                 int ped_cell;
                 int i;
@@ -3358,7 +3344,6 @@ void Keyboard_Handler(void)
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
-                        poskeyval = 0;
                     }
                     else
                     {
@@ -3393,7 +3378,6 @@ void Keyboard_Handler(void)
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
-                            poskeyval = 0;
                         }
                     }
                     Actupated(0);
@@ -3455,7 +3439,6 @@ void Keyboard_Handler(void)
                                 gui_action = GUI_CMD_SET_FOCUS_TRACK;
                             }
                         }
-                        poskeyval = 0;
                     }
                     else
                     {
@@ -3490,13 +3473,11 @@ void Keyboard_Handler(void)
                                     gui_action = GUI_CMD_SET_FOCUS_TRACK;
                                 }
                             }
-                            poskeyval = 0;
                         }
                     }
                     Actupated(0);
                 }
             }
-            poskeynote = 0;
         }
     }
 
@@ -5071,6 +5052,7 @@ void Send_Note(int Note, int Raw_Note, int One_Channel)
     Keyboard_Notes_Type[Keyboard_Nbr_Events] = Raw_Note;
     Keyboard_Notes_Bound[Keyboard_Nbr_Events] = One_Channel;
     Keyboard_Nbr_Events++;
+    if(Keyboard_Nbr_Events >= 256) Keyboard_Nbr_Events = 0;
 }
 
 // ------------------------------------------------------

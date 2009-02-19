@@ -16,7 +16,6 @@
 // ------------------------------------------------------
 // Variables
 extern int Nbr_Sub_NoteOff;
-extern int Midi_Sub_Channel_Number; 
 extern int key_record_first_time;
 extern int old_key_ped_line;
 

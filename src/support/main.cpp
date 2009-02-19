@@ -327,6 +327,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     int Key_Value;
     int Uni_Trans;
     FILE *KbFile;
+    int in_note;
     Uint32 ExePath_Size = MAX_PATH;
 
 #if defined(__MACOSX__)
@@ -597,7 +598,22 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
                         if(!is_recording_2 && is_editing)
                         {
-                            Send_Note(Scancode, FALSE, TRUE);
+                            in_note = FALSE;
+                            for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
+                            {
+                                if(ped_col == (j * 3))
+                                {
+                                    in_note = TRUE;
+                                    break;
+                                }
+                            }
+                            if(in_note)
+                            {
+                                if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                                {
+                                    Send_Note(Scancode, FALSE, TRUE);
+                                }
+                            }
                         }
                     }
 
@@ -635,7 +651,22 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
                     if(!is_recording_2 && is_editing)
                     {
-                        Send_Note(Scancode | 0x80, FALSE, TRUE);
+                        in_note = FALSE;
+                        for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
+                        {
+                            if(ped_col == (j * 3))
+                            {
+                                in_note = TRUE;
+                                break;
+                            }
+                        }
+                        if(in_note)
+                        {
+                            if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                            {
+                                Send_Note(Scancode | 0x80, FALSE, TRUE);
+                            }
+                        }
                     }
                     break;
 
@@ -782,7 +813,7 @@ int Switch_FullScreen(void)
 {
     Env_Change = TRUE;
     if((Main_Screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                       SCREEN_BPP, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+                                       SCREEN_BPP, SDL_SWSURFACE | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
     {
         return(FALSE);
     }
