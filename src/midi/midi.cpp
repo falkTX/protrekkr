@@ -8,10 +8,11 @@
 
 // ------------------------------------------------------
 // Includes
-#include "../include/Variables.h"
+#include "../include/variables.h"
 #include "../include/ptk.h"
 
 #include "include/midi.h"
+#include "include/RtMidi.h"
 
 // ------------------------------------------------------
 // Variables
@@ -22,6 +23,20 @@ extern int old_key_ped_line;
 int Midi_Notes_History[MAX_TRACKS][256];
 int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 int Midi_Notes_History_Amount;
+
+RtMidiIn  *midiin = 0;
+RtMidiOut *midiout = 0;
+
+int midiin_changed = 0;
+int midiout_changed = 0;
+
+int midiin_port_opened = 0;
+
+signed char c_midiin = -1;
+signed char c_midiout = -1;
+
+signed char n_midioutdevices = 0;
+signed char n_midiindevices = 0;
 
 // ------------------------------------------------------
 // Driver functions
@@ -42,7 +57,7 @@ int Midi_GetProgram(int midi_program)
 
 // ------------------------------------------------------
 // Handle the midi events
-void Midi_CallBackIn(Uint32 dwParam1)
+void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, void *userData)
 {
     int Midi_Channel_Number;
     int Midi_Command;
@@ -52,10 +67,20 @@ void Midi_CallBackIn(Uint32 dwParam1)
     int Instrument_Number; 
     int tmp_note;
     int Unknown_Message;
-    Uint32 Param1 = dwParam1;
+    Uint32 Param1 = 0;
+    int i;
+    unsigned char *ptr = (unsigned char *) &Param1;
+    unsigned int nBytes = message->size();
+
+    // From 1 to 3 (hopefully)
+    for(i = 0; i < nBytes; i++)
+    {
+        *ptr++ = message->at(i);
+    }
 
     Midi_Channel_Number = Param1 & 0xf;
     Midi_Command = Param1 & 0xf0;
+
     if(Midi_Command == 0x90 || Midi_Command == 0x80)
     {
         if(is_recording && !is_recording_2 && key_record_first_time)
@@ -238,6 +263,145 @@ void Midi_NoteOff(int channel, int note)
             Midi_Notes_History_Amount = 0;
         }
     }
+}
+
+// ------------------------------------------------------
+// Open the midi in device
+void Midi_InitIn(void)
+{
+    if(midiin_changed != 0)
+    {
+        if(c_midiin < -1) c_midiin = n_midiindevices - 1;
+        if(c_midiin == n_midiindevices) c_midiin = -1;
+
+        if(c_midiin != -1)
+        {
+            Midi_CloseIn();
+            try
+            {
+                midiin->openPort(c_midiin);
+                midiin->setCallback(&Midi_CallBackIn);
+                midiin->ignoreTypes(1, 1, 1);
+                if(midiin_changed == 1) mess_box("Midi In device activated...");
+                midiin_port_opened = TRUE;
+            }
+            catch(RtError &error)
+            {
+                mess_box("Midi In device failed to open...");
+            }
+        }
+        else
+        {
+            if(midiin_changed == 1) mess_box("Midi In device disconnected...");
+        }
+        midiin_changed = 0;
+    }
+}
+
+// ------------------------------------------------------
+// Close the midi in device
+void Midi_CloseIn(void)
+{
+    if(midiin)
+    {
+        if(midiin_port_opened) midiin->cancelCallback();
+        midiin->closePort();
+    }
+}
+
+// ------------------------------------------------------
+// Open the midi out device
+void Midi_InitOut(void)
+{
+    if(midiout_changed != 0)
+    {
+        Midi_Reset();
+        if(c_midiout < -1) c_midiout = n_midioutdevices - 1;
+        if(c_midiout == n_midioutdevices) c_midiout = -1;
+
+        if(c_midiout != -1)
+        {
+            Midi_CloseOut();
+            try
+            {
+                midiout->openPort(c_midiout);
+                if(midiout_changed == 1) mess_box("Midi Out device activated...");
+            }
+            catch(RtError &error)
+            {
+                mess_box("Midi Out device failed to open...");
+            }
+        }
+        else
+        {
+            if(midiout_changed == 1) mess_box("Midi Out device disconnected...");
+        }
+        midiout_changed = 0;
+    }
+}
+
+// ------------------------------------------------------
+// Close the midi out device
+void Midi_CloseOut(void)
+{
+    if(midiout) midiout->closePort();
+}
+
+// ------------------------------------------------------
+// Enumerate all midi in/out interfaces available
+void Midi_GetAll(void)
+{
+    n_midiindevices = 0;
+    n_midioutdevices = 0;
+
+    midiin = new RtMidiIn();
+    if(midiin)
+    {
+        midiout = new RtMidiOut();
+        if(midiout)
+        {
+            n_midiindevices = midiin->getPortCount();
+            n_midioutdevices = midiout->getPortCount();
+        }
+    }
+}
+
+// ------------------------------------------------------
+// Free allocated interfaces resources
+void Midi_FreeAll(void)
+{
+    if(midiin) delete midiin;
+    if(midiout) delete midiout;
+}
+
+// ------------------------------------------------------
+// Send a command to the midi out device
+void _Midi_Send(int nbr_track, int eff_dat, int row_dat)
+{
+    std::vector<unsigned char> message;
+    if(eff_dat != -1)
+    {
+        message.push_back(nbr_track);
+        message.push_back(eff_dat);
+        message.push_back(row_dat);
+        if(midiout) midiout->sendMessage(&message);
+    }
+}
+
+// ------------------------------------------------------
+// Return the name of the current midi in device
+char *Midi_GetInName(void)
+{
+    if(c_midiin == -1) return("");
+    return((char *) midiin->getPortName(c_midiin).c_str());
+}
+
+// ------------------------------------------------------
+// Return the name of the current midi out device
+char *Midi_GetOutName(void)
+{
+    if(c_midiout == -1) return("");
+    return((char *) midiout->getPortName(c_midiout).c_str());
 }
 
 #endif

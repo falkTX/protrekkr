@@ -163,7 +163,7 @@ void Me_Handler(void)
         volatile short *ptrBuffer1 = (short *) (((int) ptrAudio_BufferPlay1) | 0x40000000);
         volatile short *ptrBuffer2 = (short *) (((int) ptrAudio_BufferPlay2) | 0x40000000);
         volatile int *ptrMutex = (int *) (((int) &Mutex) | 0x40000000);
-    
+
         if(*ptrAUDIO_Play_Flag && *ptrSongplaying)
         {
             if(*ptrMutex == 0)
@@ -269,15 +269,15 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 
 #if defined(__MACOSX__)
     AUDIO_Device = kAudioDeviceUnknown;
-	Amount = sizeof(AudioDeviceID);
-	if(AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-				                &Amount,
+    Amount = sizeof(AudioDeviceID);
+    if(AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
+                                &Amount,
                                 (void *) &AUDIO_Device) == noErr)
-	{
+    {
         if(AudioDeviceAddIOProc(AUDIO_Device,
                                 AUDIO_Callback,
-			                    NULL) == noErr)
-	    {
+                                NULL) == noErr)
+        {
             return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
         }
     }
@@ -337,14 +337,14 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     frag_size = (int) (AUDIO_PCM_FREQ * (milliseconds / 1000.0f));
 
 #if defined(__MACOSX__)
-	AudioValueRange Frame_Range;
+    AudioValueRange Frame_Range;
 
     Amount = sizeof(AudioStreamBasicDescription);
     if(AudioDeviceGetProperty(AUDIO_Device,
                               0,
                               FALSE,
                               kAudioDevicePropertyStreamFormat,
-				              &Amount,
+                              &Amount,
                               &Desc) == noErr)
     {
         Desc.mSampleRate = AUDIO_PCM_FREQ;
@@ -367,8 +367,8 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
                                   0,
                                   FALSE,
                                   kAudioDevicePropertyStreamFormat,
-				                  sizeof(AudioStreamBasicDescription),
-                                  &Desc) == noErr)      
+                                  sizeof(AudioStreamBasicDescription),
+                                  &Desc) == noErr)
         {
 	        Amount = sizeof(AudioValueRange);
             if(AudioDeviceGetProperty(AUDIO_Device,
@@ -486,18 +486,18 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
             sceKernelDcacheWritebackInvalidateAll();
             int i;
             u8 *Src = (u8 *) &me_stub;
-	        u8 *Dest = (u8 *) 0xbfc00040;
-	        for(i = 0; i < (int) ((int) &me_stub_end - (int) &me_stub); i++)
+            u8 *Dest = (u8 *) 0xbfc00040;
+            for(i = 0; i < (int) ((int) &me_stub_end - (int) &me_stub); i++)
             {
-		        Dest[i] = Src[i];
-	        }
-	        _sw(((u32) Me_Handler) | 0x40000000, 0xbfc00600);
+                Dest[i] = Src[i];
+            }
+            _sw(((u32) Me_Handler) | 0x40000000, 0xbfc00600);
             me_sceKernelDcacheWritebackInvalidateAll();
-	        sceKernelDcacheWritebackAll();
+            sceKernelDcacheWritebackAll();
             sceSysregMeResetEnable();
-	        sceSysregMeBusClockEnable();
-	        sceSysregMeResetDisable();
-            
+            sceSysregMeBusClockEnable();
+            sceSysregMeResetDisable();
+
             AUDIO_thid = sceKernelCreateThread("Ptk Audio Thread", AUDIO_Thread, AUDIO_THREAD_PRIORITY, AUDIO_THREAD_STACKSIZE, 0, NULL);
             if(AUDIO_thid > 0)
             {
@@ -538,17 +538,22 @@ void AUDIO_Wait_For_Thread(void)
     }
     else
     {
-        while(!AUDIO_Acknowledge)
+#if defined(__LINUX__)
+        if(hThread)
+#endif
         {
+            while(!AUDIO_Acknowledge)
+            {
 
 #if defined(__WIN32__)
-            Sleep(10);
+                Sleep(10);
 #endif
 #if defined(__LINUX__) || defined(__MACOSX__)
-            usleep(10);
+                usleep(10);
 #endif
 
-        };
+            };
+        }
     }
 #endif // __MACOSX__
 
@@ -646,13 +651,16 @@ void AUDIO_Stop_Sound_Buffer(void)
     AUDIO_Stop();
 
 #if defined(__LINUX__)
-    Thread_Running = 0;
-    while(!Thread_Running)
+    if(hThread)
     {
-        usleep(10);
+        Thread_Running = 0;
+        while(!Thread_Running)
+        {
+            usleep(10);
+        }
+        if(AUDIO_SoundBuffer) free(AUDIO_SoundBuffer);
+        AUDIO_SoundBuffer = NULL;
     }
-    if(AUDIO_SoundBuffer) free(AUDIO_SoundBuffer);
-    AUDIO_SoundBuffer = NULL;
 #endif
 
 #if defined(__PSP__)

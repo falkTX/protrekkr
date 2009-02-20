@@ -2,15 +2,15 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
-       -lSDL -lsdldraw -lz
+       -lasound -lSDL -lsdldraw -lz
 FLAGS = -O2 -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
-        -D __LINUX__ -D __GCC__ -D __NO_MIDI__ -D __NO_CODEC__
+        -D __LINUX__ -D __GCC__ -D __NO_CODEC__ -D __LINUX_ALSASEQ__
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_instrument.o \
           samples_pack.o files_list.o files.o \
-          midi.o \
+          midi.o RtMidi.o \
           timer.o main.o \
           misc_draw.o xml.o \
           riff.o \
@@ -78,6 +78,9 @@ files.o: src/files/files.cpp
 	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 midi.o: src/midi/midi.cpp
+	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
+
+RtMidi.o: src/midi/RtMidi.cpp
 	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
 
 timer.o: src/support/timer.cpp

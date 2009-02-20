@@ -1820,9 +1820,15 @@ void Set_Track_Slider(int pos)
     if(ped_track < pos) ped_track = pos;
     float fpos = (float) pos;
 
-    // We need to know the maximum of gui_track
-    fpos /= Songtracks - Visible_Columns;
-    fpos *= 72 - 16;
+    if(Songtracks - Visible_Columns)
+    {
+        fpos /= Songtracks - Visible_Columns;
+        fpos *= 72 - 16;
+    }
+    else
+    {
+        fpos = 0.0f;
+    }
     Realslider_Horiz(726, 429, (int) fpos, 16, 72, 72, TRUE);
 }
 
@@ -1839,7 +1845,7 @@ void Mouse_Sliders_Pattern_Ed(void)
         Pos_Mouse = (Pos_Mouse / (72.0f - 16.0f));
         if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
         Visible_Columns = Get_Visible_Complete_Tracks();
-        
+
         Pos_Mouse = Pos_Mouse * (Songtracks - Visible_Columns);
         gui_track = (int) Pos_Mouse;
         Actupated(1);

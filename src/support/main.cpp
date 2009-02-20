@@ -346,7 +346,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0)
     {
         Message_Error("Can't open SDL.");
-        return(0);
+        exit(0);
     }
     atexit(Destroy_Context);
 
@@ -358,9 +358,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     NoMidi = "no midi";
 #endif
 #if defined(__NO_CODEC__)
-    NoCodec = " - no codec";
+#if defined(__NO_MIDI__)
+    NoCodec = " - ";
 #endif
-#if !defined(__NO_MIDI__) && !defined(__NOCODEC__)
+    NoCodec = "no codec";
+#endif
+#if !defined(__NO_MIDI__) && !defined(__NO_CODEC__)
     NoMidi = "none";
 #endif
 
@@ -382,7 +385,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     if(ExePath == NULL)
     {
         Message_Error("Can't open alloc memory.");
-        return(0);
+        SDL_Quit();
+        exit(0);
     }
     memset(ExePath, 0, ExePath_Size + 1);
 
@@ -438,7 +442,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     if(!XML_Init())
     {
-        return(0);
+        SDL_Quit();
+        exit(0);
     }
 
     if((Keyboards = XML_get_string("files", "file", "keyboards", "value")) != NULL)
@@ -519,7 +524,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     if(!Switch_FullScreen())
     {
         Message_Error("Can't open screen.");
-        return(0);
+        SDL_Quit();
+        exit(0);
     }
     Ptk_Palette[0].r = Save_R;
     Ptk_Palette[0].g = Save_G;
@@ -537,7 +543,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     if(!Init_Context())
     {
-        return(0);
+        SDL_Quit();
+        exit(0);
     }
 
     SDL_GetMouseState((int *) &Startup_Mouse_Pos_x, (int *) &Startup_Mouse_Pos_y);
@@ -797,7 +804,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Midi_FreeAll();
 #endif
 
-    return(0);
+    SDL_Quit();
+    exit(0);
 }
 
 // ------------------------------------------------------

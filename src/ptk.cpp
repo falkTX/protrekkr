@@ -355,6 +355,7 @@ int Init_Context(void)
     if(!Ptk_InitDriver(AUDIO_Milliseconds))
 #endif
     {
+        Ptk_ReleaseDriver();
         Message_Error("Can't initialize audio driver.");
         return(FALSE);
     }
