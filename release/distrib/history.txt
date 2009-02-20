@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.90d:
+
+- Implemented midi in/out for Linux and Mac OS X.
+
 v1.90c:
 
 - Fixed a bug in the recording mode.
