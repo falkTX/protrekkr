@@ -1809,6 +1809,7 @@ void Actualize_Name(int *newletter, char *nam)
         newletter[71] = FALSE;
         strcpy(nam, cur_input_name);
         snamesel = 0;
+        Keyboard_Nbr_Events = 0;
         return;
     }
     // Valid input
@@ -1816,6 +1817,7 @@ void Actualize_Name(int *newletter, char *nam)
     {
         newletter[39] = FALSE;
         snamesel = 0;
+        Keyboard_Nbr_Events = 0;
         return;
     }
 
@@ -2836,7 +2838,7 @@ void Keyboard_Handler(void)
     // -------------------------------------------
 
     // ------------------------------------------
-    if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0)
+    if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0 && !reelletter)
     {
         // Key jazz release
         if(Keys_Raw_Off[0x10]) { Record_Keys[0] = (12 + 1) | 0x80;  Keys_Raw_Off[0x10] = FALSE; Keys_Raw[0x10] = FALSE; }
@@ -3487,7 +3489,7 @@ void Keyboard_Handler(void)
 
     // --------------------------------------------
     // Enter one or several notes (used for midi and record as well as simple editing)
-    if(!Get_LAlt() && !Get_LCtrl() && !Get_LShift())
+    if(!Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0 && !reelletter)
     {
         int go_note = FALSE;
 

@@ -1871,6 +1871,7 @@ void Sp_Player(void)
             Curr_Signal_R[i] = 0;
             Done_CVol[c][i] = FALSE;
 
+            // Play a sample
             if(sp_Stage[c][i] == PLAYING_SAMPLE || sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
             {
                 if(!Synth_Was[c][i]) goto ByPass_Wav;
@@ -1905,7 +1906,7 @@ ByPass_Wav:
                     gotsome = TRUE;
 
                     Current_Pointer = sp_Position[c][i].half.first;
-    
+
                     if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
                     else Old_Pointer = 0;
 
@@ -1971,8 +1972,13 @@ ByPass_Wav:
                 }
             }
 
+            // Synth
             if(Synthesizer[c][i].ENV1_STAGE || Synthesizer[c][i].ENV2_STAGE)
             {
+//                char fuck[64];
+  //              sprintf(fuck, "%d %d\n", c, i);
+    //            OutputDebugString(fuck);
+
                 if(!Done_CVol[c][i])
                 {
                     if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.004f;
@@ -1998,8 +2004,7 @@ ByPass_Wav:
                                                                 (Uint64 *) &sp_Position_osc3[c][i],
 #endif
                                                                 Vstep1[c][i]
-                                                         );
-
+                                                               );
 
                 if((Synthesizer[c][i].OSC1_WAVEFORM == 5 || Synthesizer[c][i].OSC2_WAVEFORM == 5))
                 {
@@ -2060,7 +2065,7 @@ ByPass_Wav:
 
         // A rather clumsy cross fading to avoid the most outrageous clicks
         // (i also tried with splines but didn't hear any difference)
-        if(New_Instrument[c])
+/*        if(New_Instrument[c])
         {
             All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
             All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
@@ -2077,7 +2082,7 @@ ByPass_Wav:
             Segue_SamplesL[c] = All_Signal_L;
             Segue_SamplesR[c] = All_Signal_R;
         }
-
+*/
         // -----------------------------------------------
         if(gotsome)
         {

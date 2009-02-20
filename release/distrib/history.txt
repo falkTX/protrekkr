@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.90b:
+
+- An extra note was pasted after names input when editing mode was turned on.
+
 v1.90:
 
 - Added a scrollbar beside patterns.
