@@ -19,6 +19,14 @@ extern int Nbr_Sub_NoteOff;
 extern int key_record_first_time;
 extern int old_key_ped_line;
 
+int Midi_Notes_History[MAX_TRACKS][256];
+int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+int Midi_Notes_History_Amount;
+
+// ------------------------------------------------------
+// Driver functions
+void _Midi_Send(int nbr_track, int eff_dat, int row_dat);
+
 // ------------------------------------------------------
 // Return the instrument associated with the midi program
 int Midi_GetProgram(int midi_program)
@@ -34,7 +42,7 @@ int Midi_GetProgram(int midi_program)
 
 // ------------------------------------------------------
 // Handle the midi events
-void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
+void Midi_CallBackIn(Uint32 dwParam1)
 {
     int Midi_Channel_Number;
     int Midi_Command;
@@ -45,7 +53,6 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
     int tmp_note;
     int Unknown_Message;
     Uint32 Param1 = dwParam1;
-    Uint32 Param2 = dwParam2;
 
     Midi_Channel_Number = Param1 & 0xf;
     Midi_Command = Param1 & 0xf0;
@@ -59,6 +66,7 @@ void Midi_CallBackIn(Uint32 dwParam1, Uint32 dwParam2)
             is_record_key = FALSE;
             is_editing = TRUE;
             Songplaying = TRUE;
+            ped_line_delay = ped_line;
             key_record_first_time = FALSE;
             old_key_ped_line = ped_line;
             Clear_Midi_Channels_Pool();
@@ -163,7 +171,7 @@ void Midi_AllNotesOff(void)
 }
 
 // ------------------------------------------------------
-// Reset midi programs
+// Reset midi out device
 void Midi_Reset(void)
 {
     Midi_AllNotesOff();
@@ -171,6 +179,64 @@ void Midi_Reset(void)
     for(int mreset = 0; mreset < 16; mreset++)
     {
         LastProgram[mreset] = -1;
+    }
+}
+
+// ------------------------------------------------------
+// Send a command to the midi out device
+void Midi_Send(int nbr_track, int eff_dat, int row_dat)
+{
+    int i;
+
+    if(c_midiout != -1)
+    {
+        if((nbr_track & 0xfff0) == 144)
+        {
+            for(i = 0; i < 256; i++)
+            {
+                // First empty channel
+                if(Midi_Notes_History[nbr_track & 0xf][i] == 0)
+                {
+                    Midi_Notes_History[nbr_track & 0xf][i] = eff_dat + 1;
+                    break;
+                }
+            }
+        }
+        _Midi_Send(nbr_track, eff_dat, row_dat);
+    }
+}
+
+// ------------------------------------------------------
+// Turn a midi channel off
+void Midi_NoteOff(int channel, int note)
+{
+    int i;
+
+    if(c_midiout != -1)
+    {
+        note++;
+        _Midi_Send(176 + CHAN_MIDI_PRG[channel], 0x40, 0);
+        if(note != -1)
+        {
+            for(i = 0; i < 256; i++)
+            {
+                if(Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] == note)
+                {
+                    _Midi_Send(0x80 + CHAN_MIDI_PRG[channel], (note - 1), 127);
+                    Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] = 0;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(i = 0; i < 256; i++)
+            {
+                _Midi_Send(0x80 + CHAN_MIDI_PRG[channel], (Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] - 1), 127);
+                Midi_Notes_History[CHAN_MIDI_PRG[channel]][i] = 0;
+            }
+            Midi_Notes_History_Amount = 0;
+        }
     }
 }
 

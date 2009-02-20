@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.90c:
+
+- Fixed a bug in the recording mode.
+- Recording now starts at the current pattern line instead of restarting
+  from it's beginning.
+
 v1.90b:
 
 - An extra note was pasted after names input when editing mode was turned on.

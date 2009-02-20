@@ -3010,8 +3010,7 @@ void Keyboard_Handler(void)
                 is_record_key = FALSE;
                 is_editing = TRUE;
                 Songplaying = TRUE;
-                ped_line = 0;
-                ped_line_delay = 0;
+                ped_line_delay = ped_line;
                 key_record_first_time = FALSE;
                 old_key_ped_line = ped_line;
                 Clear_Midi_Channels_Pool();
@@ -3658,7 +3657,7 @@ void Keyboard_Handler(void)
                                 }
                                 Sub_Channels_NoteOff[ped_track][Nbr_Sub_NoteOff].Sub_Channel = pos;
 
-                                if(Nbr_Sub_NoteOff < 14) Nbr_Sub_NoteOff++;
+                                if(Nbr_Sub_NoteOff < (Channels_MultiNotes[ped_track] - 1)) Nbr_Sub_NoteOff++;
                                 else Nbr_Sub_NoteOff = 0;
                             }
 
