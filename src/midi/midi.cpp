@@ -20,6 +20,9 @@ extern int Nbr_Sub_NoteOff;
 extern int key_record_first_time;
 extern int old_key_ped_line;
 
+char Midi_In_Name[256];
+char Midi_Out_Name[256];
+
 int Midi_Notes_History[MAX_TRACKS][256];
 int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 int Midi_Notes_History_Amount;
@@ -285,7 +288,7 @@ void Midi_InitIn(void)
                 if(midiin_changed == 1) mess_box("Midi In device activated...");
                 midiin_port_opened = TRUE;
             }
-            catch(RtError &error)
+            catch(...)
             {
                 mess_box("Midi In device failed to open...");
             }
@@ -327,7 +330,7 @@ void Midi_InitOut(void)
                 midiout->openPort(c_midiout);
                 if(midiout_changed == 1) mess_box("Midi Out device activated...");
             }
-            catch(RtError &error)
+            catch(...)
             {
                 mess_box("Midi Out device failed to open...");
             }
@@ -392,16 +395,26 @@ void _Midi_Send(int nbr_track, int eff_dat, int row_dat)
 // Return the name of the current midi in device
 char *Midi_GetInName(void)
 {
-    if(c_midiin == -1) return("");
-    return((char *) midiin->getPortName(c_midiin).c_str());
+    if(c_midiin == -1)
+    {
+        strcpy(Midi_Out_Name, "");
+        return(Midi_Out_Name);
+    }
+    midiin->getPortName(c_midiin, Midi_In_Name);
+    return(Midi_In_Name);
 }
 
 // ------------------------------------------------------
 // Return the name of the current midi out device
 char *Midi_GetOutName(void)
 {
-    if(c_midiout == -1) return("");
-    return((char *) midiout->getPortName(c_midiout).c_str());
+    if(c_midiout == -1)
+    {
+        strcpy(Midi_Out_Name, "");
+        return(Midi_Out_Name);
+    }
+    midiout->getPortName(c_midiout, Midi_Out_Name);
+    return(Midi_Out_Name);
 }
 
 #endif

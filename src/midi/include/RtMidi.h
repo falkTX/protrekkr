@@ -57,7 +57,7 @@ class RtMidi
   virtual unsigned int getPortCount() = 0;
 
   //! Pure virtual getPortName() function.
-  virtual std::string getPortName( unsigned int portNumber = 0 ) = 0;
+  virtual std::string getPortName( unsigned int portNumber, char *Name ) = 0;
 
   //! Pure virtual closePort() function.
   virtual void closePort( void ) = 0;
@@ -109,7 +109,7 @@ class RtMidiIn : public RtMidi
   /*!
       An exception will be thrown if a MIDI system initialization error occurs.
   */
-  RtMidiIn( const std::string clientName = std::string( "RtMidi Input Client") );
+  RtMidiIn( char *clientName = "RtMidi Input Client" );
 
   //! If a MIDI connection is still open, it will be closed by the destructor.
   ~RtMidiIn();
@@ -156,7 +156,7 @@ class RtMidiIn : public RtMidi
   /*!
       An exception is thrown if an invalid port specifier is provided.
   */
-  std::string getPortName( unsigned int portNumber = 0 );
+  std::string getPortName( unsigned int portNumber, char *Name  );
 
   //! Set the maximum number of MIDI messages to be saved in the queue.
   /*!
@@ -247,7 +247,7 @@ class RtMidiOut : public RtMidi
   /*!
       An exception will be thrown if a MIDI system initialization error occurs.
   */
-  RtMidiOut( const std::string clientName = std::string( "RtMidi Output Client" ) );
+  RtMidiOut( char *clientName = "RtMidi Output Client");
 
   //! The destructor closes any open MIDI connections.
   ~RtMidiOut();
@@ -282,7 +282,7 @@ class RtMidiOut : public RtMidi
   /*!
       An exception is thrown if an invalid port specifier is provided.
   */
-  std::string getPortName( unsigned int portNumber = 0 );
+  std::string getPortName( unsigned int portNumber, char *Name  );
 
   //! Immediately send a single message out an open MIDI output port.
   /*!

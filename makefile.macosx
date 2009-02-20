@@ -22,7 +22,7 @@ EXEOBJS_PPC = ptk_ppc.o \
           patterns_blocks_ppc.o editor_synth_ppc.o editor_sample_ppc.o editor_fx_setup_ppc.o editor_setup_ppc.o \
           editor_diskio_ppc.o editor_instrument_ppc.o \
           samples_pack_ppc.o files_list_ppc.o files_ppc.o \
-          midi_ppc.o \
+          midi_ppc.o RtMidi_ppc.o \
           timer_ppc.o main_ppc.o sdlmain_ppc.o \
           misc_draw_ppc.o xml_ppc.o \
           riff_ppc.o \
@@ -34,7 +34,7 @@ EXEOBJS_X86 = ptk_x86.o \
           patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
           editor_diskio_x86.o editor_instrument_x86.o \
           samples_pack_x86.o files_list_x86.o files_x86.o \
-          midi_x86.o \
+          midi_x86.o RtMidi_x86.o \
           timer_x86.o main_x86.o sdlmain_x86.o \
           misc_draw_x86.o xml_x86.o \
           riff_x86.o \
@@ -109,6 +109,9 @@ files_ppc.o: src/files/files.cpp
 
 midi_ppc.o: src/midi/midi.cpp
 	g++ -c -o $(@) $(FLAGS_PPC) src/midi/midi.cpp
+
+RtMidi_ppc.o: src/midi/RtMidi.cpp
+	g++ -c -o $(@) $(FLAGS_PPC) src/midi/RtMidi.cpp
 
 timer_ppc.o: src/support/timer.cpp
 	g++ -c -o $(@) $(FLAGS_PPC) src/support/timer.cpp
@@ -201,6 +204,9 @@ files_x86.o: src/files/files.cpp
 
 midi_x86.o: src/midi/midi.cpp
 	g++ -c -o $(@) $(FLAGS_X86) src/midi/midi.cpp
+
+RtMidi_x86.o: src/midi/RtMidi.cpp
+	g++ -c -o $(@) $(FLAGS_X86) src/midi/RtMidi.cpp
 
 timer_x86.o: src/support/timer.cpp
 	g++ -c -o $(@) $(FLAGS_X86) src/support/timer.cpp
