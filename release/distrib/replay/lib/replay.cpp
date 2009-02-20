@@ -116,12 +116,6 @@ volatile int Songplaying;
 int Songplaying;
 #endif
 
-int New_Instrument[MAX_TRACKS];
-int Pos_Segue[MAX_TRACKS];
-float Segue_Volume[MAX_TRACKS];
-float Segue_SamplesL[MAX_TRACKS];
-float Segue_SamplesR[MAX_TRACKS];
-
 #if defined(PTK_303)
     gear303 tb303engine[2];
     para303 tb303[2];
@@ -1287,12 +1281,6 @@ void Pre_Song_Init(void)
 #endif
 
         CCut[ini] = 126.0f;
-
-        New_Instrument[ini] = 0;
-        Pos_Segue[ini] = 0;
-        Segue_Volume[ini] = 0;
-        Segue_SamplesL[ini] = 0;
-        Segue_SamplesR[ini] = 0;
     }
 
 #if defined(PTK_FLANGER)
@@ -2063,26 +2051,6 @@ ByPass_Wav:
 
         }
 
-        // A rather clumsy cross fading to avoid the most outrageous clicks
-        // (i also tried with splines but didn't hear any difference)
-/*        if(New_Instrument[c])
-        {
-            All_Signal_L = (All_Signal_L * (1.0f - Segue_Volume[c])) + (Segue_SamplesL[c] * Segue_Volume[c]);
-            All_Signal_R = (All_Signal_R * (1.0f - Segue_Volume[c])) + (Segue_SamplesR[c] * Segue_Volume[c]);
-            Pos_Segue[c]++;
-            Segue_Volume[c] -= 1.0f / 127.0f;
-            if(Pos_Segue[c] >= 128)
-            {
-                New_Instrument[c] = FALSE;
-            }
-        }
-        else
-        {
-            // Store the transition
-            Segue_SamplesL[c] = All_Signal_L;
-            Segue_SamplesR[c] = All_Signal_R;
-        }
-*/
         // -----------------------------------------------
         if(gotsome)
         {
@@ -2702,9 +2670,6 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
         }
-        Pos_Segue[channel] = 0;
-        Segue_Volume[channel] = 1.0f;
-        New_Instrument[channel] = TRUE;
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
