@@ -172,6 +172,7 @@ int play(const char *fn)
 	// launch decode thread
 	killDecodeThread = 0;
 	thread_handle = (HANDLE) CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) DecodeThread, NULL, 0, &thread_id);
+    SetThreadPriority(thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
 	
 	return 0; 
 }
