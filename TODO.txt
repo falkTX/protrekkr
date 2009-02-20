@@ -1,17 +1,5 @@
 TODO (in no special order):
 
- + Editing.
- + Live rec.
- + Key jazz.
- + Ptp format.
- + Record mode (multi-notes off lacking).
- + Block operations.
- + Midi channels.
- + Key repeat when editing notes.
- + Test the replay.
- 
- - Perform some tests on linux and macosx (especially the keyboard).
-
 ----------------------------------------------------------
  - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
    to other Operating Systems.
