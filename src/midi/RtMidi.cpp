@@ -452,7 +452,7 @@ std::string RtMidiIn :: getPortName( unsigned int portNumber, char *Name )
     //ost << "RtMidiIn::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
     //errorString_ = ost.str();
     //error( RtError::INVALID_PARAMETER );
-    return;
+    return 0;
   }
   portRef = MIDIGetSource( portNumber );
 
@@ -460,7 +460,7 @@ std::string RtMidiIn :: getPortName( unsigned int portNumber, char *Name )
   CFStringGetCString( nameRef, name, sizeof(name), 0);
   CFRelease( nameRef );
   std::string stringName = name;
-  strcpy(Name, name.c_str());
+  strcpy(Name, name);
   return stringName;
 }
 
@@ -485,7 +485,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber, char *Name  )
     //ost << "RtMidiOut::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
     //errorString_ = ost.str();
     //error( RtError::INVALID_PARAMETER );
-    return;
+    return 0;
   }
   portRef = MIDIGetDestination( portNumber );
 
@@ -493,7 +493,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber, char *Name  )
   CFStringGetCString( nameRef, name, sizeof(name), 0);
   CFRelease( nameRef );
   std::string stringName = name;
-  strcpy(Name, name.c_str());
+  strcpy(Name, name);
   return stringName;
 }
 

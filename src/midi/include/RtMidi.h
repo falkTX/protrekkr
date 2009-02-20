@@ -220,7 +220,7 @@ class RtMidiIn : public RtMidi
 
  private:
 
-  void initialize( const std::string& clientName );
+  void initialize( char *clientName );
   RtMidiInData inputData_;
 
 };
@@ -293,7 +293,7 @@ class RtMidiOut : public RtMidi
 
  private:
 
-  void initialize( const std::string& clientName );
+  void initialize( char *clientName );
 };
 
 #endif

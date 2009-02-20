@@ -2,13 +2,13 @@ LIBS_PPC = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
-       -lsdldraw_ppc -lz -framework CoreAudio -framework AudioUnit -framework Cocoa -framework SDL
+       -lsdldraw_ppc -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
 
 LIBS_X86 = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
-       -lsdldraw_x86 -lz -framework CoreAudio -framework AudioUnit -framework Cocoa -framework SDL
+       -lsdldraw_x86 -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
 
 DEBUG = 
 
@@ -50,8 +50,8 @@ RemObj:
 	-rm -f $(EXEOBJS_X86)
 
 protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
-	g++ -s -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
-	g++ -s -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
+	g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
+	g++ -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
 	lipo -create ./release/distrib/ptk_macosx_x86 ./release/distrib/ptk_macosx_ppc -output ./release/distrib/ptk_macosx
 	strip -x -X -S ./release/distrib/ptk_macosx
 	-rm -f ./release/distrib/ptk_macosx_ppc
