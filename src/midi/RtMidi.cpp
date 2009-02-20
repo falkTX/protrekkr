@@ -38,7 +38,7 @@
 // RtMidi: Version 1.0.8
 
 #include "include/RtMidi.h"
-//#include <sstream>
+#include <sstream>
 
 //*********************************************************************//
 //  Common RtMidi Definitions
@@ -955,7 +955,7 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
 
 	snd_seq_port_info_t *pinfo;
 	snd_seq_port_info_alloca( &pinfo );
-  std::ostringstream ost;
+  //std::ostringstream ost;
   AlsaMidiData *data = static_cast<AlsaMidiData *> (apiData_);
   if ( portInfo( data->seq, pinfo, SND_SEQ_PORT_CAP_READ|SND_SEQ_PORT_CAP_SUBS_READ, (int) portNumber ) == 0 ) {
     //ost << "RtMidiIn::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
@@ -1137,7 +1137,7 @@ std::string RtMidiIn :: getPortName( unsigned int portNumber, char *Name  )
     os << ":";
     os << snd_seq_port_info_get_port( pinfo );
     std::string stringName = os.str();
-    strcpy(Name, cs.c_str());
+    strcpy(Name, stringName.c_str());
     return stringName;
   }
 
@@ -1177,7 +1177,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber, char *Name  )
     os << ":";
     os << snd_seq_port_info_get_port(pinfo);
     std::string stringName = os.str();
-    strcpy(Name, cs.c_str());
+    strcpy(Name, stringName.c_str());
     return stringName;
   }
 
