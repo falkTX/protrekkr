@@ -3056,7 +3056,7 @@ void DoEffects(void)
             case 0xa:
                 if(Subicounter == 0)
                 {
-                    TCut[trackef] = float((float) (rand() / 256) * ((float) (pltr_dat_row / 255.0f)));
+                    TCut[trackef] = float((float) (rand() & 0xff) * ((float) (pltr_dat_row / 255.0f)));
 
                     if(TCut[trackef] < 1) TCut[trackef] = 1;
                     if(TCut[trackef] > 127) TCut[trackef] = 127;
