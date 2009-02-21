@@ -16,7 +16,6 @@ TODO (in no special order):
  - Add an option to play a packed sample in order to test it inside the tracker.
  - Add customization for the keys shortcuts in the xml file (may be ok like that).
  - Add a large patterns view mode (more rows).
- - Small / big fonts view for patterns.
  - Navigate through samples data with the mouse wheel in the samples editor.
  - Arrows to finetune samples looping datas in instruments tab.
  - Undo functions for samples and patterns.
