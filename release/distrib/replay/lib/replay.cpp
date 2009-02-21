@@ -727,6 +727,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type)
 #endif
 
                 break;
+
             case SMP_PACK_MP3:
 
 #if !defined(__NO_CODEC__)
@@ -2000,10 +2001,6 @@ ByPass_Wav:
             // Synth
             if(Synthesizer[c][i].ENV1_STAGE || Synthesizer[c][i].ENV2_STAGE)
             {
-//                char fuck[64];
-  //              sprintf(fuck, "%d %d\n", c, i);
-    //            OutputDebugString(fuck);
-
                 if(!Done_CVol[c][i])
                 {
                     if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.004f;

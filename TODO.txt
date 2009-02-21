@@ -31,3 +31,4 @@ TODO (in no special order):
  - Add a metronome for the recording mode.
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.
+ - More colors in the patterns.

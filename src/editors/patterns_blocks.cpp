@@ -1271,8 +1271,7 @@ COLUMN_TYPE Get_Column_Type(char *Buffer, int column)
 {
     int track = Get_Track_From_Nibble(Buffer, column);
     int i;
-    int fuck = Get_Max_Nibble_Track(Buffer, track);
-    int notes = (fuck - 8) / 3;
+    int notes = (Get_Max_Nibble_Track(Buffer, track) - 8) / 3;
 
     column = Get_Track_Relative_Column(Buffer, column);
 

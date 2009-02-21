@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.91b:
+
+- Fixed the rand commands in the synth tab.
+
 v1.91:
 
 - Midi controller modification command (0x90) wasn't accessible anymore

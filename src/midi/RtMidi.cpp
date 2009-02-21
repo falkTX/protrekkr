@@ -1623,6 +1623,7 @@ struct WinMidiData {
   LPMIDIHDR sysexBuffer;
 };
 
+#if !defined(__GCC__)
 extern "C"
 {
 int __lc_codepage = 0;
@@ -1631,6 +1632,7 @@ int __mb_cur_max = 0;
 int errno = 0;
 unsigned short *_pctype = 0;
 }
+#endif
 
 #define  RT_SYSEX_BUFFER_SIZE 1024
 

@@ -3926,7 +3926,7 @@ Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
         d_stream.next_in = (Uint8 *) Memory;
         d_stream.avail_in = Size_Out;
         d_stream.next_out = Test_Mem;
-        d_stream.avail_out = -1;
+        d_stream.avail_out = (Uint32) -1;
         inflateInit(&d_stream);
         inflate(&d_stream, Z_FULL_FLUSH);
         inflateEnd(&d_stream);

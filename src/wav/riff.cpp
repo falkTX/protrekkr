@@ -334,7 +334,7 @@ WaveFile::WaveFile()
 DDCRET WaveFile::OpenForRead(const char *Filename)
 {
     UINT32 data_length;
-    WAVEFORMATEXTENSIBLE Extra_Infos;
+    _WAVEFORMATEXTENSIBLE Extra_Infos;
     short Pad;
 
     // Verify filename parameter as best we can...
@@ -366,7 +366,7 @@ DDCRET WaveFile::OpenForRead(const char *Filename)
             if(wave_format.data.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
             {
                 retcode = Read(&Pad, sizeof(short));
-                retcode = Read(&Extra_Infos, sizeof(WAVEFORMATEXTENSIBLE));
+                retcode = Read(&Extra_Infos, sizeof(_WAVEFORMATEXTENSIBLE));
                 wave_format.data.wFormatTag = Swap_32(Extra_Infos.SubFormat.Data1);
                 wave_format.data.nBitsPerSample = Swap_16(Extra_Infos.Samples.wValidBitsPerSample);
             }

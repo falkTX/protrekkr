@@ -98,9 +98,7 @@ class RiffFile
                         );
 };
 
-#ifndef _WAVEFORMATEX_
-#define _WAVEFORMATEX_
-typedef struct tWAVEFORMATEX
+typedef struct
 {
     UINT16   wFormatTag;        /* format type */
     UINT16   nChannels;         /* number of channels (i.e. mono, stereo...) */
@@ -110,8 +108,7 @@ typedef struct tWAVEFORMATEX
     UINT16   wBitsPerSample;    /* Number of bits per sample of mono data */
     UINT16   cbSize;            /* The count in bytes of the size of
                                   extra information (after cbSize) */
-} WAVEFORMATEX;
-#endif
+} _WAVEFORMATEX;
 
 #ifndef GUID_DEFINED
 #define GUID_DEFINED
@@ -124,8 +121,6 @@ typedef struct _GUID
 } GUID;
 #endif /* GUID_DEFINED */
 
-#ifndef _WAVEFORMATEXTENSIBLE_
-#define _WAVEFORMATEXTENSIBLE_
 typedef struct
 {
     union
@@ -136,8 +131,7 @@ typedef struct
     } Samples;
     UINT32 dwChannelMask; /* which channels are present in stream */
     GUID SubFormat;
-} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
-#endif
+} _WAVEFORMATEXTENSIBLE, *_PWAVEFORMATEXTENSIBLE;
 
 struct WaveFormat_ChunkData
 {
