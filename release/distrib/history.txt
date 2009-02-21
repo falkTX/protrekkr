@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.90e:
+
+- Midi notes off command was broken.
+- Effect 0xAxx (Set Random Cutoff) slightly modified, the xx value is now
+  the amplitude of the calculated random value from 0 to 0xff.
+
 v1.90d:
 
 - Implemented midi in/out for Linux and Mac OS X.
