@@ -899,7 +899,7 @@ void Realslider_Horiz(int x, int y, int value, int displayed, int maximum, int s
         SetColor(COL_SLIDER_MED);
         bjbox(x + 1, y + 1, size, 16 - 1);
 
-        Gui_Draw_Button_Box(x + 1 + (int) Pos_slider, y + 1, caret_size, 16 - 2, "", BUTTON_NORMAL);
+        Gui_Draw_Button_Box(x + 1 + (int) Pos_slider, y + 1, (int) caret_size, 16 - 2, "", BUTTON_NORMAL);
     }
     else
     {
