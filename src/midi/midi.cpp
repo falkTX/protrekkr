@@ -244,7 +244,7 @@ void Midi_NoteOff(int channel, int note)
     {
         note++;
         _Midi_Send(176 + CHAN_MIDI_PRG[channel], 0x40, 0);
-        if(note != -1)
+        if(note)
         {
             for(i = 0; i < 256; i++)
             {

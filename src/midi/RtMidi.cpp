@@ -1920,7 +1920,7 @@ static void CALLBACK midiInputCallback( HMIDIOUT hmin,
   apiData->message.bytes.clear();
 }
 
-void RtMidiIn :: initialize( const std::string& /*clientName*/ )
+void RtMidiIn :: initialize( char * /*clientName*/ )
 {
   // We'll issue a warning here if no devices are available but not
   // throw an error since the user can plugin something later.
@@ -2115,7 +2115,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber, char *Name  )
   return stringName;
 }
 
-void RtMidiOut :: initialize( const std::string& /*clientName*/ )
+void RtMidiOut :: initialize( char * /*clientName*/ )
 {
   // We'll issue a warning here if no devices are available but not
   // throw an error since the user can plug something in later.

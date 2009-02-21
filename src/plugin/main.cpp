@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#define VERSION "v1.90"
+#define VERSION "v1.90d"
 
 #include "in2.h"
 
