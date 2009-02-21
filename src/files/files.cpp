@@ -805,7 +805,9 @@ Read_Mod_File:
             Midi_Reset();
 #endif
 
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
             Reset_Patterns_Zoom();
+#endif
 
             init_sample_bank();
             Pre_Song_Init();
