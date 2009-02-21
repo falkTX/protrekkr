@@ -1,7 +1,32 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius 
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 #ifndef _VARIABLES_H_
@@ -57,6 +82,7 @@
 #define GUI_CMD_SET_TRACK_REVERB_SEND 56
 #define GUI_CMD_SET_TRACK_PANNING 57
 #define GUI_CMD_CALC_LENGTH 58
+#define GUI_CMD_SWITCH_TRACK_ZOOM_STATE 59
 
 #define GUI_CMD_SELECT_DISKIO 60
 #define GUI_CMD_SELECT_TRACK_EDIT 61
@@ -523,8 +549,6 @@ void Compressor_work(void);
 void StartRec(void);
 void StartEdit(void);
 void ComputeCoefs(int freq, int r, int t);
-void blitnote(int x, int y, int note, int y1, int y2);
-void Letter(int x, int y, char ltr, int ys, int y2);
 void live303(int pltr_eff_row, int pltr_dat_row);
 float Filter(float x, char i);
 float Kutoff(int v);

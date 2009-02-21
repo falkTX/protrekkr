@@ -1,12 +1,38 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius 
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 // ------------------------------------------------------
 // Includes
 #include "include/editor_track.h"
+#include "include/editor_pattern.h"
 
 // ------------------------------------------------------
 // Functions
@@ -179,6 +205,10 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
             if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            if(Is_Track_Zoomed(ped_track) && Channels_MultiNotes[ped_track] > 11)
+            {
+                Toggle_Track_Zoom(ped_track);
+            }
             Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Actupated(0);
         }
@@ -268,7 +298,7 @@ void Mouse_Left_Track_Ed(void)
             teac = 11;
         }
 
-        // Mute track
+        // Distortion
         if(zcheckMouse(570, 548, 60, 16))
         {
             Disclap[ped_track] = !Disclap[ped_track];
@@ -276,6 +306,7 @@ void Mouse_Left_Track_Ed(void)
             teac = 12;
         }
 
+        // Mute track
         if(zcheckMouse(508, 512, 64, 16))
         {
             if(CHAN_MUTE_STATE[ped_track] == 0) CHAN_MUTE_STATE[ped_track] = 1;

@@ -2,6 +2,14 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.91:
+
+- Midi controller modification command (0x90) wasn't accessible anymore
+  in panning row, fixed.
+- Fixed an issue that could occur with rand() function under linux.
+- Introduced zoomed tracks; Each track can be zoomed independantly
+  and will be displayed with a bigger font.
+
 v1.90e:
 
 - Midi notes off command was broken.

@@ -1,7 +1,32 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius 
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 #ifndef _EDITOR_PATTERN_H_
@@ -21,12 +46,9 @@
 // Constants
 #define PAT_COL_SHIFT 4
 #define PAT_COL_NOTE 24
-#define PAT_COL_INSTRUMENT 52
-#define PAT_COL_VOLUME 72
-#define PAT_COL_PANNING 92
-#define PAT_COL_EFFECTS 112
 
 #define PAT_COL_CHAR 8
+#define PAT_COL_CHAR_BIG 11
 
 #define DISPLAYED_LINES 28
 
@@ -46,6 +68,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void);
 void Mouse_Left_Pattern_Ed(void);
 void Mouse_Right_Pattern_Ed(void);
 int Get_Visible_Tracks_Size(void);
+int Get_Visible_Partial_Tracks(void);
 int Get_Current_Position(void);
 void Goto_Previous_Row(void);
 void Goto_Next_Row(void);
@@ -58,5 +81,9 @@ void Goto_Bottom_Right(void);
 void Goto_Row(int row);
 int Get_Visible_Complete_Tracks(void);
 int Get_Pattern_Offset(int track, int row, int pattern);
+void Reset_Patterns_Zoom(void);
+void Toggle_Track_Zoom(int track);
+void Clear_Track_Zoom(int track);
+int Is_Track_Zoomed(int track);
 
 #endif

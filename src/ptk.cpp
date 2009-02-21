@@ -1,7 +1,32 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius 
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 // ------------------------------------------------------
@@ -362,6 +387,7 @@ int Init_Context(void)
 
     Set_Default_Channels_Polyphony();
     init_sample_bank();
+    Reset_Patterns_Zoom();
     Pre_Song_Init();
     Post_Song_Init();
 
@@ -714,6 +740,20 @@ int Screen_Update(void)
             else CHAN_MUTE_STATE[tmp_track] = 0;
 
             if(userscreen == USER_SCREEN_TRACK_EDIT) Actualize_Track_Ed(10);
+            Actupated(0);
+        }
+
+        if(gui_action == GUI_CMD_SWITCH_TRACK_ZOOM_STATE)
+        {
+            int tmp_track = Get_Track_Over_Mouse();
+
+            Toggle_Track_Zoom(tmp_track);
+
+            // Too big to be zoomed
+            if(Is_Track_Zoomed(tmp_track) && Channels_MultiNotes[ped_track] > 11)
+            {
+                Toggle_Track_Zoom(tmp_track);
+            }
             Actupated(0);
         }
 
@@ -1635,6 +1675,8 @@ void Newmod(void)
     SongStop();
     Stop_Current_Sample();
     mess_box("Freeing all allocated buffers and restarting...");   
+
+    Reset_Patterns_Zoom();
 
     Free_Samples();
 
@@ -3329,9 +3371,13 @@ void Keyboard_Handler(void)
 
                         // Max panning
                         if(oldval != 255 && ped_col == (5 + j) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
                         {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            if(oldval != 255 && ped_col == (5 + j) &&
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            }
                         }
 
                         // Max instrument
@@ -3363,9 +3409,13 @@ void Keyboard_Handler(void)
 
                             // Max panning
                             if(oldval != 255 && ped_col == (5 + j) &&
-                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
                             {
-                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                                if(oldval != 255 && ped_col == (5 + j) &&
+                                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                                {
+                                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                                }
                             }
 
                             // Max instrument
@@ -3424,9 +3474,13 @@ void Keyboard_Handler(void)
 
                         // Max panning
                         if(oldval != 255 && ped_col == (6 + j) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
                         {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            if(oldval != 255 && ped_col == (6 + j) &&
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                            {
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                            }
                         }
 
                         // Max instrument
@@ -3458,9 +3512,13 @@ void Keyboard_Handler(void)
 
                             // Max panning
                             if(oldval != 255 && ped_col == (6 + j) &&
-                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
                             {
-                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                                if(oldval != 255 && ped_col == (6 + j) &&
+                                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                                {
+                                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                                }
                             }
 
                             // Max instrument
@@ -4057,7 +4115,6 @@ void Mouse_Handler(void)
         if(zcheckMouse(134, 152, 16, 16)) gui_action = GUI_CMD_INCREASE_STEP_ADD;
         if(zcheckMouse(258, 134, 16, 16)) gui_action = GUI_CMD_PREV_INSTR;
         if(zcheckMouse(302, 134, 16, 16)) gui_action = GUI_CMD_NEXT_INSTR;
-        if(zcheckMouse(1, 184, CHANNELS_WIDTH, 10)) gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
 
         // --- Player --------------------------------------------
 

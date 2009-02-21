@@ -1,8 +1,7 @@
 TODO (in no special order):
 
 ----------------------------------------------------------
- - Adapt Windows dependencies (midi stuff & codecs packers & depackers)
-   to other Operating Systems.
+ - Adapt Windows dependencies (codecs packers & depackers) to other Operating Systems.
  - Create a decent gadgets system (events based).
  - Add a function to wipe the current song
    (removing unused patterns, although this is done for .ptp files, it's not implemented for .ptk).
@@ -20,12 +19,11 @@ TODO (in no special order):
  - Small / big fonts view for patterns.
  - Navigate through samples data with the mouse wheel in the samples editor.
  - Arrows to finetune samples looping datas in instruments tab.
- - Undo function for samples and patterns.
+ - Undo functions for samples and patterns.
  - Click on numbers & move the mouse to modify them (or use the wheel).
- - More shortcuts.
  - Alternate way to enter notes (a la fruity loops).
  - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
- - Add a set of functions to remap instruments in sequencer (from -> to).
+ - Add a set of functions to remap instruments in the sequencer tab (from -> to).
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
@@ -33,3 +31,4 @@ TODO (in no special order):
  - Chords editor.
  - Add a metronome for the recording mode.
  - Add individual panning data for instruments & synths.
+ - Add support for soundfont 2 files.

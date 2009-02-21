@@ -1,7 +1,32 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius 
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 // ------------------------------------------------------
@@ -2422,34 +2447,34 @@ void CParcha_Misc(int cpar)
 
 void Rand_OSC1()
 {
-    PARASynth[ped_patsam].osc1_waveform = rand() / 8192;
+    PARASynth[ped_patsam].osc1_waveform = rand() & 0x1fff;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].osc1_pw = rand() / 64;
+        PARASynth[ped_patsam].osc1_pw = rand() & 0x3f;
     }
     PARASynth[ped_patsam].env1_attack = rand();
     PARASynth[ped_patsam].env1_decay = rand();
-    PARASynth[ped_patsam].env1_sustain = rand() / 256;
+    PARASynth[ped_patsam].env1_sustain = rand() & 0xff;
     PARASynth[ped_patsam].env1_release = rand();
-    PARASynth[ped_patsam].osc3_volume = rand() / 256;
+    PARASynth[ped_patsam].osc3_volume = rand() & 0xff;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_OSC2()
 {
-    PARASynth[ped_patsam].osc2_waveform = rand() / 8192;
+    PARASynth[ped_patsam].osc2_waveform = rand() & 0x1fff;
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].osc2_pw = rand() / 64;
+        PARASynth[ped_patsam].osc2_pw = rand() & 0x3f;
     }
-    PARASynth[ped_patsam].osc2_finetune = rand() / 256;
+    PARASynth[ped_patsam].osc2_finetune = rand() & 0xff;
     PARASynth[ped_patsam].env2_attack = rand();
     PARASynth[ped_patsam].env2_decay = rand();
-    PARASynth[ped_patsam].env2_sustain = rand() / 256;
+    PARASynth[ped_patsam].env2_sustain = rand() & 0xff;
     PARASynth[ped_patsam].env2_release = rand();
     if(rand() > 16384)
     {
-        PARASynth[ped_patsam].osc2_detune = rand() / 256;
+        PARASynth[ped_patsam].osc2_detune = rand() & 0xff;
     }
     else
     {
@@ -2460,72 +2485,72 @@ void Rand_OSC2()
 
 void Rand_VCF()
 {
-    PARASynth[ped_patsam].vcf_type = rand() / 10923;
-    PARASynth[ped_patsam].vcf_cutoff = rand() / 256;
-    PARASynth[ped_patsam].vcf_resonance = rand() / 256;
+    PARASynth[ped_patsam].vcf_type = rand() % 10923;
+    PARASynth[ped_patsam].vcf_cutoff = rand() & 0xff;
+    PARASynth[ped_patsam].vcf_resonance = rand() & 0xff;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_LFO1()
 {
-    PARASynth[ped_patsam].lfo1_period = rand() / 256;
+    PARASynth[ped_patsam].lfo1_period = rand() & 0xff;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].lfo1_osc1_pw = rand() / 256;
+        PARASynth[ped_patsam].lfo1_osc1_pw = rand() & 0xff;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].lfo1_osc2_pw = rand() / 256;
+        PARASynth[ped_patsam].lfo1_osc2_pw = rand() & 0xff;
     }
-    PARASynth[ped_patsam].lfo1_osc1_volume = rand() / 256;
-    PARASynth[ped_patsam].lfo1_osc2_volume = rand() / 256;
-    PARASynth[ped_patsam].lfo1_vcf_cutoff = rand() / 256;
-    PARASynth[ped_patsam].lfo1_vcf_resonance = rand() / 256;
+    PARASynth[ped_patsam].lfo1_osc1_volume = rand() & 0xff;
+    PARASynth[ped_patsam].lfo1_osc2_volume = rand() & 0xff;
+    PARASynth[ped_patsam].lfo1_vcf_cutoff = rand() & 0xff;
+    PARASynth[ped_patsam].lfo1_vcf_resonance = rand() & 0xff;
     if(rand() > 16384)
     {
-        PARASynth[ped_patsam].lfo1_osc1_pitch = rand() / 256;
-        PARASynth[ped_patsam].lfo1_osc2_pitch = rand() / 256;
+        PARASynth[ped_patsam].lfo1_osc1_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].lfo1_osc2_pitch = rand() & 0xff;
     }
     else
     {
-        PARASynth[ped_patsam].lfo1_osc1_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].lfo1_osc2_pitch = 64 + ((rand() - 16384) / 10923);
+        PARASynth[ped_patsam].lfo1_osc1_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].lfo1_osc2_pitch = 64 + ((rand() - 16384) % 10923);
     }
     PARASynth[ped_patsam].lfo1_attack = rand();
     PARASynth[ped_patsam].lfo1_decay = rand();
-    PARASynth[ped_patsam].lfo1_sustain = rand() / 256;
+    PARASynth[ped_patsam].lfo1_sustain = rand() & 0xff;
     PARASynth[ped_patsam].lfo1_release = rand();
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_LFO2()
 {
-    PARASynth[ped_patsam].lfo2_period = rand() / 256;
+    PARASynth[ped_patsam].lfo2_period = rand() & 0xff;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].lfo2_osc1_pw = rand() / 256;
+        PARASynth[ped_patsam].lfo2_osc1_pw = rand() & 0xff;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].lfo2_osc2_pw = rand() / 256;
+        PARASynth[ped_patsam].lfo2_osc2_pw = rand() & 0xff;
     }
-    PARASynth[ped_patsam].lfo2_osc1_volume = rand() / 256;
-    PARASynth[ped_patsam].lfo2_osc2_volume = rand() / 256;
-    PARASynth[ped_patsam].lfo2_vcf_cutoff = rand() / 256;
-    PARASynth[ped_patsam].lfo2_vcf_resonance = rand() / 256;
+    PARASynth[ped_patsam].lfo2_osc1_volume = rand() & 0xff;
+    PARASynth[ped_patsam].lfo2_osc2_volume = rand() & 0xff;
+    PARASynth[ped_patsam].lfo2_vcf_cutoff = rand() & 0xff;
+    PARASynth[ped_patsam].lfo2_vcf_resonance = rand() & 0xff;
     if(rand() > 16384)
     {
-        PARASynth[ped_patsam].lfo2_osc1_pitch = rand() / 256;
-        PARASynth[ped_patsam].lfo2_osc2_pitch = rand() / 256;
+        PARASynth[ped_patsam].lfo2_osc1_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].lfo2_osc2_pitch = rand() & 0xff;
     }
     else
     {
-        PARASynth[ped_patsam].lfo2_osc1_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].lfo2_osc2_pitch = 64 + ((rand() - 16384) / 10923);
+        PARASynth[ped_patsam].lfo2_osc1_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].lfo2_osc2_pitch = 64 + ((rand() - 16384) % 10923);
     }
     PARASynth[ped_patsam].lfo2_attack = rand();
     PARASynth[ped_patsam].lfo2_decay = rand();
-    PARASynth[ped_patsam].lfo2_sustain = rand() / 256;
+    PARASynth[ped_patsam].lfo2_sustain = rand() & 0xff;
     PARASynth[ped_patsam].lfo2_release = rand();
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
@@ -2534,29 +2559,29 @@ void Rand_ENV1()
 {
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].env1_osc1_pw = rand() / 256;
+        PARASynth[ped_patsam].env1_osc1_pw = rand() & 0xff;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].env1_osc2_pw = rand() / 256;
+        PARASynth[ped_patsam].env1_osc2_pw = rand() & 0xff;
     }
-    PARASynth[ped_patsam].env1_osc1_volume = rand() / 256;
-    PARASynth[ped_patsam].env1_osc2_volume = rand() / 256;
-    PARASynth[ped_patsam].env1_vcf_cutoff = rand() / 256;
-    PARASynth[ped_patsam].env1_vcf_resonance = rand() / 256;
+    PARASynth[ped_patsam].env1_osc1_volume = rand() & 0xff;
+    PARASynth[ped_patsam].env1_osc2_volume = rand() & 0xff;
+    PARASynth[ped_patsam].env1_vcf_cutoff = rand() & 0xff;
+    PARASynth[ped_patsam].env1_vcf_resonance = rand() & 0xff;
     if(rand() > 16384)
     {
-        PARASynth[ped_patsam].env1_osc1_pitch = rand() / 256;
-        PARASynth[ped_patsam].env1_osc2_pitch = rand() / 256;
-        PARASynth[ped_patsam].env2_osc1_pitch = rand() / 256;
-        PARASynth[ped_patsam].env2_osc2_pitch = rand() / 256;
+        PARASynth[ped_patsam].env1_osc1_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].env1_osc2_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].env2_osc1_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].env2_osc2_pitch = rand() & 0xff;
     }
     else
     {
-        PARASynth[ped_patsam].env1_osc1_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].env1_osc2_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].env2_osc1_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].env2_osc2_pitch = 64 + ((rand() - 16384) / 10923);
+        PARASynth[ped_patsam].env1_osc1_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].env1_osc2_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].env2_osc1_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].env2_osc2_pitch = 64 + ((rand() - 16384) % 10923);
     }
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
@@ -2565,25 +2590,25 @@ void Rand_ENV2()
 {
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].env2_osc1_pw = rand() / 256;
+        PARASynth[ped_patsam].env2_osc1_pw = rand() & 0xff;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].env2_osc2_pw = rand() / 256;
+        PARASynth[ped_patsam].env2_osc2_pw = rand() & 0xff;
     }
-    PARASynth[ped_patsam].env2_osc1_volume = rand() / 256;
-    PARASynth[ped_patsam].env2_osc2_volume = rand() / 256;
-    PARASynth[ped_patsam].env2_vcf_cutoff = rand() / 256;
-    PARASynth[ped_patsam].env2_vcf_resonance = rand() / 256;
+    PARASynth[ped_patsam].env2_osc1_volume = rand() & 0xff;
+    PARASynth[ped_patsam].env2_osc2_volume = rand() & 0xff;
+    PARASynth[ped_patsam].env2_vcf_cutoff = rand() & 0xff;
+    PARASynth[ped_patsam].env2_vcf_resonance = rand() & 0xff;
     if(rand() > 16384)
     {
-        PARASynth[ped_patsam].env2_osc1_pitch = rand() / 256;
-        PARASynth[ped_patsam].env2_osc2_pitch = rand() / 256;
+        PARASynth[ped_patsam].env2_osc1_pitch = rand() & 0xff;
+        PARASynth[ped_patsam].env2_osc2_pitch = rand() & 0xff;
     }
     else
     {
-        PARASynth[ped_patsam].env2_osc1_pitch = 64 + ((rand() - 16384) / 10923);
-        PARASynth[ped_patsam].env2_osc2_pitch = 64 + ((rand() - 16384) / 10923);
+        PARASynth[ped_patsam].env2_osc1_pitch = 64 + ((rand() - 16384) % 10923);
+        PARASynth[ped_patsam].env2_osc2_pitch = 64 + ((rand() - 16384) % 10923);
     }
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
@@ -2592,10 +2617,10 @@ void Rand_Misc()
 {
     if(Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].ptc_glide = rand() / 256;
+        PARASynth[ped_patsam].ptc_glide = rand() & 0xff;
     }
     PARASynth[ped_patsam].glb_volume = 100;
-    PARASynth[ped_patsam].disto = rand() / 256;
+    PARASynth[ped_patsam].disto = rand() & 0xff;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 

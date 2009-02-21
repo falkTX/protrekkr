@@ -1,7 +1,32 @@
 // ------------------------------------------------------
 // Protrekkr
-// Written by Franck Charlet
-// Based on the work of Juan Antonio Arguelles Rius
+// Based on Juan Antonio Arguelles Rius's NoiseTrekker.
+//
+// Copyright (C) 2008-2009 Franck Charlet.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+//  1. Redistributions of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//  2. Redistributions in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL FRANCK CHARLET OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
 // ------------------------------------------------------
 
 // ------------------------------------------------------
@@ -28,6 +53,7 @@ int FgColor;
 int max_colors_logo;
 int max_colors_303;
 SDL_Surface *Temp_PFONT;
+SDL_Surface *Temp_BIGPFONT;
 int Beveled = TRUE;
 
 int Nbr_Letters;
@@ -222,6 +248,8 @@ int bare_color_idx;
 
 // ------------------------------------------------------
 // Functions
+void (*Letter_Function)(int x, int y, char ltr, int ys, int y2) = Letter;
+void Blit_note(int x, int y, int note, int y1, int y2, int size);
 
 void out_note(int x, int y, int note, int color)
 {
@@ -926,179 +954,242 @@ void Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
     {
-        case 0: Copy(PFONT, x, y, 72, ys, 79, y2); break;
-        case 1: Copy(PFONT, x, y, 80, ys, 87, y2); break;
-        case 2: Copy(PFONT, x, y, 88, ys, 95, y2); break;
-        case 3: Copy(PFONT, x, y, 96, ys, 103, y2); break;
-        case 4: Copy(PFONT, x, y, 104, ys, 111, y2); break;
-        case 5: Copy(PFONT, x, y, 112, ys, 119, y2); break;
-        case 6: Copy(PFONT, x, y, 120, ys, 127, y2); break;
-        case 7: Copy(PFONT, x, y, 128, ys, 135, y2); break;
-        case 8: Copy(PFONT, x, y, 136, ys, 143, y2); break;
-        case 9: Copy(PFONT, x, y, 144, ys, 151, y2); break;
-        case 10: Copy(PFONT, x, y, 0, ys, 7, y2); break; // A
-        case 11: Copy(PFONT, x, y, 8, ys, 15, y2); break;// B
-        case 12: Copy(PFONT, x, y, 16, ys, 23, y2); break;// C
-        case 13: Copy(PFONT, x, y, 24, ys, 31, y2); break;// D
-        case 14: Copy(PFONT, x, y, 32, ys, 39, y2); break;// E
-        case 15: Copy(PFONT, x, y, 40, ys, 47, y2); break;// F
-        case 16: Copy(PFONT, x, y, 48, ys, 55, y2); break;// G
-        case 17: Copy(PFONT, x, y, 64, ys, 71, y2); break; // #
-        case 18: Copy(PFONT, x, y, 176, ys, 183, y2); break; // -
-        case 19: Copy(PFONT, x, y, 152, ys, 175, y2); break; // Off
-        case 20: Copy(PFONT, x, y, 56, ys, 63, y2); break; // Blank
-        case 21: Copy(PFONT, x, y, 184, ys, 191, y2); break; // .
+        case 0: Copy(Temp_PFONT, x, y, 72, ys, 79, y2); break;
+        case 1: Copy(Temp_PFONT, x, y, 80, ys, 87, y2); break;
+        case 2: Copy(Temp_PFONT, x, y, 88, ys, 95, y2); break;
+        case 3: Copy(Temp_PFONT, x, y, 96, ys, 103, y2); break;
+        case 4: Copy(Temp_PFONT, x, y, 104, ys, 111, y2); break;
+        case 5: Copy(Temp_PFONT, x, y, 112, ys, 119, y2); break;
+        case 6: Copy(Temp_PFONT, x, y, 120, ys, 127, y2); break;
+        case 7: Copy(Temp_PFONT, x, y, 128, ys, 135, y2); break;
+        case 8: Copy(Temp_PFONT, x, y, 136, ys, 143, y2); break;
+        case 9: Copy(Temp_PFONT, x, y, 144, ys, 151, y2); break;
+        case 10: Copy(Temp_PFONT, x, y, 0, ys, 7, y2); break; // A
+        case 11: Copy(Temp_PFONT, x, y, 8, ys, 15, y2); break;// B
+        case 12: Copy(Temp_PFONT, x, y, 16, ys, 23, y2); break;// C
+        case 13: Copy(Temp_PFONT, x, y, 24, ys, 31, y2); break;// D
+        case 14: Copy(Temp_PFONT, x, y, 32, ys, 39, y2); break;// E
+        case 15: Copy(Temp_PFONT, x, y, 40, ys, 47, y2); break;// F
+        case 16: Copy(Temp_PFONT, x, y, 48, ys, 55, y2); break;// G
+        case 17: Copy(Temp_PFONT, x, y, 64, ys, 71, y2); break; // #
+        case 18: Copy(Temp_PFONT, x, y, 176, ys, 183, y2); break; // -
+        case 19: Copy(Temp_PFONT, x, y, 152, ys, 175, y2); break; // Off
+        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_PFONT, x, y, 184, ys, 191, y2); break; // .
 
-        //case 22: Copy(PFONT, x, y, 0, 104, 130, 111); break; // .
+        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 23: Copy(PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 26, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 26, 64 + 6); break; // ZOOM OFF
 
-        //case 27: Copy(PFONT, x, y, 78, 64, 109, 64 + 6); break; // EDIT ON!
-        //case 28: Copy(PFONT, x, y, 111, 64, 142, 64 + 6); break; // EDIT OFF!
+        case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
 
-        case 29: Copy(PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
-        case 30: Copy(PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+        case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+    }
+}
 
-        case 31: Copy(PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
-        case 32: Copy(PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
-        case 33: Copy(PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+// ------------------------------------------------------
+// dest x
+// dest y
+// letter
+// src y
+// length y
+void BigLetter(int x, int y, char ltr, int ys, int y2)
+{
+    switch(ltr)
+    {
+        case 0: Copy(Temp_BIGPFONT, x, y, 100, ys, 100 + 12, y2); break;
+        case 1: Copy(Temp_BIGPFONT, x, y, 111, ys, 111 + 12, y2); break;
+        case 2: Copy(Temp_BIGPFONT, x, y, 122, ys, 122 + 12, y2); break;
+        case 3: Copy(Temp_BIGPFONT, x, y, 133, ys, 133 + 12, y2); break;
+        case 4: Copy(Temp_BIGPFONT, x, y, 144, ys, 144 + 12, y2); break;
+        case 5: Copy(Temp_BIGPFONT, x, y, 155, ys, 155 + 12, y2); break;
+        case 6: Copy(Temp_BIGPFONT, x, y, 166, ys, 166 + 12, y2); break;
+        case 7: Copy(Temp_BIGPFONT, x, y, 177, ys, 177 + 12, y2); break;
+        case 8: Copy(Temp_BIGPFONT, x, y, 188, ys, 188 + 12, y2); break;
+        case 9: Copy(Temp_BIGPFONT, x, y, 199, ys, 199 + 12, y2); break;
+        case 10: Copy(Temp_BIGPFONT, x, y, 0, ys, 12, y2); break; // A
+        case 11: Copy(Temp_BIGPFONT, x, y, 11, ys, 11 + 12, y2); break;// B
+        case 12: Copy(Temp_BIGPFONT, x, y, 22, ys, 22 + 12, y2); break;// C
+        case 13: Copy(Temp_BIGPFONT, x, y, 33, ys, 33 + 12, y2); break;// D
+        case 14: Copy(Temp_BIGPFONT, x, y, 44, ys, 44 + 12, y2); break;// E
+        case 15: Copy(Temp_BIGPFONT, x, y, 55, ys, 55 + 12, y2); break;// F
+        case 16: Copy(Temp_BIGPFONT, x, y, 66, ys, 66 + 12, y2); break;// G
+        
+        case 17: Copy(Temp_BIGPFONT, x, y, 88, ys, 88 + 12, y2); break; // #
+        case 18: Copy(Temp_BIGPFONT, x, y, 243, ys, 243 + 12, y2); break; // -
+        case 19: Copy(Temp_BIGPFONT, x, y, 210, ys, 210 + 34, y2); break; // Off
+        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_BIGPFONT, x, y, 254, ys, 254 + 12, y2); break; // .
+
+        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 26, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 26, 64 + 6); break; // ZOOM OFF
+
+        case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+
+        case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
     }
 }
 
 void blitnote(int x, int y, int note, int y1, int y2)
 {
+    Letter_Function = Letter;
+    Blit_note(x, y, note, y1, y2, 8);
+}
+
+void blitbignote(int x, int y, int note, int y1, int y2)
+{
+    Letter_Function = BigLetter;
+    Blit_note(x, y, note, y1, y2, 11);
+}
+
+void Blit_note(int x, int y, int note, int y1, int y2, int size)
+{
+    int sizex2 = size * 2;
     switch(note)
     {
-        case 120: Letter(x, y, 19, y1, y2); break;
+        case 120: Letter_Function(x, y, 19, y1, y2); break;
         case 121:
-            Letter(x, y, 18, y1, y2);
-            Letter(x + 8, y, 18, y1, y2);
-            Letter(x + 16, y, 18, y1, y2);
+            Letter_Function(x, y, 18, y1, y2);
+            Letter_Function(x + size, y, 18, y1, y2);
+            Letter_Function(x + sizex2, y, 18, y1, y2);
             break;
 
-        case 0: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 1: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 2: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 3: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 4: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 5: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 6: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 7: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 8: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 9: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 10: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 11: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 0, y1, y2); break;
-        case 12: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 13: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 14: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 15: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 16: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 17: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 18: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 19: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 20: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 21: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 22: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 23: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 1, y1, y2); break;
-        case 24: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 25: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 26: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 27: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 28: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 29: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 30: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 31: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 32: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 33: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 34: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 35: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 2, y1, y2); break;
-        case 36: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 37: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 38: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 39: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 40: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 41: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 42: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 43: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 44: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 45: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 46: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 47: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 3, y1, y2); break;
-        case 48: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 49: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 50: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 51: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 52: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 53: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 54: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 55: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 56: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 57: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 58: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 59: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 4, y1, y2); break;
-        case 60: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 61: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 62: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 63: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 64: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 65: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 66: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 67: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 68: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 69: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 70: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 71: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 5, y1, y2); break;
-        case 72: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 73: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 74: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 75: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 76: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 77: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 78: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 79: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 80: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 81: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 82: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 83: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 6, y1, y2); break;
-        case 84: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 85: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 86: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 87: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 88: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 89: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 90: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 91: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 92: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 93: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 94: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 95: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 7, y1, y2); break;
-        case 96: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 97: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 98: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 99: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 100: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 101: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 102: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 103: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 104: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 105: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 106: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 107: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 8, y1, y2); break;
-        case 108: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 109: Letter(x, y, 12, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 110: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 111: Letter(x, y, 13, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 112: Letter(x, y, 14, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 113: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 114: Letter(x, y, 15, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 115: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 116: Letter(x, y, 16, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 117: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 118: Letter(x, y, 10, y1, y2); Letter(x + 8, y, 17, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
-        case 119: Letter(x, y, 11, y1, y2); Letter(x + 8, y, 18, y1, y2); Letter(x + 16, y, 9, y1, y2); break;
+        case 0: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 1: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 2: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 3: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 4: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 5: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 6: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 7: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 8: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 9: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 10: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 11: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 0, y1, y2); break;
+        case 12: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 13: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 14: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 15: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 16: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 17: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 18: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 19: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 20: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 21: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 22: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 23: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 1, y1, y2); break;
+        case 24: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 25: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 26: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 27: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 28: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 29: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 30: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 31: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 32: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 33: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 34: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 35: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 2, y1, y2); break;
+        case 36: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 37: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 38: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 39: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 40: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 41: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 42: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 43: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 44: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 45: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 46: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 47: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 3, y1, y2); break;
+        case 48: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 49: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 50: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 51: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 52: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 53: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 54: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 55: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 56: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 57: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 58: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 59: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 4, y1, y2); break;
+        case 60: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 61: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 62: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 63: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 64: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 65: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 66: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 67: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 68: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 69: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 70: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 71: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 5, y1, y2); break;
+        case 72: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 73: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 74: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 75: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 76: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 77: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 78: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 79: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 80: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 81: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 82: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 83: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 6, y1, y2); break;
+        case 84: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 85: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 86: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 87: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 88: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 89: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 90: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 91: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 92: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 93: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 94: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 95: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 7, y1, y2); break;
+        case 96: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 97: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 98: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 99: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 100: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 101: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 102: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 103: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 104: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 105: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 106: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 107: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 8, y1, y2); break;
+        case 108: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 109: Letter_Function(x, y, 12, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 110: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 111: Letter_Function(x, y, 13, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 112: Letter_Function(x, y, 14, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 113: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 114: Letter_Function(x, y, 15, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 115: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 116: Letter_Function(x, y, 16, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 117: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 118: Letter_Function(x, y, 10, y1, y2); Letter_Function(x + size, y, 17, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
+        case 119: Letter_Function(x, y, 11, y1, y2); Letter_Function(x + size, y, 18, y1, y2); Letter_Function(x + sizex2, y, 9, y1, y2); break;
     }
 }
 
@@ -1200,6 +1291,11 @@ void UISetPalette(SDL_Color *Palette, int Amount)
     {
         SDL_SetPalette(Temp_PFONT, SDL_PHYSPAL, Palette, 0, Amount);
         SDL_SetPalette(Temp_PFONT, SDL_LOGPAL, Palette, 0, Amount);
+    }
+    if(Temp_BIGPFONT)
+    {
+        SDL_SetPalette(Temp_BIGPFONT, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(Temp_BIGPFONT, SDL_LOGPAL, Palette, 0, Amount);
     }
     if(POINTER)
     {
@@ -1379,7 +1475,7 @@ void Set_Channel_State_Pic(int x, int color, int inv_color)
 
 // ------------------------------------------------------
 // Create the complete font set to display the patterns
-void Create_Pattern_font(void)
+void Create_Pattern_font(SDL_Surface *Dest, int offset)
 {
     unsigned char *Pix;
     unsigned char *Pix3;
@@ -1390,19 +1486,19 @@ void Create_Pattern_font(void)
     int j;
 
     // Create the pattern font
-    Copy_To_Surface(PFONT, Temp_PFONT, 0, 0, 0, 0, 192, 8);
+    Copy_To_Surface(PFONT, Dest, 0, 0, 0, offset, 270, offset + 8);
 
     // Set the base colors
-    while(SDL_LockSurface(Temp_PFONT) < 0);
+    while(SDL_LockSurface(Dest) < 0);
 
-    Pix = (unsigned char *) Temp_PFONT->pixels;
-    Pix3 = Pix + (87 * Temp_PFONT->pitch);
+    Pix = (unsigned char *) Dest->pixels;
+    Pix3 = Pix + (87 * Dest->pitch);
 
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset])
             {
                 Pix[Surface_offset] = COL_PATTERN_LO_FORE;
@@ -1418,13 +1514,13 @@ void Create_Pattern_font(void)
 
     // Invert
     Pix2 = Pix;
-    Pix2 += (8 * Temp_PFONT->pitch);
-    Pix3 = Pix2 + (87 * Temp_PFONT->pitch);
+    Pix2 += (8 * Dest->pitch);
+    Pix3 = Pix2 + (87 * Dest->pitch);
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_LO_FORE)
             {
                 Pix2[Surface_offset] = COL_PATTERN_LO_BACK;
@@ -1438,37 +1534,38 @@ void Create_Pattern_font(void)
         }
     }
 
-    SDL_UnlockSurface(Temp_PFONT);
+    SDL_UnlockSurface(Dest);
 
     // Blank line
-    Copy_To_Surface(PFONT, Temp_PFONT, 0, 16, 0, 15, 192, 1);
+    Copy_To_Surface(PFONT, Dest, 0, 16, 0, 7, 270, 7 + 1);
 
-    while(SDL_LockSurface(Temp_PFONT) < 0);
+    while(SDL_LockSurface(Dest) < 0);
 
     Pix2 = Pix;
-    Pix2 += (16 * Temp_PFONT->pitch);
+    Pix2 += (16 * Dest->pitch);
 
+    // Big one
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
-            Surface_offset_Dest = ((j * 2) * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
+            Surface_offset_Dest = ((j * 2) * Dest->pitch) + i;
             Pix2[Surface_offset_Dest] = Pix[Surface_offset] + 4;
-            Pix2[Surface_offset_Dest + Temp_PFONT->pitch] = Pix[Surface_offset] + 4;
+            Pix2[Surface_offset_Dest + Dest->pitch] = Pix[Surface_offset] + 4;
         }
     }
 
-    // Invert
-    Pix2 = (unsigned char *) Temp_PFONT->pixels;
-    Pix2 += (32 * Temp_PFONT->pitch);
-    Pix = (unsigned char *) Temp_PFONT->pixels;
-    Pix += (16 * Temp_PFONT->pitch);
+    // Big one inverted
+    Pix2 = (unsigned char *) Dest->pixels;
+    Pix2 += (32 * Dest->pitch);
+    Pix = (unsigned char *) Dest->pixels;
+    Pix += (16 * Dest->pitch);
     for(j = 0; j < 16; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_SEL_BACK)
             {
                 Pix2[Surface_offset] = COL_PATTERN_SEL_FORE;
@@ -1480,16 +1577,16 @@ void Create_Pattern_font(void)
         }
     }
 
-    // Caret font
-    Pix2 = (unsigned char *) Temp_PFONT->pixels;
-    Pix2 += (48 * Temp_PFONT->pitch);
-    Pix = (unsigned char *) Temp_PFONT->pixels;
-    Pix += (16 * Temp_PFONT->pitch);
+    // Big one under the caret
+    Pix2 = (unsigned char *) Dest->pixels;
+    Pix2 += (48 * Dest->pitch);
+    Pix = (unsigned char *) Dest->pixels;
+    Pix += (16 * Dest->pitch);
     for(j = 0; j < 16; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_SEL_BACK)
             {
                 Pix2[Surface_offset] = COL_VUMETERPEAK;
@@ -1501,32 +1598,32 @@ void Create_Pattern_font(void)
         }
     }
 
-    // Highlight
-    Pix = (unsigned char *) Temp_PFONT->pixels;
+    // Highlight inverted
+    Pix = (unsigned char *) Dest->pixels;
     Pix2 = Pix;
-    Pix2 += (71 * Temp_PFONT->pitch);
-    Pix3 = Pix2 + (87 * Temp_PFONT->pitch);
+    Pix2 += (71 * Dest->pitch);
+    Pix3 = Pix2 + (87 * Dest->pitch);
 
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             Pix2[Surface_offset] = Pix[Surface_offset] + 2;
             Pix3[Surface_offset] = Pix[Surface_offset] + 2 + 9;
         }
     }
 
-    // Invert
-    Pix = (unsigned char *) Temp_PFONT->pixels;
-    Pix += (71 * Temp_PFONT->pitch);
-    Pix2 = Pix + (8 * Temp_PFONT->pitch);
-    Pix3 = Pix2 + (87 * Temp_PFONT->pitch);
+    // (invert the previous one)
+    Pix = (unsigned char *) Dest->pixels;
+    Pix += (71 * Dest->pitch);
+    Pix2 = Pix + (8 * Dest->pitch);
+    Pix3 = Pix2 + (87 * Dest->pitch);
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_HI_FORE)
             {
                 Pix2[Surface_offset] = COL_PATTERN_HI_BACK;
@@ -1541,37 +1638,25 @@ void Create_Pattern_font(void)
     }
 
     // Highlight
-    Pix = (unsigned char *) Temp_PFONT->pixels;
+    Pix = (unsigned char *) Dest->pixels;
     Pix2 = Pix;
-    Pix2 += (71 * Temp_PFONT->pitch);
-    Pix3 = Pix2 + (87 * Temp_PFONT->pitch);
+    Pix2 += (71 * Dest->pitch);
+    Pix3 = Pix2 + (87 * Dest->pitch);
 
     for(j = 0; j < 8; j++)
     {
-        for(i = 0; i < Temp_PFONT->w; i++)
+        for(i = 0; i < Dest->w; i++)
         {
-            Surface_offset = (j * Temp_PFONT->pitch) + i;
+            Surface_offset = (j * Dest->pitch) + i;
             Pix2[Surface_offset] = Pix[Surface_offset] + 2;
             Pix3[Surface_offset] = Pix[Surface_offset] + 2 + 9;
         }
     }
 
-    SDL_UnlockSurface(Temp_PFONT);
+    SDL_UnlockSurface(Dest);
 
-    Copy_To_Surface(PFONT, Temp_PFONT, 0, 64, 0, 8, 192, 7);
-
-    // Channels status
-    Set_Channel_State_Pic(0, COL_MUTE, COL_MUTE_PLAY_INVERT);
-    Set_Channel_State_Pic(28, COL_PLAY, COL_MUTE_PLAY_INVERT);
-    Set_Channel_State_Pic(56, COL_PLAY, COL_MUTE_PLAY_INVERT);
-    Set_Channel_State_Pic(84, COL_MUTE, COL_MUTE_PLAY_INVERT);
-    Set_Channel_State_Pic(111, COL_MUTE, COL_PATTERN_LO_BACK);
-    Set_Channel_State_Pic(138, COL_MUTE, COL_PATTERN_HI_BACK);
-    Set_Channel_State_Pic(165, COL_MUTE, COL_PATTERN_SEL_BACK);
-
-    // We don't need it anymore
-    SDL_FreeSurface(PFONT);
-    PFONT = Temp_PFONT;
+    // Markers arrows
+    Copy_To_Surface(PFONT, Dest, 0, 64, 0, 8, 270, 8 + 7);
 }
 
 // ------------------------------------------------------
@@ -1650,7 +1735,8 @@ int Set_Pictures_Colors(void)
         Palette_Logo[i].unused = Pic_Palette->colors[i].unused;
     }
 
-    Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 192, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_BIGPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
 
     Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
     memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));
@@ -1663,7 +1749,20 @@ int Set_Pictures_Colors(void)
     Ptk_Palette[0].b = 0;
     Init_UI();
 
-    Create_Pattern_font();
+    Create_Pattern_font(Temp_PFONT, 0);
+    Create_Pattern_font(Temp_BIGPFONT, 15);
+
+    // Create the channels status
+    Set_Channel_State_Pic(0, COL_MUTE, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(28, COL_PLAY, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(56, COL_PLAY, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(84, COL_MUTE, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(111, COL_MUTE, COL_PATTERN_LO_BACK);
+    Set_Channel_State_Pic(138, COL_MUTE, COL_PATTERN_HI_BACK);
+    Set_Channel_State_Pic(165, COL_MUTE, COL_PATTERN_SEL_BACK);
+    Set_Channel_State_Pic(193, COL_PLAY, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(221, COL_MUTE, COL_MUTE_PLAY_INVERT);
+
     return(TRUE);
 }
 
