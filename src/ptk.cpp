@@ -387,7 +387,6 @@ int Init_Context(void)
 
     Set_Default_Channels_Polyphony();
     init_sample_bank();
-    Reset_Patterns_Zoom();
     Pre_Song_Init();
     Post_Song_Init();
 
@@ -1675,8 +1674,6 @@ void Newmod(void)
     SongStop();
     Stop_Current_Sample();
     mess_box("Freeing all allocated buffers and restarting...");   
-
-    Reset_Patterns_Zoom();
 
     Free_Samples();
 

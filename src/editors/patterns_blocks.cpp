@@ -33,6 +33,7 @@
 // Includes
 #include "../include/variables.h"
 #include "include/patterns_blocks.h"
+#include "include/editor_pattern.h"
 
 // ------------------------------------------------------
 // Structures
@@ -1136,6 +1137,11 @@ void Clear_Patterns_Pool(void)
     {
         Clear_Track_Data(i);
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    Reset_Patterns_Zoom();
+#endif
+
 }
 
 // ------------------------------------------------------

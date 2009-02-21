@@ -2897,14 +2897,14 @@ void DoEffects(void)
 
         int64 pltr_dat_row = *(RawPatterns + tefactor + PATTERN_FXDATA);
 
-        // Sample only
+        // Sample only: only set the default volume
         if(Subicounter == 0)
         {
             for(i = 0; i < Channels_MultiNotes[trackef]; i++)
             {
                 if(pltr_note[i] == 121 && pltr_sample[i] != 255)
                 {
-                    sp_Tvol[trackef][i] = CustomVol[pltr_sample[i]];
+                    sp_Tvol[trackef][Reserved_Sub_Channels[trackef][i]] = CustomVol[pltr_sample[i]];
                 }
             }
         }

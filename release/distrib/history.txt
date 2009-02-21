@@ -9,6 +9,8 @@ v1.91:
 - Fixed an issue that could occur with rand() function under linux.
 - Introduced zoomed tracks; Each track can be zoomed independantly
   and will be displayed with a bigger font.
+- Volume wasn't re-initilizaed when instrument only column was filled
+  without note.
 
 v1.90e:
 
