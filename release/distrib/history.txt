@@ -8,6 +8,8 @@ v1.92:
   that should improve the ergonomy a bit.
 - Samples weren't re-initiliazed correctly after a "New Module" command
   was issued.
+- Fixed a bug in the 2nd oscillator of the synth core
+  when using custom waveforms.
 
 v1.91b:
 

@@ -619,6 +619,18 @@ float CSynth::GetSample(short *Left_Samples,
     GS_VAL = 0;
     GS_VAL2 = 0;
 
+    unsigned int Rns1 = Rns;
+    unsigned int Rns2 = Rns;
+    char Stereo1 = Stereo;
+    char Stereo2 = Stereo;
+    char Loop_Type1 = Loop_Type;
+    char Loop_Type2 = Loop_Type;
+
+    unsigned int Loop_Sub1 = Loop_Sub;
+    unsigned int Loop_Sub2 = Loop_Sub;
+    unsigned int Length1 = Length;
+    unsigned int Length2 = Length;
+
     if(ENV1_STAGE)
     {
         // Oscillator1 On
@@ -677,11 +689,11 @@ float CSynth::GetSample(short *Left_Samples,
                     }
                     osc_speed2 *= 65;
                     osc_speed1 *= 65;
-                    Length = SIZE_WAVEFORMS;
-                    Rns = SIZE_WAVEFORMS;
-                    Loop_Sub = SIZE_WAVEFORMS;
-                    Loop_Type = SMP_LOOP_FORWARD;
-                    Stereo = 1;
+                    Length1 = SIZE_WAVEFORMS;
+                    Rns1 = SIZE_WAVEFORMS;
+                    Loop_Sub1 = SIZE_WAVEFORMS;
+                    Loop_Type1 = SMP_LOOP_FORWARD;
+                    Stereo1 = 1;
                 }
 
                 if(Left_Samples1)
@@ -690,7 +702,7 @@ float CSynth::GetSample(short *Left_Samples,
 
                     res_dec = pos_osc1_disto->half.last;
                     i_POSITION = pos_osc1_disto->half.first;
-                    if(Loop_Type == SMP_LOOP_NONE) if(i_POSITION > Length - 2) i_POSITION = Length - 2;
+                    if(Loop_Type1 == SMP_LOOP_NONE) if(i_POSITION > Length1 - 2) i_POSITION = Length1 - 2;
                     if((int) i_POSITION < 0) i_POSITION = 0;
 
                     mul_datL = 1.0f;
@@ -703,7 +715,7 @@ float CSynth::GetSample(short *Left_Samples,
                                  + (ENV1_VALUE * ENV1_OSC1_PW)
                                  + (ENV2_VALUE * ENV2_OSC1_PW));
                         if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(Stereo1 == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 
                     if(i_POSITION) Old_Pointer = i_POSITION - 1;
@@ -713,16 +725,16 @@ float CSynth::GetSample(short *Left_Samples,
                                 (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL, res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME;
+                                (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
 
                     // Stereo sample
-                    if(Stereo == 2)
+                    if(Stereo1 == 2)
                     {
                         GS_VAL2 = (Cubic_Work(
                                         (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                         (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                         (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                        (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME;
+                                        (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
                     }
 
                     osc_speed2 += osc_speed1;
@@ -731,35 +743,35 @@ float CSynth::GetSample(short *Left_Samples,
                     if(ENV1_LOOP_BACKWARD == TRUE) pos_osc1->absolu -= osc_speed2;
                     else pos_osc1->absolu += osc_speed2;
 
-                    switch(Loop_Type)
+                    switch(Loop_Type1)
                     {
                         case SMP_LOOP_NONE:
-                            if(pos_osc1->half.first >= Length)
+                            if(pos_osc1->half.first >= Length1)
                             {
-                                pos_osc1->half.first = Length;
+                                pos_osc1->half.first = Length1;
                                 *track = PLAYING_NOSAMPLE;
                             }
                             break;
                         case SMP_LOOP_FORWARD:
-                            if(pos_osc1->half.first >= Length)
+                            if(pos_osc1->half.first >= Length1)
                             {
-                                pos_osc1->half.first -= Loop_Sub;
+                                pos_osc1->half.first -= Loop_Sub1;
                             }
                             break;
                         case SMP_LOOP_PINGPONG:
                             if(ENV1_LOOP_BACKWARD == TRUE)
                             {
-                                if((int) pos_osc1->half.first <= (int) (Length - Loop_Sub))
+                                if((int) pos_osc1->half.first <= (int) (Length1 - Loop_Sub1))
                                 {
-                                    pos_osc1->half.first = Length - Loop_Sub;
+                                    pos_osc1->half.first = Length1 - Loop_Sub1;
                                     ENV1_LOOP_BACKWARD = FALSE;
                                 }
                             }
                             else
                             {
-                                if(pos_osc1->half.first >= Length)
+                                if(pos_osc1->half.first >= Length1)
                                 {
-                                    pos_osc1->half.first = Length;
+                                    pos_osc1->half.first = Length1;
                                     ENV1_LOOP_BACKWARD = TRUE;
                                 }
                             }
@@ -827,21 +839,21 @@ float CSynth::GetSample(short *Left_Samples,
                     }
                     osc_speed1b *= 65;
                     osc_speed2 *= 65;
-                    Length = SIZE_WAVEFORMS;
-                    Rns = SIZE_WAVEFORMS;
-                    Loop_Sub = SIZE_WAVEFORMS;
-                    Loop_Type = SMP_LOOP_FORWARD;
-                    Stereo = 1;
+                    Length2 = SIZE_WAVEFORMS;
+                    Rns2 = SIZE_WAVEFORMS;
+                    Loop_Sub2 = SIZE_WAVEFORMS;
+                    Loop_Type2 = SMP_LOOP_FORWARD;
+                    Stereo2 = 1;
                 }
 
                 if(Left_Samples)
                 {
                     T_OSC2_VOLUME = ((LFO1_VALUE * LFO1_OSC2_VOLUME + LFO2_VALUE * LFO2_OSC2_VOLUME) + ENV2_MIN)
-                    * ENV2_VOLUME_1 * ENV2_VOLUME_2;
+                                    * ENV2_VOLUME_1 * ENV2_VOLUME_2;
 
                     res_dec = pos_osc2->half.last;
                     i_POSITION = pos_osc2->half.first;
-                    if(Loop_Type == SMP_LOOP_NONE) if(i_POSITION > Length - 2) i_POSITION = Length - 2;
+                    if(Loop_Type2 == SMP_LOOP_NONE) if(i_POSITION > Length2 - 2) i_POSITION = Length2 - 2;
                     if((int) i_POSITION < 0) i_POSITION = 0;
 
                     mul_datL = 1.0f;
@@ -849,12 +861,12 @@ float CSynth::GetSample(short *Left_Samples,
                     if(OSC2_PW)
                     {
                         T_OSC_PW = OSC2_PW * 
-                                 ((LFO1_VALUE * LFO1_OSC2_PW) 
-                                + (LFO2_VALUE * LFO2_OSC2_PW)
-                                + (ENV1_VALUE * ENV1_OSC2_PW)
-                                + (ENV2_VALUE * ENV2_OSC2_PW));
+                                    ((LFO1_VALUE * LFO1_OSC2_PW) 
+                                    + (LFO2_VALUE * LFO2_OSC2_PW)
+                                    + (ENV1_VALUE * ENV1_OSC2_PW)
+                                    + (ENV2_VALUE * ENV2_OSC2_PW));
                         if(*(Left_Samples + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(Stereo2 == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 
                     if(i_POSITION) Old_Pointer = i_POSITION - 1;
@@ -865,17 +877,17 @@ float CSynth::GetSample(short *Left_Samples,
                                 (float) (*(Left_Samples + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns) * vol) * T_OSC2_VOLUME;
+                                res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
 
                     // Stereo sample
-                    if(Stereo == 2)
+                    if(Stereo2 == 2)
                     {
                         GS_VAL2 += (Cubic_Work(
                                     (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                    res_dec, i_POSITION, Rns) * vol) * T_OSC2_VOLUME;
+                                    res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
                     }
 
                     osc_speed2 += osc_speed1b;
@@ -884,35 +896,35 @@ float CSynth::GetSample(short *Left_Samples,
                     if(ENV2_LOOP_BACKWARD == TRUE) pos_osc2->absolu -= osc_speed2;
                     else pos_osc2->absolu += osc_speed2;
 
-                    switch(Loop_Type)
+                    switch(Loop_Type2)
                     {
                         case SMP_LOOP_NONE:
-                            if(pos_osc2->half.first >= Length)
+                            if(pos_osc2->half.first >= Length2)
                             {
-                                pos_osc2->half.first = Length;
+                                pos_osc2->half.first = Length2;
                                 *track2 = PLAYING_NOSAMPLE;
                             }
                             break;
                         case SMP_LOOP_FORWARD:
-                            if(pos_osc2->half.first >= Length)
+                            if(pos_osc2->half.first >= Length2)
                             {
-                                pos_osc2->half.first -= Loop_Sub;
+                                pos_osc2->half.first -= Loop_Sub2;
                             }
                             break;
                         case SMP_LOOP_PINGPONG:
                             if(ENV2_LOOP_BACKWARD == TRUE)
                             {
-                                if((int) pos_osc2->half.first <= (int) (Length - Loop_Sub))
+                                if((int) pos_osc2->half.first <= (int) (Length2 - Loop_Sub2))
                                 {
-                                    pos_osc2->half.first = Length - Loop_Sub;
+                                    pos_osc2->half.first = Length2 - Loop_Sub2;
                                     ENV2_LOOP_BACKWARD = FALSE;
                                 }
                             }
                             else
                             {
-                                if(pos_osc2->half.first >= Length)
+                                if(pos_osc2->half.first >= Length2)
                                 {
-                                    pos_osc2->half.first = Length;
+                                    pos_osc2->half.first = Length2;
                                     ENV2_LOOP_BACKWARD = TRUE;
                                 }
                             }
@@ -1071,7 +1083,7 @@ float CSynth::GetSample(short *Left_Samples,
 
     GS_VAL *= GLB_VOLUME;
 
-    if(Stereo == 2)
+    if(Stereo == 2 || Stereo1 == 2 || Stereo2 == 2)
     {
 
 #if defined(PTK_SYNTH_DISTO)

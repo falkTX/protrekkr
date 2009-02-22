@@ -1014,25 +1014,35 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                             sprintf(Line, "%s", PARASynth[rel_val].presetname);
                             PrintXY(xr + 18, yr + (counter * 12), Font, Line);
 
-                            Nbr_Splits = 0;
-                            for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+                            int instr_to_search = Synthprg[rel_val];
+                            if(instr_to_search == 0)
                             {
-                                if(SampleType[rel_val][i])
-                                {
-                                    Nbr_Splits++;
-                                }
+                                sprintf(Line, "No waveform");
                             }
-                            switch(Nbr_Splits)
+                            else
                             {
-                                case 0:
-                                    sprintf(Line, "No waveform");
-                                    break;
-                                case 1:
-                                    sprintf(Line, "%d waveform", Nbr_Splits);
-                                    break;
-                                default:
-                                    sprintf(Line, "%d waveforms", Nbr_Splits);
-                                    break;
+                                Nbr_Splits = 0;
+                                if(instr_to_search == 1) instr_to_search = rel_val;
+                                else instr_to_search -= 2;
+                                for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+                                {
+                                    if(SampleType[instr_to_search][i])
+                                    {
+                                        Nbr_Splits++;
+                                    }
+                                }
+                                switch(Nbr_Splits)
+                                {
+                                    case 0:
+                                        sprintf(Line, "No waveform");
+                                        break;
+                                    case 1:
+                                        sprintf(Line, "%d waveform", Nbr_Splits);
+                                        break;
+                                    default:
+                                        sprintf(Line, "%d waveforms", Nbr_Splits);
+                                        break;
+                                }
                             }
                             PrintXY(xr + 168, yr + (counter * 12), Font, Line);
 
