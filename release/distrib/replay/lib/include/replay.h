@@ -49,11 +49,13 @@
 #define MAX_FILTER 23
 #define MAX_COMB_FILTERS 10
 #define PI 3.1415926535897932384626433832795
+
 #define SMP_PACK_GSM 0
 #define SMP_PACK_MP3 1
 #define SMP_PACK_TRUESPEECH 2
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
+
 #define MAX_ROWS 128
 #define MAX_SEQUENCES 256
 #define MAX_INSTRS 128
@@ -191,8 +193,8 @@ extern short patternLines[MAX_ROWS];
 extern char nameins[128][20];
 extern char Midiprg[128];
 extern unsigned char Synthprg[128];
-extern char SampleCompression[128];
 extern char SampleType[128][16];
+extern char SampleCompression[128];
 extern char SampleName[128][16][64];
 extern char Basenote[128][16];
 extern Uint32 LoopStart[128][16];

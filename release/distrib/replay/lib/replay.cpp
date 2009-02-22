@@ -4035,7 +4035,7 @@ void Free_Samples(void)
         }
     }
 }
-#endif // __STAND_ALONE__
+#endif // !__STAND_ALONE__ || __WINAMP__
 
 // ------------------------------------------------------
 #if defined(PTK_COMPRESSOR)

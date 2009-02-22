@@ -540,17 +540,18 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_SET_FILES_LIST_SLIDER)
         {
             lt_ykar = Mouse.y - 72;
-            ltActualize(0);
+            Actualize_Files_List(0);
         }
 
+        // File selection
         if(gui_action == GUI_CMD_SET_FILES_LIST_SELECT_FILE)
         {
-            int broadcast = lt_index + (Mouse.y - 44) / 12;
+            int broadcast = lt_index + (Mouse.y - 43) / 12;
             last_index = -1;
             if(broadcast != lt_curr)
             {
                 lt_curr = broadcast;
-                ltActualize(1);
+                Actualize_Files_List(1);
             }
             else
             {
@@ -565,9 +566,27 @@ int Screen_Update(void)
                 {
                     Set_Current_Dir();
                     Read_SMPT();
-                    ltActualize(0);
+                    Actualize_Files_List(0);
                 }
             }
+        }
+
+        // Instruments/synths list slider
+        if(gui_action == GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER)
+        {
+            Instrs_ykar = Mouse.y - 72;
+            Actualize_Instruments_Synths_List(0);
+        }
+
+        // Select an instrument/synth
+        if(gui_action == GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT)
+        {
+            ped_patsam = Instrs_index + (Mouse.y - 43) / 12;
+            Actualize_Instruments_Synths_List(1);
+            Actualize_Patterned();
+            RefreshSample();
+            NewWav();
+            Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
         // --- Sequence ---------------------------------------
@@ -996,7 +1015,12 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_FILELIST_SCROLL)
         {
-            ltActualize(1);
+            Actualize_Files_List(1);
+        }
+
+        if(gui_action == GUI_CMD_INSTR_SYNTH_SCROLL)
+        {
+            Actualize_Instruments_Synths_List(1);
         }
 
         if(gui_action == GUI_CMD_UPDATE_LOOP_EDITOR_ED)
@@ -1294,10 +1318,7 @@ int Screen_Update(void)
 
             Refresh_UI_Context();
 
-            // CPU meter was here
-            Gui_Draw_Button_Box(586 + 60 + 100, 6, 52, 16, CpuStr, BUTTON_NORMAL | BUTTON_DISABLED);
-
-            ltActualize(0);
+            Actualize_Files_List(0);
 
             // Vu meters background
             SetColor(COL_BACKGROUND);
@@ -1692,6 +1713,8 @@ void Newmod(void)
 
     Set_Default_Channels_Polyphony();
 
+    init_sample_bank();
+
     Pre_Song_Init();
     Post_Song_Init();
 
@@ -1754,6 +1777,8 @@ void Newmod(void)
     NewWav();
     Actupated(0);
     Reset_Tracks_To_Render();
+    Refresh_UI_Context();
+    
 }
 
 // ------------------------------------------------------
@@ -1964,7 +1989,7 @@ void WavRenderizer(void)
 
         last_index = -1;
         Read_SMPT();
-        ltActualize(0);
+        Actualize_Files_List(0);
 
         mess_box(buffer);
         Actupated(0);
@@ -3916,26 +3941,49 @@ void Mouse_Handler(void)
     // mouse wheel up
     if(Mouse.wheel == 1)
     {
+        // Scroll the pattern
         if(!Songplaying && !is_recording)
         {
             Mouse_Wheel_Pattern_Ed(-MouseWheel_Multiplier);
         }
 
         // Scroll the files list
-        if(Scopish != SCOPE_ZONE_SCOPE)
+        switch(Scopish)
         {
-            if(zcheckMouse(410, 41, 390, 136) == 1)
-            {
-                lt_index--;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
 
-            // Scroll the files list
-            if(zcheckMouse(394, 58, 16, 103) == 1)
-            {
-                lt_index--;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+                // Scroll the instruments/synths lists
+                if(zcheckMouse(410, 41, 390, 136) == 1)
+                {
+                    Instrs_index--;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+
+                if(zcheckMouse(394, 58, 16, 103) == 1)
+                {
+                    Instrs_index--;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+
+                // Scroll the files lists
+                if(zcheckMouse(410, 41, 390, 136) == 1)
+                {
+                    lt_index--;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+
+                if(zcheckMouse(394, 58, 16, 103) == 1)
+                {
+                    lt_index--;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+                break;
         }
 
         // Scroll the sequences
@@ -3949,45 +3997,70 @@ void Mouse_Handler(void)
             }
         }
 
+        // Scroll the knobs
         Mouse_Wheel_303_Ed(MouseWheel_Multiplier);
     }
 
     // mouse wheel down
     if(Mouse.wheel == -1)
     {
+        // Scroll the pattern
         if(!Songplaying && !is_recording)
         {
             Mouse_Wheel_Pattern_Ed(MouseWheel_Multiplier);
         }
 
-        if(Scopish != SCOPE_ZONE_SCOPE)
+        switch(Scopish)
         {
-            // Scroll the files list
-            if(zcheckMouse(410, 41, 390, 136) == 1)
-            {
-                lt_index++;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
 
-            // Scroll the files list
-            if(zcheckMouse(394, 58, 16, 103) == 1)
-            {
-                lt_index++;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+                // Scroll the instruments/synths lists
+                if(zcheckMouse(410, 41, 390, 136) == 1)
+                {
+                    Instrs_index++;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+
+                if(zcheckMouse(394, 58, 16, 103) == 1)
+                {
+                    Instrs_index++;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+
+                // Scroll the files lists
+                if(zcheckMouse(410, 41, 390, 136) == 1)
+                {
+                    lt_index++;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+
+                // Scroll the files list
+                if(zcheckMouse(394, 58, 16, 103) == 1)
+                {
+                    lt_index++;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+                break;
         }
 
         // Scroll the sequences
         if(userscreen == USER_SCREEN_SEQUENCER)
         {
-                if(zcheckMouse(257, 466, 26, 90) ||
-                   zcheckMouse(89, 466, 26, 90) ||
-                   zcheckMouse(120, 466, 132, 90))
-                {
-                    gui_action = GUI_CMD_NEXT_POSITION;
-                }
+            if(zcheckMouse(257, 466, 26, 90) ||
+               zcheckMouse(89, 466, 26, 90) ||
+               zcheckMouse(120, 466, 132, 90))
+            {
+                gui_action = GUI_CMD_NEXT_POSITION;
+            }
         }
 
+        // Scroll the knobs
         Mouse_Wheel_303_Ed(-MouseWheel_Multiplier);
     }
 
@@ -4000,9 +4073,18 @@ void Mouse_Handler(void)
 
     if(Mouse.button & MOUSE_LEFT_BUTTON)
     {
-        if(Scopish != SCOPE_ZONE_SCOPE)
+        switch(Scopish)
         {
-            if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
+                if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+                if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
+                break;
         }
 
         Mouse_Left_Repeat_Instrument_Ed();
@@ -4051,7 +4133,6 @@ void Mouse_Handler(void)
             {
                 Scopish = SCOPE_ZONE_INSTR_DIR;
                 Draw_Scope_Files_Button();
-
             }
 
             // Presets dir.
@@ -4062,10 +4143,27 @@ void Mouse_Handler(void)
             }
 
             // Tracks/Stereo scopes.
-            if(zcheckMouse(728, 24, 18, 16))
+            if(zcheckMouse(746, 6, 18, 16))
             {
+                if(Scopish == SCOPE_ZONE_SCOPE)
+                { 
+                    Scopish_LeftRight ^= TRUE;
+                }
                 Scopish = SCOPE_ZONE_SCOPE;
-                Scopish_LeftRight ^= TRUE;
+                Draw_Scope_Files_Button();
+            }
+
+            // Instrument list
+            if(zcheckMouse(764, 6, 18, 16))
+            {
+                Scopish = SCOPE_ZONE_INSTR_LIST;
+                Draw_Scope_Files_Button();
+            }
+
+            // Synth list
+            if(zcheckMouse(782, 6, 18, 16))
+            {
+                Scopish = SCOPE_ZONE_SYNTH_LIST;
                 Draw_Scope_Files_Button();
             }
         }
@@ -4084,26 +4182,52 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_UPDATE_PATTERN_ED;
         }
 
-        if(Scopish != SCOPE_ZONE_SCOPE)
+        switch(Scopish)
         {
-            // Files list up
-            if(zcheckMouse(394, 42, 16, 14))
-            {
-                lt_index--;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
-            
-            // Files list down
-            if(zcheckMouse(394, 162, 16, 14))
-            {
-                lt_index++;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
+                if(zcheckMouse(394, 42, 16, 14))
+                {
+                    Instrs_index--;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
 
-            if(zcheckMouse(412, 43, 226 + restx, 133))
-            {
-                gui_action = GUI_CMD_SET_FILES_LIST_SELECT_FILE;
-            }
+                if(zcheckMouse(394, 162, 16, 14))
+                {
+                    Instrs_index++;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+
+                // Select a file
+                if(zcheckMouse(412, 43, 226 + restx, 133))
+                {
+                    gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT;
+                }
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+                // Files list up
+                if(zcheckMouse(394, 42, 16, 14))
+                {
+                    lt_index--;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+            
+                // Files list down
+                if(zcheckMouse(394, 162, 16, 14))
+                {
+                    lt_index++;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+
+                // Select a file
+                if(zcheckMouse(412, 43, 226 + restx, 133))
+                {
+                    gui_action = GUI_CMD_SET_FILES_LIST_SELECT_FILE;
+                }
+                break;
         }
 
         if(zcheckMouse(258, 152, 16, 16)) gui_action = GUI_CMD_LOWER_OCTAVE;
@@ -4322,18 +4446,36 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_PLAY_SONG;
         }
 
-        if(Scopish != SCOPE_ZONE_SCOPE)
+        switch(Scopish)
         {
-            if(zcheckMouse(394, 42, 16, 14)==1)
-            {
-                lt_index -= 10;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
-            if(zcheckMouse(394, 162, 16, 14) == 1)
-            {
-                lt_index += 10;
-                gui_action = GUI_CMD_FILELIST_SCROLL;
-            }
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
+                if(zcheckMouse(394, 42, 16, 14) == 1)
+                {
+                    Instrs_index -= 10;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+                if(zcheckMouse(394, 162, 16, 14) == 1)
+                {
+                    Instrs_index += 10;
+                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+                }
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+                if(zcheckMouse(394, 42, 16, 14) == 1)
+                {
+                    lt_index -= 10;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+                if(zcheckMouse(394, 162, 16, 14) == 1)
+                {
+                    lt_index += 10;
+                    gui_action = GUI_CMD_FILELIST_SCROLL;
+                }
+                break;
         }
 
         // Reduce the number of tracks
@@ -4484,10 +4626,10 @@ int Next_Line_Pattern_Auto(int *position, int lines, int *line)
     int new_pattern;
     int max_value;
 
-    if(*line >= lines) //patternLines[pSequence[*position]])
+    if(*line >= lines)
     {
         // Normal end of pattern
-        *line = *line - lines; //patternLines[pSequence[*position]];
+        *line = *line - lines;
         *position += 1;
         if(*position >= sLength - 1)
         {
@@ -4564,7 +4706,7 @@ void Display_Beat_Time(void)
 // Display master compressor
 void Display_Master_Comp(void)
 {
-    char tt[64];
+    char string[64];
 
     if(display_title)
     {
@@ -4572,25 +4714,25 @@ void Display_Master_Comp(void)
         Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
-            sprintf(tt, "Off");
+            sprintf(string, "Off");
         }
         else
         {
-            sprintf(tt, "%d%%", (int) (mas_comp_threshold));
+            sprintf(string, "%d%%", (int) (mas_comp_threshold));
         }
-        Print_String(tt, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
+        Print_String(string, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
 
         Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
         Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio * 0.5f), TRUE);
         if(mas_comp_ratio <= 0.01f)
         {
-            sprintf(tt, "Off");
+            sprintf(string, "Off");
         }
         else
         {
-            sprintf(tt, "%d%%", (int) (mas_comp_ratio));
+            sprintf(string, "%d%%", (int) (mas_comp_ratio));
         }
-        Print_String(tt, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
+        Print_String(string, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
     }
 }
          
@@ -4615,7 +4757,7 @@ void Display_Master_Volume(void)
 // Display the shuffle amount
 void Display_Shuffle(void)
 {
-    char tt[64];
+    char string[64];
 
     if(display_title)
     {
@@ -4624,8 +4766,8 @@ void Display_Shuffle(void)
         Gui_Draw_Button_Box(586, 6, 40, 16, "Shuffle", BUTTON_NORMAL | BUTTON_DISABLED);
 
         Realslider_Size(586 + 40, 6, 100, shuffle, TRUE);
-        sprintf(tt, "%d%%", shuffle);
-        Print_String(tt, 586 + 40, 8, 116, BUTTON_TEXT_CENTERED);
+        sprintf(string, "%d%%", shuffle);
+        Print_String(string, 586 + 40, 8, 116, BUTTON_TEXT_CENTERED);
     }
 }
 
@@ -4668,7 +4810,6 @@ void Mouse_Sliders_Master_Shuffle(void)
 
 void Actualize_Master(char gode)
 {
-
     if(gode == 0 || gode == 1)
     {
         if(BeatsPerMin < 32) BeatsPerMin = 32;
@@ -5032,52 +5173,111 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(728, 24, 16, 16,"T", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(728, 24, 16, 16,"S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
-            Gui_Draw_Button_Box(746, 24, 16, 16,"M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16,"I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16,"P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            break;
+
+        case SCOPE_ZONE_INSTR_LIST:
+            SetColor(COL_BACKGROUND);
+            bjbox(394, 42, 405, 135);
+            bjbox(394, 24, 370, 17);
+            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            
+            Actualize_Instruments_Synths_List(0);
+            
+            if(Scopish_LeftRight)
+            {
+                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+
+            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            break;
+
+        case SCOPE_ZONE_SYNTH_LIST:
+            SetColor(COL_BACKGROUND);
+            bjbox(394, 42, 405, 135);
+            bjbox(394, 24, 370, 17);
+            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+
+            Actualize_Instruments_Synths_List(0);
+
+            if(Scopish_LeftRight)
+            {
+                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+
+            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
         
         case SCOPE_ZONE_MOD_DIR:
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
             Read_SMPT();
-            DumpList(413, 41, lt_index);
-            ltActualize(0);
-            Gui_Draw_Button_Box(394, 24, 58, 16, "Current Dir:", BUTTON_NORMAL | BUTTON_DISABLED);
+            Dump_Files_List(413, 41);
+            Actualize_Files_List(0);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(728, 24, 16, 16,"T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(728, 24, 16, 16,"S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16,"M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16,"I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16,"P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16,"M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16,"I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16,"P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16,"M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16,"I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16,"P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
             }
     

@@ -59,6 +59,8 @@ char Dir_Instrs[MAX_PATH];
 char Dir_Presets[MAX_PATH];
 char *cur_dir;
 
+// ------------------------------------------------------
+// Functions
 void Clear_Files_List(void)
 {
     for(unsigned int listcleaner = 0; listcleaner < 2048; listcleaner++)
@@ -149,6 +151,8 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
 }
 #endif
 
+// ------------------------------------------------------
+// Fill the list with the content of the relevant directory
 void Read_SMPT(void)
 {
     lt_ykar = 0;
@@ -241,6 +245,7 @@ void Read_SMPT(void)
         } // while      
         _findclose(hFile);
     }
+
 #else
 
     sprintf(SMPT_LIST[list_counter], "./");
@@ -259,59 +264,66 @@ void Read_SMPT(void)
 
 }
 
-void DumpList(int xr, int yr, int y)
+// ------------------------------------------------------
+// Display the files list on screen
+void Dump_Files_List(int xr, int yr)
 {
-    if(Scopish != SCOPE_ZONE_SCOPE)
+    int y = lt_index;
+
+    switch(Scopish)
     {
-        SetColor(COL_BACKGROUND);
-        bjbox(xr - 1, yr + 1, 227 + restx, 135);
+        case SCOPE_ZONE_MOD_DIR:
+        case SCOPE_ZONE_INSTR_DIR:
+        case SCOPE_ZONE_PRESET_DIR:
+            SetColor(COL_BACKGROUND);
+            bjbox(xr - 1, yr + 1, 227 + restx, 135);
 
-        // Current dir background
-        Gui_Draw_Button_Box(454, 24, 112 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            // Current dir background
+            Gui_Draw_Button_Box(394, 24, 190 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-        switch(Scopish)
-        {
-            case SCOPE_ZONE_MOD_DIR:
-                PrintXY(458, 26, USE_FONT, Dir_Mods);
-                break;
-            case SCOPE_ZONE_INSTR_DIR:
-                PrintXY(458, 26, USE_FONT, Dir_Instrs);
-                break;
-            case SCOPE_ZONE_PRESET_DIR:
-                PrintXY(458, 26, USE_FONT, Dir_Presets);
-                break;
-        }
-
-        for(int counter = 0; counter < 11; counter++)
-        {
-            int rel_val = y + counter;
-
-            if(y + counter < lt_items)
+            switch(Scopish)
             {
-                // Highlight bar in files requester.
-                if(y + counter == lt_curr)
-                {
-                    SetColor(COL_PUSHED_MED);
-                    bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
-                }
-
-                if(FILETYPE[rel_val] == _A_SUBDIR)
-                {
-                    PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
-                }
-                else
-                {
-                    PrintXY(xr, yr + (counter * 12), USE_FONT, SMPT_LIST[rel_val]);
-                }
+                case SCOPE_ZONE_MOD_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Mods);
+                    break;
+                case SCOPE_ZONE_INSTR_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Instrs);
+                    break;
+                case SCOPE_ZONE_PRESET_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Presets);
+                    break;
             }
 
-        }
+            for(int counter = 0; counter < 11; counter++)
+            {
+                int rel_val = y + counter;
+
+                if(y + counter < lt_items)
+                {
+                    // Highlight bar in files requester.
+                    if(y + counter == lt_curr)
+                    {
+                        SetColor(COL_PUSHED_MED);
+                        bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
+                    }
+
+                    if(FILETYPE[rel_val] == _A_SUBDIR)
+                    {
+                        PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
+                    }
+                    else
+                    {
+                        PrintXY(xr, yr + (counter * 12), USE_FONT, SMPT_LIST[rel_val]);
+                    }
+                }
+            }
+            break;
     }
 }
 
 // ------------------------------------------------------
 // Redraw the files list
-void ltActualize(int modeac)
+void Actualize_Files_List(int modeac)
 {
     int const brolim = lt_items - 11;
 
@@ -331,42 +343,46 @@ void ltActualize(int modeac)
 
         case 3:
 
-            if(Scopish != SCOPE_ZONE_SCOPE)
+            switch(Scopish)
             {
+                case SCOPE_ZONE_MOD_DIR:
+                case SCOPE_ZONE_INSTR_DIR:
+                case SCOPE_ZONE_PRESET_DIR:
 
-                if(modeac == 0)
-                {
-                    if(lt_ykar > 70) lt_ykar = 70;
-                    if(lt_ykar < 0) lt_ykar = 0;
-                    lt_index = (lt_ykar * brolim) / 70;
-                }
-
-                if(lt_index > brolim) lt_index = brolim;
-                if(lt_index < 0) lt_index = 0;
-                if(modeac != 0)
-                {
-                    if(brolim)
+                    if(modeac == 0)
                     {
-                        lt_ykar = (lt_index * 70) / brolim;
+                        if(lt_ykar > 70) lt_ykar = 70;
+                        if(lt_ykar < 0) lt_ykar = 0;
+                        lt_index = (lt_ykar * brolim) / 70;
                     }
-                    else
-                    {
-                        lt_ykar = (lt_index * 70);
-                    }
-                }
 
-                SetColor(COL_SLIDER_LO);
-                bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
-                SetColor(COL_SLIDER_HI);
-                bjbox(395, 59, 15 + 1, 101 + 1);
-                SetColor(COL_SLIDER_MED);
-                bjbox(395, 59, 15, 101);
-                Gui_Draw_Button_Box(394 + 1, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
-                if(last_index != lt_index)
-                {
-                    DumpList(413, 41, lt_index);
-                    last_index = lt_index;
-                }
+                    if(lt_index > brolim) lt_index = brolim;
+                    if(lt_index < 0) lt_index = 0;
+                    if(modeac != 0)
+                    {
+                        if(brolim)
+                        {
+                            lt_ykar = (lt_index * 70) / brolim;
+                        }
+                        else
+                        {
+                            lt_ykar = (lt_index * 70);
+                        }
+                    }
+
+                    SetColor(COL_SLIDER_LO);
+                    bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
+                    SetColor(COL_SLIDER_HI);
+                    bjbox(395, 59, 15 + 1, 101 + 1);
+                    SetColor(COL_SLIDER_MED);
+                    bjbox(395, 59, 15, 101);
+                    Gui_Draw_Button_Box(394 + 1, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
+                    if(last_index != lt_index)
+                    {
+                        Dump_Files_List(413, 41);
+                        last_index = lt_index;
+                    }
+                    break;
             }
             break;
     }

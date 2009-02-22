@@ -35,6 +35,7 @@
 #include "include/editor_diskio.h"
 #include "include/patterns_blocks.h"
 #include "../support/include/timer.h"
+#include "include/editor_instrument.h"
 
 // ------------------------------------------------------
 // Variables
@@ -338,7 +339,7 @@ void draw_pated(int track, int line, int petrack, int row)
         dover += 4;
         if(dover >= MAX_PATT_SCREEN_X) break;
 
-        Cur_Char_Function[cur_track].Fnc(dover, 187, liner + track, 71, 71 + 6);
+        Cur_Char_Function[cur_track].Fnc(dover - 1, 187, liner + track, 71, 71 + 6);
 
         // Mute on/off
         if((dover + (Cur_Char_size[cur_track] + 1)) >= MAX_PATT_SCREEN_X) break;
@@ -351,15 +352,15 @@ void draw_pated(int track, int line, int petrack, int row)
         else Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29, 187, 24, 0, 0);
 
         // Zoom on/off
-        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 30) >= MAX_PATT_SCREEN_X) break;
+        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 29) >= MAX_PATT_SCREEN_X) break;
         if(Is_Track_Zoomed(cur_track)) Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29, 187, 27, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29, 187, 28, 0, 0);
 
         // Caret track marker
-        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 30 + 27) >= MAX_PATT_SCREEN_X) break;
+        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
         if(ped_track == cur_track) SetColor(COL_VUMETERPEAK);
         else SetColor(COL_PATTERN_LO_BACK);
-        bjbox(dover + (Cur_Char_size[cur_track] + 1) + 29 + 30 + 27, 187, 12, 7);
+        bjbox(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29 + 17, 187, 12, 7);
 
         // On / off
         for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
@@ -1309,6 +1310,7 @@ void Actualize_Patterned(void)
     Gui_Draw_Arrows_Number_Box2(90, 152, ped_pattad, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     value_box(258, 152, ped_patoct, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     value_box(258, 134, ped_patsam, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Actualize_Instruments_Synths_List(2);
 }
 
 // ------------------------------------------------------
@@ -1971,7 +1973,7 @@ void Mouse_Left_Pattern_Ed(void)
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
-        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10)) gui_action = GUI_CMD_SWITCH_TRACK_ZOOM_STATE;
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_ZOOM_STATE;
         start_mute_check_x += Get_Track_Size(i);
     }
 }
@@ -1997,7 +1999,7 @@ void Mouse_Right_Pattern_Ed(void)
     {
         int tmp_track = Get_Track_Over_Mouse();
 
-        if(tmp_track > 15) tmp_track = 15;
+        if(tmp_track > MAX_TRACKS - 1) tmp_track = MAX_TRACKS - 1;
         if(tmp_track < 0) tmp_track = 0;
 
         Solo_Track(tmp_track);

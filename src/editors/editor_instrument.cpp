@@ -33,6 +33,7 @@
 // Includes
 #include "include/editor_instrument.h"
 #include "include/editor_sample.h"
+#include "../files/include/files_list.h"
 
 #include "../../release/distrib/replay/lib/include/endianness.h"
 
@@ -44,6 +45,12 @@ int Allow_Buttons_Pushed;
 int Allow_Global;
 int Allow_Global_Pushed;
 int Allow_Global_Sliders;
+
+int Instrs_ykar = 0;
+int Instrs_items = 128;
+int Instrs_index = 0;
+int Instrs_curr = 0;
+int Instrs_last_index = -1;
 
 void set_instr_global(void)
 {
@@ -244,16 +251,17 @@ void Actualize_Instrument_Ed(int typex, char gode)
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 #endif
 
-                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "N/A", BUTTON_NORMAL | BUTTON_DISABLED);
+                        Gui_Draw_Button_Box(570 + 18, 502, 24, 16, "-", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
 #if !defined(__NO_MIDI__)
                     }
                     else
                     {
-                        value_box(570, 502, Midiprg[ped_patsam] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Arrows_Number_Box(570, 502, Midiprg[ped_patsam], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     }
-#endif
 
+                    Actualize_Instruments_Synths_List(1);
+#endif
                 }
                 if(gode == 0 || gode == 12)
                 {
@@ -345,7 +353,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                     Read_SMPT();
                     last_index = -1;
-                    ltActualize(0);
+                    Actualize_Files_List(0);
                 }
 
                 if(gode == 0 || gode == 15)
@@ -400,6 +408,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #endif
 
                     }
+                    Actualize_Instruments_Synths_List(1);
                 }
 
                 break;
@@ -870,5 +879,240 @@ void Mouse_Sliders_Right_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
+    }
+}
+
+// ------------------------------------------------------
+// Display the instruments or synths list on screen
+void Dump_Instruments_Synths_List(int xr, int yr)
+{
+    char Line[200];
+    int i;
+    int Nbr_Splits;
+    int Font;
+
+    switch(Scopish)
+    {
+        case SCOPE_ZONE_INSTR_LIST:
+        case SCOPE_ZONE_SYNTH_LIST:
+
+            SetColor(COL_BACKGROUND);
+            bjbox(xr - 1, yr + 1, 227 + restx, 135);
+
+            switch(Scopish)
+            {
+                case SCOPE_ZONE_INSTR_LIST:
+                    PrintXY(398, 26, USE_FONT, "Instruments List");
+                    break;
+                case SCOPE_ZONE_SYNTH_LIST:
+                    PrintXY(398, 26, USE_FONT, "Synths List");
+                    break;
+            }
+
+            for(int counter = 0; counter < 11; counter++)
+            {
+                int rel_val = Instrs_index + counter;
+
+                if(Instrs_index + counter < MAX_INSTRS)
+                {
+                    if(Instrs_index + counter == ped_patsam)
+                    {
+                        SetColor(COL_PUSHED_MED);
+                        bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
+                    }
+
+                    switch(Scopish)
+                    {
+                        case SCOPE_ZONE_INSTR_LIST:
+
+                            // Instruments view
+                            Nbr_Splits = 0;
+                            Font = USE_FONT_LOW;
+                            for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+                            {
+                                if(SampleType[rel_val][i])
+                                {
+                                    Nbr_Splits++;
+                                }
+                            }
+                            if(Nbr_Splits) Font = USE_FONT;
+
+                            sprintf(Line, "%.2x:", rel_val);
+                            PrintXY(xr, yr + (counter * 12), Font, Line);
+                            sprintf(Line, "%s", nameins[rel_val]);
+                            PrintXY(xr + 18, yr + (counter * 12), Font, Line);
+        
+                            sprintf(Line, "%s", nameins[rel_val]);
+                            PrintXY(xr + 18, yr + (counter * 12), Font, Line);
+                            switch(Nbr_Splits)
+                            {
+                                case 0:
+                                    sprintf(Line, "No waveform");
+                                    break;
+                                case 1:
+                                    sprintf(Line, "%d waveform", Nbr_Splits);
+                                    break;
+                                default:
+                                    sprintf(Line, "%d waveforms", Nbr_Splits);
+                                    break;
+                            }
+                            PrintXY(xr + 168, yr + (counter * 12), Font, Line);
+
+                            if(Nbr_Splits)
+                            {
+                                switch(SampleCompression[rel_val])
+                                {
+                                    case SMP_PACK_GSM:
+                                        sprintf(Line, "Pack: Gsm");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                    case SMP_PACK_MP3:
+                                        sprintf(Line, "Pack: Mp3");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                    case SMP_PACK_TRUESPEECH:
+                                        sprintf(Line, "Pack: TrueSp.");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                    case SMP_PACK_NONE:
+                                        sprintf(Line, "Pack: None");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                    case SMP_PACK_AT3:
+                                        sprintf(Line, "Pack: At3");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                PrintXY(xr + 240, yr + (counter * 12), Font, "Pack: -");
+                            }
+
+                            if(Midiprg[rel_val] == -1)
+                            {
+                                sprintf(Line, "Midi prg.: -");
+                                PrintXY(xr + 320, yr + (counter * 12), Font, Line);
+                            }
+                            else
+                            {
+                                sprintf(Line, "Midi prg.: %.2d", Midiprg[rel_val]);
+                                PrintXY(xr + 320, yr + (counter * 12), USE_FONT, Line);
+                            }
+                            
+                            break;
+
+                        case SCOPE_ZONE_SYNTH_LIST:
+
+                            Font = USE_FONT;
+                            if(Synthprg[rel_val] == 0) Font = USE_FONT_LOW;
+                            
+                            // Synths view
+                            sprintf(Line, "%.2x:", rel_val);
+                            PrintXY(xr, yr + (counter * 12), Font, Line);
+
+                            sprintf(Line, "%s", PARASynth[rel_val].presetname);
+                            PrintXY(xr + 18, yr + (counter * 12), Font, Line);
+
+                            Nbr_Splits = 0;
+                            for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+                            {
+                                if(SampleType[rel_val][i])
+                                {
+                                    Nbr_Splits++;
+                                }
+                            }
+                            switch(Nbr_Splits)
+                            {
+                                case 0:
+                                    sprintf(Line, "No waveform");
+                                    break;
+                                case 1:
+                                    sprintf(Line, "%d waveform", Nbr_Splits);
+                                    break;
+                                default:
+                                    sprintf(Line, "%d waveforms", Nbr_Splits);
+                                    break;
+                            }
+                            PrintXY(xr + 168, yr + (counter * 12), Font, Line);
+
+                            if(Synthprg[rel_val] == 0)
+                            {
+                                sprintf(Line, "No Instr.");
+                                PrintXY(xr + 260, yr + (counter * 12), Font, Line);
+                            }
+                            else if(Synthprg[rel_val] == 1)
+                            {
+                                sprintf(Line, "Rel. Instr.: Curr");
+                                PrintXY(xr + 260, yr + (counter * 12), USE_FONT, Line);
+                            }
+                            else
+                            {
+                                sprintf(Line, "Rel. Instr.: %.2x", Synthprg[rel_val] - 2);
+                                PrintXY(xr + 260, yr + (counter * 12), USE_FONT, Line);
+                            }
+
+                            break;
+                    }
+                }
+            }
+            break;
+    }
+}
+
+// ------------------------------------------------------
+// Redraw the instruments or synths list
+void Actualize_Instruments_Synths_List(int modeac)
+{
+    int const brolim = Instrs_items - 11;
+
+    switch(Scopish)
+    {
+        case SCOPE_ZONE_INSTR_LIST:
+        case SCOPE_ZONE_SYNTH_LIST:
+
+            if(modeac == 0)
+            {
+                if(Instrs_ykar > 70) Instrs_ykar = 70;
+                if(Instrs_ykar < 0) Instrs_ykar = 0;
+                Instrs_index = (Instrs_ykar * brolim) / 70;
+            }
+
+            if(modeac == 2)
+            {
+                if(ped_patsam >= Instrs_index + 11)
+                {
+                    Instrs_index += ped_patsam - (Instrs_index + 10);
+                }
+
+                if(ped_patsam < Instrs_index)
+                {
+                    Instrs_index -= Instrs_index - ped_patsam;
+                }
+            }
+
+            if(Instrs_index > brolim) Instrs_index = brolim;
+            if(Instrs_index < 0) Instrs_index = 0;
+            if(modeac != 0)
+            {
+                if(brolim)
+                {
+                    Instrs_ykar = (Instrs_index * 70) / brolim;
+                }
+                else
+                {
+                    Instrs_ykar = (Instrs_index * 70);
+                }
+            }
+
+            SetColor(COL_SLIDER_LO);
+            bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
+            SetColor(COL_SLIDER_HI);
+            bjbox(395, 59, 15 + 1, 101 + 1);
+            SetColor(COL_SLIDER_MED);
+            bjbox(395, 59, 15, 101);
+            Gui_Draw_Button_Box(394 + 1, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
+            Dump_Instruments_Synths_List(413, 41);
+            break;
     }
 }

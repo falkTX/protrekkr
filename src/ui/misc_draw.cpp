@@ -345,12 +345,43 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
-                if(ComponentR == 0) ComponentR = 255;
-                if(ComponentG == 0) ComponentG = 255;
-                if(ComponentB == 0) ComponentB = 255;
-                ComponentR >>= 1;
-                ComponentG >>= 1;
-                ComponentB >>= 1;
+
+                // Set the shadow font
+                if(ComponentR >= 128)
+                {
+                    ComponentR = 128 + (ComponentR >> 2);
+                }
+                else
+                {
+                    ComponentR = (128 - (ComponentR >> 2));
+                }
+                if(ComponentG >= 128)
+                {
+                    ComponentG = 128 + (ComponentG >> 2);
+                }
+                else
+                {
+                    ComponentG = (128 - (ComponentG >> 2));
+                }
+                if(ComponentB >= 128)
+                {
+                    ComponentB = 128 + (ComponentB >> 2);
+                }
+                else
+                {
+                    ComponentB = (128 - (ComponentB >> 2));
+                }
+                //if(ComponentG >= 128) ComponentG = 128 + (ComponentG >> 3);
+                //else ComponentG = 128 + (255 - ComponentG >> 3);
+                //if(ComponentB >= 128) ComponentB = 128 + (ComponentB >> 3);
+                //else ComponentB = 128 + (255 - ComponentB >> 3);
+
+                if(ComponentR < 0) ComponentR = 0;
+                if(ComponentG < 0) ComponentG = 0;
+                if(ComponentB < 0) ComponentB = 0;
+                if(ComponentR > 0xff) ComponentR = 0xff;
+                if(ComponentG > 0xff) ComponentG = 0xff;
+                if(ComponentB > 0xff) ComponentB = 0xff;
                 Ptk_Palette[i + 1].r = ComponentR;
                 Ptk_Palette[i + 1].g = ComponentG;
                 Ptk_Palette[i + 1].b = ComponentB;
@@ -624,6 +655,7 @@ void Refresh_UI_Context(void)
     Actualize_Fx_Ed(0);
     Actualize_Track_Fx_Ed(0);
     Actualize_Patterned();
+    Actualize_Instruments_Synths_List(0);
 }
 
 // ------------------------------------------------------
@@ -982,8 +1014,8 @@ void Letter(int x, int y, char ltr, int ys, int y2)
         case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
         case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 26, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 26, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -1033,8 +1065,8 @@ void BigLetter(int x, int y, char ltr, int ys, int y2)
         case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
         case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 26, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 26, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)

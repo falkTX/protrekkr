@@ -58,8 +58,8 @@ extern int lt_curr;
 // Functions
 void Set_Current_Dir(void);
 void Read_SMPT(void);
-void DumpList(int xr, int yr, int y);
-void ltActualize(int modeac);
+void Dump_Files_List(int xr, int yr);
+void Actualize_Files_List(int modeac);
 void Clear_Files_List(void);
 char *Get_Current_FileName(void);
 unsigned int Get_Current_FileType(void);

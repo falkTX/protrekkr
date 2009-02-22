@@ -32,6 +32,7 @@
 // ------------------------------------------------------
 // Includes
 #include "include/editor_synth.h"
+#include "include/editor_instrument.h"
 #include "../support/include/timer.h"
 
 // ------------------------------------------------------
@@ -233,7 +234,6 @@ void Actualize_Synth_Ed(char gode)
 
     if(userscreen == USER_SCREEN_SYNTH_EDIT)
     {
-
         if(gode == UPDATE_SYNTH_ED_ALL ||
            gode == UPDATE_SYNTH_CHANGE_ASSOCIATED_SAMPLE ||
            gode == UPDATE_SYNTH_ED_VALUES)
@@ -271,6 +271,7 @@ void Actualize_Synth_Ed(char gode)
             Gui_Draw_Button_Box(524, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(294, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(460, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+            Actualize_Instruments_Synths_List(1);
         }
 
         if(gode == UPDATE_SYNTH_ED_ALL ||
@@ -341,6 +342,7 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[ped_patsam].presetname, Allow_Button);
             }
+            Actualize_Instruments_Synths_List(1);
         }
 
         if(gode == UPDATE_SYNTH_ED_VALIDATE_PARAMS)

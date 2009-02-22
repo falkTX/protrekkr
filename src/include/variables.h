@@ -102,6 +102,8 @@
 #define GUI_CMD_UPDATE_LOOP_EDITOR_ED 101
 #define GUI_CMD_SAVE_MODULE 102
 
+#define GUI_CMD_INSTR_SYNTH_SCROLL 103
+
 #define GUI_CMD_SET_INSTRUMENT_AMPLI 104
 #define GUI_CMD_SET_INSTRUMENT_FINETUNE 105
 #define GUI_CMD_SET_INSTRUMENT_DECAY 106
@@ -121,6 +123,9 @@
 #define GUI_CMD_SAVE_FINAL 117
 #define GUI_CMD_CALC_FINAL 118
 #define GUI_CMD_SAVE_303_PATTERN 119
+
+#define GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER 120
+#define GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT 121
 
 #define GUI_CMD_PREVIOUS_16_INSTR 125
 #define GUI_CMD_NEXT_16_INSTR 126
@@ -198,6 +203,8 @@
 #define SCOPE_ZONE_MOD_DIR 1
 #define SCOPE_ZONE_INSTR_DIR 2
 #define SCOPE_ZONE_PRESET_DIR 3
+#define SCOPE_ZONE_INSTR_LIST 4
+#define SCOPE_ZONE_SYNTH_LIST 5
 
 #define MIN_VUMETER 4
 #define MAX_VUMETER 155
@@ -507,9 +514,7 @@ void GetBackMouse(void);
 void SeqFill(int st, int en, char n);
 void PutBackMouse(void);
 void Read_SMPT(void);
-void DumpList(int xr, int yr, int y);
 void Initreverb();
-void ltActualize(int modeac);
 void init_sample_bank(void);
 void AllocateWave(int n_index, long lenfir, int samplechans);
 void LoadFile(int Freeindex, const char *str);

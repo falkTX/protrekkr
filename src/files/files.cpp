@@ -3464,7 +3464,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             fclose(in);
             last_index = -1;
             Read_SMPT();
-            ltActualize(0);
+            Actualize_Files_List(0);
 
             if(Ok_Memory)
             {
@@ -3587,7 +3587,7 @@ void SaveSynth(void)
 
         Read_SMPT();
         last_index = -1;
-        ltActualize(0);
+        Actualize_Files_List(0);
         mess_box("Synthesizer program saved succesfully..."); 
     }
     else
@@ -3803,7 +3803,7 @@ void SaveInst(void)
 
         Read_SMPT();
         last_index = -1;
-        ltActualize(0);
+        Actualize_Files_List(0);
         Actualize_Patterned();
         mess_box("Instrument saved succesfully..."); 
     }
@@ -3876,7 +3876,7 @@ void Save303(void)
         fclose(in);
         Read_SMPT();
         last_index = -1;
-        ltActualize(0);
+        Actualize_Files_List(0);
         mess_box("303 pattern saved succesfully...");   
     }
     else
@@ -3982,7 +3982,7 @@ int Pack_Module(char *FileName)
     mess_box(name);
     Read_SMPT();
     last_index = -1;
-    ltActualize(0);
+    Actualize_Files_List(0);
     return(FALSE);
 }
 
@@ -4074,7 +4074,7 @@ void SaveConfig(void)
 
         Read_SMPT();
         last_index = -1;
-        ltActualize(0);
+        Actualize_Files_List(0);
         mess_box("Configuration file saved succesfully...");  
     }
     else

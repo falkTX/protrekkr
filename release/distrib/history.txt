@@ -2,6 +2,13 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.92:
+
+- Added global lists for instruments and synths,
+  that should improve the ergonomy a bit.
+- Samples weren't re-initiliazed correctly after a "New Module" command
+  was issued.
+
 v1.91b:
 
 - Fixed the rand commands in the synth tab.
