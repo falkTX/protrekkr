@@ -585,7 +585,7 @@ void Draw_Editors_Bar(int Highlight)
     if(Highlight == -1)
     {
         SetColor(COL_BACKGROUND);
-        bjbox(0, 429, 800, 18);
+        bjbox(0, 428, 800, 19);
         Highlight = curr_tab_highlight;
     }
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
@@ -593,7 +593,7 @@ void Draw_Editors_Bar(int Highlight)
         if(Patterns_Lines_Offset)
         {
             SetColor(COL_BACKGROUND);
-            bjbox(0, 429, 800, 18);
+            bjbox(0, 428, 800, 19);
         }
         Highlight_Tab[Highlight] = BUTTON_PUSHED;
         Patterns_Lines = DISPLAYED_LINES_SMALL;
@@ -607,7 +607,7 @@ void Draw_Editors_Bar(int Highlight)
     {
         userscreen = USER_SCREEN_LARGE_PATTERN;
         SetColor(COL_BACKGROUND);
-        bjbox(0, 429 + Patterns_Lines_Offset, 800, 18);
+        bjbox(0, 428 + Patterns_Lines_Offset, 800, 19);
         Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
         Actupated(0);
 

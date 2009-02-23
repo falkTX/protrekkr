@@ -439,7 +439,7 @@ void draw_pated(int track, int line, int petrack, int row)
     bjbox(0,
           196,
           CHANNELS_WIDTH + 2,
-          (8 * (Patterns_Lines + 1) + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 5 : 0))
+          (8 * (Patterns_Lines + 1) + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 4 : 0))
          );
 
     for(liner = VIEWLINE2; liner < VIEWLINE; liner++)
