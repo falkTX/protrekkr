@@ -59,8 +59,6 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(248, 502, 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 520, 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 538, 56, 16, "Pan", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_NORMAL);
     Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
 
@@ -80,27 +78,30 @@ void Actualize_Track_Ed(char gode)
             if(ped_track > MAX_TRACKS - 1) ped_track = 0;
             if(ped_track < 0) ped_track = MAX_TRACKS - 1;
             value_box(508, 486, ped_track, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
         }
 
         if(gode == 0 || gode == 1)
         {
             if(TCut[ped_track] < 0) TCut[ped_track] = 0;
             if(TCut[ped_track] > 127) TCut[ped_track] = 127;
-            Realslider(77, 484, (int) TCut[ped_track], TRUE);
+            Realslider(77, 484, (int) TCut[ped_track], FType[ped_track] != 4);
         }
 
         if(gode == 0 || gode == 2)
         {
             if(FRez[ped_track] < 0) FRez[ped_track] = 0;
             if(FRez[ped_track] > 127) FRez[ped_track] = 127;
-            Realslider(77, 502, FRez[ped_track], TRUE);
+            Realslider(77, 502, FRez[ped_track], FType[ped_track] != 4);
         }
 
         if(gode == 0 || gode == 3)
         {
             if(ICut[ped_track] > 0.0078125f) ICut[ped_track] = 0.0078125f;
             if(ICut[ped_track] < 0.00006103515625f) ICut[ped_track] = 0.00006103515625f;
-            Realslider(77, 538, (int) (ICut[ped_track] * 16384.0f), TRUE);
+            Realslider(77, 538, (int) (ICut[ped_track] * 16384.0f), FType[ped_track] != 4);
         }
 
         if(gode == 0 || gode == 4)
@@ -156,14 +157,14 @@ void Actualize_Track_Ed(char gode)
         {
             if(DThreshold[ped_track] < 0) DThreshold[ped_track] = 0;
             if(DThreshold[ped_track] > 65535) DThreshold[ped_track] = 65535;
-            Realslider(308, 484, (int) DThreshold[ped_track] / 512, TRUE);
+            Realslider(308, 484, (int) DThreshold[ped_track] / 512, Disclap[ped_track]);
         }
 
         if(gode == 0 || gode == 8)
         {
             if(DClamp[ped_track] < 0) DClamp[ped_track] = 0;
             if(DClamp[ped_track] > 65535) DClamp[ped_track] = 65535;
-            Realslider(308, 502, (int) DClamp[ped_track] / 512, TRUE);
+            Realslider(308, 502, (int) DClamp[ped_track] / 512, Disclap[ped_track]);
         }
 
         if(gode == 0 || gode == 9)
@@ -225,20 +226,24 @@ void Mouse_Left_Track_Ed(void)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
+
+        // Filter type
         if(zcheckMouse(77, 520, 16, 16) && FType[ped_track] > 0)
         {
             ResetFilters(ped_track);
             FType[ped_track]--;
-            teac = 4;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
         if(zcheckMouse(121, 520, 16, 16) && FType[ped_track] < MAX_FILTER)
         {
             ResetFilters(ped_track);
             FType[ped_track]++;
-            teac = 4;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
+
+        // Previous track
         if(zcheckMouse(508, 486, 16, 16))
         {
             ped_track--;
@@ -246,6 +251,8 @@ void Mouse_Left_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
         }
+
+        // Next track
         if(zcheckMouse(552, 486, 16, 16))
         {
             ped_track++;
@@ -253,6 +260,8 @@ void Mouse_Left_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
         }
+
+        // Delay send
         if(zcheckMouse(570, 486, 16, 16))
         {
             CSend[ped_track]--;
@@ -266,18 +275,20 @@ void Mouse_Left_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(456, 484, 40, 16))
+        if(zcheckMouse(456, 484, 40, 16) && Disclap[ped_track])
         {
             DThreshold[ped_track] = DClamp[ped_track];
             teac = 7;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(456, 502, 40, 16))
+        if(zcheckMouse(456, 502, 40, 16) && Disclap[ped_track])
         {
             DClamp[ped_track] = DThreshold[ped_track];
             teac = 8;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
+
+        // Channel panning
         if(zcheckMouse(456, 538, 40, 16))
         {
             TPan[ped_track] = 0.5f;
@@ -285,6 +296,7 @@ void Mouse_Left_Track_Ed(void)
             teac = 9;
         }
 
+        // Midi channel
         if(zcheckMouse(570, 530, 16, 16))
         {
             CHAN_MIDI_PRG[ped_track]--;
@@ -303,7 +315,7 @@ void Mouse_Left_Track_Ed(void)
         {
             Disclap[ped_track] = !Disclap[ped_track];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
-            teac = 12;
+            teac = 0;
         }
 
         // Mute track
@@ -454,11 +466,11 @@ void Mouse_Sliders_Track_Ed(void)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-        if(zcheckMouse(77, 484, 148, 16)) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
-        if(zcheckMouse(77, 502, 148, 16)) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
-        if(zcheckMouse(77, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_INERTIA;
-        if(zcheckMouse(308, 484, 148, 16)) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
-        if(zcheckMouse(308, 502, 148, 16)) gui_action = GUI_CMD_SET_TRACK_CLAMP;
+        if(zcheckMouse(77, 484, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
+        if(zcheckMouse(77, 502, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
+        if(zcheckMouse(77, 538, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
+        if(zcheckMouse(308, 484, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
+        if(zcheckMouse(308, 502, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
         if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
         if(zcheckMouse(308, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
     }

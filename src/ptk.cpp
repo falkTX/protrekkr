@@ -34,6 +34,18 @@
 #include "include/ptk.h"
 
 // ------------------------------------------------------
+// Constants
+// This is a nasty hack: we should have a specific ASCII buffer
+// instead of using the unicode one.
+#if !defined(__MACOSX__)
+#define UNICODE_OFFSET1 0x20
+#define UNICODE_OFFSET2 0x60
+#else
+#define UNICODE_OFFSET1 0
+#define UNICODE_OFFSET2 0
+#endif
+
+// ------------------------------------------------------
 // Variables
 unsigned char sl3 = 0;
 
@@ -328,7 +340,7 @@ int Init_Context(void)
         case 6: sprintf(tipoftheday, "Tip Of The Hour: Volume note-cut command 'Fx' is very useful to avoid sample-clicking."); break;
         case 7: sprintf(tipoftheday, "Tip Of The Hour: Left-Clicking on pattern editor channels numbers will mute/unmute any track (right clicking will solo it)."); break;
         case 8: sprintf(tipoftheday, "Tip Of The Hour: Pattern command '16xx' will reset the Filter LFO of the track. No parameter required."); break;
-        case 9: sprintf(tipoftheday, "Tip Of The Hour: With a '90' value on the panning column you can change midi controllers values."); break;
+        case 9: sprintf(tipoftheday, "Tip Of The Hour: Use '90' command in the panning column to change midi controllers values."); break;
         case 10: sprintf(tipoftheday, "Tip Of The Hour: Increase latency time if sound is distorted."); break;
         case 11: sprintf(tipoftheday, "Tip Of The Hour: Pressing right mouse button on most arrows buttons (\03\04) will speed operation up.");
 
@@ -894,6 +906,32 @@ int Screen_Update(void)
         }
 
         // Tabs select
+        if(gui_action == GUI_CMD_SELECT_LARGE_PATTERNS)
+        {
+            if(Patterns_Lines == DISPLAYED_LINES_SMALL)
+            {
+                Patterns_Lines = DISPLAYED_LINES_LARGE;
+                Patterns_Lines_Offset = 132;
+                VIEWLINE = 22;
+                VIEWLINE2 = -22;
+                YVIEW = 372;
+                Actupated(0);
+                Draw_Editors_Bar(USER_SCREEN_LARGE_PATTERN);
+             }
+            else
+            {
+                userscreen = curr_tab_highlight;
+                Patterns_Lines = DISPLAYED_LINES_SMALL;
+                Patterns_Lines_Offset = 0;
+                VIEWLINE = 15;
+                VIEWLINE2 = -13;
+                YVIEW = 300;
+                Actupated(0);
+                Draw_Editors_Bar(-1);
+                Refresh_UI_Context();
+            }
+        }
+
         if(gui_action == GUI_CMD_SELECT_DISKIO)
         {
             retletter[71] = TRUE;
@@ -981,7 +1019,7 @@ int Screen_Update(void)
             retletter[71] = FALSE;
             userscreen = USER_SCREEN_SAMPLE_EDIT;
             Draw_Sample_Ed();
-            Actualize_Wave_Ed(0);
+            Actualize_Sample_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SELECT_TB303_EDIT)
@@ -1243,9 +1281,9 @@ int Screen_Update(void)
             mess_box("Maximum number of patterns reached.");
         }
 
-        if(gui_action == GUI_CMD_REFRESH_WAVE_ED)
+        if(gui_action == GUI_CMD_REFRESH_SAMPLE_ED)
         {
-            Actualize_Wave_Ed(teac);
+            Actualize_Sample_Ed(teac);
         }
 
         if(gui_action == GUI_CMD_ASK_EXIT)
@@ -1305,8 +1343,6 @@ int Screen_Update(void)
             Gui_Draw_Button_Box(262, 62, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(262, 80, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
             Display_Beat_Time();
-
-            //Set_Track_Slider(gui_track);
 
             NewWav();
 
@@ -1642,8 +1678,8 @@ void StartRec(void)
 {
     liveparam = 0;
     livevalue = 0;
-    if(sr_isrecording) Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: ON", BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: OFF", BUTTON_NORMAL);
+    if(sr_isrecording) Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: On", BUTTON_PUSHED);
+    else Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: Off", BUTTON_NORMAL);
 }
 
 // ------------------------------------------------------
@@ -2256,6 +2292,10 @@ void Keyboard_Handler(void)
 
     if(Get_LShift())
     {
+        if(Keys[SDLK_ESCAPE])
+        {
+            gui_action = GUI_CMD_SELECT_LARGE_PATTERNS;
+        }
         if(Keys[SDLK_F1])
         {
             gui_action = GUI_CMD_SELECT_SEQUENCER;
@@ -2902,6 +2942,44 @@ void Keyboard_Handler(void)
     }
     // -------------------------------------------
 
+    int Shift = 0;
+    if(Get_LShift() || Get_RShift())
+    {
+        Shift = UNICODE_OFFSET1;
+    }
+
+    if(snamesel == 0 && !reelletter)
+    {
+        // Data columns
+        if(Keys_Unicode[SDLK_0]) retvalue = 0;
+        if(Keys[SDLK_KP0]) retvalue = 0;
+        if(Keys_Unicode[SDLK_1]) retvalue = 1;
+        if(Keys[SDLK_KP1]) retvalue = 1;
+        if(Keys_Unicode[SDLK_2]) retvalue = 2;
+        if(Keys[SDLK_KP2]) retvalue = 2;
+        if(Keys_Unicode[SDLK_3]) retvalue = 3;
+        if(Keys[SDLK_KP3]) retvalue = 3;
+        if(Keys_Unicode[SDLK_4]) retvalue = 4;
+        if(Keys[SDLK_KP4]) retvalue = 4;
+        if(Keys_Unicode[SDLK_5]) retvalue = 5;
+        if(Keys[SDLK_KP5]) retvalue = 5;
+        if(Keys_Unicode[SDLK_6]) retvalue = 6;
+        if(Keys[SDLK_KP6]) retvalue = 6;
+        if(Keys_Unicode[SDLK_7]) retvalue = 7;
+        if(Keys[SDLK_KP7]) retvalue = 7;
+        if(Keys_Unicode[SDLK_8]) retvalue = 8;
+        if(Keys[SDLK_KP8]) retvalue = 8;
+        if(Keys_Unicode[SDLK_9]) retvalue = 9;
+        if(Keys[SDLK_KP9]) retvalue = 9;
+        if(Keys[SDLK_a - Shift]) retvalue = 10;
+        if(Keys[SDLK_b - Shift]) retvalue = 11;
+        if(Keys[SDLK_c - Shift]) retvalue = 12;
+        if(Keys[SDLK_d - Shift]) retvalue = 13;
+        if(Keys[SDLK_e - Shift]) retvalue = 14;
+        if(Keys[SDLK_f - Shift]) retvalue = 15;
+        if(Keys[SDLK_DELETE]) retvalue = 16;
+    }
+
     // ------------------------------------------
     if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0 && !reelletter)
     {
@@ -2944,40 +3022,6 @@ void Keyboard_Handler(void)
         if(Keys_Raw_Off[0x27]) { Record_Keys[35] = (15 + 1) | 0x80; Keys_Raw_Off[0x27] = FALSE; Keys_Raw[0x27] = FALSE; }
         if(Keys_Raw_Off[0x35]) { Record_Keys[36] = (16 + 1) | 0x80; Keys_Raw_Off[0x35] = FALSE; Keys_Raw[0x35] = FALSE; }
 
-        if(Keys[SDLK_z]) retnote = 0;
-        if(Keys[SDLK_s]) retnote = 1;
-        if(Keys[SDLK_x]) retnote = 2;
-        if(Keys[SDLK_d]) retnote = 3;
-        if(Keys[SDLK_c]) retnote = 4;
-        if(Keys[SDLK_v]) retnote = 5;
-        if(Keys[SDLK_g]) retnote = 6;
-        if(Keys[SDLK_b]) retnote = 7;
-        if(Keys[SDLK_h]) retnote = 8;
-        if(Keys[SDLK_n]) retnote = 9;
-        if(Keys[SDLK_j]) retnote = 10;
-        if(Keys[SDLK_m]) retnote = 11;
-        if(Keys[SDLK_COMMA]) retnote = 12;
-        if(Keys[SDLK_l]) retnote = 13;
-        if(Keys[SDLK_PERIOD]) retnote = 14;
-        if(Keys[SDLK_SEMICOLON]) retnote = 15;
-        if(Keys[SDLK_SLASH]) retnote = 16;
-        if(Keys[SDLK_q]) retnote = 12;
-        if(Keys[SDLK_z]) retnote = 13;
-        if(Keys[SDLK_w]) retnote = 14;
-        if(Keys[SDLK_3]) retnote = 15;
-        if(Keys[SDLK_e]) retnote = 16;
-        if(Keys[SDLK_r]) retnote = 17;
-        if(Keys[SDLK_s]) retnote = 18;
-        if(Keys[SDLK_t]) retnote = 19;
-        if(Keys[SDLK_6]) retnote = 20;
-        if(Keys[SDLK_y]) retnote = 21;
-        if(Keys[SDLK_7]) retnote = 22;
-        if(Keys[SDLK_u]) retnote = 23;
-        if(Keys[SDLK_i]) retnote = 24;
-        if(Keys[SDLK_9]) retnote = 25;
-        if(Keys[SDLK_o]) retnote = 26;
-        if(Keys[SDLK_0]) retnote = 27;
-        if(Keys[SDLK_p]) retnote = 28;
         if(Keys[SDLK_DELETE])
         {
             retnote = -1;
@@ -3032,35 +3076,6 @@ void Keyboard_Handler(void)
         if(Keys_Raw[0x34]) { retnote_raw = 14; Record_Keys[34] = 14 + 1; }
         if(Keys_Raw[0x27]) { retnote_raw = 15; Record_Keys[35] = 15 + 1; }
         if(Keys_Raw[0x35]) { retnote_raw = 16; Record_Keys[36] = 16 + 1; }
-
-        // Data columns
-        if(Keys_Unicode['0']) retvalue = 0;
-        if(Keys[SDLK_KP0]) retvalue = 0;
-        if(Keys_Unicode['1']) retvalue = 1;
-        if(Keys[SDLK_KP1]) retvalue = 1;
-        if(Keys_Unicode['2']) retvalue = 2;
-        if(Keys[SDLK_KP2]) retvalue = 2;
-        if(Keys_Unicode['3']) retvalue = 3;
-        if(Keys[SDLK_KP3]) retvalue = 3;
-        if(Keys_Unicode['4']) retvalue = 4;
-        if(Keys[SDLK_KP4]) retvalue = 4;
-        if(Keys_Unicode['5']) retvalue = 5;
-        if(Keys[SDLK_KP5]) retvalue = 5;
-        if(Keys_Unicode['6']) retvalue = 6;
-        if(Keys[SDLK_KP6]) retvalue = 6;
-        if(Keys_Unicode['7']) retvalue = 7;
-        if(Keys[SDLK_KP7]) retvalue = 7;
-        if(Keys_Unicode['8']) retvalue = 8;
-        if(Keys[SDLK_KP8]) retvalue = 8;
-        if(Keys_Unicode['9']) retvalue = 9;
-        if(Keys[SDLK_KP9]) retvalue = 9;
-        if(Keys[SDLK_a]) retvalue = 10;
-        if(Keys[SDLK_b]) retvalue = 11;
-        if(Keys[SDLK_c]) retvalue = 12;
-        if(Keys[SDLK_d]) retvalue = 13;
-        if(Keys[SDLK_e]) retvalue = 14;
-        if(Keys[SDLK_f]) retvalue = 15;
-        if(Keys[SDLK_DELETE]) retvalue = 16;
 
         int i;
 
@@ -3177,16 +3192,6 @@ void Keyboard_Handler(void)
             po_alt = TRUE;
         }
         if(!Get_LAlt() && po_alt) po_alt = FALSE;
-
-// This is a nasty hack: we should have a specific ASCII buffer
-// instead of using the unicode one.
-#if !defined(__MACOSX__)
-#define UNICODE_OFFSET1 0x20
-#define UNICODE_OFFSET2 0x60
-#else
-#define UNICODE_OFFSET1 0
-#define UNICODE_OFFSET2 0
-#endif
 
         if(Key_Unicode)
         {
@@ -4361,26 +4366,31 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_DELETE_INSTRUMENT;
         }
 
-        // Tabs
-        if(zcheckMouse(396, 429, 64, 16) && userscreen != USER_SCREEN_TRACK_FX_EDIT) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
-        if(zcheckMouse(132, 429, 64, 16) && userscreen != USER_SCREEN_SYNTH_EDIT) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
-        if(zcheckMouse(594, 429, 64, 16) && userscreen != USER_SCREEN_SETUP_EDIT) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
-        if(zcheckMouse(0, 429, 64, 16) && userscreen != USER_SCREEN_SEQUENCER) gui_action = GUI_CMD_SELECT_SEQUENCER;
-        if(zcheckMouse(528, 429, 64, 16) && userscreen != USER_SCREEN_DISKIO_EDIT) gui_action = GUI_CMD_SELECT_DISKIO;
-        if(zcheckMouse(330, 429, 64, 16) && userscreen != USER_SCREEN_TRACK_EDIT) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
-        if(zcheckMouse(66, 429, 64, 16) && userscreen != USER_SCREEN_INSTRUMENT_EDIT)
+        int Add_Offset = (Patterns_Lines == DISPLAYED_LINES_LARGE ? 133 : 0);
+        if(zcheckMouse(0, 429 + Add_Offset, 18, 16))
+        {
+            gui_action = GUI_CMD_SELECT_LARGE_PATTERNS;
+        }
+
+        if(zcheckMouse(20, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SEQUENCER || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SEQUENCER;
+        if(zcheckMouse(84, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_INSTRUMENT_EDIT;
             seditor = 0;
         }
-        if(zcheckMouse(462, 429, 64, 16) && userscreen != USER_SCREEN_FX_SETUP_EDIT)
+        if(zcheckMouse(148, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SYNTH_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
+        if(zcheckMouse(212, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SAMPLE_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
+        if(zcheckMouse(276, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TB303_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TB303_EDIT;
+        if(zcheckMouse(340, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
+        if(zcheckMouse(404, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_FX_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
+        if(zcheckMouse(468, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_FX_SETUP_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_FX_EDIT;
             teac = 0;
         }  
-        if(zcheckMouse(198, 429, 64, 16) && userscreen != USER_SCREEN_SAMPLE_EDIT) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
-        if(zcheckMouse(264, 429, 64, 16) && userscreen != USER_SCREEN_TB303_EDIT) gui_action = GUI_CMD_SELECT_TB303_EDIT;
-        if(zcheckMouse(660, 429, 64, 16))
+        if(zcheckMouse(532, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO;
+        if(zcheckMouse(596, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
+        if(zcheckMouse(660, 429 + Add_Offset, 62, 16))
         {
             if(Asking_Exit) gui_action = GUI_CMD_EXIT;
             else gui_action = GUI_CMD_ASK_EXIT;

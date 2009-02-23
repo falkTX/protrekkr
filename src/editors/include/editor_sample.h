@@ -46,7 +46,7 @@
 // Functions
 void Draw_Sample_Ed(void);
 void Draw_Sampled_Wave(void);
-void Actualize_Wave_Ed(char gode);
+void Actualize_Sample_Ed(char gode);
 void NewWav(void);
 void Mouse_Left_Sample_Ed(void);
 void Mouse_Right_Sample_Ed(void);

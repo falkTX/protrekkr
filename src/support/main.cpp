@@ -95,7 +95,6 @@ int key_on = 0;
 float delay_refresh;
 float delay_refresh2;
 extern int display_title;
-int exiting;
 
 char *ExePath;
 
@@ -813,7 +812,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
         SDL_Delay(10);
     }
-    exiting = TRUE;
     SaveConfig();
 
 	if(ExePath) free(ExePath);

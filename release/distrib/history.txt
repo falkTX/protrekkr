@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.92b:
+
+- Added an option to show or hide the bottom panel in order to display
+  more patterns rows (Shortcut: LSHIFT+ESCAPE to toggle the view)
+
 v1.92:
 
 - Added global lists for instruments and synths,

@@ -260,7 +260,7 @@ void NewWav(void)
     sed_range_start = 0;
     sed_range_end = 0;
     sed_range_mode = FALSE;
-    Actualize_Wave_Ed(0);
+    Actualize_Sample_Ed(0);
 }
 
 // Draw the current playback position
@@ -377,7 +377,7 @@ void Draw_Sampled_Wave3(void)
     }
 }
 
-void Actualize_Wave_Ed(char gode)
+void Actualize_Sample_Ed(char gode)
 {
     int32 sed_real_range_start;
     int32 sed_real_range_end;
@@ -731,7 +731,7 @@ void Mouse_Right_Sample_Ed(void)
                 sed_range_end = 0;
                 sed_range_mode = FALSE;
                 draw_sampled_wave = TRUE;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
                 teac = 4;
             }
             else
@@ -742,7 +742,7 @@ void Mouse_Right_Sample_Ed(void)
                 sed_range_end = sed_display_start + sed_display_length - 1;
                 draw_sampled_wave = TRUE;
                 teac = 0;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
         }
     }
@@ -826,32 +826,32 @@ void Mouse_Left_Sample_Ed(void)
             if(zcheckMouse(520, 476, 29, 16) && sed_range_mode)
             {
                 teac = 20;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
             if(zcheckMouse(520, 512, 60, 16) && sed_range_mode)
             {
                 teac = 21;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
             if(zcheckMouse(520, 494, 60, 16) && sed_range_mode)
             {
                 teac = 22;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
             if(zcheckMouse(520, 530, 60, 16) && sed_range_mode)
             {
                 teac = 23;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
             if(zcheckMouse(520, 548, 60, 16) && sed_range_mode)
             {
                 teac = 24;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
             if(zcheckMouse(551, 476, 29, 16) && sed_range_mode)
             {
                 teac = 25;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             if(zcheckMouse(582, 512, 60, 16))
@@ -861,7 +861,7 @@ void Mouse_Left_Sample_Ed(void)
                 sed_display_length = SampleNumSamples[ped_patsam][ped_split];
                 draw_sampled_wave = TRUE;
                 teac = 3;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             if(zcheckMouse(582, 530, 60, 16))
@@ -884,7 +884,7 @@ void Mouse_Left_Sample_Ed(void)
                 sed_range_end = 0;
                 draw_sampled_wave = TRUE;
                 teac = 0;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             // Select all
@@ -895,7 +895,7 @@ void Mouse_Left_Sample_Ed(void)
                 sed_range_end = sed_display_start + sed_display_length - 1;
                 draw_sampled_wave = TRUE;
                 teac = 0;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             // Zoom in
@@ -912,7 +912,7 @@ void Mouse_Left_Sample_Ed(void)
                 sed_display_length = (sed_range_end - sed_range_start) + 1;
                 draw_sampled_wave = TRUE;
                 teac = 3;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             // Zoom out
@@ -934,7 +934,7 @@ void Mouse_Left_Sample_Ed(void)
                 }
                 draw_sampled_wave = TRUE;
                 teac = 3;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
         }
     }
@@ -983,7 +983,7 @@ void Mouse_Sliders_Sample_Ed(void)
                 {
                     sed_range_end = axswave;
                 }
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
                 draw_sampled_wave = TRUE;
                 sas = TRUE;
             } // SAMPLETYPE
@@ -1006,7 +1006,7 @@ void Mouse_Sliders_Sample_Ed(void)
                 }
                 if(s_offset < 0) s_offset = 0;
                 sed_display_start = (int32) s_offset;
-                gui_action = GUI_CMD_REFRESH_WAVE_ED;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
                 draw_sampled_wave = TRUE;
             }
         }

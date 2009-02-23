@@ -95,6 +95,7 @@ extern char Dir_Mods[MAX_PATH];
 extern char Dir_Instrs[MAX_PATH];
 extern char Dir_Presets[MAX_PATH];
 extern char *cur_dir;
+extern char Scopish_LeftRight;
 
 //char appbuffer[MAX_PATH];
 
@@ -4007,7 +4008,7 @@ int TestMod(void)
 // Save the configuration
 void SaveConfig(void)
 {
-    FILE *in;
+    FILE *out;
     char extension[10];
     char FileName[MAX_PATH];
     int i;
@@ -4015,7 +4016,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG2");
+    sprintf(extension, "TWNNCFG3");
     mess_box("Saving 'ptk.cfg' on current directory...");
 
 #if defined(__WIN32__)
@@ -4027,50 +4028,52 @@ void SaveConfig(void)
     memset(KeyboardName, 0, sizeof(KeyboardName));
     sprintf(KeyboardName, "%s", Keyboard_Name);
 
-    in = fopen(FileName, "wb");
-    if(in != NULL)
+    out = fopen(FileName, "wb");
+    if(out != NULL)
     {
-        Write_Data(extension, sizeof(char), 9, in);
-        Write_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
-        Write_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
-        Write_Data_Swap(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
+        Write_Data(extension, sizeof(char), 9, out);
+        Write_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, out);
+        Write_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, out);
+        Write_Data_Swap(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, out);
 
 #if defined(__NO_MIDI__)
-        Write_Data(&phony, sizeof(phony), 1, in);
+        Write_Data(&phony, sizeof(phony), 1, out);
 #else
-        Write_Data(&c_midiin, sizeof(c_midiin), 1, in);
+        Write_Data(&c_midiin, sizeof(c_midiin), 1, out);
 #endif
 
 #if defined(__NO_MIDI__)
-        Write_Data(&phony, sizeof(phony), 1, in);
+        Write_Data(&phony, sizeof(phony), 1, out);
 #else
-        Write_Data(&c_midiout, sizeof(c_midiout), 1, in);
+        Write_Data(&c_midiout, sizeof(c_midiout), 1, out);
 #endif
 
-        Write_Data_Swap(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, in);
-        Write_Data(&Rows_Decimal, sizeof(Rows_Decimal), 1, in);
-        Write_Data(&FullScreen, sizeof(FullScreen), 1, in);
+        Write_Data_Swap(&MouseWheel_Multiplier, sizeof(MouseWheel_Multiplier), 1, out);
+        Write_Data(&Rows_Decimal, sizeof(Rows_Decimal), 1, out);
+        Write_Data(&FullScreen, sizeof(FullScreen), 1, out);
 
         for(i = 0; i < NUMBER_COLORS; i++)
         {
             Real_Palette_Idx = Idx_Palette[i];
-            Write_Data(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, in);
-            Write_Data(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, in);
-            Write_Data(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, in);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].r, sizeof(char), 1, out);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].g, sizeof(char), 1, out);
+            Write_Data(&Ptk_Palette[Real_Palette_Idx].b, sizeof(char), 1, out);
         }
-        Write_Data(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, in);
-        Write_Data_Swap(&Beveled, sizeof(Beveled), 1, in);
-        Write_Data_Swap(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
-        Write_Data(&AutoSave, sizeof(AutoSave), 1, in);
+        Write_Data(&See_Prev_Next_Pattern, sizeof(See_Prev_Next_Pattern), 1, out);
+        Write_Data_Swap(&Beveled, sizeof(Beveled), 1, out);
+        Write_Data_Swap(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, out);
+        Write_Data(&AutoSave, sizeof(AutoSave), 1, out);
         
-        Write_Data(&Dir_Mods, sizeof(Dir_Mods), 1, in);
-        Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
-        Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
-        Write_Data(KeyboardName, MAX_PATH, 1, in);
+        Write_Data(&Dir_Mods, sizeof(Dir_Mods), 1, out);
+        Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, out);
+        Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, out);
+        Write_Data(KeyboardName, MAX_PATH, 1, out);
 
-        Write_Data(&rawrender_32float, sizeof(char), 1, in);
+        Write_Data(&rawrender_32float, sizeof(char), 1, out);
+        Write_Data(&Patterns_Lines, sizeof(char), 1, out);
+        Write_Data(&Scopish_LeftRight, sizeof(char), 1, out);
 
-        fclose(in);
+        fclose(out);
 
         Read_SMPT();
         last_index = -1;
@@ -4110,7 +4113,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG2") == 0)
+        if(strcmp(extension, "TWNNCFG3") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4150,6 +4153,27 @@ void LoadConfig(void)
             Read_Data(KeyboardName, MAX_PATH, 1, in);
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
+            Read_Data(&Patterns_Lines, sizeof(char), 1, in);
+            Read_Data(&Scopish_LeftRight, sizeof(char), 1, in);
+
+            if(Patterns_Lines == DISPLAYED_LINES_LARGE)
+            {
+                VIEWLINE = 22;
+                VIEWLINE2 = -22;
+                YVIEW = 372;
+                Patterns_Lines_Offset = 132;
+                userscreen = USER_SCREEN_LARGE_PATTERN;
+                curr_tab_highlight = USER_SCREEN_DISKIO_EDIT;
+            }
+            else
+            {
+                VIEWLINE = 15;
+                VIEWLINE2 = -13;
+                YVIEW = 300;
+                Patterns_Lines_Offset = 0;
+                userscreen = USER_SCREEN_DISKIO_EDIT;
+                curr_tab_highlight = USER_SCREEN_DISKIO_EDIT;
+            }
         }
         fclose(in);
     }

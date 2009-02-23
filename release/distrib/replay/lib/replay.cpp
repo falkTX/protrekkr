@@ -4045,7 +4045,7 @@ void Initreverb()
 
     switch(DelayType)
     {
-        case 0: // Deep Night II
+        case 0:
             decays[0][0] = 20; decays[0][1] =  0;
             decays[1][0] =  0; decays[1][1] = 15;
             decays[2][0] = 15; decays[2][1] =  0;
@@ -4071,7 +4071,7 @@ void Initreverb()
             num_echoes = 10;
             break;
 
-        case 1: // Deep Night III
+        case 1:
             decays[0][0] =  7; decays[0][1] =  7;
             decays[1][0] =-13; decays[1][1] =-15;
             decays[2][0] = 25; decays[2][1] = 32;
@@ -4097,7 +4097,7 @@ void Initreverb()
             num_echoes = 10;
             break;
 
-        case 2: // Deep Night III
+        case 2:
             decays[0][0] =  1; decays[0][1] =  2;
             decays[1][0] =  1; decays[1][1] = -4;
             decays[2][0] =  9; decays[2][1] =  1;
@@ -4123,7 +4123,7 @@ void Initreverb()
             num_echoes = 10;
             break;
 
-        case 3: // Deep Night II
+        case 3:
             decays[0][0] = 22; decays[0][1] =  3;
             decays[1][0] =  5; decays[1][1] = 12;
             decays[2][0] = 12; decays[2][1] =  1;
@@ -4137,7 +4137,7 @@ void Initreverb()
             num_echoes = 4;
             break;
 
-        case 4: // Deep Night II
+        case 4:
             decays[0][0] = 11; decays[0][1] = 0;
             decays[1][0] = 0 ; decays[1][1] = 21;
             decays[2][0] = 31; decays[2][1] = 0;
@@ -4151,7 +4151,7 @@ void Initreverb()
             num_echoes = 4;
             break;
 
-        case 5: // Deep Night III
+        case 5:
             decays[0][0] =  7; decays[0][1] =  7;
             decays[1][0] =-13; decays[1][1] =-15;
             decays[2][0] = 25; decays[2][1] = 32;
@@ -4177,7 +4177,7 @@ void Initreverb()
             num_echoes = 10;
             break;
 
-        case 6: // Deep Night III
+        case 6:
             decays[0][0] =  7; decays[0][1] =  7;
             decays[1][0] =-13; decays[1][1] =-15;
             decays[2][0] = 25; decays[2][1] = 32;

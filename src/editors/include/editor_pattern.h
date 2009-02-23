@@ -50,9 +50,15 @@
 #define PAT_COL_CHAR 8
 #define PAT_COL_CHAR_BIG 11
 
-#define DISPLAYED_LINES 28
+#define DISPLAYED_LINES_SMALL 28
+#define DISPLAYED_LINES_LARGE 44
 
 #define MAX_PATT_SCREEN_X 778
+
+// ------------------------------------------------------
+// Variables
+extern char Patterns_Lines;
+extern int Patterns_Lines_Offset;
 
 // ------------------------------------------------------
 // Functions

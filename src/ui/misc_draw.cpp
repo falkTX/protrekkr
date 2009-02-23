@@ -56,6 +56,8 @@ SDL_Surface *Temp_PFONT;
 SDL_Surface *Temp_BIGPFONT;
 int Beveled = TRUE;
 
+int curr_tab_highlight;
+
 int Nbr_Letters;
 int Font_Height = 11;
 char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010 ";
@@ -576,28 +578,65 @@ void Draw_Editors_Bar(int Highlight)
         BUTTON_NORMAL,
         BUTTON_NORMAL,
         BUTTON_NORMAL,
+        BUTTON_NORMAL,
         BUTTON_NORMAL
     };
-    Highlight_Tab[Highlight] = BUTTON_PUSHED;
+    
+    if(Highlight == -1)
+    {
+        SetColor(COL_BACKGROUND);
+        bjbox(0, 429, 800, 18);
+        Highlight = curr_tab_highlight;
+    }
+    if(Highlight != USER_SCREEN_LARGE_PATTERN)
+    {
+        if(Patterns_Lines_Offset)
+        {
+            SetColor(COL_BACKGROUND);
+            bjbox(0, 429, 800, 18);
+        }
+        Highlight_Tab[Highlight] = BUTTON_PUSHED;
+        Patterns_Lines = DISPLAYED_LINES_SMALL;
+        VIEWLINE = 15;
+        VIEWLINE2 = -13;
+        YVIEW = 300;
+        Patterns_Lines_Offset = 0;
+        Actupated(0);
+    }
+    else
+    {
+        userscreen = USER_SCREEN_LARGE_PATTERN;
+        SetColor(COL_BACKGROUND);
+        bjbox(0, 429 + Patterns_Lines_Offset, 800, 18);
+        Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
+        Actupated(0);
 
-    Gui_Draw_Button_Box(396, 429, 64, 16, "Track FX", Highlight_Tab[7]);
-    Gui_Draw_Button_Box(132, 429, 64, 16, "Synth", Highlight_Tab[6]);
-    Gui_Draw_Button_Box(594, 429, 64, 16, "Misc. Setup", Highlight_Tab[5]);
-    Gui_Draw_Button_Box(0, 429, 64, 16, "Sequencer", Highlight_Tab[4]);
-    Gui_Draw_Button_Box(528, 429, 64, 16, "Disk IO", Highlight_Tab[0]);
-    Gui_Draw_Button_Box(330, 429, 64, 16, "Track", Highlight_Tab[1]);
-    Gui_Draw_Button_Box(66, 429, 64, 16, "Instrument", Highlight_Tab[2]);
-    Gui_Draw_Button_Box(462, 429, 64, 16, "FX Setup", Highlight_Tab[3]);
-    Gui_Draw_Button_Box(198, 429, 64, 16, "Sample Ed.", Highlight_Tab[8]);
-    Gui_Draw_Button_Box(264, 429, 64, 16, "303", Highlight_Tab[9]);
-    Gui_Draw_Button_Box(660, 429, 64, 16, "Exit", Highlight_Tab[10]);
+    }
 
+    if(Patterns_Lines_Offset == 0) Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    else Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20, 429 + Patterns_Lines_Offset, 62, 16, "Sequencer", Highlight_Tab[4]);
+    Gui_Draw_Button_Box(84, 429 + Patterns_Lines_Offset, 62, 16, "Instrument", Highlight_Tab[2]);
+    Gui_Draw_Button_Box(148, 429 + Patterns_Lines_Offset, 62, 16, "Synth", Highlight_Tab[6]);
+    Gui_Draw_Button_Box(212, 429 + Patterns_Lines_Offset, 62, 16, "Sample Ed.", Highlight_Tab[8]);
+    Gui_Draw_Button_Box(276, 429 + Patterns_Lines_Offset, 62, 16, "303", Highlight_Tab[9]);
+    Gui_Draw_Button_Box(340, 429 + Patterns_Lines_Offset, 62, 16, "Track", Highlight_Tab[1]);
+    Gui_Draw_Button_Box(404, 429 + Patterns_Lines_Offset, 62, 16, "Track FX", Highlight_Tab[7]);
+    Gui_Draw_Button_Box(468, 429 + Patterns_Lines_Offset, 62, 16, "FX Setup", Highlight_Tab[3]);
+    Gui_Draw_Button_Box(532, 429 + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
+    Gui_Draw_Button_Box(596, 429 + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
+    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 62, 16, "Exit", Highlight_Tab[10]);
+
+    if(Highlight != USER_SCREEN_LARGE_PATTERN)
+    {
+        curr_tab_highlight = Highlight;
+    }
     Asking_Exit = FALSE;
 }
 
 void Draw_Ask_Exit(void)
 {
-    Gui_Draw_Button_Box(660, 429, 64, 16, "Sure ?", BUTTON_PUSHED);
+    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 64, 16, "Sure ?", BUTTON_PUSHED);
 }
 
 // ------------------------------------------------------
@@ -636,10 +675,14 @@ void Refresh_UI_Context(void)
         case USER_SCREEN_TRACK_FX_EDIT:
             Draw_Track_Fx_Ed();
             break;
+        case USER_SCREEN_LARGE_PATTERN:
+            Draw_Editors_Bar(USER_SCREEN_LARGE_PATTERN);
+            break;
     }
+    seditor = 0;
+    
     Actualize_DiskIO_Ed(0);
     Actualize_303_Ed(0);
-    seditor = 0;
     Actualize_Instrument_Ed(0, 0);
     Actualize_Sequencer();
     Display_Master_Comp();
@@ -647,11 +690,12 @@ void Refresh_UI_Context(void)
     Display_Shuffle();
     Actualize_Master(0);
     Actualize_Master(4);
+
     Actualize_Seq_Ed();
     Actualize_Track_Ed(0);
     Actualize_Master_Ed(0);
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
-    Actualize_Wave_Ed(0);
+    Actualize_Sample_Ed(0);
     Actualize_Fx_Ed(0);
     Actualize_Track_Fx_Ed(0);
     Actualize_Patterned();

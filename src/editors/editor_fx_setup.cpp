@@ -86,12 +86,12 @@ void Actualize_Fx_Ed(char gode)
             }
 
             if(gode) Initreverb();
-            value_box(79, 516, DelayType, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(79, 516, DelayType, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | (compressor ? 0 : BUTTON_DISABLED));
         }
 
         if(gode == 0 || gode == 2)
         {
-            Realslider(77, 498, (int) (Feedback * 127.0f), TRUE);
+            Realslider(77, 498, (int) (Feedback * 127.0f), compressor);
         }
 
         if(gode == 0 || gode == 3)
@@ -140,7 +140,7 @@ void Actualize_Fx_Ed(char gode)
         {
             if(c_threshold < 10) c_threshold = 10;
             if(c_threshold > 127) c_threshold = 127;
-            Realslider(77, 534, c_threshold, TRUE);
+            Realslider(77, 534, c_threshold, compressor);
             
             // Re-generate
             if(gode == 7) allPassInit((float) c_threshold);
@@ -164,7 +164,7 @@ void Actualize_Fx_Ed(char gode)
         {
             if(REVERBFILTER < 0.05f) REVERBFILTER = 0.05f;
             if(REVERBFILTER > 0.99f) REVERBFILTER = 0.99f;
-            Realslider(77, 552, (int) (REVERBFILTER * 128.0f), TRUE);
+            Realslider(77, 552, (int) (REVERBFILTER * 128.0f), compressor);
         }
 
         if(gode == 0 || gode == 10)
@@ -187,7 +187,7 @@ void Mouse_Sliders_Fx_Ed(void)
 {
     if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
     {
-        if(zcheckMouse(77, 498, 148, 16))
+        if(zcheckMouse(77, 498, 148, 16) && compressor)
         {
             Feedback = float(float(Mouse.x - 87) / 127.0f);
             if(Feedback < 0) Feedback = 0;
@@ -197,13 +197,13 @@ void Mouse_Sliders_Fx_Ed(void)
             teac = 2;
         }
         
-        if(zcheckMouse(77, 534, 148, 16))
+        if(zcheckMouse(77, 534, 148, 16) && compressor)
         {
             c_threshold = Mouse.x - 87;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 7;
         }
-        if(zcheckMouse(77, 552, 148, 16))
+        if(zcheckMouse(77, 552, 148, 16) && compressor)
         {
             REVERBFILTER = (float)(Mouse.x - 87) / 128.0f;
             if(REVERBFILTER < 0.0f) REVERBFILTER = 0.0f;
@@ -277,14 +277,14 @@ void Mouse_Left_Fx_Ed(void)
     {
 
         // Delay type
-        if(zcheckMouse(79, 516, 16, 16) == 1)
+        if(zcheckMouse(79, 516, 16, 16) && compressor)
         {
             DelayType--;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 1;
         }
         // Delay type
-        if(zcheckMouse(79 + 44, 516, 16, 16) == 1)
+        if(zcheckMouse(79 + 44, 516, 16, 16) && compressor)
         {
             DelayType++;
             gui_action = GUI_CMD_UPDATE_FX_ED;
@@ -292,13 +292,13 @@ void Mouse_Left_Fx_Ed(void)
         }
 
         // Ticks synchro left
-        if(zcheckMouse(534, 480, 16, 16) == 1)
+        if(zcheckMouse(534, 480, 16, 16))
         {
             Ticks_Synchro_Left--;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 10;
         }
-        if(zcheckMouse(578, 480, 16, 16) == 1)
+        if(zcheckMouse(578, 480, 16, 16))
         {
             Ticks_Synchro_Left++;
             gui_action = GUI_CMD_UPDATE_FX_ED;
@@ -306,43 +306,43 @@ void Mouse_Left_Fx_Ed(void)
         }
 
         // Ticks synchro right
-        if(zcheckMouse(534, 498, 16, 16) == 1)
+        if(zcheckMouse(534, 498, 16, 16))
         {
             Ticks_Synchro_Right--;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 11;
         }
-        if(zcheckMouse(578, 498, 16, 16) == 1)
+        if(zcheckMouse(578, 498, 16, 16))
         {
             Ticks_Synchro_Right++;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 11;
         }
 
-        if(zcheckMouse(596, 480, 32, 16) == 1)
+        if(zcheckMouse(596, 480, 32, 16))
         {
             lchorus_delay = SamplesPerTick * Ticks_Synchro_Left;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 3;
         }
-        if(zcheckMouse(596, 498, 32, 16) == 1)
+        if(zcheckMouse(596, 498, 32, 16))
         {
             rchorus_delay = SamplesPerTick * Ticks_Synchro_Right;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 4;
         }
 
-        if(compressor == 0 && zcheckMouse(79, 480, 32, 16) == 1)
+        if(compressor == FALSE && zcheckMouse(79, 480, 32, 16))
         {
-            compressor = 1;
+            compressor = TRUE;
             gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 8;
+            teac = 0;
         }
-        if(compressor == 1 && zcheckMouse(113, 480, 32, 16) == 1)
+        if(compressor == TRUE && zcheckMouse(113, 480, 32, 16))
         {
-            compressor = 0;
+            compressor = FALSE;
             gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 8;
+            teac = 0;
         }  
     }
 }

@@ -41,7 +41,7 @@
 // Variables
 int VIEWLINE = 15; // BOOKMARK
 int VIEWLINE2 = -13;
-int YVIEW = 300; 
+int YVIEW = 300;
 char is_editing = 0;
 char is_recording = 0;
 char is_recording_2 = 0;
@@ -251,6 +251,22 @@ int Table_Mouse_Lines[] =
     8 * 26 + 8 + 1,
     8 * 27 + 8 + 1,
     8 * 28 + 8 + 1,
+    8 * 29 + 8 + 1,
+    8 * 30 + 8 + 1,
+    8 * 31 + 8 + 1,
+    8 * 32 + 8 + 1,
+    8 * 33 + 8 + 1,
+    8 * 34 + 8 + 1,
+    8 * 35 + 8 + 1,
+    8 * 36 + 8 + 1,
+    8 * 37 + 8 + 1,
+    8 * 38 + 8 + 1,
+    8 * 39 + 8 + 1,
+    8 * 40 + 8 + 1,
+    8 * 41 + 8 + 1,
+    8 * 42 + 8 + 1,
+    8 * 43 + 8 + 1,
+    8 * 44 + 8 + 1
 };
 
 int Cur_Char_size[MAX_TRACKS];
@@ -277,6 +293,9 @@ PtkTimer Pattern_Timer_Vert;
 int Pattern_Scrolling_Vert;
 float Pattern_First_Delay_Vert;
 float Pattern_Delay_Vert;
+
+char Patterns_Lines = DISPLAYED_LINES_SMALL;
+int Patterns_Lines_Offset = 0;
 
 // ------------------------------------------------------
 // Functions
@@ -410,14 +429,18 @@ void draw_pated(int track, int line, int petrack, int row)
         if(dover >= MAX_PATT_SCREEN_X) break;
     }
 
-    int y = YVIEW + VIEWLINE2 * 8;
+    int y = YVIEW + (VIEWLINE2 * 8);
     Cur_Position2 = Cur_Position;
     Shadow_Pattern = 0;
     In_Prev_Next = FALSE;
     In_Prev_Next2 = FALSE;
 
     SetColor(COL_PATTERN_LO_BACK);
-    bjbox(0, 196, CHANNELS_WIDTH + 2, (8 * 29));
+    bjbox(0,
+          196,
+          CHANNELS_WIDTH + 2,
+          (8 * (Patterns_Lines + 1) + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 5 : 0))
+         );
 
     for(liner = VIEWLINE2; liner < VIEWLINE; liner++)
     {
@@ -1285,9 +1308,9 @@ void Actupated(int modac)
     draw_pated(gui_track, cur_line, ped_track, ped_col);
     draw_pated_highlight(gui_track, cur_line, ped_track, ped_col);
 
-    Realslider_Vert(781, 212, cur_line, DISPLAYED_LINES, patternLines[pSequence[Cur_Position]] + DISPLAYED_LINES, 200, TRUE);
+    Realslider_Vert(781, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 200 + Patterns_Lines_Offset, TRUE);
     Gui_Draw_Button_Box(781, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(781, 413, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(781, 413 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
@@ -1531,7 +1554,7 @@ int Get_Track_Over_Mouse(void)
         }
         if(found_track == FALSE && mouse_coord >= 0)
         {
-            under_mouse = Songtracks - 1; //(gui_track + Visible_Columns);
+            under_mouse = Songtracks - 1;
         }
     }
 
@@ -1717,7 +1740,7 @@ int Get_Line_Over_Mouse(void)
         if(mouse_line >= Table_Mouse_Lines[i] &&
            mouse_line < Table_Mouse_Lines[i + 1])
         {
-            mouse_line = i - 13 + ped_line;
+            mouse_line = i + VIEWLINE2 + ped_line;
             break;   
         }
     }
@@ -1794,7 +1817,7 @@ void Mouse_Wheel_Pattern_Ed(int roll_amount)
     else Cur_Position = cPosition;
 
     // Scroll the patterns
-    if(zcheckMouse_nobutton(0, 182, CONSOLE_WIDTH, 246) == 1)
+    if(zcheckMouse_nobutton(0, 182, CONSOLE_WIDTH, 246 + Patterns_Lines_Offset) == 1)
     {
         ped_line += roll_amount;
         if(Continuous_Scroll && !Cur_Position) if(ped_line < 0) ped_line = 0;
@@ -1816,7 +1839,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     int sched_line;
 
     // Position the caret on the specified track/column with the mouse
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset))
     {
         ped_track = Get_Track_Over_Mouse();
         ped_col = Get_Column_Over_Mouse();
@@ -1827,7 +1850,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     // Go to the row selected with the mouse
     if(!Songplaying)
     {
-        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234))
+        if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset))
         {
             if(!is_recording)
             {
@@ -1869,13 +1892,14 @@ void Set_Track_Slider(int pos)
     if(Songtracks - Visible_Columns)
     {
         fpos /= Songtracks - Visible_Columns;
-        fpos *= 72 - 16;
+        fpos *= 74 - 16;
     }
     else
     {
         fpos = 0.0f;
     }
-    Realslider_Horiz(726, 429, (int) fpos, 16, 72, 72, TRUE);
+    Realslider_Horiz(724, 429 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0),
+                     (int) fpos, 16, 74, 74, TRUE);
 }
 
 // ------------------------------------------------------
@@ -1883,7 +1907,8 @@ void Set_Track_Slider(int pos)
 void Mouse_Sliders_Pattern_Ed(void)
 {
     // Current track slider
-    if(zcheckMouse(726, 429, 72, 16))
+    if(zcheckMouse(726, 429 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0),
+                   72, 16))
     {
         float Pos_Mouse = (float) (Mouse.x - 726 - 4);
         if(Pos_Mouse < 0) Pos_Mouse = 0;
@@ -1898,18 +1923,18 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // Rows slider
-    if(zcheckMouse(781, 212, 16 + 1, 200) & !Songplaying)
+    if(zcheckMouse(781, 212, 16 + 1, 200 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0)) & !Songplaying)
     {
         int final_row;
         int Cur_Position = Get_Current_Position();
-        int max_length = patternLines[pSequence[Cur_Position]] + DISPLAYED_LINES;
-        int Center = Slider_Get_Center(DISPLAYED_LINES, max_length, 200);
-        float Pos_Mouse = ((float) ((Mouse.y - 212) - (Center / 2))) / 200.0f;
+        int max_length = patternLines[pSequence[Cur_Position]] + Patterns_Lines;
+        int Center = Slider_Get_Center(Patterns_Lines, max_length, 200 + Patterns_Lines_Offset);
+        float Pos_Mouse = ((float) ((Mouse.y - 212) - (Center / 2))) / (200.0f + (float) Patterns_Lines_Offset);
         if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
         float s_offset = (Pos_Mouse * max_length);
-        if(s_offset > (float) (max_length - DISPLAYED_LINES))
+        if(s_offset > (float) (max_length - Patterns_Lines))
         {
-            s_offset = (float) (max_length - DISPLAYED_LINES);
+            s_offset = (float) (max_length - Patterns_Lines);
         }
         final_row = (int32) s_offset;
         if(final_row < 0) final_row = 0;
@@ -1919,7 +1944,7 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // End of the marking stuff
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234) && !Songplaying)
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0)) && !Songplaying)
     {
         Mark_Block_End(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse(), 3);
     }
@@ -1934,7 +1959,7 @@ void Mouse_Left_Pattern_Ed(void)
     int tracks;
 
     // Start of the marking block
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234) && !Songplaying)
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset) && !Songplaying)
     {
         Mark_Block_Start(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse());
     }
@@ -1949,7 +1974,7 @@ void Mouse_Left_Pattern_Ed(void)
         Actupated(0);
     }
 
-    if(zcheckMouse(781, 413, 16 + 1, 14) & !Songplaying)
+    if(zcheckMouse(781, 413 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
     {
         int Cur_Position = Get_Current_Position();
 
@@ -1959,7 +1984,6 @@ void Mouse_Left_Pattern_Ed(void)
     }
 
     // Tracks mute
-    
     start_mute_check_x = PAT_COL_NOTE + 2 + 4;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)

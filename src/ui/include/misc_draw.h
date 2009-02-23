@@ -92,6 +92,7 @@ extern char *Labels_Palette[];
 extern SDL_Color Ptk_Palette[256];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
+extern int curr_tab_highlight;
 
 // ------------------------------------------------------
 // Functions

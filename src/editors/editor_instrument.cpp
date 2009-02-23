@@ -118,7 +118,6 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
     {
-
         if(SampleType[ped_patsam][ped_split])
         {
             Allow_Buttons = BUTTON_NORMAL;
