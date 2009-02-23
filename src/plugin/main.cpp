@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#define VERSION "v1.90d"
+#define VERSION "v1.93"
 
 #include "in2.h"
 
@@ -172,7 +172,7 @@ int play(const char *fn)
 	// launch decode thread
 	killDecodeThread = 0;
 	thread_handle = (HANDLE) CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) DecodeThread, NULL, 0, &thread_id);
-    SetThreadPriority(thread_handle, THREAD_PRIORITY_TIME_CRITICAL);
+    SetThreadPriority(thread_handle, THREAD_PRIORITY_HIGHEST);
 	
 	return 0; 
 }
@@ -189,7 +189,7 @@ void stop()
 
 	if (thread_handle != INVALID_HANDLE_VALUE)
 	{
-		killDecodeThread=1;
+		killDecodeThread = 1;
 		if (WaitForSingleObject(thread_handle, 10000) == WAIT_TIMEOUT)
 		{
 			MessageBox(mod.hMainWindow,
