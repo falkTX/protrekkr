@@ -2,9 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.92c:
+v1.93:
 
 - Resampler improved, should produce much less aliasing.
+- Fixed a small issue involving the cache memory in the PSP replay.
 
 v1.92b:
 
