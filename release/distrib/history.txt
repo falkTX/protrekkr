@@ -6,6 +6,8 @@ v1.92b:
 
 - Added an option to show or hide the bottom panel in order to display
   more patterns rows (Shortcut: LSHIFT+ESCAPE to toggle the view)
+- Left shift wasn't active while editing data columns
+  of patterns to enter digits.
 
 v1.92:
 
