@@ -19,6 +19,8 @@
 
 PSP_MODULE_INFO("", PSP_MODULE_KERNEL, 1, 1);
 
+SceCtrlData Ctrl_Buf;
+
 extern "C"
 {
     extern unsigned int _PTK_MODULE;
@@ -32,11 +34,6 @@ extern "C"
 
 void ptk_start(void)
 {
-    SceCtrlData Ctrl_Buf;
-
-	pspDebugScreenInit();
-    pspDebugScreenSetOffset((int) 0);
-
     if(Ptk_InitDriver(LATENCY))
     {
         // Load it
@@ -46,12 +43,13 @@ void ptk_start(void)
             Ptk_Play();
         
             // Quit with the home button
-            while(1)
+	        while(1)
             {
                 sceCtrlPeekBufferPositive(&Ctrl_Buf, 1);
                 if(Ctrl_Buf.Buttons & PSP_CTRL_HOME) break;
-
+  
                 sceKernelPowerTick(6);
+                sceKernelDcacheWritebackAll();
             }
             Ptk_Stop();
         }

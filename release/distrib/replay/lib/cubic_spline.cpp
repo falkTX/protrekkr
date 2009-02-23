@@ -34,48 +34,27 @@
 #include "include/cubic_spline.h"
 
 // ------------------------------------------------------
-// Variables
-float at[RESOLUTION];
-float bt[RESOLUTION];
-float ct[RESOLUTION];
-float dt[RESOLUTION];
-
-// ------------------------------------------------------
-// Initialize the working table
-void Cubic_Init(void)
-{
-    for(int i = 0; i < RESOLUTION; i++)
-    {
-        float x = (float) i / (float) RESOLUTION;
-        at[i] = -0.5f * x * x * x + x * x - 0.5f * x;
-        bt[i] = 1.5f * x * x * x - 2.5f * x * x + 1.0f;
-        ct[i] = -1.5f * x * x * x + 2.0f * x * x + 0.5f * x;
-        dt[i] = 0.5f * x * x * x - 0.5f * x * x;
-    }
-}
-
-// ------------------------------------------------------
-// Work function. Where all is cooked :]
-// yo = y[-1] [sample at x-1]
-// y0 = y[0]  [sample at x (input)]
-// y1 = y[1]  [sample at x+1]
-// y2 = y[2]  [sample at x+2]
-
-// res= distance between two neighbours sample points [y0 and y1] 
-//      ,so [0...1.0]. You have to multiply this distance * RESOLUTION used
-//      on the spline conversion table. [256 by default]
-// If you are using 256 is assumed you are using 8 bit decimal
-// fixed point offsets for resampling.
-
-// offset = sample offset [info to avoid go out of bounds on sample reading ]
-// offset = sample length [info to avoid go out of bounds on sample reading ]
-float Cubic_Work(float yo, float y0, float y1, float y2,
+// Interpolation (From Olli Niemitalo)
+float Cubic_Work(float ym, float input, float y1, float y2,
                  unsigned int res, long offset, long length)
 {
-    res = res >> 22;
-    if(offset == 0) yo = 0;
+    // 0..1.0f
+    float x = (float) (((float) res) / 4294967296.0);
+  
+    if(offset == 0) ym = 0;
     if(offset + 2 > length) y1 = 0;
     if(offset + 3 > length) y2 = 0;
 
-    return at[res] * yo + bt[res] * y0 + ct[res] * y1 + dt[res] * y2;
+    // -0.5..0.5
+    float z = x - 0.5f;
+    float even1 = y1 + input;
+    float odd1 = y1 - input;
+    float even2 = y2 + ym;
+    float odd2 = y2 - ym;
+
+    float c0 = even1 * 0.45868f + even2 * 0.04131f;
+    float c1 = odd1 * 0.48068f + odd2 * 0.17577f;
+    float c2 = even1 * -0.24618f + even2 * 0.24614f;
+    float c3 = odd1 * -0.36030f + odd2 * 0.10174f;
+    return(((c3 * z + c2) * z + c1) * z + c0);
 }

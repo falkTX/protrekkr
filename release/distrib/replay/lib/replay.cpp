@@ -592,8 +592,6 @@ int STDCALL Ptk_InitDriver(void)
 {
 #endif
 
-    Cubic_Init();
-
     // Create the stock waveforms
     int i;
     float incr = 1.0f / 44100.0f;

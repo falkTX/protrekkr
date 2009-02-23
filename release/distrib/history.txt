@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.92c:
+
+- Resampler improved, should produce much less aliasing.
+
 v1.92b:
 
 - Added an option to show or hide the bottom panel in order to display

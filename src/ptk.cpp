@@ -1965,7 +1965,12 @@ void WavRenderizer(void)
     if(!hd_isrecording)
     {
         WaveFile RF;
-        RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2);
+        if(RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
+        {
+            sprintf(buffer, "Can't open '%s.wav' file.", name);
+            mess_box(buffer);
+            return;
+        }
         SongStop();
         SDL_Delay(500);
         sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
