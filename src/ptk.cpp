@@ -5323,7 +5323,7 @@ void Send_Note(int Note, int Raw_Note, int One_Channel)
 void Note_Jazz(int track, int note)
 {
     // Play the note
-    int Sub_Channel = Get_Free_Sub_Channel(track, 16);
+    int Sub_Channel = Get_Free_Sub_Channel(track, Channels_Polyphony[track]);
 
     if(Sub_Channel == -1)
     {

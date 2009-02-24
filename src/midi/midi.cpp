@@ -140,7 +140,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
                 case 0x7:
                     // Master volume
                     local_mas_vol = ((float) Midi_Datas_2 / 128.0f);
-                    if(local_mas_vol < 0.01f) local_mas_vol = 0.01f;
+                    if(local_mas_vol < 0.0f) local_mas_vol = 0.0f;
                     if(local_mas_vol > 1.0f) local_mas_vol = 1.0f;
                     break;
 

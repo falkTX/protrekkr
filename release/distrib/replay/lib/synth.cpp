@@ -93,9 +93,6 @@ void CSynth::Reset(void)
     LFO1_SUBGRMAX = 200;
     LFO2_SUBGRMAX = 200;
 
-    LFO1_VALUE = 0;
-    LFO2_VALUE = 0;
-
     LFO1_OSC1_PW = 0;
     LFO1_OSC2_PW = 0;
     LFO1_OSC1_PITCH = 0;
@@ -164,10 +161,12 @@ void CSynth::Reset(void)
     LFO1_COUNTER = 0;
     LFO1_STAGE = 0;
     LFO1_ADSR_VALUE = 0.0f;
+    LFO1_VALUE = 0;
 
     LFO2_COUNTER = 0;
     LFO2_STAGE = 0;
     LFO2_ADSR_VALUE = 0.0f;
+    LFO2_VALUE = 0;
 
     ENV1_STAGE = 0;
     ENV2_STAGE = 0;

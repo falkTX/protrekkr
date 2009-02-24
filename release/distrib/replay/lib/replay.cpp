@@ -1174,6 +1174,11 @@ void Reset_Values(void)
 
 #endif
 
+            New_Instrument[i] = 0;
+            Pos_Segue[i] = 0;
+            Segue_Volume[i] = 0;
+            Segue_SamplesL[i] = 0;
+            Segue_SamplesR[i] = 0;
         }
 
 #if defined(PTK_FLANGER)
@@ -1229,12 +1234,7 @@ void Reset_Values(void)
 
 #if !defined(__STAND_ALONE__)
         Actupated(0);
-#else
-        // Free the patterns block
-        if(RawPatterns) free(RawPatterns);
-        RawPatterns = NULL;
 #endif
-
     }
 }
 
@@ -1274,19 +1274,14 @@ void PTKEXPORT Ptk_Play(void)
 // Stop replaying
 void PTKEXPORT Ptk_Stop(void)
 {
+    Done_Reset = FALSE;
     local_mas_vol = 0.0f;
 
-/*    for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
-    {
-        for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++)
-        {
-            //Synthesizer[stopper][stopper_poly].NoteOff();
-            //if(sp_Stage[stopper][stopper_poly] == PLAYING_SAMPLE) sp_Stage[stopper][stopper_poly] = PLAYING_SAMPLE_NOTEOFF;
-            //Reserved_Sub_Channels[stopper][stopper_poly] = -1;
-
-            sp_channelsample[stopper][stopper_poly] = -1;
-        }
-    }*/
+#if defined(__STAND_ALONE__)
+    // Free the patterns block
+    if(RawPatterns) free(RawPatterns);
+    RawPatterns = NULL;
+#endif
 
 }
 
@@ -1429,11 +1424,6 @@ void Pre_Song_Init(void)
         CCut[ini] = 0.0f;
 #endif
 
-        New_Instrument[ini] = 0;
-        Pos_Segue[ini] = 0;
-        Segue_Volume[ini] = 0;
-        Segue_SamplesL[ini] = 0;
-        Segue_SamplesR[ini] = 0;
     }
 
     local_mas_vol = 1.0f;
@@ -2582,7 +2572,6 @@ void Play_Instrument(int channel, int sub_channel,
 
     Cur_Position = cPosition;
 
-
     if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM == 5)
     {
         sp_Position[channel][sub_channel].absolu = 0;
@@ -2855,7 +2844,7 @@ void Play_Instrument(int channel, int sub_channel,
             }
 
             // Send the note to the midi device
-            float veloc = vol * mas_vol * local_curr_mas_vol;
+            float veloc = vol * mas_vol * local_mas_vol;
 
             Midi_Send(144 + CHAN_MIDI_PRG[channel], mnote, (int) (veloc * 127));
             if(midi_sub_channel < 0) Midi_Current_Notes[CHAN_MIDI_PRG[channel]][(-midi_sub_channel) - 1] = mnote;

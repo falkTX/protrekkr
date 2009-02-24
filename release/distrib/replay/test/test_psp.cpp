@@ -46,10 +46,10 @@ void ptk_start(void)
 	        while(1)
             {
                 sceCtrlPeekBufferPositive(&Ctrl_Buf, 1);
+                sceKernelDcacheWritebackAll();
                 if(Ctrl_Buf.Buttons & PSP_CTRL_HOME) break;
   
                 sceKernelPowerTick(6);
-                sceKernelDcacheWritebackAll();
             }
             Ptk_Stop();
         }
