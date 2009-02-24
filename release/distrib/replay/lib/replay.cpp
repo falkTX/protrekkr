@@ -1277,7 +1277,7 @@ void PTKEXPORT Ptk_Stop(void)
     Done_Reset = FALSE;
     local_mas_vol = 0.0f;
 
-#if defined(__STAND_ALONE__)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     // Free the patterns block
     if(RawPatterns) free(RawPatterns);
     RawPatterns = NULL;
