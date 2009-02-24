@@ -141,9 +141,9 @@ class gear303
         unsigned int tbPattern;   // From 0 to 31, 255 - Off
         unsigned char tbLine;      // From 0 to 15, 255 - Off
 
-//#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
         gear303();
-//#endif
+
+        void reset(void);
 
         void tbNoteOn(int tbNote, para303 *PARAT303);
 

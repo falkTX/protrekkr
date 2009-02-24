@@ -100,11 +100,11 @@ void Actualize_Fx_Ed(char gode)
             if(lchorus_delay < 1) lchorus_delay = 1;
             if(gode == 3)
             {
-                lchorus_counter = 44100;
-                lchorus_counter2 = 44100 - lchorus_delay;
+                lchorus_counter = MIX_RATE;
+                lchorus_counter2 = MIX_RATE - lchorus_delay;
             }
             Realslider(307, 480, lchorus_delay / 175, TRUE);
-            outlong(458, 480, (lchorus_delay * 1000) / 44100, 2);
+            outlong(458, 480, (lchorus_delay * 1000) / MIX_RATE, 2);
         }
 
         if(gode == 0 || gode == 4)
@@ -113,11 +113,11 @@ void Actualize_Fx_Ed(char gode)
             if(rchorus_delay < 1) rchorus_delay = 1;
             if(gode == 4)
             {
-                rchorus_counter = 44100;
-                rchorus_counter2 = 44100 - rchorus_delay;
+                rchorus_counter = MIX_RATE;
+                rchorus_counter2 = MIX_RATE - rchorus_delay;
             }
             Realslider(307, 498, rchorus_delay / 175, TRUE);
-            outlong(458, 498, (rchorus_delay * 1000) / 44100, 2);
+            outlong(458, 498, (rchorus_delay * 1000) / MIX_RATE, 2);
         }
 
         if(gode == 0 || gode == 5)

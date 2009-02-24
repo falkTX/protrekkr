@@ -36,18 +36,24 @@
 #if defined(PTK_303)
 
 // ------------------------------------------------------
-// Constructor, 303 initialization
-//#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+// Constructor
 gear303::gear303()
+{
+    tbVolume = 0.5f;
+}
+
+// ------------------------------------------------------
+// 303 initialization
+void gear303::reset(void)
 {
     tbPattern = 255;
     tbLine = 255;
     tbCurrentVolume = 0.5f;
-    tbVolume = 0.5f;
     tbRealVolume = 0.5f;
     tbInnertime = 0.0f;
     tbTargetVolume = 0.5f;
     tbRealCutoff = 0.5f;
+
     tbCutoff = 0.5f;
     tbResonance = 0.5f;
     tbEnvmod = 0.5f;
@@ -64,7 +70,6 @@ gear303::gear303()
     hpf = 0;
     tbWaveform = 0;
 }
-//#endif
 
 // ------------------------------------------------------
 // Render 1 32bit-float sample

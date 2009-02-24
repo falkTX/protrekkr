@@ -256,10 +256,10 @@ void Init_Tracker_Context_After_ModLoad(void)
     gui_track = 0;
 #endif
 
-    lchorus_counter = 44100;
-    rchorus_counter = 44100;
-    lchorus_counter2 = 44100 - lchorus_delay;
-    rchorus_counter2 = 44100 - rchorus_delay;
+    lchorus_counter = MIX_RATE;
+    rchorus_counter = MIX_RATE;
+    lchorus_counter2 = MIX_RATE - lchorus_delay;
+    rchorus_counter2 = MIX_RATE - rchorus_delay;
     Initreverb();
 
     Mas_Compressor_Set_Variables(mas_comp_threshold, mas_comp_ratio);
@@ -2041,6 +2041,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_AutoFadeOut = FALSE;
     int Store_FX_VolumeSlideUp = FALSE;
     int Store_FX_VolumeSlideDown = FALSE;
+    int Store_FX_SetGlobalVolume = FALSE;
     int Store_FX_Arpeggio = FALSE;
 
     int Store_TrackFilters = FALSE;
@@ -2520,6 +2521,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_Arpeggio = TRUE;
                                     break;
 
+                                // $1a Set global volume
+                                case 0x1c:
+                                    Store_FX_SetGlobalVolume = TRUE;
+                                    break;
+
                                 // $31 First TB303 control
                                 case 0x31:
                                     Store_303_1 = TRUE;
@@ -2611,7 +2617,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                               Store_FX_AutoFadeIn |
                               Store_FX_AutoFadeOut |
                               Store_FX_VolumeSlideUp |
-                              Store_FX_VolumeSlideDown);
+                              Store_FX_VolumeSlideDown |
+                              Store_FX_SetGlobalVolume
+                             );
 
     Save_Constant("PTK_FX_NOTECUT", Store_FX_NoteCut);
     Save_Constant("PTK_FX_PITCHUP", Store_FX_PitchUp);
@@ -2642,6 +2650,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_AUTOFADEMODE", Store_FX_AutoFadeIn | Store_FX_AutoFadeOut);
     Save_Constant("PTK_FX_VOLUMESLIDEUP", Store_FX_VolumeSlideUp);
     Save_Constant("PTK_FX_VOLUMESLIDEDOWN", Store_FX_VolumeSlideDown);
+    Save_Constant("PTK_FX_SETGLOBALVOLUME", Store_FX_SetGlobalVolume);
     Save_Constant("PTK_FX_ARPEGGIO", Store_FX_Arpeggio);
 
     Save_Constant("PTK_FX_TICK0", Store_FX_Arpeggio | Store_FX_PatternLoop);
@@ -4659,7 +4668,7 @@ int Calc_Length(void)
     int ilen;
 
     shuffle_switch = -1;
-    Samples = (int) ((60 * 44100) / (BeatsPerMin * TicksPerBeat));
+    Samples = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     if(shuffle_switch == 1) shuffle_stp = -((Samples * shuffle) / 200);
     else shuffle_stp = (Samples * shuffle) / 200;
 
@@ -4729,7 +4738,7 @@ int Calc_Length(void)
                     Cur_Patt += PATTERN_BYTES;
                 }
             }
-            Samples = (int) ((60 * 44100) / (BPM * Ticks));
+            Samples = (int) ((60 * MIX_RATE) / (BPM * Ticks));
 
             PosTicks++;
             if(PosTicks > Samples + shuffle_stp)
@@ -4763,7 +4772,7 @@ int Calc_Length(void)
             }
         }
     }
-    len /= 44100;
+    len /= MIX_RATE;
 
     ilen = (int) len;
 

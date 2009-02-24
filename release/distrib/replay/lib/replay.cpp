@@ -119,7 +119,10 @@ s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
     s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
+#if defined(PTK_TRACKFILTERS)
 float CCut[MAX_TRACKS];
+#endif
+
 float TCut[MAX_TRACKS];
 float ICut[MAX_TRACKS];
 float LVol[MAX_TRACKS];
@@ -171,6 +174,9 @@ char rawrender_32float;
 #else
     float mas_vol;
 #endif
+
+float local_mas_vol;
+float local_curr_mas_vol;
 
 int left_value;
 int right_value;
@@ -267,7 +273,7 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_LIMITER)
     #define MAS_COMPRESSOR_SECONDS 0.1f
-    #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * SAMPLESPERSEC)
+    #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * MIX_RATE)
     float mas_comp_bufferL[MAS_COMPRESSOR_SIZE];
     float mas_comp_bufferR[MAS_COMPRESSOR_SIZE];
     int mas_comp_pos_rms_buffer;
@@ -346,10 +352,10 @@ float xi2[MAX_TRACKS];
     float rchorus_feedback = 0.5f;
     int lchorus_delay = 10584;
     int rchorus_delay = 15876;
-    unsigned int lchorus_counter = SAMPLESPERSEC;
-    unsigned int rchorus_counter = SAMPLESPERSEC;
-    unsigned int lchorus_counter2 = SAMPLESPERSEC - lchorus_delay;
-    unsigned int rchorus_counter2 = SAMPLESPERSEC - rchorus_delay;
+    unsigned int lchorus_counter = MIX_RATE;
+    unsigned int rchorus_counter = MIX_RATE;
+    unsigned int lchorus_counter2 = MIX_RATE - lchorus_delay;
+    unsigned int rchorus_counter2 = MIX_RATE - rchorus_delay;
 #else
     float lchorus_feedback;
     float rchorus_feedback;
@@ -434,6 +440,10 @@ static unsigned long ctz[64] =
 extern int Midi_Notes_History[MAX_TRACKS][256];
 extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 
+#if !defined(__STAND_ALONE__)
+void Clear_Midi_Channels_Pool(void);
+#endif
+
 // ------------------------------------------------------
 // Functions
 void allPassInit(float miliSecs);
@@ -482,6 +492,9 @@ void Compressor_work(void);
 float Mas_Compressor(float input, float *rms_sum, float *Buffer, float *Env);
 float Do_RMS(float input, float *rms_sum, float *buffer);
 
+int Done_Reset;
+void Reset_Values(void);
+
 // ------------------------------------------------------
 // Audio mixer
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
@@ -509,7 +522,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
         for(i = Len - 1; i >= 0; i -= 4)
 #endif
         {
-            GetPlayerValues(mas_vol);
+            GetPlayerValues();
 
 #if defined(__MACOSX__)
             // Send them to the driver first
@@ -523,8 +536,10 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             left_value = (int) (left_float);
             right_value = (int) (right_float);
 #else
+
             *pSamples++ = left_value;
             *pSamples++ = right_value;
+
 #endif
 
 #if !defined(__STAND_ALONE__)
@@ -562,6 +577,11 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             }
 #endif
         }
+      
+        if(local_curr_mas_vol == 0.0f)
+        {
+            Reset_Values();
+        }
 
 #if !defined(__WINAMP__)
         if(AUDIO_GetSamples() > ((AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3)) / 4))
@@ -594,7 +614,7 @@ int STDCALL Ptk_InitDriver(void)
 
     // Create the stock waveforms
     int i;
-    float incr = 1.0f / 44100.0f;
+    float incr = 1.0f / fMIX_RATE;
     float stop = 2.0f;
     float x;
     unsigned short temp_saw;
@@ -775,11 +795,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
     {
         Cur_Module += 4;
 
-        // Allocate the patterns
-        if(RawPatterns) free(RawPatterns);
-        RawPatterns = (unsigned char *) malloc(PATTERN_POOL_SIZE);
-        if(!RawPatterns) return(FALSE);
-
         Pre_Song_Init();
 
         Mod_Dat_Read(&nPatterns, sizeof(char));
@@ -794,6 +809,15 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&patternLines[i], sizeof(char));
             patternLines[i] = Swap_16(patternLines[i]);
         }
+
+        // Allocated the necessary room for the patterns
+        int max_lines = (PATTERN_BYTES * Songtracks * PATTERN_ROW_LEN * nPatterns);
+
+        // Free the patterns block
+        if(RawPatterns) free(RawPatterns);
+
+        RawPatterns = (unsigned char *) malloc(max_lines);
+        if(!RawPatterns) return(FALSE);
 
         // Multi notes
         Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
@@ -930,6 +954,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         {
             Mod_Dat_Read(&TCut[twrite], sizeof(float));
             Mod_Dat_Read(&ICut[twrite], sizeof(float));
+
             Mod_Dat_Read(&TPan[twrite], sizeof(float));
             ComputeStereo(twrite);
             Mod_Dat_Read(&FType[twrite], sizeof(int));
@@ -1054,10 +1079,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         cPosition = start_position;
 
-#if defined(PTK_COMPRESSOR)
-        Initreverb();
-#endif
-
         Post_Song_Init();
 
         return(TRUE);
@@ -1114,6 +1135,110 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 }
 
 // ------------------------------------------------------
+// Reset some values before starting playing
+void Reset_Values(void)
+{
+    int i;
+
+    if(!Done_Reset)
+    {
+        lchorus_counter = MIX_RATE;
+        rchorus_counter = MIX_RATE;
+        lchorus_counter2 = MIX_RATE - lchorus_delay;
+        rchorus_counter2 = MIX_RATE - rchorus_delay;
+
+        for(i = 0; i < 131072; i++)
+        {
+            lbuff_chorus[i] = 0.0f;
+            rbuff_chorus[i] = 0.0f;
+        }
+
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            ResetFilters(i);
+
+#if defined(PTK_TRACKFILTERS)
+            CCut[i] = 0.0f;
+#endif
+
+            ramper[i] = 0;
+
+#if defined(PTK_FLANGER)
+            foff2[i] = 0.0f;
+            foff1[i] = 0.0f;
+            for(int ini2 = 0; ini2 < 16400; ini2++)
+            {
+                FLANGE_LEFTBUFFER[i][ini2] = 0.0f;
+                FLANGE_RIGHTBUFFER[i][ini2] = 0.0f;
+            }
+
+#endif
+
+        }
+
+#if defined(PTK_FLANGER)
+        Flanger_sbuf0L = 0;
+        Flanger_sbuf1L = 0;
+        Flanger_sbuf0R = 0;
+        Flanger_sbuf1R = 0;
+#endif
+
+#if defined(PTK_COMPRESSOR)
+        Initreverb();
+#endif
+
+        for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
+        {
+            for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++)
+            {
+                Synthesizer[stopper][stopper_poly].Reset();
+                sp_Stage[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+                sp_Stage2[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+                sp_Stage3[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+                Reserved_Sub_Channels[stopper][stopper_poly] = -1;
+                sp_channelsample[stopper][stopper_poly] = -1;
+            }
+        }
+
+#if defined(PTK_303)
+        
+        tb303engine[0].reset();
+        tb303engine[1].reset();
+        
+        track3031 = 255;
+        track3032 = 255;
+#endif
+
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
+        Midi_AllNotesOff();
+#endif
+        // Clear all midi channels
+        Clear_Midi_Channels_Pool();
+#endif
+
+        // Store the visual position (not the replayed one)
+        if(Songplaying)
+        {
+            cPosition = cPosition_delay;
+            ped_line = ped_line_delay;
+        }
+
+        Done_Reset = TRUE;
+        Songplaying = FALSE;
+
+#if !defined(__STAND_ALONE__)
+        Actupated(0);
+#else
+        // Free the patterns block
+        if(RawPatterns) free(RawPatterns);
+        RawPatterns = NULL;
+#endif
+
+    }
+}
+
+// ------------------------------------------------------
 // Start replaying
 void PTKEXPORT Ptk_Play(void)
 {
@@ -1131,7 +1256,14 @@ void PTKEXPORT Ptk_Play(void)
     }
 #endif
 
-    Songplaying = 1;
+    Done_Reset = FALSE;
+    Reset_Values();
+    Done_Reset = FALSE;
+
+    local_mas_vol = 1.0f;
+    local_curr_mas_vol = 0.0f;
+
+    Songplaying = TRUE;
 
 #if defined(__PSP__)
     sceKernelDcacheWritebackInvalidateAll();	
@@ -1142,28 +1274,20 @@ void PTKEXPORT Ptk_Play(void)
 // Stop replaying
 void PTKEXPORT Ptk_Stop(void)
 {
-    Songplaying = 0;
+    local_mas_vol = 0.0f;
 
-#if defined(PTK_303)
-    tb303engine[0].tbPattern = 255;
-    tb303engine[0].tbLine = 255;
-    tb303engine[1].tbPattern = 255;
-    tb303engine[1].tbLine = 255;
-    track3031 = 255;
-    track3032 = 255;
-#endif
-
-    for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
+/*    for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
     {
         for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++)
         {
-            Synthesizer[stopper][stopper_poly].NoteOff();
-            if(sp_Stage[stopper][stopper_poly] == PLAYING_SAMPLE) sp_Stage[stopper][stopper_poly] = PLAYING_SAMPLE_NOTEOFF;
-            Reserved_Sub_Channels[stopper][stopper_poly] = -1;
+            //Synthesizer[stopper][stopper_poly].NoteOff();
+            //if(sp_Stage[stopper][stopper_poly] == PLAYING_SAMPLE) sp_Stage[stopper][stopper_poly] = PLAYING_SAMPLE_NOTEOFF;
+            //Reserved_Sub_Channels[stopper][stopper_poly] = -1;
 
             sp_channelsample[stopper][stopper_poly] = -1;
         }
-    }
+    }*/
+
 }
 
 // ------------------------------------------------------
@@ -1171,14 +1295,6 @@ void PTKEXPORT Ptk_Stop(void)
 void Pre_Song_Init(void)
 {
     int i;
-
-#if defined(PTK_FLANGER)
-    int j;
-#endif
-
-#if !defined(__STAND_ALONE__)
-    Initreverb();
-#endif
 
     glide = 0;
 
@@ -1265,7 +1381,6 @@ void Pre_Song_Init(void)
         LFO_ON[ini] = 0;
         LFO_RATE[ini] = 0.0001f;
         LFO_AMPL[ini] = 0;
-        LFOGR[ini] = 0;
 #endif
 
 #if !defined(__STAND_ALONE__)
@@ -1310,7 +1425,9 @@ void Pre_Song_Init(void)
         glidestep[ini] = 0;
 #endif
 
-        CCut[ini] = 126.0f;
+#if defined(PTK_TRACKFILTERS)
+        CCut[ini] = 0.0f;
+#endif
 
         New_Instrument[ini] = 0;
         Pos_Segue[ini] = 0;
@@ -1319,20 +1436,14 @@ void Pre_Song_Init(void)
         Segue_SamplesR[ini] = 0;
     }
 
+    local_mas_vol = 1.0f;
+    local_curr_mas_vol = 0.0f;
+
 #if defined(PTK_FLANGER)
     Flanger_sbuf0L = 0;
     Flanger_sbuf1L = 0;
     Flanger_sbuf0R = 0;
     Flanger_sbuf1R = 0;
-
-    for(i = 0; i < MAX_COMB_FILTERS; i++)
-    {
-        for(j = 0 ; j < 100000; j++)
-        {
-            delay_left_buffer[i][j] = 0;
-            delay_right_buffer[i][j] = 0;
-        }
-    }
 #endif
 
     for(i = 0; i < 128; i++)
@@ -1440,11 +1551,11 @@ void Post_Song_Init(void)
     }
 #endif
 
-    lchorus_counter = SAMPLESPERSEC;
-    rchorus_counter = SAMPLESPERSEC;
-    lchorus_counter2 = SAMPLESPERSEC - lchorus_delay;
-    rchorus_counter2 = SAMPLESPERSEC - rchorus_delay;
-    SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));
+    lchorus_counter = MIX_RATE;
+    rchorus_counter = MIX_RATE;
+    lchorus_counter2 = MIX_RATE - lchorus_delay;
+    rchorus_counter2 = MIX_RATE - rchorus_delay;
+    SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     PosInTick = 0;
     SamplesPerSub = SamplesPerTick / 6;
     ped_line = 0;
@@ -1884,11 +1995,8 @@ void Sp_Player(void)
         All_Signal_L = 0;
         All_Signal_R = 0;
 
-        // If wav is selected in the synth we don't play it directly but through the synth.
-
         // -------------------------------------------
 
-        // Interpolation algorithm
         for(i = 0; i < Channels_Polyphony[c]; i++)
         {
             Curr_Signal_L[i] = 0;
@@ -1922,7 +2030,7 @@ ByPass_Wav:
                         Done_CVol[c][i] = TRUE;
                     }
                     if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
-                    else if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
+                    if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
 
                     res_dec = sp_Position[c][i].half.last;
 
@@ -2004,7 +2112,7 @@ ByPass_Wav:
                     if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.004f;
                     else sp_Cvol[c][i] += 0.004f;
                     if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
-                    else if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
+                    if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
                 }
 
                 Curr_Signal_L[i] += Synthesizer[c][i].GetSample(Player_WL[c][i],
@@ -2747,7 +2855,7 @@ void Play_Instrument(int channel, int sub_channel,
             }
 
             // Send the note to the midi device
-            float veloc = vol * mas_vol;
+            float veloc = vol * mas_vol * local_curr_mas_vol;
 
             Midi_Send(144 + CHAN_MIDI_PRG[channel], mnote, (int) (veloc * 127));
             if(midi_sub_channel < 0) Midi_Current_Notes[CHAN_MIDI_PRG[channel]][(-midi_sub_channel) - 1] = mnote;
@@ -3119,7 +3227,6 @@ void DoEffects(void)
                     old_note[trackef][i] = pltr_note[i];
                 }
 
-
                 if(pltr_dat_row > 0 && (Subicounter % pltr_dat_row) == 0)
                 {
                     for(i = 0; i < Channels_MultiNotes[trackef]; i++)
@@ -3169,7 +3276,7 @@ void DoEffects(void)
                 if(pltr_dat_row > 32)
                 {
                     BeatsPerMin = (int) pltr_dat_row;
-                    SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));  
+                    SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
                     SamplesPerSub = SamplesPerTick / 6;
                 }
 #if !defined(__STAND_ALONE__)
@@ -3185,7 +3292,7 @@ void DoEffects(void)
                 TicksPerBeat = (int) pltr_dat_row;
                 if(TicksPerBeat < 1) TicksPerBeat = 1;
                 if(TicksPerBeat > 16) TicksPerBeat = 16;
-                SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));  
+                SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
                 SamplesPerSub = SamplesPerTick / 6;
 
 #if defined(PTK_SHUFFLE)
@@ -3202,21 +3309,21 @@ void DoEffects(void)
 
 #if defined(PTK_FX_SENDTODELAYCOMMAND)
             // $10 Send to delay Command
-            case 0x10: 
+            case 0x10:
                 CCoef[trackef] = (float) pltr_dat_row / 255.0f;
                 break;
 #endif
 
 #if defined(PTK_FX_SENDTOREVERBCOMMAND)
             // $11 Send to reverb Command
-            case 0x11: 
+            case 0x11:
                 DSend[trackef] = (float) pltr_dat_row / 255.0f;
                 break;
 #endif
 
 #if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
             // $12 Set distortion Threshold
-            case 0x12: 
+            case 0x12:
                 DThreshold[trackef] = (float) pltr_dat_row * 128.0f;
                 break;
 #endif
@@ -3292,6 +3399,13 @@ void DoEffects(void)
                     sp_Tvol[trackef][i] -= pltr_dat_row * 0.0039062f;
                     if(sp_Tvol[trackef][i] < 0.0f) sp_Tvol[trackef][i] = 0.0f;
                 }
+                break;
+#endif
+
+#if defined(PTK_FX_SETGLOBALVOLUME)
+            // $1a Set global volume
+            case 0x1c:
+                local_mas_vol = pltr_dat_row / 255.0f;
                 break;
 #endif
 
@@ -3378,22 +3492,22 @@ void ComputeStereo(int channel)
 
 // ------------------------------------------------------
 // Main mixing routine
-void GetPlayerValues(float master_coef)
+void GetPlayerValues(void)
 {
-    left_chorus = 2.0f;
-    right_chorus = 2.0f;
+    left_chorus = 0.0f;
+    right_chorus = 0.0f;
     Sp_Player();
 
-    if(++lchorus_counter > 88200) lchorus_counter = 44100;
-    if(++rchorus_counter > 88200) rchorus_counter = 44100;
+    if(++lchorus_counter > (MIX_RATE * 2)) lchorus_counter = MIX_RATE;
+    if(++rchorus_counter > (MIX_RATE * 2)) rchorus_counter = MIX_RATE;
     lbuff_chorus[lchorus_counter] = left_chorus + lbuff_chorus[lchorus_counter2] * lchorus_feedback;
     rbuff_chorus[rchorus_counter] = right_chorus + rbuff_chorus[rchorus_counter2] * rchorus_feedback;
-    if(++lchorus_counter2 > 88200) lchorus_counter2 = 44100;
-    if(++rchorus_counter2 > 88200) rchorus_counter2 = 44100;
+    if(++lchorus_counter2 > (MIX_RATE * 2)) lchorus_counter2 = MIX_RATE;
+    if(++rchorus_counter2 > (MIX_RATE * 2)) rchorus_counter2 = MIX_RATE;
     float rchore = lbuff_chorus[lchorus_counter2];
     float lchore = rbuff_chorus[rchorus_counter2];
-    left_float = lchore + left_float;
-    right_float = rchore + right_float;
+    left_float += lchore;
+    right_float += rchore;
 
 #if defined(PTK_COMPRESSOR)
     Compressor_work();
@@ -3418,8 +3532,22 @@ void GetPlayerValues(float master_coef)
     }
 #endif
 
-    left_float *= master_coef;
-    right_float *= master_coef;
+    left_float *= mas_vol;
+    right_float *= mas_vol;
+
+    if(local_curr_mas_vol >= local_mas_vol)
+    {
+        local_curr_mas_vol -= 0.003f;
+    }
+    else
+    {
+        local_curr_mas_vol += 0.003f;
+    }
+    if(local_curr_mas_vol > 1.0f) local_curr_mas_vol = 1.0f;
+    if(local_curr_mas_vol < 0.0f) local_curr_mas_vol = 0.0f;
+
+    left_float *= local_curr_mas_vol;
+    right_float *= local_curr_mas_vol;
 
     if(left_float > 1.0f) left_float = 1.0f;
     if(left_float < -1.0f) left_float = -1.0f;
@@ -3451,7 +3579,7 @@ void GetPlayerValues(float master_coef)
 // Precalc filters coefficients
 void ComputeCoefs(int freq, int r, int t)
 {
-    float omega = float(2 * PI * Kutoff(freq) / 44100.0f);
+    float omega = float(2 * PI * Kutoff(freq) / fMIX_RATE);
     float sn = (float) sinf(omega);
     float cs = (float) cosf(omega);
     float alpha;
@@ -3751,6 +3879,8 @@ void live303(int pltr_eff_row, int pltr_dat_row)
         case 0x3c: tb303[1].accent = pltr_dat_row / 2; break;
         case 0x3d: tb303[0].tune = pltr_dat_row / 2; break;
         case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
+        case 0x41: tb303engine[0].tbVolume = ((float) pltr_dat_row) / 255.0f; break;
+        case 0x42: tb303engine[1].tbVolume = ((float) pltr_dat_row) / 255.0f; break;
     }
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
@@ -4039,6 +4169,9 @@ void Free_Samples(void)
 #if defined(PTK_COMPRESSOR)
 void Initreverb()
 {
+    int i;
+    int j;
+
     LFP_L.Reset();
 
     switch(DelayType)
@@ -4202,7 +4335,7 @@ void Initreverb()
             break;
     }
 
-    for(int i = 0; i < num_echoes; i++)
+    for(i = 0; i < num_echoes; i++)
     {
         int mlrw = 99999 - (delay_time + delays[i]) * 4;
 
@@ -4213,6 +4346,16 @@ void Initreverb()
 
         counters[i] = mlrw;
     }
+ 
+    for(i = 0; i < MAX_COMB_FILTERS; i++)
+    {
+        for(j = 0 ; j < 100000; j++)
+        {
+            delay_left_buffer[i][j] = 0;
+            delay_right_buffer[i][j] = 0;
+        }
+    }
+
     rev_counter = 99999;
 }
 
@@ -4226,7 +4369,9 @@ void Compressor_work(void)
         // Comb filter
         for(int i = 0; i < num_echoes; i++)
         {
-            delay_left_buffer[i][rev_counter] = (delay_left_final + delay_right_final + delay_left_buffer[i][counters[i]]) * decays[i][0];
+            delay_left_buffer[i][rev_counter] = (delay_left_final + delay_right_final +
+                                                 delay_left_buffer[i][counters[i]]) *
+                                                 decays[i][0];
             l_rout += delay_left_buffer[i][counters[i]];
             if(++counters[i] > 99999) counters[i] = 0;
         }
@@ -4257,7 +4402,7 @@ void Compressor_work(void)
         l_rout = (-Feedback * temp1) + allBuffer_L5[delayedCounter5];
         allBuffer_L5[currentCounter] = (l_rout * Feedback) + temp1;
 
-        // Stereo diffussion
+        // Stereo diffusion
         right_float += l_rout;
 
         temp1 = l_rout;

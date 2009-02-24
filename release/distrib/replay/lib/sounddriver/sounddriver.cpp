@@ -202,6 +202,7 @@ void Me_Handler(void)
                 {
                     AUDIO_Mixer((Uint8 *) ptrBuffer2, *ptrAUDIO_SoundBuffer_Size);
                 }
+
                 *ptrAUDIO_Samples += *ptrAUDIO_SoundBuffer_Size;
                 *ptrAUDIO_Timer = ((((float) *ptrAUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
                 *ptrMutex = TRUE;
@@ -263,8 +264,10 @@ DWORD WINAPI AUDIO_Thread(LPVOID lpParameter)
             if(Bytes_To_Lock < 0) Bytes_To_Lock += AUDIO_Latency;
             AUDIO_Sound_Buffer->Lock(AUDIO_Old_Buffer_Pos, Bytes_To_Lock, &AUDIO_Audio_Ptr1, &AUDIO_Audio_Bytes1, &AUDIO_Audio_Ptr2, &AUDIO_Audio_Bytes2, 0);
             AUDIO_Old_Buffer_Pos = AUDIO_Buffer_Pos;
+
             AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr1, AUDIO_Audio_Bytes1);
             AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr2, AUDIO_Audio_Bytes2);
+
             AUDIO_Sound_Buffer->Unlock(AUDIO_Audio_Ptr1, AUDIO_Audio_Bytes1, AUDIO_Audio_Ptr2, AUDIO_Audio_Bytes2);
 
             AUDIO_Samples += (AUDIO_Audio_Bytes1 + AUDIO_Audio_Bytes2);
@@ -690,6 +693,9 @@ void AUDIO_Stop_Sound_Buffer(void)
 #endif
 
 #if defined(__PSP__)
+    me_sceKernelDcacheWritebackInvalidateAll();	
+    sceSysregMeResetEnable();
+    sceSysregMeBusClockDisable();
     if(AUDIO_thid > 0) sceKernelDeleteThread(AUDIO_thid);
     if(AUDIO_HWChannel) sceAudioChRelease(AUDIO_HWChannel);
     if(ptrAudio_BufferPlay1) free((void *) ptrAudio_BufferPlay1);
@@ -726,12 +732,6 @@ void AUDIO_Stop_Driver(void)
 #if defined(__LINUX__)
     if(AUDIO_Device) close(AUDIO_Device);
     AUDIO_Device = 0;
-#endif
-
-#if defined(__PSP__)
-    me_sceKernelDcacheWritebackInvalidateAll();	
-    sceSysregMeResetEnable();
-    sceSysregMeBusClockDisable();
 #endif
 
 #if defined(__WIN32__)

@@ -800,7 +800,6 @@ int Screen_Update(void)
             is_editing = 0;
             StartEdit();
             SongStop();
-            Actupated(0);
         }
 
         if(gui_action == GUI_CMD_RECORD_303)
@@ -1707,20 +1706,6 @@ void SongStop(void)
     Gui_Draw_Button_Box(8, 44, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL);
     mess_box("Ready...");
 
-    // Store the visual position (not the replayed one)
-    if(Songplaying)
-    {
-        cPosition = cPosition_delay;
-        ped_line = ped_line_delay;
-    }
-
-#if !defined(__NO_MIDI__)
-    Midi_AllNotesOff();
-#endif
-
-    // Clear all midi channels
-    Clear_Midi_Channels_Pool();
-
     Ptk_Stop();
 }
 
@@ -1783,10 +1768,10 @@ void Newmod(void)
     lchorus_delay = 10584;
     rchorus_delay = 15876;
 
-    lchorus_counter = 44100;
-    rchorus_counter = 44100;
-    lchorus_counter2 = 44100 - lchorus_delay;
-    rchorus_counter2 = 44100 - rchorus_delay;
+    lchorus_counter = MIX_RATE;
+    rchorus_counter = MIX_RATE;
+    lchorus_counter2 = MIX_RATE - lchorus_delay;
+    rchorus_counter2 = MIX_RATE - rchorus_delay;
     compressor = 0;
     c_threshold = 32;
     DelayType = 1;
@@ -1863,7 +1848,7 @@ char *table_newletter[71] =
     "%s8",
     "%s9",
     NULL, // 37
-    NULL, // 38
+    "%s ", // 38
     NULL, // 39
     "%s.", // 40
     "%sA",
@@ -1943,8 +1928,11 @@ void Actualize_Name(int *newletter, char *nam)
             {
                 if(namesize < 18)
                 {
-                    if(table_newletter[i]) sprintf(nam, table_newletter[i], nam);
-                    namesize++;
+                    if(table_newletter[i])
+                    {
+                        sprintf(nam, table_newletter[i], nam);
+                        namesize++;
+                    }
                 }
                 newletter[i] = FALSE;
             }
@@ -1996,7 +1984,7 @@ void WavRenderizer(void)
         while(cPosition > 0 || ped_line > 0 || bru == FALSE)
         {
             if(ped_line > 0) bru = TRUE;
-            GetPlayerValues(mas_vol);
+            GetPlayerValues();
             if(rawrender_32float)
             {
                 RF.WriteStereoFloatSample(left_float_render, right_float_render);
@@ -4867,8 +4855,8 @@ void Actualize_Master(char gode)
         Actupated(0);
     }
 
-    SamplesPerTick = (int) ((60 * SAMPLESPERSEC) / (BeatsPerMin * TicksPerBeat));  
-    float SamplesPerBeat = (float) SAMPLESPERSEC / (((float) BeatsPerMin * 4) / 60);
+    SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
+    float SamplesPerBeat = (float) MIX_RATE / (((float) BeatsPerMin * 4) / 60);
     SamplesPerSub = SamplesPerTick / 6;
 
     if(userscreen == USER_SCREEN_SETUP_EDIT) Actualize_Master_Ed(3);
@@ -5336,6 +5324,7 @@ void Note_Jazz(int track, int note)
 {
     // Play the note
     int Sub_Channel = Get_Free_Sub_Channel(track, 16);
+
     if(Sub_Channel == -1)
     {
         // We didn't have enough channel
@@ -5344,6 +5333,8 @@ void Note_Jazz(int track, int note)
     Sub_Channels_Jazz[track][Sub_Channel].Note = ((note + 1) << 8);
     Sub_Channels_Jazz[track][Sub_Channel].Channel = track;
     Sub_Channels_Jazz[track][Sub_Channel].Sub_Channel = Sub_Channel;
+    local_mas_vol = 1.0f;
+
     if(!is_editing || is_recording_2)
     {
         Play_Instrument(track, Sub_Channel,

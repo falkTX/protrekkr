@@ -50,6 +50,9 @@
 #define MAX_COMB_FILTERS 10
 #define PI 3.1415926535897932384626433832795
 
+#define MIX_RATE 44100
+#define fMIX_RATE 44100.0f
+
 #define SMP_PACK_GSM 0
 #define SMP_PACK_MP3 1
 #define SMP_PACK_TRUESPEECH 2
@@ -122,8 +125,6 @@
 #define PATTERN_TRACK_LEN MAX_ROWS * PATTERN_BYTES
 #define PATTERN_LEN PATTERN_ROW_LEN * MAX_ROWS
 #define PATTERN_POOL_SIZE PATTERN_LEN * MAX_PATTERNS
-
-#define SAMPLESPERSEC 44100
 
 #define FLANGER_LOPASS_CUTOFF 0.1f
 #define FLANGER_LOPASS_RESONANCE 0.4f
@@ -221,6 +222,7 @@ extern int c_threshold;
 extern int BeatsPerMin;
 extern int TicksPerBeat;
 extern float mas_vol;
+extern float local_mas_vol;
 
 extern int delay_time;
 extern float Feedback;
@@ -303,7 +305,7 @@ void Play_Instrument(int channel, int sub_channel,
                      int glide, int Play_Selection, int midi_sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
-void GetPlayerValues(float master_coef);
+void GetPlayerValues(void);
 void noteoff303(char strack);
 void init_sample_bank(void);
 void KillInst(int inst_nbr);

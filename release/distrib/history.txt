@@ -2,6 +2,15 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.94:
+
+- Fixed a nasty memory leak in the PSP replay
+  (also only necessary data are now allocated).
+- Space char wasn't available when typing a name.
+- Added effects 0x41 and 0x42 to control the volumes of the 2 303 units.
+- Added effect 0x1c: set global volume.
+- Start & stop song cleaned up (clicks should be gone).
+
 v1.93:
 
 - Resampler improved, should produce much less aliasing.

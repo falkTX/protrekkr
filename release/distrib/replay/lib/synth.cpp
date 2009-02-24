@@ -54,7 +54,6 @@ void CSynth::Reset(void)
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     // Synthesizer General Reset
-    GS_VAL = 0;
     GLB_VOLUME = 1.0f;
     DISTO = 0.0f;
     OSC1_WAVEFORM = 1;      /* Sawtooth */
@@ -138,15 +137,6 @@ void CSynth::Reset(void)
     OSC1_STEP = 0;
     OSC2_STEP = 0;
 
-    ENV1_STAGE = 0;
-    ENV2_STAGE = 0;
-
-    ENV1_COUNTER = 0;
-    ENV2_COUNTER = 0;
-
-    ENV1_VALUE = 0;
-    ENV2_VALUE = 0;
-
     ENV1_VOLUME_1 = 0;
     ENV1_VOLUME_2 = 0;
     ENV2_VOLUME_1 = 0;
@@ -154,14 +144,6 @@ void CSynth::Reset(void)
 
     ENV1_MIN = 0;
     ENV2_MIN = 0;
-
-    LFO1_STAGE = 0;
-    LFO1_COUNTER = 0;
-    LFO1_ADSR_VALUE = 0;
-
-    LFO2_STAGE = 0;
-    LFO2_COUNTER = 0;
-    LFO2_ADSR_VALUE = 0;
 
     LFO1_ATTACK = 0.0f;
     LFO1_DECAY = 0.1f;
@@ -173,21 +155,40 @@ void CSynth::Reset(void)
     LFO2_SUSTAIN = 0.3f;
     LFO2_RELEASE = 0.0f;
 
-    GS_VAL = 0;
-
     OSC3_VOLUME = 0;
 
-#if defined(__GCC__)
-    PTC_GLIDE64 = 4294967296ll;
-#else
-    PTC_GLIDE64 = 4294967296;
-#endif
+    PTC_GLIDE64 = 0;
 
 #endif
+
+    LFO1_COUNTER = 0;
+    LFO1_STAGE = 0;
+    LFO1_ADSR_VALUE = 0.0f;
+
+    LFO2_COUNTER = 0;
+    LFO2_STAGE = 0;
+    LFO2_ADSR_VALUE = 0.0f;
+
+    ENV1_STAGE = 0;
+    ENV2_STAGE = 0;
+
+    ENV1_COUNTER = 0;
+    ENV2_COUNTER = 0;
+
+    ENV1_VALUE = 0;
+    ENV2_VALUE = 0;
+
+    ENV1_A_COEF = 0.0f;
+    ENV2_A_COEF = 0.0f;
 
     OSC1_SPEED = 0;
     OSC2_SPEED = 0;
     OSC3_SPEED = 0;
+
+    sbuf0L = 0.0f;
+    sbuf1L = 0.0f;
+    sbuf0R = 0.0f;
+    sbuf1R = 0.0f;
 }
 
 // ------------------------------------------------------

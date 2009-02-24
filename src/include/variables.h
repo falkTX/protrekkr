@@ -269,9 +269,9 @@ extern char compressor; // 0-->Off 1-->On
 extern int c_threshold;
 extern int BeatsPerMin;
 extern int TicksPerBeat;
-extern float mas_vol;
-extern float mas_comp_threshold;
-extern float mas_comp_ratio;
+//extern float mas_vol;
+//extern float mas_comp_threshold;
+//extern float mas_comp_ratio;
 extern int delay_time;
 
 extern float Feedback;
@@ -531,7 +531,7 @@ void value_box3(int x, int y, char val, int flags);
 void value_box4(int x, int y, char val);
 void Actualize_Track_Ed(char gode);
 void Actualize_Songname(int *newletter, char *nam);
-void GetPlayerValues(float master_coef);
+void GetPlayerValues(void);
 void Check_Loops(void);
 void Skincopy(int xd, int yd, int xs, int ys, int w, int h);
 void Go303(void);
