@@ -1232,9 +1232,6 @@ void Reset_Values(void)
         Done_Reset = TRUE;
         Songplaying = FALSE;
 
-#if !defined(__STAND_ALONE__)
-        Actupated(0);
-#endif
     }
 }
 
@@ -1257,11 +1254,10 @@ void PTKEXPORT Ptk_Play(void)
 #endif
 
     Done_Reset = FALSE;
-    Reset_Values();
-    Done_Reset = FALSE;
-
     local_mas_vol = 1.0f;
     local_curr_mas_vol = 0.0f;
+    Reset_Values();
+    Done_Reset = FALSE;
 
     Songplaying = TRUE;
 
@@ -1274,8 +1270,8 @@ void PTKEXPORT Ptk_Play(void)
 // Stop replaying
 void PTKEXPORT Ptk_Stop(void)
 {
-    Done_Reset = FALSE;
     local_mas_vol = 0.0f;
+    Done_Reset = FALSE;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     // Free the patterns block

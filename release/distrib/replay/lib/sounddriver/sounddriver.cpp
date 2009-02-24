@@ -134,7 +134,7 @@ static OSStatus AUDIO_Callback(AudioDeviceID device,
     {
         AUDIO_Mixer((Uint8 *) data_out->mBuffers[0].mData, data_out->mBuffers[0].mDataByteSize);
 
-        AUDIO_Samples += data_out->mBuffers[0].mDataByteSize * 8;
+        AUDIO_Samples += data_out->mBuffers[0].mDataByteSize;
         AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
     }
     return(kAudioHardwareNoError);
@@ -413,7 +413,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
             {
                 AUDIO_SoundBuffer_Size = (int) Frame_Range.mMaximum;
             }
-            AUDIO_Latency = AUDIO_SoundBuffer_Size * 8;
+            AUDIO_Latency = AUDIO_SoundBuffer_Size;
 
             if(AudioDeviceSetProperty(AUDIO_Device,
                                       0,
