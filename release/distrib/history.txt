@@ -10,6 +10,7 @@ v1.94:
 - Added effects 0x41 and 0x42 to control the volumes of the 2 303 units.
 - Added effect 0x1c: set global volume.
 - Start & stop song cleaned up (clicks should be gone).
+- Fixed a small issue regarding latency in the Mac OS X version.
 
 v1.93:
 
