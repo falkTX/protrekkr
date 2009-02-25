@@ -1577,6 +1577,7 @@ void Sp_Player(void)
 {
     unsigned int Old_Pointer;
     unsigned int res_dec;
+    float Signal_303;
 
     int i;
     int j;
@@ -2135,12 +2136,16 @@ ByPass_Wav:
 #if defined(PTK_303)
         if(track3031 == c && CHAN_ACTIVE_STATE[cPosition][c])
         {
-            All_Signal_L += tb303engine[0].tbGetSample();
+            Signal_303 = tb303engine[0].tbGetSample();
+            All_Signal_L += Signal_303;
+            if(grown) All_Signal_R += Signal_303;
             gotsome = TRUE;
         }
         if(track3032 == c && CHAN_ACTIVE_STATE[cPosition][c])
         {
-            All_Signal_R += tb303engine[1].tbGetSample();
+            Signal_303 += tb303engine[1].tbGetSample();
+            All_Signal_L += Signal_303;
+            if(grown) All_Signal_R += Signal_303;
             gotsome = TRUE;
         }
 #endif

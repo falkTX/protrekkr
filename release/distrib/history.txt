@@ -2,11 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.95:
+v1.94b:
 
 - Added some colors for the notes
   (also changed the font so patterns should be a bit easier to read now).
 - Added volume ramping for the 303 units.
+- The 2nd 303 unit wasn't triggered correctly.
 
 v1.94:
 
