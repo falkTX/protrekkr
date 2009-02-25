@@ -9,7 +9,7 @@ TODO (in no special order):
  - A global synchro editor.
  - Remove totally empty channels (nothing on every used patterns or always off).
    (and remove identical samples in .ptp).
- - Import .mid.
+ - Import .mid files.
  - Save the synchro data as milliseconds too (+ add a Ptk_GetTime function).
  - Ability to record a selected range of patterns to WAV.
  - Add an option to play a packed sample in order to test it inside the tracker.
@@ -29,7 +29,6 @@ TODO (in no special order):
  - Add a metronome for the recording mode.
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.
- - More colors in the patterns.
  - Drag'n'drop blocks in patterns.
  - VSTs support in the samples editor.
  - Expose the reverb variables to the user.

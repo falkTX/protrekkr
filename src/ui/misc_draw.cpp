@@ -54,8 +54,10 @@ int max_colors_logo;
 int max_colors_303;
 SDL_Surface *Temp_PFONT;
 SDL_Surface *Temp_BIGPFONT;
+SDL_Surface *Temp_SMALLPFONT;
 SDL_Surface *Temp_NOTEPFONT;
 SDL_Surface *Temp_NOTEBIGPFONT;
+SDL_Surface *Temp_NOTESMALLPFONT;
 int Beveled = TRUE;
 
 int max_colors_Pointer;
@@ -1131,11 +1133,6 @@ void Note_Letter(int x, int y, char ltr, int ys, int y2)
 }
 
 // ------------------------------------------------------
-// dest x
-// dest y
-// letter
-// src y
-// length y
 void Big_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
@@ -1150,6 +1147,7 @@ void Big_Letter(int x, int y, char ltr, int ys, int y2)
         case 7: Copy(Temp_BIGPFONT, x, y, 177, ys, 177 + 12, y2); break;
         case 8: Copy(Temp_BIGPFONT, x, y, 188, ys, 188 + 12, y2); break;
         case 9: Copy(Temp_BIGPFONT, x, y, 199, ys, 199 + 12, y2); break;
+
         case 10: Copy(Temp_BIGPFONT, x, y, 0, ys, 12, y2); break; // A
         case 11: Copy(Temp_BIGPFONT, x, y, 11, ys, 11 + 12, y2); break;// B
         case 12: Copy(Temp_BIGPFONT, x, y, 22, ys, 22 + 12, y2); break;// C
@@ -1183,11 +1181,6 @@ void Big_Letter(int x, int y, char ltr, int ys, int y2)
 }
 
 // ------------------------------------------------------
-// dest x
-// dest y
-// letter
-// src y
-// length y
 void Note_Big_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
@@ -1202,6 +1195,7 @@ void Note_Big_Letter(int x, int y, char ltr, int ys, int y2)
         case 7: Copy(Temp_NOTEBIGPFONT, x, y, 177, ys, 177 + 12, y2); break;
         case 8: Copy(Temp_NOTEBIGPFONT, x, y, 188, ys, 188 + 12, y2); break;
         case 9: Copy(Temp_NOTEBIGPFONT, x, y, 199, ys, 199 + 12, y2); break;
+
         case 10: Copy(Temp_NOTEBIGPFONT, x, y, 0, ys, 12, y2); break; // A
         case 11: Copy(Temp_NOTEBIGPFONT, x, y, 11, ys, 11 + 12, y2); break;// B
         case 12: Copy(Temp_NOTEBIGPFONT, x, y, 22, ys, 22 + 12, y2); break;// C
@@ -1213,8 +1207,103 @@ void Note_Big_Letter(int x, int y, char ltr, int ys, int y2)
         case 17: Copy(Temp_NOTEBIGPFONT, x, y, 88, ys, 88 + 12, y2); break; // #
         case 18: Copy(Temp_NOTEBIGPFONT, x, y, 243, ys, 243 + 12, y2); break; // -
         case 19: Copy(Temp_NOTEBIGPFONT, x, y, 210, ys, 210 + 34, y2); break; // Off
-        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
         case 21: Copy(Temp_NOTEBIGPFONT, x, y, 254, ys, 254 + 12, y2); break; // .
+
+        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+
+        case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+
+        case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+    }
+}
+
+// ------------------------------------------------------
+void Small_Letter(int x, int y, char ltr, int ys, int y2)
+{
+    switch(ltr)
+    {
+        case 0: Copy(Temp_SMALLPFONT, x, y, 54, ys, 54 + 7, y2); break; // 0
+        case 1: Copy(Temp_SMALLPFONT, x, y, 60, ys, 60 + 7, y2); break; // 1
+        case 2: Copy(Temp_SMALLPFONT, x, y, 66, ys, 66 + 7, y2); break; // 2
+        case 3: Copy(Temp_SMALLPFONT, x, y, 72, ys, 72 + 7, y2); break; // 3
+        case 4: Copy(Temp_SMALLPFONT, x, y, 78, ys, 78 + 7, y2); break; // 4
+        case 5: Copy(Temp_SMALLPFONT, x, y, 84, ys, 84 + 7, y2); break; // 5
+        case 6: Copy(Temp_SMALLPFONT, x, y, 90, ys, 90 + 7, y2); break; // 6
+        case 7: Copy(Temp_SMALLPFONT, x, y, 96, ys, 96 + 7, y2); break; // 7
+        case 8: Copy(Temp_SMALLPFONT, x, y, 102, ys, 102 + 7, y2); break; // 8
+        case 9: Copy(Temp_SMALLPFONT, x, y, 108, ys, 108 + 7, y2); break; // 9
+        
+        case 10: Copy(Temp_SMALLPFONT, x, y, 0, ys, 7, y2); break; // A
+        case 11: Copy(Temp_SMALLPFONT, x, y, 6, ys, 6 + 7, y2); break;// B
+        case 12: Copy(Temp_SMALLPFONT, x, y, 12, ys, 12 + 7, y2); break;// C
+        case 13: Copy(Temp_SMALLPFONT, x, y, 18, ys, 18 + 7, y2); break;// D
+        case 14: Copy(Temp_SMALLPFONT, x, y, 24, ys, 24 + 7, y2); break;// E
+        case 15: Copy(Temp_SMALLPFONT, x, y, 30, ys, 30 + 7, y2); break;// F
+        case 16: Copy(Temp_SMALLPFONT, x, y, 36, ys, 36 + 7, y2); break;// G
+        
+        case 17: Copy(Temp_SMALLPFONT, x, y, 48, ys, 48 + 7, y2); break; // #
+        case 18: Copy(Temp_SMALLPFONT, x, y, 132, ys, 132 + 7, y2); break; // -
+        case 19: Copy(Temp_SMALLPFONT, x, y, 114, ys, 114 + 17, y2); break; // Off
+        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_SMALLPFONT, x, y, 138, ys, 138 + 7, y2); break; // .
+
+        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+
+        case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+
+        case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+    }
+}
+
+// ------------------------------------------------------
+void Note_Small_Letter(int x, int y, char ltr, int ys, int y2)
+{
+    switch(ltr)
+    {
+        case 0: Copy(Temp_NOTESMALLPFONT, x, y, 54, ys, 54 + 7, y2); break; // 0
+        case 1: Copy(Temp_NOTESMALLPFONT, x, y, 60, ys, 60 + 7, y2); break; // 1
+        case 2: Copy(Temp_NOTESMALLPFONT, x, y, 66, ys, 66 + 7, y2); break; // 2
+        case 3: Copy(Temp_NOTESMALLPFONT, x, y, 72, ys, 72 + 7, y2); break; // 3
+        case 4: Copy(Temp_NOTESMALLPFONT, x, y, 78, ys, 78 + 7, y2); break; // 4
+        case 5: Copy(Temp_NOTESMALLPFONT, x, y, 84, ys, 84 + 7, y2); break; // 5
+        case 6: Copy(Temp_NOTESMALLPFONT, x, y, 90, ys, 90 + 7, y2); break; // 6
+        case 7: Copy(Temp_NOTESMALLPFONT, x, y, 96, ys, 96 + 7, y2); break; // 7
+        case 8: Copy(Temp_NOTESMALLPFONT, x, y, 102, ys, 102 + 7, y2); break; // 8
+        case 9: Copy(Temp_NOTESMALLPFONT, x, y, 108, ys, 108 + 7, y2); break; // 9
+        
+        case 10: Copy(Temp_NOTESMALLPFONT, x, y, 0, ys, 7, y2); break; // A
+        case 11: Copy(Temp_NOTESMALLPFONT, x, y, 6, ys, 6 + 7, y2); break;// B
+        case 12: Copy(Temp_NOTESMALLPFONT, x, y, 12, ys, 12 + 7, y2); break;// C
+        case 13: Copy(Temp_NOTESMALLPFONT, x, y, 18, ys, 18 + 7, y2); break;// D
+        case 14: Copy(Temp_NOTESMALLPFONT, x, y, 24, ys, 24 + 7, y2); break;// E
+        case 15: Copy(Temp_NOTESMALLPFONT, x, y, 30, ys, 30 + 7, y2); break;// F
+        case 16: Copy(Temp_NOTESMALLPFONT, x, y, 36, ys, 36 + 7, y2); break;// G
+        
+        case 17: Copy(Temp_NOTESMALLPFONT, x, y, 48, ys, 48 + 7, y2); break; // #
+        case 18: Copy(Temp_NOTESMALLPFONT, x, y, 132, ys, 132 + 7, y2); break; // -
+        case 19: Copy(Temp_NOTESMALLPFONT, x, y, 114, ys, 114 + 17, y2); break; // Off
+        
+        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_NOTESMALLPFONT, x, y, 138, ys, 138 + 7, y2); break; // .
 
         case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
         case 24: Copy(Temp_NOTEPFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
@@ -1243,6 +1332,12 @@ void blitbignote(int x, int y, int note, int y1, int y2)
 {
     Letter_Function = Note_Big_Letter;
     Blit_note(x, y, note, y1, y2, 11);
+}
+
+void blitsmallnote(int x, int y, int note, int y1, int y2)
+{
+    Letter_Function = Note_Small_Letter;
+    Blit_note(x, y, note, y1, y2, 6);
 }
 
 void Blit_note(int x, int y, int note, int y1, int y2, int size)
@@ -1484,6 +1579,11 @@ void UISetPalette(SDL_Color *Palette, int Amount)
         SDL_SetPalette(Temp_BIGPFONT, SDL_PHYSPAL, Palette, 0, Amount);
         SDL_SetPalette(Temp_BIGPFONT, SDL_LOGPAL, Palette, 0, Amount);
     }
+    if(Temp_SMALLPFONT)
+    {
+        SDL_SetPalette(Temp_SMALLPFONT, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(Temp_SMALLPFONT, SDL_LOGPAL, Palette, 0, Amount);
+    }
     if(Temp_NOTEPFONT)
     {
         SDL_SetPalette(Temp_NOTEPFONT, SDL_PHYSPAL, Palette, 0, Amount);
@@ -1493,6 +1593,11 @@ void UISetPalette(SDL_Color *Palette, int Amount)
     {
         SDL_SetPalette(Temp_NOTEBIGPFONT, SDL_PHYSPAL, Palette, 0, Amount);
         SDL_SetPalette(Temp_NOTEBIGPFONT, SDL_LOGPAL, Palette, 0, Amount);
+    }
+    if(Temp_NOTESMALLPFONT)
+    {
+        SDL_SetPalette(Temp_NOTESMALLPFONT, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(Temp_NOTESMALLPFONT, SDL_LOGPAL, Palette, 0, Amount);
     }
     if(POINTER)
     {
@@ -1955,8 +2060,10 @@ int Set_Pictures_Colors(void)
 
     Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
     Temp_BIGPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_SMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
     Temp_NOTEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
     Temp_NOTEBIGPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTESMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
 
     Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
     memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));
@@ -1971,8 +2078,10 @@ int Set_Pictures_Colors(void)
 
     Create_Pattern_font(Temp_PFONT, 0, COL_PATTERN_LO_FORE, COL_PATTERN_SEL_FORE, COL_PATTERN_HI_FORE);
     Create_Pattern_font(Temp_BIGPFONT, 15, COL_PATTERN_LO_FORE, COL_PATTERN_SEL_FORE, COL_PATTERN_HI_FORE);
+    Create_Pattern_font(Temp_SMALLPFONT, 23, COL_PATTERN_LO_FORE, COL_PATTERN_SEL_FORE, COL_PATTERN_HI_FORE);
     Create_Pattern_font(Temp_NOTEPFONT, 0, COL_NOTE_LO_FORE, COL_NOTE_SEL_FORE, COL_NOTE_HI_FORE);
     Create_Pattern_font(Temp_NOTEBIGPFONT, 15, COL_NOTE_LO_FORE, COL_NOTE_SEL_FORE, COL_NOTE_HI_FORE);
+    Create_Pattern_font(Temp_NOTESMALLPFONT, 23, COL_NOTE_LO_FORE, COL_NOTE_SEL_FORE, COL_NOTE_HI_FORE);
 
     // Create the channels status
     Set_Channel_State_Pic(0, COL_MUTE, COL_MUTE_PLAY_INVERT);

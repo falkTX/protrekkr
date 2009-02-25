@@ -271,16 +271,6 @@ int Table_Mouse_Lines[] =
 
 int Cur_Char_size[MAX_TRACKS];
 
-typedef struct
-{
-    void (*Fnc)(int, int, char, int, int);
-} LETTER_FUNCTION, *LPLETTER_FUNCTION;
-
-typedef struct
-{
-    void (*Fnc)(int, int, int, int, int);
-} NOTE_FUNCTION, *LPNOTE_FUNCTION;
-
 LETTER_FUNCTION Cur_Char_Function[MAX_TRACKS];
 NOTE_FUNCTION Cur_Note_Function[MAX_TRACKS];
 
@@ -358,28 +348,28 @@ void draw_pated(int track, int line, int petrack, int row)
         dover += 4;
         if(dover >= MAX_PATT_SCREEN_X) break;
 
-        Cur_Char_Function[cur_track].Fnc(dover - 1, 187, liner + track, 71, 71 + 6);
+        Cur_Char_Function[cur_track].Fnc(dover - 1, 187, cur_track, 71, 71 + 6);
 
         // Mute on/off
-        if((dover + (Cur_Char_size[cur_track] + 1)) >= MAX_PATT_SCREEN_X) break;
-        if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1), 187, 25, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1), 187, 26, 0, 0);
+        if((dover + (Cur_Char_size[cur_track])) >= MAX_PATT_SCREEN_X) break;
+        if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track], 187, 25, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track], 187, 26, 0, 0);
 
         // Active on/off
-        if((dover + (Cur_Char_size[cur_track] + 1) + 29) >= MAX_PATT_SCREEN_X) break;
-        if(CHAN_ACTIVE_STATE[Cur_Position][cur_track]) Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29, 187, 23, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29, 187, 24, 0, 0);
+        if((dover + Cur_Char_size[cur_track] + 29) >= MAX_PATT_SCREEN_X) break;
+        if(CHAN_ACTIVE_STATE[Cur_Position][cur_track]) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29, 187, 23, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29, 187, 24, 0, 0);
 
         // Zoom on/off
-        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 29) >= MAX_PATT_SCREEN_X) break;
-        if(Is_Track_Zoomed(cur_track)) Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29, 187, 27, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29, 187, 28, 0, 0);
+        if((dover + Cur_Char_size[cur_track] + 29 + 29) >= MAX_PATT_SCREEN_X) break;
+        if(Is_Track_Zoomed(cur_track) != PAT_COL_CHAR) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 27, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 28, 0, 0);
 
         // Caret track marker
-        if((dover + (Cur_Char_size[cur_track] + 1) + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
+        if((dover + Cur_Char_size[cur_track] + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
         if(ped_track == cur_track) SetColor(COL_VUMETERPEAK);
         else SetColor(COL_PATTERN_LO_BACK);
-        bjbox(dover + (Cur_Char_size[cur_track] + 1) + 29 + 29 + 17, 187, 12, 7);
+        bjbox(dover + Cur_Char_size[cur_track] + 29 + 29 + 17, 187, 12, 7);
 
         // On / off
         for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
@@ -2050,7 +2040,7 @@ void Mouse_Left_Pattern_Ed(void)
     }
 
     // Tracks mute
-    start_mute_check_x = PAT_COL_NOTE + 2 + 4;
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
@@ -2058,12 +2048,12 @@ void Mouse_Left_Pattern_Ed(void)
         start_mute_check_x += Get_Track_Size(i);
     }
 
-    // Tracks zoom
-    start_mute_check_x = PAT_COL_NOTE + 2 + 4 + (29 * 2);
+    // Tracks zoom > big
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2);
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
-        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_ZOOM_STATE;
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_BIG_STATE;
         start_mute_check_x += Get_Track_Size(i);
     }
 }
@@ -2072,6 +2062,10 @@ void Mouse_Left_Pattern_Ed(void)
 // Handle the right mouse button event
 void Mouse_Right_Pattern_Ed(void)
 {
+    int start_mute_check_x;
+    int tracks;
+    int i;
+
     // Decrease/Increase steps
     if(zcheckMouse(90, 152, 16, 16))
     {
@@ -2084,17 +2078,28 @@ void Mouse_Right_Pattern_Ed(void)
         gui_action = GUI_CMD_UPDATE_PATTERN_ED;
     }
 
-    // Solo track with right mouse button
-    if(zcheckMouse(1, 184, CHANNELS_WIDTH, 10) == 1)
+    // Solo track
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4;
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
     {
-        int tmp_track = Get_Track_Over_Mouse();
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
+        {
+            int tmp_track = Get_Track_Over_Mouse();
+            Solo_Track(tmp_track);
+            // Will unmute the correct track
+            gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
+        }
+        start_mute_check_x += Get_Track_Size(i);
+    }
 
-        if(tmp_track > MAX_TRACKS - 1) tmp_track = MAX_TRACKS - 1;
-        if(tmp_track < 0) tmp_track = 0;
-
-        Solo_Track(tmp_track);
-        // Will unmute the correct track
-        gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
+    // Tracks zoom > small
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2);
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
+    {
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_SMALL_STATE;
+        start_mute_check_x += Get_Track_Size(i);
     }
 }
 
@@ -2279,17 +2284,33 @@ void Reset_Patterns_Zoom(void)
 
 // ------------------------------------------------------
 // Toggle the zoom status of a track
-void Toggle_Track_Zoom(int track)
+void Toggle_Track_Zoom(int track, int big)
 {
-    if(!Is_Track_Zoomed(track))
+    if(big)
     {
-        Cur_Char_size[track] = PAT_COL_CHAR_BIG;
-        Cur_Char_Function[track].Fnc = Big_Letter;
-        Cur_Note_Function[track].Fnc = blitbignote;
+        if(Is_Track_Zoomed(track) == PAT_COL_CHAR_BIG)
+        {
+            Clear_Track_Zoom(track);
+        }
+        else
+        {
+            Cur_Char_size[track] = PAT_COL_CHAR_BIG;
+            Cur_Char_Function[track].Fnc = Big_Letter;
+            Cur_Note_Function[track].Fnc = blitbignote;
+        }
     }
     else
     {
-        Clear_Track_Zoom(track);
+        if(Is_Track_Zoomed(track) == PAT_COL_CHAR_SMALL)
+        {
+            Clear_Track_Zoom(track);
+        }
+        else
+        {
+            Cur_Char_size[track] = PAT_COL_CHAR_SMALL;
+            Cur_Char_Function[track].Fnc = Small_Letter;
+            Cur_Note_Function[track].Fnc = blitsmallnote;
+        }
     }
 }
 
@@ -2297,11 +2318,7 @@ void Toggle_Track_Zoom(int track)
 // Check if a track is zoomed
 int Is_Track_Zoomed(int track)
 {
-    if(Cur_Char_size[track] == PAT_COL_CHAR)
-    {
-        return(FALSE);
-    }
-    return(TRUE);
+    return(Cur_Char_size[track]);
 }
 
 // ------------------------------------------------------

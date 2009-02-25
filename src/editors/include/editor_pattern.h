@@ -49,11 +49,24 @@
 
 #define PAT_COL_CHAR 8
 #define PAT_COL_CHAR_BIG 11
+#define PAT_COL_CHAR_SMALL 6
 
 #define DISPLAYED_LINES_SMALL 28
 #define DISPLAYED_LINES_LARGE 44
 
 #define MAX_PATT_SCREEN_X 778
+
+// ------------------------------------------------------
+// Structures
+typedef struct
+{
+    void (*Fnc)(int, int, char, int, int);
+} LETTER_FUNCTION, *LPLETTER_FUNCTION;
+
+typedef struct
+{
+    void (*Fnc)(int, int, int, int, int);
+} NOTE_FUNCTION, *LPNOTE_FUNCTION;
 
 // ------------------------------------------------------
 // Variables
@@ -88,7 +101,7 @@ void Goto_Row(int row);
 int Get_Visible_Complete_Tracks(void);
 int Get_Pattern_Offset(int track, int row, int pattern);
 void Reset_Patterns_Zoom(void);
-void Toggle_Track_Zoom(int track);
+void Toggle_Track_Zoom(int track, int big);
 void Clear_Track_Zoom(int track);
 int Is_Track_Zoomed(int track);
 

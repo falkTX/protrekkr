@@ -150,9 +150,11 @@ void Refresh_UI_Context(void);
 
 void blitnote(int x, int y, int note, int y1, int y2);
 void blitbignote(int x, int y, int note, int y1, int y2);
+void blitsmallnote(int x, int y, int note, int y1, int y2);
 void Note_Letter(int x, int y, char ltr, int ys, int y2);
 void Letter(int x, int y, char ltr, int ys, int y2);
 void Big_Letter(int x, int y, char ltr, int ys, int y2);
+void Small_Letter(int x, int y, char ltr, int ys, int y2);
 void Note_Big_Letter(int x, int y, char ltr, int ys, int y2);
 extern void (*Letter_Function)(int x, int y, char ltr, int ys, int y2);
 

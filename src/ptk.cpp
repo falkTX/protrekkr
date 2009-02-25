@@ -773,17 +773,25 @@ int Screen_Update(void)
             Actupated(0);
         }
 
-        if(gui_action == GUI_CMD_SWITCH_TRACK_ZOOM_STATE)
+        if(gui_action == GUI_CMD_SWITCH_TRACK_BIG_STATE)
         {
             int tmp_track = Get_Track_Over_Mouse();
 
-            Toggle_Track_Zoom(tmp_track);
+            Toggle_Track_Zoom(tmp_track, TRUE);
 
             // Too big to be zoomed
-            if(Is_Track_Zoomed(tmp_track) && Channels_MultiNotes[ped_track] > 11)
+            if(Is_Track_Zoomed(tmp_track) == PAT_COL_CHAR_BIG && Channels_MultiNotes[ped_track] > 11)
             {
-                Toggle_Track_Zoom(tmp_track);
+                Clear_Track_Zoom(tmp_track);
             }
+            Actupated(0);
+        }
+
+        if(gui_action == GUI_CMD_SWITCH_TRACK_SMALL_STATE)
+        {
+            int tmp_track = Get_Track_Over_Mouse();
+
+            Toggle_Track_Zoom(tmp_track, FALSE);
             Actupated(0);
         }
 

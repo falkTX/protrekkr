@@ -206,9 +206,10 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
             if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
-            if(Is_Track_Zoomed(ped_track) && Channels_MultiNotes[ped_track] > 11)
+            if(Is_Track_Zoomed(ped_track) == PAT_COL_CHAR_BIG && Channels_MultiNotes[ped_track] > 11)
             {
-                Toggle_Track_Zoom(ped_track);
+                // Zoom it back
+                Clear_Track_Zoom(ped_track);
             }
             Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Actupated(0);
