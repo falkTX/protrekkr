@@ -714,21 +714,50 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         dover += PAT_COL_SHIFT;
         if(dover >= MAX_PATT_SCREEN_X) break;
-        Cur_Char_Function[cur_track].Fnc(dover, y, p_e >> 4, cur_color, cur_color + 7);
-        dover += Cur_Char_size[cur_track];
-        if(dover >= MAX_PATT_SCREEN_X) break;
-        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
-        Cur_Char_Function[cur_track].Fnc(dover, y, p_eh, cur_color, cur_color + 7);
-        dover += Cur_Char_size[cur_track];
-        if(dover >= MAX_PATT_SCREEN_X) break;
-        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
-        Cur_Char_Function[cur_track].Fnc(dover, y, p_f >> 4, cur_color, cur_color + 7);
-        dover += Cur_Char_size[cur_track];
-        if(dover >= MAX_PATT_SCREEN_X) break;
-        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
-        Cur_Char_Function[cur_track].Fnc(dover, y, p_fh, cur_color, cur_color + 7);
-        dover += Cur_Char_size[cur_track];
-        if(dover >= MAX_PATT_SCREEN_X) break;
+
+        if(!p_e && !p_f)
+        {
+            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        }
+        else
+        {
+            Cur_Char_Function[cur_track].Fnc(dover, y, p_e >> 4, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, p_eh, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, p_f >> 4, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            Cur_Char_Function[cur_track].Fnc(dover, y, p_fh, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+            if(dover >= MAX_PATT_SCREEN_X) break;
+        }
+
 
         cur_column++;
     } // Track
@@ -1011,36 +1040,73 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
             if(dover >= MAX_PATT_SCREEN_X) break;
-            if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, 48, 48 + 15);
-            else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, cur_color, cur_color + 15);
-            dover += Cur_Char_size[cur_track];
-            if(dover >= MAX_PATT_SCREEN_X) break;
-            high_col++;
 
-            //  Effect lo
-            cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
-            if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, 48, 48 + 15);
-            else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, cur_color, cur_color + 15);
-            dover += Cur_Char_size[cur_track];
-            if(dover >= MAX_PATT_SCREEN_X) break;
-            high_col++;
+            if(!p_e && !p_f)
+            {
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
 
-            //  Effect data hi
-            cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
-            if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
-            if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, 48, 48 + 15);
-            else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, cur_color, cur_color + 15);
-            dover += Cur_Char_size[cur_track];
-            if(dover >= MAX_PATT_SCREEN_X) break;
-            high_col++;
+                //  Effect lo
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
 
-            //  Effect data lo
-            cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
-            if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, 48, 48 + 15);
-            else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, cur_color, cur_color + 15);
-            dover += Cur_Char_size[cur_track];
-            if(dover >= MAX_PATT_SCREEN_X) break;
-            high_col++;
+                //  Effect data hi
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+
+                //  Effect data lo
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+            }
+            else
+            {
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+
+                //  Effect lo
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+
+                //  Effect data hi
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+
+                //  Effect data lo
+                cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
+                if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, 48, 48 + 15);
+                else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, cur_color, cur_color + 15);
+                dover += Cur_Char_size[cur_track];
+                if(dover >= MAX_PATT_SCREEN_X) break;
+                high_col++;
+            }
 
             ++cur_column;
 
@@ -2218,7 +2284,7 @@ void Toggle_Track_Zoom(int track)
     if(!Is_Track_Zoomed(track))
     {
         Cur_Char_size[track] = PAT_COL_CHAR_BIG;
-        Cur_Char_Function[track].Fnc = BigLetter;
+        Cur_Char_Function[track].Fnc = Big_Letter;
         Cur_Note_Function[track].Fnc = blitbignote;
     }
     else

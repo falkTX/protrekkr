@@ -69,6 +69,8 @@ void gear303::reset(void)
     tbOscSpeed = 0.0f;
     hpf = 0;
     tbWaveform = 0;
+    RampVolume = 0.0f;
+    Cur_RampVolume = 0.0f;
 }
 
 // ------------------------------------------------------
@@ -114,7 +116,26 @@ float gear303::tbGetSample(void)
     float output = tbFilter();
     if(output < -32768.0f) output = -32768.0f;
     if(output > 32767.0f) output = 32767.0f;
-    return(output);
+    
+    if(Cur_RampVolume >= RampVolume)
+    {
+        Cur_RampVolume -= 0.003f;
+    }
+    else
+    {
+        Cur_RampVolume += 0.003f;
+    }
+    if(Cur_RampVolume > 1.0f) Cur_RampVolume = 1.0f;
+    if(Cur_RampVolume < 0.0f && tbPattern != 255)
+    {
+        Cur_RampVolume = 0.0f;
+        tbLine = 255;
+        tbPattern = 255;
+        tbBuf0 = 0.0f;
+        tbBuf1 = 0.0f;
+    }
+    
+    return(output * Cur_RampVolume);
 }
 
 // ------------------------------------------------------

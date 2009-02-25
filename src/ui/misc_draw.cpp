@@ -54,8 +54,11 @@ int max_colors_logo;
 int max_colors_303;
 SDL_Surface *Temp_PFONT;
 SDL_Surface *Temp_BIGPFONT;
+SDL_Surface *Temp_NOTEPFONT;
+SDL_Surface *Temp_NOTEBIGPFONT;
 int Beveled = TRUE;
 
+int max_colors_Pointer;
 int curr_tab_highlight;
 
 int Nbr_Letters;
@@ -143,8 +146,9 @@ char *HexTab[] =
     "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
 };
 
-SDL_Color Ptk_Palette[256];
+SDL_Color Ptk_Palette[256 * 2];
 SDL_Color Palette_303[256];
+SDL_Color Palette_Pointer[256];
 SDL_Color Palette_Logo[256];
 
 char *Labels_Palette[] =
@@ -164,6 +168,9 @@ char *Labels_Palette[] =
     "Pattern Hi Foregnd",
     "Pattern Sel Backgnd",
     "Pattern Sel Foregnd",
+    "Note Lo Foregnd",
+    "Note Hi Foregnd",
+    "Note Sel Foregnd",
     "Track Off / Mute",
     "Track On / Play"
 };
@@ -179,14 +186,20 @@ int Idx_Palette[] =
     15,
     16,
     17,
+    
     19,
     20,
     21,
     22,
     23,
     24,
-    25,
-    26
+    
+    26,
+    28,
+    30,
+    
+    31,
+    32
 };
 
 SDL_Color Default_Palette[] =
@@ -221,25 +234,41 @@ SDL_Color Default_Palette[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 19 Pattern lo background
     { 0x68, 0x8c, 0xac, 0x00 },      // 20 Pattern lo foreground
 
-    { 0x28, 0x2c, 0x3c, 0x00 },      // 21 Pattern hi background
+    { 0x06, 0x1c, 0x28, 0x00 },      // 21 Pattern hi background
     { 0xa0, 0xbe, 0xe4, 0x00 },      // 22 Pattern hi foreground
 
     { 0x11, 0x55, 0x7f, 0x00 },      // 23 Pattern sel background
     { 0xea, 0xf0, 0xff, 0x00 },      // 24 Pattern sel foreground
 
-    { 0xff, 0x4a, 0x00, 0x00 },      // 25 mute
-    { 0x38, 0xbe, 0x88, 0x00 },      // 26 play
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0xe0, 0xb6, 0x80, 0x00 },      // 26 Note lo foreground
 
-    { 0xff, 0xff, 0xff, 0x00 },      // 27 mute/play highlight (fixed)
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0xff, 0xd4, 0xb6, 0x00 },      // 28 Note hi foreground
 
-    { 0x00, 0x00, 0x00, 0x00 },      // 28 Shadow Pattern lo background (calculated)
-    { 0x00, 0x00, 0x00, 0x00 },      // 29 Shadow Pattern lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+    { 0xea, 0xf0, 0xff, 0x00 },      // 30 Note sel foreground
 
-    { 0x00, 0x00, 0x00, 0x00 },      // 30 Shadow Pattern hi background (calculated)
-    { 0x00, 0x00, 0x00, 0x00 },      // 31 Shadow Pattern hi foreground (calculated)
+    { 0xff, 0x4a, 0x00, 0x00 },      // 31 mute
+    { 0x38, 0xbe, 0x88, 0x00 },      // 32 play
 
-    { 0x00, 0x00, 0x00, 0x00 },      // 32 Shadow Pattern sel background (calculated)
-    { 0x00, 0x00, 0x00, 0x00 },      // 33 Shadow Pattern sel foreground (calculated)
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
 };
 
 LONGRGB Phony_Palette[sizeof(Default_Palette) / sizeof(SDL_Color)];
@@ -291,10 +320,10 @@ void Set_Phony_Palette(void)
     {
         switch(i)
         {
-            case 2:
-            case 5:
-            case 8:
-            case 11:
+            case COL_STATIC_HI:
+            case COL_HI:
+            case COL_PUSHED_HI:
+            case COL_SLIDER_HI:
                 ComponentR = Phony_Palette[i + 1].r;
                 ComponentG = Phony_Palette[i + 1].g;
                 ComponentB = Phony_Palette[i + 1].b;
@@ -309,10 +338,10 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].b = ComponentB;
                 break;
 
-            case 4:
-            case 7:
-            case 10:
-            case 13:
+            case COL_STATIC_LO:
+            case COL_LO:
+            case COL_PUSHED_LO:
+            case COL_SLIDER_LO:
                 ComponentR = Phony_Palette[i - 1].r;
                 ComponentG = Phony_Palette[i - 1].g;
                 ComponentB = Phony_Palette[i - 1].b;
@@ -340,7 +369,7 @@ void Set_Phony_Palette(void)
                 break;
 
             // The font
-            case 17:
+            case COL_FONT_HI:
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
@@ -349,34 +378,12 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].b = ComponentB;
 
                 // Set the shadow font
-                if(ComponentR >= 128)
-                {
-                    ComponentR = 128 + (ComponentR >> 2);
-                }
-                else
-                {
-                    ComponentR = (128 - (ComponentR >> 2));
-                }
-                if(ComponentG >= 128)
-                {
-                    ComponentG = 128 + (ComponentG >> 2);
-                }
-                else
-                {
-                    ComponentG = (128 - (ComponentG >> 2));
-                }
-                if(ComponentB >= 128)
-                {
-                    ComponentB = 128 + (ComponentB >> 2);
-                }
-                else
-                {
-                    ComponentB = (128 - (ComponentB >> 2));
-                }
-                //if(ComponentG >= 128) ComponentG = 128 + (ComponentG >> 3);
-                //else ComponentG = 128 + (255 - ComponentG >> 3);
-                //if(ComponentB >= 128) ComponentB = 128 + (ComponentB >> 3);
-                //else ComponentB = 128 + (255 - ComponentB >> 3);
+                if(ComponentR >= 128) ComponentR = 128 + (ComponentR >> 2);
+                else ComponentR = (128 - (ComponentR >> 2));
+                if(ComponentG >= 128) ComponentG = 128 + (ComponentG >> 2);
+                else ComponentG = (128 - (ComponentG >> 2));
+                if(ComponentB >= 128) ComponentB = 128 + (ComponentB >> 2);
+                else ComponentB = (128 - (ComponentB >> 2));
 
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentG < 0) ComponentG = 0;
@@ -392,12 +399,15 @@ void Set_Phony_Palette(void)
                 Phony_Palette[i + 1].b = ComponentB;
                 break;
 
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-            case 23:
-            case 24:
+            case COL_PATTERN_LO_BACK:
+            case COL_PATTERN_LO_FORE:
+            case COL_PATTERN_HI_BACK:
+            case COL_PATTERN_HI_FORE:
+            case COL_PATTERN_SEL_BACK:
+            case COL_PATTERN_SEL_FORE:
+            case COL_NOTE_LO_FORE:
+            case COL_NOTE_HI_FORE:
+            case COL_NOTE_SEL_FORE:
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
@@ -407,21 +417,21 @@ void Set_Phony_Palette(void)
                 ComponentR >>= 1;
                 ComponentG >>= 1;
                 ComponentB >>= 1;
-                Ptk_Palette[i + 9].r = ComponentR;
-                Ptk_Palette[i + 9].g = ComponentG;
-                Ptk_Palette[i + 9].b = ComponentB;
-                Phony_Palette[i + 9].r = ComponentR;
-                Phony_Palette[i + 9].g = ComponentG;
-                Phony_Palette[i + 9].b = ComponentB;
+                Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
+                Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
+                Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
+                Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
+                Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
+                Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
                 break;
 
-            case 25:
+            case COL_MUTE:
                 Ptk_Palette[i].r = Phony_Palette[i].r;
                 Ptk_Palette[i].g = Phony_Palette[i].g;
                 Ptk_Palette[i].b = Phony_Palette[i].b;
                 break;
 
-            case 26:
+            case COL_PLAY:
                 Ptk_Palette[i].r = Phony_Palette[i].r;
                 Ptk_Palette[i].g = Phony_Palette[i].g;
                 Ptk_Palette[i].b = Phony_Palette[i].b;
@@ -1076,7 +1086,57 @@ void Letter(int x, int y, char ltr, int ys, int y2)
 // letter
 // src y
 // length y
-void BigLetter(int x, int y, char ltr, int ys, int y2)
+void Note_Letter(int x, int y, char ltr, int ys, int y2)
+{
+    switch(ltr)
+    {
+        case 0: Copy(Temp_NOTEPFONT, x, y, 72, ys, 79, y2); break;
+        case 1: Copy(Temp_NOTEPFONT, x, y, 80, ys, 87, y2); break;
+        case 2: Copy(Temp_NOTEPFONT, x, y, 88, ys, 95, y2); break;
+        case 3: Copy(Temp_NOTEPFONT, x, y, 96, ys, 103, y2); break;
+        case 4: Copy(Temp_NOTEPFONT, x, y, 104, ys, 111, y2); break;
+        case 5: Copy(Temp_NOTEPFONT, x, y, 112, ys, 119, y2); break;
+        case 6: Copy(Temp_NOTEPFONT, x, y, 120, ys, 127, y2); break;
+        case 7: Copy(Temp_NOTEPFONT, x, y, 128, ys, 135, y2); break;
+        case 8: Copy(Temp_NOTEPFONT, x, y, 136, ys, 143, y2); break;
+        case 9: Copy(Temp_NOTEPFONT, x, y, 144, ys, 151, y2); break;
+        case 10: Copy(Temp_NOTEPFONT, x, y, 0, ys, 7, y2); break; // A
+        case 11: Copy(Temp_NOTEPFONT, x, y, 8, ys, 15, y2); break;// B
+        case 12: Copy(Temp_NOTEPFONT, x, y, 16, ys, 23, y2); break;// C
+        case 13: Copy(Temp_NOTEPFONT, x, y, 24, ys, 31, y2); break;// D
+        case 14: Copy(Temp_NOTEPFONT, x, y, 32, ys, 39, y2); break;// E
+        case 15: Copy(Temp_NOTEPFONT, x, y, 40, ys, 47, y2); break;// F
+        case 16: Copy(Temp_NOTEPFONT, x, y, 48, ys, 55, y2); break;// G
+        case 17: Copy(Temp_NOTEPFONT, x, y, 64, ys, 71, y2); break; // #
+        case 18: Copy(Temp_NOTEPFONT, x, y, 176, ys, 183, y2); break; // -
+        case 19: Copy(Temp_NOTEPFONT, x, y, 152, ys, 175, y2); break; // Off
+        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_NOTEPFONT, x, y, 184, ys, 191, y2); break; // .
+
+        case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_NOTEPFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_NOTEPFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_NOTEPFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+
+        case 27: Copy(Temp_NOTEPFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_NOTEPFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+
+        case 29: Copy(Temp_NOTEPFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_NOTEPFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+
+        case 31: Copy(Temp_NOTEPFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_NOTEPFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_NOTEPFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+    }
+}
+
+// ------------------------------------------------------
+// dest x
+// dest y
+// letter
+// src y
+// length y
+void Big_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
     {
@@ -1122,15 +1182,66 @@ void BigLetter(int x, int y, char ltr, int ys, int y2)
     }
 }
 
+// ------------------------------------------------------
+// dest x
+// dest y
+// letter
+// src y
+// length y
+void Note_Big_Letter(int x, int y, char ltr, int ys, int y2)
+{
+    switch(ltr)
+    {
+        case 0: Copy(Temp_NOTEBIGPFONT, x, y, 100, ys, 100 + 12, y2); break;
+        case 1: Copy(Temp_NOTEBIGPFONT, x, y, 111, ys, 111 + 12, y2); break;
+        case 2: Copy(Temp_NOTEBIGPFONT, x, y, 122, ys, 122 + 12, y2); break;
+        case 3: Copy(Temp_NOTEBIGPFONT, x, y, 133, ys, 133 + 12, y2); break;
+        case 4: Copy(Temp_NOTEBIGPFONT, x, y, 144, ys, 144 + 12, y2); break;
+        case 5: Copy(Temp_NOTEBIGPFONT, x, y, 155, ys, 155 + 12, y2); break;
+        case 6: Copy(Temp_NOTEBIGPFONT, x, y, 166, ys, 166 + 12, y2); break;
+        case 7: Copy(Temp_NOTEBIGPFONT, x, y, 177, ys, 177 + 12, y2); break;
+        case 8: Copy(Temp_NOTEBIGPFONT, x, y, 188, ys, 188 + 12, y2); break;
+        case 9: Copy(Temp_NOTEBIGPFONT, x, y, 199, ys, 199 + 12, y2); break;
+        case 10: Copy(Temp_NOTEBIGPFONT, x, y, 0, ys, 12, y2); break; // A
+        case 11: Copy(Temp_NOTEBIGPFONT, x, y, 11, ys, 11 + 12, y2); break;// B
+        case 12: Copy(Temp_NOTEBIGPFONT, x, y, 22, ys, 22 + 12, y2); break;// C
+        case 13: Copy(Temp_NOTEBIGPFONT, x, y, 33, ys, 33 + 12, y2); break;// D
+        case 14: Copy(Temp_NOTEBIGPFONT, x, y, 44, ys, 44 + 12, y2); break;// E
+        case 15: Copy(Temp_NOTEBIGPFONT, x, y, 55, ys, 55 + 12, y2); break;// F
+        case 16: Copy(Temp_NOTEBIGPFONT, x, y, 66, ys, 66 + 12, y2); break;// G
+        
+        case 17: Copy(Temp_NOTEBIGPFONT, x, y, 88, ys, 88 + 12, y2); break; // #
+        case 18: Copy(Temp_NOTEBIGPFONT, x, y, 243, ys, 243 + 12, y2); break; // -
+        case 19: Copy(Temp_NOTEBIGPFONT, x, y, 210, ys, 210 + 34, y2); break; // Off
+        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Temp_NOTEBIGPFONT, x, y, 254, ys, 254 + 12, y2); break; // .
+
+        case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_NOTEPFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_NOTEPFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_NOTEPFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+
+        case 27: Copy(Temp_NOTEPFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_NOTEPFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+
+        case 29: Copy(Temp_NOTEPFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_NOTEPFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+
+        case 31: Copy(Temp_NOTEPFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_NOTEPFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_NOTEPFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+    }
+}
+
 void blitnote(int x, int y, int note, int y1, int y2)
 {
-    Letter_Function = Letter;
+    Letter_Function = Note_Letter;
     Blit_note(x, y, note, y1, y2, 8);
 }
 
 void blitbignote(int x, int y, int note, int y1, int y2)
 {
-    Letter_Function = BigLetter;
+    Letter_Function = Note_Big_Letter;
     Blit_note(x, y, note, y1, y2, 11);
 }
 
@@ -1373,6 +1484,16 @@ void UISetPalette(SDL_Color *Palette, int Amount)
         SDL_SetPalette(Temp_BIGPFONT, SDL_PHYSPAL, Palette, 0, Amount);
         SDL_SetPalette(Temp_BIGPFONT, SDL_LOGPAL, Palette, 0, Amount);
     }
+    if(Temp_NOTEPFONT)
+    {
+        SDL_SetPalette(Temp_NOTEPFONT, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(Temp_NOTEPFONT, SDL_LOGPAL, Palette, 0, Amount);
+    }
+    if(Temp_NOTEBIGPFONT)
+    {
+        SDL_SetPalette(Temp_NOTEBIGPFONT, SDL_PHYSPAL, Palette, 0, Amount);
+        SDL_SetPalette(Temp_NOTEBIGPFONT, SDL_LOGPAL, Palette, 0, Amount);
+    }
     if(POINTER)
     {
         SDL_SetPalette(POINTER, SDL_PHYSPAL, Palette, 0, Amount);
@@ -1551,7 +1672,10 @@ void Set_Channel_State_Pic(int x, int color, int inv_color)
 
 // ------------------------------------------------------
 // Create the complete font set to display the patterns
-void Create_Pattern_font(SDL_Surface *Dest, int offset)
+void Create_Pattern_font(SDL_Surface *Dest, int offset,
+                         int Lo_Fore,
+                         int Sel_Fore,
+                         int Hi_Fore)
 {
     unsigned char *Pix;
     unsigned char *Pix3;
@@ -1577,13 +1701,13 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
             Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset])
             {
-                Pix[Surface_offset] = COL_PATTERN_LO_FORE;
-                Pix3[Surface_offset] = COL_PATTERN_LO_FORE + 9;
+                Pix[Surface_offset] = Lo_Fore;
+                Pix3[Surface_offset] = Lo_Fore + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
             else
             {
                 Pix[Surface_offset] = COL_PATTERN_LO_BACK;
-                Pix3[Surface_offset] = COL_PATTERN_LO_BACK + 9;
+                Pix3[Surface_offset] = COL_PATTERN_LO_BACK + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
         }
     }
@@ -1597,15 +1721,15 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
         for(i = 0; i < Dest->w; i++)
         {
             Surface_offset = (j * Dest->pitch) + i;
-            if(Pix[Surface_offset] == COL_PATTERN_LO_FORE)
+            if(Pix[Surface_offset] == Lo_Fore)
             {
                 Pix2[Surface_offset] = COL_PATTERN_LO_BACK;
-                Pix3[Surface_offset] = COL_PATTERN_LO_BACK  + 9;
+                Pix3[Surface_offset] = COL_PATTERN_LO_BACK + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
             else
             {
-                Pix2[Surface_offset] = COL_PATTERN_LO_FORE;
-                Pix3[Surface_offset] = COL_PATTERN_LO_FORE  + 9;
+                Pix2[Surface_offset] = Lo_Fore;
+                Pix3[Surface_offset] = Lo_Fore + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
         }
     }
@@ -1628,7 +1752,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
             Surface_offset = (j * Dest->pitch) + i;
             Surface_offset_Dest = ((j * 2) * Dest->pitch) + i;
             Pix2[Surface_offset_Dest] = Pix[Surface_offset] + 4;
-            Pix2[Surface_offset_Dest + Dest->pitch] = Pix[Surface_offset] + 4;
+            Pix2[Surface_offset_Dest + Dest->pitch] = Pix2[Surface_offset_Dest];
         }
     }
 
@@ -1644,7 +1768,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
             Surface_offset = (j * Dest->pitch) + i;
             if(Pix[Surface_offset] == COL_PATTERN_SEL_BACK)
             {
-                Pix2[Surface_offset] = COL_PATTERN_SEL_FORE;
+                Pix2[Surface_offset] = Sel_Fore;
             }
             else
             {
@@ -1686,7 +1810,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
         {
             Surface_offset = (j * Dest->pitch) + i;
             Pix2[Surface_offset] = Pix[Surface_offset] + 2;
-            Pix3[Surface_offset] = Pix[Surface_offset] + 2 + 9;
+            Pix3[Surface_offset] = Pix[Surface_offset] + 2 + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
         }
     }
 
@@ -1700,15 +1824,15 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
         for(i = 0; i < Dest->w; i++)
         {
             Surface_offset = (j * Dest->pitch) + i;
-            if(Pix[Surface_offset] == COL_PATTERN_HI_FORE)
+            if(Pix[Surface_offset] == Hi_Fore)
             {
                 Pix2[Surface_offset] = COL_PATTERN_HI_BACK;
-                Pix3[Surface_offset] = COL_PATTERN_HI_BACK + 9;
+                Pix3[Surface_offset] = COL_PATTERN_HI_BACK + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
             else
             {
-                Pix2[Surface_offset] = COL_PATTERN_HI_FORE;
-                Pix3[Surface_offset] = COL_PATTERN_HI_FORE + 9;
+                Pix2[Surface_offset] = Hi_Fore;
+                Pix3[Surface_offset] = Hi_Fore + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
             }
         }
     }
@@ -1725,7 +1849,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset)
         {
             Surface_offset = (j * Dest->pitch) + i;
             Pix2[Surface_offset] = Pix[Surface_offset] + 2;
-            Pix3[Surface_offset] = Pix[Surface_offset] + 2 + 9;
+            Pix3[Surface_offset] = Pix[Surface_offset] + 2 + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK);
         }
     }
 
@@ -1755,7 +1879,6 @@ int Set_Pictures_Colors(void)
 {
     int i;
     unsigned char *Pix;
-    int max_colors_pointer = 0;
 
     SDL_Palette *Pic_Palette;
     int min_idx = sizeof(Default_Palette) / sizeof(SDL_Color);
@@ -1802,6 +1925,15 @@ int Set_Pictures_Colors(void)
         Palette_303[i].unused = Pic_Palette->colors[i].unused;
     }
 
+    Pic_Palette = POINTER->format->palette;
+    for(i = 0; i < max_colors_303; i++)
+    {
+        Palette_Pointer[i].r = Pic_Palette->colors[i].r;
+        Palette_Pointer[i].g = Pic_Palette->colors[i].g;
+        Palette_Pointer[i].b = Pic_Palette->colors[i].b;
+        Palette_Pointer[i].unused = Pic_Palette->colors[i].unused;
+    }
+
     Pic_Palette = LOGOPIC->format->palette;
     for(i = 0; i < max_colors_logo; i++)
     {
@@ -1811,8 +1943,20 @@ int Set_Pictures_Colors(void)
         Palette_Logo[i].unused = Pic_Palette->colors[i].unused;
     }
 
+    // Remap the colors of the pointer
+    Pix = (unsigned char *) POINTER->pixels;
+    max_colors_Pointer = 0;
+    for(i = 0; i < POINTER->w * POINTER->h; i++)
+    {
+        if(Pix[i] > max_colors_Pointer) max_colors_Pointer = Pix[i];
+        if(Pix[i]) Pix[i] += min_idx + max_colors_303;
+    }
+    max_colors_Pointer++;
+
     Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
     Temp_BIGPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTEBIGPFONT = SDL_AllocSurface(SDL_SWSURFACE, 270, 87 * 2, 8, 0, 0, 0, 0xff);
 
     Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
     memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));
@@ -1825,8 +1969,10 @@ int Set_Pictures_Colors(void)
     Ptk_Palette[0].b = 0;
     Init_UI();
 
-    Create_Pattern_font(Temp_PFONT, 0);
-    Create_Pattern_font(Temp_BIGPFONT, 15);
+    Create_Pattern_font(Temp_PFONT, 0, COL_PATTERN_LO_FORE, COL_PATTERN_SEL_FORE, COL_PATTERN_HI_FORE);
+    Create_Pattern_font(Temp_BIGPFONT, 15, COL_PATTERN_LO_FORE, COL_PATTERN_SEL_FORE, COL_PATTERN_HI_FORE);
+    Create_Pattern_font(Temp_NOTEPFONT, 0, COL_NOTE_LO_FORE, COL_NOTE_SEL_FORE, COL_NOTE_HI_FORE);
+    Create_Pattern_font(Temp_NOTEBIGPFONT, 15, COL_NOTE_LO_FORE, COL_NOTE_SEL_FORE, COL_NOTE_HI_FORE);
 
     // Create the channels status
     Set_Channel_State_Pic(0, COL_MUTE, COL_MUTE_PLAY_INVERT);
@@ -1844,12 +1990,11 @@ int Set_Pictures_Colors(void)
 
 void Set_Main_Palette(void)
 {
+    SDL_Palette *Pic_Palette;
     int i;
 
 Wait_Palette:
     if(SKIN303 == NULL) goto Wait_Palette;
-
-    SDL_Palette *Pic_Palette = SKIN303->format->palette;
 
     for(i = 0; i < max_colors_303; i++)
     {
@@ -1857,6 +2002,14 @@ Wait_Palette:
         Ptk_Palette[i + bare_color_idx].g = Palette_303[i].g;
         Ptk_Palette[i + bare_color_idx].b = Palette_303[i].b;
         Ptk_Palette[i + bare_color_idx].unused = Palette_303[i].unused;
+    }
+
+    for(i = 0; i < max_colors_Pointer; i++)
+    {
+        Ptk_Palette[i + bare_color_idx + max_colors_303].r = Palette_Pointer[i].r;
+        Ptk_Palette[i + bare_color_idx + max_colors_303].g = Palette_Pointer[i].g;
+        Ptk_Palette[i + bare_color_idx + max_colors_303].b = Palette_Pointer[i].b;
+        Ptk_Palette[i + bare_color_idx + max_colors_303].unused = Palette_Pointer[i].unused;
     }
 }
 
@@ -1869,7 +2022,7 @@ void Set_Logo_Palette(void)
         Ptk_Palette[i + bare_color_idx].r = Palette_Logo[i].r;
         Ptk_Palette[i + bare_color_idx].g = Palette_Logo[i].g;
         Ptk_Palette[i + bare_color_idx].b = Palette_Logo[i].b;
-        Ptk_Palette[i + bare_color_idx].unused = Palette_303[i].unused;
+        Ptk_Palette[i + bare_color_idx].unused = Palette_Logo[i].unused;
     }
 }
 

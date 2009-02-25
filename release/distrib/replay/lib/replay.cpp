@@ -2133,12 +2133,12 @@ ByPass_Wav:
         }
 
 #if defined(PTK_303)
-        if(track3031 == c)
+        if(track3031 == c && CHAN_ACTIVE_STATE[cPosition][c])
         {
             All_Signal_L += tb303engine[0].tbGetSample();
             gotsome = TRUE;
         }
-        if(track3032 == c)
+        if(track3032 == c && CHAN_ACTIVE_STATE[cPosition][c])
         {
             All_Signal_R += tb303engine[1].tbGetSample();
             gotsome = TRUE;
@@ -3880,42 +3880,43 @@ void Fire303(unsigned char number, int unit)
    
     switch(number)
     {
-        case 0x00: tb303engine[unit].tbPattern = tb303[unit].selectedpattern; break;
-        case 0xa1: tb303engine[unit].tbPattern = 0; break;
-        case 0xa2: tb303engine[unit].tbPattern = 1; break;
-        case 0xa3: tb303engine[unit].tbPattern = 2; break;
-        case 0xa4: tb303engine[unit].tbPattern = 3; break;
-        case 0xa5: tb303engine[unit].tbPattern = 4; break;
-        case 0xa6: tb303engine[unit].tbPattern = 5; break;
-        case 0xa7: tb303engine[unit].tbPattern = 6; break;
-        case 0xa8: tb303engine[unit].tbPattern = 7; break;
-        case 0xb1: tb303engine[unit].tbPattern = 8; break;
-        case 0xb2: tb303engine[unit].tbPattern = 9; break;
-        case 0xb3: tb303engine[unit].tbPattern = 10; break;
-        case 0xb4: tb303engine[unit].tbPattern = 11; break;
-        case 0xb5: tb303engine[unit].tbPattern = 12; break;
-        case 0xb6: tb303engine[unit].tbPattern = 13; break;
-        case 0xb7: tb303engine[unit].tbPattern = 14; break;
-        case 0xb8: tb303engine[unit].tbPattern = 15; break;
-        case 0xc1: tb303engine[unit].tbPattern = 16; break;
-        case 0xc2: tb303engine[unit].tbPattern = 17; break;
-        case 0xc3: tb303engine[unit].tbPattern = 18; break;
-        case 0xc4: tb303engine[unit].tbPattern = 19; break;
-        case 0xc5: tb303engine[unit].tbPattern = 20; break;
-        case 0xc6: tb303engine[unit].tbPattern = 21; break;
-        case 0xc7: tb303engine[unit].tbPattern = 22; break;
-        case 0xc8: tb303engine[unit].tbPattern = 23; break;
-        case 0xd1: tb303engine[unit].tbPattern = 24; break;
-        case 0xd2: tb303engine[unit].tbPattern = 25; break;
-        case 0xd3: tb303engine[unit].tbPattern = 26; break;
-        case 0xd4: tb303engine[unit].tbPattern = 27; break;
-        case 0xd5: tb303engine[unit].tbPattern = 28; break;
-        case 0xd6: tb303engine[unit].tbPattern = 29; break;
-        case 0xd7: tb303engine[unit].tbPattern = 30; break;
-        case 0xd8: tb303engine[unit].tbPattern = 31; break;
+        case 0x00: tb303engine[unit].tbPattern = tb303[unit].selectedpattern; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa1: tb303engine[unit].tbPattern = 0; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa2: tb303engine[unit].tbPattern = 1; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa3: tb303engine[unit].tbPattern = 2; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa4: tb303engine[unit].tbPattern = 3; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa5: tb303engine[unit].tbPattern = 4; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa6: tb303engine[unit].tbPattern = 5; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa7: tb303engine[unit].tbPattern = 6; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xa8: tb303engine[unit].tbPattern = 7; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb1: tb303engine[unit].tbPattern = 8; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb2: tb303engine[unit].tbPattern = 9; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb3: tb303engine[unit].tbPattern = 10; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb4: tb303engine[unit].tbPattern = 11; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb5: tb303engine[unit].tbPattern = 12; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb6: tb303engine[unit].tbPattern = 13; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb7: tb303engine[unit].tbPattern = 14; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xb8: tb303engine[unit].tbPattern = 15; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc1: tb303engine[unit].tbPattern = 16; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc2: tb303engine[unit].tbPattern = 17; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc3: tb303engine[unit].tbPattern = 18; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc4: tb303engine[unit].tbPattern = 19; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc5: tb303engine[unit].tbPattern = 20; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc6: tb303engine[unit].tbPattern = 21; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc7: tb303engine[unit].tbPattern = 22; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xc8: tb303engine[unit].tbPattern = 23; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd1: tb303engine[unit].tbPattern = 24; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd2: tb303engine[unit].tbPattern = 25; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd3: tb303engine[unit].tbPattern = 26; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd4: tb303engine[unit].tbPattern = 27; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd5: tb303engine[unit].tbPattern = 28; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd6: tb303engine[unit].tbPattern = 29; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd7: tb303engine[unit].tbPattern = 30; tb303engine[unit].RampVolume = 1.0f; break;
+        case 0xd8: tb303engine[unit].tbPattern = 31; tb303engine[unit].RampVolume = 1.0f; break;
 
         default: // No Fire
             tb303engine[unit].tbLine = 255;
+            tb303engine[unit].RampVolume = 0.0f;
             break;
     }
 
@@ -3929,20 +3930,14 @@ void noteoff303(char strack)
 {
     if(strack == track3031)
     {
-        tb303engine[0].tbLine = 255;
-        tb303engine[0].tbPattern = 255;
-        track3031 = 255;
-        tb303engine[0].tbBuf0 = 0.0f;
-        tb303engine[0].tbBuf1 = 0.0f;
+        tb303engine[0].RampVolume = 0.0f;
+        track3032 = 255;
     }
 
     if(strack == track3032)
     {
-        tb303engine[1].tbLine = 255;
-        tb303engine[1].tbPattern = 255;
+        tb303engine[1].RampVolume = 0.0f;
         track3032 = 255;
-        tb303engine[1].tbBuf0 = 0.0f;
-        tb303engine[1].tbBuf1 = 0.0f;
     }
 }
 

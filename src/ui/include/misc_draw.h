@@ -65,10 +65,29 @@
 #define COL_PATTERN_HI_FORE 22
 #define COL_PATTERN_SEL_BACK 23
 #define COL_PATTERN_SEL_FORE 24
-#define COL_MUTE 25
-#define COL_PLAY 26
-#define COL_MUTE_PLAY_INVERT 27
-#define NUMBER_COLORS 17
+
+#define COL_NOTE_LO_FORE 26
+#define COL_NOTE_HI_FORE 28
+#define COL_NOTE_SEL_FORE 30
+
+#define COL_MUTE 31
+#define COL_PLAY 32
+#define COL_MUTE_PLAY_INVERT 33
+
+#define COL_PATTERN_LO_BACK_SHADOW 34
+#define COL_PATTERN_LO_FORE_SHADOW 35
+#define COL_PATTERN_HI_BACK_SHADOW 36
+#define COL_PATTERN_HI_FORE_SHADOW 37
+#define COL_PATTERN_SEL_BACK_SHADOW 38
+#define COL_PATTERN_SEL_FORE_SHADOW 39
+#define COL_NOTE_LO_BACK_SHADOW 40
+#define COL_NOTE_LO_FORE_SHADOW 41
+#define COL_NOTE_HI_BACK_SHADOW 42
+#define COL_NOTE_HI_FORE_SHADOW 43
+#define COL_NOTE_SEL_BACK_SHADOW 44
+#define COL_NOTE_SEL_FORE_SHADOW 45
+
+#define NUMBER_COLORS 20
 
 #define BUTTON_NORMAL 1
 #define BUTTON_PUSHED 2
@@ -89,7 +108,7 @@ typedef struct
 // Variables
 extern SDL_Surface *Main_Screen;
 extern char *Labels_Palette[];
-extern SDL_Color Ptk_Palette[256];
+extern SDL_Color Ptk_Palette[256 * 2];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
 extern int curr_tab_highlight;
@@ -131,8 +150,10 @@ void Refresh_UI_Context(void);
 
 void blitnote(int x, int y, int note, int y1, int y2);
 void blitbignote(int x, int y, int note, int y1, int y2);
+void Note_Letter(int x, int y, char ltr, int ys, int y2);
 void Letter(int x, int y, char ltr, int ys, int y2);
-void BigLetter(int x, int y, char ltr, int ys, int y2);
+void Big_Letter(int x, int y, char ltr, int ys, int y2);
+void Note_Big_Letter(int x, int y, char ltr, int ys, int y2);
 extern void (*Letter_Function)(int x, int y, char ltr, int ys, int y2);
 
 void Draw_Ask_Exit(void);

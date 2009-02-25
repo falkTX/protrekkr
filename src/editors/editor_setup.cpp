@@ -365,7 +365,7 @@ void Mouse_Right_Master_Ed(void)
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
         // Previous color
-        if(zcheckMouse(520, 501, 16, 16) == 1)
+        if(zcheckMouse(520, 495, 16, 16) == 1)
         {
             current_palette_idx -= 10;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -373,7 +373,7 @@ void Mouse_Right_Master_Ed(void)
         }
 
         // Next color
-        if(zcheckMouse(520 + (18 + 108) + 2, 501, 16, 16) == 1)
+        if(zcheckMouse(520 + (18 + 108) + 2, 495, 16, 16) == 1)
         {
             current_palette_idx += 10;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;

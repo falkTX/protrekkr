@@ -4025,7 +4025,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG3");
+    sprintf(extension, "TWNNCFG4");
     mess_box("Saving 'ptk.cfg' on current directory...");
 
 #if defined(__WIN32__)
@@ -4122,7 +4122,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG3") == 0)
+        if(strcmp(extension, "TWNNCFG4") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);

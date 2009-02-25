@@ -5189,6 +5189,7 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
             break;
 

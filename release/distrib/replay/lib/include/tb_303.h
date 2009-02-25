@@ -153,6 +153,8 @@ class gear303
         float tbBuf1;
         float tbVolume;
 
+        float RampVolume;
+
     private:
 
         float tbFilter(void);
@@ -173,6 +175,8 @@ class gear303
         // Oscillator variables
         float tbOscPosition;
         float tbOscSpeed;
+
+        float Cur_RampVolume;
 
         // Waveform Type
         char tbWaveform;

@@ -2,14 +2,19 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.95:
+
+- Added some colors for the notes
+  (also changed the font so patterns should be a bit easier to read now).
+
 v1.94:
 
 - Fixed a nasty memory leak in the PSP replay
   (also only necessary data are now allocated).
-- Space char wasn't available when typing a name.
+- Space char wasn't available during names input.
 - Added effects 0x41 and 0x42 to control the volumes of the 2 303 units.
 - Added effect 0x1c: set global volume.
-- Start & stop song cleaned up (clicks should be gone).
+- Start & stop song cleaned up (clicks should be gone or at least reduced).
 - Fixed a small issue regarding latency in the Mac OS X version.
 
 v1.93:
