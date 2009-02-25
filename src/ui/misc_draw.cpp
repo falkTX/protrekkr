@@ -1990,7 +1990,6 @@ int Set_Pictures_Colors(void)
 
 void Set_Main_Palette(void)
 {
-    SDL_Palette *Pic_Palette;
     int i;
 
 Wait_Palette:

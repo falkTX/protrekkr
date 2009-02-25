@@ -3864,8 +3864,8 @@ void live303(int pltr_eff_row, int pltr_dat_row)
         case 0x3c: tb303[1].accent = pltr_dat_row / 2; break;
         case 0x3d: tb303[0].tune = pltr_dat_row / 2; break;
         case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
-        case 0x41: tb303engine[0].tbVolume = ((float) pltr_dat_row) / 255.0f; break;
-        case 0x42: tb303engine[1].tbVolume = ((float) pltr_dat_row) / 255.0f; break;
+        case 0x41: tb303engine[0].RampVolume = ((float) pltr_dat_row) / 255.0f; break;
+        case 0x42: tb303engine[1].RampVolume = ((float) pltr_dat_row) / 255.0f; break;
     }
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)

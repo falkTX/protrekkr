@@ -40,6 +40,7 @@
 gear303::gear303()
 {
     tbVolume = 0.5f;
+    reset();
 }
 
 // ------------------------------------------------------
@@ -126,13 +127,9 @@ float gear303::tbGetSample(void)
         Cur_RampVolume += 0.003f;
     }
     if(Cur_RampVolume > 1.0f) Cur_RampVolume = 1.0f;
-    if(Cur_RampVolume < 0.0f && tbPattern != 255)
+    if(Cur_RampVolume < 0.0f)
     {
         Cur_RampVolume = 0.0f;
-        tbLine = 255;
-        tbPattern = 255;
-        tbBuf0 = 0.0f;
-        tbBuf1 = 0.0f;
     }
     
     return(output * Cur_RampVolume);

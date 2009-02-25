@@ -6,43 +6,13 @@
 --------------------Configuration: ProTrekkr - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating command line "rc.exe /l 0x407 /fo"Release/Resources.res" /i "src\Support" /d "NDEBUG" "C:\Src\Pc\ptk\src\Support\Resources.rc"" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP193.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1B7.tmp" with contents
 [
 /nologo /ML /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /Fo"Release/" /Fd"Release/" /FD /c 
-"C:\Src\Pc\ptk\src\support\main.cpp"
-"C:\Src\Pc\ptk\src\Support\timer.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_303.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_DiskIO.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Fx_Setup.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Instrument.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Pattern.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Sample.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Sequencer.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Setup.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Synth.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Track.cpp"
-"C:\Src\Pc\ptk\src\Editors\Editor_Track_Fx.cpp"
-"C:\Src\Pc\ptk\src\Editors\Patterns_Blocks.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\SoundDriver\SoundDriver.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\Cubic_Spline.cpp"
-"C:\Src\Pc\ptk\release\distrib\replay\lib\endianness.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\Replay.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\Samples_Unpack.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\Synth.cpp"
-"C:\Src\Pc\ptk\Release\Distrib\Replay\lib\TB_303.cpp"
 "C:\Src\Pc\ptk\src\UI\Misc_Draw.cpp"
-"C:\Src\Pc\ptk\src\UI\xml.cpp"
-"C:\Src\Pc\ptk\src\Files\Files.cpp"
-"C:\Src\Pc\ptk\src\Files\Files_List.cpp"
-"C:\Src\Pc\ptk\src\Files\Samples_Pack.cpp"
-"C:\Src\Pc\ptk\src\Wav\Riff.cpp"
-"C:\Src\Pc\ptk\src\midi\midi.cpp"
-"C:\Src\Pc\ptk\src\midi\RtMidi.cpp"
-"C:\Src\Pc\ptk\src\ptk.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP193.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP194.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1B7.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1B8.tmp" with contents
 [
 kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi32.lib sdl_draw.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib libcp.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
 .\Release\main.obj
@@ -77,50 +47,16 @@ kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi
 .\Release\ptk.obj
 .\Release\Resources.res
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP194.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1B8.tmp"
 <h3>Output Window</h3>
-Compiling resources...
 Compiling...
-main.cpp
-timer.cpp
-Editor_303.cpp
-Editor_DiskIO.cpp
-Editor_Fx_Setup.cpp
-Editor_Instrument.cpp
-Editor_Pattern.cpp
-Editor_Sample.cpp
-Editor_Sequencer.cpp
-Editor_Setup.cpp
-Editor_Synth.cpp
-Editor_Track.cpp
-Editor_Track_Fx.cpp
-Patterns_Blocks.cpp
-SoundDriver.cpp
-Cubic_Spline.cpp
-endianness.cpp
-Replay.cpp
-Samples_Unpack.cpp
-Synth.cpp
-Generating Code...
-Compiling...
-TB_303.cpp
 Misc_Draw.cpp
-C:\Src\Pc\ptk\src\UI\Misc_Draw.cpp(1993) : warning C4101: 'Pic_Palette' : unreferenced local variable
-xml.cpp
-Files.cpp
-Files_List.cpp
-Samples_Pack.cpp
-Riff.cpp
-midi.cpp
-RtMidi.cpp
-ptk.cpp
-Generating Code...
 Linking...
 
 
 
 <h3>Results</h3>
-ptk_win.exe - 0 error(s), 1 warning(s)
+ptk_win.exe - 0 error(s), 0 warning(s)
 </pre>
 </body>
 </html>
