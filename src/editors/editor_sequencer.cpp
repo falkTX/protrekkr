@@ -32,6 +32,7 @@
 // ------------------------------------------------------
 // Includes
 #include "include/editor_sequencer.h"
+#include "include/editor_pattern.h"
 
 // ------------------------------------------------------
 // Structures
@@ -78,31 +79,37 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Track Part Sequencer");
 
-    Gui_Draw_Button_Box(4, 466, 80, 16,"Clear All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 484, 80, 16,"Clear Position", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 522, 80, 16,"Reset All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 540, 80, 16,"Reset Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(4, 466, 80, 16, "Clear All", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(4, 484, 80, 16, "Clear Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(4, 522, 80, 16, "Reset All", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(4, 540, 80, 16, "Reset Position", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(396, 466, 32, 16,"Cut", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396 + 34, 466, 32, 16,"Copy", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396, 484, 66, 16,"Paste", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396, 502, 66, 16,"Insert/Paste", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(396, 466, 32, 16, "Cut", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(396 + 34, 466, 32, 16, "Copy", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(396, 484, 66, 16, "Paste", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(396, 502, 66, 16, "Insert/Paste", BUTTON_NORMAL);
 
     Display_Seq_Buffer();
 
-    Gui_Draw_Button_Box(308, 466, 80, 16,"Ptn->Pos [Cur]", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 484, 80, 16,"Ptn->Pos [Sng]", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 522, 80, 16,"Insert Position", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 540, 80, 16,"Delete Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(308, 466, 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(308, 484, 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(288, 466, 16, 16,"\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 484, 16, 16,"\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 522, 16, 16,"\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 540, 16, 16,"\10", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, 466, 16, 16, "\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, 484, 16, 16, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, 522, 16, 16, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, 540, 16, 16, "\10", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(89, 466, 25, 90, "", BUTTON_NORMAL);
     Gui_Draw_Button_Box(257, 466, 25, 90, "", BUTTON_NORMAL);
     Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
+
+    Gui_Draw_Button_Box(480, 466, 190, 46, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(490, 488, 50, 16, "Small", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(550, 488, 50, 16, "Normal", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(610, 488, 50, 16, "Large", BUTTON_NORMAL);
+    
 }
 
 void Actualize_Seq_Ed(void)
@@ -147,11 +154,40 @@ void Actualize_Seq_Ed(void)
 void Mouse_Left_Sequencer_Ed(void)
 {
     int Cur_Position = cPosition;
+    int i;
 
     if(Songplaying) Cur_Position = cPosition_delay;
 
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
+
+        // Zoom'em small
+        if(zcheckMouse(490, 488, 50, 16))
+        {
+            for(i = 0; i < Songtracks; i++)
+            {
+                Set_Track_Zoom(i, TRACK_SMALL);
+            }
+            Actupated(0);
+        }
+        // Zoom'em normal
+        if(zcheckMouse(550, 488, 50, 16))
+        {
+            for(i = 0; i < Songtracks; i++)
+            {
+                Set_Track_Zoom(i, TRACK_NORMAL);
+            }
+            Actupated(0);
+        }
+        // Zoom'em large
+        if(zcheckMouse(610, 488, 50, 16))
+        {
+            for(i = 0; i < Songtracks; i++)
+            {
+                Set_Track_Zoom(i, TRACK_LARGE);
+            }
+            Actupated(0);
+        }
 
         // Clear all
         if(zcheckMouse(4, 466, 80, 16))
@@ -377,23 +413,7 @@ void Mouse_Left_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 470) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
-            {
-                int seqindex = (Mouse.x - 123) / 8;
-                if(seqindex < 0) seqindex = 0;
-                if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
-                if(!CHAN_ACTIVE_STATE[posindex][seqindex])
-                {
-                    CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
-                    CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
-                }
-                else
-                {
-                    CHAN_ACTIVE_STATE[posindex][seqindex] = FALSE;
-                    CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
-                }
-                gui_action = GUI_CMD_UPDATE_SEQUENCER;
-            }
+            Toggle_Track_On_Off_Status(posindex, (Mouse.x - 123) / 8);
         }
 
         // Scroll the positions
@@ -413,7 +433,6 @@ void Mouse_Left_Sequencer_Ed(void)
 void Mouse_Right_Sequencer_Ed(void)
 {
     int Cur_Position = cPosition;
-    int Already_Solo;
     int i;
     if(Songplaying) Cur_Position = cPosition_delay;
 
@@ -478,44 +497,8 @@ void Mouse_Right_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 470) / 12) - 3;
             posindex += Cur_Position;
-
-            if(posindex >= 0 && posindex < sLength)
-            {
-                int seqindex = (Mouse.x - 123) / 8;
-                if(seqindex < 0) seqindex = 0;
-                if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
-
-                if(CHAN_ACTIVE_STATE[posindex][seqindex])
-                {
-                    Already_Solo = 0;
-                    for(int alphac = 0; alphac < Songtracks; alphac++)
-                    {
-                        if(CHAN_ACTIVE_STATE[posindex][alphac] == TRUE) Already_Solo++;
-                    }
-                    if(Already_Solo == 1)
-                    {
-                        for(int alphac = 0; alphac < Songtracks; alphac++)
-                        {
-                            CHAN_ACTIVE_STATE[posindex][alphac] = TRUE;
-                            CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
-                        }
-                    }
-                    else
-                    {
-                        for(int alphac = 0; alphac < Songtracks; alphac++)
-                        {
-                            CHAN_ACTIVE_STATE[posindex][alphac] = FALSE;
-                            CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
-                        }
-                    }
-                }
-                // Active it
-                CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
-                CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
-                gui_action = GUI_CMD_UPDATE_SEQUENCER;
-            }
+            Solo_Track_On_Off(posindex, (Mouse.x - 123) / 8);
         }
-
 
         // Insert 10 positions
         if(zcheckMouse(308, 522, 80, 16))
@@ -605,6 +588,7 @@ void SeqFill(int st, int en, char n)
     }
 }     
 
+// ------------------------------------------------------
 // Delete a position
 void SeqDelete(int st)
 {
@@ -631,6 +615,7 @@ void SeqDelete(int st)
     }
 }     
 
+// ------------------------------------------------------
 // Insert a position
 void SeqInsert(int st)
 {
@@ -665,6 +650,7 @@ void Anat(int posil)
     }
 }
 
+// ------------------------------------------------------
 // Copy a position
 void SeqCopy(int st)
 {
@@ -675,6 +661,7 @@ void SeqCopy(int st)
     }
 }     
 
+// ------------------------------------------------------
 // Paste a position
 void SeqPaste(int st)
 {
@@ -686,6 +673,7 @@ void SeqPaste(int st)
     }
 }     
 
+// ------------------------------------------------------
 // Notify the user selected buffer visually
 void Display_Seq_Buffer(void)
 {
@@ -693,4 +681,82 @@ void Display_Seq_Buffer(void)
     Gui_Draw_Button_Box(396 + 17, 522, 15, 16, "2", cur_seq_buffer[1]);
     Gui_Draw_Button_Box(396 + (17 * 2), 522, 15, 16, "3", cur_seq_buffer[2]);
     Gui_Draw_Button_Box(396 + (17 * 3), 522, 15, 16, "4", cur_seq_buffer[3]);
+}
+
+// ------------------------------------------------------
+// Turn a channel active state on/off
+void Toggle_Track_On_Off_Status(int posindex, int seqindex)
+{
+    if(posindex >= 0 && posindex < sLength)
+    {
+        if(seqindex < 0) seqindex = 0;
+        if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
+        if(!CHAN_ACTIVE_STATE[posindex][seqindex])
+        {
+            CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
+            CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
+        }
+        else
+        {
+            CHAN_ACTIVE_STATE[posindex][seqindex] = FALSE;
+            CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
+        }
+        Actupated(0);
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
+}
+
+// ------------------------------------------------------
+// Turn all channel active states on/off but one
+void Solo_Track_On_Off(int posindex, int seqindex)
+{
+    int Already_Solo;
+
+    if(posindex >= 0 && posindex < sLength)
+    {
+        if(seqindex < 0) seqindex = 0;
+        if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
+
+        if(CHAN_ACTIVE_STATE[posindex][seqindex])
+        {
+            // Check if it was the only track turned on
+            Already_Solo = 0;
+            for(int alphac = 0; alphac < Songtracks; alphac++)
+            {
+                if(CHAN_ACTIVE_STATE[posindex][alphac] == TRUE) Already_Solo++;
+            }
+            if(Already_Solo == 1)
+            {
+                // Was already soloed: turn'em all on
+                for(int alphac = 0; alphac < Songtracks; alphac++)
+                {
+                    CHAN_ACTIVE_STATE[posindex][alphac] = TRUE;
+                    CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
+                }
+            }
+            else
+            {
+                // Solo it
+                for(int alphac = 0; alphac < Songtracks; alphac++)
+                {
+                    CHAN_ACTIVE_STATE[posindex][alphac] = FALSE;
+                    CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
+                }
+            }
+        }
+        else
+        {
+            // Solo it
+            for(int alphac = 0; alphac < Songtracks; alphac++)
+            {
+                CHAN_ACTIVE_STATE[posindex][alphac] = FALSE;
+                CHAN_HISTORY_STATE[posindex][alphac] = FALSE;
+            }
+        }
+        // Active it
+        CHAN_ACTIVE_STATE[posindex][seqindex] = TRUE;
+        CHAN_HISTORY_STATE[posindex][seqindex] = FALSE;
+        Actupated(0);
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
 }

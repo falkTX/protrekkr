@@ -1,5 +1,9 @@
 TODO (in no special order):
 
++ Add a set of functions to remap instruments in the sequencer tab (from -> to).
++ Expose the reverb variables to the user.
++ Add requesters (especially before overwriting files and before exiting).
+
 ----------------------------------------------------------
  - Adapt codecs packers & depackers to other Operating Systems.
  - Create a decent gadgets system (events based).
@@ -16,19 +20,16 @@ TODO (in no special order):
  - Add customization for the keys shortcuts in the xml file (may be ok like that).
  - Navigate through samples data with the mouse wheel in the samples editor.
  - Arrows to finetune samples looping datas in instruments tab.
- - Undo functions for samples and patterns.
+ - Undo functions for samples editor and patterns.
  - Click on numbers & move the mouse to modify them (or use the wheel).
  - Alternate way to enter notes (a la fruity loops).
  - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
- - Add a set of functions to remap instruments in the sequencer tab (from -> to).
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
- - Add requesters (especially before overwriting files and before exiting).
  - Chords editor.
  - Add a metronome for the recording mode.
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
  - VSTs support in the samples editor.
- - Expose the reverb variables to the user.

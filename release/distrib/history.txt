@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.95:
+
+- Introduced small tracks
+  (right click on the 3rd icon of a track or via the sequencer).
+- Added 3 commands in the sequencer to zoom all tracks at once.
+
 v1.94b:
 
 - Added some colors for the notes

@@ -773,17 +773,12 @@ int Screen_Update(void)
             Actupated(0);
         }
 
-        if(gui_action == GUI_CMD_SWITCH_TRACK_BIG_STATE)
+        if(gui_action == GUI_CMD_SWITCH_TRACK_LARGE_STATE)
         {
             int tmp_track = Get_Track_Over_Mouse();
 
             Toggle_Track_Zoom(tmp_track, TRUE);
 
-            // Too big to be zoomed
-            if(Is_Track_Zoomed(tmp_track) == PAT_COL_CHAR_BIG && Channels_MultiNotes[ped_track] > 11)
-            {
-                Clear_Track_Zoom(tmp_track);
-            }
             Actupated(0);
         }
 

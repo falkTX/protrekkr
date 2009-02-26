@@ -36,6 +36,7 @@
 #include "include/patterns_blocks.h"
 #include "../support/include/timer.h"
 #include "include/editor_instrument.h"
+#include "include/editor_sequencer.h"
 
 // ------------------------------------------------------
 // Variables
@@ -362,7 +363,7 @@ void draw_pated(int track, int line, int petrack, int row)
 
         // Zoom on/off
         if((dover + Cur_Char_size[cur_track] + 29 + 29) >= MAX_PATT_SCREEN_X) break;
-        if(Is_Track_Zoomed(cur_track) != PAT_COL_CHAR) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 27, 0, 0);
+        if(Get_Track_Type(cur_track) != TRACK_NORMAL) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 27, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 28, 0, 0);
 
         // Caret track marker
@@ -2039,21 +2040,45 @@ void Mouse_Left_Pattern_Ed(void)
         Actupated(0);
     }
 
-    // Tracks mute
+    // Track mute
     start_mute_check_x = PAT_COL_NOTE + 1 + 4;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
-        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10)) gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
+        {
+            gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
+            break;
+        }
         start_mute_check_x += Get_Track_Size(i);
     }
 
-    // Tracks zoom > big
+    // Track on/off
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + 29;
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
+    {
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
+        {
+            int Cur_Position = cPosition;
+            if(Songplaying) Cur_Position = cPosition_delay;
+            int tmp_track = Get_Track_Over_Mouse();
+            Toggle_Track_On_Off_Status(Cur_Position, tmp_track);
+            break;
+        }
+        start_mute_check_x += Get_Track_Size(i);
+    }
+
+    // Track zoom > large
     start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2);
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
-        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_BIG_STATE;
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10))
+        {
+            gui_action = GUI_CMD_SWITCH_TRACK_LARGE_STATE;
+            break;
+        }
         start_mute_check_x += Get_Track_Size(i);
     }
 }
@@ -2093,7 +2118,24 @@ void Mouse_Right_Pattern_Ed(void)
         start_mute_check_x += Get_Track_Size(i);
     }
 
-    // Tracks zoom > small
+    // All tracks off but the selected one
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + 29;
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
+    {
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
+        {
+            int Cur_Position = cPosition;
+            if(Songplaying) Cur_Position = cPosition_delay;
+            int tmp_track = Get_Track_Over_Mouse();
+            Solo_Track_On_Off(Cur_Position, tmp_track);
+            break;
+        }
+        start_mute_check_x += Get_Track_Size(i);
+    }
+
+
+    // Track zoom > small
     start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2);
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
@@ -2284,41 +2326,50 @@ void Reset_Patterns_Zoom(void)
 
 // ------------------------------------------------------
 // Toggle the zoom status of a track
-void Toggle_Track_Zoom(int track, int big)
+void Toggle_Track_Zoom(int track, int large)
 {
-    if(big)
+    if(large)
     {
-        if(Is_Track_Zoomed(track) == PAT_COL_CHAR_BIG)
+        if(Get_Track_Type(track) == TRACK_LARGE)
         {
-            Clear_Track_Zoom(track);
+            Set_Track_Zoom(track, TRACK_NORMAL);
         }
         else
         {
-            Cur_Char_size[track] = PAT_COL_CHAR_BIG;
-            Cur_Char_Function[track].Fnc = Big_Letter;
-            Cur_Note_Function[track].Fnc = blitbignote;
+            Set_Track_Zoom(track, TRACK_LARGE);
         }
     }
     else
     {
-        if(Is_Track_Zoomed(track) == PAT_COL_CHAR_SMALL)
+        if(Get_Track_Type(track) == TRACK_SMALL)
         {
-            Clear_Track_Zoom(track);
+            Set_Track_Zoom(track, TRACK_NORMAL);
         }
         else
         {
-            Cur_Char_size[track] = PAT_COL_CHAR_SMALL;
-            Cur_Char_Function[track].Fnc = Small_Letter;
-            Cur_Note_Function[track].Fnc = blitsmallnote;
+            Set_Track_Zoom(track, TRACK_SMALL);
         }
     }
 }
 
 // ------------------------------------------------------
-// Check if a track is zoomed
-int Is_Track_Zoomed(int track)
+// Return the type of a track
+TRACK_TYPE Get_Track_Type(int track)
 {
-    return(Cur_Char_size[track]);
+    switch(Cur_Char_size[track])
+    {
+        case PAT_COL_CHAR:
+            return(TRACK_NORMAL);
+
+        case PAT_COL_CHAR_LARGE:
+            return(TRACK_LARGE);
+
+        case PAT_COL_CHAR_SMALL:
+            return(TRACK_SMALL);
+
+        default:
+            return(TRACK_NORMAL);
+    }
 }
 
 // ------------------------------------------------------
@@ -2328,4 +2379,33 @@ void Clear_Track_Zoom(int track)
     Cur_Char_size[track] = PAT_COL_CHAR;
     Cur_Char_Function[track].Fnc = Letter;
     Cur_Note_Function[track].Fnc = blitnote;
+}
+
+// ------------------------------------------------------
+// Set the zoom status of a track
+void Set_Track_Zoom(int track, TRACK_TYPE type)
+{
+    switch(type)
+    {
+        case TRACK_SMALL:
+            Cur_Char_size[track] = PAT_COL_CHAR_SMALL;
+            Cur_Char_Function[track].Fnc = Small_Letter;
+            Cur_Note_Function[track].Fnc = blitsmallnote;
+            break;
+
+        case TRACK_NORMAL:
+            Clear_Track_Zoom(track);
+            break;
+
+        case TRACK_LARGE:
+            Cur_Char_size[track] = PAT_COL_CHAR_LARGE;
+            Cur_Char_Function[track].Fnc = Large_Letter;
+            Cur_Note_Function[track].Fnc = blitlargenote;
+            // Track is too damn large to be zoomed
+            if(Channels_MultiNotes[track] > 11)
+            {
+                Clear_Track_Zoom(track);
+            }
+            break;
+    }
 }

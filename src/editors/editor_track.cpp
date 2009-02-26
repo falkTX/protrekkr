@@ -206,7 +206,7 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
             if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
-            if(Is_Track_Zoomed(ped_track) == PAT_COL_CHAR_BIG && Channels_MultiNotes[ped_track] > 11)
+            if(Get_Track_Type(ped_track) == TRACK_LARGE && Channels_MultiNotes[ped_track] > 11)
             {
                 // Zoom it back
                 Clear_Track_Zoom(ped_track);

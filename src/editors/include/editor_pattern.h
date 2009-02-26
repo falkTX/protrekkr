@@ -48,13 +48,22 @@
 #define PAT_COL_NOTE 24
 
 #define PAT_COL_CHAR 8
-#define PAT_COL_CHAR_BIG 11
+#define PAT_COL_CHAR_LARGE 11
 #define PAT_COL_CHAR_SMALL 6
 
 #define DISPLAYED_LINES_SMALL 28
 #define DISPLAYED_LINES_LARGE 44
 
 #define MAX_PATT_SCREEN_X 778
+
+// ------------------------------------------------------
+// Enumerations
+enum TRACK_TYPE
+{
+    TRACK_SMALL,
+    TRACK_NORMAL,
+    TRACK_LARGE
+};
 
 // ------------------------------------------------------
 // Structures
@@ -101,8 +110,9 @@ void Goto_Row(int row);
 int Get_Visible_Complete_Tracks(void);
 int Get_Pattern_Offset(int track, int row, int pattern);
 void Reset_Patterns_Zoom(void);
-void Toggle_Track_Zoom(int track, int big);
+void Toggle_Track_Zoom(int track, int large);
 void Clear_Track_Zoom(int track);
-int Is_Track_Zoomed(int track);
+TRACK_TYPE Get_Track_Type(int track);
+void Set_Track_Zoom(int track, TRACK_TYPE type);
 
 #endif
