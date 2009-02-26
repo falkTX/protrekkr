@@ -226,9 +226,9 @@ SDL_Color Default_Palette[] =
     { 0x40, 0x4c, 0x7c, 0x00 },      // 12
     { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
 
-    { 0x24, 0x9c, 0x76, 0x00 },      // 14 vumeter
-    { 0xee, 0xae, 0x86, 0x00 },      // 15 vumeter peak
-    { 0x6a, 0xff, 0xc2, 0x00 },      // 16 scopes / samples
+    { 0x00, 0x94, 0x7c, 0x00 },      // 14 vumeter
+    { 0x82, 0xc8, 0xff, 0x00 },      // 15 vumeter peak
+    { 0x88, 0xd0, 0xff, 0x00 },      // 16 scopes / samples
 
     { 0xff, 0xff, 0xff, 0x00 },      // 17 Font hi
     { 0x77, 0x77, 0x77, 0x00 },      // 18 Font lo
@@ -239,7 +239,7 @@ SDL_Color Default_Palette[] =
     { 0x06, 0x1c, 0x28, 0x00 },      // 21 Pattern hi background
     { 0xa0, 0xbe, 0xe4, 0x00 },      // 22 Pattern hi foreground
 
-    { 0x11, 0x55, 0x7f, 0x00 },      // 23 Pattern sel background
+    { 0x00, 0x46, 0x40, 0x00 },      // 23 Pattern sel background
     { 0xea, 0xf0, 0xff, 0x00 },      // 24 Pattern sel foreground
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
@@ -252,7 +252,7 @@ SDL_Color Default_Palette[] =
     { 0xea, 0xf0, 0xff, 0x00 },      // 30 Note sel foreground
 
     { 0xff, 0x4a, 0x00, 0x00 },      // 31 mute
-    { 0x38, 0xbe, 0x88, 0x00 },      // 32 play
+    { 0x00, 0x92, 0xb4, 0x00 },      // 32 play
 
     { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
 
@@ -282,6 +282,9 @@ int bare_color_idx;
 // ------------------------------------------------------
 // Functions
 void (*Letter_Function)(int x, int y, char ltr, int ys, int y2) = Letter;
+SDL_Surface *Note_Surface;
+SDL_Surface *Note_Alt_Surface;
+
 void Blit_note(int x, int y, int note, int y1, int y2, int size);
 
 void out_note(int x, int y, int note, int color)
@@ -380,12 +383,12 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].b = ComponentB;
 
                 // Set the shadow font
-                if(ComponentR >= 128) ComponentR = 128 + (ComponentR >> 2);
-                else ComponentR = (128 - (ComponentR >> 2));
-                if(ComponentG >= 128) ComponentG = 128 + (ComponentG >> 2);
-                else ComponentG = (128 - (ComponentG >> 2));
-                if(ComponentB >= 128) ComponentB = 128 + (ComponentB >> 2);
-                else ComponentB = (128 - (ComponentB >> 2));
+                if(ComponentR >= 128) ComponentR = 128 + (ComponentR >> 3);
+                else ComponentR = (128 - (ComponentR >> 3));
+                if(ComponentG >= 128) ComponentG = 128 + (ComponentG >> 3);
+                else ComponentG = (128 - (ComponentG >> 3));
+                if(ComponentB >= 128) ComponentB = 128 + (ComponentB >> 3);
+                else ComponentB = (128 - (ComponentB >> 3));
 
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentG < 0) ComponentG = 0;
@@ -416,9 +419,11 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
+
                 ComponentR >>= 1;
                 ComponentG >>= 1;
                 ComponentB >>= 1;
+                
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
@@ -1092,43 +1097,43 @@ void Note_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
     {
-        case 0: Copy(Temp_NOTEPFONT, x, y, 72, ys, 79, y2); break; // 0
-        case 1: Copy(Temp_NOTEPFONT, x, y, 80, ys, 87, y2); break; // 1
-        case 2: Copy(Temp_NOTEPFONT, x, y, 88, ys, 95, y2); break; // 2
-        case 3: Copy(Temp_NOTEPFONT, x, y, 96, ys, 103, y2); break; // 3
-        case 4: Copy(Temp_NOTEPFONT, x, y, 104, ys, 111, y2); break; // 4
-        case 5: Copy(Temp_NOTEPFONT, x, y, 112, ys, 119, y2); break; // 5
-        case 6: Copy(Temp_NOTEPFONT, x, y, 120, ys, 127, y2); break; // 6
-        case 7: Copy(Temp_NOTEPFONT, x, y, 128, ys, 135, y2); break; // 7
-        case 8: Copy(Temp_NOTEPFONT, x, y, 136, ys, 143, y2); break; // 8
-        case 9: Copy(Temp_NOTEPFONT, x, y, 144, ys, 151, y2); break; // 9
-        case 10: Copy(Temp_NOTEPFONT, x, y, 0, ys, 7, y2); break; // A
-        case 11: Copy(Temp_NOTEPFONT, x, y, 8, ys, 15, y2); break;// B
-        case 12: Copy(Temp_NOTEPFONT, x, y, 16, ys, 23, y2); break;// C
-        case 13: Copy(Temp_NOTEPFONT, x, y, 24, ys, 31, y2); break;// D
-        case 14: Copy(Temp_NOTEPFONT, x, y, 32, ys, 39, y2); break;// E
-        case 15: Copy(Temp_NOTEPFONT, x, y, 40, ys, 47, y2); break;// F
-        case 16: Copy(Temp_NOTEPFONT, x, y, 48, ys, 55, y2); break;// G
-        case 17: Copy(Temp_NOTEPFONT, x, y, 64, ys, 71, y2); break; // #
-        case 18: Copy(Temp_NOTEPFONT, x, y, 176, ys, 183, y2); break; // -
-        case 19: Copy(Temp_NOTEPFONT, x, y, 152, ys, 175, y2); break; // Off
-        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
-        case 21: Copy(Temp_NOTEPFONT, x, y, 184, ys, 191, y2); break; // .
+        case 0: Copy(Note_Surface, x, y, 72, ys, 79, y2); break; // 0
+        case 1: Copy(Note_Surface, x, y, 80, ys, 87, y2); break; // 1
+        case 2: Copy(Note_Surface, x, y, 88, ys, 95, y2); break; // 2
+        case 3: Copy(Note_Surface, x, y, 96, ys, 103, y2); break; // 3
+        case 4: Copy(Note_Surface, x, y, 104, ys, 111, y2); break; // 4
+        case 5: Copy(Note_Surface, x, y, 112, ys, 119, y2); break; // 5
+        case 6: Copy(Note_Surface, x, y, 120, ys, 127, y2); break; // 6
+        case 7: Copy(Note_Surface, x, y, 128, ys, 135, y2); break; // 7
+        case 8: Copy(Note_Surface, x, y, 136, ys, 143, y2); break; // 8
+        case 9: Copy(Note_Surface, x, y, 144, ys, 151, y2); break; // 9
+        case 10: Copy(Note_Surface, x, y, 0, ys, 7, y2); break; // A
+        case 11: Copy(Note_Surface, x, y, 8, ys, 15, y2); break;// B
+        case 12: Copy(Note_Surface, x, y, 16, ys, 23, y2); break;// C
+        case 13: Copy(Note_Surface, x, y, 24, ys, 31, y2); break;// D
+        case 14: Copy(Note_Surface, x, y, 32, ys, 39, y2); break;// E
+        case 15: Copy(Note_Surface, x, y, 40, ys, 47, y2); break;// F
+        case 16: Copy(Note_Surface, x, y, 48, ys, 55, y2); break;// G
+        case 17: Copy(Note_Surface, x, y, 64, ys, 71, y2); break; // #
+        case 18: Copy(Note_Surface, x, y, 176, ys, 183, y2); break; // -
+        case 19: Copy(Note_Surface, x, y, 152, ys, 175, y2); break; // Off
+        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 21: Copy(Note_Surface, x, y, 184, ys, 191, y2); break; // .
 
-        case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_NOTEPFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_NOTEPFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_NOTEPFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_NOTEPFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_NOTEPFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
-        case 29: Copy(Temp_NOTEPFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
-        case 30: Copy(Temp_NOTEPFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
+        case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
+        case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
 
-        case 31: Copy(Temp_NOTEPFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
-        case 32: Copy(Temp_NOTEPFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
-        case 33: Copy(Temp_NOTEPFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+        case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
+        case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
+        case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
     }
 }
 
@@ -1185,30 +1190,30 @@ void Note_Large_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
     {
-        case 0: Copy(Temp_NOTELARGEPFONT, x, y, 100, ys, 100 + 11, y2); break;
-        case 1: Copy(Temp_NOTELARGEPFONT, x, y, 111, ys, 111 + 11, y2); break;
-        case 2: Copy(Temp_NOTELARGEPFONT, x, y, 122, ys, 122 + 11, y2); break;
-        case 3: Copy(Temp_NOTELARGEPFONT, x, y, 133, ys, 133 + 11, y2); break;
-        case 4: Copy(Temp_NOTELARGEPFONT, x, y, 144, ys, 144 + 11, y2); break;
-        case 5: Copy(Temp_NOTELARGEPFONT, x, y, 155, ys, 155 + 11, y2); break;
-        case 6: Copy(Temp_NOTELARGEPFONT, x, y, 166, ys, 166 + 11, y2); break;
-        case 7: Copy(Temp_NOTELARGEPFONT, x, y, 177, ys, 177 + 11, y2); break;
-        case 8: Copy(Temp_NOTELARGEPFONT, x, y, 188, ys, 188 + 11, y2); break;
-        case 9: Copy(Temp_NOTELARGEPFONT, x, y, 199, ys, 199 + 11, y2); break;
+        case 0: Copy(Note_Surface, x, y, 100, ys, 100 + 11, y2); break;
+        case 1: Copy(Note_Surface, x, y, 111, ys, 111 + 11, y2); break;
+        case 2: Copy(Note_Surface, x, y, 122, ys, 122 + 11, y2); break;
+        case 3: Copy(Note_Surface, x, y, 133, ys, 133 + 11, y2); break;
+        case 4: Copy(Note_Surface, x, y, 144, ys, 144 + 11, y2); break;
+        case 5: Copy(Note_Surface, x, y, 155, ys, 155 + 11, y2); break;
+        case 6: Copy(Note_Surface, x, y, 166, ys, 166 + 11, y2); break;
+        case 7: Copy(Note_Surface, x, y, 177, ys, 177 + 11, y2); break;
+        case 8: Copy(Note_Surface, x, y, 188, ys, 188 + 11, y2); break;
+        case 9: Copy(Note_Surface, x, y, 199, ys, 199 + 11, y2); break;
 
-        case 10: Copy(Temp_NOTELARGEPFONT, x, y, 0, ys, 11, y2); break; // A
-        case 11: Copy(Temp_NOTELARGEPFONT, x, y, 11, ys, 11 + 11, y2); break;// B
-        case 12: Copy(Temp_NOTELARGEPFONT, x, y, 22, ys, 22 + 11, y2); break;// C
-        case 13: Copy(Temp_NOTELARGEPFONT, x, y, 33, ys, 33 + 11, y2); break;// D
-        case 14: Copy(Temp_NOTELARGEPFONT, x, y, 44, ys, 44 + 11, y2); break;// E
-        case 15: Copy(Temp_NOTELARGEPFONT, x, y, 55, ys, 55 + 11, y2); break;// F
-        case 16: Copy(Temp_NOTELARGEPFONT, x, y, 66, ys, 66 + 11, y2); break;// G
+        case 10: Copy(Note_Surface, x, y, 0, ys, 11, y2); break; // A
+        case 11: Copy(Note_Surface, x, y, 11, ys, 11 + 11, y2); break;// B
+        case 12: Copy(Note_Surface, x, y, 22, ys, 22 + 11, y2); break;// C
+        case 13: Copy(Note_Surface, x, y, 33, ys, 33 + 11, y2); break;// D
+        case 14: Copy(Note_Surface, x, y, 44, ys, 44 + 11, y2); break;// E
+        case 15: Copy(Note_Surface, x, y, 55, ys, 55 + 11, y2); break;// F
+        case 16: Copy(Note_Surface, x, y, 66, ys, 66 + 11, y2); break;// G
         
-        case 17: Copy(Temp_NOTELARGEPFONT, x, y, 88, ys, 88 + 11, y2); break; // #
-        case 18: Copy(Temp_NOTELARGEPFONT, x, y, 243, ys, 243 + 11, y2); break; // -
-        case 19: Copy(Temp_NOTELARGEPFONT, x, y, 210, ys, 210 + 34, y2); break; // Off
+        case 17: Copy(Note_Surface, x, y, 88, ys, 88 + 11, y2); break; // #
+        case 18: Copy(Note_Surface, x, y, 243, ys, 243 + 11, y2); break; // -
+        case 19: Copy(Note_Surface, x, y, 210, ys, 210 + 34, y2); break; // Off
         case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
-        case 21: Copy(Temp_NOTELARGEPFONT, x, y, 254, ys, 254 + 11, y2); break; // .
+        case 21: Copy(Note_Surface, x, y, 254, ys, 254 + 11, y2); break; // .
 
         case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
         case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
@@ -1279,31 +1284,31 @@ void Note_Small_Letter(int x, int y, char ltr, int ys, int y2)
 {
     switch(ltr)
     {
-        case 0: Copy(Temp_NOTESMALLPFONT, x, y, 54, ys, 54 + 5, y2); break; // 0
-        case 1: Copy(Temp_NOTESMALLPFONT, x, y, 60, ys, 60 + 5, y2); break; // 1
-        case 2: Copy(Temp_NOTESMALLPFONT, x, y, 66, ys, 66 + 5, y2); break; // 2
-        case 3: Copy(Temp_NOTESMALLPFONT, x, y, 72, ys, 72 + 5, y2); break; // 3
-        case 4: Copy(Temp_NOTESMALLPFONT, x, y, 78, ys, 78 + 5, y2); break; // 4
-        case 5: Copy(Temp_NOTESMALLPFONT, x, y, 84, ys, 84 + 5, y2); break; // 5
-        case 6: Copy(Temp_NOTESMALLPFONT, x, y, 90, ys, 90 + 5, y2); break; // 6
-        case 7: Copy(Temp_NOTESMALLPFONT, x, y, 96, ys, 96 + 5, y2); break; // 7
-        case 8: Copy(Temp_NOTESMALLPFONT, x, y, 102, ys, 102 + 5, y2); break; // 8
-        case 9: Copy(Temp_NOTESMALLPFONT, x, y, 108, ys, 108 + 5, y2); break; // 9
+        case 0: Copy(Note_Surface, x, y, 54, ys, 54 + 5, y2); break; // 0
+        case 1: Copy(Note_Surface, x, y, 60, ys, 60 + 5, y2); break; // 1
+        case 2: Copy(Note_Surface, x, y, 66, ys, 66 + 5, y2); break; // 2
+        case 3: Copy(Note_Surface, x, y, 72, ys, 72 + 5, y2); break; // 3
+        case 4: Copy(Note_Surface, x, y, 78, ys, 78 + 5, y2); break; // 4
+        case 5: Copy(Note_Surface, x, y, 84, ys, 84 + 5, y2); break; // 5
+        case 6: Copy(Note_Surface, x, y, 90, ys, 90 + 5, y2); break; // 6
+        case 7: Copy(Note_Surface, x, y, 96, ys, 96 + 5, y2); break; // 7
+        case 8: Copy(Note_Surface, x, y, 102, ys, 102 + 5, y2); break; // 8
+        case 9: Copy(Note_Surface, x, y, 108, ys, 108 + 5, y2); break; // 9
         
-        case 10: Copy(Temp_NOTESMALLPFONT, x, y, 0, ys, 5, y2); break; // A
-        case 11: Copy(Temp_NOTESMALLPFONT, x, y, 6, ys, 6 + 5, y2); break;// B
-        case 12: Copy(Temp_NOTESMALLPFONT, x, y, 12, ys, 12 + 5, y2); break;// C
-        case 13: Copy(Temp_NOTESMALLPFONT, x, y, 18, ys, 18 + 5, y2); break;// D
-        case 14: Copy(Temp_NOTESMALLPFONT, x, y, 24, ys, 24 + 5, y2); break;// E
-        case 15: Copy(Temp_NOTESMALLPFONT, x, y, 30, ys, 30 + 5, y2); break;// F
-        case 16: Copy(Temp_NOTESMALLPFONT, x, y, 36, ys, 36 + 5, y2); break;// G
+        case 10: Copy(Note_Surface, x, y, 0, ys, 5, y2); break; // A
+        case 11: Copy(Note_Surface, x, y, 6, ys, 6 + 5, y2); break;// B
+        case 12: Copy(Note_Surface, x, y, 12, ys, 12 + 5, y2); break;// C
+        case 13: Copy(Note_Surface, x, y, 18, ys, 18 + 5, y2); break;// D
+        case 14: Copy(Note_Surface, x, y, 24, ys, 24 + 5, y2); break;// E
+        case 15: Copy(Note_Surface, x, y, 30, ys, 30 + 5, y2); break;// F
+        case 16: Copy(Note_Surface, x, y, 36, ys, 36 + 5, y2); break;// G
         
-        case 17: Copy(Temp_NOTESMALLPFONT, x, y, 48, ys, 48 + 5, y2); break; // #
-        case 18: Copy(Temp_NOTESMALLPFONT, x, y, 132, ys, 132 + 5, y2); break; // -
-        case 19: Copy(Temp_NOTESMALLPFONT, x, y, 114, ys, 114 + 17, y2); break; // Off
+        case 17: Copy(Note_Surface, x, y, 48, ys, 48 + 5, y2); break; // #
+        case 18: Copy(Note_Surface, x, y, 132, ys, 132 + 5, y2); break; // -
+        case 19: Copy(Note_Surface, x, y, 114, ys, 114 + 17, y2); break; // Off
         
         case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
-        case 21: Copy(Temp_NOTESMALLPFONT, x, y, 138, ys, 138 + 5, y2); break; // .
+        case 21: Copy(Note_Surface, x, y, 138, ys, 138 + 5, y2); break; // .
 
         case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
         case 24: Copy(Temp_NOTEPFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
@@ -1325,18 +1330,24 @@ void Note_Small_Letter(int x, int y, char ltr, int ys, int y2)
 void blitnote(int x, int y, int note, int y1, int y2)
 {
     Letter_Function = Note_Letter;
+    Note_Surface = Temp_NOTEPFONT;
+    Note_Alt_Surface = Temp_PFONT;
     Blit_note(x, y, note, y1, y2, 8);
 }
 
 void blitlargenote(int x, int y, int note, int y1, int y2)
 {
     Letter_Function = Note_Large_Letter;
+    Note_Surface = Temp_NOTELARGEPFONT;
+    Note_Alt_Surface = Temp_LARGEPFONT;
     Blit_note(x, y, note, y1, y2, 11);
 }
 
 void blitsmallnote(int x, int y, int note, int y1, int y2)
 {
     Letter_Function = Note_Small_Letter;
+    Note_Alt_Surface = Temp_SMALLPFONT;
+    Note_Surface = Temp_NOTESMALLPFONT;
     Blit_note(x, y, note, y1, y2, 6);
 }
 
@@ -1345,8 +1356,12 @@ void Blit_note(int x, int y, int note, int y1, int y2, int size)
     int sizex2 = size * 2;
     switch(note)
     {
-        case 120: Letter_Function(x, y, 19, y1, y2); break;
+        case 120:
+            Letter_Function(x, y, 19, y1, y2);
+            break;
+
         case 121:
+            Note_Surface = Note_Alt_Surface;
             Letter_Function(x, y, 18, y1, y2);
             Letter_Function(x + size, y, 18, y1, y2);
             Letter_Function(x + sizex2, y, 18, y1, y2);

@@ -75,6 +75,7 @@ typedef struct
 typedef struct
 {
     void (*Fnc)(int, int, int, int, int);
+    void (*Fnc_Lo)(int, int, char, int, int);
 } NOTE_FUNCTION, *LPNOTE_FUNCTION;
 
 // ------------------------------------------------------

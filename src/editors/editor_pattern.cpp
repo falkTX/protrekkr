@@ -330,7 +330,7 @@ void draw_pated(int track, int line, int petrack, int row)
     }
 
     // Clear headers line
-    SetColor(COL_PATTERN_LO_BACK);
+    SetColor(COL_BACKGROUND);
     bjbox(0, 183, CONSOLE_WIDTH, 13);
 
     dover = PAT_COL_NOTE;
@@ -341,7 +341,7 @@ void draw_pated(int track, int line, int petrack, int row)
         cur_track = track + liner;
 
         if(ped_track == cur_track) SetColor(COL_PUSHED_MED);
-        else SetColor(COL_PATTERN_LO_BACK);
+        else SetColor(COL_BACKGROUND);
 
         dover += 2;
         if(dover >= MAX_PATT_SCREEN_X) break;
@@ -369,7 +369,7 @@ void draw_pated(int track, int line, int petrack, int row)
         // Caret track marker
         if((dover + Cur_Char_size[cur_track] + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
         if(ped_track == cur_track) SetColor(COL_VUMETERPEAK);
-        else SetColor(COL_PATTERN_LO_BACK);
+        else SetColor(COL_BACKGROUND);
         bjbox(dover + Cur_Char_size[cur_track] + 29 + 29 + 17, 187, 12, 7);
 
         // On / off

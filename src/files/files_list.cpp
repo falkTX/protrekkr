@@ -269,6 +269,8 @@ void Read_SMPT(void)
 void Dump_Files_List(int xr, int yr)
 {
     int y = lt_index;
+    FILE *File;
+    char Size_String[64];
 
     switch(Scopish)
     {
@@ -310,10 +312,21 @@ void Dump_Files_List(int xr, int yr)
                     if(FILETYPE[rel_val] == _A_SUBDIR)
                     {
                         PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
+                        PrintXY(xr + 364, yr + (counter * 12) + 1, USE_FONT_LOW, "<Dir>");
                     }
                     else
                     {
-                        PrintXY(xr, yr + (counter * 12), USE_FONT, SMPT_LIST[rel_val]);
+                        PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val]);
+                        File = fopen(SMPT_LIST[rel_val], "rb");
+                        if(File)
+                        {
+                            int Size = Get_File_Size(File);
+                            sprintf(Size_String, "%9.d", Size);
+                            int pos = (xr + 385) - Get_Size_Text(Size_String);
+                            PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
+                            fclose(File);
+                        }
+
                     }
                 }
             }
