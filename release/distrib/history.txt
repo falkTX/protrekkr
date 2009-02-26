@@ -5,9 +5,10 @@ ProTrekkr releases history
 v1.95:
 
 - Introduced small tracks
-  (right click on the 3rd icon of a track or via the sequencer).
+  (right click on the 3rd icon of a track or globally via the sequencer).
 - Added 3 commands in the sequencer to zoom all tracks at once.
 - Filesizes are now displayed beside names.
+- Added an instruments remapper in the sequencer tab.
 
 v1.94b:
 

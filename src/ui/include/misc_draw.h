@@ -93,7 +93,7 @@
 #define BUTTON_PUSHED 2
 #define BUTTON_TEXT_CENTERED 4
 #define BUTTON_DISABLED 8
-#define BUTTON_NOBORDER 16
+#define BUTTON_NO_BORDER 16
 
 // ------------------------------------------------------
 // Structures

@@ -976,7 +976,7 @@ int Screen_Update(void)
             retletter[71] = FALSE;
             userscreen = USER_SCREEN_SEQUENCER;
             Draw_Sequencer_Ed();
-            Actualize_Seq_Ed();
+            Actualize_Seq_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SELECT_SCREEN_SETUP_EDIT)
@@ -1119,7 +1119,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_UPDATE_SEQ_ED)
         {
-            Actualize_Seq_Ed();
+            Actualize_Seq_Ed(0);
         }
 
         if(gui_action == GUI_CMD_UPDATE_FX_ED)
@@ -4846,7 +4846,7 @@ void Actualize_Master(char gode)
     {
         Gui_Draw_Arrows_Number_Box2(324, 44, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-        if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed();
+        if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 
         SetColor(COL_BACKGROUND);
         bjbox(0, 186, fsize, 242);

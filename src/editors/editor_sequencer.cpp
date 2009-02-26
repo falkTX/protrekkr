@@ -33,6 +33,7 @@
 // Includes
 #include "include/editor_sequencer.h"
 #include "include/editor_pattern.h"
+#include "include/patterns_blocks.h"
 
 // ------------------------------------------------------
 // Structures
@@ -61,6 +62,9 @@ int cur_seq_buffer[] =
     BUTTON_NORMAL,
     BUTTON_NORMAL
 };
+
+int Remap_From;
+int Remap_To;
 
 // ------------------------------------------------------
 // Functions
@@ -105,14 +109,24 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(257, 466, 25, 90, "", BUTTON_NORMAL);
     Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(480, 466, 190, 46, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(490, 488, 50, 16, "Small", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(550, 488, 50, 16, "Normal", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(610, 488, 50, 16, "Large", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(480, 466, 250, 26, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(480, 471, 190, 26, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
     
+    Gui_Draw_Button_Box(565, 472, 50, 16, "Small", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(620, 472, 50, 16, "Normal", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(675, 472, 50, 16, "Large", BUTTON_NORMAL);
+    
+    Gui_Draw_Button_Box(480, 501, 250, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+
+    Gui_Draw_Button_Box(600, 524, 60, 16, "Selection", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(600, 544, 60, 16, "Track", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(662, 524, 60, 16, "Pattern", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(662, 544, 60, 16, "Song", BUTTON_NORMAL);
 }
 
-void Actualize_Seq_Ed(void)
+void Actualize_Seq_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
@@ -148,21 +162,99 @@ void Actualize_Seq_Ed(void)
             }
         } // for end
         Actupated(0);
+
+        // From instrument
+        if(gode == 0 || gode == 1)
+        {
+            if(Remap_From < 0) Remap_From = 0;
+            if(Remap_From > 0x7f) Remap_From = 0x7f;
+            value_box(520, 524, Remap_From, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+
+        // To instrument
+        if(gode == 0 || gode == 2)
+        {
+            if(Remap_To < 0) Remap_To = 0;
+            if(Remap_To > 0x7f) Remap_To = 0x7f;
+            value_box(520, 544, Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
     }
 }
 
 void Mouse_Left_Sequencer_Ed(void)
 {
-    int Cur_Position = cPosition;
     int i;
+    int j;
+    int Cur_Position = cPosition;
 
     if(Songplaying) Cur_Position = cPosition_delay;
 
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
+        // Remap Selection
+        if(zcheckMouse(600, 524, 60, 16))
+        {
+            Instrument_Remap_Block(Cur_Position, Get_Real_Selection(FALSE), Remap_From, Remap_To);
+        }
+        // Remap Track
+        if(zcheckMouse(600, 544, 60, 16))
+        {
+            Instrument_Remap_Block(Cur_Position, Select_Track(ped_track), Remap_From, Remap_To);
+        }
+        // Remap Pattern
+        if(zcheckMouse(662, 524, 60, 16))
+        {
+            for(i = 0; i < Songtracks; i++)
+            {
+                Instrument_Remap_Block(Cur_Position, Select_Track(i), Remap_From, Remap_To);
+            }
+        }
+        // Remap Song
+        if(zcheckMouse(662, 544, 60, 16))
+        {
+            for(j = 0; j < sLength; j++)
+            {
+                for(i = 0; i < Songtracks; i++)
+                {
+                    Instrument_Remap_Block(j, Select_Track(i), Remap_From, Remap_To);
+                }
+            }
+        }
+
+        // From Instrument
+        if(zcheckMouse(520, 524, 16, 16) == 1)
+        {
+            Remap_From--;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // From Instrument
+        if(zcheckMouse(520 + 44, 524, 16, 16) == 1)
+        {
+            Remap_From++;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // To Instrument
+        if(zcheckMouse(520, 544, 16, 16) == 1)
+        {
+            Remap_To--;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // To Instrument
+        if(zcheckMouse(520 + 44, 544, 16, 16) == 1)
+        {
+            Remap_To++;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
 
         // Zoom'em small
-        if(zcheckMouse(490, 488, 50, 16))
+        if(zcheckMouse(565, 472, 50, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -171,7 +263,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Actupated(0);
         }
         // Zoom'em normal
-        if(zcheckMouse(550, 488, 50, 16))
+        if(zcheckMouse(620, 472, 50, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -180,7 +272,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Actupated(0);
         }
         // Zoom'em large
-        if(zcheckMouse(610, 488, 50, 16))
+        if(zcheckMouse(675, 472, 50, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -438,6 +530,37 @@ void Mouse_Right_Sequencer_Ed(void)
 
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
+        // From Instrument
+        if(zcheckMouse(520, 524, 16, 16) == 1)
+        {
+            Remap_From -= 10;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // From Instrument
+        if(zcheckMouse(520 + 44, 524, 16, 16) == 1)
+        {
+            Remap_From += 10;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // To Instrument
+        if(zcheckMouse(520, 544, 16, 16) == 1)
+        {
+            Remap_To -= 10;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
+
+        // To Instrument
+        if(zcheckMouse(520 + 44, 544, 16, 16) == 1)
+        {
+            Remap_To += 10;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 1;
+        }
 
         // Sub 100 to the selected pattern
         if(zcheckMouse(260, 468, 7, 84))
@@ -573,7 +696,7 @@ void Actualize_Sequencer(void)
     else value_box(188, 98, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Arrows_Number_Box(188, 80, sLength, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed();
+    if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 }
 
 void SeqFill(int st, int en, char n)

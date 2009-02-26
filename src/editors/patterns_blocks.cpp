@@ -35,16 +35,7 @@
 #include "include/patterns_blocks.h"
 #include "include/editor_pattern.h"
 
-// ------------------------------------------------------
-// Structures
 #if !defined(__WINAMP__)
-typedef struct
-{
-    int x_start;
-    int y_start;
-    int x_end;
-    int y_end;
-} SELECTION, *LPSELECTION;
 
 // ------------------------------------------------------
 // Variables
@@ -585,26 +576,39 @@ void Paste_Block(int Position)
 }
 
 // ------------------------------------------------------
-// Load a selection structure (and auto select a complete track if nothing was selected)
-SELECTION Get_Real_Selection(void)
+// Select a complete track
+SELECTION Select_Track(int Track)
 {
     int i;
+    SELECTION Cur_Sel;
+
+    // Default selection
+    Cur_Sel.y_start = 0;
+    Cur_Sel.y_end = patternLines[pSequence[cPosition]] - 1;
+    Cur_Sel.x_start = 0;
+    for(i = 0; i < Track; i++)
+    {
+        Cur_Sel.x_start += Get_Max_Nibble_Track(Channels_MultiNotes, i);
+    }
+    Cur_Sel.x_end = Cur_Sel.x_start + (Get_Max_Nibble_Track(Channels_MultiNotes, Track) - 1);
+    return(Cur_Sel);
+}
+
+// ------------------------------------------------------
+// Load a selection structure (and auto select a complete track if nothing was selected)
+SELECTION Get_Real_Selection(int Default)
+{
     SELECTION Cur_Sel;
     Cur_Sel.y_start = block_start;
     Cur_Sel.y_end = block_end;
     Cur_Sel.x_start = block_start_track;
     Cur_Sel.x_end = block_end_track;
-    if(!(block_end_track - block_start_track) || !(block_end - block_start))
+    if(Default)
     {
-        // Default selection
-        Cur_Sel.y_start = 0;
-        Cur_Sel.y_end = patternLines[pSequence[cPosition]] - 1;
-        Cur_Sel.x_start = 0;
-        for(i = 0; i < ped_track; i++)
+        if(!(block_end_track - block_start_track) || !(block_end - block_start))
         {
-            Cur_Sel.x_start += Get_Max_Nibble_Track(Channels_MultiNotes, i);
+            Cur_Sel = Select_Track(ped_track);
         }
-        Cur_Sel.x_end = Cur_Sel.x_start + (Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1);
     }
     return(Cur_Sel);
 }
@@ -625,7 +629,7 @@ void Interpolate_Block(int Position)
     COLUMN_TYPE type;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
 
     for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
     {
@@ -724,7 +728,7 @@ void Randomize_Block(int Position)
     COLUMN_TYPE type;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
 
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
@@ -780,7 +784,7 @@ void Semitone_Up_Block(int Position)
     int note;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -812,7 +816,7 @@ void Semitone_Down_Block(int Position)
     int note;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -845,7 +849,7 @@ void Instrument_Semitone_Up_Block(int Position)
     int instrument;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -883,7 +887,7 @@ void Instrument_Semitone_Down_Block(int Position)
     int instrument;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection();
+    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -904,6 +908,49 @@ void Instrument_Semitone_Down_Block(int Position)
                         }
                         Write_Pattern_Column(Position, xbc, ybc, note);
                     }
+                }
+            }
+        }
+    }
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Remap an instrument
+void Instrument_Remap_Block(int Position, SELECTION Sel, int From, int To)
+{
+    int ybc;
+    int xbc;
+    int instrument;
+    int max_columns = Get_Max_Nibble_All_Tracks();
+
+    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+    {
+        for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
+        {
+            if(xbc < max_columns && ybc < MAX_ROWS)
+            {
+                switch(Get_Column_Type(Channels_MultiNotes, xbc))
+                {
+                    case INSTRHI:
+                        instrument = Read_Pattern_Column(Position, xbc, ybc);
+                        instrument |= Read_Pattern_Column(Position, xbc + 1, ybc);
+                        if(instrument == From)
+                        {
+                            Write_Pattern_Column(Position, xbc, ybc, To);
+                            Write_Pattern_Column(Position, xbc + 1, ybc, To);
+                        }
+                        break;
+
+                    case INSTRLO:
+                        instrument = Read_Pattern_Column(Position, xbc - 1, ybc);
+                        instrument |= Read_Pattern_Column(Position, xbc, ybc);
+                        if(instrument == From)
+                        {
+                            Write_Pattern_Column(Position, xbc - 1, ybc, To);
+                            Write_Pattern_Column(Position, xbc, ybc, To);
+                        }
+                        break;
                 }
             }
         }

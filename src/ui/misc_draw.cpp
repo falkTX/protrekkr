@@ -161,7 +161,7 @@ char *Labels_Palette[] =
     "Pushed Buttons",
     "Sliders",
     "Vumeter",
-    "Vumeter peak",
+    "Vumtr. peak / Caret",
     "Scopes / Samples",
     "Font",
     "Pattern Lo Backgnd",
@@ -708,7 +708,7 @@ void Refresh_UI_Context(void)
     Actualize_Master(0);
     Actualize_Master(4);
 
-    Actualize_Seq_Ed();
+    Actualize_Seq_Ed(0);
     Actualize_Track_Ed(0);
     Actualize_Master_Ed(0);
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
@@ -737,7 +737,7 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
     int x2 = x + sx;
     int y2 = y + sy;
 
-    if(!(pushed & BUTTON_NOBORDER))
+    if(!(pushed & BUTTON_NO_BORDER))
     {
         if(pushed & BUTTON_NORMAL)
         {

@@ -326,7 +326,6 @@ void Dump_Files_List(int xr, int yr)
                             PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
                             fclose(File);
                         }
-
                     }
                 }
             }

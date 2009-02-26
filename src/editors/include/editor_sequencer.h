@@ -45,7 +45,7 @@
 // ------------------------------------------------------
 // Functions
 void Draw_Sequencer_Ed(void);
-void Actualize_Seq_Ed(void);
+void Actualize_Seq_Ed(char gode);
 void Mouse_Left_Sequencer_Ed(void);
 void Mouse_Right_Sequencer_Ed(void);
 void Actualize_Sequencer(void);

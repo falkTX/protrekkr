@@ -63,10 +63,10 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
+    Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 
     Gui_Draw_Button_Box(640, 518, 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(714, 539, 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NOBORDER);
+    Gui_Draw_Button_Box(714, 539, 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 }
    
 void Actualize_Track_Ed(char gode)

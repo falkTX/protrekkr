@@ -78,9 +78,9 @@ void Actualize_Fx_Ed(char gode)
                 case 1: Gui_Draw_Button_Box(142, 516, 81, 16, "Great Hall", BUTTON_NORMAL | BUTTON_DISABLED); break;
                 case 2: Gui_Draw_Button_Box(142, 516, 81, 16, "Room 2", BUTTON_NORMAL | BUTTON_DISABLED); break;
                 case 3: Gui_Draw_Button_Box(142, 516, 81, 16, "Echoy", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 4: Gui_Draw_Button_Box(142, 516, 81, 16, "1Comb", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 5: Gui_Draw_Button_Box(142, 516, 81, 16, "Room2", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 6: Gui_Draw_Button_Box(142, 516, 81, 16, "Hall3", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 4: Gui_Draw_Button_Box(142, 516, 81, 16, "1 Comb", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 5: Gui_Draw_Button_Box(142, 516, 81, 16, "Room 3", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 6: Gui_Draw_Button_Box(142, 516, 81, 16, "Hall 2", BUTTON_NORMAL | BUTTON_DISABLED); break;
 
                 default:Gui_Draw_Button_Box(142, 516, 81, 16, "Not Defined", BUTTON_NORMAL | BUTTON_DISABLED); break;
             }

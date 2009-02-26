@@ -50,6 +50,16 @@ enum COLUMN_TYPE
 };
 
 // ------------------------------------------------------
+// Structures
+typedef struct
+{
+    int x_start;
+    int y_start;
+    int x_end;
+    int y_end;
+} SELECTION, *LPSELECTION;
+
+// ------------------------------------------------------
 // Functions
 int Init_Block_Work(void);
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
@@ -59,6 +69,8 @@ void Copy_Selection_To_Buffer(int Position);
 void Paste_Selection_From_Buffer(int Position);
 void Cut_Selection(int Position);
 void Copy_Selection(int Position);
+SELECTION Get_Real_Selection(int Default);
+SELECTION Select_Track(int Track);
 void Paste_Block(int Position);
 void Interpolate_Block(int Position);
 void Randomize_Block(int Position);
@@ -66,6 +78,7 @@ void Semitone_Up_Block(int Position);
 void Semitone_Down_Block(int Position);
 void Instrument_Semitone_Up_Block(int Position);
 void Instrument_Semitone_Down_Block(int Position);
+void Instrument_Remap_Block(int Position, SELECTION Sel, int From, int To);
 void Select_Track_Block(void);
 void Select_Pattern_Block(void);
 void Select_Note_Block(void);
