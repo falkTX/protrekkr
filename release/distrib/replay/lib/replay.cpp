@@ -204,6 +204,12 @@ int Type_Mp3_BitRate[] =
     64, 88, 96, 128, 160, 192
 };
 
+char At3_BitRate[MAX_INSTRS];
+int Type_At3_BitRate[] =
+{
+    66, 105, 132
+};
+
 #endif
 #endif
 
@@ -787,6 +793,17 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 
         switch(Pack_Type)
         {
+
+#if defined(__PSP__)
+            case SMP_PACK_AT3:
+
+#if !defined(__NO_CODEC__)
+#if defined(PTK_AT3)
+                UnpackAT3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
+#endif
+#endif
+#endif
+
             case SMP_PACK_GSM:
 
 #if !defined(__NO_CODEC__)
@@ -907,10 +924,22 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
 
-#if defined(PTK_MP3)
-            if(SampleCompression[swrite] == SMP_PACK_MP3)
+#if defined(PTK_MP3) || defined(PTK_AT3)
+            switch(SampleCompression[swrite])
             {
-                Mod_Dat_Read(&Mp3_BitRate[swrite], sizeof(char));
+
+#if defined(PTK_MP3)
+                case SMP_PACK_MP3:
+                    Mod_Dat_Read(&Mp3_BitRate[swrite], sizeof(char));
+                    break;
+#endif
+
+#if defined(PTK_AT3)
+                case SMP_PACK_AT3:
+                    Mod_Dat_Read(&At3_BitRate[swrite], sizeof(char));
+                    break;
+#endif
+
             }
 #endif
 
@@ -945,11 +974,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         Save_Len /= 2;
                         Sample_Buffer = Unpack_Sample(Save_Len,
                                                       SampleCompression[swrite],
-#if defined(PTK_MP3)
-                                                      Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
-#else
-                                                      0);
-#endif
+                                                      SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
+                                                      Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                      Type_At3_BitRate[At3_BitRate[swrite]]
+                                                     );
+
                         Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                         // Interpolate samples
                         for(iSmp = 0; iSmp < Save_Len; iSmp++)
@@ -976,11 +1005,10 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     {
                         RawSamples[swrite][0][slwrite] = Unpack_Sample(Save_Len,
                                                                        SampleCompression[swrite],
-#if defined(PTK_MP3)
-                                                                       Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
-#else
-                                                                       0);
-#endif
+                                                                       SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
+                                                                            Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                                            Type_At3_BitRate[At3_BitRate[swrite]]
+                                                                      );
                     }
                     *(RawSamples[swrite][0][slwrite]) = 0;
 
@@ -992,11 +1020,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         {
                             Sample_Buffer = Unpack_Sample(Save_Len,
                                                           SampleCompression[swrite],
-#if defined(PTK_MP3)
-                                                          Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
-#else
-                                                          0);
-#endif
+                                                          SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
+                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                                Type_At3_BitRate[At3_BitRate[swrite]]
+                                                         );
+
                             Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                             for(iSmp = 0; iSmp < Save_Len; iSmp++)
                             {
@@ -1019,11 +1047,10 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         {
                             RawSamples[swrite][1][slwrite] = Unpack_Sample(Save_Len,
                                                                            SampleCompression[swrite],
-#if defined(PTK_MP3)
-                                                                           Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
-#else
-                                                                           0);
-#endif
+                                                                           SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
+                                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                                                Type_At3_BitRate[At3_BitRate[swrite]]
+                                                                          );
                         }
                         *RawSamples[swrite][1][slwrite] = 0;
                     }
@@ -4225,9 +4252,8 @@ void KillInst(int inst_nbr)
     SampleCompression[inst_nbr] = SMP_PACK_NONE;
 #endif
 
-#if defined(PTK_MP3)
     Mp3_BitRate[inst_nbr] = 0;
-#endif
+    At3_BitRate[inst_nbr] = 0;
 
     for(int z = 0; z < 16; z++)
     {

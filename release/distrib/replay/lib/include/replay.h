@@ -179,6 +179,9 @@ extern int counters[MAX_COMB_FILTERS];
 extern char Mp3_BitRate[MAX_INSTRS];
 extern int Type_Mp3_BitRate[];
 
+extern char At3_BitRate[MAX_INSTRS];
+extern int Type_At3_BitRate[];
+
 #if defined(PTK_COMPRESSOR)
 extern char num_echoes;
 #endif

@@ -321,7 +321,11 @@ void Dump_Files_List(int xr, int yr)
                         if(File)
                         {
                             int Size = Get_File_Size(File);
-                            sprintf(Size_String, "%9.d", Size);
+                            if(Size == 0)
+                            {
+                                sprintf(Size_String, "0");
+                            }
+                            else sprintf(Size_String, "%9.d", Size);
                             int pos = (xr + 385) - Get_Size_Text(Size_String);
                             PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
                             fclose(File);

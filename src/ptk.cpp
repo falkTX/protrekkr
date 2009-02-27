@@ -1409,6 +1409,7 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
     SampleCompression[n_index] = SMP_PACK_NONE;
 #endif
     Mp3_BitRate[n_index] = 0;
+    At3_BitRate[n_index] = 0;
 
     SampleChannels[n_index][ped_split] = samplechans;
     RawSamples[n_index][0][ped_split] = (short *) malloc(lenfir * 2);
@@ -1988,12 +1989,13 @@ void WavRenderizer(void)
             if(rawrender_32float)
             {
                 RF.WriteStereoFloatSample(left_float_render, right_float_render);
+                filesize += 8;
             }
             else
             {
                 RF.WriteStereoSample(left_value, right_value);
+                filesize += 4;
             }
-            filesize += 4;
         }
 
         for(i = 0; i < MAX_TRACKS; i++)

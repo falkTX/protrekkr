@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.95b:
+v1.96:
 
 - More granularity of constants generation (potentially smaller replay).
 - Mp3 samples packing bitrate is now selectable between:
@@ -11,6 +11,9 @@ v1.95b:
 - Forgot to include LameACM.inf in the windows distribution
   (without that file the codec couldn't be installed
    and samples with mp3 packing scheme weren't packed at all, shame).
+- Added At3 samples packing scheme (Windows users need to install
+  the atrac3 codec located in the install directory).
+  Rates are: 66, 105 & 132 kbps (the result is quite good actually).
 
 v1.95:
 

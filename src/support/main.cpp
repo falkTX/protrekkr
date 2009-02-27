@@ -325,6 +325,9 @@ void Load_Keyboard_Def(char *FileName)
     }
 }
 
+#include <mmreg.h>
+#include <msacm.h>
+
 // ------------------------------------------------------
 // Main part of the tracker interface
 #if defined(__WIN32__)
@@ -353,6 +356,34 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     FILE *KbFile;
     int in_note;
     Uint32 ExePath_Size = MAX_PATH;
+
+/*    ACMFORMATCHOOSE cfm;
+    TRUESPEECHWAVEFORMAT Unpack_TrueSpeech_Format;
+    WAVEFORMATEX Unpack_Wave_Format;
+    HACMSTREAM Pack_Stream;
+
+	memset(&Unpack_Wave_Format, 0, sizeof(WAVEFORMATEX));
+	Unpack_Wave_Format.wFormatTag = WAVE_FORMAT_PCM;
+	memset(&Unpack_TrueSpeech_Format, 0, sizeof(Unpack_TrueSpeech_Format));
+	memset(&cfm, 0, sizeof(ACMFORMATCHOOSE));
+
+    Unpack_Wave_Format.wFormatTag = WAVE_FORMAT_PCM;
+    Unpack_Wave_Format.nChannels = 2;
+    Unpack_Wave_Format.cbSize = 0;
+    Unpack_Wave_Format.wBitsPerSample = 16;
+    Unpack_Wave_Format.nSamplesPerSec = 44100;
+    Unpack_Wave_Format.nBlockAlign = Unpack_Wave_Format.nChannels * Unpack_Wave_Format.wBitsPerSample / 8;
+    Unpack_Wave_Format.nAvgBytesPerSec = Unpack_Wave_Format.nSamplesPerSec * Unpack_Wave_Format.nBlockAlign;
+
+    cfm.cbStruct = sizeof(ACMFORMATCHOOSE);
+    cfm.pwfx = (WAVEFORMATEX *) &Unpack_TrueSpeech_Format;
+    cfm.cbwfx = sizeof(Unpack_TrueSpeech_Format);
+    cfm.fdwStyle = ACMFORMATCHOOSE_STYLEF_INITTOWFXSTRUCT;
+    cfm.hwndOwner = NULL;
+    cfm.pszTitle = "test";
+    acmFormatChoose(&cfm);
+//    acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Unpack_Wave_Format, (LPWAVEFORMATEX) &Unpack_TrueSpeech_Format, NULL, 0, 0, 0);
+*/
 
 #if defined(__MACOSX__)
     Uint32 Path_Length;
