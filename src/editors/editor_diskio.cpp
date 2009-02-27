@@ -119,12 +119,15 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL);
     Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(342, 470, 184, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(342, 470, 304, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
     PrintXY(350, 472, USE_FONT, "Tracks To Render As WAV:");
     Display_Tracks_To_Render();
 
     Gui_Draw_Button_Box(350, 532, 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(532, 513, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(532, 534, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 }
 
 void Actualize_DiskIO_Ed(int gode)
@@ -145,6 +148,46 @@ void Actualize_DiskIO_Ed(int gode)
                 Gui_Draw_Button_Box(458, 532, 29, 16, "32", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
+        }
+
+        if(gode == 0 || gode == 2)
+        {
+            if(!rawrender_range)
+            {
+                Gui_Draw_Button_Box(534, 488, 40, 16, "Whole", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(534 + 42, 488, 40, 16, "Range", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(534, 488, 40, 16, "Whole", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(534 + 42, 488, 40, 16, "Range", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            }
+        }
+
+        // From position
+        if(gode == 0 || gode == 3)
+        {
+            if(rawrender_from < 0) rawrender_from = 0;
+            if(rawrender_from > (sLength - 1)) rawrender_from = (sLength - 1);
+            if(rawrender_from > rawrender_to)
+            {
+                rawrender_to = rawrender_from;
+                Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+            }
+            Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+        }
+
+        // To position
+        if(gode == 0 || gode == 4)
+        {
+            if(rawrender_to < 0) rawrender_to = 0;
+            if(rawrender_to > (sLength - 1)) rawrender_to = (sLength - 1);
+            if(rawrender_to < rawrender_from)
+            {
+                rawrender_from = rawrender_to;
+                Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+            }
+            Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
         }
 
         if(allow_save)
@@ -198,6 +241,42 @@ void Mouse_Right_DiskIO_Ed(void)
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
     {
         Check_Tracks_To_Render_To_Solo();
+
+        if(rawrender_range)
+        {
+            // From position
+            if(zcheckMouse(572, 514, 16, 16) == 1)
+            {
+                rawrender_from -= 10;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 3;
+            }
+
+            // From position
+            if(zcheckMouse(572 + 44, 514, 16, 16) == 1)
+            {
+                rawrender_from += 10;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 3;
+            }
+
+            // To position
+            if(zcheckMouse(572, 534, 16, 16) == 1)
+            {
+                rawrender_to -= 10;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 4;
+            }
+
+            // To position
+            if(zcheckMouse(572 + 44, 534, 16, 16) == 1)
+            {
+                rawrender_to += 10;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 4;
+            }
+        }
+
     }
 }
 
@@ -280,6 +359,57 @@ void Mouse_Left_DiskIO_Ed(void)
             rawrender_32float = FALSE;
             teac = 1;
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        // Render entire song
+        if(zcheckMouse(534, 488, 40, 16))
+        {
+            rawrender_range = FALSE;
+            teac = 0;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        // Render a range
+        if(zcheckMouse(534 + 42, 488, 40, 16))
+        {
+            rawrender_range = TRUE;
+            teac = 0;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        if(rawrender_range)
+        {
+            // From position
+            if(zcheckMouse(572, 514, 16, 16) == 1)
+            {
+                rawrender_from--;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 3;
+            }
+
+            // From position
+            if(zcheckMouse(572 + 44, 514, 16, 16) == 1)
+            {
+                rawrender_from++;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 3;
+            }
+
+            // To position
+            if(zcheckMouse(572, 534, 16, 16) == 1)
+            {
+                rawrender_to--;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 4;
+            }
+
+            // To position
+            if(zcheckMouse(572 + 44, 534, 16, 16) == 1)
+            {
+                rawrender_to++;
+                gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+                teac = 4;
+            }
         }
 
         Check_Tracks_To_Render();

@@ -237,6 +237,7 @@ extern int BeatsPerMin;
 extern int TicksPerBeat;
 extern float mas_vol;
 extern float local_mas_vol;
+extern volatile float local_ramp_vol;
 
 extern int delay_time;
 extern float Feedback;

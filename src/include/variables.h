@@ -479,6 +479,9 @@ extern unsigned int SamplesPerSub;
 // Render as .wav
 extern char rawrender;
 extern char rawrender_32float;
+extern int rawrender_range;
+extern int rawrender_from;
+extern int rawrender_to;
 
 extern char sas;
 

@@ -178,14 +178,25 @@ int play(const char *fn)
 }
 
 // standard pause implementation
-void pause() { paused = 1; mod.outMod->Pause(1); }
-void unpause() { paused = 0; mod.outMod->Pause(0); }
-int ispaused() { return paused; }
-
+void pause()
+{
+    paused = 1;
+    mod.outMod->Pause(1);
+}
+void unpause()
+{
+    paused = 0;
+    mod.outMod->Pause(0);
+}
+int ispaused()
+{
+    return paused;
+}
 
 // stop playing.
 void stop()
 {
+    Ptk_Stop();
 
 	if (thread_handle != INVALID_HANDLE_VALUE)
 	{
@@ -196,7 +207,7 @@ void stop()
 			            "error asking thread to die!\n",
 				        "error killing decode thread",
 				        MB_OK | MB_ICONERROR);
-			TerminateThread(thread_handle,0);
+			TerminateThread(thread_handle, 0);
 		}
 		CloseHandle(thread_handle);
 		thread_handle = INVALID_HANDLE_VALUE;
@@ -207,9 +218,8 @@ void stop()
 
 	// deinitialize visualization
 	mod.SAVSADeInit();
-	
-    Ptk_Stop();
 }
+ 
 
 // returns length of playing track
 int getlength() {
@@ -283,10 +293,10 @@ int infoDlg(const char *fn, HWND hwnd)
 // if length_in_ms is NULL, no length is copied into it.
 void getfileinfo(const char *filename, char *title, int *length_in_ms)
 {
-	if (!filename || !*filename)  // currently playing file
+	if(!filename || !*filename)  // currently playing file
 	{
-		if (length_in_ms) *length_in_ms=getlength();
-		if (title) // get non-path portion.of filename
+		if(length_in_ms) *length_in_ms=getlength();
+		if(title) // get non-path portion.of filename
 		{
 			//char *p=lastfn+strlen(lastfn);
 			//while (*p != '\\' && p >= lastfn) p--;
@@ -354,7 +364,7 @@ int get_576_samples(char *buf)
 
 DWORD WINAPI DecodeThread(LPVOID b)
 {
-	while (!killDecodeThread) 
+	while(!killDecodeThread) 
 	{
 /*		if (seek_needed != -1) // seek is needed.
 		{
@@ -368,7 +378,7 @@ DWORD WINAPI DecodeThread(LPVOID b)
 		//	SetFilePointer(input_file,offs*NCH*(BPS/8),NULL,FILE_BEGIN); // seek!
 		}
 		*/
-		if (done) // done was set to TRUE during decoding, signaling eof
+		if(done) // done was set to TRUE during decoding, signaling eof
 		{
 			mod.outMod->CanWrite();		// some output drivers need CanWrite
 									    // to be called on a regular basis.
@@ -376,24 +386,24 @@ DWORD WINAPI DecodeThread(LPVOID b)
 			if (!mod.outMod->IsPlaying()) 
 			{
 				// we're done playing, so tell Winamp and quit the thread.
-				PostMessage(mod.hMainWindow,WM_WA_MPEG_EOF,0,0);
+				PostMessage(mod.hMainWindow, WM_WA_MPEG_EOF, 0, 0);
 				return 0;	// quit thread
 			}
 			Sleep(10);		// give a little CPU time back to the system.
 		}
-		else if (mod.outMod->CanWrite() >= ((576*NCH*(BPS/8))*(mod.dsp_isactive()?2:1)))
+		else if (mod.outMod->CanWrite() >= ((576 * NCH * (BPS / 8)) * (mod.dsp_isactive() ? 2 : 1)))
 			// CanWrite() returns the number of bytes you can write, so we check that
 			// to the block size. the reason we multiply the block size by two if 
 			// mod.dsp_isactive() is that DSP plug-ins can change it by up to a 
 			// factor of two (for tempo adjustment).
 		{	
 			int l = 576 * NCH * (BPS / 8);	       // block length in bytes
-			static char sample_buffer[576*NCH*(BPS/8)*2]; 
+			static char sample_buffer[576 * NCH * (BPS / 8) * 2]; 
 												   // sample buffer. twice as 
 												   // big as the blocksize
 
 			l = get_576_samples(sample_buffer);	   // retrieve samples
-			if (!l)			// no samples means we're at eof
+			if(!l)			// no samples means we're at eof
 			{
 				done = 1;
 			}
@@ -406,14 +416,14 @@ DWORD WINAPI DecodeThread(LPVOID b)
 				decode_pos_ms += (576 * 1000) / SAMPLERATE;
 
 				// if we have a DSP plug-in, then call it on our samples
-				if (mod.dsp_isactive()) 
-					l=mod.dsp_dosamples(
-						(short *)sample_buffer, l / NCH / (BPS / 8), BPS, NCH, SAMPLERATE
+				if(mod.dsp_isactive()) 
+					l = mod.dsp_dosamples(
+						(short *) sample_buffer, l / NCH / (BPS / 8), BPS, NCH, SAMPLERATE
 					  ) // dsp_dosamples
 					  * (NCH * (BPS / 8));
 
 				// write the pcm data to the output system
-				mod.outMod->Write(sample_buffer,l);
+				mod.outMod->Write(sample_buffer, l);
 			}
 		}
 		else Sleep(20); 

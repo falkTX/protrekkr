@@ -11,14 +11,11 @@ TODO (in no special order):
    (and remove identical samples in .ptp).
  - Import .mid files.
  - Save the synchro data as milliseconds too (+ add a Ptk_GetTime function).
- - Ability to record a selected range of patterns to WAV.
  - Add an option to play a packed sample in order to test it inside the tracker.
  - Add customization for the keys shortcuts in the xml file (may be ok like that).
- - Navigate through samples data with the mouse wheel in the samples editor.
- - Arrows to finetune samples looping datas in instruments tab.
  - Undo functions for samples editor and patterns.
  - Click on numbers & move the mouse to modify them (or use the wheel).
- - Alternate way to enter notes (a la fruity loops).
+ - Alternate way to enter notes (a la fruity loops or something).
  - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).

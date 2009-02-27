@@ -4,16 +4,20 @@ ProTrekkr releases history
 
 v1.96:
 
-- More granularity of constants generation (potentially smaller replay).
+- More granularity in constants generation (potentially smaller replay).
 - Mp3 samples packing bitrate is now selectable between:
   64, 88, 96, 128, 160 & 192 kbps.
 - LSHIFT+I: Show instruments list / LSHIFT+S: Show synths list.
 - Forgot to include LameACM.inf in the windows distribution
   (without that file the codec couldn't be installed
-   and samples with mp3 packing scheme weren't packed at all, shame).
+   and samples using mp3 packing scheme weren't packed at all, shame).
 - Added At3 samples packing scheme (Windows users need to install
-  the atrac3 codec located in the install directory).
-  Rates are: 66, 105 & 132 kbps (the result is quite good actually).
+  the atrac3 codec located in the install directory in order to pack samples).
+  Rates are: 66, 105 & 132 kbps.
+- Added the ability to select a range of positions for songs rendering to .wav.
+- The nasty click occuring when loading a module while another one
+  was still playing should be gone.
+- Added mouse wheel navigation support in samples editor.
 
 v1.95:
 

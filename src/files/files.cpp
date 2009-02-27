@@ -1338,7 +1338,6 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
-
             }
             else
             {

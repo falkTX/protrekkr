@@ -172,10 +172,13 @@ float right_chorus;
 float delay_left_final;
 float delay_right_final;
 int PosInTick;
-char rawrender;
-char rawrender_32float;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+    char rawrender;
+    char rawrender_32float;
+    int rawrender_range;
+    int rawrender_from;
+    int rawrender_to;
     float mas_vol = 1.0f;
 #else
     float mas_vol;
@@ -183,12 +186,19 @@ char rawrender_32float;
 
 float local_mas_vol;
 float local_curr_mas_vol;
+volatile float local_curr_ramp_vol;
+volatile float local_ramp_vol;
 
 int left_value;
 int right_value;
 
 #if !defined(__WINAMP__)
     int Songplaying_Pattern;
+
+#if !defined(__STAND_ALONE__) 
+    int done;
+#endif
+
 #else
     extern int done;
 #endif
@@ -196,21 +206,23 @@ int right_value;
 int Subicounter;
 
 #if !defined(__NO_CODEC__)
-#if defined(PTK_MP3)
 
+#if defined(PTK_MP3)
 char Mp3_BitRate[MAX_INSTRS];
 int Type_Mp3_BitRate[] =
 {
     64, 88, 96, 128, 160, 192
 };
+#endif
 
+#if defined(PTK_AT3)
 char At3_BitRate[MAX_INSTRS];
 int Type_At3_BitRate[] =
 {
     66, 105, 132
 };
-
 #endif
+
 #endif
 
 #if defined(PTK_FX_PATTERNBREAK)
@@ -526,7 +538,7 @@ void Initreverb();
 float Mas_Compressor(float input, float *rms_sum, float *Buffer, float *Env);
 float Do_RMS(float input, float *rms_sum, float *buffer);
 
-int Done_Reset;
+volatile int Done_Reset;
 void Reset_Values(void);
 
 // ------------------------------------------------------
@@ -612,7 +624,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
         }
       
-        if(local_curr_mas_vol == 0.0f)
+        if(local_curr_ramp_vol <= 0.0f)
         {
             Reset_Values();
         }
@@ -635,8 +647,6 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #if defined(__WIN32__)
 int STDCALL Ptk_InitDriver(HWND hWnd, int milliseconds)
 {
-    int i;
-
     AUDIO_Milliseconds = milliseconds;
 #else
 int STDCALL Ptk_InitDriver(int milliseconds)
@@ -647,6 +657,8 @@ int STDCALL Ptk_InitDriver(int milliseconds)
 int STDCALL Ptk_InitDriver(void)
 {
 #endif
+
+    int i;
 
 #if defined(PTK_SYNTH)
     // Create the stock waveforms
@@ -854,10 +866,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
     int nbr_instr;
     int twrite;
 
-    Ptk_Stop();
-
-    // .ptp modules aren't portable from big endian platform to
-    // little endian ones
+    // .ptp modules aren't portable from big endian platform to little endian ones
     // (so that header will be saved as PRTK on little endian platforms and as KTRP on the other ones)
     if(dwModule[0] == 'KTRP')
     {
@@ -974,9 +983,19 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         Save_Len /= 2;
                         Sample_Buffer = Unpack_Sample(Save_Len,
                                                       SampleCompression[swrite],
-                                                      SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
-                                                      Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                      SampleCompression[swrite] == SMP_PACK_MP3 ?
+#if defined(PTK_MP3)
+                                                      Type_Mp3_BitRate[Mp3_BitRate[swrite]]
+#else
+                                                      0
+#endif
+                                                      :
+
+#if defined(PTK_AT3)
                                                       Type_At3_BitRate[At3_BitRate[swrite]]
+#else
+                                                      0
+#endif
                                                      );
 
                         Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
@@ -1005,9 +1024,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     {
                         RawSamples[swrite][0][slwrite] = Unpack_Sample(Save_Len,
                                                                        SampleCompression[swrite],
-                                                                       SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
-                                                                            Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                                       SampleCompression[swrite] == SMP_PACK_MP3 ?
+#if defined(PTK_MP3)
+                                                                            Type_Mp3_BitRate[Mp3_BitRate[swrite]]
+#else
+                                                                            0
+#endif
+                                                                            :
+#if defined(PTK_AT3)
                                                                             Type_At3_BitRate[At3_BitRate[swrite]]
+#else
+                                                                            0
+#endif
                                                                       );
                     }
                     *(RawSamples[swrite][0][slwrite]) = 0;
@@ -1020,9 +1048,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         {
                             Sample_Buffer = Unpack_Sample(Save_Len,
                                                           SampleCompression[swrite],
-                                                          SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
-                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                          SampleCompression[swrite] == SMP_PACK_MP3 ?
+#if defined(PTK_MP3)
+                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]]
+#else
+                                                                0
+#endif
+                                                                :
+#if defined(PTK_AT3)
                                                                 Type_At3_BitRate[At3_BitRate[swrite]]
+#else
+                                                                0
+#endif
                                                          );
 
                             Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
@@ -1047,9 +1084,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         {
                             RawSamples[swrite][1][slwrite] = Unpack_Sample(Save_Len,
                                                                            SampleCompression[swrite],
-                                                                           SampleCompression[swrite] == SAMPLE_PACK_MP3 ?
-                                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]] :
+                                                                           SampleCompression[swrite] == SMP_PACK_MP3 ?
+#if defined(PTK_MP3)
+                                                                                Type_Mp3_BitRate[Mp3_BitRate[swrite]]
+#else
+                                                                                0
+#endif
+                                                                                :
+#if defined(PTK_AT3)
                                                                                 Type_At3_BitRate[At3_BitRate[swrite]]
+#else
+                                                                                0
+#endif
                                                                           );
                         }
                         *RawSamples[swrite][1][slwrite] = 0;
@@ -1378,9 +1424,14 @@ void Reset_Values(void)
             ped_line = ped_line_delay;
         }
 
+#if defined(__PSP__)
+        volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
+        *ptr_Done_Reset = TRUE;
+#else
         Done_Reset = TRUE;
-        Songplaying = FALSE;
+#endif
 
+        Songplaying = FALSE;
     }
 }
 
@@ -1403,8 +1454,13 @@ void PTKEXPORT Ptk_Play(void)
 #endif
 
     Done_Reset = FALSE;
+
     local_mas_vol = 1.0f;
     local_curr_mas_vol = 0.0f;
+
+    local_ramp_vol = 1.0f;
+    local_curr_ramp_vol = 0.0f;
+
     Reset_Values();
     Done_Reset = FALSE;
 
@@ -1415,12 +1471,33 @@ void PTKEXPORT Ptk_Play(void)
 #endif
 }
 
+#if defined(__PSP__)
+extern "C"
+{
+    void me_sceKernelDcacheWritebackInvalidateAll(void);
+}
+#endif
+
 // ------------------------------------------------------
 // Stop replaying
 void PTKEXPORT Ptk_Stop(void)
 {
-    local_mas_vol = 0.0f;
+#if defined(__PSP__)
+    volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
+    *ptr_Done_Reset = FALSE;
+    me_sceKernelDcacheWritebackInvalidateAll();
+    sceKernelDcacheWritebackInvalidateAll();	
+    while(*ptr_Done_Reset == FALSE)
+    {
+        local_ramp_vol = 0.0f;
+    }
+#else
     Done_Reset = FALSE;
+    while(Done_Reset == FALSE)
+    {
+        local_ramp_vol = 0.0f;
+    }
+#endif
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     // Free the patterns block
@@ -1582,8 +1659,10 @@ void Pre_Song_Init(void)
 
     }
 
-    local_mas_vol = 1.0f;
-    local_curr_mas_vol = 0.0f;
+#if defined(PTK_303)
+    tb303engine[0].reset();
+    tb303engine[1].reset();
+#endif
 
 #if defined(PTK_FLANGER)
     Flanger_sbuf0L = 0;
@@ -1715,6 +1794,12 @@ void Post_Song_Init(void)
     if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle) / 200);
     else shufflestep = (SamplesPerTick * shuffle) / 200;
 #endif
+
+    local_ramp_vol = 1.0f;
+    local_curr_ramp_vol = 0.0f;
+    
+    local_mas_vol = 1.0f;
+    local_curr_mas_vol = 0.0f;
 
     cPosition_delay = cPosition;
 
@@ -2081,7 +2166,7 @@ void Sp_Player(void)
                     if(cPosition >= sLength)
                     {
                         cPosition = 0;
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__)
                         done = 1;
 #endif
                     }
@@ -3075,7 +3160,7 @@ void Play_Instrument(int channel, int sub_channel,
             }
 
             // Send the note to the midi device
-            float veloc = vol * mas_vol * local_mas_vol;
+            float veloc = vol * mas_vol * local_mas_vol * local_ramp_vol;
 
             Midi_Send(144 + CHAN_MIDI_PRG[channel], mnote, (int) (veloc * 127));
             if(midi_sub_channel < 0) Midi_Current_Notes[CHAN_MIDI_PRG[channel]][(-midi_sub_channel) - 1] = mnote;
@@ -3765,16 +3850,30 @@ void GetPlayerValues(void)
     if(local_curr_mas_vol >= local_mas_vol)
     {
         local_curr_mas_vol -= 0.003f;
+        if(local_curr_mas_vol < 0.0f) local_curr_mas_vol = 0.0f;
     }
     else
     {
         local_curr_mas_vol += 0.003f;
+        if(local_curr_mas_vol > 1.0f) local_curr_mas_vol = 1.0f;
     }
-    if(local_curr_mas_vol > 1.0f) local_curr_mas_vol = 1.0f;
-    if(local_curr_mas_vol < 0.0f) local_curr_mas_vol = 0.0f;
 
     left_float *= local_curr_mas_vol;
     right_float *= local_curr_mas_vol;
+
+    if(local_curr_ramp_vol >= local_ramp_vol)
+    {
+        local_curr_ramp_vol -= 0.003f;
+        if(local_curr_ramp_vol < 0.0f) local_curr_ramp_vol = 0.0f;
+    }
+    else
+    {
+        local_curr_ramp_vol += 0.003f;
+        if(local_curr_ramp_vol > 1.0f) local_curr_ramp_vol = 1.0f;
+    }
+
+    left_float *= local_curr_ramp_vol;
+    right_float *= local_curr_ramp_vol;
 
     if(left_float > 1.0f) left_float = 1.0f;
     if(left_float < -1.0f) left_float = -1.0f;
@@ -4252,8 +4351,13 @@ void KillInst(int inst_nbr)
     SampleCompression[inst_nbr] = SMP_PACK_NONE;
 #endif
 
+#if defined(PTK_MP3)
     Mp3_BitRate[inst_nbr] = 0;
+#endif
+
+#if defined(PTK_AT3)
     At3_BitRate[inst_nbr] = 0;
+#endif
 
     for(int z = 0; z < 16; z++)
     {

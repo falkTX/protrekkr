@@ -3,14 +3,16 @@ TARGET = ptkreplay
 EXTRA_TARGETS = EBOOT.PBP
 
 OBJS = test/test_psp.o test/module.o lib/sounddriver/mestub.o
-
+#-ffast-math -fgcse-las -fgcse-sm -fgcse-after-reload -fauto-inc-dec -fdelayed-branch \
+ #        -fsee -ftracer -freorder-blocks-and-partition -fstrict-aliasing -fweb -fsingle-precision-constant \
+         
 INCDIR =
-CFLAGS = -n -g -G0 -O3 -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__ -D __PSP__
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+CFLAGS = -n -ffast-math -fsingle-precision-constant -g -G0 -O2 -D __GCC__ -D __STAND_ALONE__ -D __NO_CODEC__ -D __NO_MIDI__ -D __PSP__
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -ffast-math
 ASFLAGS = -c $(CFLAGS)
 
 LIBDIR =
-LDFLAGS = -g -nostartfiles -mno-crt0 
+LDFLAGS = -g -nostartfiles -mno-crt0 -ffast-math
 LIBS= -lptkreplay -lpspaudio -lpsprtc -lpsppower -lm -lpspmath
 
 CC       = psp-gcc

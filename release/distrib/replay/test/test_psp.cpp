@@ -41,7 +41,7 @@ void ptk_start(void)
         {
             // Start playing it
             Ptk_Play();
-        
+
             // Quit with the home button
 	        while(1)
             {

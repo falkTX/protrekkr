@@ -943,6 +943,27 @@ void Mouse_Left_Sample_Ed(void)
     }
 }
 
+void Mouse_Wheel_Sample_Ed(int roll_amount)
+{
+    if(userscreen == USER_SCREEN_SAMPLE_EDIT)
+    {
+        if(zcheckMouse(0, 450, 512, 109 + 16))
+        {
+            int max_length = SampleNumSamples[ped_patsam][ped_split];
+            int shown_length = (sed_range_end - sed_range_start) + 1;
+            sed_display_start += roll_amount * (shown_length / 16);
+            
+            if(sed_display_start < 0) sed_display_start = 0;
+            if(sed_display_start > (max_length - sed_display_length))
+            {
+                sed_display_start = (max_length - sed_display_length);
+            }
+            gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
+            draw_sampled_wave = TRUE;
+        }
+    }
+}
+
 void Mouse_Sliders_Sample_Ed(void)
 {
     int Mouse_Pos;
@@ -954,7 +975,6 @@ void Mouse_Sliders_Sample_Ed(void)
         {
             if(SampleType[ped_patsam][ped_split])
             {
-
                 Mouse_Pos = Mouse.x - 1;
                 if(Mouse_Pos < 0) Mouse_Pos = 0;
                 if(Mouse_Pos > 512) Mouse_Pos = 512;

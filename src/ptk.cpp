@@ -149,6 +149,9 @@ Uint32 Timer_CallBack(Uint32 interval, void *param);
 Uint32 (*Timer_Ptr)(Uint32 interval, void *param) = &Timer_CallBack;
 char CpuStr[80];
 
+extern int done;
+extern float local_curr_mas_vol;
+
 int Asking_Exit;
 
 int MouseWheel_Multiplier = 1;
@@ -569,9 +572,9 @@ int Screen_Update(void)
             {
                 if(Get_Current_FileType() != _A_SUBDIR)
                 {
-                    AUDIO_Stop();
                     Stop_Current_Sample();
                     LoadFile(ped_patsam, Get_Current_FileName());
+                    AUDIO_Stop();
                     AUDIO_Play();
                 }
                 else
@@ -1109,7 +1112,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_UPDATE_DISKIO_ED)
         {
-            Actualize_DiskIO_Ed(0);
+            Actualize_DiskIO_Ed(teac);
         }
 
         if(gui_action == GUI_CMD_NEW_MODULE)
@@ -1514,6 +1517,7 @@ void LoadFile(int Freeindex, const char *str)
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
+            Ptk_Stop();
             LoadMod(name);
             NewWav();
         }
@@ -1779,6 +1783,10 @@ void Newmod(void)
     delay_time = 0;
     seditor = 0;
 
+    rawrender_range = FALSE;
+    rawrender_from = 0;
+    rawrender_to = 0;
+
     Final_Mod_Length = 0;
 
     for(int spl = 0; spl < MAX_TRACKS; spl++)
@@ -1950,6 +1958,7 @@ void WavRenderizer(void)
     sprintf(buffer, "%s.wav", name);
     int Save_CHAN_MUTE_STATE[MAX_TRACKS];
     int i;
+    int Max_Position;
 
     if(!hd_isrecording)
     {
@@ -1964,15 +1973,25 @@ void WavRenderizer(void)
         SDL_Delay(500);
         sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
         mess_box(buffer);
-        SDL_Delay(500);
+        SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 
         ped_line = 0;
         ped_line_delay = 0;
-        cPosition = 0;
-        cPosition_delay = 0;
+        if(rawrender_range)
+        {
+            cPosition = rawrender_from;
+            cPosition_delay = rawrender_from;
+            Max_Position = rawrender_to + 1;
+        }
+        else
+        {
+            cPosition = 0;
+            cPosition_delay = 0;
+            Max_Position = sLength;
+        }
 
         long filesize = 0;
-        char bru = FALSE;
+        done = FALSE;
 
         for(i = 0; i < MAX_TRACKS; i++)
         {
@@ -1982,29 +2001,28 @@ void WavRenderizer(void)
 
         SongPlay();
 
-        while(cPosition > 0 || ped_line > 0 || bru == FALSE)
+        while(cPosition < Max_Position && done == FALSE)
         {
-            if(ped_line > 0) bru = TRUE;
             GetPlayerValues();
             if(rawrender_32float)
             {
                 RF.WriteStereoFloatSample(left_float_render, right_float_render);
-                filesize += 8;
             }
             else
             {
                 RF.WriteStereoSample(left_value, right_value);
-                filesize += 4;
             }
+            filesize += 4;
         }
+
+        RF.Close();
+        SongStop();
 
         for(i = 0; i < MAX_TRACKS; i++)
         {
             CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
         }
 
-        RF.Close();
-        SongStop();
         int minutes = filesize / 10584000;
         int seconds = (filesize - minutes * 10584000) / 176400;
 
@@ -2061,7 +2079,7 @@ void Stop_Current_Sample(void)
         {
             if(sp_channelsample[u][i] == ped_patsam)
             {
-                sp_Stage[u][i] = PLAYING_NOSAMPLE;
+                if(sp_Stage[u][i] = PLAYING_SAMPLE) sp_Stage[u][i] = PLAYING_SAMPLE_NOTEOFF;
             }
         }
         Player_FD[u] = 0;
@@ -4014,6 +4032,8 @@ void Mouse_Handler(void)
 
         // Scroll the knobs
         Mouse_Wheel_303_Ed(MouseWheel_Multiplier);
+
+        Mouse_Wheel_Sample_Ed(MouseWheel_Multiplier);
     }
 
     // mouse wheel down
@@ -4077,6 +4097,8 @@ void Mouse_Handler(void)
 
         // Scroll the knobs
         Mouse_Wheel_303_Ed(-MouseWheel_Multiplier);
+
+        Mouse_Wheel_Sample_Ed(-MouseWheel_Multiplier);
     }
 
     if(Mouse.button & MOUSE_RIGHT_BUTTON)
@@ -5352,6 +5374,7 @@ void Note_Jazz(int track, int note)
     Sub_Channels_Jazz[track][Sub_Channel].Channel = track;
     Sub_Channels_Jazz[track][Sub_Channel].Sub_Channel = Sub_Channel;
     local_mas_vol = 1.0f;
+    local_ramp_vol = 1.0f;
 
     if(!is_editing || is_recording_2)
     {
