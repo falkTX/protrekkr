@@ -142,7 +142,7 @@ void Actualize_Track_Ed(char gode)
         {
             if(DSend[ped_track] < 0) DSend[ped_track] = 0;
             if(DSend[ped_track] > 1.0f) DSend[ped_track] = 1.0f;
-            Realslider(308, 520, int(DSend[ped_track] * 128.0f), TRUE);
+            Realslider(308, 520, int(DSend[ped_track] * 128.0f), compressor != 0);
         }
 
         if(gode == 0 || gode == 6)
@@ -472,7 +472,7 @@ void Mouse_Sliders_Track_Ed(void)
         if(zcheckMouse(77, 538, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
         if(zcheckMouse(308, 484, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
         if(zcheckMouse(308, 502, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
-        if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
+        if(compressor != 0) if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
         if(zcheckMouse(308, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
     }
 }

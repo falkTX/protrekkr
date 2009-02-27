@@ -2,6 +2,16 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.95b:
+
+- More granularity of constants generation (potentially smaller replay).
+- Mp3 samples packing bitrate is now selectable between:
+  64, 88, 96, 128, 160 & 192 kbps.
+- LSHIFT+I: Show instruments list / LSHIFT+S: Show synths list.
+- Forgot to include LameACM.inf in the windows distribution
+  (without that file the codec couldn't be installed
+   and samples with mp3 packing scheme weren't packed at all, shame).
+
 v1.95:
 
 - Introduced small tracks

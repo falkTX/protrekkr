@@ -59,13 +59,12 @@ typedef unsigned int Uint32;
 // ------------------------------------------------------
 // Constants
 #define MP3_FRAMES_DELAG (1460 - 355)
-#define BITRATE 64
 
 // ------------------------------------------------------
 // Functions
 void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
 void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
-void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
+void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
 
 #endif
 

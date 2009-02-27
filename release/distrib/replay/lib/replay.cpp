@@ -195,6 +195,18 @@ int right_value;
 
 int Subicounter;
 
+#if !defined(__NO_CODEC__)
+#if defined(PTK_MP3)
+
+char Mp3_BitRate[MAX_INSTRS];
+int Type_Mp3_BitRate[] =
+{
+    64, 88, 96, 128, 160, 192
+};
+
+#endif
+#endif
+
 #if defined(PTK_FX_PATTERNBREAK)
 // 255 when no jump or yes on patbreak < 128 = line to jump.
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -400,7 +412,7 @@ int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
-char SampleCompression[128];
+char SampleCompression[MAX_INSTRS];
 int delay_time;
 int DelayType;
 
@@ -752,7 +764,7 @@ void Mod_Dat_Read(void *Dest, int size)
     Cur_Module += size;
 }
 
-short *Unpack_Sample(int Dest_Length, char Pack_Type)
+short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 {
     int Packed_Length;
     short *Dest_Buffer;
@@ -789,7 +801,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type)
 
 #if !defined(__NO_CODEC__)
 #if defined(PTK_MP3)
-                UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
 #endif
 #endif
                 break;
@@ -889,11 +901,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             if(Synthprg[swrite])
             {
                 Mod_Dat_Read(&PARASynth[swrite], sizeof(SynthParameters));
-            } 
+            }
 #endif
 
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
+
+#if defined(PTK_MP3)
+            if(SampleCompression[swrite] == SMP_PACK_MP3)
+            {
+                Mod_Dat_Read(&Mp3_BitRate[swrite], sizeof(char));
+            }
+#endif
 
             for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
@@ -924,7 +943,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     if(Apply_Interpolation)
                     {
                         Save_Len /= 2;
-                        Sample_Buffer = Unpack_Sample(Save_Len, SampleCompression[swrite]);
+                        Sample_Buffer = Unpack_Sample(Save_Len,
+                                                      SampleCompression[swrite],
+#if defined(PTK_MP3)
+                                                      Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
+#else
+                                                      0);
+#endif
                         Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                         // Interpolate samples
                         for(iSmp = 0; iSmp < Save_Len; iSmp++)
@@ -949,7 +974,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     }
                     else
                     {
-                        RawSamples[swrite][0][slwrite] = Unpack_Sample(Save_Len, SampleCompression[swrite]);
+                        RawSamples[swrite][0][slwrite] = Unpack_Sample(Save_Len,
+                                                                       SampleCompression[swrite],
+#if defined(PTK_MP3)
+                                                                       Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
+#else
+                                                                       0);
+#endif
                     }
                     *(RawSamples[swrite][0][slwrite]) = 0;
 
@@ -959,7 +990,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     {
                         if(Apply_Interpolation)
                         {
-                            Sample_Buffer = Unpack_Sample(Save_Len, SampleCompression[swrite]);
+                            Sample_Buffer = Unpack_Sample(Save_Len,
+                                                          SampleCompression[swrite],
+#if defined(PTK_MP3)
+                                                          Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
+#else
+                                                          0);
+#endif
                             Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                             for(iSmp = 0; iSmp < Save_Len; iSmp++)
                             {
@@ -980,7 +1017,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                         }
                         else
                         {
-                            RawSamples[swrite][1][slwrite] = Unpack_Sample(Save_Len, SampleCompression[swrite]);
+                            RawSamples[swrite][1][slwrite] = Unpack_Sample(Save_Len,
+                                                                           SampleCompression[swrite],
+#if defined(PTK_MP3)
+                                                                           Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
+#else
+                                                                           0);
+#endif
                         }
                         *RawSamples[swrite][1][slwrite] = 0;
                     }
@@ -989,6 +1032,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                 }// Exist Sample
             }
         }
+
+        // Reading mod properties
+        Mod_Dat_Read(&compressor, sizeof(char));
 
         // Reading Track Properties
         for(twrite = 0; twrite < Songtracks; twrite++)
@@ -1002,13 +1048,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&FRez[twrite], sizeof(int));
             Mod_Dat_Read(&DThreshold[twrite], sizeof(float));
             Mod_Dat_Read(&DClamp[twrite], sizeof(float));
-            Mod_Dat_Read(&DSend[twrite], sizeof(float));
+
+#if defined(PTK_COMPRESSOR)
+            if(compressor)
+            {
+                Mod_Dat_Read(&DSend[twrite], sizeof(float));
+            }
+#endif
+
             Mod_Dat_Read(&CSend[twrite], sizeof(int));
             Mod_Dat_Read(&Channels_Polyphony[twrite], sizeof(char));
         }
 
-        // Reading mod properties
-        Mod_Dat_Read(&compressor, sizeof(char));
         Mod_Dat_Read(&c_threshold, sizeof(int));
         Mod_Dat_Read(&BeatsPerMin, sizeof(int));
         Mod_Dat_Read(&TicksPerBeat, sizeof(int));
@@ -1018,26 +1069,32 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 
 #if defined(PTK_LIMITER)
-        Mod_Dat_Read(&mas_threshold, sizeof(float));
-        Mod_Dat_Read(&mas_ratio, sizeof(float));
+        if(Comp_Flag)
+        {
+            Mod_Dat_Read(&mas_threshold, sizeof(float));
+            Mod_Dat_Read(&mas_ratio, sizeof(float));
+        }
 #endif
 
         Mod_Dat_Read(&delay_time, sizeof(int));
         Mod_Dat_Read(&Feedback, sizeof(float));
 
 #if defined(PTK_COMPRESSOR)
-        Mod_Dat_Read(&DelayType, sizeof(int));
-        Mod_Dat_Read(&num_echoes, sizeof(char));
+        if(compressor)
+        {
+            Mod_Dat_Read(&DelayType, sizeof(int));
+            Mod_Dat_Read(&num_echoes, sizeof(char));
 
-        for(i = 0; i < MAX_COMB_FILTERS; i++)
-        {
-            Mod_Dat_Read(&delays[i], sizeof(int));
-        }
-        for(j = 0; j < MAX_COMB_FILTERS; j++)
-        {
-            for(i = 0; i < 2; i++)
+            for(i = 0; i < MAX_COMB_FILTERS; i++)
             {
-                Mod_Dat_Read(&decays[j][i], sizeof(float));
+                Mod_Dat_Read(&delays[i], sizeof(int));
+            }
+            for(j = 0; j < MAX_COMB_FILTERS; j++)
+            {
+                for(i = 0; i < 2; i++)
+                {
+                    Mod_Dat_Read(&decays[j][i], sizeof(float));
+                }
             }
         }
 #endif
@@ -4166,6 +4223,10 @@ void KillInst(int inst_nbr)
     SampleCompression[inst_nbr] = SMP_PACK_GSM;
 #else
     SampleCompression[inst_nbr] = SMP_PACK_NONE;
+#endif
+
+#if defined(PTK_MP3)
+    Mp3_BitRate[inst_nbr] = 0;
 #endif
 
     for(int z = 0; z < 16; z++)

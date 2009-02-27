@@ -176,6 +176,9 @@ extern float decays[MAX_COMB_FILTERS][2];
 extern int delays[MAX_COMB_FILTERS];       // delays for the comb filters
 extern int counters[MAX_COMB_FILTERS];
 
+extern char Mp3_BitRate[MAX_INSTRS];
+extern int Type_Mp3_BitRate[];
+
 #if defined(PTK_COMPRESSOR)
 extern char num_echoes;
 #endif
@@ -195,26 +198,26 @@ extern char Songtracks;
 extern unsigned char sLength;
 extern unsigned char pSequence[256];
 extern short patternLines[MAX_ROWS];
-extern char nameins[128][20];
-extern char Midiprg[128];
+extern char nameins[MAX_INSTRS][20];
+extern char Midiprg[MAX_INSTRS];
 
 #if defined(PTK_SYNTH)
-extern unsigned char Synthprg[128];
+extern unsigned char Synthprg[MAX_INSTRS];
 #endif
 
-extern char SampleType[128][16];
-extern char SampleCompression[128];
-extern char SampleName[128][16][64];
-extern char Basenote[128][16];
-extern Uint32 LoopStart[128][16];
-extern Uint32 LoopEnd[128][16];
-extern char LoopType[128][16];
-extern Uint32 SampleNumSamples[128][16];
-extern char Finetune[128][16];
-extern float SampleVol[128][16];
-extern float FDecay[128][16];
-extern short *RawSamples[128][2][16];
-extern char SampleChannels[128][16];
+extern char SampleType[MAX_INSTRS][16];
+extern char SampleCompression[MAX_INSTRS];
+extern char SampleName[MAX_INSTRS][16][64];
+extern char Basenote[MAX_INSTRS][16];
+extern Uint32 LoopStart[MAX_INSTRS][16];
+extern Uint32 LoopEnd[MAX_INSTRS][16];
+extern char LoopType[MAX_INSTRS][16];
+extern Uint32 SampleNumSamples[MAX_INSTRS][16];
+extern char Finetune[MAX_INSTRS][16];
+extern float SampleVol[MAX_INSTRS][16];
+extern float FDecay[MAX_INSTRS][16];
+extern short *RawSamples[MAX_INSTRS][2][16];
+extern char SampleChannels[MAX_INSTRS][16];         // Mono / Stereo
 extern float TCut[MAX_TRACKS];
 extern float ICut[MAX_TRACKS];
 extern float TPan[MAX_TRACKS];

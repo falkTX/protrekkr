@@ -1408,6 +1408,7 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
 #else
     SampleCompression[n_index] = SMP_PACK_NONE;
 #endif
+    Mp3_BitRate[n_index] = 0;
 
     SampleChannels[n_index][ped_split] = samplechans;
     RawSamples[n_index][0][ped_split] = (short *) malloc(lenfir * 2);
@@ -1508,6 +1509,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGA") == 0 ||
                 strcmp(extension, "TWNNSNGB") == 0 ||
                 strcmp(extension, "TWNNSNGC") == 0 ||
+                strcmp(extension, "TWNNSNGD") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -3195,6 +3197,21 @@ void Keyboard_Handler(void)
                     if(userscreen == USER_SCREEN_TRACK_EDIT) Actualize_Track_Ed(10);
                     Actupated(0);
                 }
+
+                // Display instruments list
+                if(Keys[SDLK_i - UNICODE_OFFSET1])
+                {
+                    Scopish = SCOPE_ZONE_INSTR_LIST;
+                    Draw_Scope_Files_Button();
+                }
+
+                // Display synths list
+                if(Keys[SDLK_s - UNICODE_OFFSET1])
+                {
+                    Scopish = SCOPE_ZONE_SYNTH_LIST;
+                    Draw_Scope_Files_Button();
+                }
+
             }
         }
 

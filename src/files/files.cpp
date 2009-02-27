@@ -202,8 +202,8 @@ int Read_Mod_Data(void *Datas, int Unit, int Length, FILE *Handle);
 int Read_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle);
 int Write_Mod_Data(void *Datas, int Unit, int Length, FILE *Handle);
 int Write_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle);
-void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type);
-short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type);
+void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int BitRate);
+short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitRate);
 void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int (*Read_Function_Swap)(void *, int ,int, FILE *),
                        FILE *in,
@@ -713,6 +713,7 @@ int LoadMod(char *FileName)
     int Old_Bug = TRUE;
     int new_disto = FALSE;
     int Pack_Scheme = FALSE;
+    int Mp3_Scheme = FALSE;
     int tps_pos;
     int tps_trk;
     int nbr_instr;
@@ -744,6 +745,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'D':
+                Mp3_Scheme = TRUE;
             case 'C':
                 Multi = TRUE;
             case 'B':
@@ -982,7 +985,17 @@ Read_Mod_File:
                     }
 
                     // Compression type
-                    if(Pack_Scheme) Read_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+                    if(Pack_Scheme)
+                    {
+                        Read_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+                        if(Mp3_Scheme)
+                        {
+                            if(SampleCompression[swrite] == SMP_PACK_MP3)
+                            {
+                                Read_Mod_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
+                            }
+                        }
+                    }
 
                     for(int slwrite = 0; slwrite < 16; slwrite++)
                     {
@@ -1118,6 +1131,10 @@ Read_Mod_File:
 
                     // Compression type
                     Read_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+                    if(SampleCompression[swrite] == SMP_PACK_MP3)
+                    {
+                        Read_Mod_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
+                    }
 
                     for(int slwrite = 0; slwrite < 16; slwrite++)
                     {
@@ -1153,7 +1170,10 @@ Read_Mod_File:
                             if(Apply_Interpolation)
                             {
                                 Save_Len /= 2;
-                                Sample_Buffer = Unpack_Sample(in, Save_Len, SampleCompression[swrite]);
+                                Sample_Buffer = Unpack_Sample(in,
+                                                              Save_Len,
+                                                              SampleCompression[swrite],
+                                                              Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                                 Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                                 if(Sample_Buffer)
                                 {
@@ -1181,7 +1201,10 @@ Read_Mod_File:
                             }
                             else
                             {
-                                RawSamples[swrite][0][slwrite] = Unpack_Sample(in, Save_Len, SampleCompression[swrite]);
+                                RawSamples[swrite][0][slwrite] = Unpack_Sample(in,
+                                                                               Save_Len,
+                                                                               SampleCompression[swrite],
+                                                                               Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                             }
                             *(RawSamples[swrite][0][slwrite]) = 0;
 
@@ -1191,7 +1214,10 @@ Read_Mod_File:
                             {
                                 if(Apply_Interpolation)
                                 {
-                                    Sample_Buffer = Unpack_Sample(in, Save_Len, SampleCompression[swrite]);
+                                    Sample_Buffer = Unpack_Sample(in,
+                                                                  Save_Len,
+                                                                  SampleCompression[swrite],
+                                                                  Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                                     Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 2);
                                     if(Sample_Buffer)
                                     {
@@ -1215,7 +1241,10 @@ Read_Mod_File:
                                 }
                                 else
                                 {
-                                    RawSamples[swrite][1][slwrite] = Unpack_Sample(in, Save_Len, SampleCompression[swrite]);
+                                    RawSamples[swrite][1][slwrite] = Unpack_Sample(in,
+                                                                                   Save_Len,
+                                                                                   SampleCompression[swrite],
+                                                                                   Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                                 }
                                 *RawSamples[swrite][1][slwrite] = 0;
                             }
@@ -1289,6 +1318,8 @@ Read_Mod_File:
             }
             else
             {
+                Read_Mod_Data(&compressor, sizeof(char), 1, in);
+
                 // Reading Track Properties
                 for(twrite = 0; twrite < Songtracks; twrite++)
                 {
@@ -1303,13 +1334,15 @@ Read_Mod_File:
                     Read_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
                     Read_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
                     Read_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
-                    Read_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+                    if(compressor)
+                    {
+                        Read_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+                    }
                     Read_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
                     Read_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
                 }
 
                 // Reading mod properties
-                Read_Mod_Data(&compressor, sizeof(char), 1, in);
                 Read_Mod_Data(&c_threshold, sizeof(int), 1, in);
                 Read_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
                 Read_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
@@ -1654,7 +1687,7 @@ Read_Mod_File:
 
 // ------------------------------------------------------
 // Load and decode a packed sample
-short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
+short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitRate)
 {
     int Packed_Length;
 
@@ -1691,7 +1724,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
                 UnpackGSM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
             case SMP_PACK_MP3:
-                UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
                 break;
             case SMP_PACK_TRUESPEECH:
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
@@ -1710,7 +1743,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type)
 // ------------------------------------------------------
 // Save a packed sample
 #if !defined(__WINAMP__)
-void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
+void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int BitRate)
 {
     int PackedLen = 0;
     short *PackedSample = NULL;
@@ -1726,16 +1759,19 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
             memset(PackedSample, 0, Size * 2);
             //PackedLen = ToAT3(Sample, PackedSample, Size * 2);
             break;
+
         case SMP_PACK_GSM:
             PackedSample = (short *) malloc(Size * 2);
             memset(PackedSample, 0, Size * 2);
             PackedLen = ToGSM(Sample, PackedSample, Size * 2);
             break;
+
         case SMP_PACK_MP3:
             PackedSample = (short *) malloc(Size * 2);
             memset(PackedSample, 0, Size * 2);
-            PackedLen = ToMP3(Sample, PackedSample, Size * 2);
+            PackedLen = ToMP3(Sample, PackedSample, Size * 2, BitRate);
             break;
+
         case SMP_PACK_TRUESPEECH:
             Aligned_Size = (Size * 2) + 0x400;
             AlignedSample = (short *) malloc(Aligned_Size);
@@ -1767,7 +1803,7 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type)
     else
     {
 #endif
-        // Couldn't pack (too small or user do not want that to happens)
+        // Couldn't pack (too small or user do not want that to happen)
         PackedLen = -1;
         Write_Mod_Data(&PackedLen, sizeof(char), 4, FileHandle);
         Write_Mod_Data(Sample, sizeof(char), Size * 2, FileHandle);
@@ -2812,6 +2848,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             Write_Mod_Data(&No_Comp, sizeof(char), 1, in);
 #else
             Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+            if(SampleCompression[swrite] == SMP_PACK_MP3)
+            {
+                Write_Mod_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
+            }
 #endif
 
             // Compression type
@@ -2893,11 +2933,19 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         {
                             Smp_Dats[iSmp] = *(RawSamples[swrite][0][slwrite] + (iSmp * 2));
                         }
-                        Pack_Sample(in, Smp_Dats, Calc_Len, SampleCompression[swrite]);
+                        Pack_Sample(in,
+                                    Smp_Dats,
+                                    Calc_Len,
+                                    SampleCompression[swrite],
+                                    Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                     }
                     else
                     {
-                        Pack_Sample(in, RawSamples[swrite][0][slwrite], Calc_Len, SampleCompression[swrite]);
+                        Pack_Sample(in,
+                                    RawSamples[swrite][0][slwrite],
+                                    Calc_Len,
+                                    SampleCompression[swrite],
+                                    Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                     }
                     // Stereo mode ?
                     Write_Mod_Data(&SampleChannels[swrite][slwrite], sizeof(char), 1, in);
@@ -2910,11 +2958,19 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             {
                                 Smp_Dats[iSmp] = *(RawSamples[swrite][1][slwrite] + (iSmp * 2));
                             }
-                            Pack_Sample(in, Smp_Dats, Calc_Len, SampleCompression[swrite]);
+                            Pack_Sample(in,
+                                        Smp_Dats,
+                                        Calc_Len,
+                                        SampleCompression[swrite],
+                                        Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                         }
                         else
                         {
-                            Pack_Sample(in, RawSamples[swrite][1][slwrite], Calc_Len, SampleCompression[swrite]);
+                            Pack_Sample(in,
+                                        RawSamples[swrite][1][slwrite],
+                                        Calc_Len,
+                                        SampleCompression[swrite],
+                                        Type_Mp3_BitRate[Mp3_BitRate[swrite]]);
                         }
                     }
                     free(Smp_Dats);
@@ -2946,6 +3002,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_MP3", Store_Mp3);
     Save_Constant("PTK_TRUESPEECH", Store_TrueSpeech);
     Save_Constant("PTK_AT3", Store_At3);
+
+    Write_Mod_Data(&compressor, sizeof(char), 1, in);
 
     for(twrite = 0; twrite < Songtracks; twrite++)
     {
@@ -3031,14 +3089,16 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             Write_Mod_Data(&FRez[twrite], sizeof(int), 1, in);
             Write_Mod_Data(&DThreshold[twrite], sizeof(float), 1, in);
             Write_Mod_Data(&DClamp[twrite], sizeof(float), 1, in);
-            Write_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+            if(compressor)
+            {
+                Write_Mod_Data(&DSend[twrite], sizeof(float), 1, in);
+            }
             Write_Mod_Data(&CSend[twrite], sizeof(int), 1, in);
             Write_Mod_Data(&Channels_Polyphony[twrite], sizeof(char), 1, in);
         }
     }
 
     // Writing mod properties
-    Write_Mod_Data(&compressor, sizeof(char), 1, in);
     Write_Mod_Data(&c_threshold, sizeof(int), 1, in);
     Write_Mod_Data(&BeatsPerMin, sizeof(int), 1, in);
     Write_Mod_Data(&TicksPerBeat, sizeof(int), 1, in);
@@ -3386,6 +3446,10 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
                 // Compression type
                 Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+                if(SampleCompression[swrite] == SMP_PACK_MP3)
+                {
+                    Write_Mod_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
+                }
 
                 // 16 splits / instrument
                 for(int slwrite = 0; slwrite < 16; slwrite++)
@@ -3693,6 +3757,7 @@ void LoadInst(char *FileName)
 {
     int old_bug = FALSE;
     int Pack_Scheme = FALSE;
+    int Mp3_Scheme = FALSE;
     int new_adsr = FALSE;
     int tight = FALSE;
 
@@ -3724,6 +3789,14 @@ void LoadInst(char *FileName)
         }
         if(strcmp(extension, "TWNNINS4") == 0)
         {
+            Pack_Scheme = TRUE;
+            new_adsr = TRUE;
+            tight = TRUE;
+            goto Read_Inst;
+        }
+        if(strcmp(extension, "TWNNINS5") == 0)
+        {
+            Mp3_Scheme = TRUE;
             Pack_Scheme = TRUE;
             new_adsr = TRUE;
             tight = TRUE;
@@ -3761,6 +3834,15 @@ Read_Inst:
             // Gsm by default
             if(Pack_Scheme) Read_Data(&SampleCompression[swrite], sizeof(char), 1, in);
             else SampleCompression[swrite] = SMP_PACK_GSM;
+
+            // Load the bitrate
+            if(Mp3_Scheme)
+            {
+                if(SampleCompression[swrite] == SMP_PACK_MP3)
+                {
+                    Read_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
+                }
+            }
 
             for(int slwrite = 0; slwrite < 16; slwrite++)
             {
@@ -3829,7 +3911,7 @@ void SaveInst(void)
     char synth_prg;
     int synth_save;
 
-    sprintf(extension, "TWNNINS4");
+    sprintf(extension, "TWNNINS5");
     sprintf (Temph, "Saving '%s.pti' instrument on current directory...", nameins[ped_patsam]);
     mess_box(Temph);
     sprintf(Temph, "%s.pti", nameins[ped_patsam]);
@@ -3863,6 +3945,7 @@ void SaveInst(void)
         Write_Synth_Params(&Write_Data, &Write_Data_Swap, in, swrite);
 
         Write_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+        Write_Data(&Mp3_BitRate[swrite], sizeof(char), 1, in);
 
         swrite = synth_save;
         for(int slwrite = 0; slwrite < 16; slwrite++)
@@ -4031,6 +4114,13 @@ int Pack_Module(char *FileName)
     Uint8 *Final_Mem_Out;
     int Depack_Size;
 
+    if(!strlen(FileName))
+    {
+        sprintf(name, "Can't save module without a name...");
+        mess_box(name);
+        return(FALSE);
+    }
+
     sprintf(Temph, "%s.ptk", FileName);
 
     int Len = SaveMod("", FALSE, SAVE_CALCLEN, NULL);
@@ -4045,7 +4135,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGC");
+        sprintf(extension, "TWNNSNGD");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

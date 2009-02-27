@@ -111,7 +111,7 @@ int ToGSM(short *Source, short *Dest, int Size)
     return(Dest_Size);
 }
 
-int ToMP3(short *Source, short *Dest, int Size)
+int ToMP3(short *Source, short *Dest, int Size, int BitRate)
 {
     int Src_size;
     int Dest_Size;
@@ -128,7 +128,7 @@ int ToMP3(short *Source, short *Dest, int Size)
     MP3_Format.wfx.cbSize = MPEGLAYER3_WFX_EXTRA_BYTES;
     MP3_Format.wfx.nChannels = 1;
     MP3_Format.wfx.nSamplesPerSec = 44100;
-    MP3_Format.wfx.nAvgBytesPerSec = BITRATE * (1000 / 8);
+    MP3_Format.wfx.nAvgBytesPerSec = BitRate * (1000 / 8);
     MP3_Format.wfx.wBitsPerSample = 0;
     MP3_Format.wfx.nBlockAlign = 1;
     MP3_Format.wID = MPEGLAYER3_ID_MPEG;
@@ -136,7 +136,8 @@ int ToMP3(short *Source, short *Dest, int Size)
     MP3_Format.nBlockSize = 0;
     MP3_Format.nFramesPerBlock = 0;
     MP3_Format.nCodecDelay = 0;
-    acmStreamOpen( &Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &MP3_Format, NULL, 0, 0, 0);
+
+    acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &MP3_Format, NULL, 0, 0, 0);
 
     Src_size = Size;
     unsigned long rawbufsize = 0;
@@ -170,9 +171,9 @@ int ToMP3(short *Source, short *Dest, int Size)
     }
 
     acmStreamUnprepareHeader(Pack_Stream, &Pack_Stream_Head, 0);
+    acmStreamClose(Pack_Stream, 0);
     if(rawbuf) free(rawbuf);
     if(Pack_Buf) free(Pack_Buf);
-    acmStreamClose(Pack_Stream, 0);
 
     return(Dest_Size);
 }

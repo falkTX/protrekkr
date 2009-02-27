@@ -2,8 +2,8 @@
     <encodings default="Current">
         <config name="Current">
             <Smart use="true" />
-            <Copyright use="true" />
-            <CRC use="true" />
+            <Copyright use="false" />
+            <CRC use="false" />
             <Original use="false" />
             <Private use="false" />
             <Channel mode="Joint-stereo" />

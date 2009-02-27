@@ -41,7 +41,7 @@
 // ------------------------------------------------------
 // Functions
 int ToGSM(short *Source, short *Dest, int Size);
-int ToMP3(short *Source, short *Dest, int Size);
+int ToMP3(short *Source, short *Dest, int Size, int BitRate);
 int ToTrueSpeech(short *Source, short *Dest, int Size);
 
 #endif

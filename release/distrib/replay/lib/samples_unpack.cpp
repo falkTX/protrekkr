@@ -161,7 +161,7 @@ void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 // ------------------------------------------------------
 // Unpack a MP3 sample
 #if defined(PTK_MP3)
-void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
 {
     int i;
     int Real_Size;
@@ -172,13 +172,15 @@ void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     MP3_Format.wfx.cbSize = MPEGLAYER3_WFX_EXTRA_BYTES;
     MP3_Format.wfx.nChannels = 1;
     MP3_Format.wfx.nSamplesPerSec = 44100;
-    MP3_Format.wfx.nAvgBytesPerSec = BITRATE * (1000 / 8);
+    MP3_Format.wfx.nAvgBytesPerSec = BitRate * (1000 / 8);
     MP3_Format.wfx.nBlockAlign = 1;
     MP3_Format.wID = MPEGLAYER3_ID_MPEG;
     MP3_Format.fdwFlags = MPEGLAYER3_FLAG_PADDING_OFF;
     MP3_Format.nBlockSize = 0x68;
+    MP3_Format.nFramesPerBlock = 0;
+    MP3_Format.nCodecDelay = 0;
     acmFormatSuggest(NULL, (LPWAVEFORMATEX) &MP3_Format, (LPWAVEFORMATEX) &Wave_Format, sizeof(WAVEFORMATEX), ACM_FORMATSUGGESTF_WFORMATTAG);
-    acmStreamOpen( &Unpack_Stream, NULL, (LPWAVEFORMATEX) &MP3_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, 0 );
+    acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &MP3_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, 0 );
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
     short *dwDest = (short *) malloc((Real_Size * 2) + (MP3_FRAMES_DELAG * 4));
