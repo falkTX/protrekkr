@@ -157,8 +157,8 @@ void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &At3_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, 0);
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 2));
-    memset(dwDest, 0, (Real_Size * 2));
+    short *dwDest = (short *) malloc((Real_Size * 4));
+    memset(dwDest, 0, (Real_Size * 4));
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;
@@ -169,7 +169,7 @@ void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
 
     for(i = 0; i < Dst_Size; i++)
     {
-        Dest[i] = dwDest[i];
+        Dest[i] = dwDest[i * 2];
     }
 
     if(dwDest) free(dwDest);
