@@ -54,6 +54,14 @@
 // Constants
 #define SIZE_WAVEFORMS_SPACE 88200
 
+#define WAVEFORM_SIN 0
+#define WAVEFORM_SAW 1
+#define WAVEFORM_PULSE 2
+#define WAVEFORM_WHITE 3
+#define WAVEFORM_NONE 4
+#define WAVEFORM_WAV 5
+#define WAVEFORM_PINK 6
+
 // ------------------------------------------------------
 // Types
 #if defined(__WIN32__) && !defined(__GCC__)
@@ -63,6 +71,10 @@ typedef unsigned __int64 Uint64;
 typedef long long int64;
 typedef unsigned long long Uint64;
 #endif
+
+extern float SIN[360];
+
+#if defined(PTK_SYNTH)
 
 // ------------------------------------------------------
 // Structures
@@ -178,14 +190,24 @@ struct SynthParameters
 extern int SamplesPerTick;
 
 /* Sine float-precalculated table, in absolute degrees. */
-extern float SIN[360];
+#if defined(PTK_SYNTH_SIN)
 extern short STOCK_SIN[SIZE_WAVEFORMS_SPACE * 2];
-extern short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
-extern short STOCK_PUL[SIZE_WAVEFORMS_SPACE * 2];
-extern short STOCK_WIT[SIZE_WAVEFORMS_SPACE * 2];
+#endif
 
-#if defined(PTK_SYNTH_PINKNOISE)
-    extern short STOCK_PIN[SIZE_WAVEFORMS_SPACE * 2];
+#if defined(PTK_SYNTH_SAW)
+extern short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_PULSE)
+extern short STOCK_PULSE[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_WHITE)
+extern short STOCK_WHITE[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_PINK)
+    extern short STOCK_PINK[SIZE_WAVEFORMS_SPACE * 2];
 #endif
 
 extern int SIZE_WAVEFORMS;
@@ -422,6 +444,8 @@ class CSynth
         float DISTO;
 };
 
+#endif // PTK_SYNTH
+
 #if defined(PTK_COMPRESSOR)
 class rFilter
 {
@@ -455,9 +479,5 @@ class rFilter
         };
 };
 #endif
-
-// ------------------------------------------------------
-// Functions
-void Initreverb();
 
 #endif

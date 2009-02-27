@@ -35,16 +35,30 @@
 
 // ------------------------------------------------------
 // Variables
+float SIN[360]; // Sine float-precalculated table, in absolute degrees.
+
+#if defined(PTK_SYNTH)
+
 int SIZE_WAVEFORMS;
 
-float SIN[360]; // Sine float-precalculated table, in absolute degrees.
+#if defined(PTK_SYNTH_SIN)
 short STOCK_SIN[SIZE_WAVEFORMS_SPACE * 2];
-short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
-short STOCK_PUL[SIZE_WAVEFORMS_SPACE * 2];
-short STOCK_WIT[SIZE_WAVEFORMS_SPACE * 2];
+#endif
 
-#if defined(PTK_SYNTH_PINKNOISE)
-    short STOCK_PIN[SIZE_WAVEFORMS_SPACE * 2];
+#if defined(PTK_SYNTH_SAW)
+short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_PULSE)
+short STOCK_PULSE[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_WHITE)
+short STOCK_WHITE[SIZE_WAVEFORMS_SPACE * 2];
+#endif
+
+#if defined(PTK_SYNTH_PINK)
+    short STOCK_PINK[SIZE_WAVEFORMS_SPACE * 2];
 #endif
 
 // ------------------------------------------------------
@@ -56,8 +70,8 @@ void CSynth::Reset(void)
     // Synthesizer General Reset
     GLB_VOLUME = 1.0f;
     DISTO = 0.0f;
-    OSC1_WAVEFORM = 1;      /* Sawtooth */
-    OSC2_WAVEFORM = 2;      /* Pulse */
+    OSC1_WAVEFORM = WAVEFORM_SAW;      /* Sawtooth */
+    OSC2_WAVEFORM = WAVEFORM_PULSE;    /* Pulse */
 
     T_OSC1_VOLUME = 0;
     T_OSC2_VOLUME = 0;
@@ -298,8 +312,8 @@ void CSynth::LfoAdvance(void)
 void CSynth::NoteOn(float note, float speed, int Looping, unsigned int Length,
                     unsigned int Loop_Length, float note_smp)
 {
-    float note_1 = OSC1_WAVEFORM == 5 ? note_smp: note;
-    float note_2 = OSC2_WAVEFORM == 5 ? note_smp: note;
+    float note_1 = OSC1_WAVEFORM == WAVEFORM_WAV ? note_smp: note;
+    float note_2 = OSC2_WAVEFORM == WAVEFORM_WAV ? note_smp: note;
 
     float smp_freq;
     float adsr_ratio;
@@ -324,7 +338,7 @@ void CSynth::NoteOn(float note, float speed, int Looping, unsigned int Length,
     ENV1_VOLUME_2 = 0;
     ENV2_VOLUME_2 = 0;
 
-    if(OSC1_WAVEFORM != 5)
+    if(OSC1_WAVEFORM != WAVEFORM_WAV)
     {
         Length = SIZE_WAVEFORMS;
         Loop_Length = SIZE_WAVEFORMS;
@@ -343,7 +357,7 @@ void CSynth::NoteOn(float note, float speed, int Looping, unsigned int Length,
     ENV1b_RELEASE = (ENV1_RELEASE / adsr_ratio) * smp_freq;
     LFO1b_RELEASE = (LFO1_RELEASE / adsr_ratio) * smp_freq;
 
-    if(OSC2_WAVEFORM != 5)
+    if(OSC2_WAVEFORM != WAVEFORM_WAV)
     {
         Length = SIZE_WAVEFORMS;
         Loop_Length = SIZE_WAVEFORMS;
@@ -634,7 +648,7 @@ float CSynth::GetSample(short *Left_Samples,
     if(ENV1_STAGE)
     {
         // Oscillator1 On
-        if(OSC1_WAVEFORM != 4)
+        if(OSC1_WAVEFORM != WAVEFORM_NONE)
         {
             T_OSC1_VOLUME = ((LFO1_VALUE * LFO1_OSC1_VOLUME + LFO2_VALUE * LFO2_OSC1_VOLUME) + ENV1_MIN)
                              * ENV1_VOLUME_1 * ENV1_VOLUME_2;
@@ -665,27 +679,41 @@ float CSynth::GetSample(short *Left_Samples,
                             + ENV2_VALUE * ENV2_OSC1_PITCH) * 4294967296.0);
                 osc_speed2 = OSC1_SPEED;
                 Left_Samples1 = Left_Samples;
-                if(OSC1_WAVEFORM != 5)
+                if(OSC1_WAVEFORM != WAVEFORM_WAV)
                 {
                     switch(OSC1_WAVEFORM)
                     {
-                        case 0:
+
+#if defined(PTK_SYNTH_SIN)
+                        case WAVEFORM_SIN:
                             Left_Samples1 = STOCK_SIN;
                             break;
-                        case 1:
+#endif
+
+#if defined(PTK_SYNTH_SAW)
+                        case WAVEFORM_SAW:
                             Left_Samples1 = STOCK_SAW;
                             break;
-                        case 2:
-                            Left_Samples1 = STOCK_PUL;
-                            break;
-                        case 3:
-                            Left_Samples1 = STOCK_WIT;
-                            break;
-#if defined(PTK_SYNTH_PINKNOISE)
-                        case 6:
-                            Left_Samples1 = STOCK_PIN;
+#endif
+
+#if defined(PTK_SYNTH_PULSE)
+                        case WAVEFORM_PULSE:
+                            Left_Samples1 = STOCK_PULSE;
                             break;
 #endif
+
+#if defined(PTK_SYNTH_WHITE)
+                        case WAVEFORM_WHITE:
+                            Left_Samples1 = STOCK_WHITE;
+                            break;
+#endif
+
+#if defined(PTK_SYNTH_PINK)
+                        case WAVEFORM_PINK:
+                            Left_Samples1 = STOCK_PINK;
+                            break;
+#endif
+
                     }
                     osc_speed2 *= 65;
                     osc_speed1 *= 65;
@@ -782,10 +810,11 @@ float CSynth::GetSample(short *Left_Samples,
         }
     }
 
+#if defined(PTK_SYNTH_OSC2)
     if(ENV2_STAGE)
     {
         // Oscillator2 On 
-        if(OSC2_WAVEFORM != 4)
+        if(OSC2_WAVEFORM != WAVEFORM_NONE)
         {
             if(*track2)
             {
@@ -815,27 +844,41 @@ float CSynth::GetSample(short *Left_Samples,
                                 + ENV1_VALUE * ENV1_OSC2_PITCH
                                 + ENV2_VALUE * ENV2_OSC2_PITCH) * 4294967296.0));
                 osc_speed2 = OSC2_SPEED;
-                if(OSC2_WAVEFORM != 5)
+                if(OSC2_WAVEFORM != WAVEFORM_WAV)
                 {
                     switch(OSC2_WAVEFORM)
                     {
-                        case 0:
+
+#if defined(PTK_SYNTH_SIN)
+                        case WAVEFORM_SIN:
                             Left_Samples = STOCK_SIN;
                             break;
-                        case 1:
+#endif
+
+#if defined(PTK_SYNTH_SAW)
+                        case WAVEFORM_SAW:
                             Left_Samples = STOCK_SAW;
                             break;
-                        case 2:
-                            Left_Samples = STOCK_PUL;
-                            break;
-                        case 3:
-                            Left_Samples = STOCK_WIT;
-                            break;
-#if defined(PTK_SYNTH_PINKNOISE)
-                        case 6:
-                            Left_Samples = STOCK_PIN;
+#endif
+
+#if defined(PTK_SYNTH_PULSE)
+                        case WAVEFORM_PULSE:
+                            Left_Samples = STOCK_PULSE;
                             break;
 #endif
+
+#if defined(PTK_SYNTH_WHITE)
+                        case WAVEFORM_WHITE:
+                            Left_Samples = STOCK_WHITE;
+                            break;
+#endif
+
+#if defined(PTK_SYNTH_PINK)
+                        case WAVEFORM_PINK:
+                            Left_Samples = STOCK_PINK;
+                            break;
+#endif
+
                     }
                     osc_speed1b *= 65;
                     osc_speed2 *= 65;
@@ -934,14 +977,14 @@ float CSynth::GetSample(short *Left_Samples,
             }
         }
     }
+#endif // PTK_SYNTH_OSC2
 
 #if defined(PTK_SYNTH_OSC3)
     if(OSC3_SWITCH)
     {
         // SubOscillator On
-        if(OSC1_WAVEFORM != 4)
+        if(OSC1_WAVEFORM != WAVEFORM_NONE)
         {
-
             if(*track)
             {
                 osc_speed2 = OSC1_SPEED / 2;
@@ -1223,7 +1266,16 @@ float CSynth::FilterL(void)
     GS_VAL++;
     sbuf0L = FILT_A * sbuf0L + FILT_CUTO * (GS_VAL + FILT_B * (sbuf0L - sbuf1L)); 
     sbuf1L = FILT_A * sbuf1L + FILT_CUTO * sbuf0L;
+#if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
     return(VCF_TYPE == 0 ? sbuf1L : GS_VAL - sbuf1L);
+#else
+    #if defined(PTK_SYNTH_FILTER_LO)
+        return(sbuf1L);
+    #endif
+    #if defined(PTK_SYNTH_FILTER_HI)
+        return(GS_VAL - sbuf1L);
+    #endif
+#endif
 }
 
 float CSynth::FilterR(void)
@@ -1231,6 +1283,17 @@ float CSynth::FilterR(void)
     GS_VAL2++;
     sbuf0R = FILT_A * sbuf0R + FILT_CUTO * (GS_VAL2 + FILT_B * (sbuf0R - sbuf1R));
     sbuf1R = FILT_A * sbuf1R + FILT_CUTO * sbuf0R;
+#if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
     return(VCF_TYPE == 0 ? sbuf1R : GS_VAL2 - sbuf1R);
+#else
+    #if defined(PTK_SYNTH_FILTER_LO)
+        return(sbuf1R);
+    #endif
+    #if defined(PTK_SYNTH_FILTER_HI)
+        return(GS_VAL2 - sbuf1R);
+    #endif
+#endif
 }
 #endif
+
+#endif // PTK_SYNTH

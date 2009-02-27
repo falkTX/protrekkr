@@ -37,9 +37,12 @@
 // ------------------------------------------------------
 // Variables
 extern s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
+
+#if defined(PTK_SYNTH)
 extern s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
 extern s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 extern s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
+#endif
 
 int32 axswave = 0;
 

@@ -175,7 +175,11 @@ union s_access
 extern float decays[MAX_COMB_FILTERS][2];
 extern int delays[MAX_COMB_FILTERS];       // delays for the comb filters
 extern int counters[MAX_COMB_FILTERS];
+
+#if defined(PTK_COMPRESSOR)
 extern char num_echoes;
+#endif
+
 extern unsigned char *RawPatterns;
 extern int cPosition;
 extern unsigned int lchorus_counter;
@@ -193,7 +197,11 @@ extern unsigned char pSequence[256];
 extern short patternLines[MAX_ROWS];
 extern char nameins[128][20];
 extern char Midiprg[128];
+
+#if defined(PTK_SYNTH)
 extern unsigned char Synthprg[128];
+#endif
+
 extern char SampleType[128][16];
 extern char SampleCompression[128];
 extern char SampleName[128][16][64];
@@ -273,11 +281,19 @@ extern int plx;
 extern int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int Locked_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+
+#if defined(PTK_SYNTH)
 extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+
 extern int L_MaxLevel;
 extern int R_MaxLevel;
+
+#if defined(PTK_SYNTH)
 extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+
 extern float Player_FD[MAX_TRACKS];
 extern char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
 extern char sp_split[MAX_TRACKS][MAX_POLYPHONY];
@@ -288,7 +304,11 @@ extern int Songplaying;
 #endif
 extern int left_value;
 extern int right_value;
+
+#if defined(PTK_SYNTH)
 extern SynthParameters PARASynth[128];
+#endif
+
 extern float ramper[MAX_TRACKS];
 extern unsigned char nPatterns;
 extern int delay_time;
@@ -310,7 +330,11 @@ void noteoff303(char strack);
 void init_sample_bank(void);
 void KillInst(int inst_nbr);
 void Post_Song_Init(void);
+
+#if defined(PTK_SYNTH)
 void ResetSynthParameters(SynthParameters *TSP);
+#endif
+
 void Free_Samples(void);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
 int Get_Free_Sub_Channel(int channel, int polyphony);

@@ -65,7 +65,10 @@ int SamplesPerTick;
     float FADECOEF[MAX_TRACKS];
 #endif
 
+#if defined(PTK_SYNTH)
 CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+
 float Player_FD[MAX_TRACKS];
 char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
 char sp_split[MAX_TRACKS][MAX_POLYPHONY];
@@ -112,11 +115,14 @@ float TPan[MAX_TRACKS];
 int old_note[MAX_TRACKS][MAX_POLYPHONY];
 
 s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
+
+#if defined(PTK_SYNTH)
 s_access sp_Position_osc1[MAX_TRACKS][MAX_POLYPHONY];
 s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH_OSC3)
     s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
+#endif
 #endif
 
 #if defined(PTK_TRACKFILTERS)
@@ -258,7 +264,10 @@ float All_Signal_L;
 float All_Signal_R;
 unsigned int Current_Pointer;
 
+#if defined(PTK_SYNTH)
 char Synth_Was[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+
 short *Player_WL[MAX_TRACKS][MAX_POLYPHONY];
 short *Player_WR[MAX_TRACKS][MAX_POLYPHONY];
 unsigned int Rns[MAX_TRACKS][MAX_POLYPHONY];
@@ -298,8 +307,13 @@ float ramper[MAX_TRACKS];
 char Basenote[128][16];
 char SampleType[128][16];
 char Finetune[128][16];
+
 unsigned char Synthprg[128];
+
+#if defined(PTK_SYNTH)
 SynthParameters PARASynth[128];
+#endif
+
 char LoopType[128][16];
 Uint32 LoopStart[128][16];
 Uint32 LoopEnd[128][16];
@@ -328,12 +342,14 @@ short *RawSamples[128][2][16];
     float allBuffer_L6[5760];
     float delay_left_buffer[MAX_COMB_FILTERS][100000];
     float delay_right_buffer[MAX_COMB_FILTERS][100000];
-    float decays[MAX_COMB_FILTERS][2];
     int counters[MAX_COMB_FILTERS];
     int rev_counter;
     rFilter LFP_L;
+    char num_echoes;
     int delays[MAX_COMB_FILTERS];       // delays for the comb filters
-#endif
+    float decays[MAX_COMB_FILTERS][2];
+
+#endif // PTK_COMPRESSOR
 
 float buf024[MAX_TRACKS];
 float buf124[MAX_TRACKS];
@@ -371,12 +387,6 @@ float xi2[MAX_TRACKS];
 char compressor;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    char num_echoes = 1;
-#else
-    char num_echoes;
-#endif
-
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float REVERBFILTER = 0.3f;
 #else
     float REVERBFILTER;
@@ -384,8 +394,12 @@ char compressor;
 
 int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+
+#if defined(PTK_SYNTH)
 int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
 int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+
 char SampleCompression[128];
 int delay_time;
 int DelayType;
@@ -422,7 +436,7 @@ int DelayType;
     unsigned char nPatterns;
 #endif
 
-#if defined(PTK_SYNTH_PINKNOISE)
+#if defined(PTK_SYNTH_PINK)
 unsigned int dice[7];
 static unsigned long ctz[64] =
 {
@@ -479,6 +493,8 @@ float Kutoff(int v);
 float Resonance(float v);
 float Bandwidth(int v);
 void Compressor_work(void);
+
+void Initreverb();
 
 #if defined(PTK_FLANGER)
     float Filter_FlangerL(float input);
@@ -601,6 +617,8 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #if defined(__WIN32__)
 int STDCALL Ptk_InitDriver(HWND hWnd, int milliseconds)
 {
+    int i;
+
     AUDIO_Milliseconds = milliseconds;
 #else
 int STDCALL Ptk_InitDriver(int milliseconds)
@@ -612,19 +630,31 @@ int STDCALL Ptk_InitDriver(void)
 {
 #endif
 
+#if defined(PTK_SYNTH)
     // Create the stock waveforms
-    int i;
     float incr = 1.0f / fMIX_RATE;
     float stop = 2.0f;
     float x;
     unsigned short temp_saw;
-    short *wav_sin = STOCK_SIN;
-    short *wav_saw = STOCK_SAW;
-    short *wav_pul = STOCK_PUL;
-    short *wav_wit = STOCK_WIT;
 
-#if defined(PTK_SYNTH_PINKNOISE)
-    short *wav_pin = STOCK_PIN;
+#if defined(PTK_SYNTH_SIN)
+    short *wav_sin = STOCK_SIN;
+#endif
+
+#if defined(PTK_SYNTH_SAW)
+    short *wav_saw = STOCK_SAW;
+#endif
+
+#if defined(PTK_SYNTH_PULSE)
+    short *wav_pul = STOCK_PULSE;
+#endif
+
+#if defined(PTK_SYNTH_WHITE)
+    short *wav_wit = STOCK_WHITE;
+#endif
+
+#if defined(PTK_SYNTH_PINK)
+    short *wav_pin = STOCK_PINK;
     unsigned int newrand;
     unsigned int prevrand;
     unsigned int k;
@@ -643,23 +673,31 @@ int STDCALL Ptk_InitDriver(void)
         //      float value2 = (float) ((PI * 2.0f) * (x * 2.0f));
         //    value2 = sinf(value + sinf(value2));
 
+#if defined(PTK_SYNTH_PULSE)
         if(sinf(value) < 0.0f) *wav_pul++ = 32767;
         else *wav_pul++ = -32767;
+#endif
 
+#if defined(PTK_SYNTH_SAW)
         // There's a problem with fmodf->signed short in mingw here
         temp_saw = (unsigned short) (fmodf(x * 2.0f, 64.0f) * 32767.0f);
         *wav_saw++ = (short) (((float) (short) temp_saw));
+#endif
 
         //*wav_pul++ = (short) (value2 * 16384.0f);
         //value = (float) ((PI * 2.0) * x);
         //value2 = sinf(value + sinf(value));
         //*wav_saw++ = (short) (value2 * 16384.0f);
 
+#if defined(PTK_SYNTH_SIN)
         *wav_sin++ = (unsigned short) (sinf(value) * 32767.0f);
+#endif
 
+#if defined(PTK_SYNTH_WHITE)
         *wav_wit++ = (short) (rand() - 16384);
+#endif
 
-#if defined(PTK_SYNTH_PINKNOISE)
+#if defined(PTK_SYNTH_PINK)
         // McCartney pink noise generator
         k = ctz[SIZE_WAVEFORMS & 63];
         prevrand = dice[k];
@@ -674,6 +712,7 @@ int STDCALL Ptk_InitDriver(void)
 
         SIZE_WAVEFORMS++;
     }
+#endif // PTK_SYNTH
 
     // Initializing working SINETABLE
     for(i = 0; i < 360; i++)
@@ -846,10 +885,12 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         {
             Mod_Dat_Read(&Synthprg[swrite], sizeof(char));
 
+#if defined(PTK_SYNTH)
             if(Synthprg[swrite])
             {
                 Mod_Dat_Read(&PARASynth[swrite], sizeof(SynthParameters));
             } 
+#endif
 
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
@@ -983,7 +1024,24 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         Mod_Dat_Read(&delay_time, sizeof(int));
         Mod_Dat_Read(&Feedback, sizeof(float));
+
+#if defined(PTK_COMPRESSOR)
         Mod_Dat_Read(&DelayType, sizeof(int));
+        Mod_Dat_Read(&num_echoes, sizeof(char));
+
+        for(i = 0; i < MAX_COMB_FILTERS; i++)
+        {
+            Mod_Dat_Read(&delays[i], sizeof(int));
+        }
+        for(j = 0; j < MAX_COMB_FILTERS; j++)
+        {
+            for(i = 0; i < 2; i++)
+            {
+                Mod_Dat_Read(&decays[j][i], sizeof(float));
+            }
+        }
+#endif
+
         Mod_Dat_Read(&lchorus_delay, sizeof(int));
         Mod_Dat_Read(&rchorus_delay, sizeof(int));
         Mod_Dat_Read(&lchorus_feedback, sizeof(float));
@@ -1196,10 +1254,17 @@ void Reset_Values(void)
         {
             for(int stopper_poly = 0; stopper_poly < MAX_POLYPHONY; stopper_poly++)
             {
+
+#if defined(PTK_SYNTH)
                 Synthesizer[stopper][stopper_poly].Reset();
+#endif
+
                 sp_Stage[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+
+#if defined(PTK_SYNTH)
                 sp_Stage2[stopper][stopper_poly] = PLAYING_NOSAMPLE;
                 sp_Stage3[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+#endif
                 Reserved_Sub_Channels[stopper][stopper_poly] = -1;
                 sp_channelsample[stopper][stopper_poly] = -1;
             }
@@ -1304,7 +1369,10 @@ void Pre_Song_Init(void)
             Vstep_arp[ini][i] = 0;
 #endif
 
+#if defined(PTK_SYNTH)
             Synth_Was[ini][i] = 0;
+#endif
+
             Player_WL[ini][i] = 0;
             Player_WR[ini][i] = 0;
             Rns[ini][i] = 0;
@@ -1316,20 +1384,28 @@ void Pre_Song_Init(void)
             Player_LE[ini][i] = 0;
             Player_LL[ini][i] = 0;
             Player_NS[ini][i] = 0;
+
+#if defined(PTK_SYNTH)
             Synthesizer[ini][i].Reset();
+#endif
 
             sp_Step[ini][i] = 0;
             sp_Stage[ini][i] = PLAYING_NOSAMPLE;
 
+#if defined(PTK_SYNTH)
             sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
             sp_Stage3[ini][i] = PLAYING_NOSAMPLE;
+#endif
 
             sp_Position[ini][i].absolu = 0;
+
+#if defined(PTK_SYNTH)
             sp_Position_osc1[ini][i].absolu = 0;
             sp_Position_osc2[ini][i].absolu = 0;
 
 #if defined(PTK_SYNTH_OSC3)
             sp_Position_osc3[ini][i].absolu = 0;
+#endif
 #endif
 
             CHAN_ACTIVE_STATE[ini][i] = TRUE;
@@ -1579,14 +1655,19 @@ void Sp_Player(void)
     unsigned int res_dec;
     float Signal_303;
 
+    char gotsome;
+    int c;
     int i;
     int j;
     int trigger_note_off;
 
     left_float = 0;
     right_float = 0;
+
+#if defined(PTK_COMPRESSOR)
     delay_left_final = 1.0f;
     delay_right_final = 1.0f;
+#endif
 
     if(Songplaying)
     {
@@ -1714,7 +1795,11 @@ void Sp_Player(void)
                             {
                                 sp_Stage[ct][old_channel] = PLAYING_SAMPLE_NOTEOFF;
                             }
+
+#if defined(PTK_SYNTH)
                             Synthesizer[ct][old_channel].NoteOff();
+#endif
+
                         }
                         // Mark it as playing
                         Reserved_Sub_Channels[ct][i] = free_sub_channel;
@@ -1758,7 +1843,11 @@ void Sp_Player(void)
                         if(j != -1)
                         {
                             if(sp_Stage[ct][j] == PLAYING_SAMPLE) sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+
+#if defined(PTK_SYNTH)
                             Synthesizer[ct][j].NoteOff();
+#endif
+
                             Reserved_Sub_Channels[ct][i] = -1;
                         }
 
@@ -1974,10 +2063,10 @@ void Sp_Player(void)
         }
     }
 
-    for(int c = 0; c < Songtracks; c++)
+    for(c = 0; c < Songtracks; c++)
     {
         grown = FALSE;
-        char gotsome = FALSE;
+        gotsome = FALSE;
 
         All_Signal_L = 0;
         All_Signal_R = 0;
@@ -1993,10 +2082,15 @@ void Sp_Player(void)
             // Play a sample
             if(sp_Stage[c][i] == PLAYING_SAMPLE || sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
             {
+
+#if defined(PTK_SYNTH)
                 if(!Synth_Was[c][i]) goto ByPass_Wav;
-                if((Synthesizer[c][i].OSC1_WAVEFORM != 5 && Synthesizer[c][i].OSC2_WAVEFORM != 5))
+
+                if((Synthesizer[c][i].OSC1_WAVEFORM != WAVEFORM_WAV &&
+                    Synthesizer[c][i].OSC2_WAVEFORM != WAVEFORM_WAV))
                 {
 ByPass_Wav:
+#endif
                     if(sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
                     {
                         // Note Stop
@@ -2088,9 +2182,14 @@ ByPass_Wav:
                     {
                         sp_Stage[c][i] = PLAYING_NOSAMPLE;
                     }
+
+#if defined(PTK_SYNTH)
                 }
+#endif
+
             }
 
+#if defined(PTK_SYNTH)
             // Synth
             if(Synthesizer[c][i].ENV1_STAGE || Synthesizer[c][i].ENV2_STAGE)
             {
@@ -2121,12 +2220,14 @@ ByPass_Wav:
                                                                 Vstep1[c][i]
                                                                );
 
-                if((Synthesizer[c][i].OSC1_WAVEFORM == 5 || Synthesizer[c][i].OSC2_WAVEFORM == 5))
+                if((Synthesizer[c][i].OSC1_WAVEFORM == WAVEFORM_WAV ||
+                    Synthesizer[c][i].OSC2_WAVEFORM == WAVEFORM_WAV))
                 {
                     if(Player_SC[c][i] == 2) grown = TRUE;
                 }
                 gotsome = TRUE;
             }
+#endif // PTK_SYNTH
 
             // Gather the signals of all the sub channels
             All_Signal_L += Curr_Signal_L[i];
@@ -2167,7 +2268,15 @@ ByPass_Wav:
             // We send a note off to all sub channels
             for(i = 0; i < Channels_Polyphony[c]; i++)
             {
+                if(sp_Stage[c][i] == PLAYING_SAMPLE)
+                {
+                    sp_Stage[c][i] = PLAYING_SAMPLE_NOTEOFF;
+                }
+
+#if defined(PTK_SYNTH)
                 Synthesizer[c][i].NoteOff();
+#endif
+
             }
 
 #if defined(PTK_303)
@@ -2400,6 +2509,7 @@ ByPass_Wav:
             if(!grown) All_Signal_R = All_Signal_L;
 
             // Dry Send
+#if defined(PTK_DISCLAP)
             if(Disclap[c])
             {   // Distortion
                 if(All_Signal_L > DThreshold[c]) All_Signal_L = DClamp[c];
@@ -2408,6 +2518,7 @@ ByPass_Wav:
                 if(All_Signal_R > DThreshold[c]) All_Signal_R = DClamp[c];
                 else if(All_Signal_R < -DThreshold[c]) All_Signal_R = -DClamp[c];
             }
+#endif
 
             All_Signal_L *= LVol[c];
             All_Signal_R *= RVol[c];
@@ -2467,6 +2578,7 @@ ByPass_Wav:
             left_float += All_Signal_L;
             right_float += All_Signal_R;
 
+#if defined(PTK_COMPRESSOR)
             // Sending to delay...
             float const DS = DSend[c];
 
@@ -2475,6 +2587,7 @@ ByPass_Wav:
                 delay_left_final += All_Signal_L * DS;
                 delay_right_final += All_Signal_R * DS;
             }
+#endif
 
             // Sending to chorus
             float const DC = CCoef[c];
@@ -2515,9 +2628,12 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 
     for(i = 0; i < polyphony; i++)
     {
-        if(sp_Stage[channel][i] == PLAYING_NOSAMPLE &&
-           sp_Stage2[channel][i] == PLAYING_NOSAMPLE &&
-           sp_Stage3[channel][i] == PLAYING_NOSAMPLE)
+        if(sp_Stage[channel][i] == PLAYING_NOSAMPLE 
+#if defined(PTK_SYNTH)
+           && sp_Stage2[channel][i] == PLAYING_NOSAMPLE 
+           && sp_Stage3[channel][i] == PLAYING_NOSAMPLE
+#endif
+          )
         {
             return(i);
         }
@@ -2560,6 +2676,7 @@ void Play_Instrument(int channel, int sub_channel,
         if(glide) no_retrig_adsr = TRUE;
     }
 
+#if defined(PTK_SYNTH)
     switch(Synthprg[sample])
     {
         case SYNTH_WAVE_OFF:          // synth off
@@ -2570,10 +2687,14 @@ void Play_Instrument(int channel, int sub_channel,
             associated_sample = Synthprg[sample] - 2;
             break;
     }
+#else
+    associated_sample = sample;
+#endif
 
     Cur_Position = cPosition;
 
-    if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM == 5)
+#if defined(PTK_SYNTH)
+    if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM == WAVEFORM_WAV)
     {
         sp_Position[channel][sub_channel].absolu = 0;
         sp_Position_osc1[channel][sub_channel].absolu = 0;
@@ -2583,11 +2704,12 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
     }
-    if(Synthesizer[channel][sub_channel].OSC2_WAVEFORM == 5)
+    if(Synthesizer[channel][sub_channel].OSC2_WAVEFORM == WAVEFORM_WAV)
     {
         sp_Position[channel][sub_channel].absolu = 0;
         sp_Position_osc2[channel][sub_channel].absolu = 0;
     }
+#endif
 
     // Check if the channel have to be played
     if(CHAN_ACTIVE_STATE[Cur_Position][channel])
@@ -2618,10 +2740,11 @@ void Play_Instrument(int channel, int sub_channel,
         note -= Basenote[associated_sample][split];
         note += float((float) Finetune[associated_sample][split] * 0.0078125f);
 
+#if defined(PTK_SYNTH)
         if(!no_retrig_adsr)
         {
-            Synthesizer[channel][sub_channel].OSC1_WAVEFORM = 4;
-            Synthesizer[channel][sub_channel].OSC2_WAVEFORM = 4;
+            Synthesizer[channel][sub_channel].OSC1_WAVEFORM = WAVEFORM_NONE;
+            Synthesizer[channel][sub_channel].OSC2_WAVEFORM = WAVEFORM_NONE;
             if(Synthprg[sample])
             {
                 Synthesizer[channel][sub_channel].ChangeParameters(PARASynth[sample]);
@@ -2633,6 +2756,7 @@ void Play_Instrument(int channel, int sub_channel,
                                                          note);
             }
         }
+#endif
 
         // Fix a bug as this can also be used for synth
         // which isn't correct
@@ -2659,7 +2783,9 @@ void Play_Instrument(int channel, int sub_channel,
 
         // Only synth
         sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
-        if(Synthprg[sample] == 0)
+
+#if defined(PTK_SYNTH)
+        if(Synthprg[sample] == SYNTH_WAVE_OFF)
         {
             sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
             sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
@@ -2669,27 +2795,37 @@ void Play_Instrument(int channel, int sub_channel,
             sp_Stage2[channel][sub_channel] = PLAYING_STOCK;
             sp_Stage3[channel][sub_channel] = PLAYING_STOCK;
         }
+#endif
 
         sp_channelsample[channel][sub_channel] = sample;
 
         if(SampleType[associated_sample][split])
         {
+
+#if defined(PTK_SYNTH)
             if(Synthprg[sample])
             {
                 // Synth + sample if both are != wav
-                if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM != 5 &&
-                   Synthesizer[channel][sub_channel].OSC2_WAVEFORM != 5)
+                if(Synthesizer[channel][sub_channel].OSC1_WAVEFORM != WAVEFORM_WAV &&
+                   Synthesizer[channel][sub_channel].OSC2_WAVEFORM != WAVEFORM_WAV)
                 {
                     sp_Stage[channel][sub_channel] = PLAYING_SAMPLE;
                 }
             }
             else
             {
+#endif
                 // Only sample
                 sp_Stage[channel][sub_channel] = PLAYING_SAMPLE;
+
+#if defined(PTK_SYNTH)
                 sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
                 sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
+#endif
+
+#if defined(PTK_SYNTH)
             }
+#endif
 
             if(!offset) 
             {
@@ -2733,7 +2869,9 @@ void Play_Instrument(int channel, int sub_channel,
                 }
             }
 
+#if defined(PTK_SYNTH)
             Synth_Was[channel][sub_channel] = Synthprg[sample];
+#endif
 
             sp_split[channel][sub_channel] = split;
 
@@ -2797,7 +2935,12 @@ void Play_Instrument(int channel, int sub_channel,
             if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
             {
                 sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+
+#if defined(PTK_SYNTH)
                 sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
+                sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
+#endif
+
             }
         }
         else
@@ -2812,11 +2955,14 @@ void Play_Instrument(int channel, int sub_channel,
         }
         if(!no_retrig_adsr)
         {
+
+#if defined(PTK_SYNTH)
             sp_Position_osc1[channel][sub_channel] = sp_Position[channel][sub_channel];
             sp_Position_osc2[channel][sub_channel] = sp_Position[channel][sub_channel];
 
 #if defined(PTK_SYNTH_OSC3)
             sp_Position_osc3[channel][sub_channel] = sp_Position[channel][sub_channel];
+#endif
 #endif
 
         }
@@ -3049,7 +3195,10 @@ void DoEffects(void)
                         if(FType[trackef] == 4) sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
                         else sp_Tvol[trackef][i] = 0.001f;
                     }
+
+#if defined(PTK_SYNTH)
                     Synthesizer[trackef][i].NoteOff();
+#endif
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
@@ -3234,7 +3383,11 @@ void DoEffects(void)
                             {
                                 sp_Stage[trackef][old_channel] = PLAYING_SAMPLE_NOTEOFF;
                             }
+
+#if defined(PTK_SYNTH)
                             Synthesizer[trackef][old_channel].NoteOff();
+#endif
+
                         }
                         Reserved_Sub_Channels[trackef][i] = free_sub_channel;
 
@@ -3996,7 +4149,10 @@ void init_sample_bank(void)
             sprintf(nameins[inico], "Untitled");
 #endif
 
+#if defined(PTK_SYNTH)
             ResetSynthParameters(&PARASynth[inico]);
+#endif
+
             KillInst(inico);
         }
     }
@@ -4046,7 +4202,10 @@ void KillInst(int inst_nbr)
         Midiprg[inst_nbr] = -1;
 #endif
 
+#if defined(PTK_SYNTH)
         Synthprg[inst_nbr] = SYNTH_WAVE_OFF;
+#endif
+
         CustomVol[inst_nbr] = 1.0f;
     }
 }
@@ -4054,6 +4213,7 @@ void KillInst(int inst_nbr)
 // ------------------------------------------------------
 // Next Function: used to reset synthparameters Structure
 // Well, I think the default preset is not very cool, but nah!
+#if defined(PTK_SYNTH)
 void ResetSynthParameters(SynthParameters *TSP)
 {
 
@@ -4061,8 +4221,8 @@ void ResetSynthParameters(SynthParameters *TSP)
     sprintf(TSP->presetname, "Untitled");
 #endif
 
-    TSP->osc1_waveform = 1;
-    TSP->osc2_waveform = 2;
+    TSP->osc1_waveform = WAVEFORM_SAW;
+    TSP->osc2_waveform = WAVEFORM_PULSE;
     TSP->osc1_pw = 256;
     TSP->osc2_pw = 256;
     TSP->osc2_detune = 65;
@@ -4126,6 +4286,7 @@ void ResetSynthParameters(SynthParameters *TSP)
     TSP->lfo2_sustain = 16;
     TSP->lfo2_release = 16384;
 }
+#endif // PTK_SYNTH
 
 // ------------------------------------------------------
 // Free all allocated Samples
@@ -4159,19 +4320,20 @@ void Initreverb()
 
     LFP_L.Reset();
 
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     switch(DelayType)
     {
         case 0:
-            decays[0][0] = 20; decays[0][1] =  0;
-            decays[1][0] =  0; decays[1][1] = 15;
-            decays[2][0] = 15; decays[2][1] =  0;
-            decays[3][0] =  0; decays[3][1] = 10;
-            decays[4][0] =  9; decays[4][1] =  0;
-            decays[5][0] =  1; decays[5][1] =  8;
-            decays[6][0] =  8; decays[6][1] =  1;
-            decays[7][0] =  1; decays[7][1] =  4;
-            decays[8][0] =  4; decays[8][1] =  0;
-            decays[9][0] =  1; decays[9][1] =  2;
+            decays[0][0] = 20.0f; decays[0][1] =  0.0f;
+            decays[1][0] =  0.0f; decays[1][1] = 15.0f;
+            decays[2][0] = 15.0f; decays[2][1] =  0.0f;
+            decays[3][0] =  0.0f; decays[3][1] = 10.0f;
+            decays[4][0] =  9.0f; decays[4][1] =  0.0f;
+            decays[5][0] =  1.0f; decays[5][1] =  8.0f;
+            decays[6][0] =  8.0f; decays[6][1] =  1.0f;
+            decays[7][0] =  1.0f; decays[7][1] =  4.0f;
+            decays[8][0] =  4.0f; decays[8][1] =  0.0f;
+            decays[9][0] =  1.0f; decays[9][1] =  2.0f;
 
             delays[0] = 1000;
             delays[1] = 1100; 
@@ -4188,16 +4350,16 @@ void Initreverb()
             break;
 
         case 1:
-            decays[0][0] =  7; decays[0][1] =  7;
-            decays[1][0] =-13; decays[1][1] =-15;
-            decays[2][0] = 25; decays[2][1] = 32;
-            decays[3][0] = 31; decays[3][1] = 26;
-            decays[4][0] = 20; decays[4][1] =-30;
-            decays[5][0] = 28; decays[5][1] = 24;
-            decays[6][0] =-21; decays[6][1] =-18;
-            decays[7][0] = 18; decays[7][1] = 14;
-            decays[8][0] =-13; decays[8][1] =-12;
-            decays[9][0] =  9; decays[9][1] =  7;
+            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
+            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
+            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
+            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
+            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
+            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
+            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
+            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
+            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
+            decays[9][0] =   9.0f; decays[9][1] =   7.0f;
 
             delays[0] = 1000;
             delays[1] = 1600; 
@@ -4214,16 +4376,16 @@ void Initreverb()
             break;
 
         case 2:
-            decays[0][0] =  1; decays[0][1] =  2;
-            decays[1][0] =  1; decays[1][1] = -4;
-            decays[2][0] =  9; decays[2][1] =  1;
-            decays[3][0] = 12; decays[3][1] = 11;
-            decays[4][0] = 22; decays[4][1] = -1;
-            decays[5][0] =  1; decays[5][1] = 19;
-            decays[6][0] = 15; decays[6][1] = -1;
-            decays[7][0] =  1; decays[7][1] = 12;
-            decays[8][0] =  7; decays[8][1] =- 1;
-            decays[9][0] =  2; decays[9][1] =  3;
+            decays[0][0] =  1.0f; decays[0][1] =  2.0f;
+            decays[1][0] =  1.0f; decays[1][1] = -4.0f;
+            decays[2][0] =  9.0f; decays[2][1] =  1.0f;
+            decays[3][0] = 12.0f; decays[3][1] = 11.0f;
+            decays[4][0] = 22.0f; decays[4][1] = -1.0f;
+            decays[5][0] =  1.0f; decays[5][1] = 19.0f;
+            decays[6][0] = 15.0f; decays[6][1] = -1.0f;
+            decays[7][0] =  1.0f; decays[7][1] = 12.0f;
+            decays[8][0] =  7.0f; decays[8][1] = -1.0f;
+            decays[9][0] =  2.0f; decays[9][1] =  3.0f;
 
             delays[0] =  100;
             delays[1] =  200; 
@@ -4240,10 +4402,10 @@ void Initreverb()
             break;
 
         case 3:
-            decays[0][0] = 22; decays[0][1] =  3;
-            decays[1][0] =  5; decays[1][1] = 12;
-            decays[2][0] = 12; decays[2][1] =  1;
-            decays[3][0] =  3; decays[3][1] =  5;
+            decays[0][0] = 22.0f; decays[0][1] =  3.0f;
+            decays[1][0] =  5.0f; decays[1][1] = 12.0f;
+            decays[2][0] = 12.0f; decays[2][1] =  1.0f;
+            decays[3][0] =  3.0f; decays[3][1] =  5.0f;
 
             delays[0] = 2000;
             delays[1] = 4400; 
@@ -4254,10 +4416,10 @@ void Initreverb()
             break;
 
         case 4:
-            decays[0][0] = 11; decays[0][1] = 0;
-            decays[1][0] = 0 ; decays[1][1] = 21;
-            decays[2][0] = 31; decays[2][1] = 0;
-            decays[3][0] = 0 ; decays[3][1] = 41;
+            decays[0][0] = 11.0f; decays[0][1] =  0.0f;
+            decays[1][0] =  0.0f; decays[1][1] = 21.0f;
+            decays[2][0] = 31.0f; decays[2][1] =  0.0f;
+            decays[3][0] =  0.0f; decays[3][1] = 41.0f;
 
             delays[0] = 3012;
             delays[1] = 4012;
@@ -4268,16 +4430,16 @@ void Initreverb()
             break;
 
         case 5:
-            decays[0][0] =  7; decays[0][1] =  7;
-            decays[1][0] =-13; decays[1][1] =-15;
-            decays[2][0] = 25; decays[2][1] = 32;
-            decays[3][0] = 31; decays[3][1] = 26;
-            decays[4][0] = 20; decays[4][1] =-30;
-            decays[5][0] = 28; decays[5][1] = 24;
-            decays[6][0] =-21; decays[6][1] =-18;
-            decays[7][0] = 18; decays[7][1] = 14;
-            decays[8][0] =-13; decays[8][1] =-12;
-            decays[9][0] =  9; decays[9][1] =  7;
+            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
+            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
+            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
+            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
+            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
+            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
+            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
+            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
+            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
+            decays[9][0] =   9.0f; decays[9][1] =   7.0f;
 
             delays[0] = 20;
             delays[1] = 600;  
@@ -4294,16 +4456,16 @@ void Initreverb()
             break;
 
         case 6:
-            decays[0][0] =  7; decays[0][1] =  7;
-            decays[1][0] =-13; decays[1][1] =-15;
-            decays[2][0] = 25; decays[2][1] = 32;
-            decays[3][0] = 31; decays[3][1] = 26;
-            decays[4][0] = 20; decays[4][1] =-30;
-            decays[5][0] = 28; decays[5][1] = 24;
-            decays[6][0] =-21; decays[6][1] =-18;
-            decays[7][0] = 18; decays[7][1] = 14;
-            decays[8][0] =-13; decays[8][1] =-12;
-            decays[9][0] = 12; decays[9][1] =  8;
+            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
+            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
+            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
+            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
+            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
+            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
+            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
+            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
+            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
+            decays[9][0] =  12.0f; decays[9][1] =   8.0f;
 
             delays[0] = 20;
             delays[1] = 600;  
@@ -4322,12 +4484,16 @@ void Initreverb()
 
     for(i = 0; i < num_echoes; i++)
     {
+        decays[i][0] = decays[i][0] * 0.015625f;
+        decays[i][1] = decays[i][1] * 0.015625f;
+    }
+#endif
+
+    for(i = 0; i < num_echoes; i++)
+    {
         int mlrw = 99999 - (delay_time + delays[i]) * 4;
 
         if(mlrw < 0) mlrw = 0;
-
-        decays[i][0] = decays[i][0] * 0.015625f;
-        decays[i][1] = decays[i][1] * 0.015625f;
 
         counters[i] = mlrw;
     }

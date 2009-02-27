@@ -231,7 +231,6 @@ void Draw_Synth_Ed(void)
 
 void Actualize_Synth_Ed(char gode)
 {
-
     if(userscreen == USER_SCREEN_SYNTH_EDIT)
     {
         if(gode == UPDATE_SYNTH_ED_ALL ||

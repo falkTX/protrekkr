@@ -97,8 +97,6 @@ extern char Dir_Presets[MAX_PATH];
 extern char *cur_dir;
 extern char Scopish_LeftRight;
 
-//char appbuffer[MAX_PATH];
-
 int Mod_Length;
 int Mod_Simulate;
 Uint8 *Mod_Memory;
@@ -1339,7 +1337,22 @@ Read_Mod_File:
 
                 Read_Mod_Data(&delay_time, sizeof(int), 1, in);
                 Read_Mod_Data(&Feedback, sizeof(float), 1, in);
-                Read_Mod_Data(&DelayType, sizeof(int), 1, in);
+                if(compressor)
+                {
+                    Read_Mod_Data(&DelayType, sizeof(int), 1, in);
+                    Read_Mod_Data(&num_echoes, sizeof(char), 1, in);
+                    for(i = 0; i < MAX_COMB_FILTERS; i++)
+                    {
+                        Read_Mod_Data(&delays[i], sizeof(int), 1, in);
+                    }
+                    for(j = 0; j < MAX_COMB_FILTERS; j++)
+                    {
+                        for(i = 0; i < 2; i++)
+                        {
+                            Read_Mod_Data(&decays[j][i], sizeof(float), 1, in);
+                        }
+                    }
+                }
                 Read_Mod_Data(&lchorus_delay, sizeof(int), 1, in);
                 Read_Mod_Data(&rchorus_delay, sizeof(int), 1, in);
                 Read_Mod_Data(&lchorus_feedback, sizeof(float), 1, in);
@@ -2008,10 +2021,12 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_TrueSpeech = FALSE;
     int Store_At3 = FALSE;
     int Store_Flanger = FALSE;
+    int Store_Disclap = FALSE;
     int Store_LFO = FALSE;
     int Store_Instr_Waveform_Osc1 = FALSE; 
     int Store_Instr_Waveform_Osc2 = FALSE;
     int Store_Synth_Disto = FALSE;
+    int Store_Synth_Osc2 = FALSE;
     int Store_Synth_Osc3 = FALSE;
 
     int Store_FX_NoteCut = FALSE;
@@ -2044,6 +2059,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_SetGlobalVolume = FALSE;
     int Store_FX_Arpeggio = FALSE;
 
+    int Store_Synth = FALSE;
+
     int Store_TrackFilters = FALSE;
 
     int Store_Filter_LoHiBand = FALSE;
@@ -2068,6 +2085,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_Filter_Hp24M = FALSE;
 
     int Store_Synth_Filter = FALSE;
+    int Store_Synth_Filter_Lo = FALSE;
+    int Store_Synth_Filter_Hi = FALSE;
+    int Store_Synth_Sin = FALSE;
+    int Store_Synth_Saw = FALSE;
+    int Store_Synth_Pulse = FALSE;
     int Store_Synth_WhiteNoise = FALSE;
     int Store_Synth_PinkNoise = FALSE;
 
@@ -2243,9 +2265,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             case SYNTH_WAVE_OFF:
                 break;
             case SYNTH_WAVE_CURRENT:
+                Store_Synth = TRUE;
                 synth_instr_remap = i;
                 break;
             default:
+                Store_Synth = TRUE;
                 synth_instr_remap = Synthprg[i] - 2;
                 break;
         }
@@ -2684,12 +2708,21 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             {
                 Write_Mod_Data(&PARASynth[swrite].osc1_waveform, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].osc2_waveform, sizeof(char), 1, in);
-                if(PARASynth[swrite].osc1_waveform == 5) Store_Instr_Waveform_Osc1 = TRUE;
-                if(PARASynth[swrite].osc2_waveform == 5) Store_Instr_Waveform_Osc2 = TRUE;
-                if(PARASynth[swrite].osc1_waveform == 3) Store_Synth_WhiteNoise = TRUE;
-                if(PARASynth[swrite].osc2_waveform == 3) Store_Synth_WhiteNoise = TRUE;
-                if(PARASynth[swrite].osc1_waveform == 6) Store_Synth_PinkNoise = TRUE;
-                if(PARASynth[swrite].osc2_waveform == 6) Store_Synth_PinkNoise = TRUE;
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_WAV) Store_Instr_Waveform_Osc1 = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_WAV) Store_Instr_Waveform_Osc2 = TRUE;
+
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_SIN) Store_Synth_Sin = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_SIN) Store_Synth_Sin = TRUE;
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_SAW) Store_Synth_Saw = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_SAW) Store_Synth_Saw = TRUE;
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_PULSE) Store_Synth_Pulse = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_PULSE) Store_Synth_Pulse = TRUE;
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_WHITE) Store_Synth_WhiteNoise = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_WHITE) Store_Synth_WhiteNoise = TRUE;
+                if(PARASynth[swrite].osc1_waveform == WAVEFORM_PINK) Store_Synth_PinkNoise = TRUE;
+                if(PARASynth[swrite].osc2_waveform == WAVEFORM_PINK) Store_Synth_PinkNoise = TRUE;
+
+                if(PARASynth[swrite].osc2_waveform != WAVEFORM_NONE) Store_Synth_Osc2 = TRUE;
 
                 Write_Mod_Data(&PARASynth[swrite].osc1_pw, sizeof(int), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].osc2_pw, sizeof(int), 1, in);
@@ -2699,6 +2732,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Data(&PARASynth[swrite].vcf_resonance, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].vcf_type, sizeof(char), 1, in);
                 if(PARASynth[swrite].vcf_type != 2) Store_Synth_Filter = TRUE;
+                if(PARASynth[swrite].vcf_type == 0) Store_Synth_Filter_Lo = TRUE;
+                if(PARASynth[swrite].vcf_type == 1) Store_Synth_Filter_Hi = TRUE;
 
                 Write_Mod_Data(&PARASynth[swrite].env1_attack, sizeof(int), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].env1_decay, sizeof(int), 1, in);
@@ -2888,11 +2923,20 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
 
+    Save_Constant("PTK_SYNTH", Store_Synth);
+
     Save_Constant("PTK_SYNTH_DISTO", Store_Synth_Disto);
+    Save_Constant("PTK_SYNTH_OSC2", Store_Synth_Osc2);
     Save_Constant("PTK_SYNTH_OSC3", Store_Synth_Osc3);
     Save_Constant("PTK_SYNTH_FILTER", Store_Synth_Filter);
-    Save_Constant("PTK_SYNTH_WHITENOISE", Store_Synth_WhiteNoise);
-    Save_Constant("PTK_SYNTH_PINKNOISE", Store_Synth_PinkNoise);
+    Save_Constant("PTK_SYNTH_FILTER_LO", Store_Synth_Filter_Lo);
+    Save_Constant("PTK_SYNTH_FILTER_HI", Store_Synth_Filter_Hi);
+
+    Save_Constant("PTK_SYNTH_SIN", Store_Synth_Sin);
+    Save_Constant("PTK_SYNTH_SAW", Store_Synth_Saw);
+    Save_Constant("PTK_SYNTH_PULSE", Store_Synth_Pulse);
+    Save_Constant("PTK_SYNTH_WHITE", Store_Synth_WhiteNoise);
+    Save_Constant("PTK_SYNTH_PINK", Store_Synth_PinkNoise);
 
     //Save_Constant("PTK_WAVEFORM", Store_Instr_Waveform_Osc1 | Store_Instr_Waveform_Osc2);
     //Save_Constant("PTK_WAVEFORM_OSC1", Store_Instr_Waveform_Osc1);
@@ -3031,7 +3075,26 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
     Write_Mod_Data(&delay_time, sizeof(int), 1, in);
     Write_Mod_Data(&Feedback, sizeof(float), 1, in);
-    Write_Mod_Data(&DelayType, sizeof(int), 1, in);
+    
+    if(compressor)
+    {
+        Write_Mod_Data(&DelayType, sizeof(int), 1, in);
+        Write_Mod_Data(&num_echoes, sizeof(char), 1, in);
+
+        // Save the reverb data
+        for(i = 0; i < MAX_COMB_FILTERS; i++)
+        {
+            Write_Mod_Data(&delays[i], sizeof(int), 1, in);
+        }
+        for(j = 0; j < MAX_COMB_FILTERS; j++)
+        {
+            for(i = 0; i < 2; i++)
+            {
+                Write_Mod_Data(&decays[j][i], sizeof(float), 1, in);
+            }
+        }
+    }
+
     Write_Mod_Data(&lchorus_delay, sizeof(int), 1, in);
     Write_Mod_Data(&rchorus_delay, sizeof(int), 1, in);
     Write_Mod_Data(&lchorus_feedback, sizeof(float), 1, in);
@@ -3123,6 +3186,18 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
     Save_Constant("PTK_FLANGER", Store_Flanger);
+
+    for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
+    {
+        if(!Track_Is_Muted(tps_trk))
+        {
+            if(Disclap[tps_trk])
+            {
+                Store_Disclap = TRUE;
+            }
+        }
+    }
+    Save_Constant("PTK_DISCLAP", Store_Disclap);
 
     for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
     {
@@ -4743,7 +4818,6 @@ int Calc_Length(void)
             PosTicks++;
             if(PosTicks > Samples + shuffle_stp)
             {
-
                 shuffle_switch = -shuffle_switch;
 
                 if(shuffle_switch == 1)
