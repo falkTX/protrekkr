@@ -1522,6 +1522,17 @@ void PTKEXPORT Ptk_Stop(void)
     while(Done_Reset == FALSE)
     {
         local_ramp_vol = 0.0f;
+
+#if defined(__MACOSX__)
+        usleep(10);
+#endif
+#if defined(__WIN32__)
+        Sleep(10);
+#endif
+#if defined(__LINUX__) 
+        usleep(10);
+#endif
+
     }
 #endif
 
