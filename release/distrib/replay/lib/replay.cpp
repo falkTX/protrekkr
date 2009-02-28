@@ -129,7 +129,7 @@ s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 float CCut[MAX_TRACKS];
 #endif
 
-char Use_Cubic = FALSE;
+char Use_Cubic = TRUE;
 
 float TCut[MAX_TRACKS];
 float ICut[MAX_TRACKS];
