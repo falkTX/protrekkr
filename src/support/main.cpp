@@ -325,9 +325,6 @@ void Load_Keyboard_Def(char *FileName)
     }
 }
 
-#include <mmreg.h>
-#include <msacm.h>
-
 // ------------------------------------------------------
 // Main part of the tracker interface
 #if defined(__WIN32__)
