@@ -65,6 +65,7 @@ typedef unsigned int Uint32;
 void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
 void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
 void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
+void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
 void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
 
 #endif

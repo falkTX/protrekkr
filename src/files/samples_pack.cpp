@@ -53,10 +53,13 @@ WAVEFORMATEX Wave_Format;
 MPEGLAYER3WAVEFORMAT MP3_Format;
 GSM610WAVEFORMAT GSM_Format;
 TRUESPEECHWAVEFORMAT TrueSpeech_Format;
+IMAADPCMWAVEFORMAT ADPCM_Format;
 TRUESPEECHWAVEFORMAT At3_Format;
 ACMSTREAMHEADER Pack_Stream_Head;
 HACMSTREAM Pack_Stream;
 
+// ------------------------------------------------------
+// Pack a sample to GSM
 int ToGSM(short *Source, short *Dest, int Size)
 {
     int Src_size;
@@ -112,6 +115,8 @@ int ToGSM(short *Source, short *Dest, int Size)
     return(Dest_Size);
 }
 
+// ------------------------------------------------------
+// Pack a sample to AT3
 int ToAT3(short *Source, short *Dest, int Size, int BitRate)
 {
     int Src_size;
@@ -129,8 +134,7 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
     At3_Format.wfx.wFormatTag = 0x270;
     At3_Format.wfx.nChannels = 2;
     At3_Format.wfx.nSamplesPerSec = 44100;
-    At3_Format.wfx.nAvgBytesPerSec = BitRate * 125; // 204c (8268) 3324 (13092) 4099 (16537)
-    // 0xc0 (192) 0x130 (304) 0x180 (384)
+    At3_Format.wfx.nAvgBytesPerSec = BitRate * 125;
     switch(BitRate)
     {
         case 66:
@@ -203,6 +207,8 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
     return(Dest_Size);
 }
 
+// ------------------------------------------------------
+// Pack a sample to MP3
 int ToMP3(short *Source, short *Dest, int Size, int BitRate)
 {
     int Src_size;
@@ -270,6 +276,8 @@ int ToMP3(short *Source, short *Dest, int Size, int BitRate)
     return(Dest_Size);
 }
 
+// ------------------------------------------------------
+// Pack a sample to TrueSpeech
 int ToTrueSpeech(short *Source, short *Dest, int Size)
 {
     int Src_size;
@@ -286,6 +294,63 @@ int ToTrueSpeech(short *Source, short *Dest, int Size)
     TrueSpeech_Format.wfx.wFormatTag = WAVE_FORMAT_DSPGROUP_TRUESPEECH;
     acmFormatSuggest(NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &TrueSpeech_Format, sizeof(TrueSpeech_Format), ACM_FORMATSUGGESTF_WFORMATTAG);
     acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &TrueSpeech_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
+
+    Src_size = Size;
+    unsigned long rawbufsize = 0;
+    acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size);
+    memset(Pack_Buf, 0, Src_size);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize);
+    memset(rawbuf, 0, rawbufsize);
+
+    ACMSTREAMHEADER Pack_Stream_Head;
+    ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));
+    Pack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
+    Pack_Stream_Head.pbSrc = (Uint8 *) Pack_Buf;
+    Pack_Stream_Head.cbSrcLength = Src_size;
+    Pack_Stream_Head.pbDst = rawbuf;
+    Pack_Stream_Head.cbDstLength = rawbufsize;
+    acmStreamPrepareHeader(Pack_Stream, &Pack_Stream_Head, 0);
+
+    memcpy(Pack_Buf, Source, Src_size);
+
+    acmStreamConvert(Pack_Stream, &Pack_Stream_Head, 0);
+    Dest_Size = Pack_Stream_Head.cbDstLengthUsed;
+    if(Dest_Size < Src_size)
+    {
+        memcpy(Dest, rawbuf, Dest_Size);
+    }
+    else
+    {
+        Dest_Size = 0;
+    }
+
+    acmStreamUnprepareHeader(Pack_Stream, &Pack_Stream_Head, 0);
+    if(rawbuf) free(rawbuf);
+    if(Pack_Buf) free(Pack_Buf);
+    acmStreamClose(Pack_Stream, 0);
+
+    return(Dest_Size);
+}
+
+// ------------------------------------------------------
+// Pack a sample to ADPCM
+int ToADPCM(short *Source, short *Dest, int Size)
+{
+    int Src_size;
+    int Dest_Size;
+
+    Wave_Format.wFormatTag = WAVE_FORMAT_PCM;
+    Wave_Format.nChannels = 1;
+    Wave_Format.cbSize = 0;
+    Wave_Format.wBitsPerSample = 16;
+    Wave_Format.nSamplesPerSec = 44100;
+    Wave_Format.nBlockAlign = Wave_Format.nChannels * Wave_Format.wBitsPerSample / 8;
+    Wave_Format.nAvgBytesPerSec = Wave_Format.nSamplesPerSec * Wave_Format.nBlockAlign;
+
+    ADPCM_Format.wfx.wFormatTag = WAVE_FORMAT_IMA_ADPCM;
+    acmFormatSuggest(NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &ADPCM_Format, sizeof(TrueSpeech_Format), ACM_FORMATSUGGESTF_WFORMATTAG);
+    acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &ADPCM_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
 
     Src_size = Size;
     unsigned long rawbufsize = 0;

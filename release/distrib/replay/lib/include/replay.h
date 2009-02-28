@@ -58,6 +58,7 @@
 #define SMP_PACK_TRUESPEECH 2
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
+#define SMP_PACK_ADPCM 5
 
 #define MAX_ROWS 128
 #define MAX_SEQUENCES 256

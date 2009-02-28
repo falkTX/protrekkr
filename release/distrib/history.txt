@@ -20,6 +20,7 @@ v1.96:
 - Added mouse wheel navigation support in samples editor.
 - Cubic interpolation can now be disabled
   (should increase speed a bit but at the expense of lower quality).
+- Added ADPCM packing scheme.
 
 v1.95:
 

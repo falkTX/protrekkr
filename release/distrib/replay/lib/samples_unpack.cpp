@@ -56,6 +56,9 @@ GSM610WAVEFORMAT GSM_Format;
 #if defined(PTK_TRUESPEECH)
 TRUESPEECHWAVEFORMAT TrueSpeech_Format;
 #endif
+#if defined(PTK_ADPCM)
+IMAADPCMWAVEFORMAT ADPCM_Format;
+#endif
 #if defined(PTK_AT3)
 TRUESPEECHWAVEFORMAT At3_Format;
 #endif
@@ -66,6 +69,7 @@ MPEGLAYER3WAVEFORMAT MP3_Format;
 extern WAVEFORMATEX Wave_Format;
 extern GSM610WAVEFORMAT GSM_Format;
 extern TRUESPEECHWAVEFORMAT TrueSpeech_Format;
+extern IMAADPCMWAVEFORMAT ADPCM_Format;
 extern TRUESPEECHWAVEFORMAT At3_Format;
 extern MPEGLAYER3WAVEFORMAT MP3_Format;
 #endif
@@ -117,7 +121,7 @@ void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 #endif
 
 // ------------------------------------------------------
-// Unpack a AT3 sample
+// Unpack an AT3 sample
 #if defined(PTK_AT3)
 void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
 {
@@ -262,6 +266,50 @@ void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
     for(i = 0; i < Dst_Size; i++)
     {
         Dest[i] = dwDest[i + MP3_FRAMES_DELAG];
+    }
+
+    if(dwDest) free(dwDest);
+    acmStreamUnprepareHeader(Unpack_Stream, &Unpack_Stream_Head, 0);
+    acmStreamClose(Unpack_Stream, 0);
+}
+#endif
+
+// ------------------------------------------------------
+// Unpack an ADPCM sample
+#if defined(PTK_ADPCM)
+void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+{
+    int i;
+    int Real_Size;
+
+    memset(&Wave_Format, 0, sizeof(WAVEFORMATEX));
+    Wave_Format.wFormatTag = WAVE_FORMAT_PCM;
+
+    ADPCM_Format.wfx.wFormatTag = WAVE_FORMAT_IMA_ADPCM;
+    ADPCM_Format.wfx.nChannels = 1;
+    ADPCM_Format.wfx.nSamplesPerSec = 44100;
+    ADPCM_Format.wfx.nAvgBytesPerSec = 0x566d;
+    ADPCM_Format.wfx.nBlockAlign = 0x400;
+    ADPCM_Format.wfx.wBitsPerSample = 4;
+    ADPCM_Format.wfx.cbSize = 2;
+    ADPCM_Format.wSamplesPerBlock = 0x7f9;
+    acmFormatSuggest(NULL, (LPWAVEFORMATEX) &ADPCM_Format, (LPWAVEFORMATEX) &Wave_Format, sizeof(WAVEFORMATEX), ACM_FORMATSUGGESTF_WFORMATTAG);
+    acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &ADPCM_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
+
+    acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
+    short *dwDest = (short *) malloc((Real_Size * 2));
+    memset(dwDest, 0, (Real_Size * 2));
+    Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
+    Unpack_Stream_Head.pbSrc = Source;
+    Unpack_Stream_Head.cbSrcLength = Src_Size;
+    Unpack_Stream_Head.pbDst = (Uint8 *) dwDest;
+    Unpack_Stream_Head.cbDstLength = Real_Size;
+    acmStreamPrepareHeader(Unpack_Stream, &Unpack_Stream_Head, 0);
+    acmStreamConvert(Unpack_Stream, &Unpack_Stream_Head, 0);
+
+    for(i = 0; i < Dst_Size; i++)
+    {
+        Dest[i] = dwDest[i];
     }
 
     if(dwDest) free(dwDest);

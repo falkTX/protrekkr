@@ -325,6 +325,9 @@ void Load_Keyboard_Def(char *FileName)
     }
 }
 
+#include <mmreg.h>
+#include <msacm.h>
+
 // ------------------------------------------------------
 // Main part of the tracker interface
 #if defined(__WIN32__)
@@ -357,7 +360,23 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 #if defined(__MACOSX__)
     Uint32 Path_Length;
 #endif
+/*
+    ACMFORMATCHOOSE cfm;
+    IMAADPCMWAVEFORMAT Unpack_TrueSpeech_Format;
 
+    memset(&Unpack_TrueSpeech_Format, 0, sizeof(TRUESPEECHWAVEFORMAT));
+    memset(&cfm, 0, sizeof(ACMFORMATCHOOSE));
+
+    cfm.cbStruct = sizeof(ACMFORMATCHOOSE);
+    cfm.pwfx = (WAVEFORMATEX *) &Unpack_TrueSpeech_Format;
+    cfm.cbwfx = sizeof(Unpack_TrueSpeech_Format);
+    cfm.fdwStyle = ACMFORMATCHOOSE_STYLEF_INITTOWFXSTRUCT;
+    cfm.hwndOwner = NULL;
+    cfm.pszTitle = "test";
+    acmFormatChoose(&cfm);
+
+
+*/
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
     SDL_putenv("SDL_VIDEO_CENTERED=1");
 

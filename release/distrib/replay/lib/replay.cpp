@@ -841,6 +841,15 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 #endif
 #endif
                 break;
+
+            case SMP_PACK_ADPCM:
+
+#if !defined(__NO_CODEC__)
+#if defined(PTK_ADPCM)
+                UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+#endif
+#endif
+                break;
         }
 
         free(Packed_Read_Buffer);

@@ -383,36 +383,49 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
 #if !defined(__NO_CODEC__)
                         case SMP_PACK_GSM:
-                            Gui_Draw_Button_Box(640, 484, 80, 16, "Gsm 6.10", Allow_Global_Pushed);
-                            Gui_Draw_Button_Box(640, 484 + 18, 80, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global_Pushed);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_MP3:
-                            Gui_Draw_Button_Box(640, 484, 80, 16, "Gsm 6.10", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + 18, 80, 16, "Mp3", Allow_Global_Pushed);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global_Pushed);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            break;
+                        case SMP_PACK_ADPCM:
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_TRUESPEECH:
-                            Gui_Draw_Button_Box(640, 484, 80, 16, "Gsm 6.10", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + 18, 80, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_AT3:
-                            Gui_Draw_Button_Box(640, 484, 80, 16, "Gsm 6.10", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + 18, 80, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_NONE:
-                            Gui_Draw_Button_Box(640, 484, 80, 16, "Gsm 6.10", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + 18, 80, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global_Pushed);
@@ -672,35 +685,49 @@ void Mouse_Left_Instrument_Ed(void)
         {
 
 #if !defined(__NO_CODEC__)
-            if(zcheckMouse(640, 484, 88, 16))
+
+            // Select GSM
+            if(zcheckMouse(640, 484, 39, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_GSM;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
-            if(zcheckMouse(640, 484 + (18 * 1), 88, 16))
+            // Select MP3
+            if(zcheckMouse(681, 484, 39, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_MP3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
-            if(zcheckMouse(640, 484 + (18 * 2), 88, 16))
+            // Select ADPCM
+            if(zcheckMouse(640, 484 + (18 * 1), 80, 16))
+            {
+                SampleCompression[ped_patsam] = SMP_PACK_ADPCM;
+                teac = 16;
+                gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
+            }
+
+            // Select TRUESPEECH
+            if(zcheckMouse(640, 484 + (18 * 2), 80, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_TRUESPEECH;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
-            if(zcheckMouse(640, 484 + (18 * 3), 88, 16))
+            // Select AT3
+            if(zcheckMouse(640, 484 + (18 * 3), 80, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_AT3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
-            if(zcheckMouse(640, 484 + (18 * 4), 88, 16))
+            // Select NONE
+            if(zcheckMouse(640, 484 + (18 * 4), 80, 16))
             {
                 SampleCompression[ped_patsam] = SMP_PACK_NONE;
                 teac = 16;
@@ -1040,6 +1067,10 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         break;
                                     case SMP_PACK_TRUESPEECH:
                                         sprintf(Line, "Pck: TrueSp.");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+                                    case SMP_PACK_ADPCM:
+                                        sprintf(Line, "Pck: ADPCM");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
                                     case SMP_PACK_NONE:

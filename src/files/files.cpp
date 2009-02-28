@@ -1770,6 +1770,9 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
             case SMP_PACK_TRUESPEECH:
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
+            case SMP_PACK_ADPCM:
+                UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                break;
         }
         free(Packed_Read_Buffer);
         return(Dest_Buffer);
@@ -1830,6 +1833,25 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
                 free(AlignedSample);
             }
             break;
+
+        case SMP_PACK_ADPCM:
+            Aligned_Size = (Size * 2) + 0x1000;
+            AlignedSample = (short *) malloc(Aligned_Size);
+            if(AlignedSample)
+            {
+                memset(AlignedSample, 0, Aligned_Size);
+                memcpy(AlignedSample, Sample, Size * 2);
+                // Size must be aligned
+                PackedSample = (short *) malloc(Aligned_Size);
+                if(PackedSample)
+                {
+                    memset(PackedSample, 0, Aligned_Size);
+                    PackedLen = ToADPCM(AlignedSample, PackedSample, Aligned_Size);
+                }
+                free(AlignedSample);
+            }
+            break;
+
         case SMP_PACK_NONE:
             PackedLen = 0;
             break;
@@ -2096,6 +2118,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_Gsm = FALSE;
     int Store_Mp3 = FALSE;
     int Store_TrueSpeech = FALSE;
+    int Store_ADPCM = FALSE;
     int Store_At3 = FALSE;
     int Store_Flanger = FALSE;
     int Store_Disclap = FALSE;
@@ -2937,6 +2960,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             Store_TrueSpeech = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+                        case SMP_PACK_ADPCM:
+                            Store_ADPCM = TRUE;
+                            Apply_Interpolation = TRUE;
+                            break;
                     }
 #endif
 
@@ -3065,6 +3092,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_GSM", Store_Gsm);
     Save_Constant("PTK_MP3", Store_Mp3);
     Save_Constant("PTK_TRUESPEECH", Store_TrueSpeech);
+    Save_Constant("PTK_ADPCM", Store_ADPCM);
     Save_Constant("PTK_AT3", Store_At3);
 
     Write_Mod_Data(&compressor, sizeof(char), 1, in);

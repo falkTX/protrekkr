@@ -44,6 +44,7 @@ int ToGSM(short *Source, short *Dest, int Size);
 int ToAT3(short *Source, short *Dest, int Size, int BitRate);
 int ToMP3(short *Source, short *Dest, int Size, int BitRate);
 int ToTrueSpeech(short *Source, short *Dest, int Size);
+int ToADPCM(short *Source, short *Dest, int Size);
 
 #endif
 
