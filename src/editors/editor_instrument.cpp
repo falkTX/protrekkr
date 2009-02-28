@@ -1394,12 +1394,17 @@ void Actualize_Instruments_Synths_List(int modeac)
 void Lock_Sample(int instr_nbr, int split)
 {
     int PackedLen = 0;
-    short *PackedSample = NULL;
+    short *PackedSample;
     short *Dest_Buffer;
+    short *Sample_Dest_Buffer;
+    int iSmp;
+    short Sample1;
+    short Sample2;
 
     short *AlignedSample;
     int Aligned_Size;
     short *Sample;
+    short *Smp_Dats;
     int Size;
     char Pack_Type;
     int BitRate;
@@ -1407,6 +1412,11 @@ void Lock_Sample(int instr_nbr, int split)
 
     for(i = 0; i < SampleChannels[instr_nbr][split]; i++)
     {
+        PackedSample = NULL;
+        Smp_Dats = NULL;
+        Dest_Buffer = NULL;
+        Sample_Dest_Buffer = NULL;
+        Smp_Dats = NULL;
         Size = SampleNumSamples[instr_nbr][split];
         Sample = RawSamples[instr_nbr][i][split];
         Pack_Type = SampleCompression[instr_nbr];
@@ -1423,8 +1433,19 @@ void Lock_Sample(int instr_nbr, int split)
 
         Save_WaveForm(instr_nbr, i, split);
 
-        // We will overwrite it during depacking
-        Dest_Buffer = RawSamples[instr_nbr][i][split];
+        Dest_Buffer = (short *) malloc(Size * 2);
+
+        if(Pack_Type != SMP_PACK_NONE)
+        {
+            // Halve the sample
+            Size /= 2;
+            Smp_Dats = (short *) malloc(Size * 2);
+            for(iSmp = 0; iSmp < Size; iSmp++)
+            {
+                Smp_Dats[iSmp] = *(Sample + (iSmp * 2));
+            }
+            Sample = Smp_Dats;
+        }
 
         // Pack it first
         switch(Pack_Type)
@@ -1513,9 +1534,34 @@ void Lock_Sample(int instr_nbr, int split)
                     UnpackADPCM((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
                     break;
             }
+
+            // Interpolate the sample
+            Sample_Dest_Buffer = RawSamples[instr_nbr][i][split];
+
+            for(iSmp = 0; iSmp < Size; iSmp++)
+            {
+                Sample1 = Dest_Buffer[iSmp];
+                Sample2 = Dest_Buffer[iSmp + 1];
+                if(iSmp == Size - 1)
+                {
+                    if(LoopType[instr_nbr][split])
+                    {
+                        Sample2 = Sample_Dest_Buffer[LoopStart[instr_nbr][split]];
+                    }
+                    else
+                    {
+                        Sample2 = Dest_Buffer[iSmp];
+                    }
+                }
+                Sample_Dest_Buffer[(iSmp * 2)] = Sample1;
+                Sample_Dest_Buffer[(iSmp * 2) + 1] = Sample1 + ((Sample2 - Sample1) / 2);
+            }
+
         }
 
+        if(Dest_Buffer) free(Dest_Buffer);
         if(PackedSample) free(PackedSample);
+        if(Smp_Dats) free(Smp_Dats);
     }
 
 }

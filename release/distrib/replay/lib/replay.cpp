@@ -1449,7 +1449,7 @@ void Reset_Values(void)
         Done_Reset = TRUE;
 #endif
 
-#if !defined(__STAND_ALONE) && !defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
         Actupated(0);
 #endif
 
