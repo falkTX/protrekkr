@@ -120,10 +120,6 @@ SOURCE=.\out.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\release\distrib\replay\lib\cubic_spline.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\release\distrib\replay\lib\include\cubic_spline.h
 # End Source File
 # Begin Source File

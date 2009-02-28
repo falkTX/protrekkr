@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.96:
+v1.97:
 
 - More granularity in constants generation (potentially smaller replay).
 - Mp3 samples packing bitrate is now selectable between:
@@ -21,6 +21,12 @@ v1.96:
 - Cubic interpolation can now be disabled
   (should increase speed a bit but at the expense of lower quality).
 - Added ADPCM packing scheme.
+- Added an option to pack & lock instruments and use them directly
+  in the tracker. (unpacked versions of the instruments are kept safe
+  and are saved in .ptk files as usual).
+  These instruments can't be modified in the samples editor.
+  This should come in handy to finetune a module prior to a .ptp export.
+- Fixed a bug with TrueSpeech packed samples.
 
 v1.95:
 

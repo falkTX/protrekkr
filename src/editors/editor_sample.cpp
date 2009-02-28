@@ -65,13 +65,6 @@ void Draw_Sample_Ed(void)
     Gui_Draw_Flat_Box("");
     Gui_Draw_Button_Box(516, 454, CONSOLE_WIDTH - 528, CONSOLE_HEIGHT - 482, "Sample Editor", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(520, 476, 29, 16, "Cut", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(551, 476, 29, 16, "Half", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(520, 494, 60, 16, "Maximize", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(520, 512, 60, 16, "DC Adjust", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(520, 530, 60, 16, "Fade In", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(520, 548, 60, 16, "Fade Out", BUTTON_NORMAL);
-
     Gui_Draw_Button_Box(582, 476, 60, 16, "Select All", BUTTON_NORMAL);
     Gui_Draw_Button_Box(582, 494, 60, 16, "Unselect", BUTTON_NORMAL);
 
@@ -82,11 +75,12 @@ void Draw_Sample_Ed(void)
     Gui_Draw_Button_Box(650, 476, 60, 16, "Zoom In", BUTTON_NORMAL);
     Gui_Draw_Button_Box(650, 494, 60, 16, "Zoom Out", BUTTON_NORMAL);
 
+    Gui_Draw_Button_Box(650, 512, 60, 16, "Range", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(712, 512, 60, 16, "View", BUTTON_NORMAL | BUTTON_DISABLED);
+        
     Gui_Draw_Button_Box(712, 476, 60, 16, "Set Loop S.", BUTTON_NORMAL);
     Gui_Draw_Button_Box(712, 494, 60, 16, "Set Loop E.", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(650, 512, 60, 16, "Range", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(712, 512, 60, 16, "View", BUTTON_NORMAL | BUTTON_DISABLED);
     NewWav();
 }
 
@@ -385,9 +379,27 @@ void Actualize_Sample_Ed(char gode)
     int32 sed_real_range_start;
     int32 sed_real_range_end;
     int32 wao;
+    int Disabled;
 
     if(userscreen == USER_SCREEN_SAMPLE_EDIT)
     {
+
+        if(gode == 0)
+        {
+#if !defined(__NO_CODEC__)
+            if(SamplesSwap[ped_patsam]) Disabled = BUTTON_DISABLED;
+            else
+#endif
+            {
+                Disabled = 0;
+            }
+            Gui_Draw_Button_Box(520, 476, 29, 16, "Cut", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(551, 476, 29, 16, "Half", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(520, 494, 60, 16, "Maximize", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(520, 512, 60, 16, "DC Adjust", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(520, 530, 60, 16, "Fade In", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(520, 548, 60, 16, "Fade Out", BUTTON_NORMAL | Disabled);
+        }
 
         sed_real_range_start = sed_range_start;
         sed_real_range_end = sed_range_end;
@@ -753,10 +765,17 @@ void Mouse_Right_Sample_Ed(void)
 
 void Mouse_Left_Sample_Ed(void)
 {
+    int Allow = TRUE;
+
+#if !defined(__NO_CODEC__)
+    if(SamplesSwap[ped_patsam]) Allow = FALSE;
+#endif
+
     if(userscreen == USER_SCREEN_SAMPLE_EDIT)
     {
         if(SampleType[ped_patsam][ped_split])
         {
+            // Set Loop Start
             if(zcheckMouse(712, 476, 60, 16) && sed_range_mode)
             {
                 if(sed_range_start > sed_range_end)
@@ -787,9 +806,9 @@ void Mouse_Left_Sample_Ed(void)
                 }
             }
 
+            // Set Loop End
             if(zcheckMouse(712, 494, 60, 16) && sed_range_mode)
             {
-
                 if(sed_range_start > sed_range_end)
                 {
                     LoopEnd[ped_patsam][ped_split] = sed_range_start;
@@ -826,37 +845,49 @@ void Mouse_Left_Sample_Ed(void)
                 }
             }
 
-            if(zcheckMouse(520, 476, 29, 16) && sed_range_mode)
+            // Cut
+            if(zcheckMouse(520, 476, 29, 16) && sed_range_mode && Allow)
             {
                 teac = 20;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
-            if(zcheckMouse(520, 512, 60, 16) && sed_range_mode)
+
+            // DC Adjust
+            if(zcheckMouse(520, 512, 60, 16) && sed_range_mode && Allow)
             {
                 teac = 21;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
-            if(zcheckMouse(520, 494, 60, 16) && sed_range_mode)
+
+            // Maximize
+            if(zcheckMouse(520, 494, 60, 16) && sed_range_mode && Allow)
             {
                 teac = 22;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
-            if(zcheckMouse(520, 530, 60, 16) && sed_range_mode)
+
+            // Fade in
+            if(zcheckMouse(520, 530, 60, 16) && sed_range_mode && Allow)
             {
                 teac = 23;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
-            if(zcheckMouse(520, 548, 60, 16) && sed_range_mode)
+
+            // Fade out
+            if(zcheckMouse(520, 548, 60, 16) && sed_range_mode && Allow)
             {
                 teac = 24;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
-            if(zcheckMouse(551, 476, 29, 16) && sed_range_mode)
+
+            // Half
+            if(zcheckMouse(551, 476, 29, 16) && sed_range_mode && Allow)
             {
                 teac = 25;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
+            // View All
             if(zcheckMouse(582, 512, 60, 16))
             {
                 rs_coef = 32768;
@@ -867,12 +898,14 @@ void Mouse_Left_Sample_Ed(void)
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
+            // VZoom In
             if(zcheckMouse(582, 530, 60, 16))
             {
                 rs_coef /= 2;
                 draw_sampled_wave = TRUE;
             }
 
+            // VZoom Out
             if(zcheckMouse(582, 548, 60, 16))
             {
                 rs_coef *= 2;
@@ -950,8 +983,7 @@ void Mouse_Wheel_Sample_Ed(int roll_amount)
         if(zcheckMouse(0, 450, 512, 109 + 16))
         {
             int max_length = SampleNumSamples[ped_patsam][ped_split];
-            int shown_length = (sed_range_end - sed_range_start) + 1;
-            sed_display_start += roll_amount * (shown_length / 16);
+            sed_display_start += roll_amount * (sed_display_length / 16);
             
             if(sed_display_start < 0) sed_display_start = 0;
             if(sed_display_start > (max_length - sed_display_length))

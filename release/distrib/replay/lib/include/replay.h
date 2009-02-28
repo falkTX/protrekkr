@@ -209,6 +209,13 @@ extern char Midiprg[MAX_INSTRS];
 extern unsigned char Synthprg[MAX_INSTRS];
 #endif
 
+#if !defined(__NO_CODEC__)
+#if !defined(__STAND_ALONE__)
+extern char SamplesSwap[MAX_INSTRS];
+extern short *RawSamples_Swap[MAX_INSTRS][2][16];
+#endif
+#endif
+
 extern char SampleType[MAX_INSTRS][16];
 extern char SampleCompression[MAX_INSTRS];
 extern char SampleName[MAX_INSTRS][16][64];

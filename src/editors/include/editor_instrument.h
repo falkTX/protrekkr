@@ -61,5 +61,7 @@ void Mouse_Sliders_Right_Instrument_Ed(void);
 void Afloop(void);
 void Dump_Instruments_Synths_List(int xr, int yr);
 void Actualize_Instruments_Synths_List(int modeac);
+void Save_WaveForm(int Instr_Nbr, int Channel, int Split);
+void Restore_WaveForm(int Instr_Nbr, int Channel, int Split);
 
 #endif

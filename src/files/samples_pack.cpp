@@ -158,8 +158,9 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
     At3_Format.abReserved[6] = 1;
     acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &At3_Format, NULL, 0, 0, 0);
 
-    short *dwSource = (short *) malloc(Size * 4);
-    for(i = 0; i < Size; i++)
+    short *dwSource = (short *) malloc(Size * 2);
+    memset(dwSource, 0, Size * 2);
+    for(i = 0; i < Size / 2; i++)
     {
         dwSource[(i * 2)] = Source[i];
         dwSource[(i * 2) + 1] = 0;

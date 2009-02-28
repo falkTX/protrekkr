@@ -231,6 +231,7 @@ void Load_303_Data(int (*Read_Function)(void *, int ,int, FILE *),
 void Save_303_Data(int (*Write_Function)(void *, int ,int, FILE *),
                    int (*Write_Function_Swap)(void *, int ,int, FILE *),
                    FILE *in, int unit, int pattern);
+short *Get_WaveForm(int Instr_Nbr, int Channel, int Split);
 
 // ------------------------------------------------------
 // Prepare the tracker interface once a module has been loaded
@@ -3008,9 +3009,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         Calc_Len /= 2;
                         Smp_Dats = (short *) malloc(Real_Len * 2);
                         // Halve the sample
+                        short *Sample = Get_WaveForm(swrite, 0, slwrite);
                         for(iSmp = 0; iSmp < Calc_Len; iSmp++)
                         {
-                            Smp_Dats[iSmp] = *(RawSamples[swrite][0][slwrite] + (iSmp * 2));
+                            Smp_Dats[iSmp] = *(Sample + (iSmp * 2));
                         }
                         Pack_Sample(in,
                                     Smp_Dats,
@@ -3024,7 +3026,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     else
                     {
                         Pack_Sample(in,
-                                    RawSamples[swrite][0][slwrite],
+                                    Get_WaveForm(swrite, 0, slwrite),
                                     Calc_Len,
                                     SampleCompression[swrite],
                                     SampleCompression[swrite] == SMP_PACK_MP3 ?
@@ -3039,9 +3041,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         if(Apply_Interpolation)
                         {
                             // Halve the sample
+                            short *Sample = Get_WaveForm(swrite, 1, slwrite);
                             for(iSmp = 0; iSmp < Calc_Len; iSmp++)
                             {
-                                Smp_Dats[iSmp] = *(RawSamples[swrite][1][slwrite] + (iSmp * 2));
+                                Smp_Dats[iSmp] = *(Sample + (iSmp * 2));
                             }
                             Pack_Sample(in,
                                         Smp_Dats,
@@ -3055,7 +3058,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         else
                         {
                             Pack_Sample(in,
-                                        RawSamples[swrite][1][slwrite],
+                                        Get_WaveForm(swrite, 1, slwrite),
                                         Calc_Len,
                                         SampleCompression[swrite],
                                         SampleCompression[swrite] == SMP_PACK_MP3 ?
@@ -4553,7 +4556,7 @@ void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
 {
     short *swap_buffer;
 
-    swap_buffer = Swap_New_Sample(RawSamples[sample][0][bank], sample, bank);
+    swap_buffer = Swap_New_Sample(Get_WaveForm(sample, 0, bank), sample, bank);
     if(swap_buffer)
     {
         Write_Function(swap_buffer, sizeof(short), SampleNumSamples[sample][bank], in);
@@ -4561,13 +4564,13 @@ void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
     }
     else
     {
-        Write_Function(RawSamples[sample][0][bank], sizeof(short), SampleNumSamples[sample][bank], in);
+        Write_Function(Get_WaveForm(sample, 0, bank), sizeof(short), SampleNumSamples[sample][bank], in);
     }
 
     Write_Function(&SampleChannels[sample][bank], sizeof(char), 1, in);
     if(SampleChannels[sample][bank] == 2)
     {
-        swap_buffer = Swap_New_Sample(RawSamples[sample][1][bank], sample, bank);
+        swap_buffer = Swap_New_Sample(Get_WaveForm(sample, 1, bank), sample, bank);
         if(swap_buffer)
         {
             Write_Function(swap_buffer, sizeof(short), SampleNumSamples[sample][bank], in);
@@ -4575,7 +4578,7 @@ void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
         }
         else
         {
-            Write_Function(RawSamples[sample][1][bank], sizeof(short), SampleNumSamples[sample][bank], in);
+            Write_Function(Get_WaveForm(sample, 1, bank), sizeof(short), SampleNumSamples[sample][bank], in);
         }
     }
 }
@@ -5075,3 +5078,18 @@ void Reset_Song_Length(void)
     song_Seconds = 0;
 }
 
+// ------------------------------------------------------
+// Return the data of an unpacked sample
+short *Get_WaveForm(int Instr_Nbr, int Channel, int Split)
+{
+#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+    if(SamplesSwap[Instr_Nbr])
+    {
+        return(RawSamples_Swap[Instr_Nbr][Channel][Split]); 
+    }
+    else
+#endif
+    {
+        return(RawSamples[Instr_Nbr][Channel][Split]); 
+    }
+}

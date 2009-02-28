@@ -33,7 +33,10 @@
 // Includes
 #include "include/editor_instrument.h"
 #include "include/editor_sample.h"
+#include "../files/include/samples_pack.h"
 #include "../files/include/files_list.h"
+
+#include "../../release/distrib/replay/lib/include/samples_unpack.h"
 
 #include "../../release/distrib/replay/lib/include/endianness.h"
 
@@ -56,6 +59,8 @@ extern char Mp3_BitRate[MAX_INSTRS];
 extern int Type_Mp3_BitRate[];
 extern char At3_BitRate[MAX_INSTRS];
 extern int Type_At3_BitRate[];
+
+void Lock_Sample(int instr_nbr, int split);
 
 // ------------------------------------------------------
 // Functions
@@ -433,6 +438,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #endif
 
                     }
+                    if(gode == 16) gode = 19;
                 }
 
 #if !defined(__NO_CODEC__)
@@ -441,6 +447,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     if(Mp3_BitRate[ped_patsam] < 0) Mp3_BitRate[ped_patsam] = 0;
                     if(Mp3_BitRate[ped_patsam] > 5) Mp3_BitRate[ped_patsam] = 5;
                     Gui_Draw_Arrows_Number_Box(729, 484, Type_Mp3_BitRate[Mp3_BitRate[ped_patsam]], Allow_Global | BUTTON_TEXT_CENTERED);
+                    if(gode == 17) gode = 19;
                 }
 #endif
 
@@ -450,10 +457,54 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     if(At3_BitRate[ped_patsam] < 0) At3_BitRate[ped_patsam] = 0;
                     if(At3_BitRate[ped_patsam] > 2) At3_BitRate[ped_patsam] = 2;
                     Gui_Draw_Arrows_Number_Box(729, 524, Type_At3_BitRate[At3_BitRate[ped_patsam]], Allow_Global | BUTTON_TEXT_CENTERED);
+                    if(gode == 18) gode = 19;
                 }
 #endif
 
-                if(gode == 16 || gode == 17 || gode == 18)
+#if !defined(__NO_CODEC__)
+                if(gode == 0 || gode == 19)
+                {
+                    if(SamplesSwap[ped_patsam])
+                    {
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                    }
+                    else
+                    {
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
+                    }
+                    if(gode == 19)
+                    {
+                        int i;
+                        if(SamplesSwap[ped_patsam])
+                        {
+                            for(i = 0; i < 16; i++)
+                            {
+                                Lock_Sample(ped_patsam, i);
+                            }
+                        }
+                        else
+                        {
+                            for(i = 0; i < 16; i++)
+                            {
+                                Restore_WaveForm(ped_patsam, 0, i);
+                                Restore_WaveForm(ped_patsam, 1, i);
+                                if(RawSamples_Swap[ped_patsam][0][i])
+                                {
+                                    free(RawSamples_Swap[ped_patsam][0][i]);
+                                    RawSamples_Swap[ped_patsam][0][i] = NULL;
+                                }
+                                if(RawSamples_Swap[ped_patsam][1][i])
+                                {
+                                    free(RawSamples_Swap[ped_patsam][1][i]);
+                                    RawSamples_Swap[ped_patsam][1][i] = NULL;
+                                }
+                            }
+                        }
+                    }
+                }
+#endif
+
+                if(gode == 16 || gode == 17 || gode == 18 || gode == 19)
                 {
                     Actualize_Instruments_Synths_List(1);
                 }
@@ -689,6 +740,10 @@ void Mouse_Left_Instrument_Ed(void)
             // Select GSM
             if(zcheckMouse(640, 484, 39, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_GSM)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_GSM;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -697,6 +752,10 @@ void Mouse_Left_Instrument_Ed(void)
             // Select MP3
             if(zcheckMouse(681, 484, 39, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_MP3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_MP3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -705,6 +764,10 @@ void Mouse_Left_Instrument_Ed(void)
             // Select ADPCM
             if(zcheckMouse(640, 484 + (18 * 1), 80, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_ADPCM)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_ADPCM;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -713,6 +776,10 @@ void Mouse_Left_Instrument_Ed(void)
             // Select TRUESPEECH
             if(zcheckMouse(640, 484 + (18 * 2), 80, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_TRUESPEECH)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_TRUESPEECH;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -721,6 +788,10 @@ void Mouse_Left_Instrument_Ed(void)
             // Select AT3
             if(zcheckMouse(640, 484 + (18 * 3), 80, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_AT3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_AT3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
@@ -729,43 +800,74 @@ void Mouse_Left_Instrument_Ed(void)
             // Select NONE
             if(zcheckMouse(640, 484 + (18 * 4), 80, 16))
             {
+                if(SampleCompression[ped_patsam] != SMP_PACK_NONE)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
                 SampleCompression[ped_patsam] = SMP_PACK_NONE;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
             // Mp3 BitRate
-            if(zcheckMouse(729, 484, 16, 16) == 1)
+            if(zcheckMouse(729, 484, 16, 16))
             {
+                if(SampleCompression[ped_patsam] == SMP_PACK_MP3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
+                SamplesSwap[ped_patsam] = FALSE;
                 Mp3_BitRate[ped_patsam]--;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 17;
             }
 
             // Mp3 BitRate
-            if(zcheckMouse(729 + 44, 484, 16, 16) == 1)
+            if(zcheckMouse(729 + 44, 484, 16, 16))
             {
+                if(SampleCompression[ped_patsam] == SMP_PACK_MP3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
+                SamplesSwap[ped_patsam] = FALSE;
                 Mp3_BitRate[ped_patsam]++;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 17;
             }
 
             // At3 BitRate
-            if(zcheckMouse(729, 524, 16, 16) == 1)
+            if(zcheckMouse(729, 524, 16, 16))
             {
+                if(SampleCompression[ped_patsam] == SMP_PACK_AT3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
+                SamplesSwap[ped_patsam] = FALSE;
                 At3_BitRate[ped_patsam]--;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 18;
             }
 
             // At3 BitRate
-            if(zcheckMouse(729 + 44, 524, 16, 16) == 1)
+            if(zcheckMouse(729 + 44, 524, 16, 16))
             {
+                if(SampleCompression[ped_patsam] == SMP_PACK_AT3)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
+                SamplesSwap[ped_patsam] = FALSE;
                 At3_BitRate[ped_patsam]++;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 18;
             }
 
+            // Lock sample
+            if(zcheckMouse(729, 484 + (18 * 4), 60, 16))
+            {
+                SamplesSwap[ped_patsam] = !SamplesSwap[ped_patsam];
+                gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
+                teac = 19;
+            }
 #endif
 
         }
@@ -837,6 +939,39 @@ void Mouse_Right_Instrument_Ed(void)
             teac = 10;
         }
 #endif
+
+/* NOT IMPLEMENTED YET
+#if !defined(__NO_CODEC__)
+        if(Allow_Global_Sliders)
+        {
+            // Lock all samples
+            if(zcheckMouse(729, 484 + (18 * 4), 60, 16))
+            {
+                int i;
+                int j;
+                int Lock;
+                for(i = 0; i < MAX_INSTRS; i++)
+                {
+                    Lock = FALSE;
+                    for(j = 0; j < 16; j++)
+                    {
+                        if(SampleType[i][j])
+                        {
+                            Lock = TRUE;
+                            break;
+                        }
+                    }
+                    if(Lock)
+                    {
+                        SamplesSwap[i] = !SamplesSwap[i];
+                    }
+                    gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
+                }
+                teac = 19;
+            }
+        }
+#endif
+*/
 
         if(SampleType[ped_patsam][ped_split])
         {
@@ -1044,11 +1179,31 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                 case 0:
                                     sprintf(Line, "No waveform");
                                     break;
+
                                 case 1:
-                                    sprintf(Line, "%d waveform", Nbr_Splits);
+#if !defined(__NO_CODEC__)
+                                    if(SamplesSwap[rel_val])
+                                    {
+                                        sprintf(Line, "*Locked* (%d)", Nbr_Splits);
+                                    }
+                                    else
+#endif
+                                    {
+                                        sprintf(Line, "%d waveform", Nbr_Splits);
+                                    }
                                     break;
+
                                 default:
-                                    sprintf(Line, "%d waveforms", Nbr_Splits);
+#if !defined(__NO_CODEC__)
+                                    if(SamplesSwap[rel_val])
+                                    {
+                                        sprintf(Line, "*Locked* (%d)", Nbr_Splits);
+                                    }
+                                    else
+#endif
+                                    {
+                                        sprintf(Line, "%d waveforms", Nbr_Splits);
+                                    }
                                     break;
                             }
                             PrintXY(xr + 168, yr + (counter * 12), Font, Line);
@@ -1061,22 +1216,27 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         sprintf(Line, "Pck: Gsm");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
+
                                     case SMP_PACK_MP3:
                                         sprintf(Line, "Pck: Mp3 (%d)", Type_Mp3_BitRate[Mp3_BitRate[rel_val]]);
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
+
                                     case SMP_PACK_TRUESPEECH:
                                         sprintf(Line, "Pck: TrueSp.");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
+
                                     case SMP_PACK_ADPCM:
                                         sprintf(Line, "Pck: ADPCM");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
+
                                     case SMP_PACK_NONE:
                                         sprintf(Line, "Pck: None");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
+
                                     case SMP_PACK_AT3:
                                         sprintf(Line, "Pck: At3 (%d)", Type_At3_BitRate[At3_BitRate[rel_val]]);
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
@@ -1135,9 +1295,11 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                     case 0:
                                         sprintf(Line, "No waveform");
                                         break;
+
                                     case 1:
                                         sprintf(Line, "%d waveform", Nbr_Splits);
                                         break;
+
                                     default:
                                         sprintf(Line, "%d waveforms", Nbr_Splits);
                                         break;
@@ -1225,3 +1387,167 @@ void Actualize_Instruments_Synths_List(int modeac)
             break;
     }
 }
+
+// ------------------------------------------------------
+// Lock a sample in order to test it
+#if !defined(__NO_CODEC__)
+void Lock_Sample(int instr_nbr, int split)
+{
+    int PackedLen = 0;
+    short *PackedSample = NULL;
+    short *Dest_Buffer;
+
+    short *AlignedSample;
+    int Aligned_Size;
+    short *Sample;
+    int Size;
+    char Pack_Type;
+    int BitRate;
+    int i;
+
+    for(i = 0; i < SampleChannels[instr_nbr][split]; i++)
+    {
+        Size = SampleNumSamples[instr_nbr][split];
+        Sample = RawSamples[instr_nbr][i][split];
+        Pack_Type = SampleCompression[instr_nbr];
+        BitRate = SampleCompression[instr_nbr] == SMP_PACK_MP3 ?
+                                                  Type_Mp3_BitRate[Mp3_BitRate[instr_nbr]] :
+                                                  Type_At3_BitRate[At3_BitRate[instr_nbr]];
+        if(RawSamples_Swap[instr_nbr][i][split])
+        {
+            free(RawSamples_Swap[instr_nbr][i][split]);
+            RawSamples_Swap[instr_nbr][i][split] = NULL;
+        }
+
+        RawSamples_Swap[instr_nbr][i][split] = (short *) malloc(Size * 2);
+
+        Save_WaveForm(instr_nbr, i, split);
+
+        // We will overwrite it during depacking
+        Dest_Buffer = RawSamples[instr_nbr][i][split];
+
+        // Pack it first
+        switch(Pack_Type)
+        {
+            case SMP_PACK_AT3:
+                PackedSample = (short *) malloc(Size * 2);
+                memset(PackedSample, 0, Size * 2);
+                PackedLen = ToAT3(Sample, PackedSample, Size * 2, BitRate);
+                break;
+
+            case SMP_PACK_GSM:
+                PackedSample = (short *) malloc(Size * 2);
+                memset(PackedSample, 0, Size * 2);
+                PackedLen = ToGSM(Sample, PackedSample, Size * 2);
+                break;
+
+            case SMP_PACK_MP3:
+                PackedSample = (short *) malloc(Size * 2);
+                memset(PackedSample, 0, Size * 2);
+                PackedLen = ToMP3(Sample, PackedSample, Size * 2, BitRate);
+                break;
+
+            case SMP_PACK_TRUESPEECH:
+                Aligned_Size = (Size * 2) + 0x400;
+                AlignedSample = (short *) malloc(Aligned_Size);
+                if(AlignedSample)
+                {
+                    memset(AlignedSample, 0, Aligned_Size);
+                    memcpy(AlignedSample, Sample, Size * 2);
+                    // Size must be aligned
+                    PackedSample = (short *) malloc(Aligned_Size);
+                    if(PackedSample)
+                    {
+                        memset(PackedSample, 0, Aligned_Size);
+                        PackedLen = ToTrueSpeech(AlignedSample, PackedSample, Aligned_Size);
+                    }
+                    free(AlignedSample);
+                }
+                break;
+
+            case SMP_PACK_ADPCM:
+                Aligned_Size = (Size * 2) + 0x1000;
+                AlignedSample = (short *) malloc(Aligned_Size);
+                if(AlignedSample)
+                {
+                    memset(AlignedSample, 0, Aligned_Size);
+                    memcpy(AlignedSample, Sample, Size * 2);
+                    // Size must be aligned
+                    PackedSample = (short *) malloc(Aligned_Size);
+                    if(PackedSample)
+                    {
+                        memset(PackedSample, 0, Aligned_Size);
+                        PackedLen = ToADPCM(AlignedSample, PackedSample, Aligned_Size);
+                    }
+                    free(AlignedSample);
+                }
+                break;
+
+            case SMP_PACK_NONE:
+                PackedLen = 0;
+                break;
+        }
+
+        // Depack it now
+        if(PackedLen)
+        {
+            switch(Pack_Type)
+            {
+                case SMP_PACK_AT3:
+                    UnpackAT3((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size, BitRate);
+                    break;
+
+                case SMP_PACK_GSM:
+                    UnpackGSM((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
+                    break;
+
+                case SMP_PACK_MP3:
+                    UnpackMP3((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size, BitRate);
+                    break;
+
+                case SMP_PACK_TRUESPEECH:
+                    UnpackTrueSpeech((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
+                    break;
+
+                case SMP_PACK_ADPCM:
+                    UnpackADPCM((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
+                    break;
+            }
+        }
+
+        if(PackedSample) free(PackedSample);
+    }
+
+}
+
+// ------------------------------------------------------
+// Copy a sample into the back buffer
+void Save_WaveForm(int Instr_Nbr, int Channel, int Split)
+{
+    int i;
+
+    if(RawSamples[Instr_Nbr][Channel][Split] && RawSamples_Swap[Instr_Nbr][Channel][Split])
+    {
+        for(i = 0; i < (int) SampleNumSamples[Instr_Nbr][Split]; i++)
+        {
+            RawSamples_Swap[Instr_Nbr][Channel][Split][i] = RawSamples[Instr_Nbr][Channel][Split][i];
+        }
+    }
+}
+
+// ------------------------------------------------------
+// Copy a sample from the back buffer
+void Restore_WaveForm(int Instr_Nbr, int Channel, int Split)
+{
+    int i;
+
+    if(RawSamples[Instr_Nbr][Channel][Split] && RawSamples_Swap[Instr_Nbr][Channel][Split])
+    {
+        for(i = 0; i < (int) SampleNumSamples[Instr_Nbr][Split]; i++)
+        {
+            RawSamples[Instr_Nbr][Channel][Split][i] = RawSamples_Swap[Instr_Nbr][Channel][Split][i];
+        }
+    }
+}
+
+#endif

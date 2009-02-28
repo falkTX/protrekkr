@@ -332,9 +332,16 @@ char CHAN_ACTIVE_STATE[256][MAX_TRACKS];
 
 int gco;
 float ramper[MAX_TRACKS];
-char Basenote[128][16];
-char SampleType[128][16];
-char Finetune[128][16];
+char Basenote[MAX_INSTRS][16];
+char SampleType[MAX_INSTRS][16];
+char Finetune[MAX_INSTRS][16];
+
+#if !defined(__NO_CODEC__)
+#if !defined(__STAND_ALONE__) && !(__WINAMP__)
+char SamplesSwap[MAX_INSTRS];
+short *RawSamples_Swap[MAX_INSTRS][2][16];
+#endif
+#endif
 
 unsigned char Synthprg[128];
 
@@ -342,17 +349,17 @@ unsigned char Synthprg[128];
 SynthParameters PARASynth[128];
 #endif
 
-char LoopType[128][16];
-Uint32 LoopStart[128][16];
-Uint32 LoopEnd[128][16];
-Uint32 SampleNumSamples[128][16];
-char beatsync[128];
-short beatlines[128];
+char LoopType[MAX_INSTRS][16];
+Uint32 LoopStart[MAX_INSTRS][16];
+Uint32 LoopEnd[MAX_INSTRS][16];
+Uint32 SampleNumSamples[MAX_INSTRS][16];
+char beatsync[MAX_INSTRS];
+short beatlines[MAX_INSTRS];
 int64 sp_Step[MAX_TRACKS][MAX_POLYPHONY];
-float SampleVol[128][16];
-char SampleChannels[128][16];
-float FDecay[128][16];
-short *RawSamples[128][2][16];
+float SampleVol[MAX_INSTRS][16];
+char SampleChannels[MAX_INSTRS][16];
+float FDecay[MAX_INSTRS][16];
+short *RawSamples[MAX_INSTRS][2][16];
 
 #if defined(PTK_COMPRESSOR)
     int currentCounter;
@@ -813,6 +820,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 #endif
 #endif
 #endif
+                break;
 
             case SMP_PACK_GSM:
 
@@ -1441,6 +1449,10 @@ void Reset_Values(void)
         Done_Reset = TRUE;
 #endif
 
+#if !defined(__STAND_ALONE) && !defined(__WINAMP__)
+        Actupated(0);
+#endif
+
         Songplaying = FALSE;
     }
 }
@@ -1726,25 +1738,7 @@ void Pre_Song_Init(void)
         }
     }
 
-#if defined(__STAND_ALONE__)
-    for(int freer = 0; freer < 128; freer++)
-    {
-        for(int pedsplit = 0; pedsplit < 16; pedsplit++)
-        {
-            if(SampleType[freer][pedsplit] != 0)
-            {
-                if(RawSamples[freer][0][pedsplit]) free(RawSamples[freer][0][pedsplit]);
-                RawSamples[freer][0][pedsplit] = NULL;
-                if(SampleChannels[freer][pedsplit] == 2)
-                {
-                    if(RawSamples[freer][1][pedsplit]) free(RawSamples[freer][1][pedsplit]);
-                    RawSamples[freer][1][pedsplit] = NULL;
-                }
-            }
-        }
-    }
-#endif
-
+    Free_Samples();
 }
 
 // ------------------------------------------------------
@@ -4418,12 +4412,15 @@ void KillInst(int inst_nbr)
     At3_BitRate[inst_nbr] = 0;
 #endif
 
+#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+    SamplesSwap[inst_nbr] = FALSE;
+#endif
+
     for(int z = 0; z < 16; z++)
     {
         if(RawSamples[inst_nbr][0][z])
         {
             if(RawSamples[inst_nbr][0][z]) free(RawSamples[inst_nbr][0][z]);
-            RawSamples[inst_nbr][0][z] = NULL;
         }
         RawSamples[inst_nbr][0][z] = NULL;
         if(SampleChannels[inst_nbr][z] == 2)
@@ -4431,10 +4428,25 @@ void KillInst(int inst_nbr)
             if(RawSamples[inst_nbr][1][z])
             {
                 if(RawSamples[inst_nbr][1][z]) free(RawSamples[inst_nbr][1][z]);
-                RawSamples[inst_nbr][1][z] = NULL;
             }
             RawSamples[inst_nbr][1][z] = NULL;
         }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        if(RawSamples_Swap[inst_nbr][0][z])
+        {
+            if(RawSamples_Swap[inst_nbr][0][z]) free(RawSamples_Swap[inst_nbr][0][z]);
+        }
+        RawSamples_Swap[inst_nbr][0][z] = NULL;
+        if(SampleChannels[inst_nbr][z] == 2)
+        {
+            if(RawSamples_Swap[inst_nbr][1][z])
+            {
+                if(RawSamples_Swap[inst_nbr][1][z]) free(RawSamples_Swap[inst_nbr][1][z]);
+            }
+            RawSamples_Swap[inst_nbr][1][z] = NULL;
+        }
+#endif
 
         SampleChannels[inst_nbr][z] = 0;
         SampleType[inst_nbr][z] = 0;
@@ -4537,6 +4549,7 @@ void ResetSynthParameters(SynthParameters *TSP)
     TSP->lfo2_release = 16384;
 }
 #endif // PTK_SYNTH
+#endif // !__STAND_ALONE__ || __WINAMP__
 
 // ------------------------------------------------------
 // Free all allocated Samples
@@ -4556,10 +4569,28 @@ void Free_Samples(void)
                     RawSamples[freer][1][pedsplit] = NULL;
                 }
             }
+
+#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+            if(SampleType[freer][pedsplit] != 0)
+            {
+                if(RawSamples_Swap[freer][0][pedsplit]) free(RawSamples_Swap[freer][0][pedsplit]);
+                RawSamples_Swap[freer][0][pedsplit] = NULL;
+                if(SampleChannels[freer][pedsplit] == 2)
+                {
+                    if(RawSamples_Swap[freer][1][pedsplit]) free(RawSamples_Swap[freer][1][pedsplit]);
+                    RawSamples_Swap[freer][1][pedsplit] = NULL;
+                }
+            }
+#endif
+
         }
+
+#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+        SamplesSwap[freer] = FALSE;
+#endif
+
     }
 }
-#endif // !__STAND_ALONE__ || __WINAMP__
 
 // ------------------------------------------------------
 #if defined(PTK_COMPRESSOR)

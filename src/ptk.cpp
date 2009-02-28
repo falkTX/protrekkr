@@ -1402,6 +1402,17 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
             if(RawSamples[n_index][1][ped_split]) free(RawSamples[n_index][1][ped_split]);
             RawSamples[n_index][1][ped_split] = NULL;
         }
+
+#if !defined(__NO_CODEC__)
+        if(RawSamples_Swap[n_index][0][ped_split]) free(RawSamples_Swap[n_index][0][ped_split]);
+        RawSamples_Swap[n_index][0][ped_split] = NULL;
+        if(SampleChannels[n_index][ped_split] == 2)
+        {
+            if(RawSamples_Swap[n_index][1][ped_split]) free(RawSamples_Swap[n_index][1][ped_split]);
+            RawSamples_Swap[n_index][1][ped_split] = NULL;
+        }
+#endif
+
     }
 
     SampleType[n_index][ped_split] = 1;
@@ -1411,13 +1422,13 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
     SampleCompression[n_index] = SMP_PACK_GSM;
 #else
     SampleCompression[n_index] = SMP_PACK_NONE;
+    SamplesSwap[n_index] = FALSE;
 #endif
     Mp3_BitRate[n_index] = 0;
     At3_BitRate[n_index] = 0;
 
     SampleChannels[n_index][ped_split] = samplechans;
     RawSamples[n_index][0][ped_split] = (short *) malloc(lenfir * 2);
-
     if(samplechans == 2) RawSamples[n_index][1][ped_split] = (short *) malloc(lenfir * 2);    
 
     LoopStart[n_index][ped_split] = 0;

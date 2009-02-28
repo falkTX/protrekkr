@@ -219,7 +219,7 @@ void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 
     for(i = 0; i < Dst_Size; i++)
     {
-        Dest[i] = dwDest[i];
+        Dest[i] = dwDest[i + 0x3e];
     }
 
     if(dwDest) free(dwDest);

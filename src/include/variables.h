@@ -235,94 +235,10 @@ typedef struct
 // Variables
 extern int SamplesPerTick;
 
-extern unsigned char *RawPatterns;
-extern unsigned char nPatterns;
-extern unsigned char sLength;
-extern unsigned char pSequence[256];
-extern short patternLines[128];
-extern char nameins[128][20];
-extern char Midiprg[128];
-extern unsigned char Synthprg[128];
-extern char SampleType[128][16];
-extern char SampleCompression[128];
-extern char SampleName[128][16][64];
-extern char Basenote[128][16];
-extern Uint32 LoopStart[128][16];
-extern Uint32 LoopEnd[128][16];
-extern char LoopType[128][16];
-extern Uint32 SampleNumSamples[128][16];
-extern char Finetune[128][16];
-extern float SampleVol[128][16];
-extern float FDecay[128][16];
-extern short *RawSamples[128][2][16];
-extern char SampleChannels[128][16];
-
-extern float TCut[MAX_TRACKS];
-extern float ICut[MAX_TRACKS];
-extern float TPan[MAX_TRACKS];
-extern int FType[MAX_TRACKS];
-extern int FRez[MAX_TRACKS];
-extern float DThreshold[MAX_TRACKS];
-extern float DClamp[MAX_TRACKS];
-extern float DSend[MAX_TRACKS];  
-extern int CSend[MAX_TRACKS];
-
-extern char compressor; // 0-->Off 1-->On
-extern int c_threshold;
-extern int BeatsPerMin;
-extern int TicksPerBeat;
-//extern float mas_vol;
-//extern float mas_comp_threshold;
-//extern float mas_comp_ratio;
-extern int delay_time;
-
-extern float Feedback;
-extern int DelayType;
-
-extern int lchorus_delay;
-extern int rchorus_delay;
-extern float lchorus_feedback;
-extern float rchorus_feedback;
-extern int shuffle;
-
-extern char CHAN_ACTIVE_STATE[256][16];
-extern char CHAN_HISTORY_STATE[256][16];
-extern float CCoef[MAX_TRACKS];
-extern int CHAN_MIDI_PRG[MAX_TRACKS];
-
-extern char LFO_ON[MAX_TRACKS];
-extern float LFO_RATE[MAX_TRACKS];
-extern float LFO_AMPL[MAX_TRACKS];
-
-extern char FLANGER_ON[MAX_TRACKS];
-extern float FLANGER_AMOUNT[MAX_TRACKS];
-extern float FLANGER_DEPHASE[MAX_TRACKS];
-extern float FLANGER_RATE[MAX_TRACKS];
-extern float FLANGER_AMPL[MAX_TRACKS];
-extern float FLANGER_GR[MAX_TRACKS];
-extern float FLANGER_FEEDBACK[MAX_TRACKS];
-extern int FLANGER_DELAY[MAX_TRACKS];
-extern int FLANGER_OFFSET[MAX_TRACKS];
-
-extern float foff2[MAX_TRACKS];
-extern float foff1[MAX_TRACKS];
-
-extern int CHAN_MUTE_STATE[MAX_TRACKS]; // 0->Normal 1->Muted
-
-extern char Songtracks;
-extern char Disclap[MAX_TRACKS];
-
 extern char cur_input_name[1024];
 
 extern char artist[20];
 extern char style[20];
-
-extern char beatsync[128];
-extern short beatlines[128];
-
-extern float REVERBFILTER;
-
-extern float CustomVol[128];
 
 extern int ped_track;
 
@@ -333,11 +249,6 @@ extern int ped_line_delay;
 extern int cPosition;
 extern int cPosition_delay;
 extern int gui_track;
-
-extern unsigned int lchorus_counter;
-extern unsigned int rchorus_counter;
-extern unsigned int lchorus_counter2;
-extern unsigned int rchorus_counter2;
 
 extern char userscreen;
 
@@ -368,43 +279,8 @@ extern int rs_coef;
 extern SDL_Surface *Main_Screen;
 extern int CONSOLE_HEIGHT2;
 
-extern float decays[MAX_COMB_FILTERS][2];
-extern int delays[MAX_COMB_FILTERS]; // delays for the comb filters
-extern int counters[MAX_COMB_FILTERS];
-
-extern float delay_left_buffer[MAX_COMB_FILTERS][100000];
-extern float delay_right_buffer[MAX_COMB_FILTERS][100000];
-
-extern float delay_left_final;
-extern float delay_right_final;
-
-extern char num_echoes;
-extern int rev_counter;
-
-extern float allBuffer_L[5760];
-extern float allBuffer_L2[5760];
-extern float allBuffer_L3[5760];
-extern float allBuffer_L4[5760];
-extern float allBuffer_L5[5760];
-extern float allBuffer_L6[5760];
-
-extern int delayedCounter;
-extern int delayedCounter2;
-extern int delayedCounter3;
-extern int delayedCounter4;
-extern int delayedCounter5;
-extern int delayedCounter6;
-
-extern int currentCounter;
-
-extern float left_float;
-extern float right_float;
-
 extern float left_float_render;
 extern float right_float_render;
-
-extern unsigned char track3031;
-extern unsigned char track3032;
 
 extern SDL_Surface *PFONT;
 extern SDL_Surface *FONT;
