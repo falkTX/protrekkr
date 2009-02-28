@@ -207,8 +207,6 @@ int right_value;
 
 int Subicounter;
 
-#if !defined(__NO_CODEC__)
-
 #if defined(PTK_MP3)
 char Mp3_BitRate[MAX_INSTRS];
 int Type_Mp3_BitRate[] =
@@ -223,8 +221,6 @@ int Type_At3_BitRate[] =
 {
     66, 105, 132
 };
-#endif
-
 #endif
 
 #if defined(PTK_FX_PATTERNBREAK)
