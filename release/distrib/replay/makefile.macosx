@@ -8,7 +8,7 @@ FLAGS_X86 = $(DEBUG) -O2 -arch i386 -fno-rtti -D __MACOSX__ -D __GCC__ -D __STAN
 EXEOBJS_PPC = test_ppc.o module_ppc.o
 EXEOBJS_X86 = test_x86.o module_x86.o
 
-all: bin2c module ptkreplay replaytest
+all: module ptkreplay replaytest
 clean: remobj remlibobj
 
 remobj:
@@ -46,9 +46,6 @@ module_ppc.o: module.cpp
 
 module:
 	./bin2c_uni $(MODULE) module.cpp _PTK_MODULE
-
-# bin2c #
-include ../../../src/extralibs/bin2c/makefile.macosx
 
 # the library itself #
 include lib/makefile.macosx
