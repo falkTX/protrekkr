@@ -26,7 +26,7 @@ EXEOBJS_PPC = ptk_ppc.o \
           timer_ppc.o main_ppc.o sdlmain_ppc.o \
           misc_draw_ppc.o xml_ppc.o \
           riff_ppc.o \
-          tb_303_ppc.o cubic_spline_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
+          tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
           sounddriver_ppc.o
 
 EXEOBJS_X86 = ptk_x86.o \
@@ -38,7 +38,7 @@ EXEOBJS_X86 = ptk_x86.o \
           timer_x86.o main_x86.o sdlmain_x86.o \
           misc_draw_x86.o xml_x86.o \
           riff_x86.o \
-          tb_303_x86.o cubic_spline_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
+          tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
           sounddriver_x86.o
 
 all: protrekkr
@@ -134,9 +134,6 @@ riff_ppc.o: src/wav/riff.cpp
 tb_303_ppc.o: release/distrib/replay/lib/tb_303.cpp
 	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/tb_303.cpp
 
-cubic_spline_ppc.o: release/distrib/replay/lib/cubic_spline.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/cubic_spline.cpp
-
 samples_unpack_ppc.o: release/distrib/replay/lib/samples_unpack.cpp
 	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/samples_unpack.cpp
 
@@ -228,9 +225,6 @@ riff_x86.o: src/wav/riff.cpp
 
 tb_303_x86.o: release/distrib/replay/lib/tb_303.cpp
 	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/tb_303.cpp
-
-cubic_spline_x86.o: release/distrib/replay/lib/cubic_spline.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/cubic_spline.cpp
 
 samples_unpack_x86.o: release/distrib/replay/lib/samples_unpack.cpp
 	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/samples_unpack.cpp

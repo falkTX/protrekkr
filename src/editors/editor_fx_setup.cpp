@@ -37,6 +37,7 @@
 // Variables
 int Ticks_Synchro_Left = 1;
 int Ticks_Synchro_Right = 1;
+extern char Use_Cubic;
 
 // ------------------------------------------------------
 // Functions
@@ -62,6 +63,8 @@ void Draw_Fx_Ed(void)
 
     Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL);
     Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL);
+
+    Gui_Draw_Button_Box(640, 464, 64, 16, "Interpolation", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
 void Actualize_Fx_Ed(char gode)
@@ -180,6 +183,19 @@ void Actualize_Fx_Ed(char gode)
             Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
+        if(gode == 0 || gode == 12)
+        {
+            Gui_Draw_Button_Box(706, 464, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(Use_Cubic)
+            {
+                Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Cubic", BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            Gui_Draw_Button_Box(706 + (18 + 42) + 2, 464, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
     }
 }
 
@@ -275,7 +291,6 @@ void Mouse_Left_Fx_Ed(void)
 {
     if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
     {
-
         // Delay type
         if(zcheckMouse(79, 516, 16, 16) && compressor)
         {
@@ -344,5 +359,19 @@ void Mouse_Left_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 0;
         }  
+
+        if(zcheckMouse(706, 464, 16, 16))
+        {
+            Use_Cubic = FALSE;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 12;
+        }
+        if(zcheckMouse(706 + (18 + 42) + 2, 464, 16, 16))
+        {
+            Use_Cubic = TRUE;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 12;
+        }
+
     }
 }

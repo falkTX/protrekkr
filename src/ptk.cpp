@@ -47,6 +47,7 @@
 
 // ------------------------------------------------------
 // Variables
+extern char Use_Cubic;
 unsigned char sl3 = 0;
 
 int CONSOLE_WIDTH = 800;
@@ -1514,6 +1515,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGB") == 0 ||
                 strcmp(extension, "TWNNSNGC") == 0 ||
                 strcmp(extension, "TWNNSNGD") == 0 ||
+                strcmp(extension, "TWNNSNGE") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -1730,6 +1732,8 @@ void Newmod(void)
     }
 
     Clear_Patterns_Pool();
+
+    Use_Cubic = TRUE;
 
     nPatterns = 1;
 

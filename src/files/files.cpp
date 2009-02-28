@@ -84,6 +84,7 @@ typedef struct
 // Variables
 extern SynthParameters PARASynth[128];
 
+extern char Use_Cubic;
 extern gear303 tb303engine[2];
 extern para303 tb303[2];
 extern int patt_highlight;
@@ -699,6 +700,7 @@ int LoadMod(char *FileName)
     int Portable = FALSE;
     int Poly = FALSE;
     int Multi = FALSE;
+    int Sel_Interpolation = FALSE;
 
     char Comp_Flag;
 
@@ -745,6 +747,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'E':
+                Sel_Interpolation = TRUE;
             case 'D':
                 Mp3_Scheme = TRUE;
             case 'C':
@@ -839,6 +843,20 @@ Read_Mod_File:
             Songtracks = MAX_TRACKS;
             if(!Ptk_Format) Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
             Read_Mod_Data(&sLength, sizeof(char), 1, in);
+
+            Use_Cubic = TRUE;
+
+            if(Ptk_Format)
+            {
+                if(Sel_Interpolation)
+                {
+                    Read_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
+                }
+            }
+            else
+            {
+                Read_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
+            }
 
             if(Ptk_Format)
             {
@@ -2237,6 +2255,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Write_Mod_Data(&char_value, sizeof(char), 1, in);
     
     Write_Mod_Data(&sLength, sizeof(char), 1, in);
+
+    Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
+
     // Patterns sequence
     Write_Mod_Data(New_pSequence, sizeof(char), sLength, in);
 
@@ -2676,6 +2697,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             }
         }
     }
+
+    Save_Constant("PTK_USE_CUBIC", Use_Cubic);
 
     Save_Constant("PTK_303", Store_303_1 | Store_303_2);
 
@@ -3435,7 +3458,10 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             Write_Mod_Data(&nPatterns, sizeof(char), 1, in);
             Write_Mod_Data(&sLength, sizeof(char), 1, in);
+            Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
+
             Write_Mod_Data(pSequence, sizeof(char), MAX_SEQUENCES, in);
+
 
             Swap_Short_Buffer(patternLines, MAX_ROWS);
             Write_Mod_Data(patternLines, sizeof(short), MAX_ROWS, in);
@@ -4197,7 +4223,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGD");
+        sprintf(extension, "TWNNSNGE");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

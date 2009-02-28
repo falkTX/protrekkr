@@ -1,5 +1,5 @@
 LIBFLAGS = -c
-LIBOBJS = replay.o cubic_spline.o synth.o tb_303.o samples_unpack.o sounddriver.o
+LIBOBJS = replay.o synth.o tb_303.o samples_unpack.o sounddriver.o
 
 all: ptkreplay
 clean: remlibobj
@@ -24,9 +24,6 @@ tb_303.o: lib/tb_303.cpp
 
 synth.o: lib/synth.cpp
 	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS) lib/synth.cpp
-
-cubic_spline.o: lib/cubic_spline.cpp
-	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS) lib/cubic_spline.cpp
 
 replay.o: lib/replay.cpp
 	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS) lib/replay.cpp

@@ -13,11 +13,13 @@ v1.96:
    and samples using mp3 packing scheme weren't packed at all, shame).
 - Added At3 samples packing scheme (Windows users need to install
   the atrac3 codec located in the install directory in order to pack samples).
-  Rates are: 66, 105 & 132 kbps.
+  Rates are: 66, 105 & 132 kbps (depacker not yet implemented on PSP, tho).
 - Added the ability to select a range of positions for songs rendering to .wav.
 - The nasty click occuring when loading a module while another one
   was still playing should be gone.
 - Added mouse wheel navigation support in samples editor.
+- Cubic interpolation can now be disabled
+  (should increase speed a bit but at the expense of lower quality).
 
 v1.95:
 

@@ -291,19 +291,8 @@ SOURCE=.\Release\Distrib\Replay\lib\SoundDriver\include\SoundDriver.h
 # Begin Source File
 
 SOURCE=.\Release\Distrib\Replay\lib\SoundDriver\SoundDriver.cpp
-
-!IF  "$(CFG)" == "ProTrekkr - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ProTrekkr - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\Release\Distrib\Replay\lib\Cubic_Spline.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\release\distrib\replay\lib\endianness.cpp

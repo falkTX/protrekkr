@@ -14,7 +14,7 @@ EXEOBJS = ptk.o \
           timer.o main.o \
           misc_draw.o xml.o \
           riff.o \
-          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o endianness.o \
+          tb_303.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver.o
 
 all: protrekkr
@@ -99,9 +99,6 @@ riff.o: src/wav/riff.cpp
 	g++ -c -o $(@) $(FLAGS) src/wav/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
-
-cubic_spline.o: release/distrib/replay/lib/cubic_spline.cpp
 	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp

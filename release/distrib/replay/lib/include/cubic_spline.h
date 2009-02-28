@@ -34,6 +34,28 @@
 
 // ------------------------------------------------------
 // Functions
-float Cubic_Work(float yo, float input, float y1, float y2, unsigned int res, long offset, long length);
+inline float Cubic_Work(float ym, float input, float y1, float y2,
+                 unsigned int res, long offset, long length)
+{
+    // 0..1.0f
+    float x = (float) (((float) res) / 4294967296.0);
+  
+    if(offset == 0) ym = 0;
+    if(offset + 2 > length) y1 = 0;
+    if(offset + 3 > length) y2 = 0;
+
+    // -0.5..0.5
+    float z = x - 0.5f;
+    float even1 = y1 + input;
+    float odd1 = y1 - input;
+    float even2 = y2 + ym;
+    float odd2 = y2 - ym;
+
+    float c0 = even1 * 0.45868f + even2 * 0.04131f;
+    float c1 = odd1 * 0.48068f + odd2 * 0.17577f;
+    float c2 = even1 * -0.24618f + even2 * 0.24614f;
+    float c3 = odd1 * -0.36030f + odd2 * 0.10174f;
+    return(((c3 * z + c2) * z + c1) * z + c0);
+}
 
 #endif

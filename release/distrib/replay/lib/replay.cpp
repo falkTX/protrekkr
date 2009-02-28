@@ -129,6 +129,8 @@ s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 float CCut[MAX_TRACKS];
 #endif
 
+char Use_Cubic = FALSE;
+
 float TCut[MAX_TRACKS];
 float ICut[MAX_TRACKS];
 float LVol[MAX_TRACKS];
@@ -877,6 +879,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&nPatterns, sizeof(char));
         Mod_Dat_Read(&Songtracks, sizeof(char));
         Mod_Dat_Read(&sLength, sizeof(char));
+
+        Mod_Dat_Read(&Use_Cubic, sizeof(char));
+
         Mod_Dat_Read(pSequence, sizeof(char) * sLength);
 
         // Patterns lines
@@ -1483,13 +1488,15 @@ extern "C"
 void PTKEXPORT Ptk_Stop(void)
 {
 #if defined(__PSP__)
+    // Thanks to MIPS, that machine really sucks
     volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
     *ptr_Done_Reset = FALSE;
+    volatile float *ptr_local_ramp_vol = (float *) (((int) &local_ramp_vol) | 0x40000000);
     me_sceKernelDcacheWritebackInvalidateAll();
     sceKernelDcacheWritebackInvalidateAll();	
     while(*ptr_Done_Reset == FALSE)
     {
-        local_ramp_vol = 0.0f;
+        *ptr_local_ramp_vol = 0.0f;
     }
 #else
     Done_Reset = FALSE;
@@ -2294,24 +2301,71 @@ ByPass_Wav:
 
                     if(Player_WL[c][i])
                     {
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                         Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
                                                       *(Player_WL[c][i] + Current_Pointer),
                                                       *(Player_WL[c][i] + Current_Pointer + 1),
                                                       *(Player_WL[c][i] + Current_Pointer + 2),
                                                       res_dec, Current_Pointer,
                                                       Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+#else
+                        Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
+                                            * sp_Cvol[c][i] * Player_SV[c][i]);
+#endif
+
+#else
+                        if(Use_Cubic)
+                        {
+                            Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
+                                                          *(Player_WL[c][i] + Current_Pointer),
+                                                          *(Player_WL[c][i] + Current_Pointer + 1),
+                                                          *(Player_WL[c][i] + Current_Pointer + 2),
+                                                          res_dec, Current_Pointer,
+                                                          Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        }
+                        else
+                        {
+                            Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
+                                                * sp_Cvol[c][i] * Player_SV[c][i]);
+                        }
+#endif
                     }
 
                     // Stereo sample
                     if(Player_SC[c][i] == 2)
                     {
                         grown = TRUE;
+
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                         Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
                                                       *(Player_WR[c][i] + Current_Pointer),
                                                       *(Player_WR[c][i] + Current_Pointer + 1),
                                                       *(Player_WR[c][i] + Current_Pointer + 2),
                                                       res_dec, Current_Pointer,
                                                       Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+#else
+                        Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
+                                            * sp_Cvol[c][i] * Player_SV[c][i]);
+#endif
+
+#else
+                        if(Use_Cubic)
+                        {
+                            Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
+                                                          *(Player_WR[c][i] + Current_Pointer),
+                                                          *(Player_WR[c][i] + Current_Pointer + 1),
+                                                          *(Player_WR[c][i] + Current_Pointer + 2),
+                                                          res_dec, Current_Pointer,
+                                                          Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        }
+                        else
+                        {
+                            Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
+                                                * sp_Cvol[c][i] * Player_SV[c][i]);
+                        }
+#endif
                     }
 
                     // End of Interpolation algo

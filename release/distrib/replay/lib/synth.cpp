@@ -40,6 +40,7 @@ float SIN[360]; // Sine float-precalculated table, in absolute degrees.
 #if defined(PTK_SYNTH)
 
 int SIZE_WAVEFORMS;
+extern char Use_Cubic;
 
 #if defined(PTK_SYNTH_SIN)
 short STOCK_SIN[SIZE_WAVEFORMS_SPACE * 2];
@@ -749,20 +750,65 @@ float CSynth::GetSample(short *Left_Samples,
                     if(i_POSITION) Old_Pointer = i_POSITION - 1;
                     else Old_Pointer = 0;
 
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                     GS_VAL = (Cubic_Work(
                                 (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+#else
+                    GS_VAL = (*(Left_Samples1 + i_POSITION) * mul_datL)
+                              * vol * T_OSC1_VOLUME;
+#endif
+
+#else
+                    if(Use_Cubic)
+                    {
+                        GS_VAL = (Cubic_Work(
+                                    (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                    }
+                    else
+                    {
+                        GS_VAL = (*(Left_Samples1 + i_POSITION) * mul_datL)
+                                  * vol * T_OSC1_VOLUME;
+                    }
+#endif
 
                     // Stereo sample
                     if(Stereo1 == 2)
                     {
+
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                         GS_VAL2 = (Cubic_Work(
-                                        (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                        (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                        (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                        (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                     (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
+                                     (float) (*(Right_Samples + i_POSITION)) * mul_datR,
+                                     (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
+                                     (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+#else
+                        GS_VAL2 = (*(Right_Samples + i_POSITION) * mul_datR)
+                                   * vol * T_OSC1_VOLUME;
+#endif
+
+#else
+                        if(Use_Cubic)
+                        {
+                            GS_VAL2 = (Cubic_Work(
+                                         (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
+                                         (float) (*(Right_Samples + i_POSITION)) * mul_datR,
+                                         (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
+                                         (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR, res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                        }
+                        else
+                        {
+                            GS_VAL2 = (*(Right_Samples + i_POSITION) * mul_datR)
+                                       * vol * T_OSC1_VOLUME;
+                        }
+#endif
                     }
 
                     osc_speed2 += osc_speed1;
@@ -915,22 +961,69 @@ float CSynth::GetSample(short *Left_Samples,
                     if(i_POSITION) Old_Pointer = i_POSITION - 1;
                     else Old_Pointer = 0;
 
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                     GS_VAL += (Cubic_Work(
                                 (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
                                 res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+#else
+                    GS_VAL += (*(Left_Samples + i_POSITION) * mul_datL)
+                               * vol * T_OSC2_VOLUME;
+#endif
+
+#else
+                    if(Use_Cubic)
+                    {
+                        GS_VAL += (Cubic_Work(
+                                    (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
+                                    (float) (*(Left_Samples + i_POSITION)) * mul_datL,
+                                    (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
+                                    (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
+                                    res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                    }
+                    else
+                    {
+                        GS_VAL += (*(Left_Samples + i_POSITION) * mul_datL)
+                                   * vol * T_OSC2_VOLUME;
+                    }
+#endif
 
                     // Stereo sample
                     if(Stereo2 == 2)
                     {
+
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                         GS_VAL2 += (Cubic_Work(
                                     (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
                                     res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+#else
+                        GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                                    * vol * T_OSC2_VOLUME;
+#endif
+
+#else
+                        if(Use_Cubic)
+                        {
+                            GS_VAL2 += (Cubic_Work(
+                                        (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
+                                        res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                        }
+                        else
+                        {
+                            GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                                        * vol * T_OSC2_VOLUME;
+                        }
+#endif
                     }
 
                     osc_speed2 += osc_speed1b;
@@ -1028,21 +1121,69 @@ float CSynth::GetSample(short *Left_Samples,
                     if(i_POSITION) Old_Pointer = i_POSITION - 1;
                     else Old_Pointer = 0;
 
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                     GS_VAL += (Cubic_Work(
-                                (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                    (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
+                                    res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+#else
+                    GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
+                               * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+#endif
+
+#else
+                    if(Use_Cubic)
+                    {
+                        GS_VAL += (Cubic_Work(
+                                        (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
+                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                    }
+                    else
+                    {
+                        GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
+                                   * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                    }
+#endif
 
                     if(Stereo == 2)
                     {
+
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
                         GS_VAL2 += (Cubic_Work(
-                                (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                        (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
+                                        (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
+                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+#else
+                        GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                                    * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+#endif
+
+#else
+                        if(Use_Cubic)
+                        {
+                            GS_VAL2 += (Cubic_Work(
+                                            (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION)) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
+                                            res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                        }
+                        else
+                        {
+                            GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                                        * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                        }
+#endif
+
                     }
                 }
 
