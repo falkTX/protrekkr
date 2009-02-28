@@ -4432,6 +4432,7 @@ void KillInst(int inst_nbr)
             RawSamples[inst_nbr][1][z] = NULL;
         }
 
+#if !defined(__NO_CODEC__)
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
         if(RawSamples_Swap[inst_nbr][0][z])
         {
@@ -4446,6 +4447,7 @@ void KillInst(int inst_nbr)
             }
             RawSamples_Swap[inst_nbr][1][z] = NULL;
         }
+#endif
 #endif
 
         SampleChannels[inst_nbr][z] = 0;
