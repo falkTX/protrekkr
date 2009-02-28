@@ -1449,9 +1449,11 @@ void Reset_Values(void)
         Done_Reset = TRUE;
 #endif
 
+/* Bloody Mac OSX doesn't like that all
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
         Actupated(0);
 #endif
+*/
 
         Songplaying = FALSE;
     }
