@@ -466,11 +466,11 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(SamplesSwap[ped_patsam])
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                     }
                     else
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock", Allow_Global | BUTTON_TEXT_CENTERED);
                     }
                     if(gode == 19)
                     {

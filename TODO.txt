@@ -11,7 +11,6 @@ TODO (in no special order):
    (and remove identical samples in .ptp).
  - Import .mid files.
  - Save the synchro data as milliseconds too (+ add a Ptk_GetTime function).
- - Add an option to play a packed sample in order to test it inside the tracker.
  - Add customization for the keys shortcuts in the xml file (may be ok like that).
  - Undo functions for samples editor and patterns.
  - Click on numbers & move the mouse to modify them (or use the wheel).

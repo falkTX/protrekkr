@@ -1504,6 +1504,8 @@ extern "C"
 
 // ------------------------------------------------------
 // Stop replaying
+extern int AUDIO_Play_Flag;
+
 void PTKEXPORT Ptk_Stop(void)
 {
 #if defined(__PSP__)
@@ -1513,13 +1515,13 @@ void PTKEXPORT Ptk_Stop(void)
     volatile float *ptr_local_ramp_vol = (float *) (((int) &local_ramp_vol) | 0x40000000);
     me_sceKernelDcacheWritebackInvalidateAll();
     sceKernelDcacheWritebackInvalidateAll();	
-    while(*ptr_Done_Reset == FALSE)
+    while(*ptr_Done_Reset == FALSE && AUDIO_Play_Flag)
     {
         *ptr_local_ramp_vol = 0.0f;
     }
 #else
     Done_Reset = FALSE;
-    while(Done_Reset == FALSE)
+    while(Done_Reset == FALSE && AUDIO_Play_Flag)
     {
         local_ramp_vol = 0.0f;
 
@@ -2185,7 +2187,7 @@ void Sp_Player(void)
                     if(cPosition >= sLength)
                     {
                         cPosition = 0;
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                         done = 1;
 #endif
                     }
