@@ -1420,9 +1420,9 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
 
 #if !defined(__NO_CODEC__)
     SampleCompression[n_index] = SMP_PACK_GSM;
+    SamplesSwap[n_index] = FALSE;
 #else
     SampleCompression[n_index] = SMP_PACK_NONE;
-    SamplesSwap[n_index] = FALSE;
 #endif
     Mp3_BitRate[n_index] = 0;
     At3_BitRate[n_index] = 0;
