@@ -3,7 +3,7 @@ AS = as
 AR = ar
 STRIP = strip
 LIBS = -lptkreplay -ldsound -lmsacm32
-FLAGS = -O2 -mms-bitfields -fno-rtti -fno-exceptions -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __STAND_ALONE__
+FLAGS = -O2 -ffast-math -mms-bitfields -fno-rtti -fno-exceptions -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __STAND_ALONE__
 EXEOBJS = test.o module.o
 
 all: ptkreplay replaytest
