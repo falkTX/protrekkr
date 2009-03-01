@@ -3,13 +3,12 @@
 <pre>
 <h1>Build Log</h1>
 <h3>
---------------------Configuration: ProTrekkr - Win32 Release--------------------
+--------------------Configuration: ProTrekkr - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating command line "rc.exe /l 0x407 /fo"Release/Resources.res" /i "src\Support" /d "NDEBUG" "C:\Src\Pc\ptk\src\Support\Resources.rc"" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP34.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD6.tmp" with contents
 [
-/nologo /ML /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /Fo"Release/" /Fd"Release/" /FD /c 
+/nologo /ML /W3 /Gm /GX /ZI /Od /D "__WIN32__" /D "_DEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /FR"Debug/" /Fo"Debug/" /Fd"Debug/" /FD /Zm500 /GZ /c 
 "C:\Src\Pc\ptk\src\support\main.cpp"
 "C:\Src\Pc\ptk\src\Support\timer.cpp"
 "C:\Src\Pc\ptk\src\Editors\Editor_303.cpp"
@@ -40,44 +39,8 @@ Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP34.tmp" with conten
 "C:\Src\Pc\ptk\src\midi\RtMidi.cpp"
 "C:\Src\Pc\ptk\src\ptk.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP34.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP35.tmp" with contents
-[
-kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi32.lib sdl_draw.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib libcp.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
-.\Release\main.obj
-.\Release\timer.obj
-.\Release\Editor_303.obj
-.\Release\Editor_DiskIO.obj
-.\Release\Editor_Fx_Setup.obj
-.\Release\Editor_Instrument.obj
-.\Release\Editor_Pattern.obj
-.\Release\Editor_Sample.obj
-.\Release\Editor_Sequencer.obj
-.\Release\Editor_Setup.obj
-.\Release\Editor_Synth.obj
-.\Release\Editor_Track.obj
-.\Release\Editor_Track_Fx.obj
-.\Release\Patterns_Blocks.obj
-.\Release\SoundDriver.obj
-.\Release\endianness.obj
-.\Release\Replay.obj
-.\Release\Samples_Unpack.obj
-.\Release\Synth.obj
-.\Release\TB_303.obj
-.\Release\Misc_Draw.obj
-.\Release\xml.obj
-.\Release\Files.obj
-.\Release\Files_List.obj
-.\Release\Samples_Pack.obj
-.\Release\Riff.obj
-.\Release\midi.obj
-.\Release\RtMidi.obj
-.\Release\ptk.obj
-.\Release\Resources.res
-]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP35.tmp"
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD6.tmp" 
 <h3>Output Window</h3>
-Compiling resources...
 Compiling...
 main.cpp
 timer.cpp
@@ -111,7 +74,78 @@ midi.cpp
 RtMidi.cpp
 ptk.cpp
 Generating Code...
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD7.tmp" with contents
+[
+kernel32.lib user32.lib sdl.lib sdl_draw.lib dsound.lib msacm32.lib winmm.lib advapi32.lib zlib.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib libcp.lib /nologo /subsystem:windows /pdb:none /debug /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
+.\Debug\main.obj
+.\Debug\timer.obj
+.\Debug\Editor_303.obj
+.\Debug\Editor_DiskIO.obj
+.\Debug\Editor_Fx_Setup.obj
+.\Debug\Editor_Instrument.obj
+.\Debug\Editor_Pattern.obj
+.\Debug\Editor_Sample.obj
+.\Debug\Editor_Sequencer.obj
+.\Debug\Editor_Setup.obj
+.\Debug\Editor_Synth.obj
+.\Debug\Editor_Track.obj
+.\Debug\Editor_Track_Fx.obj
+.\Debug\Patterns_Blocks.obj
+.\Debug\SoundDriver.obj
+.\Debug\endianness.obj
+.\Debug\Replay.obj
+.\Debug\Samples_Unpack.obj
+.\Debug\Synth.obj
+.\Debug\TB_303.obj
+.\Debug\Misc_Draw.obj
+.\Debug\xml.obj
+.\Debug\Files.obj
+.\Debug\Files_List.obj
+.\Debug\Samples_Pack.obj
+.\Debug\Riff.obj
+.\Debug\midi.obj
+.\Debug\RtMidi.obj
+.\Debug\ptk.obj
+.\Debug\Resources.res
+]
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD7.tmp"
+<h3>Output Window</h3>
 Linking...
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD9.tmp" with contents
+[
+/nologo /o"Debug/ProTrekkr.bsc" 
+.\Debug\main.sbr
+.\Debug\timer.sbr
+.\Debug\Editor_303.sbr
+.\Debug\Editor_DiskIO.sbr
+.\Debug\Editor_Fx_Setup.sbr
+.\Debug\Editor_Instrument.sbr
+.\Debug\Editor_Pattern.sbr
+.\Debug\Editor_Sample.sbr
+.\Debug\Editor_Sequencer.sbr
+.\Debug\Editor_Setup.sbr
+.\Debug\Editor_Synth.sbr
+.\Debug\Editor_Track.sbr
+.\Debug\Editor_Track_Fx.sbr
+.\Debug\Patterns_Blocks.sbr
+.\Debug\SoundDriver.sbr
+.\Debug\endianness.sbr
+.\Debug\Replay.sbr
+.\Debug\Samples_Unpack.sbr
+.\Debug\Synth.sbr
+.\Debug\TB_303.sbr
+.\Debug\Misc_Draw.sbr
+.\Debug\xml.sbr
+.\Debug\Files.sbr
+.\Debug\Files_List.sbr
+.\Debug\Samples_Pack.sbr
+.\Debug\Riff.sbr
+.\Debug\midi.sbr
+.\Debug\RtMidi.sbr
+.\Debug\ptk.sbr]
+Creating command line "bscmake.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPD9.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
 
 
 

@@ -133,6 +133,10 @@ SOURCE=.\src\include\ptk.h
 
 SOURCE=.\src\include\Variables.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\include\version.h
+# End Source File
 # End Group
 # Begin Group "Editors"
 

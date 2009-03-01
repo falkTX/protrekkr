@@ -413,14 +413,14 @@ void Mouse_Right_Track_Ed(void)
         {
             ResetFilters(ped_track);
             FType[ped_track] -= 16;
-            teac = 4;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
         if(zcheckMouse(121, 520, 16, 16) && FType[ped_track] < MAX_FILTER)
         {
             ResetFilters(ped_track);
             FType[ped_track] += 16;
-            teac = 4;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 

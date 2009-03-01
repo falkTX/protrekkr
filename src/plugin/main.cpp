@@ -7,11 +7,10 @@
 #include <windows.h>
 #include <stdio.h>
 
-#define VERSION "v1.95"
-
 #include "in2.h"
 
 #include "../../release/distrib/replay/lib/include/replay.h"
+#include "../include/version.h"
 
 // avoid CRT. Evil. Big. Bloated. Only uncomment this code if you are using 
 // 'ignore default libraries' in VC++. Keeps DLL size way down.
@@ -22,7 +21,7 @@ BOOL WINAPI _DllMainCRTStartup(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lp
 }
 
 // post this to the main window at end of file (after playback as stopped)
-#define WM_WA_MPEG_EOF WM_USER+2
+#define WM_WA_MPEG_EOF WM_USER + 2
 
 
 // raw configuration.
@@ -39,7 +38,7 @@ int Calc_Length(void);
 int Alloc_Patterns_Pool(void);
 extern float mas_vol;
 
-char modname[22];
+char modname[MAX_PATH];
 char artist[20];
 char style[20];
 char SampleName[128][16][64];
@@ -75,13 +74,14 @@ DWORD WINAPI DecodeThread(LPVOID b); // the decode thread procedure
 void config(HWND hwndParent)
 {
 	MessageBox(hwndParent,
-		"No configuration.",
-		"Configuration", MB_OK|MB_ICONERROR);
+		       "No configuration.",
+		       "Configuration",
+               MB_OK | MB_ICONERROR);
 	// if we had a configuration box we'd want to write it here (using DialogBox, etc)
 }
 void about(HWND hwndParent)
 {
-	MessageBox(hwndParent,"Protrekkr modules player\n\n"
+	MessageBox(hwndParent,"Protrekkr Modules Player v"VER_VER"."VER_REV"\n\n"
 	                      "(C) Copyright 2009 Franck \"hitchhikr\" Charlet",
 		                  "About",
 		                  MB_OK | MB_ICONINFORMATION);
@@ -128,7 +128,9 @@ int play(const char *fn)
 	decode_pos_ms = 0;
 	seek_needed = -1;
 
-    if(!LoadMod((char *) fn))
+    strcpy(modname, fn);
+
+    if(!LoadMod(modname))
     {
 		// we return error. 1 means to keep going in the playlist, -1
 		// means to stop the playlist.
@@ -171,7 +173,7 @@ int play(const char *fn)
 
 	// launch decode thread
 	killDecodeThread = 0;
-	thread_handle = (HANDLE) CreateThread(NULL,0,(LPTHREAD_START_ROUTINE) DecodeThread, NULL, 0, &thread_id);
+	thread_handle = (HANDLE) CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) DecodeThread, NULL, 0, &thread_id);
     SetThreadPriority(thread_handle, THREAD_PRIORITY_HIGHEST);
 	
 	return 0; 
@@ -219,33 +221,36 @@ void stop()
 	// deinitialize visualization
 	mod.SAVSADeInit();
 }
- 
 
 // returns length of playing track
-int getlength() {
-	return (file_length);
+int getlength()
+{
+	return(file_length);
 }
 
 // returns current output position, in ms.
 // you could just use return mod.outMod->GetOutputTime(),
 // but the dsp plug-ins that do tempo changing tend to make
 // that wrong.
-int getoutputtime() { 
-	return  decode_pos_ms +
-		    (mod.outMod->GetOutputTime() - mod.outMod->GetWrittenTime()); 
+int getoutputtime()
+{
+	return decode_pos_ms +
+		   (mod.outMod->GetOutputTime() - mod.outMod->GetWrittenTime()); 
 }
 
 // called when the user releases the seek scroll bar.
 // usually we use it to set seek_needed to the seek
 // point (seek_needed is -1 when no seek is needed)
 // and the decode thread checks seek_needed.
-void setoutputtime(int time_in_ms) { 
-	seek_needed = time_in_ms; 
+void setoutputtime(int time_in_ms)
+{
+	seek_needed = time_in_ms;
 }
 
 // standard volume/pan functions
-void setvolume(int volume) {
-  mod.outMod->SetVolume(volume);
+void setvolume(int volume)
+{
+    mod.outMod->SetVolume(volume);
 }
 
 void setpan(int pan) {
@@ -295,7 +300,7 @@ void getfileinfo(const char *filename, char *title, int *length_in_ms)
 {
 	if(!filename || !*filename)  // currently playing file
 	{
-		if(length_in_ms) *length_in_ms=getlength();
+		if(length_in_ms) *length_in_ms = getlength();
 		if(title) // get non-path portion.of filename
 		{
 			//char *p=lastfn+strlen(lastfn);
@@ -439,7 +444,7 @@ DWORD WINAPI DecodeThread(LPVOID b)
 In_Module mod = 
 {
 	IN_VER,	// defined in IN2.H
-	"Protrekkr Modules Player "VERSION" "
+	"Protrekkr Modules Player "VER_VER"."VER_REV" "
 	// winamp runs on both alpha systems and x86 ones. :)
 #ifdef __alpha
 	"(AXP)"

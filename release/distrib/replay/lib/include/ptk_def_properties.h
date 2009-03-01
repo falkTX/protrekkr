@@ -38,6 +38,7 @@
 #define PTK_303
 #define PTK_FX_0
 #define PTK_FX_X
+#define PTK_VOLUME_COLUMN
 #define PTK_FX_NOTECUT
 #define PTK_FX_PITCHUP
 #define PTK_FX_PITCHDOWN

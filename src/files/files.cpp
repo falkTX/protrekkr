@@ -2130,6 +2130,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_Synth_Osc2 = FALSE;
     int Store_Synth_Osc3 = FALSE;
 
+    int Store_Volume_Column = FALSE;
     int Store_FX_NoteCut = FALSE;
     int Store_FX_PitchUp = FALSE;
     int Store_FX_PitchDown = FALSE;
@@ -2482,7 +2483,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-
+    // Look for the used fx
     TmpPatterns = New_RawPatterns;
     for(pwrite = 0; pwrite < int_pattern; pwrite++)
     {
@@ -2505,6 +2506,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 if(TmpPatterns_Notes[i] & 0xf0 == 0xf0)
                                 {
                                     Store_FX_NoteCut = TRUE;
+                                }
+                                if(TmpPatterns_Notes[i] <= 64)
+                                {
+                                    Store_Volume_Column = TRUE;
                                 }
                             }
                         }
@@ -2663,7 +2668,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 case 0x32:
                                     Store_303_2 = TRUE;
                                     break;
-
                             }
                         }
                         switch(i)
@@ -2679,6 +2683,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
                                 break;
+
                             case PATTERN_FXDATA:
                                 // Don't save Fx 7 datas
                                 if(TmpPatterns_Notes[i - 1] == 0x7)
@@ -2690,6 +2695,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
                                 break;
+
                             case PATTERN_INSTR1:
                             case PATTERN_INSTR2:
                             case PATTERN_INSTR3:
@@ -2712,6 +2718,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     TmpPatterns_Notes[i] = Get_Instr_New_Order(TmpPatterns_Notes[i]);
                                 }
                                 // no break on purpose
+
                             default:
                                 Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 break;
@@ -2750,6 +2757,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                               Store_FX_VolumeSlideDown |
                               Store_FX_SetGlobalVolume
                              );
+
+    Save_Constant("PTK_VOLUME_COLUMN", Store_Volume_Column);
 
     Save_Constant("PTK_FX_NOTECUT", Store_FX_NoteCut);
     Save_Constant("PTK_FX_PITCHUP", Store_FX_PitchUp);
@@ -2793,6 +2802,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             case SYNTH_WAVE_OFF:
             case SYNTH_WAVE_CURRENT:
                 break;
+
             default:
                 Synthprg[i] = Get_Instr_New_Order(Synthprg[i] - 2) + 2;
                 break;
@@ -2935,7 +2945,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             // 16 splits / instrument
             for(int slwrite = 0; slwrite < 16; slwrite++)
             {
-
                 Write_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
                 if(SampleType[swrite][slwrite] != 0)
                 {
@@ -2949,18 +2958,22 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             Store_At3 = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+
                         case SMP_PACK_GSM:
                             Store_Gsm = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+
                         case SMP_PACK_MP3:
                             Store_Mp3 = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+
                         case SMP_PACK_TRUESPEECH:
                             Store_TrueSpeech = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+
                         case SMP_PACK_ADPCM:
                             Store_ADPCM = TRUE;
                             Apply_Interpolation = TRUE;

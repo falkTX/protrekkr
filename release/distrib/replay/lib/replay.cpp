@@ -510,8 +510,8 @@ float filter2px(int ch, float input, float f, float q);
 float filter2p24d(int ch, float input, float f, float q);
 float filterRingMod(int ch, float input, float f, float q);
 float filterRingModStereo(int ch, float input);
-float filterWater(int ch, float input, float f, float q);
-float filterWaterStereo(int ch, float input, float f, float q);
+float filterWater(int ch, float input, float f);
+float filterWaterStereo(int ch, float input, float f);
 float filterBellShaped(int ch, float input, float f, float q, float g);
 float filterDelta(int ch, float input, float f, float q);
 float int_filter2p(int ch, float input, float f, float q, float q2);
@@ -1893,6 +1893,7 @@ void Sp_Player(void)
                 pl_eff_row2 = *(RawPatterns + efactor2 + PATTERN_FX);
                 pl_dat_row2 = *(RawPatterns + efactor2 + PATTERN_FXDATA);
 
+#if defined(PTK_VOLUME_COLUMN)
                 if(pl_vol_row <= 64)
                 {
                     for(i = 0; i < Channels_Polyphony[ct]; i++)
@@ -1900,6 +1901,7 @@ void Sp_Player(void)
                         sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f; // Setting volume.
                     }
                 }
+#endif
 
 #if defined(PTK_FX_SETVOLUME)
                 if(pl_eff_row == 3)
@@ -1994,6 +1996,7 @@ void Sp_Player(void)
                         // Mark it as playing
                         Reserved_Sub_Channels[ct][i] = free_sub_channel;
 
+#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
                         if(pl_vol_row <= 64 || pl_eff_row == 3)
                         {
                             Play_Instrument(ct,
@@ -2006,6 +2009,7 @@ void Sp_Player(void)
                                             FALSE, i + 1);
                         }
                         else
+#endif
                         {
                             // Use the default sample volume if there's nothing
                             // in the volume column of no 0x3 fx
@@ -2054,12 +2058,12 @@ void Sp_Player(void)
                     }
                 }
 
+#if defined(PTK_303)
                 if(trigger_note_off)
                 {
-#if defined(PTK_303)
                     noteoff303(ct); // 303 Note Off...
-#endif
                 }
+#endif
 
             } // Channels loop
 
@@ -2609,7 +2613,7 @@ ByPass_Wav:
 #if defined(PTK_FILTER_LP24)
                         case 7:
                             All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
@@ -2622,22 +2626,32 @@ ByPass_Wav:
 
 #if defined(PTK_FILTER_AMODS)
                         case 9:
-                            All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
-                            All_Signal_R = filterRingModStereo(c, All_Signal_R);
+                            if(grown)
+                            {
+                                All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
+                                All_Signal_R = filterRingModStereo(c, All_Signal_R);
+                            }
+                            else
+                            {
+                                All_Signal_R = All_Signal_L;
+                                All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
+                                All_Signal_R = filterRingModStereo(c, All_Signal_R);
+                                grown = TRUE;
+                            }
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLEM)
                         case 10:
-                            All_Signal_L = filterWater(c, All_Signal_L, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filterWater(c, All_Signal_R, realcut, (float) FRez[c]);
+                            All_Signal_L = filterWater(c, All_Signal_L, realcut);
+                            if(grown) All_Signal_R = filterWater(c, All_Signal_R, realcut);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLES)
                         case 11:
-                            All_Signal_L = filterWater(c, All_Signal_L, realcut, (float) FRez[c]);
-                            All_Signal_R = filterWaterStereo(c, All_Signal_R, realcut, (float) FRez[c]);
+                            All_Signal_L = filterWater(c, All_Signal_L, realcut);
+                            if(grown) All_Signal_R = filterWaterStereo(c, All_Signal_R, realcut);
                             break;
 #endif
 
@@ -2714,7 +2728,7 @@ ByPass_Wav:
 #if defined(PTK_FILTER_HP12S)
                         case 22:
                             All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
@@ -4090,7 +4104,7 @@ float filterhp2(int ch, float input, float f, float q)
     float fb = float(q * (1.0f + (1.0f / fa)));
     buf024[ch] = fa * buf024[ch] + f * (input + fb * (buf024[ch] - buf124[ch])); 
     buf124[ch] = fa * buf124[ch] + f * buf024[ch];
-    return input - buf124[ch];  
+    return input - buf124[ch];
 }
 #endif
 
@@ -4137,12 +4151,12 @@ float filterRingMod(int ch, float input, float f, float q)
 #if defined(PTK_PROC_FILTERRINGMODSTEREO)
 float filterRingModStereo(int ch, float input)
 {
-    return float(input * cosf(buf0[ch] * 0.0174532f));
+    return input * cosf(buf0[ch] * 0.0174532f);
 }
 #endif
 
 #if defined(PTK_PROC_FILTERWATER)
-float filterWater(int ch, float input, float f, float q)
+float filterWater(int ch, float input, float f)
 {
     f = 127.0f - f;
     float ad = input - buf0[ch];
@@ -4153,7 +4167,7 @@ float filterWater(int ch, float input, float f, float q)
 #endif
 
 #if defined(PTK_PROC_FILTERWATERSTEREO)
-float filterWaterStereo(int ch, float input, float f, float q)
+float filterWaterStereo(int ch, float input, float f)
 {
     f = 127.0f - f;
     float ad = input - buf1[ch];

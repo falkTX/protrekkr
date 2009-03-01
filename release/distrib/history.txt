@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.97b:
+
+- Modified the behaviour of the ring mod stereo filter.
+- Added a bit more constants for the replay.
+- Song name wasn't displayed in the plugin infos.
+
 v1.97:
 
 - More granularity in constants generation (potentially smaller replay).
