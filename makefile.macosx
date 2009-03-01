@@ -12,9 +12,9 @@ LIBS_X86 = src/extralibs/tinyxml/tinyxml.o \
 
 DEBUG = 
 
-FLAGS_PPC = $(DEBUG) -O3 -mcpu=G4 -maltivec -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
+FLAGS_PPC = $(DEBUG) -O3 -mcpu=G4 -fomit-frame-pointer -ffast-math --prefetch-loop-arrays -faltivec -maltivec -mtune=G4 -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
         -arch ppc -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__ -D __BIG_ENDIAN__
-FLAGS_X86 = $(DEBUG) -O3 -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
+FLAGS_X86 = $(DEBUG) -O3 -ffast-math --prefetch-loop-arrays -fomit-frame-pointer -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
         -arch i386 -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__
 
 EXEOBJS_PPC = ptk_ppc.o \

@@ -171,7 +171,7 @@ void *AUDIO_Thread(void *arg)
 short *ptrAudio_BufferPlay1;
 short *ptrAudio_BufferPlay2;
 int AUDIO_FlipFlop = FALSE;
-int Mutex;
+int Mutex = FALSE;
 
 void Me_Handler(void)
 {
@@ -192,7 +192,7 @@ void Me_Handler(void)
 
         if(*ptrAUDIO_Play_Flag && *ptrSongplaying)
         {
-            if(*ptrMutex == 0)
+            if(*ptrMutex == FALSE)
             {
                 if(*ptrAUDIO_FlipFlop)
                 {
