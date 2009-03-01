@@ -466,11 +466,11 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(SamplesSwap[ped_patsam])
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                     }
                     else
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock", Allow_Global | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
                     }
                     if(gode == 19)
                     {
@@ -940,7 +940,6 @@ void Mouse_Right_Instrument_Ed(void)
         }
 #endif
 
-/* NOT IMPLEMENTED YET
 #if !defined(__NO_CODEC__)
         if(Allow_Global_Sliders)
         {
@@ -964,14 +963,46 @@ void Mouse_Right_Instrument_Ed(void)
                     if(Lock)
                     {
                         SamplesSwap[i] = !SamplesSwap[i];
+
+                        if(SamplesSwap[i])
+                        {
+                            for(j = 0; j < 16; j++)
+                            {
+                                Lock_Sample(i, j);
+                            }
+                        }
+                        else
+                        {
+                            for(j = 0; j < 16; j++)
+                            {
+                                Restore_WaveForm(i, 0, j);
+                                Restore_WaveForm(i, 1, j);
+                                if(RawSamples_Swap[i][0][j])
+                                {
+                                    free(RawSamples_Swap[i][0][j]);
+                                    RawSamples_Swap[i][0][j] = NULL;
+                                }
+                                if(RawSamples_Swap[i][1][j])
+                                {
+                                    free(RawSamples_Swap[i][1][j]);
+                                    RawSamples_Swap[i][1][j] = NULL;
+                                }
+                            }
+                        }
                     }
-                    gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 }
-                teac = 19;
+                if(SamplesSwap[ped_patsam])
+                {
+                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                }
+                else
+                {
+                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
+                }
+                Actualize_Instruments_Synths_List(1);
             }
         }
 #endif
-*/
 
         if(SampleType[ped_patsam][ped_split])
         {

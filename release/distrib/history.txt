@@ -8,6 +8,8 @@ v1.97b:
 - Added a few more constants for the replay.
 - Song name wasn't displayed in the plugin infos.
 - Fixed a bug in the flanger (early cut).
+- Right mouse button on the "Lock / All" button to locked/unlock
+  all instruments at once.
 
 v1.97:
 

@@ -86,15 +86,15 @@ void CSynth::Reset(void)
     VCF_RESONANCE = 0.5f;   /* Not very weird =] */
     VCF_TYPE = 0;           /* LowPass filter */
 
-    ENV1_ATTACK = 0.0f;     /* About 59 miliseconds */
-    ENV1_DECAY = 0.1f;      /* The same here */
+    ENV1_ATTACK = 0.0f;
+    ENV1_DECAY = 0.1f;
     ENV1_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
-    ENV1_RELEASE = 0.0f;    /* About 371 Miliseconds */ 
+    ENV1_RELEASE = 0.0f;
 
-    ENV2_ATTACK = 0.0f;     /* About 59 miliseconds */
-    ENV2_DECAY = 0.1f;      /* The same here */
+    ENV2_ATTACK = 0.0f;
+    ENV2_DECAY = 0.1f;
     ENV2_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
-    ENV2_RELEASE = 0.0f;    /* About 371 Miliseconds */ 
+    ENV2_RELEASE = 0.0f;
 
     LFO1_PERIOD = 16;
     LFO2_PERIOD = 16;
