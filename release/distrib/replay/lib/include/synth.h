@@ -247,7 +247,7 @@ class CSynth
 #endif
                         int64 osc_speed);
 
-        void NoteOn(float noten, float speed, int Looping, unsigned int Length,
+        void NoteOn(int noten, float speed, int Looping, unsigned int Length,
                     unsigned int Loop_Length, float note_smp);
         void NoteOff(void);
 

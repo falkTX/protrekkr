@@ -5394,7 +5394,7 @@ void Note_Jazz(int track, int note)
     if(!is_editing || is_recording_2)
     {
         Play_Instrument(track, Sub_Channel,
-                        (float) note,
+                        note,
                         ped_patsam,
                         CustomVol[ped_patsam],
                         0, 0, !is_recording, -(Sub_Channel + 1));

@@ -45,7 +45,7 @@
 // Constants
 #define MAX_TRACKS 16
 #define MAX_POLYPHONY 16
-#define DEFAULT_POLYPHONY 5
+#define DEFAULT_POLYPHONY 1
 #define MAX_FILTER 23
 #define MAX_COMB_FILTERS 10
 #define PI 3.1415926535897932384626433832795
@@ -335,7 +335,7 @@ extern int DelayType;
 void Pre_Song_Init(void);
 void Sp_Player(void);
 void Play_Instrument(int channel, int sub_channel,
-                     float note, int sample,
+                     int note, int sample,
                      float vol, unsigned int offset,
                      int glide, int Play_Selection, int midi_sub_channel);
 void ResetFilters(int tr);

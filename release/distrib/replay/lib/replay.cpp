@@ -2001,7 +2001,7 @@ void Sp_Player(void)
                         {
                             Play_Instrument(ct,
                                             free_sub_channel,
-                                            (float) pl_note[i],
+                                            pl_note[i],
                                             pl_sample[i],
                                             sp_Tvol[ct][free_sub_channel],
                                             toffset,
@@ -2015,7 +2015,7 @@ void Sp_Player(void)
                             // in the volume column of no 0x3 fx
                             Play_Instrument(ct,
                                             free_sub_channel,
-                                            (float) pl_note[i],
+                                            pl_note[i],
                                             pl_sample[i],
                                             CustomVol[pl_sample[i]],
                                             toffset,
@@ -2781,73 +2781,84 @@ ByPass_Wav:
                 All_Signal_R = 0;
             }
 #endif
+        }
 
 #if defined(PTK_FLANGER)
-            // 32-Bit HQ Interpolated System Flanger
-            if(FLANGER_ON[c])
+        // 32-Bit HQ Interpolated System Flanger
+        if(FLANGER_ON[c])
+        {
+            FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
+            FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
+
+#if defined(__PSP__)
+            // May be a bit faster
+            float fstep1 = powf(2.0f,
+                                SIN[(int) ((FLANGER_GR[c] / 6.283185f) * 360.0f)] * FLANGER_AMPL[c]);
+            float fstep2 = powf(2.0f,
+                                SIN[(int) (((FLANGER_GR[c] / 6.283185f) +
+                                            (FLANGER_DEPHASE[c] / 3.1415927f)
+                                           ) * 360.0f
+                                          )] * FLANGER_AMPL[c]);
+#else
+            float fstep1 = powf(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
+            float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
+#endif
+
+            foff2[c] += fstep1;
+            foff1[c] += fstep2;  
+
+            if(foff2[c] >= 16384.0f) foff2[c] = 0.0f;
+            if(foff1[c] >= 16384.0f) foff1[c] = 0.0f;
+            if(foff2[c] < 0.0f) foff2[c] = 0.0f;
+            if(foff1[c] < 0.0f) foff1[c] = 0.0f;
+
+            oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (foff2[c])];
+            roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (foff1[c])];
+
+            All_Signal_L += Filter_FlangerL(oldspawn[c]);
+            All_Signal_R += Filter_FlangerR(roldspawn[c]);
+
+            if(++FLANGER_OFFSET[c] > 16383) FLANGER_OFFSET[c] = 0;
+            FLANGER_GR[c] += FLANGER_RATE[c];
+
+            if(FLANGER_GR[c] >= 6.283185f)
             {
-                FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
-                FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
-
-                float fstep1 = powf(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
-                float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
-
-                foff2[c] += fstep1;
-                foff1[c] += fstep2;  
-
-                if(foff2[c] >= 16384.0f) foff2[c] = 0.0f;
-                if(foff1[c] >= 16384.0f) foff1[c] = 0.0f;
-                if(foff2[c] < 0.0f) foff2[c] = 0.0f;
-                if(foff1[c] < 0.0f) foff1[c] = 0.0f;
-
-                oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (foff2[c])];
-                roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (foff1[c])];
-
-                All_Signal_L += Filter_FlangerL(oldspawn[c]);
-                All_Signal_R += Filter_FlangerR(roldspawn[c]);
-
-                if(++FLANGER_OFFSET[c] > 16383) FLANGER_OFFSET[c] = 0;
-                FLANGER_GR[c] += FLANGER_RATE[c];
-
-                if(FLANGER_GR[c] >= 6.283185f)
-                {
-                    FLANGER_GR[c] -= 6.283185f;
-                    foff2[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
-                    foff1[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
-                }
+                FLANGER_GR[c] -= 6.283185f;
+                foff2[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
+                foff1[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
             }
+        }
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-            if(CHAN_MUTE_STATE[c])
-            {
-                All_Signal_L = 0;
-                All_Signal_R = 0;
-            }
+        if(CHAN_MUTE_STATE[c])
+        {
+            All_Signal_L = 0;
+            All_Signal_R = 0;
+        }
 #endif
 
-            left_float += All_Signal_L;
-            right_float += All_Signal_R;
+        left_float += All_Signal_L;
+        right_float += All_Signal_R;
 
 #if defined(PTK_COMPRESSOR)
-            // Sending to delay...
-            float const DS = DSend[c];
+        // Sending to delay...
+        float const DS = DSend[c];
 
-            if(DS > 0.008f)
-            {
-                delay_left_final += All_Signal_L * DS;
-                delay_right_final += All_Signal_R * DS;
-            }
+        if(DS > 0.008f)
+        {
+            delay_left_final += All_Signal_L * DS;
+            delay_right_final += All_Signal_R * DS;
+        }
 #endif
 
-            // Sending to chorus
-            float const DC = CCoef[c];
+        // Sending to chorus
+        float const DC = CCoef[c];
 
-            if(DC > 0.008f)
-            {
-                left_chorus += All_Signal_L * DC;
-                right_chorus += All_Signal_R * DC;
-            }
+        if(DC > 0.008f)
+        {
+            left_chorus += All_Signal_L * DC;
+            right_chorus += All_Signal_R * DC;
         }
 
 #if !defined(__STAND_ALONE__)
@@ -2905,7 +2916,7 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 // ------------------------------------------------------
 // Play a waveform
 void Play_Instrument(int channel, int sub_channel,
-                     float note, int sample,
+                     int inote, int sample,
                      float vol, unsigned int offset,
                      int glide, int Play_Selection, int midi_sub_channel)
 {
@@ -2915,7 +2926,8 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
     int Cur_Position;
-    float note2;
+    int note2;
+    float note;
     int associated_sample;
     int no_retrig_adsr = FALSE;
 
@@ -2969,13 +2981,13 @@ void Play_Instrument(int channel, int sub_channel,
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-        int mnote = int(note);
+        int mnote = inote;
 #endif
 #endif
 
         for(int revo = 0; revo < 16; revo++)
         {
-            if(note >= Basenote[associated_sample][revo] &&
+            if(inote >= Basenote[associated_sample][revo] &&
                SampleType[associated_sample][revo] != 0)
             {
                 split = revo;
@@ -2986,8 +2998,9 @@ void Play_Instrument(int channel, int sub_channel,
             glide = 0;
         }
 
-        note2 = note - 48;
+        note2 = inote - 48;
 
+        note = (float) inote;
         note -= Basenote[associated_sample][split];
         note += float((float) Finetune[associated_sample][split] * 0.0078125f);
 
@@ -3019,7 +3032,7 @@ void Play_Instrument(int channel, int sub_channel,
 
 #if defined(PTK_FX_ARPEGGIO)
         Vstep_arp[channel][sub_channel] = (int64) spreadnote;
-        Arpeggio_BaseNote[channel][sub_channel] = note2;
+        Arpeggio_BaseNote[channel][sub_channel] = (float) note2;
 #endif
 
         if(glide)
@@ -3646,7 +3659,7 @@ void DoEffects(void)
                         if(pltr_vol_row <= 64)
                         {
                             Play_Instrument(trackef, free_sub_channel,
-                                            (float) pltr_note[i], pltr_sample[i],
+                                            pltr_note[i], pltr_sample[i],
                                             pltr_vol_row * 0.015625f,
                                             0, 0,
                                             FALSE, i + 1);
@@ -3654,7 +3667,7 @@ void DoEffects(void)
                         else
                         {
                             Play_Instrument(trackef, free_sub_channel,
-                                            (float) pltr_note[i], pltr_sample[i],
+                                            pltr_note[i], pltr_sample[i],
                                             CustomVol[pltr_sample[i]],
                                             0, 0,
                                             FALSE, i + 1);

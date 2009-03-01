@@ -2130,6 +2130,12 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_Synth_Osc2 = FALSE;
     int Store_Synth_Osc3 = FALSE;
 
+    int Store_Synth_Phase_Osc1 = FALSE;
+    int Store_Synth_Phase_Osc2 = FALSE;
+
+    int Store_Synth_Lfo1 = FALSE;
+    int Store_Synth_Lfo2 = FALSE;
+
     int Store_Volume_Column = FALSE;
     int Store_FX_NoteCut = FALSE;
     int Store_FX_PitchUp = FALSE;
@@ -2840,6 +2846,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
                 if(PARASynth[swrite].osc2_waveform != WAVEFORM_NONE) Store_Synth_Osc2 = TRUE;
 
+                if(PARASynth[swrite].osc1_pw != 256) Store_Synth_Phase_Osc1 = TRUE;
+                if(PARASynth[swrite].osc2_pw != 256) Store_Synth_Phase_Osc2 = TRUE;
+
                 Write_Mod_Data(&PARASynth[swrite].osc1_pw, sizeof(int), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].osc2_pw, sizeof(int), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].osc2_detune, sizeof(char), 1, in);
@@ -2862,6 +2871,22 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Data(&PARASynth[swrite].lfo1_period, sizeof(int), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo2_period, sizeof(int), 1, in);
 
+                if(Store_Synth_Phase_Osc1)
+                {
+                    if(PARASynth[swrite].lfo1_osc1_pw != 64) Store_Synth_Lfo1 = TRUE;
+                }
+                if(Store_Synth_Phase_Osc2)
+                {
+                    if(PARASynth[swrite].lfo1_osc2_pw != 64) Store_Synth_Lfo1 = TRUE;
+                }
+
+                if(PARASynth[swrite].lfo1_osc1_pitch != 64) Store_Synth_Lfo1 = TRUE;
+                if(PARASynth[swrite].lfo1_osc2_pitch != 64) Store_Synth_Lfo1 = TRUE;
+                if(PARASynth[swrite].lfo1_osc1_volume != 64) Store_Synth_Lfo1 = TRUE;
+                if(PARASynth[swrite].lfo1_osc2_volume != 64) Store_Synth_Lfo1 = TRUE;
+                if(PARASynth[swrite].lfo1_vcf_cutoff != 64) Store_Synth_Lfo1 = TRUE;
+                if(PARASynth[swrite].lfo1_vcf_resonance != 64) Store_Synth_Lfo1 = TRUE;
+
                 Write_Mod_Data(&PARASynth[swrite].lfo1_osc1_pw, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo1_osc2_pw, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo1_osc1_pitch, sizeof(char), 1, in);
@@ -2870,6 +2895,22 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Data(&PARASynth[swrite].lfo1_osc2_volume, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo1_vcf_cutoff, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo1_vcf_resonance, sizeof(char), 1, in);
+
+                if(Store_Synth_Phase_Osc1)
+                {
+                    if(PARASynth[swrite].lfo2_osc1_pw != 64) Store_Synth_Lfo2 = TRUE;
+                }
+                if(Store_Synth_Phase_Osc2)
+                {
+                    if(PARASynth[swrite].lfo2_osc2_pw != 64) Store_Synth_Lfo2 = TRUE;
+                }
+
+                if(PARASynth[swrite].lfo2_osc1_pitch != 64) Store_Synth_Lfo2 = TRUE;
+                if(PARASynth[swrite].lfo2_osc2_pitch != 64) Store_Synth_Lfo2 = TRUE;
+                if(PARASynth[swrite].lfo2_osc1_volume != 64) Store_Synth_Lfo2 = TRUE;
+                if(PARASynth[swrite].lfo2_osc2_volume != 64) Store_Synth_Lfo2 = TRUE;
+                if(PARASynth[swrite].lfo2_vcf_cutoff != 64) Store_Synth_Lfo2 = TRUE;
+                if(PARASynth[swrite].lfo2_vcf_resonance != 64) Store_Synth_Lfo2 = TRUE;
 
                 Write_Mod_Data(&PARASynth[swrite].lfo2_osc1_pw, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].lfo2_osc2_pw, sizeof(char), 1, in);
@@ -3087,6 +3128,12 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     }
 
     Save_Constant("PTK_SYNTH", Store_Synth);
+
+    Save_Constant("PTK_SYNTH_PHASE1", Store_Synth_Phase_Osc1);
+    Save_Constant("PTK_SYNTH_PHASE2", Store_Synth_Phase_Osc2);
+
+    Save_Constant("PTK_SYNTH_LFO1", Store_Synth_Lfo1);
+    Save_Constant("PTK_SYNTH_LFO2", Store_Synth_Lfo2);
 
     Save_Constant("PTK_SYNTH_DISTO", Store_Synth_Disto);
     Save_Constant("PTK_SYNTH_OSC2", Store_Synth_Osc2);

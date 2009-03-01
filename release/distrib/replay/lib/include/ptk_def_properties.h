@@ -71,6 +71,10 @@
 #define PTK_FX_ARPEGGIO
 #define PTK_FX_TICK0
 #define PTK_SYNTH
+#define PTK_SYNTH_PHASE1
+#define PTK_SYNTH_PHASE2
+#define PTK_SYNTH_LFO1
+#define PTK_SYNTH_LFO2
 #define PTK_SYNTH_DISTO
 #define PTK_SYNTH_OSC2
 #define PTK_SYNTH_OSC3
