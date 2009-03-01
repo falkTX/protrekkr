@@ -2,6 +2,13 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.97c:
+
+- Even more constants (Especially for modules not using instruments).
+- Constants weren't generated correctly when using command 0x15.
+- Implemented vibrato effect (0x1dxy) x = speed y = depth
+  (can't be used if arpeggio (0x1b) is turned on).
+
 v1.97b:
 
 - Modified the behaviour of the ring mod stereo filter.

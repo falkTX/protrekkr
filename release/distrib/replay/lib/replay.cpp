@@ -274,6 +274,13 @@ int shuffleswitch;
     unsigned char sLength;
 #endif
 
+#if defined(PTK_FX_VIBRATO)
+    int64 Vstep_vib[MAX_TRACKS][MAX_POLYPHONY];
+    int Vibrato_Switch[MAX_TRACKS];
+    float Vibrato_BaseNote[MAX_TRACKS][MAX_POLYPHONY];
+    int Vibcounter[MAX_TRACKS];
+#endif
+
 #if defined(PTK_FX_ARPEGGIO)
     int64 Vstep_arp[MAX_TRACKS][MAX_POLYPHONY];
     int Arpeggio_Switch[MAX_TRACKS];
@@ -428,7 +435,10 @@ char compressor;
 #endif
 
 int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
+
+#if defined(PTK_INSTRUMENTS)
 int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+#endif
 
 #if defined(PTK_SYNTH)
 int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
@@ -787,6 +797,7 @@ void Mod_Dat_Read(void *Dest, int size)
     Cur_Module += size;
 }
 
+#if defined(PTK_INSTRUMENTS)
 short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 {
     int Packed_Length;
@@ -864,6 +875,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
         return(Dest_Buffer);
     }
 }
+#endif // PTK_INSTRUMENTS
 
 int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 {
@@ -973,6 +985,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Mod_Dat_Read(&SampleType[swrite][slwrite], sizeof(char));
+
+#if defined(PTK_INSTRUMENTS)
+
                 if(SampleType[swrite][slwrite] != 0)
                 {
                     int Apply_Interpolation;
@@ -1121,6 +1136,8 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     if(Sample_Buffer) free(Sample_Buffer);
 
                 }// Exist Sample
+#endif // PTK_INSTRUMENTS
+
             }
         }
 
@@ -1249,11 +1266,21 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&Disclap[tps_trk], sizeof(char));
         }
 
-        Mod_Dat_Read(beatsync, sizeof(char) * MAX_INSTRS);
-        Mod_Dat_Read(beatlines, sizeof(short) * MAX_INSTRS);
+        char Instrs;
+
+        Mod_Dat_Read(&Instrs, sizeof(char));
+
+        if(Instrs)
+        {
+            Mod_Dat_Read(beatsync, sizeof(char) * MAX_INSTRS);
+            Mod_Dat_Read(beatlines, sizeof(short) * MAX_INSTRS);
+        }
         Mod_Dat_Read(&REVERBFILTER, sizeof(float));
 
-        Mod_Dat_Read(CustomVol, sizeof(float) * MAX_INSTRS);
+        if(Instrs)
+        {
+            Mod_Dat_Read(CustomVol, sizeof(float) * MAX_INSTRS);
+        }
 
         char tb303_1_enabled;
         char tb303_2_enabled;
@@ -1407,7 +1434,9 @@ void Reset_Values(void)
                 Synthesizer[stopper][stopper_poly].Reset();
 #endif
 
+#if defined(PTK_INSTRUMENTS)
                 sp_Stage[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+#endif
 
 #if defined(PTK_SYNTH)
                 sp_Stage2[stopper][stopper_poly] = PLAYING_NOSAMPLE;
@@ -1561,12 +1590,21 @@ void Pre_Song_Init(void)
         Arpeggio_Switch[ini] = 0;
 #endif
 
+#if defined(PTK_FX_VIBRATO)
+        Vibrato_Switch[ini] = 0;
+#endif
+
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
 
 #if defined(PTK_FX_ARPEGGIO)
             Arpeggio_BaseNote[ini][i] = 0;
             Vstep_arp[ini][i] = 0;
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+            Vibrato_BaseNote[ini][i] = 0;
+            Vstep_vib[ini][i] = 0;
 #endif
 
 #if defined(PTK_SYNTH)
@@ -1590,7 +1628,10 @@ void Pre_Song_Init(void)
 #endif
 
             sp_Step[ini][i] = 0;
+
+#if defined(PTK_INSTRUMENTS)
             sp_Stage[ini][i] = PLAYING_NOSAMPLE;
+#endif
 
 #if defined(PTK_SYNTH)
             sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
@@ -1753,7 +1794,10 @@ void Pre_Song_Init(void)
         }
     }
 
+#if defined(PTK_INSTRUMENTS)
     Free_Samples();
+#endif
+
 }
 
 // ------------------------------------------------------
@@ -1793,6 +1837,19 @@ void Post_Song_Init(void)
         {
             Arpeggio_BaseNote[i][j] = 0;
             Vstep_arp[i][j] = 0;
+        }
+    }
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        Vibrato_Switch[i] = 0;
+        
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            Vibrato_BaseNote[i][j] = 0;
+            Vstep_vib[i][j] = 0;
         }
     }
 #endif
@@ -1982,11 +2039,13 @@ void Sp_Player(void)
                         // Check if that sub channel was playing a note
                         if(old_channel != -1)
                         {
+#if defined(PTK_INSTRUMENTS)
                             // Get the virtual channel it was playing on and remove it
                             if(sp_Stage[ct][old_channel] == PLAYING_SAMPLE)
                             {
                                 sp_Stage[ct][old_channel] = PLAYING_SAMPLE_NOTEOFF;
                             }
+#endif
 
 #if defined(PTK_SYNTH)
                             Synthesizer[ct][old_channel].NoteOff();
@@ -2036,7 +2095,10 @@ void Sp_Player(void)
                         j = Reserved_Sub_Channels[ct][i];
                         if(j != -1)
                         {
+
+#if defined(PTK_INSTRUMENTS)
                             if(sp_Stage[ct][j] == PLAYING_SAMPLE) sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+#endif
 
 #if defined(PTK_SYNTH)
                             Synthesizer[ct][j].NoteOff();
@@ -2259,6 +2321,11 @@ void Sp_Player(void)
 
     for(c = 0; c < Songtracks; c++)
     {
+
+#if defined(PTK_FX_VIBRATO)
+        Vibcounter[c]++;
+#endif
+
         grown = FALSE;
         gotsome = FALSE;
 
@@ -2273,11 +2340,14 @@ void Sp_Player(void)
             Curr_Signal_R[i] = 0;
             Done_CVol[c][i] = FALSE;
 
+#if defined(PTK_INSTRUMENTS)
+
             // Play a sample
             if(sp_Stage[c][i] == PLAYING_SAMPLE || sp_Stage[c][i] == PLAYING_SAMPLE_NOTEOFF)
             {
 
 #if defined(PTK_SYNTH)
+
                 if(!Synth_Was[c][i]) goto ByPass_Wav;
 
                 if((Synthesizer[c][i].OSC1_WAVEFORM != WAVEFORM_WAV &&
@@ -2429,6 +2499,7 @@ ByPass_Wav:
 #endif
 
             }
+#endif
 
 #if defined(PTK_SYNTH)
             // Synth
@@ -2509,10 +2580,13 @@ ByPass_Wav:
             // We send a note off to all sub channels
             for(i = 0; i < Channels_Polyphony[c]; i++)
             {
+
+#if defined(PTK_INSTRUMENTS)
                 if(sp_Stage[c][i] == PLAYING_SAMPLE)
                 {
                     sp_Stage[c][i] = PLAYING_SAMPLE_NOTEOFF;
                 }
+#endif
 
 #if defined(PTK_SYNTH)
                 Synthesizer[c][i].NoteOff();
@@ -2890,7 +2964,12 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 
     for(i = 0; i < polyphony; i++)
     {
-        if(sp_Stage[channel][i] == PLAYING_NOSAMPLE 
+        if(
+#if defined(PTK_INSTRUMENTS)
+           sp_Stage[channel][i] == PLAYING_NOSAMPLE 
+#else
+           TRUE
+#endif
 #if defined(PTK_SYNTH)
            && sp_Stage2[channel][i] == PLAYING_NOSAMPLE 
            && sp_Stage3[channel][i] == PLAYING_NOSAMPLE
@@ -2901,6 +2980,7 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
         }
     }
 
+#if defined(PTK_INSTRUMENTS)
     for(i = 0; i < polyphony; i++)
     {
         if(sp_Stage[channel][i] == PLAYING_SAMPLE_NOTEOFF)
@@ -2908,6 +2988,7 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
             return(i);
         }
     }
+#endif
     
     // None found
     return(-1);
@@ -2985,6 +3066,7 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 #endif
 
+#if defined(PTK_INSTRUMENTS)
         for(int revo = 0; revo < 16; revo++)
         {
             if(inote >= Basenote[associated_sample][revo] &&
@@ -2993,6 +3075,8 @@ void Play_Instrument(int channel, int sub_channel,
                 split = revo;
             }
         }
+#endif
+
         if(sample != sp_channelsample[channel][sub_channel])
         {
             glide = 0;
@@ -3000,9 +3084,11 @@ void Play_Instrument(int channel, int sub_channel,
 
         note2 = inote - 48;
 
+#if defined(PTK_INSTRUMENTS)
         note = (float) inote;
         note -= Basenote[associated_sample][split];
         note += float((float) Finetune[associated_sample][split] * 0.0078125f);
+#endif
 
 #if defined(PTK_SYNTH)
         if(!no_retrig_adsr)
@@ -3035,6 +3121,11 @@ void Play_Instrument(int channel, int sub_channel,
         Arpeggio_BaseNote[channel][sub_channel] = (float) note2;
 #endif
 
+#if defined(PTK_FX_VIBRATO)
+        Vstep_vib[channel][sub_channel] = (int64) spreadnote;
+        Vibrato_BaseNote[channel][sub_channel] = (float) note2;
+#endif
+
         if(glide)
         {
             sp_Step[channel][sub_channel] = (int64) spreadnote;
@@ -3046,7 +3137,9 @@ void Play_Instrument(int channel, int sub_channel,
         }
 
         // Only synth
+#if defined(PTK_INSTRUMENTS)
         sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+#endif
 
 #if defined(PTK_SYNTH)
         if(Synthprg[sample] == SYNTH_WAVE_OFF)
@@ -3063,6 +3156,7 @@ void Play_Instrument(int channel, int sub_channel,
 
         sp_channelsample[channel][sub_channel] = sample;
 
+#if defined(PTK_INSTRUMENTS)
         if(SampleType[associated_sample][split])
         {
 
@@ -3079,6 +3173,7 @@ void Play_Instrument(int channel, int sub_channel,
             else
             {
 #endif
+
                 // Only sample
                 sp_Stage[channel][sub_channel] = PLAYING_SAMPLE;
 
@@ -3101,6 +3196,10 @@ void Play_Instrument(int channel, int sub_channel,
             Arpeggio_BaseNote[channel][sub_channel] = note;
 #endif
 
+#if defined(PTK_FX_VIBRATO)
+            Vibrato_BaseNote[channel][sub_channel] = note;
+#endif
+
             if(beatsync[associated_sample])
             {
                 double spreadnote = (double) (SampleNumSamples[associated_sample][split]) / ((double) beatlines[associated_sample] * (double) SamplesPerTick);
@@ -3108,6 +3207,10 @@ void Play_Instrument(int channel, int sub_channel,
 
 #if defined(PTK_FX_ARPEGGIO)
                 Vstep_arp[channel][sub_channel] = (int64) spreadnote;
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+                Vstep_vib[channel][sub_channel] = (int64) spreadnote;
 #endif
 
                 Vstep1[channel][sub_channel] = (int64) spreadnote;
@@ -3120,6 +3223,10 @@ void Play_Instrument(int channel, int sub_channel,
 
 #if defined(PTK_FX_ARPEGGIO)
                 Vstep_arp[channel][sub_channel] = (int64) spreadnote;
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+                Vstep_vib[channel][sub_channel] = (int64) spreadnote;
 #endif
 
                 if(glide)
@@ -3198,7 +3305,10 @@ void Play_Instrument(int channel, int sub_channel,
             // Sample is out of range
             if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
             {
+
+#if defined(PTK_INSTRUMENTS)
                 sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+#endif
 
 #if defined(PTK_SYNTH)
                 sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
@@ -3208,6 +3318,8 @@ void Play_Instrument(int channel, int sub_channel,
             }
         }
         else
+#endif // PTK_INSTRUMENTS
+
         {
             sp_Cvol[channel][sub_channel] = 1.0f;
             Player_SV[channel][sub_channel] = 1.0f;
@@ -3367,6 +3479,22 @@ void DoEffects_tick0(void)
                 break;
 #endif
 
+#if defined(PTK_FX_VIBRATO)
+            // $1c vibrato switch on/off
+            case 0x1d:
+
+                Vibcounter[trackef] = 0;
+                Vibrato_Switch[trackef] = pltr_dat_row;
+                if(!pltr_dat_row)
+                {
+                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                    {
+                        Vstep1[trackef][i] = Vstep_vib[trackef][i];
+                    }
+                }
+                break;
+#endif
+
         }
     }      
 }
@@ -3454,11 +3582,14 @@ void DoEffects(void)
             {
                 for(i = 0; i < Channels_Polyphony[trackef]; i++)
                 {
+
+#if defined(PTK_INSTRUMENTS)
                     if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
                     {
                         if(FType[trackef] == 4) sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
                         else sp_Tvol[trackef][i] = 0.001f;
                     }
+#endif
 
 #if defined(PTK_SYNTH)
                     Synthesizer[trackef][i].NoteOff();
@@ -3643,10 +3774,13 @@ void DoEffects(void)
                         if(old_channel != -1)
                         {
                             // Get the virtual channel it was playing on and remove it
+
+#if defined(PTK_INSTRUMENTS)
                             if(sp_Stage[trackef][old_channel] == PLAYING_SAMPLE)
                             {
                                 sp_Stage[trackef][old_channel] = PLAYING_SAMPLE_NOTEOFF;
                             }
+#endif
 
 #if defined(PTK_SYNTH)
                             Synthesizer[trackef][old_channel].NoteOff();
@@ -3844,6 +3978,28 @@ void DoEffects(void)
                         Vstep1[trackef][i] = (int64) arpnote;
                         break;
                 }
+            }
+        }
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+        // Let's do the vibrato
+        double vibnote;
+        float vib_speed;
+        float vib_amp;
+
+        if(Vibrato_Switch[trackef])
+        {
+            vib_speed = ((float) (Vibrato_Switch[trackef] >> 4)) * (float) Vibcounter[trackef];
+            vib_speed = sinf((vib_speed * 0.00045f) / (3.14159f * 2.0f));
+            vib_amp = (float) (Vibrato_Switch[trackef] & 0xf) * 0.09f;
+            vib_speed *= vib_amp;
+
+            for(i = 0; i < Channels_Polyphony[trackef]; i++)
+            {
+                vibnote = (double) powf(2.0f, ((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
+                vibnote *= 4294967296.0f;
+                Vstep1[trackef][i] = (int64) vibnote;
             }
         }
 #endif
@@ -4597,6 +4753,7 @@ void ResetSynthParameters(SynthParameters *TSP)
 
 // ------------------------------------------------------
 // Free all allocated Samples
+#if defined(PTK_INSTRUMENTS)
 void Free_Samples(void)
 {
     for(int freer = 0; freer < 128; freer++)
@@ -4635,6 +4792,7 @@ void Free_Samples(void)
 
     }
 }
+#endif
 
 // ------------------------------------------------------
 #if defined(PTK_COMPRESSOR)

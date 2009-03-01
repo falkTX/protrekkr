@@ -496,10 +496,9 @@ void LoadAmigaMod(char *FileName, int channels)
                             t_command = 5;
                             break;
 
-                        // VIBRATO [Not supported by PTK, ptk wasn't made to sound like a violin :P ].
+                        // VIBRATO
                         case 4:
-                            t_command = 0;
-                            t_argu = 0;
+                            t_command = 0x1d;
                             break;
 
 
@@ -1570,35 +1569,46 @@ Read_Mod_File:
             }
 
             if(!Portable) if(Ptk_Format) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-            
-            Read_Mod_Data(beatsync, sizeof(char), 128, in);
-            
+
             if(Ptk_Format)
             {
-                for(i = 0; i < 128; i++)
+                Read_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
+
+                for(i = 0; i < MAX_INSTRS; i++)
                 {
                     Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
                 }
 
                 Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
 
-                for(i = 0; i < 128; i++)
+                for(i = 0; i < MAX_INSTRS; i++)
                 {
                     Read_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
                 }
             }
             else
             {
-                for(i = 0; i < 128; i++)
+                char Instrs;
+                Read_Mod_Data(&Instrs, sizeof(char), 1, in);
+
+                if(Instrs)
                 {
-                    Read_Mod_Data(&beatlines[i], sizeof(short), 1, in);
+                    Read_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
+
+                    for(i = 0; i < MAX_INSTRS; i++)
+                    {
+                        Read_Mod_Data(&beatlines[i], sizeof(short), 1, in);
+                    }
                 }
 
                 Read_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
 
-                for(i = 0; i < 128; i++)
+                if(Instrs)
                 {
-                    Read_Mod_Data(&CustomVol[i], sizeof(float), 1, in);
+                    for(i = 0; i < MAX_INSTRS; i++)
+                    {
+                        Read_Mod_Data(&CustomVol[i], sizeof(float), 1, in);
+                    }
                 }
             }
 
@@ -2135,6 +2145,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
     int Store_Synth_Lfo1 = FALSE;
     int Store_Synth_Lfo2 = FALSE;
+    
+    int Store_Instruments = FALSE;
 
     int Store_Volume_Column = FALSE;
     int Store_FX_NoteCut = FALSE;
@@ -2166,6 +2178,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_VolumeSlideDown = FALSE;
     int Store_FX_SetGlobalVolume = FALSE;
     int Store_FX_Arpeggio = FALSE;
+    int Store_FX_Vibrato = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -2628,6 +2641,74 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 // $15 Set filter Type
                                 case 0x15:
                                     Store_FX_SetFilterType = TRUE;
+                                    switch(TmpPatterns_Notes[i + 1])
+                                    {
+                                        case 0:
+                                        case 1:
+                                        case 2:
+                                        case 3:
+                                            Store_Filter_LoHiBand = TRUE;
+                                            break;
+                                        case 4:
+                                            break;
+                                        case 5:
+                                            Store_Filter_Lo24 = TRUE;
+                                            break;
+                                        case 6:
+                                            Store_Filter_Lo48 = TRUE;
+                                            break;
+                                        case 7:
+                                            Store_Filter_Lp24 = TRUE;
+                                            break;
+                                        case 8:
+                                            Store_Filter_AModM = TRUE;
+                                            break;
+                                        case 9:
+                                            Store_Filter_AModS = TRUE;
+                                            break;
+                                        case 10:
+                                            Store_Filter_SingleM = TRUE;
+                                            break;
+                                        case 11:
+                                            Store_Filter_SingleS = TRUE;
+                                            break;
+                                        case 12:
+                                            Store_Filter_Eqm15 = TRUE;
+                                            break;
+                                        case 13:
+                                            Store_Filter_Eqm6 = TRUE;
+                                            break;
+                                        case 14:
+                                            Store_Filter_Eqp6 = TRUE;
+                                            break;
+                                        case 15:
+                                            Store_Filter_Eqp15 = TRUE;
+                                            break;
+                                        case 16:
+                                            Store_Filter_Delta = TRUE;
+                                            break;
+                                        case 17:
+                                            Store_Filter_DistL = TRUE;
+                                            break;
+                                        case 18:
+                                            Store_Filter_DistM = TRUE;
+                                            break;
+                                        case 19:
+                                            Store_Filter_DistH = TRUE;
+                                            break;
+                                        case 20:
+                                            Store_Filter_Dist = TRUE;
+                                            break;
+                                        case 21:
+                                            Store_Filter_Hp12M = TRUE;
+                                            break;
+                                        case 22:
+                                            Store_Filter_Hp12S = TRUE;
+                                            break;
+                                        case 23:
+                                            Store_Filter_Hp24M = TRUE;
+                                            break;
+                                    }
                                     break;
 
                                 // $16 Reset filter lfo
@@ -2655,14 +2736,19 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_VolumeSlideDown = TRUE;
                                     break;
 
-                                // $1a Arpeggio
+                                // $1c Arpeggio
                                 case 0x1b:
                                     Store_FX_Arpeggio = TRUE;
                                     break;
 
-                                // $1a Set global volume
+                                // $1c Set global volume
                                 case 0x1c:
                                     Store_FX_SetGlobalVolume = TRUE;
+                                    break;
+
+                                // $1d Vibrato
+                                case 0x1d:
+                                    Store_FX_Vibrato = TRUE;
                                     break;
 
                                 // $31 First TB303 control
@@ -2797,8 +2883,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_VOLUMESLIDEDOWN", Store_FX_VolumeSlideDown);
     Save_Constant("PTK_FX_SETGLOBALVOLUME", Store_FX_SetGlobalVolume);
     Save_Constant("PTK_FX_ARPEGGIO", Store_FX_Arpeggio);
+    Save_Constant("PTK_FX_VIBRATO", Store_FX_Vibrato);
 
-    Save_Constant("PTK_FX_TICK0", Store_FX_Arpeggio | Store_FX_PatternLoop);
+    Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio | Store_FX_PatternLoop);
 
     // Remap the used instruments
     for(i = 0; i < MAX_INSTRS; i++)
@@ -2987,8 +3074,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             for(int slwrite = 0; slwrite < 16; slwrite++)
             {
                 Write_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
-                if(SampleType[swrite][slwrite] != 0)
+                if(SampleType[swrite][slwrite])
                 {
+                    Store_Instruments = TRUE;
                     int Apply_Interpolation = FALSE;
 
 #if !defined(__NO_CODEC__)
@@ -3126,6 +3214,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             }
         }
     }
+
+    Save_Constant("PTK_INSTRUMENTS", Store_Instruments);
 
     Save_Constant("PTK_SYNTH", Store_Synth);
 
@@ -3422,10 +3512,23 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-    Write_Mod_Data(beatsync, sizeof(char), 128, in);
-    Write_Mod_Data(beatlines, sizeof(short), 128, in);
+    char Instrs;
+    
+    Instrs = Store_Instruments;
+    
+    Write_Mod_Data(&Instrs, sizeof(char), 1, in);
+
+    if(Instrs)
+    {
+        Write_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
+        Write_Mod_Data(beatlines, sizeof(short), MAX_INSTRS, in);
+    }
     Write_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
-    Write_Mod_Data(CustomVol, sizeof(float), 128, in);
+
+    if(Instrs)
+    {
+        Write_Mod_Data(CustomVol, sizeof(float), MAX_INSTRS, in);
+    }
 
     Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
     if(Store_303_1)

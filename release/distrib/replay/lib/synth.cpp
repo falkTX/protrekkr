@@ -724,14 +724,14 @@ float CSynth::GetSample(short *Left_Samples,
         // Oscillator1 On
         if(OSC1_WAVEFORM != WAVEFORM_NONE)
         {
-            T_OSC1_VOLUME = ((
+            T_OSC1_VOLUME = (
 #if defined(PTK_SYNTH_LFO1)
                              LFO1_VALUE * LFO1_OSC1_VOLUME
 #endif
 #if defined(PTK_SYNTH_LFO2)
                              + LFO2_VALUE * LFO2_OSC1_VOLUME
 #endif
-                             ) + ENV1_MIN)
+                             + ENV1_MIN)
                              * ENV1_VOLUME_1 * ENV1_VOLUME_2;
 
             if(*track)
@@ -764,7 +764,10 @@ float CSynth::GetSample(short *Left_Samples,
                             + ENV2_VALUE * ENV2_OSC1_PITCH) * 4294967296.0);
                 osc_speed2 = OSC1_SPEED;
                 Left_Samples1 = Left_Samples;
+
+#if defined(PTK_INSTRUMENTS)
                 if(OSC1_WAVEFORM != WAVEFORM_WAV)
+#endif
                 {
                     switch(OSC1_WAVEFORM)
                     {
@@ -833,7 +836,8 @@ float CSynth::GetSample(short *Left_Samples,
                                  + (LFO2_VALUE * LFO2_OSC1_PW)
 #endif
                                  + (ENV1_VALUE * ENV1_OSC1_PW)
-                                 + (ENV2_VALUE * ENV2_OSC1_PW));
+                                 + (ENV2_VALUE * ENV2_OSC1_PW)
+                                );
                         if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
                         if(Stereo1 == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
@@ -986,7 +990,10 @@ float CSynth::GetSample(short *Left_Samples,
                                 + ENV1_VALUE * ENV1_OSC2_PITCH
                                 + ENV2_VALUE * ENV2_OSC2_PITCH) * 4294967296.0));
                 osc_speed2 = OSC2_SPEED;
+
+#if defined(PTK_INSTRUMENTS)
                 if(OSC2_WAVEFORM != WAVEFORM_WAV)
+#endif
                 {
                     switch(OSC2_WAVEFORM)
                     {
@@ -1202,7 +1209,9 @@ float CSynth::GetSample(short *Left_Samples,
                                 + ENV1_VALUE * ENV1_OSC1_PITCH
                                 + ENV2_VALUE * ENV2_OSC1_PITCH) * 4294967296.0)) / 2;
 
-                if(OSC1_WAVEFORM != 5)
+#if defined(PTK_INSTRUMENTS)
+                if(OSC1_WAVEFORM != WAVEFORM_WAV)
+#endif
                 {
                     osc_speed2 *= 65;
                     osc_speed1 *= 65;
