@@ -11,7 +11,7 @@ v1.98:
 - Added 8 bit (interpolated) comrpession scheme.
 - Reverb wasn't initialized correctly at startup.
 - Fixed a bug in .wav rendering.
-- Added a zap command.
+- Added a better zap command.
 
 v1.97c:
 
