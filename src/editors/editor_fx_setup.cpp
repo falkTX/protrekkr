@@ -46,13 +46,12 @@ void Draw_Fx_Ed(void)
     Draw_Editors_Bar(USER_SCREEN_FX_SETUP_EDIT);
 
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Flat_Box("FX: Setup");
-    Gui_Draw_Button_Box(8, 464, 224, 108, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Flat_Box("FX Setup (Global)");
+    Gui_Draw_Button_Box(8, 464, 224, 96, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 480, 56, 16, "Switch", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 498, 56, 16, "Feedback", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 516, 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 534, 56, 16, "Room Size", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 552, 56, 16, "Filter", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 516, 56, 16, "Room Size", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, 534, 56, 16, "Filter", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(240, 464, 288, 96, "Stereo Delay Settings", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 480, 56, 16, "L.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -71,27 +70,6 @@ void Actualize_Fx_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
     {
-        if(gode == 0 || gode == 1)
-        {
-            if(DelayType < 0) DelayType = 0;
-            if(DelayType > 6) DelayType = 6;
-            switch(DelayType)
-            {
-                case 0: Gui_Draw_Button_Box(142, 516, 81, 16, "Room", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 1: Gui_Draw_Button_Box(142, 516, 81, 16, "Great Hall", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 2: Gui_Draw_Button_Box(142, 516, 81, 16, "Room 2", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 3: Gui_Draw_Button_Box(142, 516, 81, 16, "Echoy", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 4: Gui_Draw_Button_Box(142, 516, 81, 16, "1 Comb", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 5: Gui_Draw_Button_Box(142, 516, 81, 16, "Room 3", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 6: Gui_Draw_Button_Box(142, 516, 81, 16, "Hall 2", BUTTON_NORMAL | BUTTON_DISABLED); break;
-
-                default:Gui_Draw_Button_Box(142, 516, 81, 16, "Not Defined", BUTTON_NORMAL | BUTTON_DISABLED); break;
-            }
-
-            if(gode) Initreverb();
-            value_box(79, 516, DelayType, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | (compressor ? 0 : BUTTON_DISABLED));
-        }
-
         if(gode == 0 || gode == 2)
         {
             Realslider(77, 498, (int) (Feedback * 127.0f), compressor);
@@ -143,10 +121,10 @@ void Actualize_Fx_Ed(char gode)
         {
             if(c_threshold < 10) c_threshold = 10;
             if(c_threshold > 127) c_threshold = 127;
-            Realslider(77, 534, c_threshold, compressor);
+            Realslider(77, 516, c_threshold, compressor);
             
             // Re-generate
-            if(gode == 7) allPassInit((float) c_threshold);
+            if(gode == 7) Initreverb();
         }
 
         if(gode == 0 || gode == 8)
@@ -167,7 +145,7 @@ void Actualize_Fx_Ed(char gode)
         {
             if(REVERBFILTER < 0.05f) REVERBFILTER = 0.05f;
             if(REVERBFILTER > 0.99f) REVERBFILTER = 0.99f;
-            Realslider(77, 552, (int) (REVERBFILTER * 128.0f), compressor);
+            Realslider(77, 534, (int) (REVERBFILTER * 128.0f), compressor);
         }
 
         if(gode == 0 || gode == 10)
@@ -213,13 +191,13 @@ void Mouse_Sliders_Fx_Ed(void)
             teac = 2;
         }
         
-        if(zcheckMouse(77, 534, 148, 16) && compressor)
+        if(zcheckMouse(77, 516, 148, 16) && compressor)
         {
             c_threshold = Mouse.x - 87;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 7;
         }
-        if(zcheckMouse(77, 552, 148, 16) && compressor)
+        if(zcheckMouse(77, 534, 148, 16) && compressor)
         {
             REVERBFILTER = (float)(Mouse.x - 87) / 128.0f;
             if(REVERBFILTER < 0.0f) REVERBFILTER = 0.0f;

@@ -32,6 +32,8 @@
 // ------------------------------------------------------
 // Includes
 #include "include/editor_303.h"
+#include "../files/include/files.h"
+#include "../ui/include/requesters.h"
 
 // ------------------------------------------------------
 // Variables
@@ -43,6 +45,8 @@ unsigned char tbEditStep = 0;
 
 flag303 tb303_pattern_buffer[4][16];
 unsigned char tb303_buffer_tone[4][16];
+
+extern REQUESTER Overwrite_Requester;
 
 // ------------------------------------------------------
 // Fucntions
@@ -82,7 +86,6 @@ void Actualize_303_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
-
         if(gode == 0 || gode == 1) number303(tb303[sl3].patternlength[tb303[sl3].selectedpattern], 118, 556);
 
         // Selected bassline
@@ -263,7 +266,7 @@ void Actualize_303_Ed(char gode)
             char tcp[30];
             sprintf(tcp, "%s_", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
 
-            if(snamesel == 6)
+            if(snamesel == INPUT_303_PATTERN)
             {
                 Gui_Draw_Button_Box(600, 480, 164, 16, tcp, BUTTON_PUSHED);
             }
@@ -920,9 +923,10 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        if(zcheckMouse(600, 480, 164, 16) && snamesel == 0)
+        // Start name input
+        if(zcheckMouse(600, 480, 164, 16) && snamesel == INPUT_NONE)
         {
-            snamesel = 6;
+            snamesel = INPUT_303_PATTERN;
             strcpy(cur_input_name, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
             namesize = 0;
             sprintf(tb303[sl3].pattern_name[tb303[sl3].selectedpattern], "");
@@ -930,9 +934,17 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_UPDATE_MIDI_303_ED;
         }
 
+        // Save the data
         if(zcheckMouse(658, 462, 34, 16))
         {
-            gui_action = GUI_CMD_SAVE_303_PATTERN;
+            if(File_Exist("%s.303", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_303_PATTERN);
+            }
+            else
+            {
+                gui_action = GUI_CMD_SAVE_303_PATTERN;
+            }
         }
     }
 }

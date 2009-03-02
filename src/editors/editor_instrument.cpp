@@ -40,8 +40,13 @@
 
 #include "../../release/distrib/replay/lib/include/endianness.h"
 
+#include "../files/include/files.h"
+#include "../ui/include/requesters.h"
+
 // ------------------------------------------------------
 // Variables
+extern REQUESTER Overwrite_Requester;
+
 int Allow_Buttons;
 int Allow_Sliders;
 int Allow_Buttons_Pushed;
@@ -299,80 +304,6 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     Gui_Draw_Arrows_Number_Box(144, 510, beatlines[ped_patsam], Allow_Global | BUTTON_TEXT_CENTERED);
                 }
 
-                if(gode == 14)
-                {
-                    char buffer[64];
-
-                    mess_box("Writing Wav Header And Sample Data...");
-
-                    WaveFile RF;
-
-                    if(strlen(SampleName[ped_patsam][ped_split]))
-                    {
-                        RF.OpenForWrite(SampleName[ped_patsam][ped_split],
-                                        44100,
-                                        16,
-                                        SampleChannels[ped_patsam][ped_split]);
-                    }
-                    else
-                    {
-                        RF.OpenForWrite("Untitled.wav",
-                                        44100,
-                                        16,
-                                        SampleChannels[ped_patsam][ped_split]);
-                    }
-
-                    char t_stereo;
-
-                    if(SampleChannels[ped_patsam][ped_split] == 1) t_stereo = FALSE;
-                    else t_stereo = TRUE;
-
-                    Uint32 woff = 0;
-
-                    short *eSamples = RawSamples[ped_patsam][0][ped_split];
-                    short *erSamples = RawSamples[ped_patsam][1][ped_split];
-
-                    while(woff < SampleNumSamples[ped_patsam][ped_split])
-                    {
-                        if(t_stereo) RF.WriteStereoSample(*eSamples++, *erSamples++);
-                        else RF.WriteMonoSample(*eSamples++);
-                        woff++;
-                    }
-
-                    // Write the looping info
-                    if(LoopType[ped_patsam][ped_split])
-                    {
-                        RiffChunkHeader header;
-                        WaveSmpl_ChunkData datas;
-
-                        header.ckID = FourCC("smpl");
-                        header.ckSize = 0x3c;
-
-                        memset(&datas, 0, sizeof(datas));
-                        datas.Num_Sample_Loops = 1;
-                        datas.Start = LoopStart[ped_patsam][ped_split];
-                        datas.End = LoopEnd[ped_patsam][ped_split];
-
-                        header.ckSize = Swap_32(header.ckSize);
-
-                        datas.Num_Sample_Loops = Swap_32(datas.Num_Sample_Loops);
-                        datas.Start = Swap_32(datas.Start);
-                        datas.End = Swap_32(datas.End);
-
-                        RF.WriteData((void *) &header, sizeof(header));
-                        RF.WriteData((void *) &datas, sizeof(datas));
-                    }
-
-                    RF.Close();
-                    if(strlen(SampleName[ped_patsam][ped_split])) sprintf(buffer, "File '%s' saved...", SampleName[ped_patsam][ped_split]);
-                    else sprintf(buffer, "File 'Untitled.wav' saved...");
-                    mess_box(buffer);
-
-                    Read_SMPT();
-                    last_index = -1;
-                    Actualize_Files_List(0);
-                }
-
                 if(gode == 0 || gode == 15)
                 {
                     if(CustomVol[ped_patsam] > 1.0f) CustomVol[ped_patsam] = 1.0f;
@@ -393,7 +324,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_MP3:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
@@ -401,7 +333,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_ADPCM:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
@@ -409,7 +342,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_TRUESPEECH:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
@@ -417,7 +351,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_AT3:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
@@ -425,7 +360,17 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global_Pushed);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
+                            break;
+                        case SMP_PACK_8BIT:
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global_Pushed);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global);
                             break;
                         case SMP_PACK_NONE:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global);
@@ -433,7 +378,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_Global);
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_Global);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 80, 16, "None", Allow_Global_Pushed);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global_Pushed);
                             break;
 #endif
 
@@ -703,15 +649,37 @@ void Mouse_Left_Instrument_Ed(void)
         {
             if(zcheckMouse(268, 492, 88, 16))
             {
-                gui_action = GUI_CMD_SAVE_INSTRUMENT;
+                if(File_Exist("%s.pti", nameins[ped_patsam]))
+                {
+                    Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_INSTRUMENT);
+                }
+                else
+                {
+                    gui_action = GUI_CMD_SAVE_INSTRUMENT;
+                }
             }
         }
 
         // Export .wav
         if(zcheckMouse(268, 510, 88, 16) && SampleType[ped_patsam][ped_split])
         {
-            gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
-            teac = 14;
+            char Name[MAX_PATH];
+            if(strlen(SampleName[ped_patsam][ped_split]))
+            {
+                sprintf(Name, "%s", SampleName[ped_patsam][ped_split]);
+            }
+            else
+            {
+                sprintf(Name, "Untitled.wav");
+            }
+            if(File_Exist("%s", Name))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_EXPORT_WAV);
+            }
+            else
+            {
+                gui_action = GUI_CMD_EXPORT_WAV;
+            }
         }
 
         if(zcheckMouse(570, 484, 16, 16) &&
@@ -797,8 +765,20 @@ void Mouse_Left_Instrument_Ed(void)
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
 
+            // Select 8BIT
+            if(zcheckMouse(640, 484 + (18 * 4), 39, 16))
+            {
+                if(SampleCompression[ped_patsam] != SMP_PACK_8BIT)
+                {
+                    SamplesSwap[ped_patsam] = FALSE;
+                }
+                SampleCompression[ped_patsam] = SMP_PACK_8BIT;
+                teac = 16;
+                gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
+            }
+
             // Select NONE
-            if(zcheckMouse(640, 484 + (18 * 4), 80, 16))
+            if(zcheckMouse(681, 484 + (18 * 4), 39, 16))
             {
                 if(SampleCompression[ped_patsam] != SMP_PACK_NONE)
                 {
@@ -1263,6 +1243,11 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
 
+                                    case SMP_PACK_8BIT:
+                                        sprintf(Line, "Pck: 8 Bit");
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+
                                     case SMP_PACK_NONE:
                                         sprintf(Line, "Pck: None");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
@@ -1535,6 +1520,14 @@ void Lock_Sample(int instr_nbr, int split)
                 }
                 break;
 
+            case SMP_PACK_8BIT:
+                PackedSample = (short *) malloc(Size * 2);
+                memset(PackedSample, 0, Size * 2);
+                // (Size is the size in samples)
+                // (PackedLen is the size in bytes)
+                PackedLen = To8Bit(Sample, PackedSample, Size);
+                break;
+
             case SMP_PACK_NONE:
                 PackedLen = 0;
                 break;
@@ -1564,6 +1557,10 @@ void Lock_Sample(int instr_nbr, int split)
                 case SMP_PACK_ADPCM:
                     UnpackADPCM((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
                     break;
+
+                case SMP_PACK_8BIT:
+                    Unpack8Bit((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
+                    break;
             }
 
             // Interpolate the sample
@@ -1587,7 +1584,6 @@ void Lock_Sample(int instr_nbr, int split)
                 Sample_Dest_Buffer[(iSmp * 2)] = Sample1;
                 Sample_Dest_Buffer[(iSmp * 2) + 1] = Sample1 + ((Sample2 - Sample1) / 2);
             }
-
         }
 
         if(Dest_Buffer) free(Dest_Buffer);

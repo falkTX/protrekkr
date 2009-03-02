@@ -62,9 +62,11 @@ int TestMod(void);
 void LoadSynth(char *FileName);
 void LoadInst(char *FileName);
 void Load303(char *FileName);
+void LoadReverb(char *FileName);
 void SaveInst(void);
 void SaveSynth(void);
 void Save303(void);
+void SaveReverb(void);
 void SaveConfig(void);
 void LoadConfig(void);
 
@@ -80,5 +82,11 @@ int Get_File_Size(FILE *Handle);
 
 int Calc_Length(void);
 void Reset_Song_Length(void);
+
+void Load_Old_Reverb_Presets(int Type);
+
+void Clear_Input(void);
+
+int File_Exist(char *Format, char *FileName);
 
 #endif

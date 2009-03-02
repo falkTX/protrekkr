@@ -29,24 +29,39 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _SAMPLES_PACK_H_
-#define _SAMPLES_PACK_H_
-
-#if !defined(__NO_CODEC__)
+#ifndef _REQUESTERS_H_
+#define _REQUESTERS_H_
 
 // ------------------------------------------------------
 // Constants
-#define MP3_FRAMES_LAG 65536
+#define BUTTON_DEFAULT 1
+#define BUTTON_CANCEL 2
+
+// ------------------------------------------------------
+// Variables
+extern int In_Requester;
+extern int Requester_Action;
+
+// ------------------------------------------------------
+// Structures
+typedef struct
+{
+    void *Next;
+    char *Text;
+    int Type;
+} REQUESTER_BUTTON, *LPREQUESTER_BUTTON;
+
+typedef struct
+{
+    char *Text;
+    LPREQUESTER_BUTTON Buttons;
+} REQUESTER, *LPREQUESTER;
 
 // ------------------------------------------------------
 // Functions
-int ToGSM(short *Source, short *Dest, int Size);
-int ToAT3(short *Source, short *Dest, int Size, int BitRate);
-int ToMP3(short *Source, short *Dest, int Size, int BitRate);
-int ToTrueSpeech(short *Source, short *Dest, int Size);
-int ToADPCM(short *Source, short *Dest, int Size);
-int To8Bit(short *Source, short *Dest, int Size);
-
-#endif
+void Mouse_Handler_Requester(void);
+void Keyboard_Handler_Requester(void);
+int Display_Requester(LPREQUESTER Requester, int Action);
+int Check_Requester(LPREQUESTER Requester);
 
 #endif

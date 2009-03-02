@@ -23,5 +23,3 @@ TODO (in no special order):
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
  - VSTs support in the samples editor.
- - Expose the reverb variables to the user.
- - Add requesters (especially before overwriting files and before exiting).

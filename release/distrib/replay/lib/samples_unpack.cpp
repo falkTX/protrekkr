@@ -318,4 +318,18 @@ void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 }
 #endif
 
+// ------------------------------------------------------
+// Unpack a Bit 8 sample
+#if defined(PTK_8BIT)
+void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+{
+    int i;
+
+    for(i = 0; i < Src_Size; i++)
+    {
+        Dest[i] = Source[i] << 8;
+    }
+}
+#endif
+
 #endif

@@ -8,7 +8,7 @@ FLAGS = -mwindows -O3 -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/e
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
-          editor_diskio.o editor_instrument.o \
+          editor_diskio.o editor_reverb.o editor_instrument.o \
           samples_pack.o files_list.o files.o \
           midi.o RtMidi.o \
           timer.o main.o \
@@ -63,6 +63,9 @@ editor_setup.o: src/editors/editor_setup.cpp
 	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_diskio.o: src/editors/editor_diskio.cpp
+	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+
+editor_reverb.o: src/editors/editor_reverb.cpp
 	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_instrument.o: src/editors/editor_instrument.cpp

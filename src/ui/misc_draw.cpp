@@ -31,20 +31,7 @@
 
 // ------------------------------------------------------
 // Includes
-#include "include/misc_draw.h"
-#include "../include/variables.h"
 #include "../include/ptk.h"
-#include "../editors/include/editor_303.h"
-#include "../editors/include/editor_diskio.h"
-#include "../editors/include/editor_fx_setup.h"
-#include "../editors/include/editor_instrument.h"
-#include "../editors/include/editor_setup.h"
-#include "../editors/include/editor_synth.h"
-#include "../editors/include/editor_pattern.h"
-#include "../editors/include/editor_sample.h"
-#include "../editors/include/editor_sequencer.h"
-#include "../editors/include/editor_track.h"
-#include "../editors/include/editor_track_fx.h"
 #include "../extralibs/sdl_draw/include/sdl_draw.h"
 
 // ------------------------------------------------------
@@ -65,7 +52,7 @@ int curr_tab_highlight;
 
 int Nbr_Letters;
 int Font_Height = 11;
-char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010 ";
+char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011 ";
 int Font_Pos[256];
 int Font_Size[256];
 
@@ -505,21 +492,21 @@ void value_box3(int x, int y, char val, int flags)
     out_note(x + 21, y + 2, val, 0xFFFFFF);
 }
 
-void outlong_small(int x, int y, int cant, int mode, int size, int flags)
+void outlong_small(int x, int y, int value, int mode, int size, int flags)
 {
     char xstr[40];
 
     switch(mode)
     {
-        case 0: sprintf(xstr, "%d", cant); break;
-        case 1: sprintf(xstr, "%d%%", cant); break;
-        case 2: sprintf(xstr, "%d ms.", cant); break;
-        case 3: sprintf(xstr, "%dhz", cant); break;
-        case 5: sprintf(xstr, "%d K.", cant); break;
-        case 6: sprintf(xstr, "%d Degr.", cant); break;
-        case 10: sprintf(xstr, "S: %d", cant); break;
-        case 11: sprintf(xstr, "E: %d", cant); break;
-        case 12: sprintf(xstr, "L: %d", cant); break;
+        case 0: sprintf(xstr, "%d", value); break;
+        case 1: sprintf(xstr, "%d%%", value); break;
+        case 2: sprintf(xstr, "%d ms.", value); break;
+        case 3: sprintf(xstr, "%dhz", value); break;
+        case 5: sprintf(xstr, "%d K.", value); break;
+        case 6: sprintf(xstr, "%d Degr.", value); break;
+        case 10: sprintf(xstr, "S: %d", value); break;
+        case 11: sprintf(xstr, "E: %d", value); break;
+        case 12: sprintf(xstr, "L: %d", value); break;
     }
     Gui_Draw_Button_Box(x, y, size - 1, 16, xstr, flags);
 }
@@ -640,20 +627,14 @@ void Draw_Editors_Bar(int Highlight)
     Gui_Draw_Button_Box(340, 429 + Patterns_Lines_Offset, 62, 16, "Track", Highlight_Tab[1]);
     Gui_Draw_Button_Box(404, 429 + Patterns_Lines_Offset, 62, 16, "Track FX", Highlight_Tab[7]);
     Gui_Draw_Button_Box(468, 429 + Patterns_Lines_Offset, 62, 16, "FX Setup", Highlight_Tab[3]);
-    Gui_Draw_Button_Box(532, 429 + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
-    Gui_Draw_Button_Box(596, 429 + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
-    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 62, 16, "Exit", Highlight_Tab[10]);
+    Gui_Draw_Button_Box(532, 429 + Patterns_Lines_Offset, 62, 16, "Reverb", Highlight_Tab[10]);
+    Gui_Draw_Button_Box(596, 429 + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
+    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
 
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
     {
         curr_tab_highlight = Highlight;
     }
-    Asking_Exit = FALSE;
-}
-
-void Draw_Ask_Exit(void)
-{
-    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 64, 16, "Sure ?", BUTTON_PUSHED);
 }
 
 // ------------------------------------------------------
@@ -662,6 +643,9 @@ void Refresh_UI_Context(void)
 {
     switch(userscreen)
     {
+        case USER_SCREEN_REVERB_EDIT:
+            Draw_Reverb_Ed();
+            break;
         case USER_SCREEN_DISKIO_EDIT:
             Draw_DiskIO_Ed();
             break;
@@ -698,6 +682,7 @@ void Refresh_UI_Context(void)
     }
     seditor = 0;
     
+    Actualize_Reverb_Ed(0);
     Actualize_DiskIO_Ed(0);
     Actualize_303_Ed(0);
     Actualize_Instrument_Ed(0, 0);
@@ -717,6 +702,7 @@ void Refresh_UI_Context(void)
     Actualize_Track_Fx_Ed(0);
     Actualize_Patterned();
     Actualize_Instruments_Synths_List(0);
+    Display_Beat_Time();
 }
 
 // ------------------------------------------------------
@@ -983,24 +969,17 @@ void Realslider_Horiz(int x, int y, int value, int displayed, int maximum, int s
 
     if((caret_size + Pos_slider) > (size - 1)) caret_size -= (caret_size + Pos_slider) - (size - 1);
    
-    if(enable)
-    {
-        SetColor(COL_SLIDER_LO);
-        bjbox(x, y, size + 2, 16 + 1);
-        SetColor(COL_SLIDER_HI);
-        bjbox(x + 1, y + 1, size + 1, 16);
-        SetColor(COL_SLIDER_MED);
-        bjbox(x + 1, y + 1, size, 16 - 1);
+    if(enable) SetColor(COL_SLIDER_LO);
+    else SetColor(COL_STATIC_LO);
+    bjbox(x, y, size + 2, 16 + 1);
+    if(enable) SetColor(COL_SLIDER_HI);
+    else SetColor(COL_STATIC_HI);
+    bjbox(x + 1, y + 1, size + 1, 16);
+    if(enable) SetColor(COL_SLIDER_MED);
+    else SetColor(COL_STATIC_MED);
+    bjbox(x + 1, y + 1, size, 16 - 1);
 
-        Gui_Draw_Button_Box(x + 1 + (int) Pos_slider, y + 1, (int) caret_size, 16 - 2, "", BUTTON_NORMAL);
-    }
-    else
-    {
-        SetColor(0);
-        bjbox(x, y, size + 1, 16 + 1);
-        bjbox(x + 1, y + 1, size + 1, 16);
-        bjbox(x + 1, y + 1, size, 16 - 1);
-    }
+    Gui_Draw_Button_Box(x + 1 + (int) Pos_slider, y + 1, (int) caret_size, 16 - 2, "", BUTTON_NORMAL | (enable ? 0 : BUTTON_DISABLED));
 }
 
 // ------------------------------------------------------
@@ -1018,23 +997,16 @@ void Realslider_Vert(int x, int y, int value, int displayed, int maximum, int si
 
     if((caret_size + Pos_slider) > size) caret_size -= (caret_size + Pos_slider) - size;
 
-    if(enable)
-    {
-        SetColor(COL_SLIDER_LO);
-        bjbox(x, y, 16 + 1, size + 2);
-        SetColor(COL_SLIDER_HI);
-        bjbox(x + 1, y + 1, 16, size + 1);
-        SetColor(COL_SLIDER_MED);
-        bjbox(x + 1, y + 1, 16 - 1, size);
-        Gui_Draw_Button_Box(x + 1, y + 1 + (int) Pos_slider, 16 - 2, (int) caret_size, "", BUTTON_NORMAL);
-    }
-    else
-    {
-        SetColor(0);
-        bjbox(x, y, size + 1, 16 + 1);
-        bjbox(x + 1, y + 1, size + 1, 16);
-        bjbox(x + 1, y + 1, size, 16 - 1);
-    }
+    if(enable) SetColor(COL_SLIDER_LO);
+    else SetColor(COL_STATIC_LO);
+    bjbox(x, y, 16 + 1, size + 2);
+    if(enable) SetColor(COL_SLIDER_HI);
+    else SetColor(COL_STATIC_HI);
+    bjbox(x + 1, y + 1, 16, size + 1);
+    if(enable) SetColor(COL_SLIDER_MED);
+    else SetColor(COL_STATIC_MED);
+    bjbox(x + 1, y + 1, 16 - 1, size);
+    Gui_Draw_Button_Box(x + 1, y + 1 + (int) Pos_slider, 16 - 2, (int) caret_size, "", BUTTON_NORMAL | (enable ? 0 : BUTTON_DISABLED));
 }
 
 // ------------------------------------------------------

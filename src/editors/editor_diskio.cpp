@@ -32,10 +32,14 @@
 // ------------------------------------------------------
 // Includes
 #include "include/editor_diskio.h"
+#include "../files/include/files.h"
+#include "../ui/include/requesters.h"
 
 // ------------------------------------------------------
 // Variables
-extern char CpuStr[80];
+extern REQUESTER Overwrite_Requester;
+extern REQUESTER Zzaapp_Requester;
+
 int allow_save = TRUE;
 extern int song_Seconds;
 extern int song_Minutes;
@@ -115,7 +119,7 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(8, 506, 80, 16, "Title", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, 524, 80, 16, "Produced By", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, 542, 80, 16, "Style", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(8, 470, 80, 16, "New Module", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(8, 470, 80, 16, "Zzaapp", BUTTON_NORMAL);
     Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL);
     Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL);
 
@@ -201,7 +205,7 @@ void Actualize_DiskIO_Ed(int gode)
             Gui_Draw_Button_Box(254, 470, 80, 16, "Save .ptp", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
 
-        if(snamesel == 1)
+        if(snamesel == INPUT_MODULE_NAME)
         {
             sprintf(tname, "%s_", name);
             Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_PUSHED);
@@ -212,7 +216,7 @@ void Actualize_DiskIO_Ed(int gode)
             Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_NORMAL);
         }
 
-        if(snamesel == 4)
+        if(snamesel == INPUT_MODULE_ARTIST)
         {
             sprintf(tname, "%s_", artist);
             Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_PUSHED);
@@ -223,7 +227,7 @@ void Actualize_DiskIO_Ed(int gode)
             Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_NORMAL);
         }
 
-        if(snamesel == 5)
+        if(snamesel == INPUT_MODULE_STYLE)
         {
             sprintf(tname, "%s_", style);
             Gui_Draw_Button_Box(90, 542, 162, 16, tname, BUTTON_PUSHED);
@@ -287,12 +291,26 @@ void Mouse_Left_DiskIO_Ed(void)
         // Save song
         if(zcheckMouse(8, 488, 80, 16))
         {
-            gui_action = GUI_CMD_SAVE_MODULE;
+            if(File_Exist("%s.ptk", name))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_MODULE);
+            }
+            else
+            {
+                gui_action = GUI_CMD_SAVE_MODULE;
+            }
         }
         // Save final
         if(zcheckMouse(254, 470, 80, 16))
         {
-            gui_action = GUI_CMD_SAVE_FINAL;
+            if(File_Exist("%s.ptp", name))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_FINAL);
+            }
+            else
+            {
+                gui_action = GUI_CMD_SAVE_FINAL;
+            }
         }
         // Calc final
         if(zcheckMouse(254, 488, 80, 16))
@@ -310,39 +328,50 @@ void Mouse_Left_DiskIO_Ed(void)
             gui_action = GUI_CMD_MODULE_INFOS;
         }
 
-        if(zcheckMouse(90, 506, 162, 16) && snamesel == 0)
+        // Start module name input
+        if(zcheckMouse(90, 506, 162, 16) && snamesel == INPUT_NONE)
         {
             strcpy(cur_input_name, name);
             sprintf(name, "");
             namesize = 0;
-            snamesel = 1;
+            snamesel = INPUT_MODULE_NAME;
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
         }
-        if(zcheckMouse(90, 524, 162, 16) && snamesel == 0)
+
+        // Start artist name input
+        if(zcheckMouse(90, 524, 162, 16) && snamesel == INPUT_NONE)
         {
             strcpy(cur_input_name, artist);
             sprintf(artist, "");
             namesize = 0;
-            snamesel = 4;
+            snamesel = INPUT_MODULE_ARTIST;
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
         }
-        if(zcheckMouse(90, 542, 162, 16) && snamesel == 0)
+
+        // Start module style input
+        if(zcheckMouse(90, 542, 162, 16) && snamesel == INPUT_NONE)
         {
             strcpy(cur_input_name, style);
             sprintf(style, "");
             namesize = 0;
-            snamesel = 5;
+            snamesel = INPUT_MODULE_STYLE;
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
         }
 
         if(zcheckMouse(8, 470, 80, 16))
         {
-            gui_action = GUI_CMD_NEW_MODULE;
+            Display_Requester(&Zzaapp_Requester, GUI_CMD_NEW_MODULE);
         }
         if(zcheckMouse(90, 488, 80, 16))
         {
-            rawrender = TRUE;
-            gui_action = GUI_CMD_RENDER_WAV;
+            if(File_Exist("%s.wav", name))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_RENDER_WAV);
+            }
+            else
+            {
+                gui_action = GUI_CMD_RENDER_WAV;
+            }
         }
 
         // Render as 32 bit on

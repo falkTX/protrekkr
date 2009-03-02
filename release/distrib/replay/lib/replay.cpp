@@ -389,7 +389,7 @@ short *RawSamples[MAX_INSTRS][2][16];
     rFilter LFP_L;
     char num_echoes;
     int delays[MAX_COMB_FILTERS];       // delays for the comb filters
-    float decays[MAX_COMB_FILTERS][2];
+    float decays[MAX_COMB_FILTERS];
 
 #endif // PTK_COMPRESSOR
 
@@ -447,7 +447,6 @@ int sp_Stage3[MAX_TRACKS][MAX_POLYPHONY];
 
 char SampleCompression[MAX_INSTRS];
 int delay_time;
-int DelayType;
 
 #if defined(PTK_FLANGER)
     float Flanger_sbuf0L;
@@ -457,6 +456,7 @@ int DelayType;
 #endif
 
 #if !defined(__STAND_ALONE__)
+    int DelayType = 1;
     int L_MaxLevel;
     int R_MaxLevel;
     extern int CHAN_MIDI_PRG[MAX_TRACKS];
@@ -505,7 +505,6 @@ void Clear_Midi_Channels_Pool(void);
 
 // ------------------------------------------------------
 // Functions
-void allPassInit(float miliSecs);
 float ApplyLfo(float cy, int trcy);
 void ComputeCoefs(int freq, int r, int t);
 
@@ -627,8 +626,10 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
                 if(wait_level > 127)
                 {
                     wait_level = 0;
-                    if(L_MaxLevel > 128) L_MaxLevel -= 128;
-                    if(R_MaxLevel > 128) R_MaxLevel -= 128;
+                    L_MaxLevel -= 128;
+                    R_MaxLevel -= 128;
+                    if(L_MaxLevel < 0) L_MaxLevel = 0;
+                    if(R_MaxLevel < 0) R_MaxLevel = 0;
                 }
 
                 Scope_Dats_LeftRight[0][pos_scope] = ((float) clamp_left_value) * 0.25f;
@@ -638,7 +639,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             }
 #endif
         }
-      
+
         if(local_curr_ramp_vol <= 0.0f)
         {
             Reset_Values();
@@ -868,6 +869,14 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
                 UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
 #endif
 #endif
+
+            case SMP_PACK_8BIT:
+
+#if !defined(__NO_CODEC__)
+#if defined(PTK_8BIT)
+                Unpack8BIT(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+#endif
+#endif
                 break;
         }
 
@@ -987,7 +996,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                 Mod_Dat_Read(&SampleType[swrite][slwrite], sizeof(char));
 
 #if defined(PTK_INSTRUMENTS)
-
                 if(SampleType[swrite][slwrite] != 0)
                 {
                     int Apply_Interpolation;
@@ -1184,25 +1192,20 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 #endif
 
-        Mod_Dat_Read(&delay_time, sizeof(int));
         Mod_Dat_Read(&Feedback, sizeof(float));
 
 #if defined(PTK_COMPRESSOR)
         if(compressor)
         {
-            Mod_Dat_Read(&DelayType, sizeof(int));
             Mod_Dat_Read(&num_echoes, sizeof(char));
 
-            for(i = 0; i < MAX_COMB_FILTERS; i++)
+            for(i = 0; i < num_echoes; i++)
             {
                 Mod_Dat_Read(&delays[i], sizeof(int));
             }
-            for(j = 0; j < MAX_COMB_FILTERS; j++)
+            for(i = 0; i < num_echoes; i++)
             {
-                for(i = 0; i < 2; i++)
-                {
-                    Mod_Dat_Read(&decays[j][i], sizeof(float));
-                }
+                Mod_Dat_Read(&decays[i], sizeof(float));
             }
         }
 #endif
@@ -1542,15 +1545,16 @@ void PTKEXPORT Ptk_Stop(void)
     volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
     *ptr_Done_Reset = FALSE;
     volatile float *ptr_local_ramp_vol = (float *) (((int) &local_ramp_vol) | 0x40000000);
+    volatile float *ptr_local_curr_ramp_vol = (float *) (((int) &local_curr_ramp_vol) | 0x40000000);
     me_sceKernelDcacheWritebackInvalidateAll();
     sceKernelDcacheWritebackInvalidateAll();	
-    while(*ptr_Done_Reset == FALSE && AUDIO_Play_Flag)
+    while(*ptr_Done_Reset == FALSE && AUDIO_Play_Flag && *ptr_local_curr_ramp_vol != 0.0f)
     {
         *ptr_local_ramp_vol = 0.0f;
     }
 #else
     Done_Reset = FALSE;
-    while(Done_Reset == FALSE && AUDIO_Play_Flag)
+    while(Done_Reset == FALSE && AUDIO_Play_Flag && local_curr_ramp_vol != 0.0f)
     {
         local_ramp_vol = 0.0f;
 
@@ -1751,7 +1755,7 @@ void Pre_Song_Init(void)
     Flanger_sbuf1R = 0;
 #endif
 
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_INSTRS; i++)
     {
         CustomVol[i] = 1.0f;
     }
@@ -1806,10 +1810,6 @@ void Post_Song_Init(void)
 {
     int i;
     int j;
-
-#if defined(PTK_COMPRESSOR)
-    allPassInit((float) c_threshold);
-#endif
 
 #if defined(PTK_SHUFFLE)
     shufflestep = shuffle;
@@ -3380,38 +3380,6 @@ void Play_Instrument(int channel, int sub_channel,
 }
 
 // ------------------------------------------------------
-// All pass filter initialization
-#if defined(PTK_COMPRESSOR)
-void allPassInit(float miliSecs)
-{
-    currentCounter = 5759;
-    delayedCounter = 5759 - int(miliSecs * 44.1f);
-    delayedCounter2 = 5759 - int(miliSecs * 50.1f);
-    delayedCounter3 = 5759 - int(miliSecs * 60.1f);
-    delayedCounter4 = 5759 - int(miliSecs * 70.1f);
-    delayedCounter5 = 5759 - int(miliSecs * 73.1f);
-    delayedCounter6 = 5759 - int(miliSecs * 79.1f);
-
-    if(delayedCounter < 0) delayedCounter = 0;
-    if(delayedCounter2 < 0) delayedCounter2 = 0;
-    if(delayedCounter3 < 0) delayedCounter3 = 0;
-    if(delayedCounter4 < 0) delayedCounter4 = 0;
-    if(delayedCounter5 < 0) delayedCounter5 = 0;
-    if(delayedCounter6 < 0) delayedCounter6 = 0;
-
-    for(int yb = 0; yb < 5760; yb++)
-    {
-        allBuffer_L[yb] = 0.0f;
-        allBuffer_L2[yb] = 0.0f;
-        allBuffer_L3[yb] = 0.0f;
-        allBuffer_L4[yb] = 0.0f;
-        allBuffer_L5[yb] = 0.0f;
-        allBuffer_L6[yb] = 0.0f;
-    }
-}
-#endif
-
-// ------------------------------------------------------
 // Handle patterns effects
 #if defined(PTK_FX_TICK0)
 void DoEffects_tick0(void)
@@ -4756,9 +4724,9 @@ void ResetSynthParameters(SynthParameters *TSP)
 #if defined(PTK_INSTRUMENTS)
 void Free_Samples(void)
 {
-    for(int freer = 0; freer < 128; freer++)
+    for(int freer = 0; freer < MAX_INSTRS; freer++)
     {
-        for(char pedsplit = 0; pedsplit < 16; pedsplit++)
+        for(char pedsplit = 0; pedsplit < MAX_INSTRS_SPLITS; pedsplit++)
         {
             if(SampleType[freer][pedsplit] != 0)
             {
@@ -4795,6 +4763,7 @@ void Free_Samples(void)
 #endif
 
 // ------------------------------------------------------
+// Initialize the reverb data
 #if defined(PTK_COMPRESSOR)
 void Initreverb()
 {
@@ -4803,178 +4772,9 @@ void Initreverb()
 
     LFP_L.Reset();
 
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    switch(DelayType)
-    {
-        case 0:
-            decays[0][0] = 20.0f; decays[0][1] =  0.0f;
-            decays[1][0] =  0.0f; decays[1][1] = 15.0f;
-            decays[2][0] = 15.0f; decays[2][1] =  0.0f;
-            decays[3][0] =  0.0f; decays[3][1] = 10.0f;
-            decays[4][0] =  9.0f; decays[4][1] =  0.0f;
-            decays[5][0] =  1.0f; decays[5][1] =  8.0f;
-            decays[6][0] =  8.0f; decays[6][1] =  1.0f;
-            decays[7][0] =  1.0f; decays[7][1] =  4.0f;
-            decays[8][0] =  4.0f; decays[8][1] =  0.0f;
-            decays[9][0] =  1.0f; decays[9][1] =  2.0f;
-
-            delays[0] = 1000;
-            delays[1] = 1100; 
-            delays[2] = 1200;
-            delays[3] = 1300;
-            delays[4] = 1400;
-            delays[5] = 1800;
-            delays[6] = 1900;
-            delays[7] = 2000;
-            delays[8] = 2100;
-            delays[9] = 2200;
-
-            num_echoes = 10;
-            break;
-
-        case 1:
-            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
-            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
-            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
-            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
-            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
-            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
-            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
-            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
-            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
-            decays[9][0] =   9.0f; decays[9][1] =   7.0f;
-
-            delays[0] = 1000;
-            delays[1] = 1600; 
-            delays[2] = 2100;
-            delays[3] = 2400;
-            delays[4] = 2290;
-            delays[5] = 2350;
-            delays[6] = 2400;
-            delays[7] = 2500;
-            delays[8] = 2680;
-            delays[9] = 3410;
-
-            num_echoes = 10;
-            break;
-
-        case 2:
-            decays[0][0] =  1.0f; decays[0][1] =  2.0f;
-            decays[1][0] =  1.0f; decays[1][1] = -4.0f;
-            decays[2][0] =  9.0f; decays[2][1] =  1.0f;
-            decays[3][0] = 12.0f; decays[3][1] = 11.0f;
-            decays[4][0] = 22.0f; decays[4][1] = -1.0f;
-            decays[5][0] =  1.0f; decays[5][1] = 19.0f;
-            decays[6][0] = 15.0f; decays[6][1] = -1.0f;
-            decays[7][0] =  1.0f; decays[7][1] = 12.0f;
-            decays[8][0] =  7.0f; decays[8][1] = -1.0f;
-            decays[9][0] =  2.0f; decays[9][1] =  3.0f;
-
-            delays[0] =  100;
-            delays[1] =  200; 
-            delays[2] =  300;
-            delays[3] = 1000;
-            delays[4] = 1190;
-            delays[5] = 1250;
-            delays[6] = 1300;
-            delays[7] = 1400;
-            delays[8] = 1580;
-            delays[9] = 1610;
-
-            num_echoes = 10;
-            break;
-
-        case 3:
-            decays[0][0] = 22.0f; decays[0][1] =  3.0f;
-            decays[1][0] =  5.0f; decays[1][1] = 12.0f;
-            decays[2][0] = 12.0f; decays[2][1] =  1.0f;
-            decays[3][0] =  3.0f; decays[3][1] =  5.0f;
-
-            delays[0] = 2000;
-            delays[1] = 4400; 
-            delays[2] = 5000;
-            delays[3] = 6200;
-
-            num_echoes = 4;
-            break;
-
-        case 4:
-            decays[0][0] = 11.0f; decays[0][1] =  0.0f;
-            decays[1][0] =  0.0f; decays[1][1] = 21.0f;
-            decays[2][0] = 31.0f; decays[2][1] =  0.0f;
-            decays[3][0] =  0.0f; decays[3][1] = 41.0f;
-
-            delays[0] = 3012;
-            delays[1] = 4012;
-            delays[2] = 4022;
-            delays[3] = 5232;
-
-            num_echoes = 4;
-            break;
-
-        case 5:
-            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
-            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
-            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
-            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
-            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
-            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
-            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
-            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
-            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
-            decays[9][0] =   9.0f; decays[9][1] =   7.0f;
-
-            delays[0] = 20;
-            delays[1] = 600;  
-            delays[2] = 100;
-            delays[3] = 400;
-            delays[4] = 290;
-            delays[5] = 1350;
-            delays[6] = 400;
-            delays[7] = 1500;
-            delays[8] = 1680;
-            delays[9] = 1410;
-
-            num_echoes = 10;
-            break;
-
-        case 6:
-            decays[0][0] =   7.0f; decays[0][1] =   7.0f;
-            decays[1][0] = -13.0f; decays[1][1] = -15.0f;
-            decays[2][0] =  25.0f; decays[2][1] =  32.0f;
-            decays[3][0] =  31.0f; decays[3][1] =  26.0f;
-            decays[4][0] =  20.0f; decays[4][1] = -30.0f;
-            decays[5][0] =  28.0f; decays[5][1] =  24.0f;
-            decays[6][0] = -21.0f; decays[6][1] = -18.0f;
-            decays[7][0] =  18.0f; decays[7][1] =  14.0f;
-            decays[8][0] = -13.0f; decays[8][1] = -12.0f;
-            decays[9][0] =  12.0f; decays[9][1] =   8.0f;
-
-            delays[0] = 20;
-            delays[1] = 600;  
-            delays[2] = 700;
-            delays[3] = 800;
-            delays[4] = 990;
-            delays[5] = 1350;
-            delays[6] = 1400;
-            delays[7] = 1500;
-            delays[8] = 1680;
-            delays[9] = 1910;
-
-            num_echoes = 10;
-            break;
-    }
-
     for(i = 0; i < num_echoes; i++)
     {
-        decays[i][0] = decays[i][0] * 0.015625f;
-        decays[i][1] = decays[i][1] * 0.015625f;
-    }
-#endif
-
-    for(i = 0; i < num_echoes; i++)
-    {
-        int mlrw = 99999 - (delay_time + delays[i]) * 4;
+        int mlrw = 99999 - (delays[i] * 4);
 
         if(mlrw < 0) mlrw = 0;
 
@@ -4991,6 +4791,31 @@ void Initreverb()
     }
 
     rev_counter = 99999;
+
+    currentCounter = 5759;
+    delayedCounter = 5759 - int(c_threshold * 44.1f);
+    delayedCounter2 = 5759 - int(c_threshold * 50.1f);
+    delayedCounter3 = 5759 - int(c_threshold * 60.1f);
+    delayedCounter4 = 5759 - int(c_threshold * 70.1f);
+    delayedCounter5 = 5759 - int(c_threshold * 73.1f);
+    delayedCounter6 = 5759 - int(c_threshold * 79.1f);
+
+    if(delayedCounter < 0) delayedCounter = 0;
+    if(delayedCounter2 < 0) delayedCounter2 = 0;
+    if(delayedCounter3 < 0) delayedCounter3 = 0;
+    if(delayedCounter4 < 0) delayedCounter4 = 0;
+    if(delayedCounter5 < 0) delayedCounter5 = 0;
+    if(delayedCounter6 < 0) delayedCounter6 = 0;
+
+    for(int yb = 0; yb < 5760; yb++)
+    {
+        allBuffer_L[yb] = 0.0f;
+        allBuffer_L2[yb] = 0.0f;
+        allBuffer_L3[yb] = 0.0f;
+        allBuffer_L4[yb] = 0.0f;
+        allBuffer_L5[yb] = 0.0f;
+        allBuffer_L6[yb] = 0.0f;
+    }
 }
 
 // ------------------------------------------------------
@@ -5005,7 +4830,7 @@ void Compressor_work(void)
         {
             delay_left_buffer[i][rev_counter] = (delay_left_final + delay_right_final +
                                                  delay_left_buffer[i][counters[i]]) *
-                                                 decays[i][0];
+                                                 decays[i];
             l_rout += delay_left_buffer[i][counters[i]];
             if(++counters[i] > 99999) counters[i] = 0;
         }

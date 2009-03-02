@@ -34,9 +34,13 @@
 #include "include/editor_synth.h"
 #include "include/editor_instrument.h"
 #include "../support/include/timer.h"
+#include "../files/include/files.h"
+#include "../ui/include/requesters.h"
 
 // ------------------------------------------------------
 // Variables
+extern REQUESTER Overwrite_Requester;
+
 extern SynthParameters PARASynth[128];
 extern int plx;
 int csynth_slv_OSC1;
@@ -333,7 +337,7 @@ void Actualize_Synth_Ed(char gode)
             char tcp[30];
             sprintf(tcp, "%s_", PARASynth[ped_patsam].presetname);
 
-            if(snamesel == 3)
+            if(snamesel == INPUT_SYNTH_NAME)
             {
                 Gui_Draw_Button_Box(592, 450, 164, 16, tcp, BUTTON_PUSHED);
             }
@@ -1041,14 +1045,23 @@ void Mouse_Left_Synth_Ed(void)
 
         if(userscreen == USER_SCREEN_SYNTH_EDIT && Allow_All)
         {
+            // Save the data
             if(zcheckMouse(758, 450, 34, 16))
             {
-                if(snamesel != 3) gui_action = GUI_CMD_SAVE_SYNTH;
+                if(File_Exist("%s.pts", PARASynth[ped_patsam].presetname))
+                {
+                    Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_SYNTH);
+                }
+                else
+                {
+                    gui_action = GUI_CMD_SAVE_SYNTH;
+                }
             }
 
-            if(zcheckMouse(592, 450, 164, 16) && snamesel == 0)
+            // Start synth name input
+            if(zcheckMouse(592, 450, 164, 16) && snamesel == INPUT_NONE)
             {
-                snamesel = 3;
+                snamesel = INPUT_SYNTH_NAME;
                 strcpy(cur_input_name, PARASynth[ped_patsam].presetname);
                 namesize = 0;
                 sprintf(PARASynth[ped_patsam].presetname, "");

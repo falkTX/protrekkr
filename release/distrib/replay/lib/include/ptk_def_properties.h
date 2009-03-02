@@ -93,6 +93,7 @@
 #define PTK_TRUESPEECH
 #define PTK_AT3
 #define PTK_ADPCM
+#define PTK_8BIT
 #define PTK_LIMITER
 #define PTK_TRACKFILTERS
 #define PTK_FILTER_LOHIBAND

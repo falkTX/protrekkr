@@ -40,6 +40,7 @@
 #include "../include/variables.h"
 
 #include "../ui/include/misc_draw.h"
+#include "../ui/include/requesters.h"
 #include "../ui/include/xml.h"
 #include "../ui/include/xml.h"
 
@@ -52,6 +53,7 @@
 #include "../editors/include/editor_synth.h"
 #include "../editors/include/editor_track_fx.h"
 #include "../editors/include/editor_diskio.h"
+#include "../editors/include/editor_reverb.h"
 #include "../editors/include/editor_sequencer.h"
 #include "../editors/include/editor_track.h"
 #include "../editors/include/editor_instrument.h"
@@ -79,6 +81,7 @@ class skin_file
 
 extern list <skin_file> skin_files;
 extern SDL_Surface *POINTER;
+extern REQUESTER Exit_Requester;
 
 // ------------------------------------------------------
 // Structures
@@ -130,5 +133,6 @@ void Clear_Midi_Channels_Pool(void);
 void Send_Note(int Note, int Raw_Note, int One_Channel);
 void Note_Jazz(int track, int note);
 void Note_Jazz_Off(int note);
+void Display_Beat_Time(void);
 
 #endif

@@ -110,7 +110,7 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
 
     Gui_Draw_Button_Box(480, 466, 250, 26, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(480, 471, 190, 26, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(480, 472, 190, 26, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
     
     Gui_Draw_Button_Box(565, 472, 50, 16, "Small", BUTTON_NORMAL);
     Gui_Draw_Button_Box(620, 472, 50, 16, "Normal", BUTTON_NORMAL);

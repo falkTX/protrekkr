@@ -38,6 +38,8 @@
 #include "include/timer.h"
 #include "include/resource.h"
 
+#include "../files/include/files.h"
+
 #if defined(__WIN32__)
 #include <windows.h>
 #include <shlwapi.h>
@@ -772,7 +774,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     break;
 
                 case SDL_QUIT:
-                    Prog_End = TRUE;
+                    if(!In_Requester)
+                    {
+                        Display_Requester(&Exit_Requester, GUI_CMD_NOP);
+                        //Prog_End = TRUE;
+                    }
                     break;
 
                 case SDL_ACTIVEEVENT:

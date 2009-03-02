@@ -391,4 +391,19 @@ int ToADPCM(short *Source, short *Dest, int Size)
     return(Dest_Size);
 }
 
+// ------------------------------------------------------
+// Pack a sample to 8 Bit
+int To8Bit(short *Source, short *Dest, int Size)
+{
+    int i;
+    Uint8 *bDest = (Uint8 *) Dest;
+
+    for(i = 0; i < Size; i++)
+    {
+        bDest[i] = Source[i] >> 8;
+    }
+
+    return(Size);
+}
+
 #endif

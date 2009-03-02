@@ -40,6 +40,7 @@
 #include "../ui/include/misc_draw.h"
 #include "../editors/include/editor_synth.h"
 #include "../editors/include/editor_diskio.h"
+#include "../editors/include/editor_reverb.h"
 #include "../editors/include/editor_instrument.h"
 #include "../editors/include/editor_sequencer.h"
 #include "../editors/include/editor_setup.h"
@@ -82,6 +83,9 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
+extern REQUESTER Overwrite_Requester;
+extern char OverWrite_Name[1024];
+
 extern SynthParameters PARASynth[128];
 
 extern char Use_Cubic;
@@ -95,6 +99,7 @@ extern int Continuous_Scroll;
 extern char Dir_Mods[MAX_PATH];
 extern char Dir_Instrs[MAX_PATH];
 extern char Dir_Presets[MAX_PATH];
+extern char Dir_Reverbs[MAX_PATH];
 extern char *cur_dir;
 extern char Scopish_LeftRight;
 
@@ -232,6 +237,12 @@ void Save_303_Data(int (*Write_Function)(void *, int ,int, FILE *),
                    int (*Write_Function_Swap)(void *, int ,int, FILE *),
                    FILE *in, int unit, int pattern);
 short *Get_WaveForm(int Instr_Nbr, int Channel, int Split);
+void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
+                      int (*Read_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
+void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
+                      int (*Write_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
 
 // ------------------------------------------------------
 // Prepare the tracker interface once a module has been loaded
@@ -677,6 +688,8 @@ void LoadAmigaMod(char *FileName, int channels)
 
         fclose(in);
 
+        Load_Old_Reverb_Presets(0);
+
         Init_Tracker_Context_After_ModLoad();
     }
     else
@@ -684,9 +697,183 @@ void LoadAmigaMod(char *FileName, int channels)
         mess_box("Protracker module loading failed. (Probably: file not found)");
     }
 
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5) snamesel = 0;
+    Clear_Input();
 }
 #endif // __WINAMP__
+
+
+// ------------------------------------------------------
+// Load the old presets
+void Load_Old_Reverb_Presets(int Type)
+{
+    int i;
+
+    switch(Type)
+    {
+        case 0:
+            decays[0] = 20.0f;
+            decays[1] =  0.0f;
+            decays[2] = 15.0f;
+            decays[3] =  0.0f;
+            decays[4] =  9.0f;
+            decays[5] =  1.0f;
+            decays[6] =  8.0f;
+            decays[7] =  1.0f;
+            decays[8] =  4.0f;
+            decays[9] =  1.0f;
+
+            delays[0] = 1000;
+            delays[1] = 1100; 
+            delays[2] = 1200;
+            delays[3] = 1300;
+            delays[4] = 1400;
+            delays[5] = 1800;
+            delays[6] = 1900;
+            delays[7] = 2000;
+            delays[8] = 2100;
+            delays[9] = 2200;
+
+            num_echoes = 10;
+            break;
+
+        case 1:
+            decays[0] =   7.0f;
+            decays[1] = -13.0f;
+            decays[2] =  25.0f;
+            decays[3] =  31.0f;
+            decays[4] =  20.0f;
+            decays[5] =  28.0f;
+            decays[6] = -21.0f;
+            decays[7] =  18.0f;
+            decays[8] = -13.0f;
+            decays[9] =   9.0f;
+
+            delays[0] = 1000;
+            delays[1] = 1600; 
+            delays[2] = 2100;
+            delays[3] = 2400;
+            delays[4] = 2290;
+            delays[5] = 2350;
+            delays[6] = 2400;
+            delays[7] = 2500;
+            delays[8] = 2680;
+            delays[9] = 3410;
+
+            num_echoes = 10;
+            break;
+
+        case 2:
+            decays[0] =  1.0f;
+            decays[1] =  1.0f;
+            decays[2] =  9.0f;
+            decays[3] = 12.0f;
+            decays[4] = 22.0f;
+            decays[5] =  1.0f;
+            decays[6] = 15.0f;
+            decays[7] =  1.0f;
+            decays[8] =  7.0f;
+            decays[9] =  2.0f;
+
+            delays[0] =  100;
+            delays[1] =  200; 
+            delays[2] =  300;
+            delays[3] = 1000;
+            delays[4] = 1190;
+            delays[5] = 1250;
+            delays[6] = 1300;
+            delays[7] = 1400;
+            delays[8] = 1580;
+            delays[9] = 1610;
+
+            num_echoes = 10;
+            break;
+
+        case 3:
+            decays[0] = 22.0f;
+            decays[1] =  5.0f;
+            decays[2] = 12.0f;
+            decays[3] =  3.0f;
+
+            delays[0] = 2000;
+            delays[1] = 4400; 
+            delays[2] = 5000;
+            delays[3] = 6200;
+
+            num_echoes = 4;
+            break;
+
+        case 4:
+            decays[0] = 11.0f;
+            decays[1] =  0.0f;
+            decays[2] = 31.0f;
+            decays[3] =  0.0f;
+
+            delays[0] = 3012;
+            delays[1] = 4012;
+            delays[2] = 4022;
+            delays[3] = 5232;
+
+            num_echoes = 4;
+            break;
+
+        case 5:
+            decays[0] =   7.0f;
+            decays[1] = -13.0f;
+            decays[2] =  25.0f;
+            decays[3] =  31.0f;
+            decays[4] =  20.0f;
+            decays[5] =  28.0f;
+            decays[6] = -21.0f;
+            decays[7] =  18.0f;
+            decays[8] = -13.0f;
+            decays[9] =   9.0f;
+
+            delays[0] = 20;
+            delays[1] = 600;  
+            delays[2] = 100;
+            delays[3] = 400;
+            delays[4] = 290;
+            delays[5] = 1350;
+            delays[6] = 400;
+            delays[7] = 1500;
+            delays[8] = 1680;
+            delays[9] = 1410;
+
+            num_echoes = 10;
+            break;
+
+        case 6:
+            decays[0] =   7.0f;
+            decays[1] = -13.0f;
+            decays[2] =  25.0f;
+            decays[3] =  31.0f;
+            decays[4] =  20.0f;
+            decays[5] =  28.0f;
+            decays[6] = -21.0f;
+            decays[7] =  18.0f;
+            decays[8] = -13.0f;
+            decays[9] =  12.0f;
+
+            delays[0] = 20;
+            delays[1] = 600;  
+            delays[2] = 700;
+            delays[3] = 800;
+            delays[4] = 990;
+            delays[5] = 1350;
+            delays[6] = 1400;
+            delays[7] = 1500;
+            delays[8] = 1680;
+            delays[9] = 1910;
+
+            num_echoes = 10;
+            break;
+    }
+    // / 64.0f
+    for(i = 0; i < num_echoes; i++)
+    {
+        decays[i] = decays[i] * 0.015625f;
+    }
+}
 
 // ------------------------------------------------------
 // Load a module file
@@ -701,6 +888,7 @@ int LoadMod(char *FileName)
     int Poly = FALSE;
     int Multi = FALSE;
     int Sel_Interpolation = FALSE;
+    int New_Reverb = FALSE;
 
     char Comp_Flag;
 
@@ -747,6 +935,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'F':
+                New_Reverb = TRUE;
             case 'E':
                 Sel_Interpolation = TRUE;
             case 'D':
@@ -794,7 +984,7 @@ int LoadMod(char *FileName)
 Read_Mod_File:
 
 #if !defined(__WINAMP__)
-            mess_box("Loading song -> Header");
+            mess_box("Loading song -> Header...");
 #endif
             Free_Samples();
 
@@ -968,7 +1158,7 @@ Read_Mod_File:
             }
 
 #if !defined(__WINAMP__)
-            mess_box("Loading song -> Sample data");
+            mess_box("Loading song -> Sample data...");
 #endif
 
             if(Ptk_Format)
@@ -1297,7 +1487,7 @@ Read_Mod_File:
             }
 
 #if !defined(__WINAMP__)
-            mess_box("Loading song -> Track info, patterns and sequence.");   
+            mess_box("Loading song -> Track info, patterns and sequence...");   
 #endif
 
             Set_Default_Channels_Polyphony();
@@ -1348,14 +1538,20 @@ Read_Mod_File:
                     }
                 }
 
-                Read_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
+                if(!New_Reverb) Read_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
                 Read_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
-                Read_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
+                if(!New_Reverb) Read_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
                 Read_Mod_Data_Swap(&lchorus_delay, sizeof(int), 1, in);
                 Read_Mod_Data_Swap(&rchorus_delay, sizeof(int), 1, in);
                 Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
                 Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+
+                // Load the new reverb data
+                if(New_Reverb)
+                {
+                    Load_Reverb_Data(Read_Mod_Data, Read_Mod_Data_Swap, in);
+                }
             }
             else
             {
@@ -1409,23 +1605,10 @@ Read_Mod_File:
                     }
                 }
 
-                Read_Mod_Data(&delay_time, sizeof(int), 1, in);
                 Read_Mod_Data(&Feedback, sizeof(float), 1, in);
                 if(compressor)
                 {
-                    Read_Mod_Data(&DelayType, sizeof(int), 1, in);
-                    Read_Mod_Data(&num_echoes, sizeof(char), 1, in);
-                    for(i = 0; i < MAX_COMB_FILTERS; i++)
-                    {
-                        Read_Mod_Data(&delays[i], sizeof(int), 1, in);
-                    }
-                    for(j = 0; j < MAX_COMB_FILTERS; j++)
-                    {
-                        for(i = 0; i < 2; i++)
-                        {
-                            Read_Mod_Data(&decays[j][i], sizeof(float), 1, in);
-                        }
-                    }
+                    Load_Reverb_Data(Read_Mod_Data, Read_Mod_Data, in);
                 }
                 Read_Mod_Data(&lchorus_delay, sizeof(int), 1, in);
                 Read_Mod_Data(&rchorus_delay, sizeof(int), 1, in);
@@ -1701,6 +1884,12 @@ Read_Mod_File:
 
             fclose(in);
 
+            if(!New_Reverb)
+            {
+                // Set the reverb to one of the old presets
+                Load_Old_Reverb_Presets(DelayType);
+            }
+
             // Init the tracker context
             Init_Tracker_Context_After_ModLoad();
 
@@ -1730,7 +1919,7 @@ Read_Mod_File:
     }
 
 #if !defined(__WINAMP__)
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5) snamesel = 0;
+    Clear_Input();
     if(Mod_Memory) free(Mod_Memory);
 #endif
 
@@ -1783,6 +1972,9 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
                 break;
             case SMP_PACK_ADPCM:
                 UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                break;
+            case SMP_PACK_8BIT:
+                Unpack8Bit(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
         }
         free(Packed_Read_Buffer);
@@ -1861,6 +2053,12 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
                 }
                 free(AlignedSample);
             }
+            break;
+
+        case SMP_PACK_8BIT:
+            PackedSample = (short *) malloc(Size * 2);
+            memset(PackedSample, 0, Size * 2);
+            PackedLen = To8Bit(Sample, PackedSample, Size);
             break;
 
         case SMP_PACK_NONE:
@@ -2018,6 +2216,26 @@ int Read_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle)
 }
 
 // ------------------------------------------------------
+// Check if a file exists
+int File_Exist(char *Format, char *FileName)
+{
+    FILE *in;
+    char Temph[MAX_PATH];
+
+    sprintf(Temph, Format, FileName);
+
+    in = fopen(Temph, "rb");
+    if(in)
+    {
+        sprintf(OverWrite_Name, "File '%s' already exists, overwrite ?", Temph);
+        Overwrite_Requester.Text = OverWrite_Name;
+        fclose(in);
+        return(TRUE);
+    }
+    return(FALSE);
+}
+
+// ------------------------------------------------------
 // Return the size of an opened file
 int Get_File_Size(FILE *Handle)
 {
@@ -2131,6 +2349,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_TrueSpeech = FALSE;
     int Store_ADPCM = FALSE;
     int Store_At3 = FALSE;
+    int Store_8Bit = FALSE;
     int Store_Flanger = FALSE;
     int Store_Disclap = FALSE;
     int Store_LFO = FALSE;
@@ -3107,6 +3326,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             Store_ADPCM = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
+
+                        case SMP_PACK_8BIT:
+                            Store_8Bit = TRUE;
+                            Apply_Interpolation = TRUE;
+                            break;
                     }
 #endif
 
@@ -3247,6 +3471,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_TRUESPEECH", Store_TrueSpeech);
     Save_Constant("PTK_ADPCM", Store_ADPCM);
     Save_Constant("PTK_AT3", Store_At3);
+    Save_Constant("PTK_8BIT", Store_8Bit);
 
     Write_Mod_Data(&compressor, sizeof(char), 1, in);
 
@@ -3378,26 +3603,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         Save_Constant("PTK_LIMITER", FALSE);
     }
 
-    Write_Mod_Data(&delay_time, sizeof(int), 1, in);
     Write_Mod_Data(&Feedback, sizeof(float), 1, in);
     
     if(compressor)
     {
-        Write_Mod_Data(&DelayType, sizeof(int), 1, in);
-        Write_Mod_Data(&num_echoes, sizeof(char), 1, in);
-
-        // Save the reverb data
-        for(i = 0; i < MAX_COMB_FILTERS; i++)
-        {
-            Write_Mod_Data(&delays[i], sizeof(int), 1, in);
-        }
-        for(j = 0; j < MAX_COMB_FILTERS; j++)
-        {
-            for(i = 0; i < 2; i++)
-            {
-                Write_Mod_Data(&decays[j][i], sizeof(float), 1, in);
-            }
-        }
+        Save_Reverb_Data(Write_Mod_Data, Write_Mod_Data, in);
     }
 
     Write_Mod_Data(&lchorus_delay, sizeof(int), 1, in);
@@ -3619,13 +3829,13 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     {
         if(NewFormat)
         {
-            sprintf(Temph, "Saving '%s.ptp' song on current directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptp' song in current directory...", FileName);
             mess_box(Temph);
             sprintf(Temph, "%s.ptp", FileName);
         }
         else
         {
-            sprintf(Temph, "Saving '%s.ptk' song on current directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptk' song in current directory...", FileName);
             mess_box(Temph);
             sprintf(Temph, "%s.ptk", FileName);
         }
@@ -3772,14 +3982,15 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
 
-            Write_Mod_Data_Swap(&delay_time, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
-            Write_Mod_Data_Swap(&DelayType, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&lchorus_delay, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&rchorus_delay, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+
+            // Save the reverb data
+            Save_Reverb_Data(Write_Mod_Data, Write_Mod_Data_Swap, in);
 
             // Writing part sequence data
             for(int tps_pos = 0; tps_pos < MAX_SEQUENCES; tps_pos++)
@@ -3903,14 +4114,6 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
         if(!Simulate) mess_box("Module save failed.");   
     }
 
-    if(!Simulate)
-    {
-        if(snamesel == 1 || snamesel == 4 || snamesel == 5)
-        {
-            snamesel = 0;
-            Actualize_DiskIO_Ed(0);
-        }
-    }
     return(Mod_Length);
 }
 
@@ -3939,7 +4142,7 @@ void LoadSynth(char *FileName)
         {
 Read_Synth:
             // Ok, extension matched!
-            mess_box("Loading Synthesizer -> structure.");  
+            mess_box("Loading Synthesizer -> structure...");
             ResetSynthParameters(&PARASynth[ped_patsam]);
 
             PARASynth[ped_patsam].disto = 0;
@@ -3990,7 +4193,7 @@ void SaveSynth(void)
     char extension[10];
 
     sprintf(extension, "TWNNSYN1");
-    sprintf (Temph, "Saving '%s.pts' synthesizer program on current directory...", PARASynth[ped_patsam].presetname);
+    sprintf (Temph, "Saving '%s.pts' synthesizer program in current directory...", PARASynth[ped_patsam].presetname);
     mess_box(Temph);
     sprintf(Temph, "%s.pts", PARASynth[ped_patsam].presetname);
     in = fopen(Temph, "wb");
@@ -4004,18 +4207,14 @@ void SaveSynth(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Synthesizer program saved succesfully..."); 
+        mess_box("Synthesizer program saved succesfully."); 
     }
     else
     {
-        mess_box("Synthesizer program save failed...");
+        mess_box("Synthesizer program save failed.");
     }
 
-    if(snamesel == 3)
-    {
-        Gui_Draw_Button_Box(432, 352, 164, 16, PARASynth[ped_patsam].presetname, BUTTON_NORMAL);
-        snamesel = 0;
-    }
+    Clear_Input();
 }
 
 // ------------------------------------------------------
@@ -4073,11 +4272,11 @@ void LoadInst(char *FileName)
         {
 Read_Inst:
             KillInst(ped_patsam);
-            mess_box("Loading Instrument -> Header"); 
+            mess_box("Loading Instrument -> Header..."); 
             Read_Data(&nameins[ped_patsam], sizeof(char), 20, in);
 
             // Reading sample data
-            mess_box("Loading Instrument -> Sample data");
+            mess_box("Loading Instrument -> Sample data...");
 
             int swrite = ped_patsam;
 
@@ -4167,11 +4366,7 @@ Read_Inst:
         mess_box("Instrument loading failed. (Probably: file not found)");
     }
     
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5)
-    {
-        snamesel = 0;
-        Actualize_DiskIO_Ed(0);
-    }
+    Clear_Input();
 }
 
 // ------------------------------------------------------
@@ -4185,7 +4380,7 @@ void SaveInst(void)
     int synth_save;
 
     sprintf(extension, "TWNNINS5");
-    sprintf (Temph, "Saving '%s.pti' instrument on current directory...", nameins[ped_patsam]);
+    sprintf (Temph, "Saving '%s.pti' instrument in current directory...", nameins[ped_patsam]);
     mess_box(Temph);
     sprintf(Temph, "%s.pti", nameins[ped_patsam]);
 
@@ -4255,17 +4450,14 @@ void SaveInst(void)
         last_index = -1;
         Actualize_Files_List(0);
         Actualize_Patterned();
-        mess_box("Instrument saved succesfully..."); 
+        mess_box("Instrument saved succesfully."); 
     }
     else
     {
-        mess_box("Instrument save failed...");
+        mess_box("Instrument save failed.");
     }
 
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5) {
-        snamesel = 0;
-        Actualize_DiskIO_Ed(0);
-    }
+    Clear_Input();
 }
 
 // ------------------------------------------------------
@@ -4284,7 +4476,7 @@ void Load303(char *FileName)
         if(strcmp(extension, "TWNN3031") == 0)
         {
             // Ok, extension matched!
-            mess_box("Loading 303 pattern.");
+            mess_box("Loading 303 pattern...");
 
             Load_303_Data(Read_Data, Read_Data_Swap, in, sl3, tb303[sl3].selectedpattern);
 
@@ -4312,7 +4504,7 @@ void Save303(void)
     char extension[10];
 
     sprintf(extension, "TWNN3031");
-    sprintf (Temph, "Saving '%s.303' pattern on current directory...", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
+    sprintf(Temph, "Saving '%s.303' pattern in current directory...", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     mess_box(Temph);
     sprintf(Temph, "%s.303", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     in = fopen(Temph, "wb");
@@ -4327,18 +4519,14 @@ void Save303(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("303 pattern saved succesfully...");   
+        mess_box("303 pattern saved succesfully.");   
     }
     else
     {
-        mess_box("303 pattern save failed...");
+        mess_box("303 pattern save failed.");
     }
 
-    if(snamesel == 6)
-    {
-        Gui_Draw_Button_Box(600, 472, 164, 16, tb303[sl3].pattern_name[tb303[sl3].selectedpattern], BUTTON_NORMAL);
-        snamesel = 0;
-    }
+    Clear_Input();
 }
 
 // ------------------------------------------------------
@@ -4417,25 +4605,21 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGE");
+        sprintf(extension, "TWNNSNGF");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
         fclose(output);
-        sprintf(name, "Module '%s.ptk' saved succesfully...", FileName);
+        sprintf(name, "Module '%s.ptk' saved succesfully.", FileName);
     }
     else
     {
-        sprintf(name, "Module save failed...");
+        sprintf(name, "Module save failed.");
     }
     if(Final_Mem_Out) free(Final_Mem_Out);
     if(Final_Mem) free(Final_Mem);
 
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5)
-    {
-        snamesel = 0;
-        Actualize_DiskIO_Ed(0);
-    }
+    Clear_Input();
     mess_box(name);
     Read_SMPT();
     last_index = -1;
@@ -4472,8 +4656,8 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG4");
-    mess_box("Saving 'ptk.cfg' on current directory...");
+    sprintf(extension, "TWNNCFG5");
+    mess_box("Saving 'ptk.cfg' in current directory...");
 
 #if defined(__WIN32__)
     sprintf(FileName, "%s\\ptk.cfg", ExePath);
@@ -4523,6 +4707,7 @@ void SaveConfig(void)
         Write_Data(&Dir_Mods, sizeof(Dir_Mods), 1, out);
         Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, out);
         Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, out);
+        Write_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, out);
         Write_Data(KeyboardName, MAX_PATH, 1, out);
 
         Write_Data(&rawrender_32float, sizeof(char), 1, out);
@@ -4534,11 +4719,11 @@ void SaveConfig(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Configuration file saved succesfully...");  
+        mess_box("Configuration file saved succesfully.");  
     }
     else
     {
-        mess_box("Configuration file save failed...");
+        mess_box("Configuration file save failed.");
     }
 }
 
@@ -4569,7 +4754,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG4") == 0)
+        if(strcmp(extension, "TWNNCFG5") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4606,6 +4791,7 @@ void LoadConfig(void)
             Read_Data(&Dir_Mods, sizeof(Dir_Mods), 1, in);
             Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
+            Read_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, in);
             Read_Data(KeyboardName, MAX_PATH, 1, in);
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
@@ -4666,6 +4852,18 @@ void LoadConfig(void)
         strcat(Dir_Presets, "\\presets");
 #else
         strcat(Dir_Presets, "/presets");
+#endif
+
+    }
+
+    if(!strlen(Dir_Reverbs))
+    {
+        GETCWD(Dir_Reverbs, MAX_PATH);
+
+#if defined(__WIN32__)
+        strcat(Dir_Reverbs, "\\reverbs");
+#else
+        strcat(Dir_Reverbs, "/reverbs");
 #endif
 
     }
@@ -5254,5 +5452,162 @@ short *Get_WaveForm(int Instr_Nbr, int Channel, int Split)
 #endif
     {
         return(RawSamples[Instr_Nbr][Channel][Split]); 
+    }
+}
+
+// ------------------------------------------------------
+// Load the data from a reverb file (or a module)
+void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
+                      int (*Read_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in)
+{
+    int i;
+
+    Read_Function(&num_echoes, sizeof(char), 1, in);
+
+    for(i = 0; i < MAX_COMB_FILTERS; i++)
+    {
+        delays[i] = 1000.0f;
+        decays[i] = 0.0f;
+    }
+
+    for(i = 0; i < num_echoes; i++)
+    {
+        Read_Function_Swap(&delays[i], sizeof(int), 1, in);
+    }
+    for(i = 0; i < num_echoes; i++)
+    {
+        Read_Function_Swap(&decays[i], sizeof(float), 1, in);
+    }
+}
+
+// ------------------------------------------------------
+// Save the data to a reverb file (or a module)
+void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
+                      int (*Write_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in)
+{
+    int i;
+
+    Write_Function(&num_echoes, sizeof(char), 1, in);
+
+    // Save the reverb data
+    for(i = 0; i < num_echoes; i++)
+    {
+        Write_Function_Swap(&delays[i], sizeof(int), 1, in);
+    }
+    for(i = 0; i < num_echoes; i++)
+    {
+        Write_Function_Swap(&decays[i], sizeof(float), 1, in);
+    }
+}
+
+// ------------------------------------------------------
+// Load a reverb file
+void LoadReverb(char *FileName)
+{
+    FILE *in;
+    in = fopen(FileName, "rb");
+
+    if(in != NULL)
+    {
+        // Reading and checking extension...
+        char extension[10];
+        fread(extension, sizeof(char), 9, in);
+
+        if(strcmp(extension, "TWNNREV1") == 0)
+        {
+            // Ok, extension matched!
+            mess_box("Loading Reverb data...");
+
+            Read_Data(Reverb_Name, sizeof(char), 20, in);
+
+            Load_Reverb_Data(Read_Data, Read_Data_Swap, in);
+
+            Initreverb();
+            Actualize_Reverb_Ed(0);
+            mess_box("Reverb data loaded ok.");
+        }
+        else
+        {
+            mess_box("That file is not a "TITLE" Reverb file...");
+        }
+        fclose(in);
+    }
+    else
+    {
+        mess_box("Reverb data loading failed. (Probably: file not found)");
+    }
+}
+
+// ------------------------------------------------------
+// Save a reverb file
+void SaveReverb(void)
+{
+    FILE *in;
+    char Temph[96];
+    char extension[10];
+
+    sprintf(extension, "TWNNREV1");
+    sprintf(Temph, "Saving '%s.prv' data in current directory...", Reverb_Name);
+    mess_box(Temph);
+    sprintf(Temph, "%s.prv", Reverb_Name);
+    in = fopen(Temph, "wb");
+
+    if(in != NULL)
+    {
+        Write_Data(extension, sizeof(char), 9, in);
+        Write_Data(Reverb_Name, sizeof(char), 20, in);
+
+        Save_Reverb_Data(Write_Data, Write_Data_Swap, in);
+
+        fclose(in);
+        Read_SMPT();
+        last_index = -1;
+        Actualize_Files_List(0);
+        mess_box("Reverb data saved succesfully.");   
+    }
+    else
+    {
+        mess_box("Reverb data save failed.");
+    }
+
+    Clear_Input();
+}
+
+// ------------------------------------------------------
+// Clear any pending input
+void Clear_Input(void)
+{
+    if(snamesel == INPUT_303_PATTERN)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_303_Ed(0);
+    }
+
+    if(snamesel == INPUT_SYNTH_NAME)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_Synth_Ed(0);
+    }
+
+    if(snamesel == INPUT_MODULE_NAME ||
+       snamesel == INPUT_MODULE_ARTIST ||
+       snamesel == INPUT_MODULE_STYLE)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_DiskIO_Ed(0);
+    }
+
+    if(snamesel == INPUT_INSTRUMENT_NAME)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_Patterned();
+    }
+
+    if(snamesel == INPUT_REVERB_NAME)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_Reverb_Ed(0);
     }
 }

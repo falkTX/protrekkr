@@ -1384,7 +1384,7 @@ void Actualize_Patterned(void)
     char tcp[30];
     sprintf(tcp, "%s_", nameins[ped_patsam]);
 
-    if(snamesel == 2) Gui_Draw_Button_Box(90, 134, 166, 16, tcp, BUTTON_PUSHED);
+    if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 134, 166, 16, tcp, BUTTON_PUSHED);
     else Gui_Draw_Button_Box(90, 134, 166, 16, nameins[ped_patsam], BUTTON_NORMAL);
 
     Gui_Draw_Arrows_Number_Box2(90, 152, ped_pattad, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);

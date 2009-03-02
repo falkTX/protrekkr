@@ -2,6 +2,17 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98:
+
+- Fixed the vu meters levels.
+- Reverb internal variables are now customizable
+  (older presets are now provided as files).
+- Added requesters before exiting or overwriting files.
+- Added 8 bit (interpolated) comrpession scheme.
+- Reverb wasn't initialized correctly at startup.
+- Fixed a bug in .wav rendering.
+- Added a zap command.
+
 v1.97c:
 
 - Even more constants (Especially for modules not using instruments).

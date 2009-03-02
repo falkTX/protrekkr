@@ -157,7 +157,7 @@ void Actualize_Master_Ed(char gode)
         {
             if(MouseWheel_Multiplier < 1) MouseWheel_Multiplier = 1;
             if(MouseWheel_Multiplier > 16) MouseWheel_Multiplier = 16;
-            value_box(446, 475, MouseWheel_Multiplier, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(446, 475, MouseWheel_Multiplier, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         // Pattern highlight
@@ -173,7 +173,14 @@ void Actualize_Master_Ed(char gode)
             }
             else
             {
-                value_box(446, 495, patt_highlight, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                if(Rows_Decimal)
+                {
+                    Gui_Draw_Arrows_Number_Box2(446, 495, patt_highlight, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                }
+                else
+                {
+                    value_box(446, 495, patt_highlight, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                }
             }
         }
         if(gode == 7) Actupated(0);
@@ -446,7 +453,7 @@ void Mouse_Left_Master_Ed(void)
         if(zcheckMouse(446, 515, 29, 16))
         {
             Rows_Decimal = TRUE;
-            teac = 8;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             Actualize_Sequencer();
             Actupated(0);
@@ -456,7 +463,7 @@ void Mouse_Left_Master_Ed(void)
         if(zcheckMouse(446 + 31, 515, 29, 16))
         {
             Rows_Decimal = FALSE;
-            teac = 8;
+            teac = 0;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             Actualize_Sequencer();
             Actupated(0);

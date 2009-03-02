@@ -29,24 +29,61 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _SAMPLES_PACK_H_
-#define _SAMPLES_PACK_H_
+#ifndef _EDITOR_REVERB_ED_H_
+#define _EDITOR_REVERB_ED_H_
 
-#if !defined(__NO_CODEC__)
+// ------------------------------------------------------
+// Includes
+#if defined(__GCC__)
+#include "../../include/variables.h"
+#include "../../ui/include/misc_draw.h"
+#else
+#include "../include/variables.h"
+#include "../ui/include/misc_draw.h"
+#endif
 
 // ------------------------------------------------------
 // Constants
-#define MP3_FRAMES_LAG 65536
+#define UPDATE_REVERB_ED_ALL 0
+#define UPDATE_REVERB_ED_ECHOES 1
+
+#define UPDATE_REVERB_ED_DELAY1 2
+#define UPDATE_REVERB_ED_DELAY2 3
+#define UPDATE_REVERB_ED_DELAY3 4
+#define UPDATE_REVERB_ED_DELAY4 5
+#define UPDATE_REVERB_ED_DELAY5 6
+#define UPDATE_REVERB_ED_DELAY6 7
+#define UPDATE_REVERB_ED_DELAY7 8
+#define UPDATE_REVERB_ED_DELAY8 9
+#define UPDATE_REVERB_ED_DELAY9 10
+#define UPDATE_REVERB_ED_DELAY10 11
+
+#define UPDATE_REVERB_ED_DECAY1 12
+#define UPDATE_REVERB_ED_DECAY2 13
+#define UPDATE_REVERB_ED_DECAY3 14
+#define UPDATE_REVERB_ED_DECAY4 15
+#define UPDATE_REVERB_ED_DECAY5 16
+#define UPDATE_REVERB_ED_DECAY6 17
+#define UPDATE_REVERB_ED_DECAY7 18
+#define UPDATE_REVERB_ED_DECAY8 19
+#define UPDATE_REVERB_ED_DECAY9 20
+#define UPDATE_REVERB_ED_DECAY10 21
+
+#define UPDATE_REVERB_ED_ARROWS 22
+
+#define UPDATE_REVERB_ED_CHANGE_NAME 23
+
+// ------------------------------------------------------
+// Variables
+extern char Reverb_Name[20];
 
 // ------------------------------------------------------
 // Functions
-int ToGSM(short *Source, short *Dest, int Size);
-int ToAT3(short *Source, short *Dest, int Size, int BitRate);
-int ToMP3(short *Source, short *Dest, int Size, int BitRate);
-int ToTrueSpeech(short *Source, short *Dest, int Size);
-int ToADPCM(short *Source, short *Dest, int Size);
-int To8Bit(short *Source, short *Dest, int Size);
-
-#endif
+void Draw_Reverb_Ed(void);
+void Actualize_Reverb_Ed(int gode);
+void Mouse_Right_Reverb_Ed(void);
+void Mouse_Left_Reverb_Ed(void);
+void Mouse_Sliders_Reverb_Ed(void);
+void Mouse_Sliders_Right_Reverb_Ed(void);
 
 #endif

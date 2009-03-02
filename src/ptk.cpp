@@ -73,6 +73,7 @@ char trkchan = TRUE;
 int pos_space = 0;
 int multifactor = 4;
 char seditor = 0;
+int Done_Tip = FALSE;
 char tipoftheday[256];
 int ctipoftheday = 0;
 char ped_split = 0;
@@ -104,6 +105,7 @@ char name[MAX_PATH];
 char synthname[MAX_PATH];
 char instrname[MAX_PATH];
 char name303[MAX_PATH];
+char namerev[MAX_PATH];
 char artist[20];
 char style[20];
 char autosavename[MAX_PATH];
@@ -116,7 +118,7 @@ char draw_sampled_wave = FALSE;
 char draw_sampled_wave2 = FALSE;
 char draw_sampled_wave3 = FALSE;
 
-int redraw_everything = 0;
+int redraw_everything = FALSE;
 char boing = FALSE;
 int LastPedRow = -1;
 char po_ctrl2 = TRUE;
@@ -139,7 +141,7 @@ int mlimit = 0;
 
 int hd_isrecording = 0;
 
-int snamesel = 0;
+int snamesel = INPUT_NONE;
 
 SDL_Surface *PFONT;
 SDL_Surface *FONT;
@@ -148,12 +150,9 @@ SDL_Surface *FONT_LOW;
 SDL_TimerID Timer;
 Uint32 Timer_CallBack(Uint32 interval, void *param);
 Uint32 (*Timer_Ptr)(Uint32 interval, void *param) = &Timer_CallBack;
-char CpuStr[80];
 
 extern int done;
 extern float local_curr_mas_vol;
-
-int Asking_Exit;
 
 int MouseWheel_Multiplier = 1;
 char Rows_Decimal = FALSE;
@@ -174,7 +173,6 @@ int Record_Keys[37];
 int Record_Keys_State[37];
 
 void Mouse_Sliders_Master_Shuffle(void);
-void Display_Beat_Time(void);
 int Calc_Length(void);
 
 extern int Ticks_Synchro_Left;
@@ -251,6 +249,84 @@ int Table_Left_Tab_Notes[] =
 int Keyboard_Events_Channels[256];
 JAZZ_KEY Sub_Channels_NoteOff[MAX_TRACKS][MAX_POLYPHONY];
 int Nbr_Sub_NoteOff;
+
+REQUESTER_BUTTON Requester_Btn_Cancel =
+{
+    NULL,
+    "Cancel",
+    BUTTON_CANCEL
+};
+
+REQUESTER_BUTTON Requester_Btn_303 =
+{
+    &Requester_Btn_Cancel,
+    "303",
+    0
+};
+
+REQUESTER_BUTTON Requester_Btn_Synths =
+{
+    &Requester_Btn_303,
+    "Synths",
+    0
+};
+
+REQUESTER_BUTTON Requester_Btn_Instruments =
+{
+    &Requester_Btn_Synths,
+    "Instruments",
+    0
+};
+
+REQUESTER_BUTTON Requester_Btn_Patterns =
+{
+    &Requester_Btn_Instruments,
+    "Patterns",
+    0
+};
+
+REQUESTER_BUTTON Requester_Btn_All =
+{
+    &Requester_Btn_Patterns,
+    "All",
+    BUTTON_DEFAULT
+};
+
+REQUESTER_BUTTON Requester_Btn_No =
+{
+    NULL,
+    "No",
+    BUTTON_CANCEL
+};
+
+REQUESTER_BUTTON Requester_Btn_Yes =
+{
+    &Requester_Btn_No,
+    "Yes",
+    BUTTON_DEFAULT
+};
+
+REQUESTER Exit_Requester =
+{
+    "Do you really want to quit ?",
+    &Requester_Btn_Yes
+};
+
+REQUESTER Overwrite_Requester =
+{
+    "",
+    &Requester_Btn_Yes
+};
+
+REQUESTER Zzaapp_Requester =
+{
+    "What do you want to Zzaapp ?",
+    &Requester_Btn_All
+};
+
+char OverWrite_Name[1024];
+
+int ZzaappOMatic;
 
 // ------------------------------------------------------
 // Load a skin picture according to the xml script
@@ -354,6 +430,7 @@ int Init_Context(void)
     L_MaxLevel = 0;
     R_MaxLevel = 0;
 
+    sprintf(Reverb_Name, "Untitled");
     sprintf(name, "Untitled");
     sprintf(artist, "Somebody");
     sprintf(style, "Goa Trance");
@@ -405,6 +482,11 @@ int Init_Context(void)
     init_sample_bank();
     Pre_Song_Init();
     Post_Song_Init();
+
+    // Old preset by default
+    Load_Old_Reverb_Presets(0);
+
+    Initreverb();
 
     char *toto = test_text;
 
@@ -476,10 +558,10 @@ int Screen_Update(void)
     int FineTune_Value;
     int i;
 
-    redraw_everything = 0;
+    redraw_everything = FALSE;
     if(Env_Change)
     {
-        redraw_everything = 1;
+        redraw_everything = TRUE;
         Env_Change = FALSE;
     }
 
@@ -506,8 +588,8 @@ int Screen_Update(void)
         // Sample ed.
         Draw_Sampled_Wave();
 
-        int Lt_vu = MIN_VUMETER + L_MaxLevel / LARG_VUMETER;
-        int Rt_vu = MIN_VUMETER + R_MaxLevel / LARG_VUMETER;
+        int Lt_vu = MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER);
+        int Rt_vu = MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER);
         int Lt_vu_Peak = Lt_vu;
         int Rt_vu_Peak = Rt_vu;
         if(Lt_vu_Peak > MAX_VUMETER - 1) Lt_vu_Peak = MAX_VUMETER - 1;
@@ -746,7 +828,7 @@ int Screen_Update(void)
         {
             ped_patsam--;
 
-            if(snamesel == 2) snamesel = 0;
+            Clear_Input();
 
             Actualize_Patterned();
             RefreshSample();
@@ -758,7 +840,7 @@ int Screen_Update(void)
         {
             ped_patsam++;
 
-            if(snamesel == 2) snamesel = 0;
+            Clear_Input();
 
             Actualize_Patterned();
             RefreshSample();
@@ -933,7 +1015,7 @@ int Screen_Update(void)
             }
         }
 
-        if(gui_action == GUI_CMD_SELECT_DISKIO)
+        if(gui_action == GUI_CMD_SELECT_DISKIO_EDIT)
         {
             retletter[71] = TRUE;
             Actualize_Input();
@@ -941,6 +1023,16 @@ int Screen_Update(void)
             userscreen = USER_SCREEN_DISKIO_EDIT;
             Draw_DiskIO_Ed(); 
             Actualize_DiskIO_Ed(0);
+        }
+
+        if(gui_action == GUI_CMD_SELECT_REVERB_EDIT)
+        {
+            retletter[71] = TRUE;
+            Actualize_Input();
+            retletter[71] = FALSE;
+            userscreen = USER_SCREEN_REVERB_EDIT;
+            Draw_Reverb_Ed(); 
+            Actualize_Reverb_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SELECT_TRACK_EDIT)
@@ -1032,9 +1124,83 @@ int Screen_Update(void)
             Draw_303_Ed();
         }
 
+        if(gui_action == GUI_CMD_EXPORT_WAV)
+        {
+            char buffer[64];
+
+            mess_box("Writing Wav Header And Sample Data...");
+
+            WaveFile RF;
+
+            if(strlen(SampleName[ped_patsam][ped_split]))
+            {
+                RF.OpenForWrite(SampleName[ped_patsam][ped_split],
+                                44100,
+                                16,
+                                SampleChannels[ped_patsam][ped_split]);
+            }
+            else
+            {
+                RF.OpenForWrite("Untitled.wav",
+                                44100,
+                                16,
+                                SampleChannels[ped_patsam][ped_split]);
+            }
+
+            char t_stereo;
+
+            if(SampleChannels[ped_patsam][ped_split] == 1) t_stereo = FALSE;
+            else t_stereo = TRUE;
+
+            Uint32 woff = 0;
+
+            short *eSamples = RawSamples[ped_patsam][0][ped_split];
+            short *erSamples = RawSamples[ped_patsam][1][ped_split];
+
+            while(woff < SampleNumSamples[ped_patsam][ped_split])
+            {
+                if(t_stereo) RF.WriteStereoSample(*eSamples++, *erSamples++);
+                else RF.WriteMonoSample(*eSamples++);
+                woff++;
+            }
+
+            // Write the looping info
+            if(LoopType[ped_patsam][ped_split])
+            {
+                RiffChunkHeader header;
+                WaveSmpl_ChunkData datas;
+
+                header.ckID = FourCC("smpl");
+                header.ckSize = 0x3c;
+
+                memset(&datas, 0, sizeof(datas));
+                datas.Num_Sample_Loops = 1;
+                datas.Start = LoopStart[ped_patsam][ped_split];
+                datas.End = LoopEnd[ped_patsam][ped_split];
+
+                header.ckSize = Swap_32(header.ckSize);
+
+                datas.Num_Sample_Loops = Swap_32(datas.Num_Sample_Loops);
+                datas.Start = Swap_32(datas.Start);
+                datas.End = Swap_32(datas.End);
+
+                RF.WriteData((void *) &header, sizeof(header));
+                RF.WriteData((void *) &datas, sizeof(datas));
+            }
+
+            RF.Close();
+            if(strlen(SampleName[ped_patsam][ped_split])) sprintf(buffer, "File '%s' saved.", SampleName[ped_patsam][ped_split]);
+            else sprintf(buffer, "File 'Untitled.wav' saved.");
+            mess_box(buffer);
+
+            Read_SMPT();
+            last_index = -1;
+            Actualize_Files_List(0);
+        }
+ 
         if(gui_action == GUI_CMD_SAVE_INSTRUMENT)
         {
-            SaveInst();
+            if(snamesel == INPUT_NONE) SaveInst();
         }
 
         if(gui_action == GUI_CMD_MODULE_INFOS)
@@ -1049,7 +1215,12 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SAVE_303_PATTERN)
         {
-            Save303();
+            if(snamesel == INPUT_NONE) Save303();
+        }
+
+        if(gui_action == GUI_CMD_SAVE_REVERB)
+        {
+            if(snamesel == INPUT_NONE) SaveReverb();
         }
 
         if(gui_action == GUI_CMD_FILELIST_SCROLL)
@@ -1069,13 +1240,13 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SAVE_MODULE)
         {
-            Pack_Module(name);
+            if(snamesel == INPUT_NONE) Pack_Module(name);
         }
 
         // Save final mod
         if(gui_action == GUI_CMD_SAVE_FINAL)
         {
-            SaveMod(name, TRUE, SAVE_WRITE, NULL);
+            if(snamesel == INPUT_NONE) SaveMod(name, TRUE, SAVE_WRITE, NULL);
         }
 
         // Calculate packed mod size
@@ -1114,6 +1285,11 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_UPDATE_DISKIO_ED)
         {
             Actualize_DiskIO_Ed(teac);
+        }
+
+        if(gui_action == GUI_CMD_UPDATE_REVERB_ED)
+        {
+            Actualize_Reverb_Ed(teac);
         }
 
         if(gui_action == GUI_CMD_NEW_MODULE)
@@ -1257,7 +1433,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_RENDER_WAV)
         {
-            WavRenderizer();
+            if(snamesel == INPUT_NONE) WavRenderizer();
         }
 
         if(gui_action == GUI_CMD_TIMED_REFRESH_SEQUENCER)
@@ -1269,12 +1445,13 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_DELETE_INSTRUMENT)
         {
+            Clear_Input();
             DeleteInstrument();
         }
 
         if(gui_action == GUI_CMD_SAVE_SYNTH)
         {
-            SaveSynth();
+            if(snamesel == INPUT_NONE) SaveSynth();
         }
 
         if(gui_action == GUI_CMD_PATTERNS_POOL_EXHAUSTED)
@@ -1287,24 +1464,16 @@ int Screen_Update(void)
             Actualize_Sample_Ed(teac);
         }
 
-        if(gui_action == GUI_CMD_ASK_EXIT)
-        {
-            Asking_Exit = TRUE;
-            Draw_Ask_Exit();
-        }
-
         if(gui_action == GUI_CMD_EXIT)
         {
-            SongStop();
-            mess_box("Seppuku...");
-            return(FALSE);
+            Display_Requester(&Exit_Requester, GUI_CMD_NOP);
         }
 
         gui_action = GUI_CMD_NOP;
     }
 
     // Draw the main windows layout
-    if(redraw_everything == 1)
+    if(redraw_everything)
     {
         if(!display_title)
         {
@@ -1323,7 +1492,14 @@ int Screen_Update(void)
 
             Draw_Scope_Files_Button();
 
-            mess_box(tipoftheday);
+            if(!Done_Tip)
+            {
+                mess_box(tipoftheday);
+                Done_Tip = TRUE;
+            }
+
+            Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
             Gui_Draw_Button_Box(0, 178, fsize, 4, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             Gui_Draw_Button_Box(0, 24, 96, 98, "Player", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -1373,8 +1549,16 @@ int Screen_Update(void)
     }
 
     // Checking for mouse and keyboard events ------------------------------------
-    Mouse_Handler();
-    Keyboard_Handler();
+    if(!In_Requester)
+    {
+        Mouse_Handler();
+        Keyboard_Handler();
+    }
+    else
+    {
+        Mouse_Handler_Requester();
+        Keyboard_Handler_Requester();
+    }
 
     // Refresh the sequencer each time the song position is different
     if(Songplaying)
@@ -1383,6 +1567,52 @@ int Screen_Update(void)
         {
             gui_action = GUI_CMD_TIMED_REFRESH_SEQUENCER;
         }
+    }
+
+    if(Check_Requester(&Overwrite_Requester) == 2)
+    {
+        gui_action = GUI_CMD_NOP;
+    }
+
+    switch(Check_Requester(&Zzaapp_Requester))
+    {
+        case 1:
+            // All
+            ZzaappOMatic = ZZAAPP_ALL;
+            break;
+
+        case 2:
+            // Patterns
+            ZzaappOMatic = ZZAAPP_PATTERNS;
+            break;
+
+        case 3:
+            // Instruments
+            ZzaappOMatic = ZZAAPP_INSTRUMENTS;
+            break;
+
+        case 4:
+            // Synths
+            ZzaappOMatic = ZZAAPP_SYNTHS;
+            break;
+
+        case 5:
+            // 303
+            ZzaappOMatic = ZZAAPP_303;
+            break;
+
+        case 6:
+            // Cancel
+            gui_action = GUI_CMD_NOP;
+            break;
+
+    }
+
+    if(Check_Requester(&Exit_Requester) == 1)
+    {
+        SongStop();
+        mess_box("Seppuku...");
+        return(FALSE);
     }
 
     return(TRUE);
@@ -1527,6 +1757,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGC") == 0 ||
                 strcmp(extension, "TWNNSNGD") == 0 ||
                 strcmp(extension, "TWNNSNGE") == 0 ||
+                strcmp(extension, "TWNNSNGF") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -1545,6 +1776,11 @@ void LoadFile(int Freeindex, const char *str)
         {
             sprintf(name303, "%s", Wavfile);
             Load303(name303);
+        }
+        else if(strcmp(extension, "TWNNREV1") == 0)
+        {
+            sprintf(namerev, "%s", Wavfile);
+            LoadReverb(namerev);
         }
         else
         {
@@ -1731,99 +1967,160 @@ void SongStop(void)
 // Create a new song
 void Newmod(void)
 {
+    int i;
+    int Old_Prg;
+
+    Clear_Input();
     SongStop();
     Stop_Current_Sample();
-    mess_box("Freeing all allocated buffers and restarting...");   
-
-    Free_Samples();
-
-    for(int api = 0; api < MAX_ROWS; api++)
-    {
-        patternLines[api] = 64;
-    }
-
-    Clear_Patterns_Pool();
-
-    Use_Cubic = TRUE;
-
-    nPatterns = 1;
 
 #if !defined(__NO_MIDI__)
     Midi_Reset();
 #endif
 
-    Set_Default_Channels_Polyphony();
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_INSTRUMENTS)
+    {
+        Free_Samples();
+        ped_patsam = 0;
+        seditor = 0;
+        Final_Mod_Length = 0;
+        Actualize_Master(0);
+        for(i = 0; i < MAX_INSTRS; i++)
+        {
+            Old_Prg = Synthprg[i];
+            KillInst(i);
+            Synthprg[i] = Old_Prg;
+            sprintf(nameins[i], "Untitled");
+            if((Synthprg[i] - 2) == i)
+            {
+                Synthprg[i] = 1;
+            }
+        }
+        NewWav();
+    }
 
-    init_sample_bank();
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_SYNTHS)
+    {
+        for(int ini = 0; ini < MAX_TRACKS; ini++)
+        {
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Synthesizer[ini][i].Reset();
+            }
+        }
 
-    Pre_Song_Init();
+        for(i = 0; i < MAX_INSTRS; i++)
+        {
+            ResetSynthParameters(&PARASynth[i]);
+            Synthprg[i] = 0;
+        }
+        Final_Mod_Length = 0;
+        Actualize_Master(0);
+        ped_patsam = 0;
+    }
+
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_PATTERNS)
+    {
+        Songtracks = 6;
+        for(int api = 0; api < MAX_ROWS; api++)
+        {
+            patternLines[api] = 64;
+        }
+        Clear_Patterns_Pool();
+        nPatterns = 1;
+        Set_Default_Channels_Polyphony();
+        for(int inico = 0; inico < 256; inico++)
+        {
+            pSequence[inico] = 0;
+            for(int inico2 = 0; inico2 < MAX_TRACKS; inico2++)
+            {
+                CHAN_ACTIVE_STATE[inico][inico2] = TRUE;
+                CHAN_HISTORY_STATE[inico][inico2] = FALSE;
+            }
+        }
+
+        sLength = 1;
+        ped_track = 0;
+        ped_col = 0;
+        ped_line = 0;
+        ped_line_delay = 0;
+        player_line = 0;
+        cPosition = 0;
+        cPosition_delay = 0;
+        rawrender_range = FALSE;
+        rawrender_from = 0;
+        rawrender_to = 0;
+        Final_Mod_Length = 0;
+        Actualize_Sequencer();
+        Actualize_Patterned();
+        Actualize_Master(0);
+        Actupated(0);
+        Reset_Tracks_To_Render();
+    }
+
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_303)
+    {
+        Reset_303_Parameters(&tb303[0]);
+        Reset_303_Parameters(&tb303[1]);
+        tb303engine[0].reset();
+        tb303engine[1].reset();
+        track3031 = 255;
+        track3032 = 255;
+    }
+
+    if(ZzaappOMatic == ZZAAPP_ALL)
+    {
+        Use_Cubic = TRUE;
+        sprintf(Reverb_Name, "Untitled");
+        sprintf(name, "Untitled");
+        sprintf(artist, "Somebody");
+        sprintf(style, "Goa Trance");
+        namesize = 8;
+        BeatsPerMin = 125;
+        TicksPerBeat = 4;
+        DelayType = 1;
+        mas_vol = 1.0f;
+        mas_comp_threshold = 100.0f;
+        mas_comp_ratio = 0.0f;
+        lchorus_feedback = 0.6f;
+        rchorus_feedback = 0.5f;
+        lchorus_delay = 10584;
+        rchorus_delay = 15876;
+        lchorus_counter = MIX_RATE;
+        rchorus_counter = MIX_RATE;
+        lchorus_counter2 = MIX_RATE - lchorus_delay;
+        rchorus_counter2 = MIX_RATE - rchorus_delay;
+        compressor = 0;
+        c_threshold = 32;
+        delay_time = 0;
+
+        // Old preset by default
+        Load_Old_Reverb_Presets(DelayType);
+        Initreverb();
+        for(int spl = 0; spl < MAX_TRACKS; spl++)
+        {
+            CCoef[spl] = float((float) CSend[spl] / 127.0f);
+        }
+        Pre_Song_Init();
+    }
+
     Post_Song_Init();
 
-    sprintf(name, "Untitled");
-    sprintf(artist, "Somebody");
-    sprintf(style, "Goa Trance");
-    namesize = 8;
-    sLength = 1;
-    BeatsPerMin = 125;
-    TicksPerBeat = 4;
     SubCounter = 0;
     PosInTick = 0;
-    DelayType = 1;
-    player_line = 0;
-    mas_vol = 1.0f;
-    mas_comp_threshold = 100.0f;
-    mas_comp_ratio = 0.0f;
-    ped_track = 0;
-    ped_patsam = 0;
-    ped_col = 0;
-    ped_line = 0;
-    ped_line_delay = 0;
-    cPosition = 0;
-    cPosition_delay = 0;
 
     allow_save = TRUE;
 
-    lchorus_feedback = 0.6f;
-    rchorus_feedback = 0.5f;
-    lchorus_delay = 10584;
-    rchorus_delay = 15876;
-
-    lchorus_counter = MIX_RATE;
-    rchorus_counter = MIX_RATE;
-    lchorus_counter2 = MIX_RATE - lchorus_delay;
-    rchorus_counter2 = MIX_RATE - rchorus_delay;
-    compressor = 0;
-    c_threshold = 32;
-    DelayType = 1;
-    delay_time = 0;
-    seditor = 0;
-
-    rawrender_range = FALSE;
-    rawrender_from = 0;
-    rawrender_to = 0;
-
-    Final_Mod_Length = 0;
-
-    for(int spl = 0; spl < MAX_TRACKS; spl++)
-    {
-        CCoef[spl] = float((float) CSend[spl] / 127.0f);
-    }
-    Actualize_Sequencer();
-    Actualize_Patterned();
-    Actualize_Master(0);
-    if(snamesel == 1 || snamesel == 4 || snamesel == 5) snamesel = 0;
     Actualize_DiskIO_Ed(0);
 
     Reset_Song_Length();
     Display_Song_Length();
+
     Draw_Scope();
 
-    mess_box("New song started...");
-    NewWav();
-    Actupated(0);
-    Reset_Tracks_To_Render();
-    Refresh_UI_Context();
-    
+    mess_box("Zzaapp done.");
+
+    Refresh_UI_Context();   
 }
 
 // ------------------------------------------------------
@@ -1918,7 +2215,7 @@ void Actualize_Name(int *newletter, char *nam)
     {
         newletter[71] = FALSE;
         strcpy(nam, cur_input_name);
-        snamesel = 0;
+        snamesel = INPUT_NONE;
         Keyboard_Nbr_Events = 0;
         return;
     }
@@ -1926,7 +2223,7 @@ void Actualize_Name(int *newletter, char *nam)
     if(newletter[39] && namesize > 0)
     {
         newletter[39] = FALSE;
-        snamesel = 0;
+        snamesel = INPUT_NONE;
         Keyboard_Nbr_Events = 0;
         return;
     }
@@ -1970,10 +2267,11 @@ void WavRenderizer(void)
 {
     plx = 0;
     char buffer[80];
-    sprintf(buffer, "%s.wav", name);
     int Save_CHAN_MUTE_STATE[MAX_TRACKS];
     int i;
     int Max_Position;
+
+    sprintf(buffer, "%s.wav", name);
 
     if(!hd_isrecording)
     {
@@ -1985,11 +2283,12 @@ void WavRenderizer(void)
             return;
         }
         SongStop();
-        SDL_Delay(500);
         sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
         mess_box(buffer);
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 
+        rawrender = TRUE;
+ 
         ped_line = 0;
         ped_line_delay = 0;
         if(rawrender_range)
@@ -2031,6 +2330,9 @@ void WavRenderizer(void)
         }
 
         RF.Close();
+
+        rawrender = FALSE;
+
         SongStop();
 
         for(i = 0; i < MAX_TRACKS; i++)
@@ -2058,7 +2360,6 @@ void WavRenderizer(void)
         mess_box(buffer);
         Actupated(0);
     }
-    rawrender = FALSE;
 }
 
 // ------------------------------------------------------
@@ -2183,36 +2484,49 @@ void Actualize_Input(void)
 {
     switch(snamesel)
     {
-        case 1:
+        // Module name
+        case INPUT_MODULE_NAME:
             Actualize_Name(retletter, name);
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
             break;
 
-        case 2:
+        // Instrument name
+        case INPUT_INSTRUMENT_NAME:
             Actualize_Name(retletter, nameins[ped_patsam]);
             gui_action = GUI_CMD_UPDATE_PATTERN_ED;
             break;
 
-        case 3:
+        // Synth name
+        case INPUT_SYNTH_NAME:
             Actualize_Name(retletter, PARASynth[ped_patsam].presetname);
             teac = UPDATE_SYNTH_CHANGE_NAME;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             break;
 
-        case 4:
+        // Module artist
+        case INPUT_MODULE_ARTIST:
             Actualize_Name(retletter, artist);
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
             break;
 
-        case 5:
+        // Module style
+        case INPUT_MODULE_STYLE:
             Actualize_Name(retletter, style);
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
             break;
 
-        case 6:
+        // 303 pattern
+        case INPUT_303_PATTERN:
             Actualize_Name(retletter, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
             teac = 18;
             gui_action = GUI_CMD_UPDATE_MIDI_303_ED;
+            break;
+
+        // 303 pattern
+        case INPUT_REVERB_NAME:
+            Actualize_Name(retletter, Reverb_Name);
+            teac = UPDATE_REVERB_ED_CHANGE_NAME;
+            gui_action = GUI_CMD_UPDATE_REVERB_ED;
             break;
     }
 }
@@ -2358,9 +2672,13 @@ void Keyboard_Handler(void)
         }
         if(Keys[SDLK_F9])
         {
-            gui_action = GUI_CMD_SELECT_DISKIO;
+            gui_action = GUI_CMD_SELECT_REVERB_EDIT;
         }
         if(Keys[SDLK_F10])
+        {
+            gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
+        }
+        if(Keys[SDLK_F11])
         {
             gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
         }
@@ -2513,7 +2831,7 @@ void Keyboard_Handler(void)
             else Insert_Track_Line(ped_track, Cur_Position);
         }
 
-        if(snamesel == 0)
+        if(snamesel == INPUT_NONE)
         {
             if(Keys[SDLK_BACKSPACE] && is_editing)
             {
@@ -2548,7 +2866,7 @@ void Keyboard_Handler(void)
 
     // -------------------------------------------
     // Editing a name
-    if(snamesel > 0)
+    if(snamesel > INPUT_NONE)
     {
         if(Keys[SDLK_a])
         {
@@ -2976,7 +3294,7 @@ void Keyboard_Handler(void)
         Shift = UNICODE_OFFSET1;
     }
 
-    if(snamesel == 0 && !reelletter)
+    if(snamesel == INPUT_NONE && !reelletter)
     {
         // Data columns
         if(Keys_Unicode[SDLK_0]) retvalue = 0;
@@ -3009,7 +3327,7 @@ void Keyboard_Handler(void)
     }
 
     // ------------------------------------------
-    if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0 && !reelletter)
+    if(!Keys[SDLK_MENU] && !Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == INPUT_NONE && !reelletter)
     {
         // Key jazz release
         if(Keys_Raw_Off[0x10]) { Record_Keys[0] = (12 + 1) | 0x80;  Keys_Raw_Off[0x10] = FALSE; Keys_Raw[0x10] = FALSE; }
@@ -3179,7 +3497,7 @@ void Keyboard_Handler(void)
     }
 
     // Turn edit mode on/off
-    if(Keys[SDLK_SPACE] && snamesel == 0 && pos_space == 1)
+    if(Keys[SDLK_SPACE] && snamesel == INPUT_NONE && pos_space == 1)
     {
         if(Get_LShift())
         {
@@ -3198,7 +3516,7 @@ void Keyboard_Handler(void)
     if(!is_recording)
     {
         // Play song
-        if(Keys[SDLK_RCTRL] && snamesel == 0 && po_ctrl2)
+        if(Keys[SDLK_RCTRL] && snamesel == INPUT_NONE && po_ctrl2)
         {
             plx = 0;
             po_ctrl2 = FALSE;
@@ -3206,7 +3524,7 @@ void Keyboard_Handler(void)
         }
         if(!Keys[SDLK_RCTRL] && !po_ctrl2) po_ctrl2 = TRUE;
 
-        if(Keys[SDLK_RALT] && snamesel == 0 && po_alt2)
+        if(Keys[SDLK_RALT] && snamesel == INPUT_NONE && po_alt2)
         {
             plx = 1;
             po_alt2 = FALSE;
@@ -3215,7 +3533,7 @@ void Keyboard_Handler(void)
         if(!Keys[SDLK_RALT] && !po_alt2) po_alt2 = TRUE;
 
         // Play song
-        if(Get_LAlt() && snamesel == 0 && !po_alt)
+        if(Get_LAlt() && snamesel == INPUT_NONE && !po_alt)
         {
             po_alt = TRUE;
         }
@@ -3291,7 +3609,14 @@ void Keyboard_Handler(void)
                 // Save
                 if(Keys[SDLK_s - UNICODE_OFFSET2])
                 {
-                    gui_action = GUI_CMD_SAVE_MODULE;
+                    if(File_Exist("%s.ptk", name))
+                    {
+                        Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_MODULE);
+                    }
+                    else
+                    {
+                        gui_action = GUI_CMD_SAVE_MODULE;
+                    }
                 }
 
                 // Cut selected block
@@ -3617,7 +3942,7 @@ void Keyboard_Handler(void)
 
     // --------------------------------------------
     // Enter one or several notes (used for midi and record as well as simple editing)
-    if(!Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == 0 && !reelletter)
+    if(!Get_LAlt() && !Get_LCtrl() && !Get_LShift() && snamesel == INPUT_NONE && !reelletter)
     {
         int go_note = FALSE;
 
@@ -4018,6 +4343,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:
             case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
 
                 // Scroll the files lists
                 if(zcheckMouse(410, 41, 390, 136) == 1)
@@ -4082,6 +4408,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:
             case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
 
                 // Scroll the files lists
                 if(zcheckMouse(410, 41, 390, 136) == 1)
@@ -4121,6 +4448,8 @@ void Mouse_Handler(void)
         Mouse_Sliders_Right_Pattern_Ed();
 
         Mouse_Sliders_Right_Instrument_Ed();
+
+        Mouse_Sliders_Right_Reverb_Ed();
     }
 
     if(Mouse.button & MOUSE_LEFT_BUTTON)
@@ -4135,6 +4464,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:
             case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
                 if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
                 break;
         }
@@ -4160,6 +4490,8 @@ void Mouse_Handler(void)
         Mouse_Sliders_Master_Shuffle();
 
         Mouse_Sliders_Pattern_Ed();
+
+        Mouse_Sliders_Reverb_Ed();
     }
     else
     {
@@ -4174,23 +4506,30 @@ void Mouse_Handler(void)
         if(display_title)
         {
             // Modules dir.
-            if(zcheckMouse(746, 24, 18, 16))
+            if(zcheckMouse(728, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_MOD_DIR;
                 Draw_Scope_Files_Button();
             }
 
             // Instruments dir.
-            if(zcheckMouse(764, 24, 18, 16))
+            if(zcheckMouse(746, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_INSTR_DIR;
                 Draw_Scope_Files_Button();
             }
 
             // Presets dir.
-            if(zcheckMouse(782, 24, 18, 16))
+            if(zcheckMouse(764, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_PRESET_DIR;
+                Draw_Scope_Files_Button();
+            }
+
+            // Reverbs dir.
+            if(zcheckMouse(782, 24, 18, 16))
+            {
+                Scopish = SCOPE_ZONE_REVERB_DIR;
                 Draw_Scope_Files_Button();
             }
 
@@ -4225,9 +4564,9 @@ void Mouse_Handler(void)
         Mouse_Left_Sample_Ed();
 
         // Change current instrument name
-        if(zcheckMouse(90, 134, 166, 16) && snamesel == 0)
+        if(zcheckMouse(90, 134, 166, 16) && snamesel == INPUT_NONE)
         {
-            snamesel = 2;
+            snamesel = INPUT_INSTRUMENT_NAME;
             strcpy(cur_input_name, nameins[ped_patsam]);
             sprintf(nameins[ped_patsam], "");
             namesize = 0;
@@ -4260,6 +4599,8 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:
             case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
+
                 // Files list up
                 if(zcheckMouse(394, 42, 16, 14))
                 {
@@ -4419,6 +4760,13 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_SELECT_LARGE_PATTERNS;
         }
 
+        // Exit
+
+        if(zcheckMouse(0, 6, 16, 16))
+        {
+            gui_action = GUI_CMD_EXIT;
+        }
+
         if(zcheckMouse(20, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SEQUENCER || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SEQUENCER;
         if(zcheckMouse(84, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
         {
@@ -4435,17 +4783,15 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_SELECT_FX_EDIT;
             teac = 0;
         }  
-        if(zcheckMouse(532, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO;
-        if(zcheckMouse(596, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
-        if(zcheckMouse(660, 429 + Add_Offset, 62, 16))
-        {
-            if(Asking_Exit) gui_action = GUI_CMD_EXIT;
-            else gui_action = GUI_CMD_ASK_EXIT;
-        }
-
+        if(zcheckMouse(532, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
+        if(zcheckMouse(596, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
+        if(zcheckMouse(660, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
+       
         Mouse_Left_Track_Fx_Ed();
 
         Mouse_Left_Sequencer_Ed();
+
+        Mouse_Left_Reverb_Ed();
 
         Mouse_Left_DiskIO_Ed();
 
@@ -4522,6 +4868,8 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:
             case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
+
                 if(zcheckMouse(394, 42, 16, 14) == 1)
                 {
                     lt_index -= 10;
@@ -4632,6 +4980,8 @@ void Mouse_Handler(void)
         Mouse_Right_Fx_Ed();
 
         Mouse_Right_303_Ed();
+
+        Mouse_Right_Reverb_Ed();
 
         Mouse_Right_DiskIO_Ed();
 
@@ -5230,7 +5580,7 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
                 Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
@@ -5239,9 +5589,10 @@ void Draw_Scope_Files_Button(void)
             {
                 Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
-            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
@@ -5251,7 +5602,7 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             
             Actualize_Instruments_Synths_List(0);
             
@@ -5264,9 +5615,10 @@ void Draw_Scope_Files_Button(void)
                 Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
-            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5277,7 +5629,7 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 350, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             Actualize_Instruments_Synths_List(0);
 
@@ -5290,9 +5642,10 @@ void Draw_Scope_Files_Button(void)
                 Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
-            Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5302,6 +5655,8 @@ void Draw_Scope_Files_Button(void)
         case SCOPE_ZONE_MOD_DIR:
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
+        case SCOPE_ZONE_REVERB_DIR:
+
             Read_SMPT();
             Dump_Files_List(413, 41);
             Actualize_Files_List(0);
@@ -5317,23 +5672,34 @@ void Draw_Scope_Files_Button(void)
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    break;
+                case SCOPE_ZONE_REVERB_DIR:
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "R", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;

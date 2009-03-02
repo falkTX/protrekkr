@@ -57,6 +57,7 @@ char Dir_Act[MAX_PATH];
 char Dir_Mods[MAX_PATH];
 char Dir_Instrs[MAX_PATH];
 char Dir_Presets[MAX_PATH];
+char Dir_Reverbs[MAX_PATH];
 char *cur_dir;
 
 // ------------------------------------------------------
@@ -97,6 +98,10 @@ void Set_Current_Dir(void)
         case SCOPE_ZONE_PRESET_DIR:
             CHDIR(Get_Current_FileName());
             GETCWD(Dir_Presets, MAX_PATH);
+            break;
+        case SCOPE_ZONE_REVERB_DIR:
+            CHDIR(Get_Current_FileName());
+            GETCWD(Dir_Reverbs, MAX_PATH);
             break;
     }
 }
@@ -177,6 +182,9 @@ void Read_SMPT(void)
             break;
         case SCOPE_ZONE_PRESET_DIR:
             cur_dir = Dir_Presets;
+            break;
+        case SCOPE_ZONE_REVERB_DIR:
+            cur_dir = Dir_Reverbs;
             break;
     }
     CHDIR(cur_dir);
@@ -277,11 +285,12 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_MOD_DIR:
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
+        case SCOPE_ZONE_REVERB_DIR:
             SetColor(COL_BACKGROUND);
             bjbox(xr - 1, yr + 1, 227 + restx, 135);
 
             // Current dir background
-            Gui_Draw_Button_Box(394, 24, 190 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 172 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             switch(Scopish)
             {
@@ -293,6 +302,9 @@ void Dump_Files_List(int xr, int yr)
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
                     PrintXY(398, 26, USE_FONT, Dir_Presets);
+                    break;
+                case SCOPE_ZONE_REVERB_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Reverbs);
                     break;
             }
 
@@ -364,6 +376,7 @@ void Actualize_Files_List(int modeac)
                 case SCOPE_ZONE_MOD_DIR:
                 case SCOPE_ZONE_INSTR_DIR:
                 case SCOPE_ZONE_PRESET_DIR:
+                case SCOPE_ZONE_REVERB_DIR:
 
                     if(modeac == 0)
                     {

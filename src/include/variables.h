@@ -83,7 +83,8 @@
 #define GUI_CMD_SET_TRACK_PANNING 57
 #define GUI_CMD_CALC_LENGTH 58
 
-#define GUI_CMD_SELECT_DISKIO 60
+#define GUI_CMD_SELECT_REVERB_EDIT 59
+#define GUI_CMD_SELECT_DISKIO_EDIT 60
 #define GUI_CMD_SELECT_TRACK_EDIT 61
 #define GUI_CMD_SELECT_INSTRUMENT_EDIT 62
 #define GUI_CMD_SELECT_FX_EDIT 63
@@ -102,6 +103,8 @@
 
 #define GUI_CMD_SWITCH_TRACK_LARGE_STATE 75
 #define GUI_CMD_SWITCH_TRACK_SMALL_STATE 76
+
+#define GUI_CMD_EXPORT_WAV 77
 
 #define GUI_CMD_FILELIST_SCROLL 100
 #define GUI_CMD_UPDATE_LOOP_EDITOR_ED 101
@@ -132,8 +135,12 @@
 #define GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER 120
 #define GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT 121
 
+#define GUI_CMD_UPDATE_REVERB_ED 122
+
 #define GUI_CMD_PREVIOUS_16_INSTR 125
 #define GUI_CMD_NEXT_16_INSTR 126
+
+#define GUI_CMD_SAVE_REVERB 127
 
 #define GUI_CMD_UPDATE_SYNTH_ED 150
 
@@ -181,8 +188,17 @@
 #define USER_SCREEN_TRACK_FX_EDIT 7
 #define USER_SCREEN_SAMPLE_EDIT 8
 #define USER_SCREEN_TB303_EDIT 9
-#define USER_SCREEN_EXIT 10
+#define USER_SCREEN_REVERB_EDIT 10
 #define USER_SCREEN_LARGE_PATTERN 11
+
+#define INPUT_NONE 0
+#define INPUT_MODULE_NAME 1
+#define INPUT_INSTRUMENT_NAME 2
+#define INPUT_SYNTH_NAME 3
+#define INPUT_MODULE_ARTIST 4
+#define INPUT_MODULE_STYLE 5
+#define INPUT_303_PATTERN 6
+#define INPUT_REVERB_NAME 7
 
 #define MARKER_START_SET 1
 #define MARKER_END_SET 2
@@ -212,13 +228,20 @@
 #define SCOPE_ZONE_PRESET_DIR 3
 #define SCOPE_ZONE_INSTR_LIST 4
 #define SCOPE_ZONE_SYNTH_LIST 5
+#define SCOPE_ZONE_REVERB_DIR 6
 
-#define MIN_VUMETER 4
+#define MIN_VUMETER 22
 #define MAX_VUMETER 155
-#define LARG_VUMETER 208
+#define LARG_VUMETER 134
 #define MIN_PEAK MAX_VUMETER - 12
 
 #define MAX_PATH 260
+
+#define ZZAAPP_ALL 1
+#define ZZAAPP_PATTERNS 2
+#define ZZAAPP_INSTRUMENTS 3
+#define ZZAAPP_SYNTHS 4
+#define ZZAAPP_303 5
 
 // ------------------------------------------------------
 // Structures
@@ -364,8 +387,6 @@ extern char sas;
 extern float Scope_Dats[MAX_TRACKS][128];
 extern float Scope_Dats_LeftRight[2][128];
 
-extern int Asking_Exit;
-
 extern SDL_Surface *SKIN303;
 extern SDL_Surface *LOGOPIC;
 extern int LOGO_WIDTH;
@@ -453,7 +474,6 @@ char zcheckMouse(int x, int y, int xs, int ys);
 void FadeToBlack(void);
 void IniCsParNames(void);
 void UpSynth(int peac,int number);
-void allPassInit(float miliSecs);
 void ComputeStereo(char channel);
 void Keyboard_Handler(void);
 void Mouse_Handler(void);

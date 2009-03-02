@@ -59,6 +59,7 @@
 #define SMP_PACK_NONE 3
 #define SMP_PACK_AT3 4
 #define SMP_PACK_ADPCM 5
+#define SMP_PACK_8BIT 6
 
 #define MAX_ROWS 128
 #define MAX_SEQUENCES 256
@@ -173,7 +174,7 @@ union s_access
 
 // ------------------------------------------------------
 // Variables
-extern float decays[MAX_COMB_FILTERS][2];
+extern float decays[MAX_COMB_FILTERS];
 extern int delays[MAX_COMB_FILTERS];       // delays for the comb filters
 extern int counters[MAX_COMB_FILTERS];
 
@@ -185,6 +186,11 @@ extern int Type_At3_BitRate[];
 
 #if defined(PTK_COMPRESSOR)
 extern char num_echoes;
+#endif
+
+#if defined(PTK_303)
+extern unsigned char track3031;
+extern unsigned char track3032;
 #endif
 
 extern unsigned char *RawPatterns;
@@ -249,7 +255,7 @@ extern volatile float local_ramp_vol;
 
 extern int delay_time;
 extern float Feedback;
-extern int DelayType;
+
 extern float lchorus_feedback;
 extern float rchorus_feedback;
 extern int shuffle;

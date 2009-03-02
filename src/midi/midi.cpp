@@ -156,7 +156,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             if(Instrument_Number > -1)
             {
                 ped_patsam = Instrument_Number;
-                if(snamesel == 2) snamesel = 0;
+                Clear_Input();
                 Actualize_Patterned();
                 RefreshSample();
                 NewWav();

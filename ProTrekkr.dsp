@@ -166,6 +166,10 @@ SOURCE=.\src\Editors\include\Editor_Pattern.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\editors\include\editor_reverb.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Editors\include\Editor_Sample.h
 # End Source File
 # Begin Source File
@@ -212,6 +216,10 @@ SOURCE=.\src\Editors\Editor_Instrument.cpp
 # Begin Source File
 
 SOURCE=.\src\Editors\Editor_Pattern.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\editors\editor_reverb.cpp
 # End Source File
 # Begin Source File
 
@@ -330,12 +338,20 @@ SOURCE=.\src\UI\include\Misc_Draw.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ui\include\requesters.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\UI\include\xml.h
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\src\UI\Misc_Draw.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui\requesters.cpp
 # End Source File
 # Begin Source File
 

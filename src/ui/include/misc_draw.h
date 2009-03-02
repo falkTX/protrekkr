@@ -104,6 +104,12 @@ typedef struct
     int b;
 } LONGRGB, *LPLONGRGB;
 
+typedef struct
+{
+    int x;
+    int y;
+} SCREEN_COORD, *LPSCREEN_COORD;
+
 // ------------------------------------------------------
 // Variables
 extern SDL_Surface *Main_Screen;
@@ -112,6 +118,7 @@ extern SDL_Color Ptk_Palette[256 * 2];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
 extern int curr_tab_highlight;
+extern int Font_Height;
 
 // ------------------------------------------------------
 // Functions
@@ -158,7 +165,6 @@ void Small_Letter(int x, int y, char ltr, int ys, int y2);
 void Note_Large_Letter(int x, int y, char ltr, int ys, int y2);
 extern void (*Letter_Function)(int x, int y, char ltr, int ys, int y2);
 
-void Draw_Ask_Exit(void);
 void DrawLine(int x1, int y1, int x2, int y2);
 void DrawPixel(int x, int y, int Color);
 void DrawHLine(int y, int x1, int x2, int Color);
