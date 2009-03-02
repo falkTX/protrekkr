@@ -246,6 +246,8 @@ int Table_Left_Tab_Notes[] =
     3, 1, 2,
 };
 
+int gui_thread_action = FALSE;
+
 int Keyboard_Events_Channels[256];
 JAZZ_KEY Sub_Channels_NoteOff[MAX_TRACKS][MAX_POLYPHONY];
 int Nbr_Sub_NoteOff;
@@ -1537,6 +1539,15 @@ int Screen_Update(void)
             SetColor(COL_BACKGROUND);
             Fillrect(MIN_VUMETER - 1, 9, MAX_VUMETER, 20);
 
+            Actupated(0);
+        }
+    }
+
+    if(display_title)
+    {       
+        if(gui_thread_action)
+        {
+            gui_thread_action = FALSE;
             Actupated(0);
         }
     }

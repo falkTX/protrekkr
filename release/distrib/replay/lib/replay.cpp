@@ -405,6 +405,10 @@ float xi0[MAX_TRACKS];
 float xi1[MAX_TRACKS];
 float xi2[MAX_TRACKS];
 
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+extern int gui_thread_action;
+#endif
+
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float lchorus_feedback = 0.6f;
     float rchorus_feedback = 0.5f;
@@ -1481,11 +1485,9 @@ void Reset_Values(void)
         Done_Reset = TRUE;
 #endif
 
-/* Bloody Mac OSX doesn't like that all
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-        Actupated(0);
+        gui_thread_action = TRUE;
 #endif
-*/
 
         Songplaying = FALSE;
     }
