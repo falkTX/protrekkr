@@ -360,5 +360,6 @@ void Free_Samples(void);
 void Mas_Compressor_Set_Variables(float treshold, float ratio);
 int Get_Free_Sub_Channel(int channel, int polyphony);
 int Get_Pattern_Offset(int pattern, int track, int row);
+void InitRevervbFilter(void);
 
 #endif

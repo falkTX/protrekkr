@@ -4796,7 +4796,12 @@ void Initreverb()
     }
 
     rev_counter = 99999;
+    
+    InitRevervbFilter();
+}
 
+void InitRevervbFilter(void)
+{
     currentCounter = 5759;
     delayedCounter = 5759 - int(c_threshold * 44.1f);
     delayedCounter2 = 5759 - int(c_threshold * 50.1f);

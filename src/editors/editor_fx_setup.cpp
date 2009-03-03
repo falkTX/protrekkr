@@ -124,7 +124,7 @@ void Actualize_Fx_Ed(char gode)
             Realslider(77, 516, c_threshold, compressor);
             
             // Re-generate
-            if(gode == 7) Initreverb();
+            if(gode == 7) InitRevervbFilter();
         }
 
         if(gode == 0 || gode == 8)
