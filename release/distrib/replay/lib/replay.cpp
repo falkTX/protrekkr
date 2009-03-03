@@ -459,7 +459,7 @@ int delay_time;
     float Flanger_sbuf1R;
 #endif
 
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int DelayType = 1;
 #endif
 
