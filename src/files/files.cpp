@@ -4289,7 +4289,6 @@ void LoadInst(char *FileName)
     int Env_Modulation = FALSE;
 
     mess_box("Attempting to load an instrument file...");
-    //Sleep(1000);
     FILE *in;
     in = fopen(FileName, "rb");
 
@@ -4311,9 +4310,10 @@ void LoadInst(char *FileName)
                 new_adsr = TRUE;
             case '2':
                 Pack_Scheme = TRUE;
+            case '1':
+                break;
             case '0':
                 old_bug = TRUE;
-            case '1':
                 break;
         }
 
