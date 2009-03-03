@@ -6,19 +6,13 @@
 --------------------Configuration: plugin - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1F0.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPC39.tmp" with contents
 [
 /nologo /MT /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PLUGIN_EXPORTS" /D "__WINAMP__" /D "__STAND_ALONE__" /Fp"Release/plugin.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\Src\Pc\ptk\src\files\files.cpp"
-"C:\Src\Pc\ptk\src\plugin\MAIN.Cpp"
-"C:\Src\Pc\ptk\src\editors\patterns_blocks.cpp"
-"C:\Src\Pc\ptk\release\distrib\replay\lib\replay.cpp"
-"C:\Src\Pc\ptk\release\distrib\replay\lib\samples_unpack.cpp"
-"C:\Src\Pc\ptk\release\distrib\replay\lib\synth.cpp"
-"C:\Src\Pc\ptk\release\distrib\replay\lib\tb_303.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1F0.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1F1.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPC39.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPC3A.tmp" with contents
 [
 kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo /dll /incremental:no /pdb:"Release/in_ptk.pdb" /machine:I386 /out:"Distrib\in_ptk.dll" /implib:"Release/in_ptk.lib" 
 .\Release\files.obj
@@ -30,16 +24,10 @@ kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo
 .\Release\synth.obj
 .\Release\tb_303.obj
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1F1.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPC3A.tmp"
 <h3>Output Window</h3>
 Compiling...
 files.cpp
-MAIN.Cpp
-patterns_blocks.cpp
-replay.cpp
-samples_unpack.cpp
-synth.cpp
-tb_303.cpp
 Linking...
    Creating library Release/in_ptk.lib and object Release/in_ptk.exp
 LINK : warning LNK4098: defaultlib "LIBCMT" conflicts with use of other libs; use /NODEFAULTLIB:library

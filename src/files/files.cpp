@@ -83,8 +83,10 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
+#if !defined(__WINAMP__)
 extern REQUESTER Overwrite_Requester;
 extern char OverWrite_Name[1024];
+#endif
 
 extern SynthParameters PARASynth[128];
 
@@ -2217,6 +2219,7 @@ int Read_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle)
 
 // ------------------------------------------------------
 // Check if a file exists
+#if !defined(__WINAMP__)
 int File_Exist(char *Format, char *FileName)
 {
     FILE *in;
@@ -2234,6 +2237,7 @@ int File_Exist(char *Format, char *FileName)
     }
     return(FALSE);
 }
+#endif
 
 // ------------------------------------------------------
 // Return the size of an opened file
@@ -5483,6 +5487,7 @@ void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
 
 // ------------------------------------------------------
 // Save the data to a reverb file (or a module)
+#if !defined(__WINAMP__)
 void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in)
@@ -5525,7 +5530,11 @@ void LoadReverb(char *FileName)
             Load_Reverb_Data(Read_Data, Read_Data_Swap, in);
 
             Initreverb();
+
+#if !defined(__WINAMP__)
             Actualize_Reverb_Ed(0);
+#endif
+
             mess_box("Reverb data loaded ok.");
         }
         else
@@ -5611,3 +5620,4 @@ void Clear_Input(void)
         Actualize_Reverb_Ed(0);
     }
 }
+#endif

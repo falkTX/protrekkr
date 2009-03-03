@@ -459,8 +459,11 @@ int delay_time;
     float Flanger_sbuf1R;
 #endif
 
-#if !defined(__STAND_ALONE__)
+#if defined(__WINAMP__)
     int DelayType = 1;
+#endif
+
+#if !defined(__STAND_ALONE__)
     int L_MaxLevel;
     int R_MaxLevel;
     extern int CHAN_MIDI_PRG[MAX_TRACKS];
@@ -878,7 +881,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 
 #if !defined(__NO_CODEC__)
 #if defined(PTK_8BIT)
-                Unpack8BIT(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                Unpack8Bit(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
 #endif
 #endif
                 break;
