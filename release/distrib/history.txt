@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.98:
+v1.98b:
 
 - Fixed a bug in the synth: ENV1 and ENV2 now really modulate the volume 
   of OSC1 or OSC2.
