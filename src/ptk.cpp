@@ -1499,6 +1499,10 @@ int Screen_Update(void)
                 mess_box(tipoftheday);
                 Done_Tip = TRUE;
             }
+            else
+            {
+                mess_box("Ready.");
+            }
 
             Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
