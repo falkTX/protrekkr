@@ -5471,7 +5471,7 @@ void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
 
     for(i = 0; i < MAX_COMB_FILTERS; i++)
     {
-        delays[i] = 1000.0f;
+        delays[i] = 1000;
         decays[i] = 0.0f;
     }
 

@@ -590,8 +590,8 @@ int Screen_Update(void)
         // Sample ed.
         Draw_Sampled_Wave();
 
-        int Lt_vu = MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER);
-        int Rt_vu = MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER);
+        int Lt_vu = (int) (MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER));
+        int Rt_vu = (int) (MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER));
         int Lt_vu_Peak = Lt_vu;
         int Rt_vu_Peak = Rt_vu;
         if(Lt_vu_Peak > MAX_VUMETER - 1) Lt_vu_Peak = MAX_VUMETER - 1;
