@@ -597,6 +597,17 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
         for(int i = 0; i < Nbr_Events; i++)
         {
+            if(In_Requester)
+            {
+                if(Current_Requester == NULL) In_Requester = FALSE;
+                memset(Keys, 0, sizeof(Keys));
+                memset(Keys_Sym, 0, sizeof(Keys_Sym));
+                memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
+                memset(Keys_Raw, 0, sizeof(Keys_Raw));
+                memset(Keys_Raw_Off, 0, sizeof(Keys_Raw_Off));
+                memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw_Repeat));
+            }
+
             switch(Events[i].type)
             {
                 case SDL_KEYDOWN:
@@ -677,20 +688,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         key_on = 0;
                     }
 
-                    if(In_Requester)
-                    {
-                        if(Current_Requester == NULL) In_Requester = FALSE;
-                        SDL_PumpEvents();
-                        SDL_PeepEvents(Events, MAX_EVENTS, SDL_GETEVENT, 0xffffff);
-                        Nbr_Events = 0;
-                        memset(Keys, 0, sizeof(Keys));
-                        memset(Keys_Sym, 0, sizeof(Keys_Sym));
-                        memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
-                        memset(Keys_Raw, 0, sizeof(Keys_Raw));
-                        memset(Keys_Raw_Off, 0, sizeof(Keys_Raw_Off));
-                        memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw_Repeat));
-                    }
-                    else
+                    if(!In_Requester)
                     {
                         // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY
                         Symbol = Events[i].key.keysym.sym;
