@@ -621,30 +621,33 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 #endif
                         Keys[Uni_Trans] = TRUE;
 
-                        Scancode = Translate_Locale_Key(Symbol);
-
-                        //printf("%x %d %x %d\n", Symbol, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
-
-                        Keys_Raw[Scancode] = TRUE;
-                        Keys_Raw_Off[Scancode] = FALSE;
-                        Keys_Raw_Repeat[Scancode] = TRUE;
-
-                        if(!is_recording_2 && is_editing)
+                        if(!In_Requester)
                         {
-                            in_note = FALSE;
-                            for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
+                            Scancode = Translate_Locale_Key(Symbol);
+
+                            //printf("%x %d %x %d\n", Symbol, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
+
+                            Keys_Raw[Scancode] = TRUE;
+                            Keys_Raw_Off[Scancode] = FALSE;
+                            Keys_Raw_Repeat[Scancode] = TRUE;
+
+                            if(!is_recording_2 && is_editing)
                             {
-                                if(ped_col == (j * 3))
+                                in_note = FALSE;
+                                for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
                                 {
-                                    in_note = TRUE;
-                                    break;
+                                    if(ped_col == (j * 3))
+                                    {
+                                        in_note = TRUE;
+                                        break;
+                                    }
                                 }
-                            }
-                            if(in_note)
-                            {
-                                if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                                if(in_note)
                                 {
-                                    Send_Note(Scancode, FALSE, TRUE);
+                                    if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                                    {
+                                        Send_Note(Scancode, FALSE, TRUE);
+                                    }
                                 }
                             }
                         }
@@ -674,30 +677,46 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         key_on = 0;
                     }
 
-                    // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY
-                    Symbol = Events[i].key.keysym.sym;
-                    Keys_Sym[Symbol] = FALSE;
-
-                    Scancode = Translate_Locale_Key(Symbol);
-                    Keys_Raw_Off[Scancode] = TRUE;
-                    Keys_Raw_Repeat[Scancode] = FALSE;
-
-                    if(!is_recording_2 && is_editing)
+                    if(In_Requester)
                     {
-                        in_note = FALSE;
-                        for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
+                        if(Current_Requester == NULL) In_Requester = FALSE;
+                        SDL_PumpEvents();
+                        SDL_PeepEvents(Events, MAX_EVENTS, SDL_GETEVENT, 0xffffff);
+                        Nbr_Events = 0;
+                        memset(Keys, 0, sizeof(Keys));
+                        memset(Keys_Sym, 0, sizeof(Keys_Sym));
+                        memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
+                        memset(Keys_Raw, 0, sizeof(Keys_Raw));
+                        memset(Keys_Raw_Off, 0, sizeof(Keys_Raw_Off));
+                        memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw_Repeat));
+                    }
+                    else
+                    {
+                        // Only used for SDLK_KP_DIVIDE and SDLK_KP_MULTIPLY
+                        Symbol = Events[i].key.keysym.sym;
+                        Keys_Sym[Symbol] = FALSE;
+
+                        Scancode = Translate_Locale_Key(Symbol);
+                        Keys_Raw_Off[Scancode] = TRUE;
+                        Keys_Raw_Repeat[Scancode] = FALSE;
+
+                        if(!is_recording_2 && is_editing)
                         {
-                            if(ped_col == (j * 3))
+                            in_note = FALSE;
+                            for(j = 0; j < Channels_MultiNotes[ped_track]; j++)
                             {
-                                in_note = TRUE;
-                                break;
+                                if(ped_col == (j * 3))
+                                {
+                                    in_note = TRUE;
+                                    break;
+                                }
                             }
-                        }
-                        if(in_note)
-                        {
-                            if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                            if(in_note)
                             {
-                                Send_Note(Scancode | 0x80, FALSE, TRUE);
+                                if(!Get_LCtrl() && !Get_LShift() && !Get_LAlt())
+                                {
+                                    Send_Note(Scancode | 0x80, FALSE, TRUE);
+                                }
                             }
                         }
                     }
@@ -777,7 +796,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     if(!In_Requester)
                     {
                         Display_Requester(&Exit_Requester, GUI_CMD_NOP);
-                        //Prog_End = TRUE;
                     }
                     break;
 

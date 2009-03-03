@@ -1140,16 +1140,6 @@ void Dump_Instruments_Synths_List(int xr, int yr)
             SetColor(COL_BACKGROUND);
             bjbox(xr - 1, yr + 1, 227 + restx, 135);
 
-            switch(Scopish)
-            {
-                case SCOPE_ZONE_INSTR_LIST:
-                    PrintXY(398, 26, USE_FONT, "Instruments List");
-                    break;
-                case SCOPE_ZONE_SYNTH_LIST:
-                    PrintXY(398, 26, USE_FONT, "Synths List");
-                    break;
-            }
-
             for(int counter = 0; counter < 11; counter++)
             {
                 int rel_val = Instrs_index + counter;
@@ -1279,8 +1269,11 @@ void Dump_Instruments_Synths_List(int xr, int yr)
 
                         case SCOPE_ZONE_SYNTH_LIST:
 
-                            Font = USE_FONT;
-                            if(Synthprg[rel_val] == 0) Font = USE_FONT_LOW;
+                            Font = USE_FONT_LOW;
+                            if(Synthprg[rel_val])
+                            {
+                                Font = USE_FONT;
+                            }
                             
                             // Synths view
                             sprintf(Line, "%.2x:", rel_val);
@@ -1343,6 +1336,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                     }
                 }
             }
+
             break;
     }
 }
@@ -1352,6 +1346,10 @@ void Dump_Instruments_Synths_List(int xr, int yr)
 void Actualize_Instruments_Synths_List(int modeac)
 {
     int const brolim = Instrs_items - 11;
+    char Line[200];
+    int i;
+    int j;
+    int Nbr_Entries = 0;
 
     switch(Scopish)
     {
@@ -1400,6 +1398,42 @@ void Actualize_Instruments_Synths_List(int modeac)
             bjbox(395, 59, 15, 101);
             Gui_Draw_Button_Box(394 + 1, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
             Dump_Instruments_Synths_List(413, 41);
+
+            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            switch(Scopish)
+            {
+                case SCOPE_ZONE_INSTR_LIST:
+
+                    Nbr_Entries = 0;
+                    for(j = 0; j < MAX_INSTRS; j++)
+                    {
+                        for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+                        {
+                            if(SampleType[j][i])
+                            {
+                                Nbr_Entries++;
+                            }
+                        }
+                    }
+                    sprintf(Line, "Instruments List (%d)", Nbr_Entries);
+                    PrintXY(398, 26, USE_FONT, Line);
+                    break;
+
+                case SCOPE_ZONE_SYNTH_LIST:
+                    Nbr_Entries = 0;
+                    for(i = 0; i < MAX_INSTRS; i++)
+                    {
+                        if(Synthprg[i])
+                        {
+                            Nbr_Entries++;
+                        }
+                    }
+                    sprintf(Line, "Synths List (%d)", Nbr_Entries);
+                    PrintXY(398, 26, USE_FONT, Line);
+                    break;
+            }
+
+
             break;
     }
 }

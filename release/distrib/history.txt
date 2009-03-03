@@ -4,6 +4,17 @@ ProTrekkr releases history
 
 v1.98:
 
+- Fixed a bug in the synth: ENV1 and ENV2 now really modulate the volume 
+  of OSC1 or OSC2.
+
+  **Due to this older modules don't sound exactly the same**
+
+- There was an issue when using combined stereo instrument + synth.
+- Added keys shortcut for requesters
+  (Usually the first letter of the button's text)
+
+v1.98:
+
 - Fixed the vu meters levels.
 - Reverb internal variables are now customizable
   (older presets are now provided as files).

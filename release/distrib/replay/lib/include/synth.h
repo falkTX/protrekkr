@@ -319,9 +319,15 @@ class CSynth
         float ENV2_D_COEF;
         float ENV2_R_COEF;
 
+#if defined(PTK_SYNTH_LFO1)
         float LFO1_PERIOD;
-        float LFO2_PERIOD;
+#endif
 
+#if defined(PTK_SYNTH_LFO2)
+        float LFO2_PERIOD;
+#endif
+
+#if defined(PTK_SYNTH_LFO1)
         float LFO1_COUNTER;
         char LFO1_STAGE;
         float LFO1b_ATTACK;
@@ -335,7 +341,9 @@ class CSynth
         float LFO1_SUSTAIN;
         float LFO1_RELEASE;
         float LFO1_ADSR_VALUE;
+#endif
 
+#if defined(PTK_SYNTH_LFO2)
         float LFO2_COUNTER;
         char LFO2_STAGE;
         float LFO2b_ATTACK;
@@ -349,25 +357,47 @@ class CSynth
         float LFO2_SUSTAIN;
         float LFO2_RELEASE;
         float LFO2_ADSR_VALUE;
+#endif
 
+#if defined(PTK_SYNTH_LFO1)
         int LFO1_GR;
-        int LFO2_GR;
+#endif
 
+#if defined(PTK_SYNTH_LFO2)
+        int LFO2_GR;
+#endif
+
+#if defined(PTK_SYNTH_LFO1)
         int LFO1_SUBGRCOUNTER;
+#endif
+
+#if defined(PTK_SYNTH_LFO2)
         int LFO2_SUBGRCOUNTER;
+#endif
 
         char ENV1_LOOP_BACKWARD;
         char ENV2_LOOP_BACKWARD;
         char ENV3_LOOP_BACKWARD;
 
+#if defined(PTK_SYNTH_LFO1)
         int LFO1_SUBGRMAX;
-        int LFO2_SUBGRMAX;
+#endif
 
+#if defined(PTK_SYNTH_LFO2)
+        int LFO2_SUBGRMAX;
+#endif
+
+#if defined(PTK_SYNTH_LFO1)
         float LFO1_VALUE;
+#endif
+
+#if defined(PTK_SYNTH_LFO2)
         float LFO2_VALUE;
+#endif
 
         /* Envelopes and LFO's modulation variables */
 
+#if defined(PTK_SYNTH_LFO1)
         float LFO1_OSC1_PW;
         float LFO1_OSC2_PW;
         float LFO1_OSC1_PITCH;
@@ -376,7 +406,9 @@ class CSynth
         float LFO1_OSC2_VOLUME; 
         float LFO1_VCF_CUTOFF;
         float LFO1_VCF_RESONANCE;  
+#endif
 
+#if defined(PTK_SYNTH_LFO2)
         float LFO2_OSC1_PW;
         float LFO2_OSC2_PW;
         float LFO2_OSC1_PITCH;
@@ -385,24 +417,29 @@ class CSynth
         float LFO2_OSC2_VOLUME;
         float LFO2_VCF_CUTOFF;
         float LFO2_VCF_RESONANCE;  
+#endif
 
+#if defined(PTK_SYNTH_ENV1)
         float ENV1_OSC1_PW;
         float ENV1_OSC2_PW;
         float ENV1_OSC1_PITCH;
         float ENV1_OSC2_PITCH;
-        float ENV1_OSC1_VOLUME;
-        float ENV1_OSC2_VOLUME; 
         float ENV1_VCF_CUTOFF;
         float ENV1_VCF_RESONANCE;  
+#endif
+        float ENV1_OSC1_VOLUME;
+        float ENV1_OSC2_VOLUME; 
 
+#if defined(PTK_SYNTH_ENV2)
         float ENV2_OSC1_PW;
         float ENV2_OSC2_PW;
         float ENV2_OSC1_PITCH;
         float ENV2_OSC2_PITCH;
-        float ENV2_OSC1_VOLUME;
-        float ENV2_OSC2_VOLUME; 
         float ENV2_VCF_CUTOFF;
         float ENV2_VCF_RESONANCE;  
+#endif
+        float ENV2_OSC1_VOLUME;
+        float ENV2_OSC2_VOLUME; 
 
         /* Internal rendering variables */
 
@@ -412,10 +449,8 @@ class CSynth
         float ENV1_COUNTER;
         float ENV2_COUNTER;
 
-        float ENV1_VOLUME_1;
-        float ENV1_VOLUME_2;
-        float ENV2_VOLUME_1;
-        float ENV2_VOLUME_2;
+        float ENV1_VOLUME;
+        float ENV2_VOLUME;
 
         float ENV1_VALUE;
         float ENV2_VALUE;
@@ -469,7 +504,6 @@ class rFilter
 
         float fWork(float input, float f)
         {
-
             float fa = 1.0f - f; 
 
             buffy0 = fa * buffy0 + f * input; 

@@ -256,56 +256,64 @@ REQUESTER_BUTTON Requester_Btn_Cancel =
 {
     NULL,
     "Cancel",
-    BUTTON_CANCEL
+    BUTTON_CANCEL,
+    SDLK_c
 };
 
 REQUESTER_BUTTON Requester_Btn_303 =
 {
     &Requester_Btn_Cancel,
-    "303",
-    0
+    "303 Units",
+    0,
+    SDLK_u
 };
 
 REQUESTER_BUTTON Requester_Btn_Synths =
 {
     &Requester_Btn_303,
     "Synths",
-    0
+    0,
+    SDLK_s
 };
 
 REQUESTER_BUTTON Requester_Btn_Instruments =
 {
     &Requester_Btn_Synths,
     "Instruments",
-    0
+    0,
+    SDLK_i
 };
 
 REQUESTER_BUTTON Requester_Btn_Patterns =
 {
     &Requester_Btn_Instruments,
     "Patterns",
-    0
+    0,
+    SDLK_p
 };
 
 REQUESTER_BUTTON Requester_Btn_All =
 {
     &Requester_Btn_Patterns,
     "All",
-    BUTTON_DEFAULT
+    BUTTON_DEFAULT,
+    SDLK_a
 };
 
 REQUESTER_BUTTON Requester_Btn_No =
 {
     NULL,
     "No",
-    BUTTON_CANCEL
+    BUTTON_CANCEL,
+    SDLK_n
 };
 
 REQUESTER_BUTTON Requester_Btn_Yes =
 {
     &Requester_Btn_No,
     "Yes",
-    BUTTON_DEFAULT
+    BUTTON_DEFAULT,
+    SDLK_y
 };
 
 REQUESTER Exit_Requester =
@@ -1753,9 +1761,11 @@ void LoadFile(int Freeindex, const char *str)
            strcmp(extension, "TWNNINS1") == 0 ||
            strcmp(extension, "TWNNINS2") == 0 ||
            strcmp(extension, "TWNNINS3") == 0 ||
-           strcmp(extension, "TWNNINS4") == 0)
+           strcmp(extension, "TWNNINS4") == 0 ||
+           strcmp(extension, "TWNNINS5") == 0 ||
+           strcmp(extension, "TWNNINS6") == 0)
         {
-           sprintf(instrname, "%s", Wavfile);
+            sprintf(instrname, "%s", Wavfile);
             LoadInst(instrname);
             NewWav();
         }
@@ -1773,6 +1783,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGD") == 0 ||
                 strcmp(extension, "TWNNSNGE") == 0 ||
                 strcmp(extension, "TWNNSNGF") == 0 ||
+                strcmp(extension, "TWNNSNGG") == 0 ||
                 extension_New == 'KTRP')
         {
             sprintf(name, "%s", Wavfile);
@@ -1781,7 +1792,8 @@ void LoadFile(int Freeindex, const char *str)
             NewWav();
         }
         else if(strcmp(extension, "TWNNSYN0") == 0 ||
-                strcmp(extension, "TWNNSYN1") == 0)
+                strcmp(extension, "TWNNSYN1") == 0 ||
+                strcmp(extension, "TWNNSYN2") == 0)
         {
             sprintf(synthname, "%s", Wavfile);
             LoadSynth(synthname);
@@ -5617,7 +5629,6 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             
             Actualize_Instruments_Synths_List(0);
             
@@ -5644,7 +5655,6 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 135);
             bjbox(394, 24, 370, 17);
-            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             Actualize_Instruments_Synths_List(0);
 

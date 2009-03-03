@@ -47,8 +47,9 @@ static char *Req_Txt_Lines[64];
 static int Req_Txt_Pos_X[64];
 static int Buttons_Size[64];
 static int Buttons_Pos[64];
+static int Buttons_Keys[64];
 static char *Buttons_Text[64];
-static LPREQUESTER Current_Requester;
+LPREQUESTER Current_Requester;
 static int Pressed_Button;
 static int Default_Button;
 static int Cancel_Button;
@@ -133,6 +134,7 @@ int Display_Requester(LPREQUESTER Requester, int Action)
     while(Button)
     {
         Buttons_Text[Nbr_Buttons] = Button->Text;
+        Buttons_Keys[Nbr_Buttons] = Button->Key;
         if(Get_Size_Text(Button->Text) + 42 > Biggest_Button)
         {
             Biggest_Button = Get_Size_Text(Button->Text) + 30;
@@ -254,6 +256,16 @@ void Mouse_Handler_Requester(void)
 // KeyBoard ShortCut Handler
 void Keyboard_Handler_Requester(void)
 {
+    int i;
+
+    for(i = 0; i < Nbr_Buttons; i++)
+    {
+        if(Keys[Buttons_Keys[i]])
+        {
+            Pressed_Button = i + 1;
+        }
+    }
+
     if(Keys[SDLK_ESCAPE])
     {
         if(Cancel_Button != -1)
@@ -282,7 +294,6 @@ void Kill_Requester(void)
         if(Req_Txt_Lines[Nbr_Lines]) free(Req_Txt_Lines[Nbr_Lines]);
         Req_Txt_Lines[Nbr_Lines] = NULL;
     }
-    In_Requester = FALSE;
     Current_Requester = NULL;
     Actupated(0);
 }

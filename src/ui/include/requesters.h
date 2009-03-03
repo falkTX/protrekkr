@@ -38,17 +38,13 @@
 #define BUTTON_CANCEL 2
 
 // ------------------------------------------------------
-// Variables
-extern int In_Requester;
-extern int Requester_Action;
-
-// ------------------------------------------------------
 // Structures
 typedef struct
 {
     void *Next;
     char *Text;
     int Type;
+    int Key;
 } REQUESTER_BUTTON, *LPREQUESTER_BUTTON;
 
 typedef struct
@@ -56,6 +52,12 @@ typedef struct
     char *Text;
     LPREQUESTER_BUTTON Buttons;
 } REQUESTER, *LPREQUESTER;
+
+// ------------------------------------------------------
+// Variables
+extern int In_Requester;
+extern int Requester_Action;
+extern LPREQUESTER Current_Requester;
 
 // ------------------------------------------------------
 // Functions
