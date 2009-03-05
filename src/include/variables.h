@@ -141,6 +141,7 @@
 #define GUI_CMD_NEXT_16_INSTR 126
 
 #define GUI_CMD_SAVE_REVERB 127
+#define GUI_CMD_SAVE_PATTERN 128
 
 #define GUI_CMD_UPDATE_SYNTH_ED 150
 
@@ -199,6 +200,7 @@
 #define INPUT_MODULE_STYLE 5
 #define INPUT_303_PATTERN 6
 #define INPUT_REVERB_NAME 7
+#define INPUT_SELECTION_NAME 8
 
 #define MARKER_START_SET 1
 #define MARKER_END_SET 2
@@ -229,6 +231,7 @@
 #define SCOPE_ZONE_INSTR_LIST 4
 #define SCOPE_ZONE_SYNTH_LIST 5
 #define SCOPE_ZONE_REVERB_DIR 6
+#define SCOPE_ZONE_PATTERN_DIR 7
 
 #define MIN_VUMETER 22
 #define MAX_VUMETER 155
@@ -344,23 +347,6 @@ extern char is_editing;
 extern char is_recording;
 extern char is_recording_2;
 extern char is_record_key;
-
-extern int block_start_track;
-extern int block_start_track_nibble;
-extern int save_block_start_track_nibble;
-extern int save_block_end_track_nibble;
-extern int block_end_track;
-extern int block_end_track_nibble;
-extern int block_start;
-extern int block_end;
-extern int block_in_selection;
-
-extern int swap_block_start_track;
-extern int swap_block_start_track_nibble;
-extern int swap_block_end_track;
-extern int swap_block_end_track_nibble;
-extern int swap_block_start;
-extern int swap_block_end;
 
 extern char sr_isrecording;
 
@@ -489,7 +475,6 @@ int Delete_Selection(int Position);
 void Copy_Selection(int Position);
 void Cut_Selection(int Position);
 void Interpolate_Block(int Position);
-void Paste_Block(int Position);
 void Randomize_Block(int Position);
 void Semitone_Up_Block(int Position);
 void Semitone_Down_Block(int Position);

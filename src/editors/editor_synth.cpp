@@ -1048,7 +1048,7 @@ void Mouse_Left_Synth_Ed(void)
             // Save the data
             if(zcheckMouse(758, 450, 34, 16))
             {
-                if(File_Exist("%s.pts", PARASynth[ped_patsam].presetname))
+                if(File_Exist("%s"SLASH"%s.pts", Dir_Presets, PARASynth[ped_patsam].presetname))
                 {
                     Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_SYNTH);
                 }

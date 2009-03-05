@@ -52,7 +52,7 @@ int curr_tab_highlight;
 
 int Nbr_Letters;
 int Font_Height = 11;
-char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011 ";
+char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014 ";
 int Font_Pos[256];
 int Font_Size[256];
 
@@ -217,8 +217,8 @@ SDL_Color Default_Palette[] =
     { 0x82, 0xc8, 0xff, 0x00 },      // 15 vumeter peak
     { 0x88, 0xd0, 0xff, 0x00 },      // 16 scopes / samples
 
-    { 0xff, 0xff, 0xff, 0x00 },      // 17 Font hi
-    { 0x77, 0x77, 0x77, 0x00 },      // 18 Font lo
+    { 0xdc, 0xf2, 0xff, 0x00 },      // 17 Font hi
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
 
     { 0x00, 0x00, 0x00, 0x00 },      // 19 Pattern lo background
     { 0x68, 0x8c, 0xac, 0x00 },      // 20 Pattern lo foreground
@@ -227,7 +227,7 @@ SDL_Color Default_Palette[] =
     { 0xa0, 0xbe, 0xe4, 0x00 },      // 22 Pattern hi foreground
 
     { 0x36, 0x2e, 0x32, 0x00 },      // 23 Pattern sel background
-    { 0xea, 0xf0, 0xff, 0x00 },      // 24 Pattern sel foreground
+    { 0xdc, 0xf2, 0xff, 0x00 },      // 24 Pattern sel foreground
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
     { 0xe0, 0xb6, 0x80, 0x00 },      // 26 Note lo foreground
@@ -779,11 +779,11 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
     if(pushed & BUTTON_TEXT_CENTERED)
     {
         x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
-        PrintXY(x, y + 2, USE_FONT, (char *) str);
+        PrintXY(x, y + 2, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
     else
     {
-        PrintXY(x + 4, y + 2, USE_FONT, (char *) str);
+        PrintXY(x + 4, y + 2, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
 }
 

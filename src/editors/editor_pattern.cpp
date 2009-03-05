@@ -429,7 +429,7 @@ void draw_pated(int track, int line, int petrack, int row)
     SetColor(COL_PATTERN_LO_BACK);
     bjbox(0,
           196,
-          CHANNELS_WIDTH + 2,
+          CONSOLE_WIDTH ,
           (8 * (Patterns_Lines + 1) + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 4 : 0))
          );
 
@@ -1219,6 +1219,14 @@ void Actupated(int modac)
     int nlines;
     int Cur_Position;
     int cur_line;
+    // Buffers blocks
+    int High[] =
+    {
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL
+    };
 
     if(is_editing > 1)
     {
@@ -1365,9 +1373,20 @@ void Actupated(int modac)
     draw_pated(gui_track, cur_line, ped_track, ped_col);
     draw_pated_highlight(gui_track, cur_line, ped_track, ped_col);
 
-    Realslider_Vert(781, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 200 + Patterns_Lines_Offset, TRUE);
+    Realslider_Vert(781, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 136 + Patterns_Lines_Offset, TRUE);
     Gui_Draw_Button_Box(781, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(781, 413 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(781, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    
+    High[Curr_Buff_Block] = BUTTON_PUSHED;
+
+    Gui_Draw_Button_Box(781, 349 + (16 * 1) + Patterns_Lines_Offset, 16, 14, "1",
+                        High[0] | BUTTON_TEXT_CENTERED | (Buff_Full[0] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(781, 349 + (16 * 2) + Patterns_Lines_Offset, 16, 14, "2",
+                        High[1] | BUTTON_TEXT_CENTERED | (Buff_Full[1] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(781, 349 + (16 * 3) + Patterns_Lines_Offset, 16, 14, "3",
+                        High[2] | BUTTON_TEXT_CENTERED | (Buff_Full[2] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(781, 349 + (16 * 4) + Patterns_Lines_Offset, 16, 14, "4",
+                        High[3] | BUTTON_TEXT_CENTERED | (Buff_Full[3] ? 0 : BUTTON_LOW_FONT));
 }
 
 // ------------------------------------------------------
@@ -1401,9 +1420,9 @@ int Get_Nibble_Color(int row, int column, int multi, int Shadow)
     
     if(!Shadow)
     {
-        if(column >= block_start_track &&
-           column <= block_end_track &&
-           row >= block_start && row <= block_end)
+        if(column >= block_start_track[Curr_Buff_Block] &&
+           column <= block_end_track[Curr_Buff_Block] &&
+           row >= block_start[Curr_Buff_Block] && row <= block_end[Curr_Buff_Block])
         {
             color = 8;
         }
@@ -1417,9 +1436,9 @@ int Get_Nibble_Color(int row, int column, int multi, int Shadow)
 int Get_Nibble_Color_Highlight(int row, int column)
 {
     int color = 0;
-    if(column >= block_start_track &&
-       column <= block_end_track &&
-       row >= block_start && row <= block_end)
+    if(column >= block_start_track[Curr_Buff_Block] &&
+       column <= block_end_track[Curr_Buff_Block] &&
+       row >= block_start[Curr_Buff_Block] && row <= block_end[Curr_Buff_Block])
     {
         color = 16;
     }
@@ -1955,7 +1974,7 @@ void Set_Track_Slider(int pos)
     {
         fpos = 0.0f;
     }
-    Realslider_Horiz(724, 429 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0),
+    Realslider_Horiz(724, 429 + Patterns_Lines_Offset,
                      (int) fpos, 16, 74, 74, TRUE);
 }
 
@@ -1964,7 +1983,7 @@ void Set_Track_Slider(int pos)
 void Mouse_Sliders_Pattern_Ed(void)
 {
     // Current track slider
-    if(zcheckMouse(726, 429 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0),
+    if(zcheckMouse(726, 429 + Patterns_Lines_Offset,
                    72, 16))
     {
         float Pos_Mouse = (float) (Mouse.x - 726 - 4);
@@ -1980,13 +1999,13 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // Rows slider
-    if(zcheckMouse(781, 212, 16 + 1, 200 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0)) & !Songplaying)
+    if(zcheckMouse(781, 212, 16 + 1, 136 + Patterns_Lines_Offset) & !Songplaying)
     {
         int final_row;
         int Cur_Position = Get_Current_Position();
         int max_length = patternLines[pSequence[Cur_Position]] + Patterns_Lines;
-        int Center = Slider_Get_Center(Patterns_Lines, max_length, 200 + Patterns_Lines_Offset);
-        float Pos_Mouse = ((float) ((Mouse.y - 212) - (Center / 2))) / (200.0f + (float) Patterns_Lines_Offset);
+        int Center = Slider_Get_Center(Patterns_Lines, max_length, 136 + Patterns_Lines_Offset);
+        float Pos_Mouse = ((float) ((Mouse.y - 212) - (Center / 2))) / (136.0f + (float) Patterns_Lines_Offset);
         if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
         float s_offset = (Pos_Mouse * max_length);
         if(s_offset > (float) (max_length - Patterns_Lines))
@@ -2001,7 +2020,7 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // End of the marking stuff
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 132 : 0)) && !Songplaying)
+    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset) && !Songplaying)
     {
         Mark_Block_End(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse(), 3);
     }
@@ -2024,20 +2043,43 @@ void Mouse_Left_Pattern_Ed(void)
     // Next/Prev rows buttons
     if(zcheckMouse(781, 196, 16 + 1, 14) & !Songplaying)
     {
-        int Cur_Position = Get_Current_Position();
-
-        ped_line--;
-        if(Continuous_Scroll && !Cur_Position) if(ped_line < 0) ped_line = 0;
-        Actupated(0);
+        Goto_Previous_Row();
     }
 
-    if(zcheckMouse(781, 413 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
+    if(zcheckMouse(781, 349 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
     {
-        int Cur_Position = Get_Current_Position();
+        Goto_Next_Row();
+        teac = 0;
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
 
-        ped_line++;
-        if(Continuous_Scroll && (Cur_Position == sLength - 1)) if(ped_line >= patternLines[pSequence[Cur_Position]]) ped_line = patternLines[pSequence[Cur_Position]] - 1;
+    if(zcheckMouse(781, 349 + (16 * 1) + Patterns_Lines_Offset, 16 + 1, 14))
+    {
+        Curr_Buff_Block = 0;
         Actupated(0);
+        teac = 0;
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
+    if(zcheckMouse(781, 349 + (16 * 2) + Patterns_Lines_Offset, 16 + 1, 14))
+    {
+        Curr_Buff_Block = 1;
+        Actupated(0);
+        teac = 0;
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
+    if(zcheckMouse(781, 349 + (16 * 3) + Patterns_Lines_Offset, 16 + 1, 14))
+    {
+        Curr_Buff_Block = 2;
+        Actupated(0);
+        teac = 0;
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
+    }
+    if(zcheckMouse(781, 349 + (16 * 4) + Patterns_Lines_Offset, 16 + 1, 14))
+    {
+        Curr_Buff_Block = 3;
+        Actupated(0);
+        teac = 0;
+        gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
 
     // Track mute

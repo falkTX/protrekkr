@@ -90,6 +90,7 @@ extern char OverWrite_Name[1024];
 
 extern SynthParameters PARASynth[128];
 
+extern char Paste_Across;
 extern char Use_Cubic;
 extern gear303 tb303engine[2];
 extern para303 tb303[2];
@@ -98,10 +99,6 @@ extern char FullScreen;
 extern char AutoSave;
 extern int Beveled;
 extern int Continuous_Scroll;
-extern char Dir_Mods[MAX_PATH];
-extern char Dir_Instrs[MAX_PATH];
-extern char Dir_Presets[MAX_PATH];
-extern char Dir_Reverbs[MAX_PATH];
 extern char *cur_dir;
 extern char Scopish_LeftRight;
 
@@ -243,7 +240,13 @@ short *Get_WaveForm(int Instr_Nbr, int Channel, int Split);
 void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in);
+void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
+                      int (*Read_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
 void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
+                      int (*Write_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
+void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in);
 
@@ -2225,12 +2228,12 @@ int Read_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle)
 // ------------------------------------------------------
 // Check if a file exists
 #if !defined(__WINAMP__)
-int File_Exist(char *Format, char *FileName)
+int File_Exist(char *Format, char *Directory, char *FileName)
 {
     FILE *in;
     char Temph[MAX_PATH];
 
-    sprintf(Temph, Format, FileName);
+    sprintf(Temph, Format, Directory, FileName);
 
     in = fopen(Temph, "rb");
     if(in)
@@ -3866,7 +3869,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     int j;
     int k;
     int l;
-    char Temph[96];
+    char Temph[MAX_PATH];
     int Ok_Memory = TRUE;
     char Comp_Flag = TRUE;
     unsigned char *cur_pattern_col;
@@ -3890,15 +3893,15 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     {
         if(NewFormat)
         {
-            sprintf(Temph, "Saving '%s.ptp' song in current directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptp' song in modules directory...", FileName);
             mess_box(Temph);
-            sprintf(Temph, "%s.ptp", FileName);
+            sprintf(Temph, "%s"SLASH"%s.ptp", Dir_Mods, FileName);
         }
         else
         {
-            sprintf(Temph, "Saving '%s.ptk' song in current directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptk' song in modules directory...", FileName);
             mess_box(Temph);
-            sprintf(Temph, "%s.ptk", FileName);
+            sprintf(Temph, "%s"SLASH"%s.ptk", Dir_Mods, FileName);
         }
         in = fopen(Temph, "wb");
     }
@@ -4249,15 +4252,16 @@ void LoadSynth(char *FileName)
 void SaveSynth(void)
 {
     FILE *in;
-    char Temph[96];
+    char Temph[MAX_PATH];
     char extension[10];
 
     sprintf(extension, "TWNNSYN2");
-    sprintf (Temph, "Saving '%s.pts' synthesizer program in current directory...", PARASynth[ped_patsam].presetname);
+    sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[ped_patsam].presetname);
     mess_box(Temph);
-    sprintf(Temph, "%s.pts", PARASynth[ped_patsam].presetname);
-    in = fopen(Temph, "wb");
 
+    sprintf(Temph, "%s"SLASH"%s.pts", Dir_Presets, PARASynth[ped_patsam].presetname);
+
+    in = fopen(Temph, "wb");
     if(in != NULL)
     {
         Write_Data(extension, sizeof(char), 9, in);
@@ -4416,17 +4420,17 @@ void LoadInst(char *FileName)
 void SaveInst(void)
 {
     FILE *in;
-    char Temph[96];
+    char Temph[MAX_PATH];
     char extension[10];
     char synth_prg;
     int synth_save;
 
     sprintf(extension, "TWNNINS6");
-    sprintf (Temph, "Saving '%s.pti' instrument in current directory...", nameins[ped_patsam]);
+    sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[ped_patsam]);
     mess_box(Temph);
-    sprintf(Temph, "%s.pti", nameins[ped_patsam]);
+    sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]);
 
-    in = fopen(Temph,"wb");
+    in = fopen(Temph, "wb");
     if(in != NULL)
     {
         // Writing header & name...
@@ -4542,13 +4546,13 @@ void Load303(char *FileName)
 void Save303(void)
 {
     FILE *in;
-    char Temph[96];
+    char Temph[MAX_PATH];
     char extension[10];
 
     sprintf(extension, "TWNN3031");
-    sprintf(Temph, "Saving '%s.303' pattern in current directory...", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
+    sprintf(Temph, "Saving '%s.303' pattern in patterns directory...", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     mess_box(Temph);
-    sprintf(Temph, "%s.303", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
+    sprintf(Temph, "%s"SLASH"%s.303", Dir_Patterns, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     in = fopen(Temph, "wb");
 
     if(in != NULL)
@@ -4622,7 +4626,7 @@ int Pack_Module(char *FileName)
     FILE *output;
     char name[128];
     char extension[10];
-    char Temph[96];
+    char Temph[MAX_PATH];
     Uint8 *Final_Mem_Out;
     int Depack_Size;
 
@@ -4633,7 +4637,7 @@ int Pack_Module(char *FileName)
         return(FALSE);
     }
 
-    sprintf(Temph, "%s.ptk", FileName);
+    sprintf(Temph, "%s"SLASH"%s.ptk", Dir_Mods, FileName);
 
     int Len = SaveMod("", FALSE, SAVE_CALCLEN, NULL);
 
@@ -4698,14 +4702,10 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG5");
-    mess_box("Saving 'ptk.cfg' in current directory...");
+    sprintf(extension, "TWNNCFG7");
+    mess_box("Saving 'ptk.cfg'...");
 
-#if defined(__WIN32__)
-    sprintf(FileName, "%s\\ptk.cfg", ExePath);
-#else
-    sprintf(FileName, "%s/ptk.cfg", ExePath);
-#endif
+    sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
 
     memset(KeyboardName, 0, sizeof(KeyboardName));
     sprintf(KeyboardName, "%s", Keyboard_Name);
@@ -4750,11 +4750,14 @@ void SaveConfig(void)
         Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, out);
         Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, out);
         Write_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, out);
+        Write_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, out);
         Write_Data(KeyboardName, MAX_PATH, 1, out);
 
         Write_Data(&rawrender_32float, sizeof(char), 1, out);
         Write_Data(&Patterns_Lines, sizeof(char), 1, out);
         Write_Data(&Scopish_LeftRight, sizeof(char), 1, out);
+        
+        Write_Data(&Paste_Across, sizeof(char), 1, out);
 
         fclose(out);
 
@@ -4781,11 +4784,7 @@ void LoadConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-#if defined(__WIN32__)
-    sprintf(FileName, "%s\\ptk.cfg", ExePath);
-#else
-    sprintf(FileName, "%s/ptk.cfg", ExePath);
-#endif
+    sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
 
     memset(KeyboardName, 0, sizeof(KeyboardName));
 
@@ -4796,7 +4795,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG5") == 0)
+        if(strcmp(extension, "TWNNCFG7") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4834,11 +4833,14 @@ void LoadConfig(void)
             Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
             Read_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, in);
+            Read_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, in);
             Read_Data(KeyboardName, MAX_PATH, 1, in);
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
             Read_Data(&Patterns_Lines, sizeof(char), 1, in);
             Read_Data(&Scopish_LeftRight, sizeof(char), 1, in);
+
+            Read_Data(&Paste_Across, sizeof(char), 1, in);
 
             if(Patterns_Lines == DISPLAYED_LINES_LARGE)
             {
@@ -4906,6 +4908,18 @@ void LoadConfig(void)
         strcat(Dir_Reverbs, "\\reverbs");
 #else
         strcat(Dir_Reverbs, "/reverbs");
+#endif
+
+    }
+
+    if(!strlen(Dir_Patterns))
+    {
+        GETCWD(Dir_Patterns, MAX_PATH);
+
+#if defined(__WIN32__)
+        strcat(Dir_Patterns, "\\patterns");
+#else
+        strcat(Dir_Patterns, "/patterns");
 #endif
 
     }
@@ -5579,9 +5593,7 @@ void LoadReverb(char *FileName)
 
             Initreverb();
 
-#if !defined(__WINAMP__)
             Actualize_Reverb_Ed(0);
-#endif
 
             mess_box("Reverb data loaded ok.");
         }
@@ -5606,11 +5618,11 @@ void SaveReverb(void)
     char extension[10];
 
     sprintf(extension, "TWNNREV1");
-    sprintf(Temph, "Saving '%s.prv' data in current directory...", Reverb_Name);
+    sprintf(Temph, "Saving '%s.prv' data in reverbs directory...", Reverb_Name);
     mess_box(Temph);
-    sprintf(Temph, "%s.prv", Reverb_Name);
-    in = fopen(Temph, "wb");
+    sprintf(Temph, "%s"SLASH"%s.prv", Dir_Reverbs, Reverb_Name);
 
+    in = fopen(Temph, "wb");
     if(in != NULL)
     {
         Write_Data(extension, sizeof(char), 9, in);
@@ -5630,6 +5642,163 @@ void SaveReverb(void)
     }
 
     Clear_Input();
+}
+
+// ------------------------------------------------------
+// Load a pattern file
+void LoadPattern(char *FileName)
+{
+    FILE *in;
+
+    if(!is_editing)
+    {
+        mess_box("Edit mode isn't turned on.");
+        return;
+    }
+
+    in = fopen(FileName, "rb");
+
+    if(in != NULL)
+    {
+        // Reading and checking extension...
+        char extension[10];
+        fread(extension, sizeof(char), 9, in);
+
+        if(strcmp(extension, "TWNNBLK1") == 0)
+        {
+            // Ok, extension matched!
+            mess_box("Loading Pattern data...");
+
+            Read_Data(Selection_Name, sizeof(char), 20, in);
+
+            Load_Pattern_Data(Read_Data, Read_Data_Swap, in);
+
+            Actupated(0);
+
+            mess_box("Pattern data loaded ok.");
+        }
+        else
+        {
+            mess_box("That file is not a "TITLE" Pattern file...");
+        }
+        fclose(in);
+    }
+    else
+    {
+        mess_box("Pattern data loading failed. (Probably: file not found)");
+    }
+}
+
+// ------------------------------------------------------
+// Save a pattern block file
+void SavePattern(void)
+{
+    FILE *in;
+    char Temph[96];
+    char extension[10];
+
+    sprintf(extension, "TWNNBLK1");
+    sprintf(Temph, "Saving '%s.ppb' data in patterns directory...", Selection_Name);
+    mess_box(Temph);
+    sprintf(Temph, "%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name);
+
+    in = fopen(Temph, "wb");
+    if(in != NULL)
+    {
+        Write_Data(extension, sizeof(char), 9, in);
+        Write_Data(Selection_Name, sizeof(char), 20, in);
+
+        Save_Pattern_Data(Write_Data, Write_Data_Swap, in);
+
+        fclose(in);
+        Read_SMPT();
+        last_index = -1;
+        Actualize_Files_List(0);
+        mess_box("Pattern data saved succesfully.");   
+    }
+    else
+    {
+        mess_box("Pattern data save failed.");
+    }
+
+    Clear_Input();
+}
+
+// ------------------------------------------------------
+// Save the data to a pattern file
+void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
+                      int (*Write_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in)
+{
+    int Cur_Position;
+
+    if(Songplaying) Cur_Position = cPosition_delay;
+    else Cur_Position = cPosition;
+
+    int Old_Curr_Buff_Block = Curr_Buff_Block;
+
+    Copy_Buff(NBR_COPY_BLOCKS - 1, Curr_Buff_Block);
+    Curr_Buff_Block = NBR_COPY_BLOCKS - 1;
+    Copy_Selection_To_Buffer(Cur_Position);
+
+    Calc_selection();
+    Actupated(0);
+    
+    Write_Function(Buff_MultiNotes[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
+    Write_Function_Swap(&b_buff_xsize[Curr_Buff_Block], sizeof(int), 1, in);
+    Write_Function_Swap(&b_buff_ysize[Curr_Buff_Block], sizeof(int), 1, in);
+    Write_Function_Swap(&start_buff_nibble[Curr_Buff_Block], sizeof(int), 1, in);
+    int Block_Len = PATTERN_LEN;
+
+    BYTE *Final_Mem_Out = Pack_Data(BuffBlock[Curr_Buff_Block], &Block_Len);
+    if(Final_Mem_Out)
+    {
+        Write_Function_Swap(&Block_Len, sizeof(int), 1, in);
+        Write_Function(Final_Mem_Out, sizeof(char), Block_Len, in);
+        free(Final_Mem_Out);
+    }
+    Curr_Buff_Block = Old_Curr_Buff_Block;
+}
+
+// ------------------------------------------------------
+// Load the data from a pattern file
+void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
+                      int (*Read_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in)
+{
+    int Cur_Position;
+
+    if(Songplaying) Cur_Position = cPosition_delay;
+    else Cur_Position = cPosition;
+
+    int Old_Curr_Buff_Block = Curr_Buff_Block;
+    Curr_Buff_Block = NBR_COPY_BLOCKS - 1;
+
+    Read_Function(Buff_MultiNotes[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
+    Read_Function_Swap(&b_buff_xsize[Curr_Buff_Block], sizeof(int), 1, in);
+    Read_Function_Swap(&b_buff_ysize[Curr_Buff_Block], sizeof(int), 1, in);
+    Read_Function_Swap(&start_buff_nibble[Curr_Buff_Block], sizeof(int), 1, in);
+
+    int Size_In;
+    int Size_Out = PATTERN_LEN;
+    Read_Function_Swap(&Size_In, sizeof(int), 1, in);
+
+    BYTE *Pack_Mem = (BYTE *) malloc(Size_In);
+    if(Pack_Mem)
+    {
+        Read_Function(Pack_Mem, sizeof(char), Size_In, in);
+
+        BYTE *Final_Mem_Out = Depack_Data(Pack_Mem, Size_In, Size_Out);
+        if(Final_Mem_Out)
+        {
+            Buff_Full[Curr_Buff_Block] = TRUE;
+            memcpy(BuffBlock[Curr_Buff_Block], Final_Mem_Out, Size_Out);
+            Paste_Block(Cur_Position, Paste_Across);
+            free(Final_Mem_Out);
+        }
+        free(Pack_Mem);
+    }
+    Curr_Buff_Block = Old_Curr_Buff_Block;
 }
 
 // ------------------------------------------------------
@@ -5666,6 +5835,12 @@ void Clear_Input(void)
     {
         snamesel = INPUT_NONE;
         Actualize_Reverb_Ed(0);
+    }
+
+    if(snamesel == INPUT_SELECTION_NAME)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_Seq_Ed(0);
     }
 }
 #endif

@@ -39,42 +39,96 @@
 
 // ------------------------------------------------------
 // Variables
-int block_start_track_nibble = -1;
-int save_block_start_track_nibble = -1;
-int block_start_track = -1;
-int block_end_track_nibble = -1;
-int block_end_track = -1;
-int block_start = 0;
-int block_end = 0;
-int block_in_selection = 0;
-int b_buff_xsize = 0;
-int b_buff_ysize = 0;
+unsigned char *Spec_BuffBlock;
+unsigned char *BuffBlock[NBR_COPY_BLOCKS];
+int Buff_Full[NBR_COPY_BLOCKS];
+int block_start_track_nibble[NBR_COPY_BLOCKS];
+int block_end_track_nibble[NBR_COPY_BLOCKS];
+int b_buff_xsize[NBR_COPY_BLOCKS];
+int b_buff_ysize[NBR_COPY_BLOCKS];
+int start_buff_nibble[NBR_COPY_BLOCKS];
+int block_in_selection[NBR_COPY_BLOCKS];
+int block_start_track[NBR_COPY_BLOCKS];
+int block_end_track[NBR_COPY_BLOCKS];
+int block_start[NBR_COPY_BLOCKS];
+int block_end[NBR_COPY_BLOCKS];
+int swap_block_start_track[NBR_COPY_BLOCKS];
+int swap_block_end_track[NBR_COPY_BLOCKS];
+int swap_block_start[NBR_COPY_BLOCKS];
+int swap_block_end[NBR_COPY_BLOCKS];
 
-int swap_block_start_track = -1;
-int swap_block_start_track_nibble = -1;
-int swap_block_end_track = -1;
-int swap_block_end_track_nibble = -1;
-int swap_block_start = 0;
-int swap_block_end = 0;
-unsigned char *BuffBlock;
+char Buff_MultiNotes[NBR_COPY_BLOCKS][MAX_TRACKS];
+int Curr_Buff_Block;
 
-int start_buff_nibble;
-char Buff_MultiNotes[MAX_TRACKS];
+// ------------------------------------------------------
+// Clear the data of a copy buffer
+void Init_Current_Buff(int i)
+{
+    int j;
+
+    Buff_Full[i] = FALSE;
+    swap_block_start[i] = -1;
+    swap_block_end[i] = -1;
+    swap_block_start_track[i] = -1;
+    swap_block_end_track[i] = -1;
+    block_start_track_nibble[i] = -1;
+    block_end_track_nibble[i] = -1;
+    b_buff_xsize[i] = 0;
+    b_buff_ysize[i] = 0;
+    start_buff_nibble[i] = 0;
+    block_start_track[i] = -1;
+    block_end_track[i] = -1;
+    block_in_selection[i] = FALSE;
+    block_start[i] = 0;
+    block_end[i] = 0;
+    for(j = 0; j < MAX_TRACKS; j++)
+    {
+        Buff_MultiNotes[i][j] = 0;
+    }
+}
+
+// ------------------------------------------------------
+// Copy the data of a buffer into another block
+void Copy_Buff(int dst, int src)
+{
+    Buff_Full[dst] = Buff_Full[src];
+    swap_block_start[dst] = swap_block_start[src];
+    swap_block_end[dst] = swap_block_end[src];
+    swap_block_start_track[dst] = swap_block_start_track[src];
+    swap_block_end_track[dst] = swap_block_end_track[src];
+    block_start_track_nibble[dst] = block_start_track_nibble[src];
+    block_end_track_nibble[dst] = block_end_track_nibble[src];
+    b_buff_xsize[dst] = b_buff_xsize[src];
+    b_buff_ysize[dst] = b_buff_ysize[src];
+    start_buff_nibble[dst] = start_buff_nibble[src];
+    block_start_track[dst] = block_start_track[src];
+    block_end_track[dst] = block_end_track[src];
+    block_in_selection[dst] = block_in_selection[src];
+    block_start[dst] = block_start[src];
+    block_end[dst] = block_end[src];
+}
 
 // ------------------------------------------------------
 // Init the blocks datas and buffers
 int Init_Block_Work(void)
 {
-    BuffBlock = (unsigned char *) malloc(PATTERN_LEN);
-    if(!BuffBlock) return(FALSE);
+    int i;
 
-    Clear_Buff();
+    for(i = 0; i < NBR_COPY_BLOCKS; i++)
+    {
+        BuffBlock[i] = (unsigned char *) malloc(PATTERN_LEN);
+        if(!BuffBlock[i]) return(FALSE);
+        Init_Current_Buff(i);
+        Clear_Buff(i);
+    }
+
+    Curr_Buff_Block = 0;
     return(TRUE);
 }
 
 // ------------------------------------------------------
 // Clear the copy block
-void Clear_Buff(void)
+void Clear_Buff(int Idx)
 {
     int i;
     int ipcut;
@@ -83,13 +137,13 @@ void Clear_Buff(void)
     {
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            *(BuffBlock + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
-            *(BuffBlock + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
+            *(BuffBlock[Idx] + ipcut + PATTERN_NOTE1 + (i * 2)) = 121;
+            *(BuffBlock[Idx] + ipcut + PATTERN_INSTR1 + (i * 2)) = 255;
         }        
-        *(BuffBlock + ipcut + PATTERN_VOLUME) = 255;
-        *(BuffBlock + ipcut + PATTERN_PANNING) = 255;
-        *(BuffBlock + ipcut + PATTERN_FX) = 0;
-        *(BuffBlock + ipcut + PATTERN_FXDATA) = 0;
+        *(BuffBlock[Idx] + ipcut + PATTERN_VOLUME) = 255;
+        *(BuffBlock[Idx] + ipcut + PATTERN_PANNING) = 255;
+        *(BuffBlock[Idx] + ipcut + PATTERN_FX) = 0;
+        *(BuffBlock[Idx] + ipcut + PATTERN_FXDATA) = 0;
     }
 }
 
@@ -97,20 +151,28 @@ void Clear_Buff(void)
 // Start the block marking stuff
 void Mark_Block_Start(int start_nibble, int start_track, int start_line)
 {
-    swap_block_start_track = (start_nibble + Get_Track_Nibble_Start(Channels_MultiNotes, start_track)) + start_track;
-    swap_block_end_track = swap_block_start_track;
-    swap_block_start = start_line;
-    swap_block_end = swap_block_start;
+    swap_block_start_track[Curr_Buff_Block] = (start_nibble +
+                                               Get_Track_Nibble_Start(Channels_MultiNotes, start_track))
+                                               + start_track;
+    swap_block_end_track[Curr_Buff_Block] = swap_block_start_track[Curr_Buff_Block];
+    swap_block_start[Curr_Buff_Block] = start_line;
+    swap_block_end[Curr_Buff_Block] = swap_block_start[Curr_Buff_Block];
 
-    if(swap_block_end_track < swap_block_start_track) swap_block_end_track = swap_block_start_track;
-    if(swap_block_end < swap_block_start) swap_block_end = swap_block_start;
+    if(swap_block_end_track[Curr_Buff_Block] < swap_block_start_track[Curr_Buff_Block])
+    {
+        swap_block_end_track[Curr_Buff_Block] = swap_block_start_track[Curr_Buff_Block];
+    }
+    if(swap_block_end[Curr_Buff_Block] < swap_block_start[Curr_Buff_Block])
+    {
+        swap_block_end[Curr_Buff_Block] = swap_block_start[Curr_Buff_Block];
+    }
 
-    if(swap_block_end_track < 0) swap_block_end_track = 0;
-    block_start_track = swap_block_start_track;
-    block_end_track = swap_block_end_track;
-    block_start = swap_block_start;
-    block_end = swap_block_end;
-    block_in_selection = TRUE;
+    if(swap_block_end_track[Curr_Buff_Block] < 0) swap_block_end_track[Curr_Buff_Block] = 0;
+    block_start_track[Curr_Buff_Block] = swap_block_start_track[Curr_Buff_Block];
+    block_end_track[Curr_Buff_Block] = swap_block_end_track[Curr_Buff_Block];
+    block_start[Curr_Buff_Block] = swap_block_start[Curr_Buff_Block];
+    block_end[Curr_Buff_Block] = swap_block_end[Curr_Buff_Block];
+    block_in_selection[Curr_Buff_Block] = TRUE;
     Actupated(0);
 }
 
@@ -125,32 +187,32 @@ void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif
     if(Modif & BLOCK_MARK_TRACKS)
     {
         swap_value = start_nibble + start_track;
-        if(swap_block_start_track >= swap_value)
+        if(swap_block_start_track[Curr_Buff_Block] >= swap_value)
         {
-            block_start_track = swap_value;
-            block_end_track = swap_block_start_track;
+            block_start_track[Curr_Buff_Block] = swap_value;
+            block_end_track[Curr_Buff_Block] = swap_block_start_track[Curr_Buff_Block];
         }
         else
         {
-            block_end_track = swap_value;
-            block_start_track = swap_block_start_track;
+            block_end_track[Curr_Buff_Block] = swap_value;
+            block_start_track[Curr_Buff_Block] = swap_block_start_track[Curr_Buff_Block];
         }
-        if(block_end_track < 0) block_end_track = 0;
-        if(block_start_track < 0) block_start_track = 0;
+        if(block_end_track[Curr_Buff_Block] < 0) block_end_track[Curr_Buff_Block] = 0;
+        if(block_start_track[Curr_Buff_Block] < 0) block_start_track[Curr_Buff_Block] = 0;
     }
     if(Modif & BLOCK_MARK_ROWS)
     {
         swap_value = start_line;
 
-        if(swap_block_start >= swap_value)
+        if(swap_block_start[Curr_Buff_Block] >= swap_value)
         {
-            block_start = swap_value;
-            block_end = swap_block_start;
+            block_start[Curr_Buff_Block] = swap_value;
+            block_end[Curr_Buff_Block] = swap_block_start[Curr_Buff_Block];
         }
         else
         {
-            block_end = swap_value;
-            block_start = swap_block_start;
+            block_end[Curr_Buff_Block] = swap_value;
+            block_start[Curr_Buff_Block] = swap_block_start[Curr_Buff_Block];
         }
     }
     Actupated(0);
@@ -174,16 +236,17 @@ void Set_Pattern_Column(int Position, int xbc, int ybc, int Data)
 
 void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
 {
-    *(BuffBlock + (ybc * PATTERN_ROW_LEN) +
-     (Get_Track_From_Nibble(Buff_MultiNotes, xbc) * PATTERN_BYTES) +
-     Get_Byte_From_Column(Buff_MultiNotes, xbc)) = Data;
+    Buff_Full[Curr_Buff_Block] = TRUE;
+    *(BuffBlock[Curr_Buff_Block] + (ybc * PATTERN_ROW_LEN) +
+     (Get_Track_From_Nibble(Buff_MultiNotes[Curr_Buff_Block], xbc) * PATTERN_BYTES) +
+     Get_Byte_From_Column(Buff_MultiNotes[Curr_Buff_Block], xbc)) = Data;
 }
 
 int Get_Buff_Column(int Position, int xbc, int ybc)
 {
-   return(*(BuffBlock + (ybc * PATTERN_ROW_LEN) +
-          (Get_Track_From_Nibble(Buff_MultiNotes, xbc) * PATTERN_BYTES) +
-          Get_Byte_From_Column(Buff_MultiNotes, xbc)));
+    return(*(BuffBlock[Curr_Buff_Block] + (ybc * PATTERN_ROW_LEN) +
+           (Get_Track_From_Nibble(Buff_MultiNotes[Curr_Buff_Block], xbc) * PATTERN_BYTES) +
+            Get_Byte_From_Column(Buff_MultiNotes[Curr_Buff_Block], xbc)));
 }
 
 // ------------------------------------------------------
@@ -254,7 +317,7 @@ void Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
 // Read a byte from the copy buffer
 int Read_Buff_Column(int Position, int xbc, int ybc)
 {
-    COLUMN_TYPE type = Get_Column_Type(Buff_MultiNotes, xbc);
+    COLUMN_TYPE type = Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], xbc);
     switch(type)
     {
         case NOTE:
@@ -282,7 +345,7 @@ int Read_Buff_Column(int Position, int xbc, int ybc)
 void Write_Buff_Column(int Position, int xbc, int ybc, int datas)
 {
     int datas_nibble;
-    COLUMN_TYPE type = Get_Column_Type(Buff_MultiNotes, xbc);
+    COLUMN_TYPE type = Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], xbc);
 
     switch(type)
     {
@@ -321,12 +384,12 @@ int Delete_Selection(int Position)
     COLUMN_TYPE type;
     int data;
 
-    if(block_start_track != -1 && block_end_track != -1)
+    if(block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
     {
         // Delete the entire selection
-        for(int ybc = block_start; ybc < block_end + 1; ybc++)
+        for(int ybc = block_start[Curr_Buff_Block]; ybc < block_end[Curr_Buff_Block] + 1; ybc++)
         {
-            for(int xbc = block_start_track; xbc < block_end_track+ 1; xbc++)
+            for(int xbc = block_start_track[Curr_Buff_Block]; xbc < block_end_track[Curr_Buff_Block] + 1; xbc++)
             {
                 type = Get_Column_Type(Channels_MultiNotes, xbc);
                 switch(type)
@@ -377,29 +440,29 @@ int Delete_Selection(int Position)
 }
 
 // ------------------------------------------------------
-// Copy a selected block into the secondary buffer
+// Copy a selected block into a secondary buffer
 void Copy_Selection_To_Buffer(int Position)
 {
     int axbc;
     int aybc;
     int relative_track;
 
-    block_start_track_nibble = block_start_track;
-    block_end_track_nibble = block_end_track;
+    block_start_track_nibble[Curr_Buff_Block] = block_start_track[Curr_Buff_Block];
+    block_end_track_nibble[Curr_Buff_Block] = block_end_track[Curr_Buff_Block];
     aybc = 0;
 
-    Clear_Buff();
-    memset(Buff_MultiNotes, 0, MAX_TRACKS);
-    start_buff_nibble = Get_Track_Relative_Column(Channels_MultiNotes, block_start_track_nibble);
-    for(int ybc = block_start; ybc < block_end + 1; ybc++)
+    Clear_Buff(Curr_Buff_Block);
+    memset(Buff_MultiNotes[Curr_Buff_Block], 0, MAX_TRACKS);
+    start_buff_nibble[Curr_Buff_Block] = Get_Track_Relative_Column(Channels_MultiNotes, block_start_track_nibble[Curr_Buff_Block]);
+    for(int ybc = block_start[Curr_Buff_Block]; ybc < block_end[Curr_Buff_Block] + 1; ybc++)
     {
         // Make sure we start to copy on the first track (but not necessary on the first column)
-        axbc = start_buff_nibble;
-        relative_track = Get_Track_From_Nibble(Channels_MultiNotes, block_start_track_nibble);
-        for(int xbc = block_start_track_nibble; xbc < block_end_track_nibble + 1; xbc++)
+        axbc = start_buff_nibble[Curr_Buff_Block];
+        relative_track = Get_Track_From_Nibble(Channels_MultiNotes, block_start_track_nibble[Curr_Buff_Block]);
+        for(int xbc = block_start_track_nibble[Curr_Buff_Block]; xbc < block_end_track_nibble[Curr_Buff_Block] + 1; xbc++)
         {
-            Buff_MultiNotes[Get_Track_From_Nibble(Channels_MultiNotes, xbc) - relative_track] =
-                            (Get_Max_Nibble_Track_From_Nibble(Channels_MultiNotes, xbc) - 8) / 3;
+            Buff_MultiNotes[Curr_Buff_Block][Get_Track_From_Nibble(Channels_MultiNotes, xbc) - relative_track] =
+                                             (Get_Max_Nibble_Track_From_Nibble(Channels_MultiNotes, xbc) - 8) / 3;
             Write_Buff_Column(Position, axbc, aybc, Read_Pattern_Column(Position, xbc, ybc));
             axbc++;
         }
@@ -408,12 +471,12 @@ void Copy_Selection_To_Buffer(int Position)
 }
 
 // ------------------------------------------------------
-// Copy a block into a pattern
-void Paste_Selection_From_Buffer(int Position)
+// Paste a block into a pattern
+void Paste_Selection_From_Buffer(int Position, int Go_Across)
 {
     int xbc;
+    int ybc;
     int axbc;
-    int aybc;
     int expanded = 0;
     // Dest start
     int start_x = Get_Track_Nibble_Start(Channels_MultiNotes, ped_track) + ped_col + ped_track;
@@ -430,9 +493,9 @@ void Paste_Selection_From_Buffer(int Position)
     int start_track;
 
     // Compensate
-    max_src = Get_Max_Nibble_Track_From_Nibble(Buff_MultiNotes, start_buff_nibble);
+    max_src = Get_Max_Nibble_Track_From_Nibble(Buff_MultiNotes[Curr_Buff_Block], start_buff_nibble[Curr_Buff_Block]);
     max_dst = Get_Max_Nibble_Track_From_Nibble(Channels_MultiNotes, start_x);
-    axbc = Get_Track_Relative_Column(Buff_MultiNotes, start_buff_nibble);
+    axbc = Get_Track_Relative_Column(Buff_MultiNotes[Curr_Buff_Block], start_buff_nibble[Curr_Buff_Block]);
     xbc = Get_Track_Relative_Column(Channels_MultiNotes, start_x);
     if(max_src < max_dst)
     {
@@ -452,7 +515,7 @@ void Paste_Selection_From_Buffer(int Position)
         }
         save_start_x = start_x;
         start_track = Get_Track_From_Nibble(Channels_MultiNotes, start_x);
-        while(Get_Column_Type(Buff_MultiNotes, axbc) != Get_Column_Type(Channels_MultiNotes, start_x))
+        while(Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], axbc) != Get_Column_Type(Channels_MultiNotes, start_x))
         {
             start_x++;
         }
@@ -462,88 +525,113 @@ void Paste_Selection_From_Buffer(int Position)
         }
     }
 
-    aybc = 0;
-    for(int ybc = ped_line; ybc < ped_line + b_buff_ysize; ybc++)
+    ybc = ped_line;
+    for(int aybc = 0; aybc < b_buff_ysize[Curr_Buff_Block]; aybc++)
     {
-        axbc = Get_Track_Relative_Column(Buff_MultiNotes, start_buff_nibble);
+        axbc = Get_Track_Relative_Column(Buff_MultiNotes[Curr_Buff_Block], start_buff_nibble[Curr_Buff_Block]);
         start_buff_x = axbc;
 
-        xbc = start_x;
-        while(xbc < start_x + b_buff_xsize + expanded)
+        if(Go_Across && ybc >= patternLines[pSequence[Position]])
         {
-            if(xbc < max_columns && ybc < patternLines[pSequence[cPosition]])
+            if(Position < (sLength - 1))
             {
-Continue_Copy:
-                // Only copy similar data
-                type_src = Get_Column_Type(Buff_MultiNotes, axbc);
-                type_dst = Get_Column_Type(Channels_MultiNotes, xbc);
-                if(type_src == type_dst)
+                if(pSequence[Position] == pSequence[Position + 1])
                 {
-                    // We need to check if we're on an odd byte for the instrument/volume or panning
-                    // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
-                    byte = Read_Buff_Column(Position, axbc, aybc);
-                    switch(type_dst)
-                    {
-                        case INSTRHI:
-                        case VOLUMEHI:
-                        case PANNINGHI:
-                            old_byte = Read_Pattern_Column(Position, xbc, ybc);
-                            old_byte |= Read_Pattern_Column(Position, xbc + 1, ybc);
-                            if(old_byte == 0xff && byte != 0xf0)
-                            {
-                                Write_Pattern_Column(Position, xbc + 1, ybc, 0);
-                            }
-                            break;
-
-                        case INSTRLO:
-                        case VOLUMELO:
-                        case PANNINGLO:
-                            // Case where the user didn't selected HI bits
-                            old_byte = Read_Pattern_Column(Position, xbc - 1, ybc);
-                            old_byte |= Read_Pattern_Column(Position, xbc, ybc);
-                            if(start_buff_x == axbc)
-                            {
-                                if(old_byte == 0xff) Write_Pattern_Column(Position, xbc - 1, ybc, 0);
-                            }
-                    }
-                    Write_Pattern_Column(Position, xbc, ybc, byte);
+                    break;
                 }
                 else
                 {
-                    if(expand)
+                    ybc = 0;
+                    Position++;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        xbc = start_x;
+        while(xbc < start_x + b_buff_xsize[Curr_Buff_Block] + expanded)
+        {
+            if(ybc < patternLines[pSequence[Position]])
+            {
+                if(xbc < max_columns)
+                {
+Continue_Copy:
+                    // Only copy similar data
+                    type_src = Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], axbc);
+                    type_dst = Get_Column_Type(Channels_MultiNotes, xbc);
+                    if(Buff_Full[Curr_Buff_Block])
                     {
-                        do
+                        if(type_src == type_dst)
                         {
-                            xbc++;
-                            expanded++;
-                            if(xbc >= start_x + b_buff_xsize + expanded)
+                            // We need to check if we're on an odd byte for the instrument/volume or panning
+                            // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble
+                            byte = Read_Buff_Column(Position, axbc, aybc);
+                            switch(type_dst)
                             {
-                                goto Stop_Col;
+                                case INSTRHI:
+                                case VOLUMEHI:
+                                case PANNINGHI:
+                                    old_byte = Read_Pattern_Column(Position, xbc, ybc);
+                                    old_byte |= Read_Pattern_Column(Position, xbc + 1, ybc);
+                                    if(old_byte == 0xff && byte != 0xf0)
+                                    {
+                                        Write_Pattern_Column(Position, xbc + 1, ybc, 0);
+                                    }
+                                    break;
+
+                                case INSTRLO:
+                                case VOLUMELO:
+                                case PANNINGLO:
+                                    // Case where the user didn't selected HI bits
+                                    old_byte = Read_Pattern_Column(Position, xbc - 1, ybc);
+                                    old_byte |= Read_Pattern_Column(Position, xbc, ybc);
+                                    if(start_buff_x == axbc)
+                                    {
+                                        if(old_byte == 0xff) Write_Pattern_Column(Position, xbc - 1, ybc, 0);
+                                    }
                             }
+                            Write_Pattern_Column(Position, xbc, ybc, byte);
                         }
-                        while(Get_Column_Type(Buff_MultiNotes, axbc) != Get_Column_Type(Channels_MultiNotes, xbc));
-                    }
-                    else
-                    {
-                        do
+                        else
                         {
-                            axbc++;
-                            if(axbc >= start_buff_x + b_buff_xsize)
+                            if(expand)
                             {
-                                goto Stop_Col;
+                                do
+                                {
+                                    xbc++;
+                                    expanded++;
+                                    if(xbc >= start_x + b_buff_xsize[Curr_Buff_Block] + expanded)
+                                    {
+                                        goto Stop_Col;
+                                    }
+                                }
+                                while(Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], axbc) != Get_Column_Type(Channels_MultiNotes, xbc));
                             }
+                            else
+                            {
+                                do
+                                {
+                                    axbc++;
+                                    if(axbc >= start_buff_x + b_buff_xsize[Curr_Buff_Block])
+                                    {
+                                        goto Stop_Col;
+                                    }
+                                }
+                                while(Get_Column_Type(Buff_MultiNotes[Curr_Buff_Block], axbc) != Get_Column_Type(Channels_MultiNotes, xbc));
+                            }
+                            goto Continue_Copy;
                         }
-                        while(Get_Column_Type(Buff_MultiNotes, axbc) != Get_Column_Type(Channels_MultiNotes, xbc));
                     }
-                    goto Continue_Copy;
                 }
             }
             axbc++;
-            if(axbc >= start_buff_x + b_buff_xsize) break;
+            if(axbc >= start_buff_x + b_buff_xsize[Curr_Buff_Block]) break;
             xbc++;
         }
 Stop_Col:
-        aybc++;
+        ybc++;
     }
 }
 
@@ -569,9 +657,9 @@ void Copy_Selection(int Position)
 
 // ------------------------------------------------------
 // Paste a block into a pattern
-void Paste_Block(int Position)
+void Paste_Block(int Position, int Go_Across)
 {
-    Paste_Selection_From_Buffer(Position);
+    Paste_Selection_From_Buffer(Position, Go_Across);
     Actupated(0);
 }
 
@@ -599,13 +687,13 @@ SELECTION Select_Track(int Track)
 SELECTION Get_Real_Selection(int Default)
 {
     SELECTION Cur_Sel;
-    Cur_Sel.y_start = block_start;
-    Cur_Sel.y_end = block_end;
-    Cur_Sel.x_start = block_start_track;
-    Cur_Sel.x_end = block_end_track;
+    Cur_Sel.y_start = block_start[Curr_Buff_Block];
+    Cur_Sel.y_end = block_end[Curr_Buff_Block];
+    Cur_Sel.x_start = block_start_track[Curr_Buff_Block];
+    Cur_Sel.x_end = block_end_track[Curr_Buff_Block];
     if(Default)
     {
-        if(!(block_end_track - block_start_track) || !(block_end - block_start))
+        if(!(block_end_track[Curr_Buff_Block] - block_start_track[Curr_Buff_Block]) || !(block_end[Curr_Buff_Block] - block_start[Curr_Buff_Block]))
         {
             Cur_Sel = Select_Track(ped_track);
         }
@@ -1059,9 +1147,8 @@ void Select_All_Notes_Block(void)
 // Calculate the selected range
 void Calc_selection(void)
 {
-    save_block_start_track_nibble = block_start_track_nibble;
-    b_buff_xsize = (block_end_track_nibble - block_start_track_nibble) + 1;
-    b_buff_ysize = (block_end - block_start) + 1;
+    b_buff_xsize[Curr_Buff_Block] = (block_end_track_nibble[Curr_Buff_Block] - block_start_track_nibble[Curr_Buff_Block]) + 1;
+    b_buff_ysize[Curr_Buff_Block] = (block_end[Curr_Buff_Block] - block_start[Curr_Buff_Block]) + 1;
 }
 
 // ------------------------------------------------------
@@ -1069,11 +1156,11 @@ void Calc_selection(void)
 void Unselect_Selection(void)
 {
     // Save the size of the copied block
-    block_start = 0;
-    block_end = 0;
-    block_start_track = -1;
-    block_end_track = -1;
-    block_in_selection = FALSE;
+    block_start[Curr_Buff_Block] = 0;
+    block_end[Curr_Buff_Block] = 0;
+    block_start_track[Curr_Buff_Block] = -1;
+    block_end_track[Curr_Buff_Block] = -1;
+    block_in_selection[Curr_Buff_Block] = FALSE;
 }
 
 // ------------------------------------------------------
@@ -1084,7 +1171,7 @@ void Select_Block_Keyboard(int Type)
     {
         if(Get_LShift())
         {
-            if(block_in_selection == FALSE) Mark_Block_Start(ped_col, ped_track, ped_line);
+            if(block_in_selection[Curr_Buff_Block] == FALSE) Mark_Block_Start(ped_col, ped_track, ped_line);
             Mark_Block_End(ped_col, ped_track, ped_line, Type);
         }
         else

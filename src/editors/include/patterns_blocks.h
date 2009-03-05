@@ -33,6 +33,10 @@
 #define _PATTERNS_BLOCKS_H_
 
 // ------------------------------------------------------
+// Constants
+#define NBR_COPY_BLOCKS 5
+
+// ------------------------------------------------------
 // Enumerations
 enum COLUMN_TYPE
 {
@@ -60,18 +64,35 @@ typedef struct
 } SELECTION, *LPSELECTION;
 
 // ------------------------------------------------------
+// Variables
+extern int Curr_Buff_Block;
+extern int Buff_Full[NBR_COPY_BLOCKS];
+extern int b_buff_xsize[NBR_COPY_BLOCKS];
+extern int b_buff_ysize[NBR_COPY_BLOCKS];
+extern int start_buff_nibble[NBR_COPY_BLOCKS];
+extern unsigned char *BuffBlock[NBR_COPY_BLOCKS];
+extern int block_start_track_nibble[NBR_COPY_BLOCKS];
+extern int block_end_track_nibble[NBR_COPY_BLOCKS];
+extern int block_start_track[NBR_COPY_BLOCKS];
+extern int block_end_track[NBR_COPY_BLOCKS];
+extern int block_start[NBR_COPY_BLOCKS];
+extern int block_end[NBR_COPY_BLOCKS];
+extern char Buff_MultiNotes[NBR_COPY_BLOCKS][MAX_TRACKS];
+
+// ------------------------------------------------------
 // Functions
 int Init_Block_Work(void);
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
 void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif);
 int Delete_Selection(int Position);
 void Copy_Selection_To_Buffer(int Position);
-void Paste_Selection_From_Buffer(int Position);
+void Paste_Selection_From_Buffer(int Position, int Go_Across);
 void Cut_Selection(int Position);
 void Copy_Selection(int Position);
+void Copy_Buff(int dst, int src);
 SELECTION Get_Real_Selection(int Default);
 SELECTION Select_Track(int Track);
-void Paste_Block(int Position);
+void Paste_Block(int Position, int Go_Across);
 void Interpolate_Block(int Position);
 void Randomize_Block(int Position);
 void Semitone_Up_Block(int Position);
@@ -101,6 +122,6 @@ int Get_Byte_From_Column(char *Buffer, int column);
 COLUMN_TYPE Get_Column_Type(char *Buffer, int column);
 int Get_Track_Relative_Column(char *Buffer, int column);
 int Get_Max_Nibble_All_Tracks(void);
-void Clear_Buff(void);
+void Clear_Buff(int Idx);
 
 #endif

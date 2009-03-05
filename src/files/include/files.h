@@ -46,11 +46,22 @@
 #define LOAD_READ FALSE
 #define LOAD_READMEM TRUE
 
+#if defined(__WIN32__)
+#define SLASH "\\"
+#else
+#define SLASH "/"
+#endif
+
 // ------------------------------------------------------
 // Variables
 extern int Final_Mod_Length;
 extern int mt_tags[13];
 extern int mt_channels[13];
+extern char Dir_Mods[MAX_PATH];
+extern char Dir_Instrs[MAX_PATH];
+extern char Dir_Presets[MAX_PATH];
+extern char Dir_Reverbs[MAX_PATH];
+extern char Dir_Patterns[MAX_PATH];
 
 // ------------------------------------------------------
 // Functions
@@ -63,10 +74,12 @@ void LoadSynth(char *FileName);
 void LoadInst(char *FileName);
 void Load303(char *FileName);
 void LoadReverb(char *FileName);
+void LoadPattern(char *FileName);
 void SaveInst(void);
 void SaveSynth(void);
 void Save303(void);
 void SaveReverb(void);
+void SavePattern(void);
 void SaveConfig(void);
 void LoadConfig(void);
 
@@ -87,6 +100,6 @@ void Load_Old_Reverb_Presets(int Type);
 
 void Clear_Input(void);
 
-int File_Exist(char *Format, char *FileName);
+int File_Exist(char *Format, char *Directory, char *FileName);
 
 #endif

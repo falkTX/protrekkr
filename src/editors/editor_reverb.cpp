@@ -338,7 +338,7 @@ void Mouse_Left_Reverb_Ed(void)
         // Save the data
         if(zcheckMouse(749, 458, 34, 16))
         {
-            if(File_Exist("%s.prv", Reverb_Name))
+            if(File_Exist("%s"SLASH"%s.prv", Dir_Reverbs, Reverb_Name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_REVERB);
             }

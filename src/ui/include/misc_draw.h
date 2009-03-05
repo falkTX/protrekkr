@@ -94,6 +94,7 @@
 #define BUTTON_TEXT_CENTERED 4
 #define BUTTON_DISABLED 8
 #define BUTTON_NO_BORDER 16
+#define BUTTON_LOW_FONT 32
 
 // ------------------------------------------------------
 // Structures

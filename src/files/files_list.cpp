@@ -58,6 +58,7 @@ char Dir_Mods[MAX_PATH];
 char Dir_Instrs[MAX_PATH];
 char Dir_Presets[MAX_PATH];
 char Dir_Reverbs[MAX_PATH];
+char Dir_Patterns[MAX_PATH];
 char *cur_dir;
 
 // ------------------------------------------------------
@@ -102,6 +103,10 @@ void Set_Current_Dir(void)
         case SCOPE_ZONE_REVERB_DIR:
             CHDIR(Get_Current_FileName());
             GETCWD(Dir_Reverbs, MAX_PATH);
+            break;
+        case SCOPE_ZONE_PATTERN_DIR:
+            CHDIR(Get_Current_FileName());
+            GETCWD(Dir_Patterns, MAX_PATH);
             break;
     }
 }
@@ -186,6 +191,9 @@ void Read_SMPT(void)
         case SCOPE_ZONE_REVERB_DIR:
             cur_dir = Dir_Reverbs;
             break;
+        case SCOPE_ZONE_PATTERN_DIR:
+            cur_dir = Dir_Patterns;
+            break;
     }
     CHDIR(cur_dir);
 
@@ -194,11 +202,11 @@ void Read_SMPT(void)
 
 #if defined(__WIN32__)
     strcat(Dir_Act, "\\*.*");
+
     if((hFile = _findfirst(Dir_Act, &c_file)) == -1L)
     {
-        sprintf(SMPT_LIST[0], "No files in current dir.");
+        sprintf(SMPT_LIST[0], "No files in current directory.");
         FILETYPE[0] = 0;
-        lt_items = 1;
     }
     else
     {
@@ -226,9 +234,8 @@ void Read_SMPT(void)
 
     if((hFile = _findfirst(Dir_Act, &c_file)) == -1L)
     {
-        sprintf(SMPT_LIST[0], "No files in current dir.");
+        sprintf(SMPT_LIST[0], "No files in current directory.");
         FILETYPE[0] = 0;
-        lt_items = 1;
     }
     else
     {
@@ -286,11 +293,12 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
         case SCOPE_ZONE_REVERB_DIR:
+        case SCOPE_ZONE_PATTERN_DIR:
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 1, yr + 1, 227 + restx, 135);
+            bjbox(xr - 2, yr + 1, 228 + restx, 135);
 
             // Current dir background
-            Gui_Draw_Button_Box(394, 24, 172 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 154 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             switch(Scopish)
             {
@@ -306,44 +314,54 @@ void Dump_Files_List(int xr, int yr)
                 case SCOPE_ZONE_REVERB_DIR:
                     PrintXY(398, 26, USE_FONT, Dir_Reverbs);
                     break;
+                case SCOPE_ZONE_PATTERN_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Patterns);
+                    break;
             }
 
-            for(int counter = 0; counter < 11; counter++)
+            if(lt_items)
             {
-                int rel_val = y + counter;
-
-                if(y + counter < lt_items)
+                for(int counter = 0; counter < 11; counter++)
                 {
-                    // Highlight bar in files requester.
-                    if(y + counter == lt_curr)
-                    {
-                        SetColor(COL_PUSHED_MED);
-                        bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
-                    }
+                    int rel_val = y + counter;
 
-                    if(FILETYPE[rel_val] == _A_SUBDIR)
+                    if(y + counter < lt_items)
                     {
-                        PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
-                        PrintXY(xr + 364, yr + (counter * 12) + 1, USE_FONT_LOW, "<Dir>");
-                    }
-                    else
-                    {
-                        PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val]);
-                        File = fopen(SMPT_LIST[rel_val], "rb");
-                        if(File)
+                        // Highlight bar in files requester.
+                        if(y + counter == lt_curr)
                         {
-                            int Size = Get_File_Size(File);
-                            if(Size == 0)
+                            SetColor(COL_PUSHED_MED);
+                            bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
+                        }
+
+                        if(FILETYPE[rel_val] == _A_SUBDIR)
+                        {
+                            PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
+                            PrintXY(xr + 364, yr + (counter * 12) + 1, USE_FONT_LOW, "<Dir>");
+                        }
+                        else
+                        {
+                            PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val]);
+                            File = fopen(SMPT_LIST[rel_val], "rb");
+                            if(File)
                             {
-                                sprintf(Size_String, "0");
+                                int Size = Get_File_Size(File);
+                                if(Size == 0)
+                                {
+                                    sprintf(Size_String, "0");
+                                }
+                                else sprintf(Size_String, "%9.d", Size);
+                                int pos = (xr + 385) - Get_Size_Text(Size_String);
+                                PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
+                                fclose(File);
                             }
-                            else sprintf(Size_String, "%9.d", Size);
-                            int pos = (xr + 385) - Get_Size_Text(Size_String);
-                            PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
-                            fclose(File);
                         }
                     }
                 }
+            }
+            else
+            {
+                PrintXY(xr, yr, USE_FONT_LOW, SMPT_LIST[0]);
             }
             break;
     }
@@ -377,6 +395,7 @@ void Actualize_Files_List(int modeac)
                 case SCOPE_ZONE_INSTR_DIR:
                 case SCOPE_ZONE_PRESET_DIR:
                 case SCOPE_ZONE_REVERB_DIR:
+                case SCOPE_ZONE_PATTERN_DIR:
 
                     if(modeac == 0)
                     {

@@ -291,7 +291,7 @@ void Mouse_Left_DiskIO_Ed(void)
         // Save song
         if(zcheckMouse(8, 488, 80, 16))
         {
-            if(File_Exist("%s.ptk", name))
+            if(File_Exist("%s"SLASH"%s.ptk", Dir_Mods, name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_MODULE);
             }
@@ -303,7 +303,7 @@ void Mouse_Left_DiskIO_Ed(void)
         // Save final
         if(zcheckMouse(254, 470, 80, 16))
         {
-            if(File_Exist("%s.ptp", name))
+            if(File_Exist("%s"SLASH"%s.ptp", Dir_Mods, name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_FINAL);
             }
@@ -364,7 +364,7 @@ void Mouse_Left_DiskIO_Ed(void)
         }
         if(zcheckMouse(90, 488, 80, 16))
         {
-            if(File_Exist("%s.wav", name))
+            if(File_Exist("%s"SLASH"%s.wav", Dir_Mods, name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_RENDER_WAV);
             }

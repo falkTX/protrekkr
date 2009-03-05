@@ -50,6 +50,8 @@ extern int Keyboard_Idx;
 
 int current_palette_idx;
 
+char Paste_Across;
+
 extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 
 char *Labels_AutoSave[] =
@@ -93,7 +95,7 @@ void Draw_Master_Ed(void)
 #else
     sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", n_midiindevices, n_midioutdevices);
 #endif
-    Gui_Draw_Button_Box(8, 466, 310, 96, middev, BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 466, 310, 78, middev, BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(12, 482, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 500, 56, 16, "Midi OUT", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -107,7 +109,6 @@ void Draw_Master_Ed(void)
     | BUTTON_DISABLED
 #endif
     );
-    PrintXY(12, 543, USE_FONT, "Go to 'Track' section to assign Midi Channels to the tracks");
 
     Gui_Draw_Button_Box(330, 455, 59, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
     Display_Milliseconds(AUDIO_Milliseconds);
@@ -121,7 +122,8 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(670, 455, 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, 475, 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 40, 16, "Default", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_NORMAL);
+
+    Gui_Draw_Button_Box(8, 555, 130, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
 void Actualize_Master_Ed(char gode)
@@ -271,11 +273,11 @@ void Actualize_Master_Ed(char gode)
         {
             if(Beveled)
             {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             Set_Phony_Palette();
             Refresh_Palette();
@@ -364,6 +366,21 @@ void Actualize_Master_Ed(char gode)
             }
 #endif
         }
+
+        if(gode == 0 || gode == 17)
+        {
+            if(Paste_Across)
+            {
+                Gui_Draw_Button_Box(140, 555, 29, 16, "On", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(140 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(140, 555, 29, 16, "On", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(140 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+            }
+        }
+
     }
 }
 
@@ -500,6 +517,22 @@ void Mouse_Left_Master_Ed(void)
         {
             Continuous_Scroll = FALSE;
             teac = 14;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
+        // Paste across pattern
+        if(zcheckMouse(140, 555, 29, 16))
+        {
+            Paste_Across = TRUE;
+            teac = 17;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
+        // Paste across pattern
+        if(zcheckMouse(140 + 31, 555, 29, 16))
+        {
+            Paste_Across = FALSE;
+            teac = 17;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
 

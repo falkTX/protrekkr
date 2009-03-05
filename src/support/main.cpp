@@ -390,10 +390,17 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     NoCodec = "no codec";
 #endif
 #if !defined(__NO_MIDI__) && !defined(__NO_CODEC__)
-    NoMidi = "none";
+    NoMidi = "";
 #endif
 
-    sprintf(Window_Title, "%s - Build restrictions: %s%s", VERSION, NoMidi, NoCodec);
+    if(strlen(NoMidi) || strlen(NoCodec))
+    {
+        sprintf(Window_Title, "%s - Build restrictions: %s%s", VERSION, NoMidi, NoCodec);
+    }
+    else
+    {
+        sprintf(Window_Title, "%s", VERSION);
+    }
     SDL_WM_SetCaption(Window_Title, NULL);
 
     // Obtain SDL window

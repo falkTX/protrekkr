@@ -43,6 +43,7 @@ int Current_copy_buffer;
 int Copied_Buffer[4];
 unsigned char tbEditStep = 0;
 
+int tb303_pattern_buffer_full[4];
 flag303 tb303_pattern_buffer[4][16];
 unsigned char tb303_buffer_tone[4][16];
 
@@ -937,7 +938,7 @@ void Mouse_Left_303_Ed(void)
         // Save the data
         if(zcheckMouse(658, 462, 34, 16))
         {
-            if(File_Exist("%s.303", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]))
+            if(File_Exist("%s"SLASH"%s.303", Dir_Patterns, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_303_PATTERN);
             }
@@ -1064,7 +1065,7 @@ void Skincopy(int xd, int yd, int xs, int ys, int w, int h)
 
 void tb303_copy_pattern(void)
 {
-
+    tb303_pattern_buffer_full[Current_copy_buffer] = TRUE;
     for(char alter = 0; alter < 16; alter++)
     {
         tb303_buffer_tone[Current_copy_buffer][alter] = tb303[sl3].tone[tb303[sl3].selectedpattern][alter];
@@ -1075,6 +1076,7 @@ void tb303_copy_pattern(void)
         tb303_pattern_buffer[Current_copy_buffer][alter].accent_flag = tb303[sl3].flag[tb303[sl3].selectedpattern][alter].accent_flag;
     }
     Copied_Buffer[Current_copy_buffer] = TRUE;
+    Display_Cur_copy_Buffer();
 }
 
 void tb303_paste_pattern(void)
@@ -1125,8 +1127,8 @@ void Display_Cur_copy_Buffer(void)
         BUTTON_NORMAL
     };
     highlight[Current_copy_buffer] = BUTTON_PUSHED;
-    Gui_Draw_Button_Box(600, 558, 15, 16, "1", highlight[0]);
-    Gui_Draw_Button_Box(616, 558, 15, 16, "2", highlight[1]);
-    Gui_Draw_Button_Box(633, 558, 15, 16, "3", highlight[2]);
-    Gui_Draw_Button_Box(649, 558, 15, 16, "4", highlight[3]);
+    Gui_Draw_Button_Box(600, 558, 15, 16, "1", highlight[0] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[0] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(616, 558, 15, 16, "2", highlight[1] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[1] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(633, 558, 15, 16, "3", highlight[2] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[2] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(649, 558, 15, 16, "4", highlight[3] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[3] ? 0 : BUTTON_LOW_FONT));
 }

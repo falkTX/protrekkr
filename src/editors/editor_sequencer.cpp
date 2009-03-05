@@ -35,6 +35,9 @@
 #include "include/editor_pattern.h"
 #include "include/patterns_blocks.h"
 
+#include "../files/include/files.h"
+#include "../ui/include/requesters.h"
+
 // ------------------------------------------------------
 // Structures
 typedef struct
@@ -45,7 +48,13 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
+extern REQUESTER Overwrite_Requester;
+
 int Cur_Seq_Buffer = 0;
+
+char Selection_Name[20];
+
+int Seq_Buffers_Full[4];
 
 SEQ_POS Seq_Buffers[4] =
 {
@@ -109,13 +118,10 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(257, 466, 25, 90, "", BUTTON_NORMAL);
     Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(480, 466, 250, 26, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(480, 472, 190, 26, "Zoom all tracks", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
-    
-    Gui_Draw_Button_Box(565, 472, 50, 16, "Small", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(620, 472, 50, 16, "Normal", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(675, 472, 50, 16, "Large", BUTTON_NORMAL);
-    
+    Gui_Draw_Button_Box(480, 466, 306, 28, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(745, 472, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
     Gui_Draw_Button_Box(480, 501, 250, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
     Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
@@ -177,6 +183,21 @@ void Actualize_Seq_Ed(char gode)
             if(Remap_To < 0) Remap_To = 0;
             if(Remap_To > 0x7f) Remap_To = 0x7f;
             value_box(520, 544, Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
+
+        if(gode == 0 || gode == 3)
+        {
+            char tcp[30];
+            sprintf(tcp, "%s_", Selection_Name);
+
+            if(snamesel == INPUT_SELECTION_NAME)
+            {
+                Gui_Draw_Button_Box(579, 472, 164, 16, tcp, BUTTON_PUSHED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(579, 472, 164, 16, Selection_Name, BUTTON_NORMAL);
+            }
         }
     }
 }
@@ -251,34 +272,6 @@ void Mouse_Left_Sequencer_Ed(void)
             Remap_To++;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
             teac = 1;
-        }
-
-        // Zoom'em small
-        if(zcheckMouse(565, 472, 50, 16))
-        {
-            for(i = 0; i < Songtracks; i++)
-            {
-                Set_Track_Zoom(i, TRACK_SMALL);
-            }
-            Actupated(0);
-        }
-        // Zoom'em normal
-        if(zcheckMouse(620, 472, 50, 16))
-        {
-            for(i = 0; i < Songtracks; i++)
-            {
-                Set_Track_Zoom(i, TRACK_NORMAL);
-            }
-            Actupated(0);
-        }
-        // Zoom'em large
-        if(zcheckMouse(675, 472, 50, 16))
-        {
-            for(i = 0; i < Songtracks; i++)
-            {
-                Set_Track_Zoom(i, TRACK_LARGE);
-            }
-            Actupated(0);
         }
 
         // Clear all
@@ -517,6 +510,30 @@ void Mouse_Left_Sequencer_Ed(void)
             {
                 cPosition = posindex;
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            }
+        }
+
+        // Start reverb name input
+        if(zcheckMouse(579, 472, 164, 16) && snamesel == INPUT_NONE)
+        {
+            snamesel = INPUT_SELECTION_NAME;
+            strcpy(cur_input_name, Selection_Name);
+            namesize = 0;
+            sprintf(Selection_Name, "");
+            teac = 3;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+        }
+        
+        // Save the data
+        if(zcheckMouse(745, 472, 34, 16))
+        {
+            if(File_Exist("%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name))
+            {
+                Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_PATTERN);
+            }
+            else
+            {
+                gui_action = GUI_CMD_SAVE_PATTERN;
             }
         }
     }
@@ -777,11 +794,13 @@ void Anat(int posil)
 // Copy a position
 void SeqCopy(int st)
 {
+    Seq_Buffers_Full[Cur_Seq_Buffer] = TRUE;
     Seq_Buffers[Cur_Seq_Buffer].pattern = pSequence[st];
     for(char trk = 0; trk < Songtracks; trk++)
     {
         Seq_Buffers[Cur_Seq_Buffer].active_state[trk] = CHAN_ACTIVE_STATE[st][trk];
     }
+    Display_Seq_Buffer();
 }     
 
 // ------------------------------------------------------
@@ -800,10 +819,10 @@ void SeqPaste(int st)
 // Notify the user selected buffer visually
 void Display_Seq_Buffer(void)
 {
-    Gui_Draw_Button_Box(396, 522, 15, 16, "1", cur_seq_buffer[0]);
-    Gui_Draw_Button_Box(396 + 17, 522, 15, 16, "2", cur_seq_buffer[1]);
-    Gui_Draw_Button_Box(396 + (17 * 2), 522, 15, 16, "3", cur_seq_buffer[2]);
-    Gui_Draw_Button_Box(396 + (17 * 3), 522, 15, 16, "4", cur_seq_buffer[3]);
+    Gui_Draw_Button_Box(396, 522, 15, 16, "1", cur_seq_buffer[0] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[0] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + 17, 522, 15, 16, "2", cur_seq_buffer[1] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[1] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + (17 * 2), 522, 15, 16, "3", cur_seq_buffer[2] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[2] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + (17 * 3), 522, 15, 16, "4", cur_seq_buffer[3] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[3] ? 0 : BUTTON_LOW_FONT));
 }
 
 // ------------------------------------------------------

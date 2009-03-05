@@ -43,6 +43,11 @@
 #endif
 
 // ------------------------------------------------------
+// Variables
+extern int Cur_Seq_Buffer;
+extern char Selection_Name[20];
+
+// ------------------------------------------------------
 // Functions
 void Draw_Sequencer_Ed(void);
 void Actualize_Seq_Ed(char gode);

@@ -649,7 +649,7 @@ void Mouse_Left_Instrument_Ed(void)
         {
             if(zcheckMouse(268, 492, 88, 16))
             {
-                if(File_Exist("%s.pti", nameins[ped_patsam]))
+                if(File_Exist("%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]))
                 {
                     Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_INSTRUMENT);
                 }
@@ -672,7 +672,7 @@ void Mouse_Left_Instrument_Ed(void)
             {
                 sprintf(Name, "Untitled.wav");
             }
-            if(File_Exist("%s", Name))
+            if(File_Exist("%s"SLASH"%s", Dir_Instrs, Name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_EXPORT_WAV);
             }
@@ -1399,7 +1399,7 @@ void Actualize_Instruments_Synths_List(int modeac)
             Gui_Draw_Button_Box(394 + 1, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
             Dump_Instruments_Synths_List(413, 41);
 
-            Gui_Draw_Button_Box(394, 24, 332, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 314, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             switch(Scopish)
             {
                 case SCOPE_ZONE_INSTR_LIST:

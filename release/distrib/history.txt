@@ -5,6 +5,15 @@ ProTrekkr releases history
 v1.98c:
 
 - Better tracks panning calculation.
+- Added 3 other alternate copy blocks for patterns (Shortcuts: LCTRL+1 to 4).
+- Added an option to paste blocks across patterns boundaries
+  (if the blocks is too big it'll be pasted over the next pattern 
+   but only if it's a different one to avoid wrapping around).
+- Create a new directory (patterns) and added an option to save current pattern
+  selections into it (.ppb files) (Shortcut: LCTRL+w)
+  (303 patterns are also saved into that directory).
+- Files are now saved into their respective directories.
+- Added some visual indicators to show if copy buffers are empty or not.
 
 v1.98b:
 
