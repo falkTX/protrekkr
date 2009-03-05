@@ -8,6 +8,8 @@
 *.a
 *.ptp*
 *.ptk*
+*.ppb*
+*.303*
 *stderr*
 *stdout*
 *.elf*

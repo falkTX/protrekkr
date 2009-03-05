@@ -18,6 +18,8 @@
 *.lib*
 *.ptp*
 *.ptk*
+*.ppb*
+*.303*
 *stderr*
 *stdout*
 *windows*

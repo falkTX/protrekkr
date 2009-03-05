@@ -17,6 +17,8 @@
 *.a*
 *.lib*
 *.ptp*
+*.ppb*
+*.303*
 *module.s*
 *.ptk*
 *stderr*
