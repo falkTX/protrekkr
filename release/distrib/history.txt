@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98c:
+
+- Better tracks panning calculation.
+
 v1.98b:
 
 - Fixed a bug in the synth: ENV1 and ENV2 now really modulate the volume 

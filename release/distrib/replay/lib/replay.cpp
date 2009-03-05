@@ -4020,10 +4020,8 @@ float ApplyLfo(float cy, int trcy)
 // Stereo volume table
 void ComputeStereo(int channel)
 {
-    LVol[channel] = 1.0f - TPan[channel];
-    RVol[channel] = 1.0f - LVol[channel];
-    if(LVol[channel] > 0.5f) LVol[channel] = 0.5f;
-    if(RVol[channel] > 0.5f) RVol[channel] = 0.5f;
+    LVol[channel] = sqrtf(1.0f - TPan[channel]);
+    RVol[channel] = sqrtf(TPan[channel]);
 }
 
 // ------------------------------------------------------
