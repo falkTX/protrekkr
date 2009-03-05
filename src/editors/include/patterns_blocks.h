@@ -92,7 +92,7 @@ void Copy_Selection(int Position);
 void Copy_Buff(int dst, int src);
 SELECTION Get_Real_Selection(int Default);
 SELECTION Select_Track(int Track);
-void Paste_Block(int Position, int Go_Across);
+void Paste_Block(int Position, int Go_Across, int Refresh);
 void Interpolate_Block(int Position);
 void Randomize_Block(int Position);
 void Semitone_Up_Block(int Position);

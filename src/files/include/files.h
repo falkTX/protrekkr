@@ -35,7 +35,7 @@
 // ------------------------------------------------------
 // Includes
 #include <stdio.h>
-//#include <direct.h>
+#include "../../include/variables.h"
 
 // ------------------------------------------------------
 // Constants

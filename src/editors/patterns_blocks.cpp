@@ -657,10 +657,10 @@ void Copy_Selection(int Position)
 
 // ------------------------------------------------------
 // Paste a block into a pattern
-void Paste_Block(int Position, int Go_Across)
+void Paste_Block(int Position, int Go_Across, int Refresh)
 {
     Paste_Selection_From_Buffer(Position, Go_Across);
-    Actupated(0);
+    if(Refresh) Actupated(0);
 }
 
 // ------------------------------------------------------

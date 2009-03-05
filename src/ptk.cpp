@@ -3732,7 +3732,7 @@ void Keyboard_Handler(void)
                 // Paste the block buffer into a pattern
                 if(Keys[SDLK_v - UNICODE_OFFSET2] && block_start_track_nibble[Curr_Buff_Block] != -1 && block_end_track_nibble[Curr_Buff_Block] != -1 && is_editing)
                 {
-                    Paste_Block(Cur_Position, Paste_Across);
+                    Paste_Block(Cur_Position, Paste_Across, TRUE);
                 }
 
                 // Transpose the selection 1 semitone higher

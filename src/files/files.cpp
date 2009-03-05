@@ -33,7 +33,6 @@
 // Includes
 #include "../extralibs/zlib-1.2.3/zlib.h"
 
-#include "../include/variables.h"
 #include "../include/ptk.h"
 #include "include/files.h"
 #include "include/samples_pack.h"
@@ -5742,15 +5741,14 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
     Copy_Selection_To_Buffer(Cur_Position);
 
     Calc_selection();
-    Actupated(0);
-    
+
     Write_Function(Buff_MultiNotes[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
     Write_Function_Swap(&b_buff_xsize[Curr_Buff_Block], sizeof(int), 1, in);
     Write_Function_Swap(&b_buff_ysize[Curr_Buff_Block], sizeof(int), 1, in);
     Write_Function_Swap(&start_buff_nibble[Curr_Buff_Block], sizeof(int), 1, in);
     int Block_Len = PATTERN_LEN;
 
-    BYTE *Final_Mem_Out = Pack_Data(BuffBlock[Curr_Buff_Block], &Block_Len);
+    unsigned char *Final_Mem_Out = Pack_Data(BuffBlock[Curr_Buff_Block], &Block_Len);
     if(Final_Mem_Out)
     {
         Write_Function_Swap(&Block_Len, sizeof(int), 1, in);
@@ -5758,6 +5756,7 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
         free(Final_Mem_Out);
     }
     Curr_Buff_Block = Old_Curr_Buff_Block;
+    Actupated(0);
 }
 
 // ------------------------------------------------------
@@ -5783,22 +5782,22 @@ void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
     int Size_Out = PATTERN_LEN;
     Read_Function_Swap(&Size_In, sizeof(int), 1, in);
 
-    BYTE *Pack_Mem = (BYTE *) malloc(Size_In);
+    unsigned char *Pack_Mem = (unsigned char *) malloc(Size_In);
     if(Pack_Mem)
     {
         Read_Function(Pack_Mem, sizeof(char), Size_In, in);
-
-        BYTE *Final_Mem_Out = Depack_Data(Pack_Mem, Size_In, Size_Out);
+        unsigned char *Final_Mem_Out = Depack_Data(Pack_Mem, Size_In, Size_Out);
         if(Final_Mem_Out)
         {
             Buff_Full[Curr_Buff_Block] = TRUE;
             memcpy(BuffBlock[Curr_Buff_Block], Final_Mem_Out, Size_Out);
-            Paste_Block(Cur_Position, Paste_Across);
+            Paste_Block(Cur_Position, Paste_Across, FALSE);
             free(Final_Mem_Out);
         }
         free(Pack_Mem);
     }
     Curr_Buff_Block = Old_Curr_Buff_Block;
+    Actupated(0);
 }
 
 // ------------------------------------------------------
