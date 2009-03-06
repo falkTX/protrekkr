@@ -254,6 +254,10 @@ class CSynth
         float FilterL(void);
         float FilterR(void);
 
+        char ENV1_LOOP_BACKWARD;
+        char ENV2_LOOP_BACKWARD;
+        char ENV3_LOOP_BACKWARD;
+
     private:
 
         /* Internal Use */
@@ -374,10 +378,6 @@ class CSynth
 #if defined(PTK_SYNTH_LFO2)
         int LFO2_SUBGRCOUNTER;
 #endif
-
-        char ENV1_LOOP_BACKWARD;
-        char ENV2_LOOP_BACKWARD;
-        char ENV3_LOOP_BACKWARD;
 
 #if defined(PTK_SYNTH_LFO1)
         int LFO1_SUBGRMAX;

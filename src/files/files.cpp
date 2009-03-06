@@ -2416,6 +2416,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_SetGlobalVolume = FALSE;
     int Store_FX_Arpeggio = FALSE;
     int Store_FX_Vibrato = FALSE;
+    int Store_FX_Reverse = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -2988,6 +2989,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_Vibrato = TRUE;
                                     break;
 
+                                // $1d Reverse playing way
+                                case 0x1e:
+                                    Store_FX_Reverse = TRUE;
+                                    break;
+
                                 // $31 First TB303 control
                                 case 0x31:
                                     Store_303_1 = TRUE;
@@ -3121,6 +3127,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_SETGLOBALVOLUME", Store_FX_SetGlobalVolume);
     Save_Constant("PTK_FX_ARPEGGIO", Store_FX_Arpeggio);
     Save_Constant("PTK_FX_VIBRATO", Store_FX_Vibrato);
+    Save_Constant("PTK_FX_REVERSE", Store_FX_Reverse);
 
     Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio | Store_FX_PatternLoop);
 

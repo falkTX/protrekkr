@@ -286,7 +286,7 @@ void Actualize_Synth_Ed(char gode)
             Gui_Draw_Button_Box(70, 505 - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(96, 505 - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(122, 505 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "wav", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(174, 505 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[ped_patsam].osc1_waveform)
             {
@@ -295,7 +295,7 @@ void Actualize_Synth_Ed(char gode)
                 case 2:Gui_Draw_Button_Box(70, 505 - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 3:Gui_Draw_Button_Box(96, 505 - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 6:Gui_Draw_Button_Box(122, 505 - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5:Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "wav", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5:Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 4:Gui_Draw_Button_Box(174, 505 - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }
@@ -309,7 +309,7 @@ void Actualize_Synth_Ed(char gode)
             Gui_Draw_Button_Box(70, 559 - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(96, 559 - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(122, 559 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "wav", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(174, 559 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[ped_patsam].osc2_waveform)
             {
@@ -318,7 +318,7 @@ void Actualize_Synth_Ed(char gode)
                 case 2: Gui_Draw_Button_Box(70, 559 - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 3: Gui_Draw_Button_Box(96, 559 - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 6: Gui_Draw_Button_Box(122, 559 - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5: Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "wav", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5: Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 4: Gui_Draw_Button_Box(174, 559 - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }

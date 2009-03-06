@@ -943,26 +943,55 @@ float CSynth::GetSample(short *Left_Samples,
                     if(osc_speed2 < 16) osc_speed2 = 16;
 #endif
 
-                    if(ENV1_LOOP_BACKWARD == TRUE) pos_osc1->absolu -= osc_speed2;
+                    if(ENV1_LOOP_BACKWARD == TRUE)
+                    {
+                        if(pos_osc1->half.first > 0)
+                        {
+                            pos_osc1->absolu -= osc_speed2;
+                        }
+                    }
                     else pos_osc1->absolu += osc_speed2;
 
                     switch(Loop_Type1)
                     {
                         case SMP_LOOP_NONE:
-                            if(pos_osc1->half.first >= Length1)
+                            if(ENV1_LOOP_BACKWARD)
                             {
-                                pos_osc1->half.first = Length1;
-                                *track = PLAYING_NOSAMPLE;
+                                if(pos_osc1->half.first <= 0)
+                                {
+                                    pos_osc1->half.first = 0;
+                                    *track = PLAYING_NOSAMPLE;
+                                }
+                            }
+                            else
+                            {
+                                if(pos_osc1->half.first >= Length1)
+                                {
+                                    pos_osc1->half.first = Length1;
+                                    *track = PLAYING_NOSAMPLE;
+                                }
                             }
                             break;
+
                         case SMP_LOOP_FORWARD:
-                            if(pos_osc1->half.first >= Length1)
+                            if(ENV1_LOOP_BACKWARD)
                             {
-                                pos_osc1->half.first -= Loop_Sub1;
+                                if((int) pos_osc1->half.first <= (int) (Length1 - Loop_Sub1))
+                                {
+                                    pos_osc1->half.first = Length1;
+                                }
+                            }
+                            else
+                            {
+                                if(pos_osc1->half.first >= Length1)
+                                {
+                                    pos_osc1->half.first = Length1 - Loop_Sub1;
+                                }
                             }
                             break;
+
                         case SMP_LOOP_PINGPONG:
-                            if(ENV1_LOOP_BACKWARD == TRUE)
+                            if(ENV1_LOOP_BACKWARD)
                             {
                                 if((int) pos_osc1->half.first <= (int) (Length1 - Loop_Sub1))
                                 {
@@ -980,7 +1009,7 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                             break;
                     }
-                }
+               }
             }
         }
     }
@@ -1204,26 +1233,55 @@ float CSynth::GetSample(short *Left_Samples,
                     if(osc_speed2 < 16) osc_speed2 = 16;
 #endif
 
-                    if(ENV2_LOOP_BACKWARD == TRUE) pos_osc2->absolu -= osc_speed2;
+                    if(ENV2_LOOP_BACKWARD == TRUE)
+                    {
+                        if(pos_osc2->half.first > 0)
+                        {
+                            pos_osc2->absolu -= osc_speed2;
+                        }
+                    }
                     else pos_osc2->absolu += osc_speed2;
 
                     switch(Loop_Type2)
                     {
                         case SMP_LOOP_NONE:
-                            if(pos_osc2->half.first >= Length2)
+                            if(ENV2_LOOP_BACKWARD)
                             {
-                                pos_osc2->half.first = Length2;
-                                *track2 = PLAYING_NOSAMPLE;
+                                if(pos_osc2->half.first <= 0)
+                                {
+                                    pos_osc2->half.first = 0;
+                                    *track2 = PLAYING_NOSAMPLE;
+                                }
+                            }
+                            else
+                            {
+                                if(pos_osc2->half.first >= Length2)
+                                {
+                                    pos_osc2->half.first = Length2;
+                                    *track2 = PLAYING_NOSAMPLE;
+                                }
                             }
                             break;
+
                         case SMP_LOOP_FORWARD:
-                            if(pos_osc2->half.first >= Length2)
+                            if(ENV2_LOOP_BACKWARD)
                             {
-                                pos_osc2->half.first -= Loop_Sub2;
+                                if((int) pos_osc2->half.first <= (int) (Length2 - Loop_Sub2))
+                                {
+                                    pos_osc2->half.first = Length2;
+                                }
+                            }
+                            else
+                            {
+                                if(pos_osc2->half.first >= Length2)
+                                {
+                                    pos_osc2->half.first = Length2 - Loop_Sub2;
+                                }
                             }
                             break;
+
                         case SMP_LOOP_PINGPONG:
-                            if(ENV2_LOOP_BACKWARD == TRUE)
+                            if(ENV2_LOOP_BACKWARD)
                             {
                                 if((int) pos_osc2->half.first <= (int) (Length2 - Loop_Sub2))
                                 {
@@ -1398,26 +1456,55 @@ float CSynth::GetSample(short *Left_Samples,
                 if(osc_speed2 < 16) osc_speed2 = 16;
 #endif
 
-                if(ENV3_LOOP_BACKWARD == TRUE) pos_osc3->absolu -= osc_speed2;
+                if(ENV3_LOOP_BACKWARD == TRUE)
+                {
+                    if(pos_osc3->half.first > 0)
+                    {
+                        pos_osc3->absolu -= osc_speed2;
+                    }
+                }
                 else pos_osc3->absolu += osc_speed2;
 
                 switch(Loop_Type)
                 {
                     case SMP_LOOP_NONE:
-                        if(pos_osc3->half.first >= Length)
+                        if(ENV3_LOOP_BACKWARD)
                         {
-                            pos_osc3->half.first = Length;
-                            *track = PLAYING_NOSAMPLE;
+                            if(pos_osc3->half.first <= 0)
+                            {
+                                pos_osc3->half.first = 0;
+                                *track = PLAYING_NOSAMPLE;
+                            }
+                        }
+                        else
+                        {
+                            if(pos_osc3->half.first >= Length)
+                            {
+                                pos_osc3->half.first = Length;
+                                *track = PLAYING_NOSAMPLE;
+                            }
                         }
                         break;
+
                     case SMP_LOOP_FORWARD:
-                        if(pos_osc3->half.first >= Length)
+                        if(ENV3_LOOP_BACKWARD)
                         {
-                            pos_osc3->half.first -= Loop_Sub;
+                            if((int) pos_osc3->half.first <= (int) (Length - Loop_Sub))
+                            {
+                                pos_osc3->half.first = Length;
+                            }
+                        }
+                        else
+                        {
+                            if(pos_osc3->half.first >= Length)
+                            {
+                                pos_osc3->half.first = Length - Loop_Sub;
+                            }
                         }
                         break;
+
                     case SMP_LOOP_PINGPONG:
-                        if(ENV3_LOOP_BACKWARD == TRUE)
+                        if(ENV3_LOOP_BACKWARD)
                         {
                             if((int) pos_osc3->half.first <= (int) (Length - Loop_Sub))
                             {

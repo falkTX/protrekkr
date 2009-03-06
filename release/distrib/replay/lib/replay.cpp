@@ -274,6 +274,10 @@ int shuffleswitch;
     unsigned char sLength;
 #endif
 
+#if defined(PTK_FX_REVERSE)
+    int Reverse_Switch[MAX_TRACKS];
+#endif
+
 #if defined(PTK_FX_VIBRATO)
     int64 Vstep_vib[MAX_TRACKS][MAX_POLYPHONY];
     int Vibrato_Switch[MAX_TRACKS];
@@ -1594,15 +1598,6 @@ void Pre_Song_Init(void)
 
     for(int ini = 0; ini < MAX_TRACKS; ini++)
     {
-
-#if defined(PTK_FX_ARPEGGIO)
-        Arpeggio_Switch[ini] = 0;
-#endif
-
-#if defined(PTK_FX_VIBRATO)
-        Vibrato_Switch[ini] = 0;
-#endif
-
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
 
@@ -1833,31 +1828,37 @@ void Post_Song_Init(void)
     repeat_loop_pos = 0;       // No repeat loop
     repeat_loop_counter = -1;
 
-#if defined(PTK_FX_ARPEGGIO)
     for(i = 0; i < MAX_TRACKS; i++)
     {
+
+#if defined(PTK_FX_ARPEGGIO)
         Arpeggio_Switch[i] = 0;
-        
-        for(j = 0; j < MAX_POLYPHONY; j++)
-        {
-            Arpeggio_BaseNote[i][j] = 0;
-            Vstep_arp[i][j] = 0;
-        }
-    }
 #endif
 
 #if defined(PTK_FX_VIBRATO)
-    for(i = 0; i < MAX_TRACKS; i++)
-    {
         Vibrato_Switch[i] = 0;
+#endif
         
         for(j = 0; j < MAX_POLYPHONY; j++)
         {
+
+#if defined(PTK_FX_ARPEGGIO)
+            Arpeggio_BaseNote[i][j] = 0;
+            Vstep_arp[i][j] = 0;
+#endif
+
+#if defined(PTK_FX_VIBRATO)
             Vibrato_BaseNote[i][j] = 0;
             Vstep_vib[i][j] = 0;
-        }
-    }
 #endif
+
+        }
+       
+#if defined(PTK_FX_REVERSE)
+        Reverse_Switch[i] = 0;
+#endif
+
+    }
 
     lchorus_counter = MIX_RATE;
     rchorus_counter = MIX_RATE;
@@ -2464,39 +2465,72 @@ ByPass_Wav:
                     // End of Interpolation algo
                     if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
                     {
-                        sp_Position[c][i].absolu -= Vstep1[c][i];
+                        if(sp_Position[c][i].half.first > 0)
+                        {
+                            sp_Position[c][i].absolu -= Vstep1[c][i];
+                        }
                     }
                     else
                     {
                         sp_Position[c][i].absolu += Vstep1[c][i];
                     }
 
-                    if(Player_LT[c][i] == SMP_LOOP_PINGPONG)
+                    switch(Player_LT[c][i])
                     {
-                        if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
-                        {
-                            if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                        case SMP_LOOP_FORWARD:
+                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                             {
-                                Player_LW[c][i] = SMP_LOOPING_BACKWARD;
+                                if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                                {
+                                    sp_Position[c][i].half.first = Player_LS[c][i];
+                                }
                             }
-                        }
-                        else
-                        {
-                            if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                            else
                             {
-                                Player_LW[c][i] = SMP_LOOPING_FORWARD;
+                                if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                                {
+                                    sp_Position[c][i].half.first = Player_LE[c][i];
+                                }
                             }
-                        }
-                    }
-                    if(Player_LT[c][i] == SMP_LOOP_FORWARD &&
-                       sp_Position[c][i].half.first >= Player_LE[c][i])
-                    {
-                        sp_Position[c][i].half.first -= Player_LL[c][i];
-                    }
-                    if(Player_LT[c][i] == SMP_LOOP_NONE &&
-                       sp_Position[c][i].half.first >= Player_NS[c][i])
-                    {
-                        sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                            break;
+
+                        case SMP_LOOP_PINGPONG:
+                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
+                            {
+                                if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                                {
+                                    sp_Position[c][i].half.first = Player_LE[c][i];
+                                    Player_LW[c][i] = SMP_LOOPING_BACKWARD;
+                                }
+                            }
+                            else
+                            {
+                                if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                                {
+                                    Player_LW[c][i] = SMP_LOOPING_FORWARD;
+                                    sp_Position[c][i].half.first = Player_LS[c][i];
+                                }
+                            }
+                            break;
+
+                        case SMP_LOOP_NONE:
+                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
+                            {
+                                if(sp_Position[c][i].half.first >= Player_NS[c][i])
+                                {
+                                    sp_Position[c][i].half.first = Player_NS[c][i];
+                                    sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                }
+                            }
+                            else
+                            {
+                                if(sp_Position[c][i].half.first <= 0)
+                                {
+                                    sp_Position[c][i].half.first = 0;
+                                    sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                }
+                            }
+                            break;
                     }
 
 #if defined(PTK_SYNTH)
@@ -3468,6 +3502,12 @@ void DoEffects_tick0(void)
                 break;
 #endif
 
+#if defined(PTK_FX_REVERSE)
+            case 0x1e:
+
+                Reverse_Switch[trackef] = TRUE;
+                break;
+#endif
         }
     }      
 }
@@ -3922,7 +3962,6 @@ void DoEffects(void)
                 local_mas_vol = pltr_dat_row / 255.0f;
                 break;
 #endif
-
         }
 
 #endif  // PTK_FX_X
@@ -3973,6 +4012,78 @@ void DoEffects(void)
                 vibnote = (double) powf(2.0f, ((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
                 vibnote *= 4294967296.0f;
                 Vstep1[trackef][i] = (int64) vibnote;
+            }
+        }
+#endif
+
+#if defined(PTK_FX_REVERSE)
+        if(Reverse_Switch[trackef])
+        {
+            Reverse_Switch[trackef] = FALSE;
+            if(pltr_dat_row)
+            {
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                {
+                    if(sp_Stage[trackef][i] != PLAYING_NOSAMPLE)
+                    {
+                        Player_LW[trackef][i] = SMP_LOOPING_BACKWARD;
+                    }
+                    if(sp_Stage2[trackef][i] != PLAYING_NOSAMPLE)
+                    {
+                        Synthesizer[trackef][i].ENV1_LOOP_BACKWARD = TRUE;
+                        Synthesizer[trackef][i].ENV3_LOOP_BACKWARD = TRUE;
+                    }
+                    if(sp_Stage3[trackef][i] != PLAYING_NOSAMPLE)
+                    {
+                        Synthesizer[trackef][i].ENV2_LOOP_BACKWARD = TRUE;
+                    }
+
+                    if(Player_LT[trackef][i] == SMP_LOOP_NONE)
+                    {
+                        if(Player_LW[trackef][i] == SMP_LOOPING_BACKWARD)
+                        {
+                            if(sp_Position[trackef][i].half.first == 0)
+                            {
+                                sp_Position[trackef][i].half.first = Player_NS[trackef][i];
+                            }
+                        }
+
+                        if(Synthesizer[trackef][i].ENV1_LOOP_BACKWARD)
+                        {
+                            if(Synthesizer[trackef][i].OSC1_WAVEFORM == WAVEFORM_WAV)
+                            {
+                                sp_Position_osc1[trackef][i].half.first = Player_NS[trackef][i];
+                                sp_Position_osc3[trackef][i].half.first = Player_NS[trackef][i];
+                            }
+                        }
+                        if(Synthesizer[trackef][i].ENV2_LOOP_BACKWARD)
+                        {
+                            if(Synthesizer[trackef][i].OSC2_WAVEFORM == WAVEFORM_WAV)
+                            {
+                                sp_Position_osc2[trackef][i].half.first = Player_NS[trackef][i];
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                {
+                    if(sp_Stage[trackef][i] != PLAYING_NOSAMPLE)
+                    {
+                        Player_LW[trackef][i] = SMP_LOOPING_FORWARD;
+                    }
+                    if(sp_Stage2[trackef][i] != PLAYING_NOSAMPLE) 
+                    {
+                        Synthesizer[trackef][i].ENV1_LOOP_BACKWARD = FALSE;
+                        Synthesizer[trackef][i].ENV3_LOOP_BACKWARD = FALSE;
+                    }
+                    if(sp_Stage3[trackef][i] != PLAYING_NOSAMPLE) 
+                    {
+                        Synthesizer[trackef][i].ENV2_LOOP_BACKWARD = FALSE;
+                    }
+                }
             }
         }
 #endif
