@@ -5,7 +5,7 @@ ProTrekkr releases history
 v1.98d:
 
 - Forward looping wasn't working correctly for instruments.
-- New effect: Reverse playing way (0x1e)
+- New effect: Select playing way (0x1e)
               0x1e00: Play forward.
               0x1e01: Play backward.
 - Added a requester before deleting an instrument to let the user select
