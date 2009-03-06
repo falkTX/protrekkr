@@ -6,7 +6,7 @@
 --------------------Configuration: plugin - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1A2.tmp" with contents
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP47.tmp" with contents
 [
 /nologo /MT /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PLUGIN_EXPORTS" /D "__WINAMP__" /D "__STAND_ALONE__" /Fp"Release/plugin.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "C:\Src\Pc\ptk\src\files\files.cpp"
@@ -18,8 +18,8 @@ Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1A2.tmp" with conte
 "C:\Src\Pc\ptk\release\distrib\replay\lib\synth.cpp"
 "C:\Src\Pc\ptk\release\distrib\replay\lib\tb_303.cpp"
 ]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1A2.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1A3.tmp" with contents
+Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP47.tmp" 
+Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP48.tmp" with contents
 [
 kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo /dll /incremental:no /pdb:"Release/in_ptk.pdb" /machine:I386 /out:"Distrib\in_ptk.dll" /implib:"Release/in_ptk.lib" 
 .\Release\files.obj
@@ -31,7 +31,7 @@ kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo
 .\Release\synth.obj
 .\Release\tb_303.obj
 ]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP1A3.tmp"
+Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP48.tmp"
 <h3>Output Window</h3>
 Compiling...
 files.cpp
