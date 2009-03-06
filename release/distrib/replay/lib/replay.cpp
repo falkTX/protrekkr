@@ -3878,27 +3878,27 @@ void DoEffects(void)
 #if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
             // $12 Set distortion Threshold
             case 0x12:
-                DThreshold[trackef] = (float) pltr_dat_row * 128.0f;
+                DThreshold[trackef] = (float) pltr_dat_row * 256.0f;
                 break;
 #endif
 
 #if defined(PTK_FX_SETDISTORTIONCLAMP)
             // $13 Set distortion clamp
             case 0x13: 
-                DClamp[trackef] = (float) pltr_dat_row * 128.0f;
+                DClamp[trackef] = (float) pltr_dat_row * 256.0f;
                 break;
 #endif
 
 #if defined(PTK_FX_SETFILTERRESONANCE)
             // $14 Set filter resonance
-            case 0x14: 
+            case 0x14:
                 FRez[trackef] = (int) (pltr_dat_row / 2);
                 break;
 #endif
 
 #if defined(PTK_FX_SETFILTERTYPE)
             // $15 Set filter Type
-            case 0x15: 
+            case 0x15:
                 if(pltr_dat_row <= MAX_FILTER) FType[trackef] = (int) pltr_dat_row;
                 break;
 #endif
@@ -3914,7 +3914,7 @@ void DoEffects(void)
 
 #if defined(PTK_FX_AUTOFADEIN)
             // $17 Auto fade in xx ticks
-            case 0x17: 
+            case 0x17:
                 if(pltr_dat_row > 0)
                 {
                     FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row;
