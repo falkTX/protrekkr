@@ -156,15 +156,15 @@ void Actualize_Track_Ed(char gode)
         if(gode == 0 || gode == 7)
         {
             if(DThreshold[ped_track] < 0) DThreshold[ped_track] = 0;
-            if(DThreshold[ped_track] > 65535) DThreshold[ped_track] = 65535;
-            Realslider(308, 484, (int) DThreshold[ped_track] / 512, Disclap[ped_track]);
+            if(DThreshold[ped_track] > 32767) DThreshold[ped_track] = 32767;
+            Realslider(308, 484, (int) DThreshold[ped_track] / 256, Disclap[ped_track]);
         }
 
         if(gode == 0 || gode == 8)
         {
             if(DClamp[ped_track] < 0) DClamp[ped_track] = 0;
-            if(DClamp[ped_track] > 65535) DClamp[ped_track] = 65535;
-            Realslider(308, 502, (int) DClamp[ped_track] / 512, Disclap[ped_track]);
+            if(DClamp[ped_track] > 32767) DClamp[ped_track] = 32767;
+            Realslider(308, 502, (int) DClamp[ped_track] / 256, Disclap[ped_track]);
         }
 
         if(gode == 0 || gode == 9)

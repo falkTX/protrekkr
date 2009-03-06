@@ -1004,7 +1004,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_TRACK_THRESHOLD)
         {
-            DThreshold[ped_track] = float((Mouse.x - 318) * 512);
+            DThreshold[ped_track] = float((Mouse.x - 318) * 256);
             Actualize_Track_Ed(7);
             liveparam = LIVE_PARAM_TRACK_THRESHOLD;
             livevalue = (Mouse.x - 318) * 2;
@@ -1012,7 +1012,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_TRACK_CLAMP)
         {
-            DClamp[ped_track] = float((Mouse.x - 318) * 512);
+            DClamp[ped_track] = float((Mouse.x - 318) * 256);
             Actualize_Track_Ed(8);
             liveparam = LIVE_PARAM_TRACK_CLAMP;
             livevalue = (Mouse.x - 318) * 2;

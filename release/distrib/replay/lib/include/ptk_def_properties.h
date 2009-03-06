@@ -140,5 +140,6 @@
 #define PTK_COMPRESSOR
 #define PTK_LFO
 #define PTK_FLANGER
+#define PTK_DISCLAP
 
 #endif

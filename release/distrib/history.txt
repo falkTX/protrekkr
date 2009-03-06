@@ -10,6 +10,7 @@ v1.98d:
               0x1e01: Play backward.
 - Added a requester before deleting an instrument to let the user select
   what part of the instrument to discard (All, Instrument or Synth).
+- Fixed the tracks disto.
 
 v1.98c:
 

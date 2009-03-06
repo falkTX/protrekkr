@@ -1711,8 +1711,8 @@ void Pre_Song_Init(void)
         ICut[ini] = 0.0039062f;
         FType[ini] = 4;
         FRez[ini] = 64;
-        DThreshold[ini] = 65535;
-        DClamp[ini] = 65535;
+        DThreshold[ini] = 32767;
+        DClamp[ini] = 32767;
         Disclap[ini] = 0;
 #endif
 
@@ -3878,14 +3878,14 @@ void DoEffects(void)
 #if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
             // $12 Set distortion Threshold
             case 0x12:
-                DThreshold[trackef] = (float) pltr_dat_row * 256.0f;
+                DThreshold[trackef] = (float) pltr_dat_row * 128.0f;
                 break;
 #endif
 
 #if defined(PTK_FX_SETDISTORTIONCLAMP)
             // $13 Set distortion clamp
             case 0x13: 
-                DClamp[trackef] = (float) pltr_dat_row * 256.0f;
+                DClamp[trackef] = (float) pltr_dat_row * 128.0f;
                 break;
 #endif
 
