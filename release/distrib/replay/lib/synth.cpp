@@ -957,7 +957,7 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_NONE:
                             if(ENV1_LOOP_BACKWARD)
                             {
-                                if(pos_osc1->half.first <= 0)
+                                if((int) pos_osc1->half.first <= 0)
                                 {
                                     pos_osc1->half.first = 0;
                                     *track = PLAYING_NOSAMPLE;
@@ -978,14 +978,14 @@ float CSynth::GetSample(short *Left_Samples,
                             {
                                 if((int) pos_osc1->half.first <= (int) (Length1 - Loop_Sub1))
                                 {
-                                    pos_osc1->half.first = Length1;
+                                    pos_osc1->half.first += Length1;
                                 }
                             }
                             else
                             {
                                 if(pos_osc1->half.first >= Length1)
                                 {
-                                    pos_osc1->half.first = Length1 - Loop_Sub1;
+                                    pos_osc1->half.first -= Loop_Sub1;
                                 }
                             }
                             break;
@@ -1247,7 +1247,7 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_NONE:
                             if(ENV2_LOOP_BACKWARD)
                             {
-                                if(pos_osc2->half.first <= 0)
+                                if((int) pos_osc2->half.first <= 0)
                                 {
                                     pos_osc2->half.first = 0;
                                     *track2 = PLAYING_NOSAMPLE;
@@ -1268,14 +1268,14 @@ float CSynth::GetSample(short *Left_Samples,
                             {
                                 if((int) pos_osc2->half.first <= (int) (Length2 - Loop_Sub2))
                                 {
-                                    pos_osc2->half.first = Length2;
+                                    pos_osc2->half.first += Length2;
                                 }
                             }
                             else
                             {
                                 if(pos_osc2->half.first >= Length2)
                                 {
-                                    pos_osc2->half.first = Length2 - Loop_Sub2;
+                                    pos_osc2->half.first -= Loop_Sub2;
                                 }
                             }
                             break;
@@ -1285,7 +1285,7 @@ float CSynth::GetSample(short *Left_Samples,
                             {
                                 if((int) pos_osc2->half.first <= (int) (Length2 - Loop_Sub2))
                                 {
-                                    pos_osc2->half.first = Length2 - Loop_Sub2;
+                                    pos_osc2->half.first = Length1 - Loop_Sub1;
                                     ENV2_LOOP_BACKWARD = FALSE;
                                 }
                             }
@@ -1470,7 +1470,7 @@ float CSynth::GetSample(short *Left_Samples,
                     case SMP_LOOP_NONE:
                         if(ENV3_LOOP_BACKWARD)
                         {
-                            if(pos_osc3->half.first <= 0)
+                            if((int) pos_osc3->half.first <= 0)
                             {
                                 pos_osc3->half.first = 0;
                                 *track = PLAYING_NOSAMPLE;
@@ -1491,14 +1491,14 @@ float CSynth::GetSample(short *Left_Samples,
                         {
                             if((int) pos_osc3->half.first <= (int) (Length - Loop_Sub))
                             {
-                                pos_osc3->half.first = Length;
+                                pos_osc3->half.first += Length;
                             }
                         }
                         else
                         {
                             if(pos_osc3->half.first >= Length)
                             {
-                                pos_osc3->half.first = Length - Loop_Sub;
+                                pos_osc3->half.first -= Loop_Sub;
                             }
                         }
                         break;

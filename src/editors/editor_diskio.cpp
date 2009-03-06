@@ -358,10 +358,12 @@ void Mouse_Left_DiskIO_Ed(void)
             gui_action = GUI_CMD_UPDATE_DISKIO_ED;
         }
 
+        // Zzaapp
         if(zcheckMouse(8, 470, 80, 16))
         {
             Display_Requester(&Zzaapp_Requester, GUI_CMD_NEW_MODULE);
         }
+
         if(zcheckMouse(90, 488, 80, 16))
         {
             if(File_Exist("%s"SLASH"%s.wav", Dir_Mods, name))

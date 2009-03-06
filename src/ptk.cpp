@@ -318,6 +318,30 @@ REQUESTER_BUTTON Requester_Btn_Yes =
     SDLK_y
 };
 
+REQUESTER_BUTTON Requester_Btn_Synth =
+{
+    &Requester_Btn_Cancel,
+    "Synth",
+    0,
+    SDLK_s
+};
+
+REQUESTER_BUTTON Requester_Btn_Instrument =
+{
+    &Requester_Btn_Synth,
+    "Instrument",
+    0,
+    SDLK_i
+};
+
+REQUESTER_BUTTON Requester_Btn_All_Delete =
+{
+    &Requester_Btn_Instrument,
+    "All",
+    BUTTON_DEFAULT,
+    SDLK_a
+};
+
 REQUESTER Exit_Requester =
 {
     "Do you really want to quit ?",
@@ -334,6 +358,12 @@ REQUESTER Zzaapp_Requester =
 {
     "What do you want to Zzaapp ?",
     &Requester_Btn_All
+};
+
+REQUESTER Delete_Requester =
+{
+    "What do you want to delete ?",
+    &Requester_Btn_All_Delete
 };
 
 char OverWrite_Name[1024];
@@ -1646,6 +1676,29 @@ int Screen_Update(void)
 
     }
 
+    switch(Check_Requester(&Delete_Requester))
+    {
+        case 1:
+            // All
+            ZzaappOMatic = ZZAAPP_ALL;
+            break;
+
+        case 2:
+            // Instrument
+            ZzaappOMatic = ZZAAPP_INSTRUMENTS;
+            break;
+
+        case 3:
+            // Synth
+            ZzaappOMatic = ZZAAPP_SYNTHS;
+            break;
+
+        case 4:
+            gui_action = GUI_CMD_NOP;
+            break;
+
+    }
+
     if(Check_Requester(&Exit_Requester) == 1)
     {
         SongStop();
@@ -2413,21 +2466,48 @@ void WavRenderizer(void)
 // Delete an instrument
 void DeleteInstrument(void)
 {
-    AUDIO_Stop();
-    Stop_Current_Sample();
-    SDL_Delay(256);
+    int i;
+    int Old_Prg;
 
-    beatsync[ped_patsam] = FALSE;
-    beatlines[ped_patsam] = 16;
-    sprintf(nameins[ped_patsam], "Untitled");
-    ResetSynthParameters(&PARASynth[ped_patsam]);
-    KillInst(ped_patsam);
-    mess_box("Instrument deleted.");
-    RefreshSample();
-    NewWav();
-    AUDIO_Play();
-    Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
-    Actualize_Patterned();
+    Stop_Current_Sample();
+
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_SYNTHS)
+    {
+        for(int ini = 0; ini < MAX_TRACKS; ini++)
+        {
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Synthesizer[ini][i].Reset();
+            }
+        }
+
+        ResetSynthParameters(&PARASynth[ped_patsam]);
+        Synthprg[ped_patsam] = 0;
+        Actualize_Master(0);
+        Final_Mod_Length = 0;
+        Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
+        mess_box("Synth deleted.");
+    }
+
+    if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_INSTRUMENTS)
+    {
+        seditor = 0;
+        Final_Mod_Length = 0;
+        Actualize_Master(0);
+        Old_Prg = Synthprg[ped_patsam];
+        KillInst(ped_patsam);
+        Synthprg[ped_patsam] = Old_Prg;
+        sprintf(nameins[ped_patsam], "Untitled");
+        if((Synthprg[ped_patsam] - 2) == ped_patsam)
+        {
+            Synthprg[ped_patsam] = 1;
+        }
+        NewWav();
+        mess_box("Instrument deleted.");
+        RefreshSample();
+        Actualize_Master(0);
+    }
+    Actualize_Instruments_Synths_List(0);
 }
 
 void Stop_Current_Sample(void)
@@ -4849,7 +4929,7 @@ void Mouse_Handler(void)
         // Delete instrument
         if(zcheckMouse(320, 134, 64, 16))
         {
-            gui_action = GUI_CMD_DELETE_INSTRUMENT;
+            Display_Requester(&Delete_Requester, GUI_CMD_DELETE_INSTRUMENT);
         }
 
         // Zoom'em small

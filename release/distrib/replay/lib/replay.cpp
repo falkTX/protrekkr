@@ -2465,7 +2465,7 @@ ByPass_Wav:
                     // End of Interpolation algo
                     if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
                     {
-                        if(sp_Position[c][i].half.first > 0)
+                        if((int) sp_Position[c][i].half.first > 0)
                         {
                             sp_Position[c][i].absolu -= Vstep1[c][i];
                         }
@@ -2487,7 +2487,7 @@ ByPass_Wav:
                             }
                             else
                             {
-                                if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                                if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
                                 {
                                     sp_Position[c][i].half.first = Player_LE[c][i];
                                 }
@@ -2505,7 +2505,7 @@ ByPass_Wav:
                             }
                             else
                             {
-                                if(sp_Position[c][i].half.first <= Player_LS[c][i])
+                                if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
                                 {
                                     Player_LW[c][i] = SMP_LOOPING_FORWARD;
                                     sp_Position[c][i].half.first = Player_LS[c][i];
@@ -2524,7 +2524,7 @@ ByPass_Wav:
                             }
                             else
                             {
-                                if(sp_Position[c][i].half.first <= 0)
+                                if((int) sp_Position[c][i].half.first <= 0)
                                 {
                                     sp_Position[c][i].half.first = 0;
                                     sp_Stage[c][i] = PLAYING_NOSAMPLE;
@@ -4038,13 +4038,15 @@ void DoEffects(void)
                         Synthesizer[trackef][i].ENV2_LOOP_BACKWARD = TRUE;
                     }
 
-                    if(Player_LT[trackef][i] == SMP_LOOP_NONE)
+                    if(Player_LT[trackef][i] == SMP_LOOP_NONE || Player_LT[trackef][i] == SMP_LOOP_PINGPONG)
                     {
+                        int Max_Loop = Player_NS[trackef][i];
+                        if(Player_LT[trackef][i] != SMP_LOOP_NONE) if((int) Player_LE[trackef][i] < Max_Loop) Max_Loop = Player_LE[trackef][i];
                         if(Player_LW[trackef][i] == SMP_LOOPING_BACKWARD)
                         {
                             if(sp_Position[trackef][i].half.first == 0)
                             {
-                                sp_Position[trackef][i].half.first = Player_NS[trackef][i];
+                                sp_Position[trackef][i].half.first = Max_Loop;
                             }
                         }
 
@@ -4052,15 +4054,15 @@ void DoEffects(void)
                         {
                             if(Synthesizer[trackef][i].OSC1_WAVEFORM == WAVEFORM_WAV)
                             {
-                                sp_Position_osc1[trackef][i].half.first = Player_NS[trackef][i];
-                                sp_Position_osc3[trackef][i].half.first = Player_NS[trackef][i];
+                                sp_Position_osc1[trackef][i].half.first = Max_Loop;
+                                sp_Position_osc3[trackef][i].half.first = Max_Loop;
                             }
                         }
                         if(Synthesizer[trackef][i].ENV2_LOOP_BACKWARD)
                         {
                             if(Synthesizer[trackef][i].OSC2_WAVEFORM == WAVEFORM_WAV)
                             {
-                                sp_Position_osc2[trackef][i].half.first = Player_NS[trackef][i];
+                                sp_Position_osc2[trackef][i].half.first = Max_Loop;
                             }
                         }
                     }
@@ -4695,6 +4697,9 @@ void KillInst(int inst_nbr)
 #if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
     SamplesSwap[inst_nbr] = FALSE;
 #endif
+
+    beatsync[inst_nbr] = FALSE;
+    beatlines[inst_nbr] = 16;
 
     for(int z = 0; z < 16; z++)
     {
