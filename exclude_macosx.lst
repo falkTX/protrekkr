@@ -14,7 +14,7 @@
 *lame*
 *.o*
 *.obj*
-*.a*
+*.a
 *.lib*
 *.ptp*
 *.ppb*
