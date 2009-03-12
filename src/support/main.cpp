@@ -453,9 +453,24 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                 break;
             }
         }
-        printf("%s\n", ExePath);
-        strcat(ExePath, "../");
-        CHDIR(ExePath);
+
+        // There's a probably abetter way to do that but
+        // it works fine and i want the app to be able 
+        // to run from a console too.
+        int Found_File = FALSE;
+        strcat(ExePath, "/../");
+        while(!Found_File)
+        {
+            printf("%s\n", ExePath);
+            CHDIR(ExePath);
+            FILE *Test_File = fopen("skins/skin.xml", "rb");
+            if(Test_File)
+            {
+                Found_File = TRUE;
+                fclose(Test_File);
+            }
+            strcat(ExePath, "../");
+        }
     #else
         GETCWD(ExePath, MAX_PATH);
     #endif

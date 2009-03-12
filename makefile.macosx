@@ -53,7 +53,7 @@ protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 	g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
 	g++ -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
 	lipo -create ./release/distrib/ptk_macosx_x86 ./release/distrib/ptk_macosx_ppc -output ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
-	strip -x -X -S ./release/distrib/ptk_macosx
+	strip -x -X -S ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	-rm -f ./release/distrib/ptk_macosx_ppc
 	-rm -f ./release/distrib/ptk_macosx_x86
 #	-rm -f $(EXEOBJS_PPC)
