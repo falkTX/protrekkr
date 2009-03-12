@@ -248,7 +248,6 @@ int Translate_Locale_Key(int Key)
 
     for(i = 0; i < 37; i++)
     {
-
         // apparently, windows doesn't care about that localization
 #if defined(__WIN32__)
         if(Cur_Keyboard[i].base == Key)
@@ -454,6 +453,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                 break;
             }
         }
+        printf("%s\n", ExePath);
+        strcat(ExePath, "../");
         CHDIR(ExePath);
     #else
         GETCWD(ExePath, MAX_PATH);
