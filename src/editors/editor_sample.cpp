@@ -117,14 +117,14 @@ void Draw_Sampled_Wave(void)
                 int rcolor4;
                 int s_ey;
                 int s_ey2;
-                int s_size;
+                int s_size = 0;
                 int s_coef;
 
                 if(strober)
                 {
-                    s_ey = 450 + (resty / strober);
-                    s_ey2 = s_ey + ((resty / strober) * 2);
-                    s_size = resty / strober;
+                    s_ey = 450 + (SAMPLE_LINES_HEIGHT / strober);
+                    s_ey2 = s_ey + ((SAMPLE_LINES_HEIGHT / strober) * 2);
+                    s_size = SAMPLE_LINES_HEIGHT / strober;
                     s_coef = 32768 / s_size;
 
                     if(rs_coef > s_coef) rs_coef = s_coef;
@@ -136,7 +136,7 @@ void Draw_Sampled_Wave(void)
                     // No sample
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
-/*
+
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
@@ -165,7 +165,7 @@ void Draw_Sampled_Wave(void)
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         // Straight line
                         DrawVLine(s_ex, s_ey, s_ey, rcolor1);
-                    }*/
+                    }
                 } // If
 
                 // STEREO DISPLAY
@@ -175,7 +175,7 @@ void Draw_Sampled_Wave(void)
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
 
-/*                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
+                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
                         int h = *(RawSamples[ped_patsam][0][ped_split] + s_offset) / rs_coef;
@@ -218,13 +218,13 @@ void Draw_Sampled_Wave(void)
                         // Straight line
                         DrawVLine(s_ex, s_ey, s_ey, rcolor1);
                         DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
-                    }*/
+                    }
                 }// If Stereo
 
                 // Loop bars
                 if(LoopType[ped_patsam][ped_split])
                 {
-/*                    int32 LSX = (int32) LoopStart[ped_patsam][ped_split] - sed_display_start;
+                    int32 LSX = (int32) LoopStart[ped_patsam][ped_split] - sed_display_start;
                     int32 LEX = (int32) LoopEnd[ped_patsam][ped_split] - sed_display_start;
 
                     LSX = (LSX * 512) / sed_display_length;
@@ -248,7 +248,7 @@ void Draw_Sampled_Wave(void)
                         DrawHLine(462, LEX - 5, LEX - 2, COL_FONT_HI);
                         DrawHLine(463, LEX - 5, LEX - 5, COL_FONT_HI);
                         DrawHLine(464, LEX - 5, LEX - 2, COL_FONT_HI);
-                    }*/
+                    }
                 }
 
             }
@@ -291,8 +291,8 @@ void Draw_Sampled_Wave2(void)
         if(SampleType[ped_patsam][ped_split] > 0)
         { // Any Sample Out There ?
             int strober = SampleChannels[ped_patsam][ped_split] * 2;
-            int s_ey = 450 + (resty / strober);
-            int s_ey2 = s_ey + ((resty / strober) * 2);
+            int s_ey = 450 + (SAMPLE_LINES_HEIGHT / strober);
+            int s_ey2 = s_ey + ((SAMPLE_LINES_HEIGHT / strober) * 2);
             int rcolor3;
             int rcolor4;
 
