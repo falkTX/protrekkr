@@ -132,7 +132,7 @@ void Draw_Sampled_Wave(void)
                 {
                     // No sample
                     SetColor(COL_BACKGROUND);
-                    Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
+                    Fillrect(0, 450, 512, 450 + 109);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -170,7 +170,7 @@ void Draw_Sampled_Wave(void)
                 {
                     // No sample
                     SetColor(COL_BACKGROUND);
-                    Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
+                    Fillrect(0, 450, 512, 450 + 109);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -254,7 +254,7 @@ void Draw_Sampled_Wave(void)
     
                 // No sample
                 SetColor(COL_BACKGROUND);
-                Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
+                Fillrect(0, 450, 512, 450 + 109);
             }
 
             draw_sampled_wave = FALSE;
