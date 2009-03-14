@@ -136,7 +136,7 @@ void Draw_Sampled_Wave(void)
                     // No sample
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
-
+/*
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
@@ -165,7 +165,7 @@ void Draw_Sampled_Wave(void)
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         // Straight line
                         DrawVLine(s_ex, s_ey, s_ey, rcolor1);
-                    }
+                    }*/
                 } // If
 
                 // STEREO DISPLAY
@@ -175,7 +175,7 @@ void Draw_Sampled_Wave(void)
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
 
-                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
+/*                    for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
                         int h = *(RawSamples[ped_patsam][0][ped_split] + s_offset) / rs_coef;
@@ -218,13 +218,13 @@ void Draw_Sampled_Wave(void)
                         // Straight line
                         DrawVLine(s_ex, s_ey, s_ey, rcolor1);
                         DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
-                    }
+                    }*/
                 }// If Stereo
 
                 // Loop bars
                 if(LoopType[ped_patsam][ped_split])
                 {
-                    int32 LSX = (int32) LoopStart[ped_patsam][ped_split] - sed_display_start;
+/*                    int32 LSX = (int32) LoopStart[ped_patsam][ped_split] - sed_display_start;
                     int32 LEX = (int32) LoopEnd[ped_patsam][ped_split] - sed_display_start;
 
                     LSX = (LSX * 512) / sed_display_length;
@@ -248,7 +248,7 @@ void Draw_Sampled_Wave(void)
                         DrawHLine(462, LEX - 5, LEX - 2, COL_FONT_HI);
                         DrawHLine(463, LEX - 5, LEX - 5, COL_FONT_HI);
                         DrawHLine(464, LEX - 5, LEX - 2, COL_FONT_HI);
-                    }
+                    }*/
                 }
 
             }
