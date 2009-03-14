@@ -124,6 +124,8 @@ void Draw_Sampled_Wave(void)
                 {
                     s_ey = 450 + (SAMPLE_LINES_HEIGHT / strober);
                     s_ey2 = s_ey + ((SAMPLE_LINES_HEIGHT / strober) * 2);
+                    if(s_ey2 > SAMPLE_HEIGHT) s_ey2 = SAMPLE_HEIGHT;
+                    if(s_ey > SAMPLE_HEIGHT) s_ey = SAMPLE_HEIGHT;
                     s_size = SAMPLE_LINES_HEIGHT / strober;
                     s_coef = 32768 / s_size;
 
@@ -145,6 +147,8 @@ void Draw_Sampled_Wave(void)
                         if(h < -s_size) h = -s_size;
 
                         int s_y = s_ey - h;
+                        if(s_y > SAMPLE_HEIGHT) s_y = SAMPLE_HEIGHT;
+
                         if(sed_range_mode && s_offset >= sed_real_range_start && s_offset <= sed_real_range_end)
                         {
                             rcolor1 = COL_BACKGROUND;
@@ -162,9 +166,9 @@ void Draw_Sampled_Wave(void)
                             DrawVLine(s_ex, 450, SAMPLE_HEIGHT, rcolor2);
                         }
                         // Sample datas
-    //                    DrawVLine(s_ex, s_ey, s_y, rcolor1);
+                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         // Straight line
-      //                  DrawVLine(s_ex, s_ey, s_ey, rcolor1);
+                        DrawVLine(s_ex, s_ey, s_ey, rcolor1);
                     }
                 } // If
 
@@ -186,6 +190,8 @@ void Draw_Sampled_Wave(void)
                         if(h2 < -s_size) h2 = -s_size;
                         int s_y = s_ey - h;
                         int s_y2 = s_ey2 - h2;
+                        if(s_y2 > SAMPLE_HEIGHT) s_y2 = SAMPLE_HEIGHT;
+                        if(s_y > SAMPLE_HEIGHT) s_y = SAMPLE_HEIGHT;
 
                         if(sed_range_mode && s_offset >= sed_real_range_start &&
                            s_offset <= sed_real_range_end)
@@ -213,11 +219,11 @@ void Draw_Sampled_Wave(void)
                             DrawVLine(s_ex, 450 + (SAMPLE_LINES_HEIGHT / 2), SAMPLE_HEIGHT, rcolor4);
                         }
                         // Sample datas
-//                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
-  //                      DrawVLine(s_ex, s_ey2, s_y2, rcolor3);
+                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
+                        DrawVLine(s_ex, s_ey2, s_y2, rcolor3);
                         // Straight line
-    //                    DrawVLine(s_ex, s_ey, s_ey, rcolor1);
-      //                  DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
+                        DrawVLine(s_ex, s_ey, s_ey, rcolor1);
+                        DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
                     }
                 }// If Stereo
 
