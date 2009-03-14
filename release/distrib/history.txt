@@ -2,11 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.99:
+v1.98e:
 
 - Added a screen update scheduler so only modified parts of the screen
-  are now refreshed, this should speed up things a tad bit as it looks like
-  some implementations of SDL are borked.
+  are now refreshed, this should speed up things quite a bit
+  as it looks like some implementations of SDL are borked.
 - Added an option to play instrument while editing.
 
 v1.98d:
