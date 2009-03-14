@@ -554,6 +554,22 @@ void Mouse_Left_Master_Ed(void)
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
 
+        // Play while editing
+        if(zcheckMouse(258, 555, 29, 16))
+        {
+            Jazz_Edit = TRUE;
+            teac = 18;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
+        // Play while editing
+        if(zcheckMouse(258 + 31, 555, 29, 16))
+        {
+            Jazz_Edit = FALSE;
+            teac = 18;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
         // Full screen on
         if(zcheckMouse(734, 455, 29, 16))
         {

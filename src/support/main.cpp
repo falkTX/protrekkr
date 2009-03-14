@@ -846,7 +846,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         if(display_title == 3) Display_Mouse_Pointer(Mouse.x, Mouse.y, FALSE);
 
         // Flush all pending blits
-        SDL_UpdateRects(Main_Screen, Nbr_Update_Rects, Update_Stack);
+        if(Nbr_Update_Rects) SDL_UpdateRects(Main_Screen, Nbr_Update_Rects, Update_Stack);
         Nbr_Update_Rects = 0;
 
         Mouse.old_x = Mouse.x;

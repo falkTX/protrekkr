@@ -280,8 +280,8 @@ void Display_Mouse_Pointer(int x, int y, int clear)
             Dst_offset = ((j + y) * Main_Screen->pitch) + (i + x);
             if(Dst_offset >= 0)
             {
-                if(((i + x) < Main_Screen->w) &&
-                   ((j + y) < Main_Screen->h))
+                if(((i + x) < (Main_Screen->w - 1)) &&
+                   ((j + y) < (Main_Screen->h - 1)))
                 {
                     if(clear)
                     {
@@ -335,6 +335,10 @@ void Push_Update_Rect(int x, int y, int width, int height)
     {
         if(Check_Rect(x, y, width + 1, height + 1))
         {
+            if(x < 0) x = 0;
+            if(y < 0) y = 0;
+            if((x + width) > SCREEN_WIDTH - 1) width = (SCREEN_WIDTH - 1) - x;
+            if((y + height) > SCREEN_HEIGHT - 1) height = (SCREEN_HEIGHT - 1) - y;
             Update_Stack[Nbr_Update_Rects].x = x;
             Update_Stack[Nbr_Update_Rects].y = y;
             Update_Stack[Nbr_Update_Rects].w = width + 1;
