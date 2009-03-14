@@ -12,7 +12,7 @@ EXEOBJS = ptk.o \
           samples_pack.o files_list.o files.o \
           midi.o RtMidi.o \
           timer.o main.o \
-          misc_draw.o requesters.o xml.o \
+          misc_draw.o draw_primitives.o requesters.o xml.o \
           riff.o \
           tb_303.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver.o
@@ -93,6 +93,9 @@ main.o: src/support/main.cpp
 	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 misc_draw.o: src/ui/misc_draw.cpp
+	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+
+draw_primitives.o: src/ui/draw_primitives.cpp
 	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 requesters.o: src/ui/requesters.cpp
