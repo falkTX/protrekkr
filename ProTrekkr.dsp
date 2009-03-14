@@ -334,6 +334,10 @@ SOURCE=.\Release\Distrib\Replay\lib\TB_303.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\src\ui\include\draw_primitives.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\UI\include\Misc_Draw.h
 # End Source File
 # Begin Source File
@@ -345,6 +349,10 @@ SOURCE=.\src\ui\include\requesters.h
 SOURCE=.\src\UI\include\xml.h
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\src\ui\draw_primitives.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\UI\Misc_Draw.cpp

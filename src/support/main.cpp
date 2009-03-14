@@ -98,6 +98,9 @@ float delay_refresh;
 float delay_refresh2;
 extern int display_title;
 
+extern int Nbr_Update_Rects;
+extern SDL_Rect Update_Stack[2048];
+
 char *ExePath;
 
 static SDL_Event Events[MAX_EVENTS];
@@ -843,9 +846,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         if(display_title == 3) Display_Mouse_Pointer(Mouse.x, Mouse.y, FALSE);
 
         // Flush all pending blits
-        SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
-
-//        SDL_Flip(Main_Screen);
+        SDL_UpdateRects(Main_Screen, Nbr_Update_Rects, Update_Stack);
+        Nbr_Update_Rects = 0;
 
         Mouse.old_x = Mouse.x;
         Mouse.old_y = Mouse.y;

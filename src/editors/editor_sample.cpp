@@ -130,6 +130,10 @@ void Draw_Sampled_Wave(void)
 
                 if(SampleChannels[ped_patsam][ped_split] == 1)
                 {
+                    // No sample
+                    SetColor(COL_BACKGROUND);
+                    Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
+
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
@@ -150,7 +154,10 @@ void Draw_Sampled_Wave(void)
                         }
 
                         // Background
-                        DrawVLine(s_ex, 450, CONSOLE_HEIGHT2, rcolor2);
+                        if(rcolor2 != COL_BACKGROUND)
+                        {
+                            DrawVLine(s_ex, 450, CONSOLE_HEIGHT2, rcolor2);
+                        }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         // Straight line
@@ -161,6 +168,10 @@ void Draw_Sampled_Wave(void)
                 // STEREO DISPLAY
                 if(SampleChannels[ped_patsam][ped_split] == 2)
                 {
+                    // No sample
+                    SetColor(COL_BACKGROUND);
+                    Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
+
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
                         int32 s_offset = (s_ex * sed_display_length) / 512 + sed_display_start;
@@ -190,8 +201,14 @@ void Draw_Sampled_Wave(void)
                         }
 
                         // Background
-                        DrawVLine(s_ex, 450, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), rcolor2);
-                        DrawVLine(s_ex, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), 450 + (CONSOLE_HEIGHT2 - 450), rcolor4);
+                        if(rcolor2 != COL_BACKGROUND)
+                        {
+                            DrawVLine(s_ex, 450, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), rcolor2);
+                        }
+                        if(rcolor4 != COL_BACKGROUND)
+                        {
+                            DrawVLine(s_ex, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), 450 + (CONSOLE_HEIGHT2 - 450), rcolor4);
+                        }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         DrawVLine(s_ex, s_ey2, s_y2, rcolor3);
@@ -236,10 +253,8 @@ void Draw_Sampled_Wave(void)
             { // IF CHECK SAMPLE
     
                 // No sample
-                for(int s_ex = 0; s_ex < 512; s_ex++)
-                {
-                    DrawVLine(s_ex, 450, CONSOLE_HEIGHT2, COL_BACKGROUND);
-                }
+                SetColor(COL_BACKGROUND);
+                Fillrect(0, 450, 512, CONSOLE_HEIGHT2 + 1);
             }
 
             draw_sampled_wave = FALSE;

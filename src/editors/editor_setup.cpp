@@ -47,6 +47,7 @@ extern int wait_AutoSave;
 
 extern int Nbr_Keyboards;
 extern int Keyboard_Idx;
+extern char Jazz_Edit;
 
 int current_palette_idx;
 
@@ -123,7 +124,8 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(520, 475, 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 40, 16, "Default", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(8, 555, 130, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(198, 555, 56, 16, "Edit Play", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
 void Actualize_Master_Ed(char gode)
@@ -367,17 +369,33 @@ void Actualize_Master_Ed(char gode)
 #endif
         }
 
+        // Paste across patterns
         if(gode == 0 || gode == 17)
         {
             if(Paste_Across)
             {
-                Gui_Draw_Button_Box(140, 555, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(140 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
             }
             else
             {
-                Gui_Draw_Button_Box(140, 555, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(140 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+            }
+        }
+
+        // Play instruments while editing
+        if(gode == 0 || gode == 18)
+        {
+            if(Jazz_Edit)
+            {
+                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
             }
         }
 
@@ -521,7 +539,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Paste across pattern
-        if(zcheckMouse(140, 555, 29, 16))
+        if(zcheckMouse(120, 555, 29, 16))
         {
             Paste_Across = TRUE;
             teac = 17;
@@ -529,7 +547,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Paste across pattern
-        if(zcheckMouse(140 + 31, 555, 29, 16))
+        if(zcheckMouse(120 + 31, 555, 29, 16))
         {
             Paste_Across = FALSE;
             teac = 17;

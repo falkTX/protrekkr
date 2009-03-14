@@ -188,6 +188,8 @@ void Solo_Track(int track_to_solo);
 
 JAZZ_KEY Sub_Channels_Jazz[MAX_TRACKS][MAX_POLYPHONY];
 
+char Jazz_Edit = FALSE;
+
 int wait_AutoSave;
 extern char AutoSave;
 int Values_AutoSave[] =
@@ -5989,7 +5991,7 @@ void Note_Jazz(int track, int note)
     local_mas_vol = 1.0f;
     local_ramp_vol = 1.0f;
 
-    if(!is_editing || is_recording_2)
+    if(Jazz_Edit || is_recording_2)
     {
         Play_Instrument(track, Sub_Channel,
                         note,
@@ -6007,7 +6009,7 @@ void Note_Jazz_Off(int note)
     LPJAZZ_KEY Channel = Get_Jazz_Key_Off(Sub_Channels_Jazz, (note + 1) << 8);
     if(Channel)
     {
-        if(!is_editing || is_recording_2)
+        if(Jazz_Edit || is_recording_2)
         {
             Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
             if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)
@@ -6024,7 +6026,7 @@ void Note_Jazz_Off(int note)
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-    if(!is_editing || is_recording_2)
+    if(Jazz_Edit || is_recording_2)
     {
         Midi_NoteOff(ped_track, note);
     }

@@ -48,39 +48,55 @@ extern char *Font_Ascii;
 extern int Nbr_Letters;
 extern int Font_Pos[256];
 extern int Font_Size[256];
+extern unsigned char *Pointer_BackBuf;
 int FgColor;
+
+int Nbr_Update_Rects;
+SDL_Rect Update_Stack[UPDATE_STACK_SIZE];
 
 // ------------------------------------------------------
 // Functions
 int Get_Char_Position(char *Ascii_Letters, int Max_Letters, char Letter);
 
 // ------------------------------------------------------
-// Primitives
+// Draw a line
 void DrawLine(int x1, int y1, int x2, int y2)
 {
     Draw_Line(Main_Screen, x1, y1, x2, y2, FgColor);
 }
 
+// ------------------------------------------------------
+// Draw a pixel
 void DrawPixel(int x, int y, int Color)
 {
     Draw_Pixel(Main_Screen, x, y, Color);
 }
 
+// ------------------------------------------------------
+// Draw an horizontal line
 void DrawHLine(int y, int x1, int x2, int Color)
 {
     Draw_HLine(Main_Screen, x1, y, x2, Color);
+    Push_Update_Rect(x1, y, x2 - x1, y + 1);
 }
 
+// ------------------------------------------------------
+// Draw a vertical line
 void DrawVLine(int x, int y1, int y2, int Color)
 {
     Draw_VLine(Main_Screen, x, y1, y2, Color);
+    Push_Update_Rect(x, y1, x + 1, y2 - y1);
 }
 
+// ------------------------------------------------------
+// Set the current color
 void SetColor(int color)
 {
     FgColor = color;
 }
 
+// ------------------------------------------------------
+// Fill a rectangle with the current color
 void Fillrect(int x1, int y1, int x2, int y2)
 {
     SDL_Rect Dst_Rect;
@@ -89,6 +105,7 @@ void Fillrect(int x1, int y1, int x2, int y2)
     Dst_Rect.w = x2 - x1;
     Dst_Rect.h = y2 - y1;
     SDL_FillRect(Main_Screen, &Dst_Rect, FgColor);
+    Push_Update_Rect(x1, y1, x2 - x1, y2 - y1);
 }
 
 // ------------------------------------------------------
@@ -181,8 +198,11 @@ void Copy(SDL_Surface *Source,
     Src_Rect.h = Dst_Rect.h + 1;
 
     SDL_BlitSurface(Source, &Src_Rect, Main_Screen, &Dst_Rect);
+    Push_Update_Rect(x, y, x2 - x1, y2 - y1);
 }
 
+// ------------------------------------------------------
+// Copy a rectangle onto a given surface
 void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
                      int x, int y, int x1, int y1, int x2, int y2)
 {
@@ -234,5 +254,92 @@ void PrintXY(int x, int y, int Font_Type, char *String)
             SDL_BlitSurface(FONT_LOW, &Src_Rect, Main_Screen, &Dst_Rect);
         }
         x += Font_Size[Idx];
+    }
+}
+
+// ------------------------------------------------------
+// Display or clear the mouse pointer at given coordinates
+void Display_Mouse_Pointer(int x, int y, int clear)
+{
+    while(SDL_LockSurface(POINTER) < 0);
+    while(SDL_LockSurface(Main_Screen) < 0);
+
+    int i;
+    int j;
+    int Src_offset;
+    int Dst_offset;
+    int Len_Dst = Main_Screen->pitch * Main_Screen->h;
+    unsigned char *SrcPix = (unsigned char *) POINTER->pixels;
+    unsigned char *DstPix = (unsigned char *) Main_Screen->pixels;
+
+    for(j = 0; j < POINTER->h; j++)
+    {
+        for(i = 0; i < POINTER->w; i++)
+        {
+            Src_offset = (j * POINTER->pitch) + i;
+            Dst_offset = ((j + y) * Main_Screen->pitch) + (i + x);
+            if(Dst_offset >= 0)
+            {
+                if(((i + x) < Main_Screen->w) &&
+                   ((j + y) < Main_Screen->h))
+                {
+                    if(clear)
+                    {
+                        if(SrcPix[Src_offset])
+                        {
+                            DstPix[Dst_offset] = Pointer_BackBuf[Src_offset];
+                        }
+                    } 
+                    else
+                    {
+                        if(SrcPix[Src_offset])
+                        {
+                            Pointer_BackBuf[Src_offset] = DstPix[Dst_offset];
+                            DstPix[Dst_offset] = SrcPix[Src_offset];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    SDL_UnlockSurface(Main_Screen);
+    SDL_UnlockSurface(POINTER);
+    Push_Update_Rect(x, y, POINTER->w, POINTER->h);
+}
+
+// ------------------------------------------------------
+// See if a rect have to be scheduled or not
+int Check_Rect(int x, int y, int width, int height)
+{
+    int i;
+
+    for(i = 0; i < Nbr_Update_Rects; i++)
+    {
+        if(x >= Update_Stack[i].x &&
+           y >= Update_Stack[i].y &&
+           (width + x) <= (Update_Stack[i].x + Update_Stack[i].w) &&
+           (height + y) <= (Update_Stack[i].y + Update_Stack[i].h))
+        {
+            return(FALSE);
+        }
+    }
+    return(TRUE);
+}
+
+
+// ------------------------------------------------------
+// Schedule a rectangle to be refreshed
+void Push_Update_Rect(int x, int y, int width, int height)
+{
+    if(Nbr_Update_Rects < 2048 - 1)
+    {
+        if(Check_Rect(x, y, width + 1, height + 1))
+        {
+            Update_Stack[Nbr_Update_Rects].x = x;
+            Update_Stack[Nbr_Update_Rects].y = y;
+            Update_Stack[Nbr_Update_Rects].w = width + 1;
+            Update_Stack[Nbr_Update_Rects].h = height + 1;
+            Nbr_Update_Rects++;
+        }
     }
 }

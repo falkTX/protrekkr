@@ -1938,55 +1938,6 @@ void Set_Logo_Palette(void)
 }
 
 // ------------------------------------------------------
-// Display or clear the mouse pointer at given coordinates
-void Display_Mouse_Pointer(int x, int y, int clear)
-{
-    while(SDL_LockSurface(POINTER) < 0);
-    while(SDL_LockSurface(Main_Screen) < 0);
-
-    int i;
-    int j;
-    int Src_offset;
-    int Dst_offset;
-    int Len_Dst = Main_Screen->pitch * Main_Screen->h;
-    unsigned char *SrcPix = (unsigned char *) POINTER->pixels;
-    unsigned char *DstPix = (unsigned char *) Main_Screen->pixels;
-
-    for(j = 0; j < POINTER->h; j++)
-    {
-        for(i = 0; i < POINTER->w; i++)
-        {
-            Src_offset = (j * POINTER->pitch) + i;
-            Dst_offset = ((j + y) * Main_Screen->pitch) + (i + x);
-            if(Dst_offset >= 0)
-            {
-                if(((i + x) < Main_Screen->w) &&
-                   ((j + y) < Main_Screen->h))
-                {
-                    if(clear)
-                    {
-                        if(SrcPix[Src_offset])
-                        {
-                            DstPix[Dst_offset] = Pointer_BackBuf[Src_offset];
-                        }
-                    } 
-                    else
-                    {
-                        if(SrcPix[Src_offset])
-                        {
-                            Pointer_BackBuf[Src_offset] = DstPix[Dst_offset];
-                            DstPix[Dst_offset] = SrcPix[Src_offset];
-                        }
-                    }
-                }
-            }
-        }
-    }
-    SDL_UnlockSurface(Main_Screen);
-    SDL_UnlockSurface(POINTER);
-}
-
-// ------------------------------------------------------
 // Set the screen palette
 void Refresh_Palette(void)
 {

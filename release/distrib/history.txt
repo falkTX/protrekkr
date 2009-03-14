@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.99:
+
+- Added an option to play instrument while editing.
+
 v1.98d:
 
 - Forward looping wasn't working correctly for instruments.
