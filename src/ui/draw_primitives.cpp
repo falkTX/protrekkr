@@ -331,6 +331,16 @@ int Check_Rect(int x, int y, int width, int height)
 // Schedule a rectangle to be refreshed
 void Push_Update_Rect(int x, int y, int width, int height)
 {
+    if(width < 0)
+    {
+        width = -width;
+        x -= width;
+    }
+    if(height < 0)
+    {
+        height = -height;
+        y -= height;
+    }
     if(Nbr_Update_Rects < 2048 - 1)
     {
         if(Check_Rect(x, y, width + 1, height + 1))

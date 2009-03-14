@@ -279,8 +279,8 @@ void NewWav(void)
     sed_display_start = 0;
     sed_display_length = SampleNumSamples[ped_patsam][ped_split];
     sed_range_start = 0;
-    sed_range_end = 0;
     sed_range_mode = FALSE;
+    sed_range_end = 0;
     Actualize_Sample_Ed(0);
 }
 
