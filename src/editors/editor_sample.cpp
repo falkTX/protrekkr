@@ -162,9 +162,9 @@ void Draw_Sampled_Wave(void)
                             DrawVLine(s_ex, 450, SAMPLE_HEIGHT, rcolor2);
                         }
                         // Sample datas
-                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
+    //                    DrawVLine(s_ex, s_ey, s_y, rcolor1);
                         // Straight line
-                        DrawVLine(s_ex, s_ey, s_ey, rcolor1);
+      //                  DrawVLine(s_ex, s_ey, s_ey, rcolor1);
                     }
                 } // If
 
@@ -213,11 +213,11 @@ void Draw_Sampled_Wave(void)
                             DrawVLine(s_ex, 450 + (SAMPLE_LINES_HEIGHT / 2), SAMPLE_HEIGHT, rcolor4);
                         }
                         // Sample datas
-                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
-                        DrawVLine(s_ex, s_ey2, s_y2, rcolor3);
+//                        DrawVLine(s_ex, s_ey, s_y, rcolor1);
+  //                      DrawVLine(s_ex, s_ey2, s_y2, rcolor3);
                         // Straight line
-                        DrawVLine(s_ex, s_ey, s_ey, rcolor1);
-                        DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
+    //                    DrawVLine(s_ex, s_ey, s_ey, rcolor1);
+      //                  DrawVLine(s_ex, s_ey2, s_ey2, rcolor3);
                     }
                 }// If Stereo
 
