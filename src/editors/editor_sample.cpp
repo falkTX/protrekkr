@@ -44,6 +44,9 @@ extern s_access sp_Position_osc2[MAX_TRACKS][MAX_POLYPHONY];
 extern s_access sp_Position_osc3[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
+#define SAMPLE_LINES_HEIGHT 109
+#define SAMPLE_HEIGHT (450 + SAMPLE_LINES_HEIGHT)
+
 int32 axswave = 0;
 
 int32 sed_display_start = 0;
@@ -132,7 +135,7 @@ void Draw_Sampled_Wave(void)
                 {
                     // No sample
                     SetColor(COL_BACKGROUND);
-                    Fillrect(0, 450, 512, 450 + 109);
+                    Fillrect(0, 450, 512, SAMPLE_HEIGHT);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -156,7 +159,7 @@ void Draw_Sampled_Wave(void)
                         // Background
                         if(rcolor2 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450, CONSOLE_HEIGHT2, rcolor2);
+                            DrawVLine(s_ex, 450, SAMPLE_HEIGHT, rcolor2);
                         }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
@@ -170,7 +173,7 @@ void Draw_Sampled_Wave(void)
                 {
                     // No sample
                     SetColor(COL_BACKGROUND);
-                    Fillrect(0, 450, 512, 450 + 109);
+                    Fillrect(0, 450, 512, SAMPLE_HEIGHT);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -203,11 +206,11 @@ void Draw_Sampled_Wave(void)
                         // Background
                         if(rcolor2 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), rcolor2);
+                            DrawVLine(s_ex, 450, 450 + (SAMPLE_LINES_HEIGHT / 2), rcolor2);
                         }
                         if(rcolor4 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450 + ((CONSOLE_HEIGHT2 - 450) / 2), 450 + (CONSOLE_HEIGHT2 - 450), rcolor4);
+                            DrawVLine(s_ex, 450 + (SAMPLE_LINES_HEIGHT / 2), SAMPLE_HEIGHT, rcolor4);
                         }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
@@ -229,7 +232,7 @@ void Draw_Sampled_Wave(void)
 
                     if(LSX >= 0 && LSX < 512)
                     {
-                        DrawVLine(LSX, 450, CONSOLE_HEIGHT2, COL_FONT_HI);
+                        DrawVLine(LSX, 450, SAMPLE_HEIGHT, COL_FONT_HI);
                         DrawHLine(460, LSX + 2, LSX + 5, COL_FONT_HI);
                         DrawHLine(461, LSX + 2, LSX + 2, COL_FONT_HI);
                         DrawHLine(462, LSX + 2, LSX + 5, COL_FONT_HI);
@@ -239,7 +242,7 @@ void Draw_Sampled_Wave(void)
 
                     if(LEX >= 0 && LEX < 512)
                     {
-                        DrawVLine(LEX, 450, CONSOLE_HEIGHT2, COL_FONT_HI);
+                        DrawVLine(LEX, 450, SAMPLE_HEIGHT, COL_FONT_HI);
                         DrawHLine(460, LEX - 5, LEX - 2, COL_FONT_HI);
                         DrawHLine(461, LEX - 5, LEX - 5, COL_FONT_HI);
                         DrawHLine(462, LEX - 5, LEX - 2, COL_FONT_HI);
@@ -254,7 +257,7 @@ void Draw_Sampled_Wave(void)
     
                 // No sample
                 SetColor(COL_BACKGROUND);
-                Fillrect(0, 450, 512, 450 + 109);
+                Fillrect(0, 450, 512, SAMPLE_HEIGHT);
             }
 
             draw_sampled_wave = FALSE;
@@ -580,7 +583,6 @@ void Actualize_Sample_Ed(char gode)
                 }
 
                 draw_sampled_wave = TRUE;
-
                 mess_box("Selection calibrated...");
             }
 
