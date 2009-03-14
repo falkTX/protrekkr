@@ -8,7 +8,6 @@ v1.98e:
   are now refreshed, this should speed up things quite a bit
   as it looks like some implementations of SDL are borked.
 - Added an option to play instrument while editing.
-- Fixed a nasty bug in the samples editor.
 
 v1.98d:
 
