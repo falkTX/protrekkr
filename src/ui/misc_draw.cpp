@@ -32,11 +32,10 @@
 // ------------------------------------------------------
 // Includes
 #include "../include/ptk.h"
-#include "../extralibs/sdl_draw/include/sdl_draw.h"
+#include "include/draw_primitives.h"
 
 // ------------------------------------------------------
 // Variables
-int FgColor;
 int max_colors_logo;
 int max_colors_303;
 SDL_Surface *Temp_PFONT;
@@ -1487,155 +1486,7 @@ void out_nibble(int x, int y, int Font_Type, int number)
     }
 }
 
-// ------------------------------------------------------
-// SDL stuff
-
-// ------------------------------------------------------
-// Primitives
-void DrawLine(int x1, int y1, int x2, int y2)
-{
-    Draw_Line(Main_Screen, x1, y1, x2, y2, FgColor);
-}
-
-void DrawPixel(int x, int y, int Color)
-{
-    Draw_Pixel(Main_Screen, x, y, Color);
-}
-
-void DrawHLine(int y, int x1, int x2, int Color)
-{
-    Draw_HLine(Main_Screen, x1, y, x2, Color);
-}
-
-void DrawVLine(int x, int y1, int y2, int Color)
-{
-    Draw_VLine(Main_Screen, x, y1, y2, Color);
-}
-
-void SetColor(int color)
-{
-    FgColor = color;
-}
-
-void Fillrect(int x1, int y1, int x2, int y2)
-{
-    SDL_Rect Dst_Rect;
-    Dst_Rect.x = x1;
-    Dst_Rect.y = y1;
-    Dst_Rect.w = x2 - x1;
-    Dst_Rect.h = y2 - y1;
-    SDL_FillRect(Main_Screen, &Dst_Rect, FgColor);
-}
-
-// ------------------------------------------------------
-// Set the current palette
-void UISetPalette(SDL_Color *Palette, int Amount)
-{
-    if(FONT_LOW)
-    {
-        SDL_SetPalette(FONT_LOW, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(FONT_LOW, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(FONT)
-    {
-        SDL_SetPalette(FONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(FONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(PFONT)
-    {
-        SDL_SetPalette(PFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(PFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(SKIN303)
-    {
-        SDL_SetPalette(SKIN303, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(SKIN303, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(LOGOPIC)
-    {
-        SDL_SetPalette(LOGOPIC, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(LOGOPIC, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_PFONT)
-    {
-        SDL_SetPalette(Temp_PFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_PFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_LARGEPFONT)
-    {
-        SDL_SetPalette(Temp_LARGEPFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_LARGEPFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_SMALLPFONT)
-    {
-        SDL_SetPalette(Temp_SMALLPFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_SMALLPFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_NOTEPFONT)
-    {
-        SDL_SetPalette(Temp_NOTEPFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_NOTEPFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_NOTELARGEPFONT)
-    {
-        SDL_SetPalette(Temp_NOTELARGEPFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_NOTELARGEPFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(Temp_NOTESMALLPFONT)
-    {
-        SDL_SetPalette(Temp_NOTESMALLPFONT, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(Temp_NOTESMALLPFONT, SDL_LOGPAL, Palette, 0, Amount);
-    }
-    if(POINTER)
-    {
-        SDL_SetPalette(POINTER, SDL_PHYSPAL, Palette, 0, Amount);
-        SDL_SetPalette(POINTER, SDL_LOGPAL, Palette, 0, Amount);
-    }
-
-    SDL_SetPalette(Main_Screen, SDL_PHYSPAL, Palette, 0, Amount);
-    SDL_SetPalette(Main_Screen, SDL_LOGPAL, Palette, 0, Amount);
-}
-
-// ------------------------------------------------------
-// Copy a surface onto the main screen
-void Copy(SDL_Surface *Source, int x, int y, int x1, int y1, int x2, int y2)
-{
-    SDL_Rect Src_Rect;
-    SDL_Rect Dst_Rect;
-
-    Dst_Rect.x = x;
-    Dst_Rect.y = y;
-    Dst_Rect.w = x2 - x1;
-    Dst_Rect.h = y2 - y1;
-
-    Src_Rect.x = x1;
-    Src_Rect.y = y1;
-    Src_Rect.w = Dst_Rect.w + 1;
-    Src_Rect.h = Dst_Rect.h + 1;
-
-    SDL_BlitSurface(Source, &Src_Rect, Main_Screen, &Dst_Rect);
-}
-
-void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
-                     int x, int y, int x1, int y1, int x2, int y2)
-{
-    SDL_Rect Src_Rect;
-    SDL_Rect Dst_Rect;
-
-    Src_Rect.x = x1;
-    Src_Rect.y = y1;
-    Src_Rect.w = (x2 - x1);
-    Src_Rect.h = (y2 - y1);
-
-    Dst_Rect.x = x;
-    Dst_Rect.y = y;
-    Dst_Rect.w = (x2 - x1);
-    Dst_Rect.h = (y2 - y1);
-
-    SDL_BlitSurface(Source, &Src_Rect, dest, &Dst_Rect);
-}
-
-// ------------------------------------------------------
+// -----------------------------------------------------
 // Return the ordinal position of a given letter
 int Get_Char_Position(char *Ascii_Letters, int Max_Letters, char Letter)
 {
@@ -1645,41 +1496,6 @@ int Get_Char_Position(char *Ascii_Letters, int Max_Letters, char Letter)
         if(Ascii_Letters[i] == Letter) return(i);
     }
     return(Max_Letters - 1);
-}
-
-// ------------------------------------------------------
-// Print a string on the screen
-void PrintXY(int x, int y, int Font_Type, char *String)
-{
-    int Idx;
-    int i;
-    SDL_Rect Src_Rect;
-    SDL_Rect Dst_Rect;
-
-    y += 2;
-
-    Dst_Rect.y = y;
-    Dst_Rect.h = Font_Height;
-    Src_Rect.y = 0;
-    Src_Rect.h = Font_Height;
-
-    for(i = 0; i < (int) strlen(String); i++)
-    {
-        Idx = Get_Char_Position(Font_Ascii, Nbr_Letters, String[i]);
-        Src_Rect.x = Font_Pos[Idx];
-        Src_Rect.w = Font_Size[Idx];
-        Dst_Rect.x = x;
-        Dst_Rect.w = Src_Rect.w;
-        if(Font_Type == USE_FONT)
-        {
-            SDL_BlitSurface(FONT, &Src_Rect, Main_Screen, &Dst_Rect);
-        }
-        else
-        {
-            SDL_BlitSurface(FONT_LOW, &Src_Rect, Main_Screen, &Dst_Rect);
-        }
-        x += Font_Size[Idx];
-    }
 }
 
 // ------------------------------------------------------

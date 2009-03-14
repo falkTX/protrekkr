@@ -113,7 +113,6 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
-extern SDL_Surface *Main_Screen;
 extern char *Labels_Palette[];
 extern SDL_Color Ptk_Palette[256 * 2];
 extern LONGRGB Phony_Palette[];
