@@ -69,35 +69,35 @@ void CSynth::Reset(void)
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     // Synthesizer General Reset
-    GLB_VOLUME = 1.0f;
-    DISTO = 0.0f;
-    OSC1_WAVEFORM = WAVEFORM_SAW;      /* Sawtooth */
-    OSC2_WAVEFORM = WAVEFORM_PULSE;    /* Pulse */
+    Data.GLB_VOLUME = 1.0f;
+    Data.DISTO = 0.0f;
+    Data.OSC1_WAVEFORM = WAVEFORM_SAW;      /* Sawtooth */
+    Data.OSC2_WAVEFORM = WAVEFORM_PULSE;    /* Pulse */
 
     T_OSC1_VOLUME = 0;
     T_OSC2_VOLUME = 0;
 
     GLOBAL_VOLUME = 0;
 
-    OSC2_DETUNE = 0;        /* No Semitone Detune */
-    OSC2_FINETUNE = 0.1f;   /* 1/10 Semitone detune */
+    Data.OSC2_DETUNE = 0;        /* No Semitone Detune */
+    Data.OSC2_FINETUNE = 0.1f;   /* 1/10 Semitone detune */
 
-    VCF_CUTOFF = 0.5f;      /* 10000Hz Cutoff */
-    VCF_RESONANCE = 0.5f;   /* Not very weird =] */
-    VCF_TYPE = 0;           /* LowPass filter */
+    Data.VCF_CUTOFF = 0.5f;      /* 10000Hz Cutoff */
+    Data.VCF_RESONANCE = 0.5f;   /* Not very weird =] */
+    Data.VCF_TYPE = 0;           /* LowPass filter */
 
-    ENV1_ATTACK = 0.0f;
-    ENV1_DECAY = 0.1f;
-    ENV1_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
-    ENV1_RELEASE = 0.0f;
+    Data.ENV1_ATTACK = 0.0f;
+    Data.ENV1_DECAY = 0.1f;
+    Data.ENV1_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
+    Data.ENV1_RELEASE = 0.0f;
 
-    ENV2_ATTACK = 0.0f;
-    ENV2_DECAY = 0.1f;
-    ENV2_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
-    ENV2_RELEASE = 0.0f;
+    Data.ENV2_ATTACK = 0.0f;
+    Data.ENV2_DECAY = 0.1f;
+    Data.ENV2_SUSTAIN = 0.3f;    /* Sustain volume at 1/3 */
+    Data.ENV2_RELEASE = 0.0f;
 
-    LFO1_PERIOD = 16;
-    LFO2_PERIOD = 16;
+    Data.LFO1_PERIOD = 16;
+    Data.LFO2_PERIOD = 16;
 
     LFO1_GR = 0;
     LFO2_GR = 0;
@@ -105,46 +105,46 @@ void CSynth::Reset(void)
     LFO1_SUBGRCOUNTER = 0;
     LFO2_SUBGRCOUNTER = 0;
 
-    LFO1_SUBGRMAX = 200;
-    LFO2_SUBGRMAX = 200;
+    Data.LFO1_SUBGRMAX = 200;
+    Data.LFO2_SUBGRMAX = 200;
 
-    LFO1_OSC1_PW = 0;
-    LFO1_OSC2_PW = 0;
-    LFO1_OSC1_PITCH = 0;
-    LFO1_OSC2_PITCH = 0;
-    LFO1_OSC1_VOLUME = 0;
-    LFO1_OSC2_VOLUME = 0;   
-    LFO1_VCF_CUTOFF = 0;
-    LFO1_VCF_RESONANCE = 0; 
+    Data.LFO1_OSC1_PW = 0;
+    Data.LFO1_OSC2_PW = 0;
+    Data.LFO1_OSC1_PITCH = 0;
+    Data.LFO1_OSC2_PITCH = 0;
+    Data.LFO1_OSC1_VOLUME = 0;
+    Data.LFO1_OSC2_VOLUME = 0;   
+    Data.LFO1_VCF_CUTOFF = 0;
+    Data.LFO1_VCF_RESONANCE = 0; 
 
-    LFO2_OSC1_PW = 0;
-    LFO2_OSC2_PW = 0;
-    LFO2_OSC1_PITCH = 0;
-    LFO2_OSC2_PITCH = 0;
-    LFO2_OSC1_VOLUME = 0;
-    LFO2_OSC2_VOLUME = 0;   
-    LFO2_VCF_CUTOFF = 0;
-    LFO2_VCF_RESONANCE = 0; 
+    Data.LFO2_OSC1_PW = 0;
+    Data.LFO2_OSC2_PW = 0;
+    Data.LFO2_OSC1_PITCH = 0;
+    Data.LFO2_OSC2_PITCH = 0;
+    Data.LFO2_OSC1_VOLUME = 0;
+    Data.LFO2_OSC2_VOLUME = 0;   
+    Data.LFO2_VCF_CUTOFF = 0;
+    Data.LFO2_VCF_RESONANCE = 0; 
 
-    ENV1_OSC1_PW = 0;
-    ENV1_OSC2_PW = 0;
-    ENV1_OSC1_PITCH = 0;
-    ENV1_OSC2_PITCH = 0;
-    ENV1_OSC1_VOLUME = 1.0f;
-    ENV1_OSC2_VOLUME = 1.0f;   
-    ENV1_VCF_CUTOFF = 0;
-    ENV1_VCF_RESONANCE = 0; 
+    Data.ENV1_OSC1_PW = 0;
+    Data.ENV1_OSC2_PW = 0;
+    Data.ENV1_OSC1_PITCH = 0;
+    Data.ENV1_OSC2_PITCH = 0;
+    Data.ENV1_OSC1_VOLUME = 1.0f;
+    Data.ENV1_OSC2_VOLUME = 1.0f;   
+    Data.ENV1_VCF_CUTOFF = 0;
+    Data.ENV1_VCF_RESONANCE = 0; 
 
-    ENV2_OSC1_PW = 0;
-    ENV2_OSC2_PW = 0;
-    ENV2_OSC1_PITCH = 0;
-    ENV2_OSC2_PITCH = 0;
-    ENV2_OSC1_VOLUME = 0;
-    ENV2_OSC2_VOLUME = 0;   
-    ENV2_VCF_CUTOFF = 0;
-    ENV2_VCF_RESONANCE = 0; 
+    Data.ENV2_OSC1_PW = 0;
+    Data.ENV2_OSC2_PW = 0;
+    Data.ENV2_OSC1_PITCH = 0;
+    Data.ENV2_OSC2_PITCH = 0;
+    Data.ENV2_OSC1_VOLUME = 0;
+    Data.ENV2_OSC2_VOLUME = 0;   
+    Data.ENV2_VCF_CUTOFF = 0;
+    Data.ENV2_VCF_RESONANCE = 0; 
 
-    OSC3_SWITCH = FALSE;
+    Data.OSC3_SWITCH = FALSE;
 
     OSC1_STEP = 0;
     OSC2_STEP = 0;
@@ -155,19 +155,19 @@ void CSynth::Reset(void)
     ENV1_MIN = 0;
     ENV2_MIN = 0;
 
-    LFO1_ATTACK = 0.0f;
-    LFO1_DECAY = 0.1f;
-    LFO1_SUSTAIN = 0.3f;
-    LFO1_RELEASE = 0.0f;
+    Data.LFO1_ATTACK = 0.0f;
+    Data.LFO1_DECAY = 0.1f;
+    Data.LFO1_SUSTAIN = 0.3f;
+    Data.LFO1_RELEASE = 0.0f;
 
-    LFO2_ATTACK = 0.0f;
-    LFO2_DECAY = 0.1f;
-    LFO2_SUSTAIN = 0.3f;
-    LFO2_RELEASE = 0.0f;
+    Data.LFO2_ATTACK = 0.0f;
+    Data.LFO2_DECAY = 0.1f;
+    Data.LFO2_SUSTAIN = 0.3f;
+    Data.LFO2_RELEASE = 0.0f;
 
-    OSC3_VOLUME = 0;
+    Data.OSC3_VOLUME = 0;
 
-    PTC_GLIDE64 = 0;
+    Data.PTC_GLIDE64 = 0;
 
 #endif
 
@@ -238,13 +238,13 @@ void CSynth::LfoAdvance(void)
             if(LFO1_COUNTER >= LFO1b_DECAY)
             {
                 if(LFO1_ADSR_VALUE < 0.0f) LFO1_ADSR_VALUE = 0.0f;
-                LFO1_ADSR_VALUE = LFO1_SUSTAIN;
+                LFO1_ADSR_VALUE = Data.LFO1_SUSTAIN;
                 LFO1_COUNTER = 0;
                 LFO1_STAGE = 3;
             }
             break;
         case 3:
-            LFO1_ADSR_VALUE = LFO1_SUSTAIN;
+            LFO1_ADSR_VALUE = Data.LFO1_SUSTAIN;
             break;
         case 4:
             LFO1_ADSR_VALUE -= LFO1_R_COEF;
@@ -258,7 +258,7 @@ void CSynth::LfoAdvance(void)
             break;
     }
 
-    if(LFO1_SUBGRCOUNTER > LFO1_SUBGRMAX)
+    if(LFO1_SUBGRCOUNTER > Data.LFO1_SUBGRMAX)
     {
         LFO1_SUBGRCOUNTER = 0;
         LFO1_GR++;
@@ -287,13 +287,13 @@ void CSynth::LfoAdvance(void)
             if(LFO2_COUNTER >= LFO2b_DECAY)
             {
                 if(LFO2_ADSR_VALUE < 0.0f) LFO2_ADSR_VALUE = 0.0f;
-                LFO2_ADSR_VALUE = LFO2_SUSTAIN;
+                LFO2_ADSR_VALUE = Data.LFO2_SUSTAIN;
                 LFO2_COUNTER = 0;
                 LFO2_STAGE = 3;
             }
             break;
         case 3:
-            LFO2_ADSR_VALUE = LFO2_SUSTAIN;
+            LFO2_ADSR_VALUE = Data.LFO2_SUSTAIN;
             break;
         case 4:
             LFO2_ADSR_VALUE -= LFO2_R_COEF;
@@ -307,7 +307,7 @@ void CSynth::LfoAdvance(void)
             break;
     }
 
-    if(LFO2_SUBGRCOUNTER > LFO2_SUBGRMAX)
+    if(LFO2_SUBGRCOUNTER > Data.LFO2_SUBGRMAX)
     {
         LFO2_SUBGRCOUNTER = 0;
         LFO2_GR++;
@@ -323,10 +323,20 @@ void CSynth::LfoAdvance(void)
 // The cooler NoteOn typical message for this Class CSynth Objects =].
 // (used at tick 0)
 void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
-                    unsigned int Loop_Length, float note_smp)
+                    unsigned int Loop_Length
+#if defined(PTK_INSTRUMENTS)
+                    ,float note_smp
+#endif
+                   )
 {
-    float note_1 = OSC1_WAVEFORM == WAVEFORM_WAV ? note_smp: (float) note;
-    float note_2 = OSC2_WAVEFORM == WAVEFORM_WAV ? note_smp: (float) note;
+
+#if defined(PTK_INSTRUMENTS)
+    float note_1 = Data.OSC1_WAVEFORM == WAVEFORM_WAV ? note_smp: (float) note;
+    float note_2 = Data.OSC2_WAVEFORM == WAVEFORM_WAV ? note_smp: (float) note;
+#else
+    float note_1 = (float) note;
+    float note_2 = (float) note;
+#endif
 
     float smp_freq;
     float adsr_ratio;
@@ -338,7 +348,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     ENV2_COUNTER = 0;
 
     OSC1_STEP = powf(2.0f, note_1 / 12.0f);
-    OSC2_STEP = powf(2.0f, (note_2 + OSC2_FINETUNE + OSC2_DETUNE) / 12.0f);
+    OSC2_STEP = powf(2.0f, (note_2 + Data.OSC2_FINETUNE + Data.OSC2_DETUNE) / 12.0f);
 
     ENV1_VALUE = 0;
     ENV2_VALUE = 0;
@@ -349,19 +359,19 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     ENV1_VOLUME = 0;
     ENV2_VOLUME = 0;
 
-    if(OSC1_WAVEFORM != WAVEFORM_WAV)
+    if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
     {
         Length = SIZE_WAVEFORMS;
         Loop_Length = SIZE_WAVEFORMS;
     }
     smp_freq = ((float) Length) / OSC1_STEP;
     adsr_ratio = smp_freq / 1024.0f;
-    ENV1b_ATTACK = (ENV1_ATTACK / adsr_ratio) * smp_freq;
-    ENV1b_DECAY = (ENV1_DECAY / adsr_ratio) * smp_freq;
+    ENV1b_ATTACK = (Data.ENV1_ATTACK / adsr_ratio) * smp_freq;
+    ENV1b_DECAY = (Data.ENV1_DECAY / adsr_ratio) * smp_freq;
 
 #if defined(PTK_SYNTH_LFO1)
-    LFO1b_ATTACK = (LFO1_ATTACK / adsr_ratio) * smp_freq;
-    LFO1b_DECAY = (LFO1_DECAY / adsr_ratio) * smp_freq;
+    LFO1b_ATTACK = (Data.LFO1_ATTACK / adsr_ratio) * smp_freq;
+    LFO1b_DECAY = (Data.LFO1_DECAY / adsr_ratio) * smp_freq;
 #endif
 
     if(Looping)
@@ -369,25 +379,25 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
         smp_freq = ((float) Loop_Length) / OSC1_STEP;
         adsr_ratio = smp_freq / 1024.0f;
     }
-    ENV1b_RELEASE = (ENV1_RELEASE / adsr_ratio) * smp_freq;
+    ENV1b_RELEASE = (Data.ENV1_RELEASE / adsr_ratio) * smp_freq;
 
 #if defined(PTK_SYNTH_LFO1)
-    LFO1b_RELEASE = (LFO1_RELEASE / adsr_ratio) * smp_freq;
+    LFO1b_RELEASE = (Data.LFO1_RELEASE / adsr_ratio) * smp_freq;
 #endif
 
-    if(OSC2_WAVEFORM != WAVEFORM_WAV)
+    if(Data.OSC2_WAVEFORM != WAVEFORM_WAV)
     {
         Length = SIZE_WAVEFORMS;
         Loop_Length = SIZE_WAVEFORMS;
     }
     smp_freq = ((float) Length) / OSC2_STEP;
     adsr_ratio = smp_freq / 1024.0f;
-    ENV2b_ATTACK = (ENV2_ATTACK / adsr_ratio) * smp_freq;
-    ENV2b_DECAY = (ENV2_DECAY / adsr_ratio) * smp_freq;
+    ENV2b_ATTACK = (Data.ENV2_ATTACK / adsr_ratio) * smp_freq;
+    ENV2b_DECAY = (Data.ENV2_DECAY / adsr_ratio) * smp_freq;
 
 #if defined(PTK_SYNTH_LFO2)
-    LFO2b_ATTACK = (LFO2_ATTACK / adsr_ratio) * smp_freq;
-    LFO2b_DECAY = (LFO2_DECAY / adsr_ratio) * smp_freq;
+    LFO2b_ATTACK = (Data.LFO2_ATTACK / adsr_ratio) * smp_freq;
+    LFO2b_DECAY = (Data.LFO2_DECAY / adsr_ratio) * smp_freq;
 #endif
 
     if(Looping)
@@ -395,10 +405,10 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
         smp_freq = ((float) Loop_Length) / OSC2_STEP;
         adsr_ratio = smp_freq / 1024.0f;
     }
-    ENV2b_RELEASE = (ENV2_RELEASE / adsr_ratio) * smp_freq;
+    ENV2b_RELEASE = (Data.ENV2_RELEASE / adsr_ratio) * smp_freq;
 
 #if defined(PTK_SYNTH_LFO2)
-    LFO2b_RELEASE = (LFO2_RELEASE / adsr_ratio) * smp_freq;
+    LFO2b_RELEASE = (Data.LFO2_RELEASE / adsr_ratio) * smp_freq;
 #endif
 
     if(ENV1b_ATTACK < 1.0f) ENV1b_ATTACK = 1.0f;
@@ -409,12 +419,12 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     if(ENV2b_RELEASE < 1.0f) ENV2b_RELEASE = 1.0f;
 
     /* Update ENV1 */
-    ENV1_D_COEF = (1.0f - ENV1_SUSTAIN) / (float) ENV1b_DECAY;
-    ENV1_R_COEF = ENV1_SUSTAIN / (float) ENV1b_RELEASE;
+    ENV1_D_COEF = (1.0f - Data.ENV1_SUSTAIN) / (float) ENV1b_DECAY;
+    ENV1_R_COEF = Data.ENV1_SUSTAIN / (float) ENV1b_RELEASE;
 
     /* Update ENV2 */
-    ENV2_D_COEF = (1.0f - ENV2_SUSTAIN) / (float) ENV2b_DECAY;
-    ENV2_R_COEF = ENV2_SUSTAIN / (float) ENV2b_RELEASE;
+    ENV2_D_COEF = (1.0f - Data.ENV2_SUSTAIN) / (float) ENV2b_DECAY;
+    ENV2_R_COEF = Data.ENV2_SUSTAIN / (float) ENV2b_RELEASE;
 
     ENV1_A_COEF = (1.0f - ENV1_VALUE) / ENV1b_ATTACK;
     ENV2_A_COEF = (1.0f - ENV2_VALUE) / ENV2b_ATTACK;
@@ -454,14 +464,14 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
 #endif
 
 #if defined(PTK_SYNTH_LFO1)
-    LFO1_D_COEF = (1.0f - LFO1_SUSTAIN) / (float) LFO1b_DECAY;
-    LFO1_R_COEF = LFO1_SUSTAIN / (float) LFO1b_RELEASE;
+    LFO1_D_COEF = (1.0f - Data.LFO1_SUSTAIN) / (float) LFO1b_DECAY;
+    LFO1_R_COEF = Data.LFO1_SUSTAIN / (float) LFO1b_RELEASE;
     LFO1_A_COEF = (1.0f - LFO1_ADSR_VALUE) / LFO1b_ATTACK;
 #endif
 
 #if defined(PTK_SYNTH_LFO2)
-    LFO2_D_COEF = (1.0f - LFO2_SUSTAIN) / (float) LFO2b_DECAY;
-    LFO2_R_COEF = LFO2_SUSTAIN / (float) LFO2b_RELEASE;
+    LFO2_D_COEF = (1.0f - Data.LFO2_SUSTAIN) / (float) LFO2b_DECAY;
+    LFO2_R_COEF = Data.LFO2_SUSTAIN / (float) LFO2b_RELEASE;
     LFO2_A_COEF = (1.0f - LFO2_ADSR_VALUE) / LFO2b_ATTACK;
 #endif
 
@@ -494,7 +504,7 @@ void CSynth::EnvRun(int *track, int *track2)
             if(ENV1_COUNTER >= ENV1b_DECAY)
             {
                 if(ENV1_VALUE < 0.0f) ENV1_VALUE = 0.0f;
-                ENV1_VALUE = ENV1_SUSTAIN;
+                ENV1_VALUE = Data.ENV1_SUSTAIN;
                 ENV1_COUNTER = 0;
                 ENV1_STAGE = SYNTH_SUSTAIN;
             }
@@ -502,7 +512,7 @@ void CSynth::EnvRun(int *track, int *track2)
 
         /* Sustain */
         case SYNTH_SUSTAIN:
-            ENV1_VALUE = ENV1_SUSTAIN;
+            ENV1_VALUE = Data.ENV1_SUSTAIN;
             break;
 
         /* Release */
@@ -543,7 +553,7 @@ void CSynth::EnvRun(int *track, int *track2)
             if(ENV2_COUNTER >= ENV2b_DECAY)
             {
                 if(ENV2_VALUE < 0.0f) ENV2_VALUE = 0.0f;
-                ENV2_VALUE = ENV2_SUSTAIN;
+                ENV2_VALUE = Data.ENV2_SUSTAIN;
                 ENV2_COUNTER = 0;
                 ENV2_STAGE = SYNTH_SUSTAIN;
             }
@@ -551,7 +561,7 @@ void CSynth::EnvRun(int *track, int *track2)
 
         /* Sustain */
         case SYNTH_SUSTAIN:
-            ENV2_VALUE = ENV2_SUSTAIN;
+            ENV2_VALUE = Data.ENV2_SUSTAIN;
             break;
 
         /* Release */
@@ -571,18 +581,18 @@ void CSynth::EnvRun(int *track, int *track2)
 
     ENV1_VOLUME = ENV1_VALUE;
 #if defined(PTK_SYNTH_ENV1)
-    ENV1_VOLUME *= ENV1_OSC1_VOLUME;
+    ENV1_VOLUME *= Data.ENV1_OSC1_VOLUME;
 #endif
 #if defined(PTK_SYNTH_ENV2)
-    ENV1_VOLUME *= ENV2_OSC1_VOLUME;
+    ENV1_VOLUME *= Data.ENV2_OSC1_VOLUME;
 #endif
 
     ENV2_VOLUME = ENV2_VALUE;
 #if defined(PTK_SYNTH_ENV1)
-    ENV2_VOLUME *= ENV1_OSC2_VOLUME;
+    ENV2_VOLUME *= Data.ENV1_OSC2_VOLUME;
 #endif
 #if defined(PTK_SYNTH_ENV2)
-    ENV2_VOLUME *= ENV2_OSC2_VOLUME;
+    ENV2_VOLUME *= Data.ENV2_OSC2_VOLUME;
 #endif
 
 #if !defined(PTK_SYNTH_LFO1) && !defined(PTK_SYNTH_LFO2)
@@ -591,13 +601,13 @@ void CSynth::EnvRun(int *track, int *track2)
     ENV1_MIN = 0.0f;
     if(
 #if defined(PTK_SYNTH_LFO1)
-    LFO1_OSC1_VOLUME == 0.0f
+    Data.LFO1_OSC1_VOLUME == 0.0f
 #else
     TRUE
 #endif
     &&
 #if defined(PTK_SYNTH_LFO2)
-    LFO2_OSC1_VOLUME == 0.0f
+    Data.LFO2_OSC1_VOLUME == 0.0f
 #else
     TRUE
 #endif
@@ -613,13 +623,13 @@ void CSynth::EnvRun(int *track, int *track2)
     ENV2_MIN = 0.0f;
     if(
 #if defined(PTK_SYNTH_LFO1)
-    LFO1_OSC2_VOLUME == 0.0f
+    Data.LFO1_OSC2_VOLUME == 0.0f
 #else
     TRUE
 #endif
     &&
 #if defined(PTK_SYNTH_LFO2)
-    LFO2_OSC2_VOLUME == 0.0f
+    Data.LFO2_OSC2_VOLUME == 0.0f
 #else
     TRUE
 #endif
@@ -727,14 +737,14 @@ float CSynth::GetSample(short *Left_Samples,
     if(ENV1_STAGE)
     {
         // Oscillator1 On
-        if(OSC1_WAVEFORM != WAVEFORM_NONE)
+        if(Data.OSC1_WAVEFORM != WAVEFORM_NONE)
         {
             T_OSC1_VOLUME = (
 #if defined(PTK_SYNTH_LFO1)
-                             LFO1_VALUE * LFO1_OSC1_VOLUME
+                             LFO1_VALUE * Data.LFO1_OSC1_VOLUME
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                             + LFO2_VALUE * LFO2_OSC1_VOLUME
+                             + LFO2_VALUE * Data.LFO2_OSC1_VOLUME
 #endif
                              + ENV1_MIN
                             )
@@ -743,16 +753,16 @@ float CSynth::GetSample(short *Left_Samples,
 
             if(*track)
             {
-                if(PTC_GLIDE64 != 0 && OSC1_SPEED != 0)
+                if(Data.PTC_GLIDE64 != 0 && OSC1_SPEED != 0)
                 {
                     if(osc_speed > OSC1_SPEED)
                     {
-                        OSC1_SPEED += PTC_GLIDE64;
+                        OSC1_SPEED += Data.PTC_GLIDE64;
                         if(OSC1_SPEED > osc_speed) OSC1_SPEED = osc_speed;
                     }
                     else
                     {
-                        OSC1_SPEED -= PTC_GLIDE64;
+                        OSC1_SPEED -= Data.PTC_GLIDE64;
                         if(OSC1_SPEED < osc_speed) OSC1_SPEED = osc_speed;
                     }
                 }
@@ -764,16 +774,16 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_PITCH)
                 osc_speed1 = (int64) ((double) (
 #if defined(PTK_SYNTH_LFO1_PITCH)
-                            LFO1_VALUE * LFO1_OSC1_PITCH
+                            LFO1_VALUE * Data.LFO1_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_LFO2_PITCH)
-                            + LFO2_VALUE * LFO2_OSC1_PITCH
+                            + LFO2_VALUE * Data.LFO2_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV1_PITCH)
-                            + ENV1_VALUE * ENV1_OSC1_PITCH
+                            + ENV1_VALUE * Data.ENV1_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV2_PITCH)
-                            + ENV2_VALUE * ENV2_OSC1_PITCH
+                            + ENV2_VALUE * Data.ENV2_OSC1_PITCH
 #endif
                            ) * 4294967296.0);
 #endif
@@ -784,10 +794,10 @@ float CSynth::GetSample(short *Left_Samples,
 
 
 #if defined(PTK_INSTRUMENTS)
-                if(OSC1_WAVEFORM != WAVEFORM_WAV)
+                if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
 #endif
                 {
-                    switch(OSC1_WAVEFORM)
+                    switch(Data.OSC1_WAVEFORM)
                     {
 
 #if defined(PTK_SYNTH_SIN)
@@ -851,21 +861,21 @@ float CSynth::GetSample(short *Left_Samples,
                     mul_datR = 1.0f;
 
 #if defined(PTK_SYNTH_PHASE1)
-                    if(OSC1_PW)
+                    if(Data.OSC1_PW)
                     {
-                        T_OSC_PW = OSC1_PW * 
+                        T_OSC_PW = Data.OSC1_PW * 
                                 (
 #if defined(PTK_SYNTH_LFO1)
-                                   (LFO1_VALUE * LFO1_OSC1_PW) 
+                                   (LFO1_VALUE * Data.LFO1_OSC1_PW) 
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                                 + (LFO2_VALUE * LFO2_OSC1_PW)
+                                 + (LFO2_VALUE * Data.LFO2_OSC1_PW)
 #endif
 #if defined(PTK_SYNTH_ENV1)
-                                 + (ENV1_VALUE * ENV1_OSC1_PW)
+                                 + (ENV1_VALUE * Data.ENV1_OSC1_PW)
 #endif
 #if defined(PTK_SYNTH_ENV2)
-                                 + (ENV2_VALUE * ENV2_OSC1_PW)
+                                 + (ENV2_VALUE * Data.ENV2_OSC1_PW)
 #endif
                                 );
                         if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
@@ -1018,22 +1028,22 @@ float CSynth::GetSample(short *Left_Samples,
     if(ENV2_STAGE)
     {
         // Oscillator2 On 
-        if(OSC2_WAVEFORM != WAVEFORM_NONE)
+        if(Data.OSC2_WAVEFORM != WAVEFORM_NONE)
         {
             if(*track2)
             {
-                osc_speed_tune = osc_speed + (int64) ((double) OSC2_FINETUNE * 536870912.0)
-                                           + (int64) ((double) OSC2_DETUNE * 536870912.0);
-                if(PTC_GLIDE64 != 0 && OSC2_SPEED != 0)
+                osc_speed_tune = osc_speed + (int64) ((double) Data.OSC2_FINETUNE * 536870912.0)
+                                           + (int64) ((double) Data.OSC2_DETUNE * 536870912.0);
+                if(Data.PTC_GLIDE64 != 0 && OSC2_SPEED != 0)
                 {
                     if(osc_speed_tune > OSC2_SPEED)
                     {
-                        OSC2_SPEED += PTC_GLIDE64;
+                        OSC2_SPEED += Data.PTC_GLIDE64;
                         if(OSC2_SPEED > osc_speed_tune) OSC2_SPEED = osc_speed_tune;
                     }
                     else
                     {
-                        OSC2_SPEED -= PTC_GLIDE64;
+                        OSC2_SPEED -= Data.PTC_GLIDE64;
                         if(OSC2_SPEED < osc_speed_tune) OSC2_SPEED = osc_speed_tune;
                     }
                 }
@@ -1046,16 +1056,16 @@ float CSynth::GetSample(short *Left_Samples,
                 osc_speed1b = ((int64) ((double)
                                (
 #if defined(PTK_SYNTH_LFO1_PITCH)
-                                  LFO1_VALUE * LFO1_OSC2_PITCH
+                                  LFO1_VALUE * Data.LFO1_OSC2_PITCH
 #endif
 #if defined(PTK_SYNTH_LFO2_PITCH)
-                                + LFO2_VALUE * LFO2_OSC2_PITCH
+                                + LFO2_VALUE * Data.LFO2_OSC2_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV1_PITCH)
-                                + ENV1_VALUE * ENV1_OSC2_PITCH
+                                + ENV1_VALUE * Data.ENV1_OSC2_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV2_PITCH)
-                                + ENV2_VALUE * ENV2_OSC2_PITCH
+                                + ENV2_VALUE * Data.ENV2_OSC2_PITCH
 #endif
                                ) * 4294967296.0));
 #endif
@@ -1063,10 +1073,10 @@ float CSynth::GetSample(short *Left_Samples,
                 osc_speed2 = OSC2_SPEED;
 
 #if defined(PTK_INSTRUMENTS)
-                if(OSC2_WAVEFORM != WAVEFORM_WAV)
+                if(Data.OSC2_WAVEFORM != WAVEFORM_WAV)
 #endif
                 {
-                    switch(OSC2_WAVEFORM)
+                    switch(Data.OSC2_WAVEFORM)
                     {
 
 #if defined(PTK_SYNTH_SIN)
@@ -1121,10 +1131,10 @@ float CSynth::GetSample(short *Left_Samples,
                 {
                     T_OSC2_VOLUME = ((
 #if defined(PTK_SYNTH_LFO1)
-                                    LFO1_VALUE * LFO1_OSC2_VOLUME
+                                    LFO1_VALUE * Data.LFO1_OSC2_VOLUME
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                                    + LFO2_VALUE * LFO2_OSC2_VOLUME
+                                    + LFO2_VALUE * Data.LFO2_OSC2_VOLUME
 #endif
                                     ) + ENV2_MIN)
                                     * ENV2_VOLUME;
@@ -1138,21 +1148,21 @@ float CSynth::GetSample(short *Left_Samples,
                     mul_datR = 1.0f;
 
 #if defined(PTK_SYNTH_PHASE2)
-                    if(OSC2_PW)
+                    if(Data.OSC2_PW)
                     {
-                        T_OSC_PW = OSC2_PW * 
+                        T_OSC_PW = Data.OSC2_PW * 
                                   (
 #if defined(PTK_SYNTH_LFO1)
-                                    (LFO1_VALUE * LFO1_OSC2_PW) 
+                                    (LFO1_VALUE * Data.LFO1_OSC2_PW) 
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                                    + (LFO2_VALUE * LFO2_OSC2_PW)
+                                    + (LFO2_VALUE * Data.LFO2_OSC2_PW)
 #endif
 #if defined(PTK_SYNTH_ENV1)
-                                    + (ENV1_VALUE * ENV1_OSC2_PW)
+                                    + (ENV1_VALUE * Data.ENV1_OSC2_PW)
 #endif
 #if defined(PTK_SYNTH_ENV2)
-                                    + (ENV2_VALUE * ENV2_OSC2_PW)
+                                    + (ENV2_VALUE * Data.ENV2_OSC2_PW)
 #endif
                                    );
                         if(*(Left_Samples + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
@@ -1306,10 +1316,10 @@ float CSynth::GetSample(short *Left_Samples,
 #endif // PTK_SYNTH_OSC2
 
 #if defined(PTK_SYNTH_OSC3)
-    if(OSC3_SWITCH)
+    if(Data.OSC3_SWITCH)
     {
         // SubOscillator On
-        if(OSC1_WAVEFORM != WAVEFORM_NONE)
+        if(Data.OSC1_WAVEFORM != WAVEFORM_NONE)
         {
             if(*track)
             {
@@ -1318,22 +1328,22 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_PITCH)
                 osc_speed1 = ((int64) ((double) (
 #if defined(PTK_SYNTH_LFO1_PITCH)
-                                + LFO1_VALUE * LFO1_OSC1_PITCH
+                                + LFO1_VALUE * Data.LFO1_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_LFO2_PITCH)
-                                + LFO2_VALUE * LFO2_OSC1_PITCH
+                                + LFO2_VALUE * Data.LFO2_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV1_PITCH)
-                                + ENV1_VALUE * ENV1_OSC1_PITCH
+                                + ENV1_VALUE * Data.ENV1_OSC1_PITCH
 #endif
 #if defined(PTK_SYNTH_ENV2_PITCH)
-                                + ENV2_VALUE * ENV2_OSC1_PITCH
+                                + ENV2_VALUE * Data.ENV2_OSC1_PITCH
 #endif
                                ) * 4294967296.0)) / 2;
 #endif
 
 #if defined(PTK_INSTRUMENTS)
-                if(OSC1_WAVEFORM != WAVEFORM_WAV)
+                if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
 #endif
                 {
                     osc_speed2 *= 65;
@@ -1359,21 +1369,21 @@ float CSynth::GetSample(short *Left_Samples,
                     mul_datR = 1.0f;
 
 #if defined(PTK_SYNTH_PHASE1)
-                    if(OSC1_PW)
+                    if(Data.OSC1_PW)
                     {
-                        T_OSC_PW = OSC1_PW * 
+                        T_OSC_PW = Data.OSC1_PW * 
                                (
 #if defined(PTK_SYNTH_LFO1)
-                                  (LFO1_VALUE * LFO1_OSC1_PW) 
+                                  (LFO1_VALUE * Data.LFO1_OSC1_PW) 
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                                + (LFO2_VALUE * LFO2_OSC1_PW)
+                                + (LFO2_VALUE * Data.LFO2_OSC1_PW)
 #endif
 #if defined(PTK_SYNTH_ENV1)
-                                + (ENV1_VALUE * ENV1_OSC1_PW)
+                                + (ENV1_VALUE * Data.ENV1_OSC1_PW)
 #endif
 #if defined(PTK_SYNTH_ENV2)
-                                + (ENV2_VALUE * ENV2_OSC1_PW)
+                                + (ENV2_VALUE * Data.ENV2_OSC1_PW)
 #endif
                                 );
 
@@ -1392,10 +1402,10 @@ float CSynth::GetSample(short *Left_Samples,
                                     (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                    res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                    res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
                     GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
-                               * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                               * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
 #else
@@ -1406,12 +1416,12 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                     }
                     else
                     {
                         GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
-                                   * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                                   * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                     }
 #endif
 
@@ -1425,10 +1435,10 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
                         GS_VAL2 += (*(Right_Samples1 + i_POSITION) * mul_datR)
-                                    * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                                    * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
 #else
@@ -1439,12 +1449,12 @@ float CSynth::GetSample(short *Left_Samples,
                                             (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
                                             (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
                                             (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                            res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * OSC3_VOLUME;
+                                            res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                         }
                         else
                         {
                             GS_VAL2 += (*(Right_Samples1 + i_POSITION) * mul_datR)
-                                        * vol * T_OSC1_VOLUME * OSC3_VOLUME;
+                                        * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                         }
 #endif
 
@@ -1528,45 +1538,45 @@ float CSynth::GetSample(short *Left_Samples,
 #endif // PTK_SYNTH_OSC3
 
 #if defined(PTK_SYNTH_DISTO)
-    if(DISTO != 1.0f)
+    if(Data.DISTO != 1.0f)
     {
         GS_VAL /= 32767.0f;
-        GS_VAL = GS_VAL * (fabsf(GS_VAL) + DISTO) / ((GS_VAL * GS_VAL) + (DISTO - 1) *
+        GS_VAL = GS_VAL * (fabsf(GS_VAL) + Data.DISTO) / ((GS_VAL * GS_VAL) + (Data.DISTO - 1) *
                  fabsf(GS_VAL) + 1);
         GS_VAL *= 32767.0f;
     }
 #endif
 
 #if defined(PTK_SYNTH_FILTER)
-    if(VCF_TYPE < 2)
+    if(Data.VCF_TYPE < 2)
     {
-        FILT_CUTO = VCF_CUTOFF
+        FILT_CUTO = Data.VCF_CUTOFF
 #if defined(PTK_SYNTH_LFO1)
-                    + LFO1_VALUE * LFO1_VCF_CUTOFF
+                    + LFO1_VALUE * Data.LFO1_VCF_CUTOFF
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                    + LFO2_VALUE * LFO2_VCF_CUTOFF
+                    + LFO2_VALUE * Data.LFO2_VCF_CUTOFF
 #endif
 #if defined(PTK_SYNTH_ENV1)
-                    + ENV1_VALUE * ENV1_VCF_CUTOFF
+                    + ENV1_VALUE * Data.ENV1_VCF_CUTOFF
 #endif
 #if defined(PTK_SYNTH_ENV2)
-                    + ENV2_VALUE * ENV2_VCF_CUTOFF
+                    + ENV2_VALUE * Data.ENV2_VCF_CUTOFF
 #endif
                    ;
 
-        FILT_RESO = VCF_RESONANCE
+        FILT_RESO = Data.VCF_RESONANCE
 #if defined(PTK_SYNTH_LFO1)
-                    + LFO1_VALUE * LFO1_VCF_RESONANCE
+                    + LFO1_VALUE * Data.LFO1_VCF_RESONANCE
 #endif
 #if defined(PTK_SYNTH_LFO2)
-                    + LFO2_VALUE * LFO2_VCF_RESONANCE
+                    + LFO2_VALUE * Data.LFO2_VCF_RESONANCE
 #endif
 #if defined(PTK_SYNTH_ENV1)
-                    + ENV1_VALUE * ENV1_VCF_RESONANCE
+                    + ENV1_VALUE * Data.ENV1_VCF_RESONANCE
 #endif
 #if defined(PTK_SYNTH_ENV2)
-                    + ENV2_VALUE * ENV2_VCF_RESONANCE
+                    + ENV2_VALUE * Data.ENV2_VCF_RESONANCE
 #endif
                    ;
         if(FILT_CUTO < 0.05f) FILT_CUTO = 0.05f;
@@ -1579,26 +1589,26 @@ float CSynth::GetSample(short *Left_Samples,
     }
 #endif
 
-    GS_VAL *= GLB_VOLUME;
+    GS_VAL *= Data.GLB_VOLUME;
 
     if(Stereo == 2)
     {
 
 #if defined(PTK_SYNTH_DISTO)
-        if(DISTO != 1.0f)
+        if(Data.DISTO != 1.0f)
         {
             GS_VAL2 /= 32767.0f;
-            GS_VAL2 = GS_VAL2 * (fabsf(GS_VAL2) + DISTO) / ((GS_VAL2 * GS_VAL2) + (DISTO - 1) *
+            GS_VAL2 = GS_VAL2 * (fabsf(GS_VAL2) + Data.DISTO) / ((GS_VAL2 * GS_VAL2) + (Data.DISTO - 1) *
                       fabsf(GS_VAL2) + 1);
             GS_VAL2 *= 32767.0f;
         }
 #endif
 
 #if defined(PTK_SYNTH_FILTER)
-        if(VCF_TYPE < 2) GS_VAL2 = FilterR();
+        if(Data.VCF_TYPE < 2) GS_VAL2 = FilterR();
 #endif
 
-        GS_VAL2 *= GLB_VOLUME;
+        GS_VAL2 *= Data.GLB_VOLUME;
         *Right_Signal += GS_VAL2 * GLOBAL_VOLUME;
     }
 
@@ -1610,182 +1620,117 @@ float CSynth::GetSample(short *Left_Samples,
     return GS_VAL * GLOBAL_VOLUME;
 }
 
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+void CSynth::ChangeParameters(LPSYNTH_DATA TSP)
+{
+    memcpy(&Data, TSP, sizeof(SYNTH_DATA));
+}
+
+#else
+
 void CSynth::ChangeParameters(SynthParameters TSP)
 {
-    OSC1_WAVEFORM = TSP.osc1_waveform;
-    OSC2_WAVEFORM = TSP.osc2_waveform;
+    Data.OSC1_WAVEFORM = TSP.osc1_waveform;
+    Data.OSC2_WAVEFORM = TSP.osc2_waveform;
 
-#if defined(PTK_SYNTH_PHASE1)
-    OSC1_PW = (float) (TSP.osc1_pw - 256) / 256.0f;
-#endif
+    Data.OSC1_PW = (float) (TSP.osc1_pw - 256) / 256.0f;
+    Data.OSC2_PW = (float) (TSP.osc2_pw - 256) / 256.0f;
 
-#if defined(PTK_SYNTH_PHASE2)
-    OSC2_PW = (float) (TSP.osc2_pw - 256) / 256.0f;
-#endif
+    Data.OSC2_DETUNE = (float) (TSP.osc2_detune - 64.0f) * 0.0625f;
+    Data.OSC2_FINETUNE = (float) TSP.osc2_finetune * 0.0078125f;
 
-    OSC2_DETUNE = (float) (TSP.osc2_detune - 64.0f) * 0.0625f;
-    OSC2_FINETUNE = (float) TSP.osc2_finetune * 0.0078125f;
+    Data.VCF_CUTOFF = (float) TSP.vcf_cutoff * 0.0078125f;
+    Data.VCF_RESONANCE = (float) TSP.vcf_resonance * 0.0078125f;
 
-    VCF_CUTOFF = (float) TSP.vcf_cutoff * 0.0078125f;
-    VCF_RESONANCE = (float) TSP.vcf_resonance * 0.0078125f;
-
-#if defined(PTK_SYNTH_FILTER)
-    VCF_TYPE = TSP.vcf_type;
-#endif
+    Data.VCF_TYPE = TSP.vcf_type;
 
     // Sustain = 0 128
-    ENV1_ATTACK = ((float) (TSP.env1_attack + 1)) / 512.0f;
-    ENV1_DECAY = ((float) (TSP.env1_decay + 1)) / 512.0f;
-    ENV1_SUSTAIN = (float) TSP.env1_sustain * 0.0078125f;          // / 128
-    ENV1_RELEASE = ((float) (TSP.env1_release + 1)) / 512.0f;
-    if(ENV1_ATTACK < 0.1f) ENV1_ATTACK = 0.1f;
-    if(ENV1_RELEASE < 0.15f) ENV1_RELEASE = 0.15f;
+    Data.ENV1_ATTACK = ((float) (TSP.env1_attack + 1)) / 512.0f;
+    Data.ENV1_DECAY = ((float) (TSP.env1_decay + 1)) / 512.0f;
+    Data.ENV1_SUSTAIN = (float) TSP.env1_sustain * 0.0078125f;          // / 128
+    Data.ENV1_RELEASE = ((float) (TSP.env1_release + 1)) / 512.0f;
+    if(Data.ENV1_ATTACK < 0.1f) Data.ENV1_ATTACK = 0.1f;
+    if(Data.ENV1_RELEASE < 0.15f) Data.ENV1_RELEASE = 0.15f;
 
-    ENV2_ATTACK = ((float) (TSP.env2_attack + 1)) / 512.0f;
-    ENV2_DECAY = ((float) (TSP.env2_decay + 1)) / 512.0f;
-    ENV2_SUSTAIN = (float) (TSP.env2_sustain * 0.0078125f);        // / 128
-    ENV2_RELEASE = ((float) (TSP.env2_release + 1)) / 512.0f;
-    if(ENV2_ATTACK < 0.1f) ENV2_ATTACK = 0.1f;
-    if(ENV2_RELEASE < 0.15f) ENV2_RELEASE = 0.15f;
+    Data.ENV2_ATTACK = ((float) (TSP.env2_attack + 1)) / 512.0f;
+    Data.ENV2_DECAY = ((float) (TSP.env2_decay + 1)) / 512.0f;
+    Data.ENV2_SUSTAIN = (float) (TSP.env2_sustain * 0.0078125f);        // / 128
+    Data.ENV2_RELEASE = ((float) (TSP.env2_release + 1)) / 512.0f;
+    if(Data.ENV2_ATTACK < 0.1f) Data.ENV2_ATTACK = 0.1f;
+    if(Data.ENV2_RELEASE < 0.15f) Data.ENV2_RELEASE = 0.15f;
   
-#if defined(PTK_SYNTH_LFO1)
-    LFO1_PERIOD = (float) (TSP.lfo1_period * 2) + 1;
-    LFO1_SUBGRMAX = (int) (((float) SamplesPerTick * 0.000277f * LFO1_PERIOD));
-#endif
+    Data.LFO1_PERIOD = (float) (TSP.lfo1_period * 2) + 1;
+    Data.LFO1_SUBGRMAX = (int) (((float) SamplesPerTick * 0.000277f * Data.LFO1_PERIOD));
 
-#if defined(PTK_SYNTH_LFO1)
-    LFO2_PERIOD = (float) (TSP.lfo2_period * 2) + 1;
-    LFO2_SUBGRMAX = (int) ((float) SamplesPerTick * 0.000277f * LFO2_PERIOD);
-#endif
+    Data.LFO2_PERIOD = (float) (TSP.lfo2_period * 2) + 1;
+    Data.LFO2_SUBGRMAX = (int) ((float) SamplesPerTick * 0.000277f * Data.LFO2_PERIOD);
 
     /* Envelopes and LFO's matrix modulation variables */
-#if defined(PTK_SYNTH_PHASE1)
-#if defined(PTK_SYNTH_LFO1)
-    LFO1_OSC1_PW =       ((float) TSP.lfo1_osc1_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.LFO1_OSC1_PW =       ((float) TSP.lfo1_osc1_pw - 64) * 0.015625f;
+    Data.LFO1_OSC2_PW =       ((float) TSP.lfo1_osc2_pw - 64) * 0.015625f;
+    Data.LFO1_OSC1_PITCH =    ((float) TSP.lfo1_osc1_pitch - 64) * 0.015625f;
+    Data.LFO1_OSC2_PITCH =    ((float) TSP.lfo1_osc2_pitch - 64) * 0.015625f;
+    Data.LFO1_OSC1_VOLUME =   ((float) TSP.lfo1_osc1_volume - 64) * 0.015625f;
+    Data.LFO1_OSC2_VOLUME =   ((float) TSP.lfo1_osc2_volume - 64) * 0.015625f;
+    Data.LFO1_VCF_CUTOFF =    ((float) TSP.lfo1_vcf_cutoff - 64) * 0.015625f;
+    Data.LFO1_VCF_RESONANCE = ((float) TSP.lfo1_vcf_resonance - 64) * 0.015625f;
 
-#if defined(PTK_SYNTH_PHASE2)
-#if defined(PTK_SYNTH_LFO1)
-    LFO1_OSC2_PW =       ((float) TSP.lfo1_osc2_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.LFO2_OSC1_PW =       ((float) TSP.lfo2_osc1_pw - 64) * 0.015625f;
+    Data.LFO2_OSC2_PW =       ((float) TSP.lfo2_osc2_pw - 64) * 0.015625f;
+    Data.LFO2_OSC1_PITCH =    ((float) TSP.lfo2_osc1_pitch - 64) * 0.015625f;
+    Data.LFO2_OSC2_PITCH =    ((float) TSP.lfo2_osc2_pitch - 64) * 0.015625f;
+    Data.LFO2_OSC1_VOLUME =   ((float) TSP.lfo2_osc1_volume - 64) * 0.015625f;
+    Data.LFO2_OSC2_VOLUME =   ((float) TSP.lfo2_osc2_volume - 64) * 0.015625f;
+    Data.LFO2_VCF_CUTOFF =    ((float) TSP.lfo2_vcf_cutoff - 64) * 0.015625f;
+    Data.LFO2_VCF_RESONANCE = ((float) TSP.lfo2_vcf_resonance - 64) * 0.015625f;
 
-#if defined(PTK_SYNTH_LFO1)
-    LFO1_OSC1_PITCH =    ((float) TSP.lfo1_osc1_pitch - 64) * 0.015625f;
-    LFO1_OSC2_PITCH =    ((float) TSP.lfo1_osc2_pitch - 64) * 0.015625f;
-    LFO1_OSC1_VOLUME =   ((float) TSP.lfo1_osc1_volume - 64) * 0.015625f;
-    LFO1_OSC2_VOLUME =   ((float) TSP.lfo1_osc2_volume - 64) * 0.015625f;
-    LFO1_VCF_CUTOFF =    ((float) TSP.lfo1_vcf_cutoff - 64) * 0.015625f;
-    LFO1_VCF_RESONANCE = ((float) TSP.lfo1_vcf_resonance - 64) * 0.015625f;
-#endif
+    Data.ENV1_OSC1_PW =       ((float) TSP.env1_osc1_pw - 64) * 0.015625f;
+    Data.ENV1_OSC2_PW =       ((float) TSP.env1_osc2_pw - 64) * 0.015625f;
+    Data.ENV1_OSC1_PITCH =    ((float) TSP.env1_osc1_pitch - 64) * 0.015625f;
+    Data.ENV1_OSC2_PITCH =    ((float) TSP.env1_osc2_pitch - 64) * 0.015625f;
+    Data.ENV1_OSC1_VOLUME =   ((float) TSP.env1_osc1_volume - 64) * 0.015625f;
+    Data.ENV1_OSC2_VOLUME =   ((float) TSP.env1_osc2_volume - 64) * 0.015625f;
+    Data.ENV1_VCF_CUTOFF =    ((float) TSP.env1_vcf_cutoff - 64) * 0.015625f;
+    Data.ENV1_VCF_RESONANCE = ((float) TSP.env1_vcf_resonance - 64) * 0.015625f;
+    if((TSP.env1_osc1_volume - 64) == 0) Data.ENV1_OSC1_VOLUME = 1.0f;
+    if((TSP.env1_osc2_volume - 64) == 0) Data.ENV1_OSC2_VOLUME = 1.0f;
 
-#if defined(PTK_SYNTH_PHASE1)
-#if defined(PTK_SYNTH_LFO2)
-    LFO2_OSC1_PW =       ((float) TSP.lfo2_osc1_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.ENV2_OSC1_PW =       ((float) TSP.env2_osc1_pw - 64) * 0.015625f;
+    Data.ENV2_OSC2_PW =       ((float) TSP.env2_osc2_pw - 64) * 0.015625f;
+    Data.ENV2_OSC1_PITCH =    ((float) TSP.env2_osc1_pitch - 64) * 0.015625f;
+    Data.ENV2_OSC2_PITCH =    ((float) TSP.env2_osc2_pitch - 64) * 0.015625f;
+    Data.ENV2_OSC1_VOLUME =   ((float) TSP.env2_osc1_volume - 64) * 0.015625f;
+    Data.ENV2_OSC2_VOLUME =   ((float) TSP.env2_osc2_volume - 64) * 0.015625f;
+    Data.ENV2_VCF_CUTOFF =    ((float) TSP.env2_vcf_cutoff - 64) * 0.015625f;
+    Data.ENV2_VCF_RESONANCE = ((float) TSP.env2_vcf_resonance - 64) * 0.015625f;
+    if((TSP.env2_osc1_volume - 64) == 0) Data.ENV2_OSC1_VOLUME = 1.0f;
+    if((TSP.env2_osc2_volume - 64) == 0) Data.ENV2_OSC2_VOLUME = 1.0f;
 
-#if defined(PTK_SYNTH_PHASE2)
-#if defined(PTK_SYNTH_LFO2)
-    LFO2_OSC2_PW =       ((float) TSP.lfo2_osc2_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.OSC3_VOLUME =        ((float) TSP.osc3_volume - 64) * 0.015625f;
+    Data.OSC3_SWITCH =        TSP.osc3_switch;
 
-#if defined(PTK_SYNTH_LFO2)
-    LFO2_OSC1_PITCH =    ((float) TSP.lfo2_osc1_pitch - 64) * 0.015625f;
-    LFO2_OSC2_PITCH =    ((float) TSP.lfo2_osc2_pitch - 64) * 0.015625f;
-    LFO2_OSC1_VOLUME =   ((float) TSP.lfo2_osc1_volume - 64) * 0.015625f;
-    LFO2_OSC2_VOLUME =   ((float) TSP.lfo2_osc2_volume - 64) * 0.015625f;
-    LFO2_VCF_CUTOFF =    ((float) TSP.lfo2_vcf_cutoff - 64) * 0.015625f;
-    LFO2_VCF_RESONANCE = ((float) TSP.lfo2_vcf_resonance - 64) * 0.015625f;
-#endif
+    Data.PTC_GLIDE =          ((float) TSP.ptc_glide * (float) TSP.ptc_glide) * 0.0000015625f;
+    Data.PTC_GLIDE64 =         (int64) ((double) Data.PTC_GLIDE * 4294967296.0);
 
-#if defined(PTK_SYNTH_PHASE1)
-#if defined(PTK_SYNTH_ENV1)
-    ENV1_OSC1_PW =       ((float) TSP.env1_osc1_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
 
-#if defined(PTK_SYNTH_PHASE2)
-#if defined(PTK_SYNTH_ENV1)
-    ENV1_OSC2_PW =       ((float) TSP.env1_osc2_pw - 64) * 0.015625f;
-#endif
-#endif
+    Data.DISTO =              (((float) TSP.disto)) + 1.0f;
 
-#if defined(PTK_SYNTH_ENV1)
-    ENV1_OSC1_PITCH =    ((float) TSP.env1_osc1_pitch - 64) * 0.015625f;
-    ENV1_OSC2_PITCH =    ((float) TSP.env1_osc2_pitch - 64) * 0.015625f;
-    ENV1_OSC1_VOLUME =   ((float) TSP.env1_osc1_volume - 64) * 0.015625f;
-    ENV1_OSC2_VOLUME =   ((float) TSP.env1_osc2_volume - 64) * 0.015625f;
-    ENV1_VCF_CUTOFF =    ((float) TSP.env1_vcf_cutoff - 64) * 0.015625f;
-    ENV1_VCF_RESONANCE = ((float) TSP.env1_vcf_resonance - 64) * 0.015625f;
-    if((TSP.env1_osc1_volume - 64) == 0) ENV1_OSC1_VOLUME = 1.0f;
-    if((TSP.env1_osc2_volume - 64) == 0) ENV1_OSC2_VOLUME = 1.0f;
-#else
-    ENV1_OSC1_VOLUME = 1.0f;
-    ENV1_OSC2_VOLUME = 1.0f;
-#endif
+    Data.LFO1_ATTACK =        ((float) (TSP.lfo1_attack + 1)) / 512.0f;
+    Data.LFO1_DECAY =         ((float) (TSP.lfo1_decay + 1)) / 512.0f;
+    Data.LFO1_SUSTAIN =       (float) TSP.lfo1_sustain * 0.0078125f;
+    Data.LFO1_RELEASE =       ((float) (TSP.lfo1_release + 1)) / 512.0f;
+    if(Data.LFO1_ATTACK < 0.1f) Data.LFO1_ATTACK = 0.1f;
+    if(Data.LFO1_RELEASE < 0.15f) Data.LFO1_RELEASE = 0.15f;
 
-#if defined(PTK_SYNTH_PHASE1)
-#if defined(PTK_SYNTH_ENV2)
-    ENV2_OSC1_PW =       ((float) TSP.env2_osc1_pw - 64) * 0.015625f;
-#endif
-#endif
-
-#if defined(PTK_SYNTH_PHASE2)
-#if defined(PTK_SYNTH_ENV2)
-    ENV2_OSC2_PW =       ((float) TSP.env2_osc2_pw - 64) * 0.015625f;
-#endif
-#endif
-
-#if defined(PTK_SYNTH_ENV2)
-    ENV2_OSC1_PITCH =    ((float) TSP.env2_osc1_pitch - 64) * 0.015625f;
-    ENV2_OSC2_PITCH =    ((float) TSP.env2_osc2_pitch - 64) * 0.015625f;
-    ENV2_OSC1_VOLUME =   ((float) TSP.env2_osc1_volume - 64) * 0.015625f;
-    ENV2_OSC2_VOLUME =   ((float) TSP.env2_osc2_volume - 64) * 0.015625f;
-    ENV2_VCF_CUTOFF =    ((float) TSP.env2_vcf_cutoff - 64) * 0.015625f;
-    ENV2_VCF_RESONANCE = ((float) TSP.env2_vcf_resonance - 64) * 0.015625f;
-    if((TSP.env2_osc1_volume - 64) == 0) ENV2_OSC1_VOLUME = 1.0f;
-    if((TSP.env2_osc2_volume - 64) == 0) ENV2_OSC2_VOLUME = 1.0f;
-#else
-    ENV2_OSC1_VOLUME = 1.0f;
-    ENV2_OSC2_VOLUME = 1.0f;
-#endif
-
-
-#if defined(PTK_SYNTH_OSC3)
-    OSC3_VOLUME =        ((float) TSP.osc3_volume - 64) * 0.015625f;
-    OSC3_SWITCH =        TSP.osc3_switch;
-#endif
-
-    PTC_GLIDE =          ((float) TSP.ptc_glide * (float) TSP.ptc_glide) * 0.0000015625f;
-    PTC_GLIDE64 =         (int64) ((double) PTC_GLIDE * 4294967296.0);
-
-    GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
-
-#if defined(PTK_SYNTH_DISTO)
-    DISTO =              (((float) TSP.disto)) + 1.0f;
-#endif
-
-#if defined(PTK_SYNTH_LFO1)
-    LFO1_ATTACK =        ((float) (TSP.lfo1_attack + 1)) / 512.0f;
-    LFO1_DECAY =         ((float) (TSP.lfo1_decay + 1)) / 512.0f;
-    LFO1_SUSTAIN =       (float) TSP.lfo1_sustain * 0.0078125f;
-    LFO1_RELEASE =       ((float) (TSP.lfo1_release + 1)) / 512.0f;
-    if(LFO1_ATTACK < 0.1f) LFO1_ATTACK = 0.1f;
-    if(LFO1_RELEASE < 0.15f) LFO1_RELEASE = 0.15f;
-#endif
-
-#if defined(PTK_SYNTH_LFO2)
-    LFO2_ATTACK =        ((float) (TSP.lfo2_attack + 1)) / 512.0f;
-    LFO2_DECAY =         ((float) (TSP.lfo2_decay + 1)) / 512.0f;
-    LFO2_SUSTAIN =       (float) TSP.lfo2_sustain * 0.0078125f;
-    LFO2_RELEASE =       ((float) (TSP.lfo2_release + 1)) / 512.0f;
-    if(LFO2_ATTACK < 0.1f) LFO2_ATTACK = 0.1f;
-    if(LFO2_RELEASE < 0.15f) LFO2_RELEASE = 0.15f;
-#endif
+    Data.LFO2_ATTACK =        ((float) (TSP.lfo2_attack + 1)) / 512.0f;
+    Data.LFO2_DECAY =         ((float) (TSP.lfo2_decay + 1)) / 512.0f;
+    Data.LFO2_SUSTAIN =       (float) TSP.lfo2_sustain * 0.0078125f;
+    Data.LFO2_RELEASE =       ((float) (TSP.lfo2_release + 1)) / 512.0f;
+    if(Data.LFO2_ATTACK < 0.1f) Data.LFO2_ATTACK = 0.1f;
+    if(Data.LFO2_RELEASE < 0.15f) Data.LFO2_RELEASE = 0.15f;
 }
+#endif // defined(__STAND_ALONE__) && !defined(__WINAMP__)
 
 #if defined(PTK_SYNTH_FILTER)
 float CSynth::FilterL(void)
@@ -1794,7 +1739,7 @@ float CSynth::FilterL(void)
     sbuf0L = FILT_A * sbuf0L + FILT_CUTO * (GS_VAL + FILT_B * (sbuf0L - sbuf1L)); 
     sbuf1L = FILT_A * sbuf1L + FILT_CUTO * sbuf0L;
 #if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
-    return(VCF_TYPE == 0 ? sbuf1L : GS_VAL - sbuf1L);
+    return(Data.VCF_TYPE == 0 ? sbuf1L : GS_VAL - sbuf1L);
 #else
     #if defined(PTK_SYNTH_FILTER_LO)
         return(sbuf1L);
@@ -1811,7 +1756,7 @@ float CSynth::FilterR(void)
     sbuf0R = FILT_A * sbuf0R + FILT_CUTO * (GS_VAL2 + FILT_B * (sbuf0R - sbuf1R));
     sbuf1R = FILT_A * sbuf1R + FILT_CUTO * sbuf0R;
 #if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
-    return(VCF_TYPE == 0 ? sbuf1R : GS_VAL2 - sbuf1R);
+    return(Data.VCF_TYPE == 0 ? sbuf1R : GS_VAL2 - sbuf1R);
 #else
     #if defined(PTK_SYNTH_FILTER_LO)
         return(sbuf1R);

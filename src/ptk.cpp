@@ -1853,8 +1853,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGD") == 0 ||
                 strcmp(extension, "TWNNSNGE") == 0 ||
                 strcmp(extension, "TWNNSNGF") == 0 ||
-                strcmp(extension, "TWNNSNGG") == 0 ||
-                extension_New == 'KTRP')
+                strcmp(extension, "TWNNSNGG") == 0)
         {
             sprintf(name, "%s", Wavfile);
             Ptk_Stop();
@@ -1967,7 +1966,7 @@ void LoadFile(int Freeindex, const char *str)
             }
             else
             {
-                mess_box("Invalid file format. I accept only '.wav' '.ptk' '.ptp' '.pti' '.303' '.pts' '.prv' or '.mod'.");
+                mess_box("Invalid file format. I only accept '.wav' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
             }
         }
         fclose(in);
@@ -5991,7 +5990,7 @@ void Note_Jazz(int track, int note)
     local_mas_vol = 1.0f;
     local_ramp_vol = 1.0f;
 
-    if(Jazz_Edit || is_recording_2)
+    if(Jazz_Edit || is_recording_2 || !is_editing)
     {
         Play_Instrument(track, Sub_Channel,
                         note,
@@ -6009,7 +6008,7 @@ void Note_Jazz_Off(int note)
     LPJAZZ_KEY Channel = Get_Jazz_Key_Off(Sub_Channels_Jazz, (note + 1) << 8);
     if(Channel)
     {
-        if(Jazz_Edit || is_recording_2)
+        if(Jazz_Edit || is_recording_2 || !is_editing)
         {
             Synthesizer[Channel->Channel][Channel->Sub_Channel].NoteOff();
             if(sp_Stage[Channel->Channel][Channel->Sub_Channel] == PLAYING_SAMPLE)

@@ -2,6 +2,14 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98f:
+
+- Removed the .ptp loading function from the tracker, it's useless now as
+  packed samples can be tested inside the tracker and it allowed me to slightly
+  reduce the size of the replay routine.
+- Instrument weren't played when the option i added in the previous version
+  wasn't turned on (shame).
+
 v1.98e:
 
 - Added a screen update scheduler so only modified parts of the screen

@@ -327,7 +327,11 @@ extern int left_value;
 extern int right_value;
 
 #if defined(PTK_SYNTH)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 extern SynthParameters PARASynth[128];
+#else
+extern SYNTH_DATA PARASynth[128];
+#endif
 #endif
 
 extern float ramper[MAX_TRACKS];
@@ -352,7 +356,7 @@ void init_sample_bank(void);
 void KillInst(int inst_nbr);
 void Post_Song_Init(void);
 
-#if defined(PTK_SYNTH)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void ResetSynthParameters(SynthParameters *TSP);
 #endif
 
