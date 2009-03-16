@@ -19,3 +19,5 @@
 *.zip*
 *bin2c_uni*
 *protrekkr.app*
+*debug*
+*release*
