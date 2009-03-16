@@ -459,13 +459,14 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         strcat(ExePath, "/../");
         while(!Found_File)
         {
-            printf("%s\n", ExePath);
             CHDIR(ExePath);
             FILE *Test_File = fopen("skins/skin.xml", "rb");
             if(Test_File)
             {
                 Found_File = TRUE;
                 fclose(Test_File);
+                ExePath[strlen(ExePath) - 1] = 0;
+                break;
             }
             strcat(ExePath, "../");
         }

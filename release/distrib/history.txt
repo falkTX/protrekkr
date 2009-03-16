@@ -9,6 +9,7 @@ v1.98f:
   reduce the size of the replay routine.
 - Instrument weren't played when the option i added in the previous version
   wasn't turned on (shame).
+- Application directory was one level too low on Mac OS X.
 
 v1.98e:
 
