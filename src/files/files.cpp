@@ -2680,7 +2680,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 if(fvalue < 0.15f) fvalue = 0.15f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
 
-
                 fvalue = ((float) (PARASynth[swrite].env2_attack + 1)) / 512.0f;
                 if(fvalue < 0.1f) fvalue = 0.1f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
@@ -2694,7 +2693,6 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 fvalue = ((float) (PARASynth[swrite].env2_release + 1)) / 512.0f;
                 if(fvalue < 0.15f) fvalue = 0.15f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
-
 
                 fvalue = (float) (PARASynth[swrite].lfo1_period * 2) + 1;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);

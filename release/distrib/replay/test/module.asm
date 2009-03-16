@@ -3,4 +3,4 @@
 
                 global _PTK_MODULE
 
-_PTK_MODULE:   incbin "house-test03.ptp"
+_PTK_MODULE:   incbin "money.ptp"
