@@ -4672,7 +4672,9 @@ void init_sample_bank(void)
             beatsync[inico] = FALSE;
             beatlines[inico] = 16;
 
+#if !defined(__WINAMP__)
             sprintf(nameins[inico], "Untitled");
+#endif
 
             ResetSynthParameters(&PARASynth[inico]);
 
@@ -4771,7 +4773,9 @@ void KillInst(int inst_nbr)
 void ResetSynthParameters(SynthParameters *TSP)
 {
 
+#if !defined(__WINAMP__)
     sprintf(TSP->presetname, "Untitled");
+#endif
 
     TSP->osc1_waveform = WAVEFORM_SAW;
     TSP->osc2_waveform = WAVEFORM_PULSE;
