@@ -2044,9 +2044,7 @@ void Sp_Player(void)
                     if(pl_note[i] < 120)
                     {
                         // Get a new virtual channel to associate with the note
-                        int old_channel = Reserved_Sub_Channels[ct][i];
-                        free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
-                        if(free_sub_channel == -1) free_sub_channel = i;
+/*                        int old_channel = Reserved_Sub_Channels[ct][i];
                         // Save it for later
 
                         // Check if that sub channel was playing a note
@@ -2063,6 +2061,27 @@ void Sp_Player(void)
 #if defined(PTK_SYNTH)
                             Synthesizer[ct][old_channel].NoteOff();
 #endif
+
+                        }*/
+                        free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
+                        if(free_sub_channel == -1) free_sub_channel = i;
+                        
+                        // Search all others channels playing this sub channel and shut'em down
+                        for(j = 0; j < Channels_MultiNotes[ct]; j++)
+                        {
+                            if(Reserved_Sub_Channels[ct][j] == free_sub_channel)
+                            {
+#if defined(PTK_INSTRUMENTS)
+                                // Get the virtual channel it was playing on and remove it
+                                if(sp_Stage[ct][j] == PLAYING_SAMPLE)
+                                {
+                                    sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                                }
+#endif
+#if defined(PTK_SYNTH)
+                                Synthesizer[ct][j].NoteOff();
+#endif
+                            }
 
                         }
                         // Mark it as playing
@@ -3537,6 +3556,7 @@ void DoEffects_tick0(void)
 void DoEffects(void)
 {
     int i;
+    int j;
     int pltr_note[MAX_POLYPHONY];
     int pltr_sample[MAX_POLYPHONY];
 
@@ -3797,12 +3817,32 @@ void DoEffects(void)
                 {
                     for(i = 0; i < Channels_MultiNotes[trackef]; i++)
                     {
-                        int old_channel = Reserved_Sub_Channels[trackef][i];
+
+//                        int old_channel = Reserved_Sub_Channels[trackef][i];
                         // Get a new virtual channel to associate with the note
                         free_sub_channel = Get_Free_Sub_Channel(trackef, Channels_Polyphony[trackef]);
                         if(free_sub_channel == -1) free_sub_channel = i;
 
-                        // Check if that sub channel was playing a note
+                        // Search all others channels playing this sub channel and shut'em down
+                        for(j = 0; j < Channels_MultiNotes[trackef]; j++)
+                        {
+                            if(Reserved_Sub_Channels[trackef][j] == free_sub_channel)
+                            {
+#if defined(PTK_INSTRUMENTS)
+                                // Get the virtual channel it was playing on and remove it
+                                if(sp_Stage[trackef][j] == PLAYING_SAMPLE)
+                                {
+                                    sp_Stage[trackef][j] = PLAYING_SAMPLE_NOTEOFF;
+                                }
+#endif
+#if defined(PTK_SYNTH)
+                                Synthesizer[trackef][j].NoteOff();
+#endif
+                            }
+
+                        }
+
+/*                        // Check if that sub channel was playing a note
                         if(old_channel != -1)
                         {
                             // Get the virtual channel it was playing on and remove it
@@ -3818,7 +3858,7 @@ void DoEffects(void)
                             Synthesizer[trackef][old_channel].NoteOff();
 #endif
 
-                        }
+                        }*/
                         Reserved_Sub_Channels[trackef][i] = free_sub_channel;
 
                         // Retrigger all playing sub channels
