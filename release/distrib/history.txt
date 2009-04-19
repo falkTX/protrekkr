@@ -2,6 +2,13 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98g:
+
+- Fixed a bug in multi-notes handling (some notes could disappear sometimes).
+- Inverted ctrl+home/end and home/end commands.
+- Fixed a bug that made the tracker to crash when an instrument was being
+  loaded while a song being played (& playing that particular instrument).
+
 v1.98f:
 
 - Removed the .ptp loading function from the tracker, it's useless now as

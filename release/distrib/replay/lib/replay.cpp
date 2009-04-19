@@ -2043,26 +2043,6 @@ void Sp_Player(void)
                 {
                     if(pl_note[i] < 120)
                     {
-                        // Get a new virtual channel to associate with the note
-/*                        int old_channel = Reserved_Sub_Channels[ct][i];
-                        // Save it for later
-
-                        // Check if that sub channel was playing a note
-                        if(old_channel != -1)
-                        {
-#if defined(PTK_INSTRUMENTS)
-                            // Get the virtual channel it was playing on and remove it
-                            if(sp_Stage[ct][old_channel] == PLAYING_SAMPLE)
-                            {
-                                sp_Stage[ct][old_channel] = PLAYING_SAMPLE_NOTEOFF;
-                            }
-#endif
-
-#if defined(PTK_SYNTH)
-                            Synthesizer[ct][old_channel].NoteOff();
-#endif
-
-                        }*/
                         free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
                         if(free_sub_channel == -1) free_sub_channel = i;
                         
@@ -3818,7 +3798,6 @@ void DoEffects(void)
                     for(i = 0; i < Channels_MultiNotes[trackef]; i++)
                     {
 
-//                        int old_channel = Reserved_Sub_Channels[trackef][i];
                         // Get a new virtual channel to associate with the note
                         free_sub_channel = Get_Free_Sub_Channel(trackef, Channels_Polyphony[trackef]);
                         if(free_sub_channel == -1) free_sub_channel = i;
@@ -3842,23 +3821,6 @@ void DoEffects(void)
 
                         }
 
-/*                        // Check if that sub channel was playing a note
-                        if(old_channel != -1)
-                        {
-                            // Get the virtual channel it was playing on and remove it
-
-#if defined(PTK_INSTRUMENTS)
-                            if(sp_Stage[trackef][old_channel] == PLAYING_SAMPLE)
-                            {
-                                sp_Stage[trackef][old_channel] = PLAYING_SAMPLE_NOTEOFF;
-                            }
-#endif
-
-#if defined(PTK_SYNTH)
-                            Synthesizer[trackef][old_channel].NoteOff();
-#endif
-
-                        }*/
                         Reserved_Sub_Channels[trackef][i] = free_sub_channel;
 
                         // Retrigger all playing sub channels
