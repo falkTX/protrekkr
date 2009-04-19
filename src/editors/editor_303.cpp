@@ -264,7 +264,7 @@ void Actualize_303_Ed(char gode)
 
         if(gode == 0 || gode == 18)
         {
-            char tcp[30];
+            char tcp[40];
             sprintf(tcp, "%s_", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
 
             if(snamesel == INPUT_303_PATTERN)
@@ -803,7 +803,7 @@ void Mouse_Left_303_Ed(void)
         {
             for(char alter = 0; alter < 16; alter++)
             {
-                tb303[sl3].tone[tb303[sl3].selectedpattern][alter] = rand() % 2731;
+                tb303[sl3].tone[tb303[sl3].selectedpattern][alter] = (rand() % 13);
             }
             teac = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -814,10 +814,10 @@ void Mouse_Left_303_Ed(void)
         {
             for(char alter = 0; alter < 16; alter++)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].slide_flag = rand() & 0x3fff;
-                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].transposeup_flag = rand() & 0x3fff;
-                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].transposedown_flag = rand() & 0x3fff;
-                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].accent_flag = rand() & 0x3fff;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].slide_flag = rand() % 2;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].transposeup_flag = rand() % 2;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].transposedown_flag = rand() % 2;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].accent_flag = rand() % 2;
             }
             teac = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -828,7 +828,7 @@ void Mouse_Left_303_Ed(void)
         {
             for(char alter = 0; alter < 16; alter++)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].pause = rand() & 0x3fff;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][alter].pause = rand() % 2;
             }
             teac = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
