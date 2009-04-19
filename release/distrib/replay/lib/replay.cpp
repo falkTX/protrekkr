@@ -2397,6 +2397,11 @@ ByPass_Wav:
 
                     Current_Pointer = sp_Position[c][i].half.first;
 
+#if !defined(__STAND_ALONE__)
+                    // Fix a bug that occurs when loading samples while playing
+                    if(Current_Pointer > Player_NS[c][i]) Current_Pointer = Player_NS[c][i] - 1;
+#endif
+
                     if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
                     else Old_Pointer = 0;
 

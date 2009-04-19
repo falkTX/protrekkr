@@ -25,3 +25,4 @@ TODO (in no special order):
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
  - VSTs support in the samples editor.
+ - Load (in a temporary buffer) and play a wav file when clicking on it.

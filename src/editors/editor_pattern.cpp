@@ -2313,9 +2313,12 @@ void Goto_Next_Column(void)
 void Goto_Top_Left(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
-    ped_col = 0;
-    ped_track = 0;
-    if(Get_LCtrl()) ped_line = 0;
+    if(!Get_LCtrl()) ped_line = 0;
+    else
+    {
+        ped_col = 0;
+        ped_track = 0;
+    }
     Actupated(0);
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
     gui_action = GUI_CMD_SET_FOCUS_TRACK;
@@ -2326,9 +2329,12 @@ void Goto_Top_Left(void)
 void Goto_Bottom_Right(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
-    ped_col = 0;
-    ped_track = Songtracks - 1;
-    if(Get_LCtrl()) ped_line = patternLines[pSequence[cPosition_delay]] - 1;
+    if(!Get_LCtrl()) ped_line = patternLines[pSequence[cPosition_delay]] - 1;
+    else
+    {
+        ped_col = 0;
+        ped_track = Songtracks - 1;
+    }
     Actupated(0);
     gui_action = GUI_CMD_SET_FOCUS_TRACK;
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
