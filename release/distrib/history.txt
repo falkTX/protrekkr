@@ -9,7 +9,7 @@ v1.98g:
 - Fixed a bug that made the tracker to crash when an instrument was being
   loaded while a song being played (& playing that particular instrument).
 - Fixed the random commands of the 303 units.
-- 303 down up & down commands were inverted.
+- 303 notes up & down commands were inverted.
 
 v1.98f:
 
