@@ -70,8 +70,8 @@ void Draw_303_Ed(void)
     Gui_Draw_Button_Box(8, 520, 64, 16, "Rand.Tones", BUTTON_NORMAL);
     Gui_Draw_Button_Box(8, 538, 64, 16, "Rand.Flags", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(600, 502, 64, 16, "All Notes Up", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(668, 502, 64, 16, "All Notes Dn", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(600, 502, 64, 16, "All Notes Up", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(668, 502, 64, 16, "All Notes Dn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(600, 522, 64, 16, "Copy Patt.", BUTTON_NORMAL);
     Gui_Draw_Button_Box(600, 540, 64, 16, "Paste Patt.", BUTTON_NORMAL);
 
@@ -143,7 +143,7 @@ void Actualize_303_Ed(char gode)
         if(gode == 0 || gode == 7) knob(361, 476, tb303[sl3].decay / 2);
         if(gode == 0 || gode == 8) knob(394, 476, tb303[sl3].accent / 2);
 
-        // Restoring Notepad notebackground
+        // Restoring notes background
         if(gode == 0 || gode == 9)
         {
             Skincopy(200, 515, 120, 55, 162, 34);
@@ -313,10 +313,10 @@ void Mouse_Right_303_Ed(void )
 {
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
-        // Volume Knob
+        // Volume Slider
         if(zcheckMouse(529, 485, 19, 88))
         {
-            tb303engine[sl3].tbVolume = 43 * 0.01136363636f;
+            tb303engine[sl3].tbVolume = 0.5f;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 15;
         }
