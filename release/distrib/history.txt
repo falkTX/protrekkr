@@ -8,6 +8,7 @@ v1.98g:
 - Inverted ctrl+home/end and home/end commands.
 - Fixed a bug that made the tracker to crash when an instrument was being
   loaded while a song being played (& playing that particular instrument).
+- Fixed the random commands of the 303 units.
 
 v1.98f:
 

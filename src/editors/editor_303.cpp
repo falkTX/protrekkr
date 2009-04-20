@@ -867,7 +867,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // all notes up
-        if(zcheckMouse(668, 502, 64, 16))
+        if(zcheckMouse(600, 502, 64, 16))
         {
             tb303_notes_up();
             teac = 0;
@@ -875,7 +875,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // all notes down
-        if(zcheckMouse(600, 502, 64, 16))
+        if(zcheckMouse(668, 502, 64, 16))
         {
             tb303_notes_down();
             teac = 0;
@@ -957,8 +957,8 @@ void Mouse_Sliders_303_Ed(void)
         // Volume Knob
         if(zcheckMouse(529, 485, 19, 88))
         {
-            float breakvol = (float) (90 - (Mouse.y - 485));
-            breakvol /= 86.0f;
+            float breakvol = (float) (80 - (Mouse.y - 485));
+            breakvol /= 72.0f;
             if(breakvol < 0.0f) breakvol = 0.0f;
             if(breakvol > 1.0f) breakvol = 1.0f;
             tb303engine[sl3].tbVolume = breakvol;
