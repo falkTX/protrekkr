@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.99h:
+
+- Fixed a nasty bug with polyphony handling.
+
 v1.98g:
 
 - Fixed a bug in multi-notes handling (some notes could disappear sometimes).
