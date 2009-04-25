@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.99h:
+v1.98h:
 
 - Fixed a nasty bug with polyphony handling.
 
