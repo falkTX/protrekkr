@@ -447,6 +447,7 @@ char compressor;
 #endif
 
 int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
+int Note_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_INSTRUMENTS)
 int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
@@ -1461,6 +1462,7 @@ void Reset_Values(void)
                 sp_Stage3[stopper][stopper_poly] = PLAYING_NOSAMPLE;
 #endif
                 Reserved_Sub_Channels[stopper][stopper_poly] = -1;
+                Note_Sub_Channels[stopper][stopper_poly] = -1;
                 sp_channelsample[stopper][stopper_poly] = -1;
             }
         }
@@ -1825,6 +1827,7 @@ void Post_Song_Init(void)
         for(j = 0; j < MAX_POLYPHONY; j++)
         {
             Reserved_Sub_Channels[i][j] = -1;
+            Note_Sub_Channels[i][j] = -1;
         }
     }
 
@@ -2041,30 +2044,42 @@ void Sp_Player(void)
 
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
+                    if(pl_note[i] < 120 && Note_Sub_Channels[ct][i] != -1)
+                    {
+                        j = Reserved_Sub_Channels[ct][i];
+
+#if defined(PTK_INSTRUMENTS)
+                        // Get the virtual channel it was playing on and remove it
+                        if(sp_Stage[ct][j] == PLAYING_SAMPLE)
+                        {
+                            sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                        }
+#endif
+#if defined(PTK_SYNTH)
+                        Synthesizer[ct][j].NoteOff();
+#endif
+
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
+                        if(Midi_Current_Notes[CHAN_MIDI_PRG[ct]][j])
+                        {
+                            Midi_NoteOff(ct, Midi_Current_Notes[CHAN_MIDI_PRG[ct]][j]);
+                            Midi_Current_Notes[CHAN_MIDI_PRG[ct]][j] = 0;
+                        }
+#endif
+#endif
+                    }
+                }
+
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
+                {
                     if(pl_note[i] < 120)
                     {
                         free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
                         if(free_sub_channel == -1) free_sub_channel = i;
-                        
-                        // Search all others channels playing this sub channel and shut'em down
-                        for(j = 0; j < Channels_MultiNotes[ct]; j++)
-                        {
-                            if(Reserved_Sub_Channels[ct][j] == free_sub_channel)
-                            {
-#if defined(PTK_INSTRUMENTS)
-                                // Get the virtual channel it was playing on and remove it
-                                if(sp_Stage[ct][j] == PLAYING_SAMPLE)
-                                {
-                                    sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
-                                }
-#endif
-#if defined(PTK_SYNTH)
-                                Synthesizer[ct][j].NoteOff();
-#endif
-                            }
 
-                        }
                         // Mark it as playing
+                        Note_Sub_Channels[ct][i] = i;
                         Reserved_Sub_Channels[ct][i] = free_sub_channel;
 
 #if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
@@ -2093,7 +2108,6 @@ void Sp_Player(void)
                                             glide,
                                             FALSE, i + 1);
                         }
-
                     }
                 }
 
@@ -2104,9 +2118,9 @@ void Sp_Player(void)
                     if(pl_note[i] == 120)
                     {
                         trigger_note_off = TRUE;
-                        j = Reserved_Sub_Channels[ct][i];
-                        if(j != -1)
+                        if(Note_Sub_Channels[ct][i] != -1)
                         {
+                            j = Reserved_Sub_Channels[ct][i];
 
 #if defined(PTK_INSTRUMENTS)
                             if(sp_Stage[ct][j] == PLAYING_SAMPLE) sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
@@ -2117,17 +2131,19 @@ void Sp_Player(void)
 #endif
 
                             Reserved_Sub_Channels[ct][i] = -1;
-                        }
+                            Note_Sub_Channels[ct][i] = -1;
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-                        if(Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i])
-                        {
-                            Midi_NoteOff(ct, Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i]);
-                            Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i] = 0;
+                            if(Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i])
+                            {
+                                Midi_NoteOff(ct, Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i]);
+                                Midi_Current_Notes[CHAN_MIDI_PRG[ct]][i] = 0;
+                            }
+#endif
+#endif
                         }
-#endif
-#endif
+
 
                     }
                 }
@@ -3797,45 +3813,59 @@ void DoEffects(void)
                 {
                     for(i = 0; i < Channels_MultiNotes[trackef]; i++)
                     {
+                        if(pl_note[i] < 120 && Note_Sub_Channels[trackef][i] != -1)
+                        {
+                            j = Reserved_Sub_Channels[trackef][i];
 
-                        // Get a new virtual channel to associate with the note
+#if defined(PTK_INSTRUMENTS)
+                            // Get the virtual channel it was playing on and remove it
+                            if(sp_Stage[trackef][j] == PLAYING_SAMPLE)
+                            {
+                                sp_Stage[trackef][j] = PLAYING_SAMPLE_NOTEOFF;
+                            }
+#endif
+#if defined(PTK_SYNTH)
+                            Synthesizer[trackef][j].NoteOff();
+#endif
+
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
+                            if(Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][j])
+                            {
+                                Midi_NoteOff(trackef, Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][j]);
+                                Midi_Current_Notes[CHAN_MIDI_PRG[trackef]][j] = 0;
+                            }
+#endif
+#endif
+                        }
+                    }
+
+                    for(i = 0; i < Channels_MultiNotes[trackef]; i++)
+                    {
                         free_sub_channel = Get_Free_Sub_Channel(trackef, Channels_Polyphony[trackef]);
                         if(free_sub_channel == -1) free_sub_channel = i;
 
-                        // Search all others channels playing this sub channel and shut'em down
-                        for(j = 0; j < Channels_MultiNotes[trackef]; j++)
-                        {
-                            if(Reserved_Sub_Channels[trackef][j] == free_sub_channel)
-                            {
-#if defined(PTK_INSTRUMENTS)
-                                // Get the virtual channel it was playing on and remove it
-                                if(sp_Stage[trackef][j] == PLAYING_SAMPLE)
-                                {
-                                    sp_Stage[trackef][j] = PLAYING_SAMPLE_NOTEOFF;
-                                }
-#endif
-#if defined(PTK_SYNTH)
-                                Synthesizer[trackef][j].NoteOff();
-#endif
-                            }
-
-                        }
-
+                        // Mark it as playing
+                        Note_Sub_Channels[trackef][i] = i;
                         Reserved_Sub_Channels[trackef][i] = free_sub_channel;
 
                         // Retrigger all playing sub channels
                         if(pltr_vol_row <= 64)
                         {
-                            Play_Instrument(trackef, free_sub_channel,
-                                            pltr_note[i], pltr_sample[i],
+                            Play_Instrument(trackef,
+                                            free_sub_channel,
+                                            pltr_note[i],
+                                            pltr_sample[i],
                                             pltr_vol_row * 0.015625f,
                                             0, 0,
                                             FALSE, i + 1);
                         }
                         else
                         {
-                            Play_Instrument(trackef, free_sub_channel,
-                                            pltr_note[i], pltr_sample[i],
+                            Play_Instrument(trackef,
+                                            free_sub_channel,
+                                            pltr_note[i],
+                                            pltr_sample[i],
                                             CustomVol[pltr_sample[i]],
                                             0, 0,
                                             FALSE, i + 1);
