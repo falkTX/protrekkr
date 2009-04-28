@@ -291,9 +291,11 @@ int shuffleswitch;
     float Arpeggio_BaseNote[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
+#if defined(PTK_FX_PATTERNLOOP)
 int repeat_loop_pos;
-
 int repeat_loop_counter;
+int repeat_loop_counter_in;
+#endif
 
 short patternLines[MAX_ROWS];
 char grown;
@@ -527,6 +529,9 @@ void ComputeCoefs(int freq, int r, int t);
 #if defined(PTK_FX_TICK0)
     void DoEffects_tick0(void);
 #endif
+#if defined(PTK_FX_PATTERNLOOP)
+    void DoEffects_tick0_b(void);
+#endif
 
 void DoEffects(void);
 float Filter(float x, char i);
@@ -563,6 +568,10 @@ void Initreverb();
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     void Mas_Compressor_Set_Variables(float treshold, float ratio);
+#endif
+
+#if !defined(__STAND_ALONE__)
+void Display_Beat_Time(void);
 #endif
 
 float Mas_Compressor(float input, float *rms_sum, float *Buffer, float *Env);
@@ -1379,8 +1388,13 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     cPosition_delay = new_position;
     PosInTick = 0;
     SubCounter = 0;
-    repeat_loop_pos = 0;       // No repeat loop
-    repeat_loop_counter = -1;
+
+#if defined(PTK_FX_PATTERNLOOP)
+    repeat_loop_pos = -1;       // No repeat loop
+    repeat_loop_counter = 0;
+    repeat_loop_counter_in = 0;
+#endif
+
     ped_line = 0;
     ped_line_delay = 0;
     Subicounter = 0;
@@ -1832,8 +1846,12 @@ void Post_Song_Init(void)
     }
 
     SubCounter = 0;
-    repeat_loop_pos = 0;       // No repeat loop
-    repeat_loop_counter = -1;
+
+#if defined(PTK_FX_PATTERNLOOP)
+    repeat_loop_pos = -1;       // No repeat loop
+    repeat_loop_counter = 0;
+    repeat_loop_counter_in = 0;
+#endif
 
     for(i = 0; i < MAX_TRACKS; i++)
     {
@@ -1939,6 +1957,17 @@ void Sp_Player(void)
 
 #if defined(PTK_FX_TICK0)
             DoEffects_tick0();
+#endif
+
+#if defined(PTK_FX_PATTERNLOOP)
+            if(repeat_loop_counter_in)
+            {
+                ped_line -= repeat_loop_pos + 1;
+                ped_line_delay -= repeat_loop_pos + 1;
+                if(ped_line < 0) ped_line = 0;
+                if(ped_line_delay < 0) ped_line_delay = 0;
+                repeat_loop_counter_in = 0;
+            }
 #endif
 
             Subicounter = 0;
@@ -2161,6 +2190,10 @@ void Sp_Player(void)
             Go303();
 #endif
 
+#if defined(PTK_FX_PATTERNLOOP)
+            DoEffects_tick0_b();
+#endif
+
         }// Pos in tick == 0
 
         if(!SubCounter) DoEffects();
@@ -2244,8 +2277,12 @@ void Sp_Player(void)
                 }
 #endif
 
-                repeat_loop_counter = -1;
-                repeat_loop_pos = 0;
+#if defined(PTK_FX_PATTERNLOOP)
+                repeat_loop_pos = -1;
+                repeat_loop_counter = 0;
+                repeat_loop_counter_in = 0;
+#endif
+
             }
 #else
             ped_line++;
@@ -2294,8 +2331,12 @@ void Sp_Player(void)
                 }
 #endif
 
-				repeat_loop_counter = -1;
-                repeat_loop_pos = 0;
+#if defined(PTK_FX_PATTERNLOOP)
+                repeat_loop_pos = -1;
+				repeat_loop_counter = 0;
+                repeat_loop_counter_in = 0;
+#endif
+
             }
 
             // Delayed pattern
@@ -3469,42 +3510,6 @@ void DoEffects_tick0(void)
         switch(pltr_eff_row)
         {
 
-#if defined(PTK_FX_PATTERNLOOP)
-            // $06 Pattern loop
-            case 0x6:
-                if(!pltr_dat_row)
-                {
-                    // Set the repeat position
-                    repeat_loop_counter = -1;
-                    repeat_loop_pos = ped_line;
-                }
-                else
-                {
-                    if(repeat_loop_counter == -1)
-                    {
-                        repeat_loop_counter = (int) pltr_dat_row;
-                        ped_line = repeat_loop_pos;
-                        ped_line_delay = repeat_loop_pos;
-                    }
-                    else
-                    {
-                        // count
-                        repeat_loop_counter--;
-                        if(repeat_loop_counter)
-                        {
-                            ped_line = repeat_loop_pos;
-                            ped_line_delay = repeat_loop_pos;
-                        }
-                        else
-                        {
-                            repeat_loop_counter = -1;
-                            repeat_loop_pos = 0;
-                        }
-                    }
-                } 
-                break;
-#endif
-
 #if defined(PTK_FX_ARPEGGIO)
             // $1b arpeggio switch on/off
             case 0x1b:
@@ -3545,6 +3550,62 @@ void DoEffects_tick0(void)
         }
     }      
 }
+
+#if defined(PTK_FX_PATTERNLOOP)
+void DoEffects_tick0_b(void)
+{
+    int temp_ped_line = ped_line;
+
+    for(int trackef = 0; trackef < Songtracks; trackef++)
+    {
+        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, temp_ped_line);
+        int pltr_eff_row = *(RawPatterns + tefactor + PATTERN_FX);
+        int pltr_dat_row = *(RawPatterns + tefactor + PATTERN_FXDATA);
+
+        switch(pltr_eff_row)
+        {
+            // $06 Pattern loop
+            case 0x6:
+                if(!pltr_dat_row)
+                {
+                    if(repeat_loop_counter == 0)
+                    {
+                        repeat_loop_pos = ped_line;
+                    }
+                }
+                else
+                {
+                    if(repeat_loop_pos != -1)
+                    {
+                        if(repeat_loop_counter == 0)
+                        {
+                            repeat_loop_counter = (int) pltr_dat_row;
+                            repeat_loop_pos = (ped_line - repeat_loop_pos);
+                            repeat_loop_counter_in = 1;
+                        }
+                        else
+                        {
+                            // count down
+                            repeat_loop_counter--;
+                            if(!repeat_loop_counter)
+                            {
+                                repeat_loop_pos = -1;
+                                repeat_loop_counter_in = 0;
+                            }
+                            else
+                            {
+                                repeat_loop_counter_in = 1;
+                            }
+                        }
+                    }
+                } 
+                break;
+
+        }
+    }      
+}
+#endif
+
 #endif
 
 // ------------------------------------------------------
@@ -3885,8 +3946,8 @@ void DoEffects(void)
                     SamplesPerSub = SamplesPerTick / 6;
                 }
 #if !defined(__STAND_ALONE__)
-                gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
-                teac = 2;
+                Display_Beat_Time();
+                Actualize_Master(2);
 #endif
                 break;
 #endif
@@ -3897,7 +3958,7 @@ void DoEffects(void)
                 TicksPerBeat = (int) pltr_dat_row;
                 if(TicksPerBeat < 1) TicksPerBeat = 1;
                 if(TicksPerBeat > 16) TicksPerBeat = 16;
-                SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
+                SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
                 SamplesPerSub = SamplesPerTick / 6;
 
 #if defined(PTK_SHUFFLE)
@@ -3906,8 +3967,8 @@ void DoEffects(void)
 #endif
 
 #if !defined(__STAND_ALONE__)
-                gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
-                teac = 2;
+                Display_Beat_Time();
+                Actualize_Master(2);
 #endif
                 break;
 #endif

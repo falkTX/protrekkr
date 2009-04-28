@@ -338,8 +338,15 @@ void LoadAmigaMod(char *FileName, int channels)
     Uint32 x;
     int ramp;
     float ramp_vol;
+    int old_volslide[16];
+    int i;
 
     SongStop();
+
+    for(i = 0; i < 16; i++)
+    {
+        old_volslide[i] = 0;
+    }
 
     in = fopen(FileName, "rb");
     if(in != NULL) {
@@ -530,13 +537,15 @@ void LoadAmigaMod(char *FileName, int channels)
                         case 0xa:
                             if(t_argu >= 16)
                             {
-                                t_command = 25; // Vol SlideUp
-                                t_argu = (int) Convert_AmigaMod_Value(t_argu >> 4, 16.0f, 45.0f);
+                                t_command = 0x19; // Vol SlideUp
+                                if(t_argu >> 4) old_volslide[pw2] =t_argu >> 4;
+                                t_argu = (int) Convert_AmigaMod_Value(old_volslide[pw2], 16.0f, 60.0f);
                             }
                             else
                             {
-                                t_command = 26; // Vol Slide Down
-                                t_argu = (int) Convert_AmigaMod_Value(t_argu & 0xf, 16.0f, 45.0f);
+                                t_command = 0x1a; // Vol Slide Down
+                                if(t_argu & 0xf) old_volslide[pw2] = t_argu & 0xf;
+                                t_argu = (int) Convert_AmigaMod_Value(old_volslide[pw2], 16.0f, 60.0f);
                             }
                             break;
 
@@ -566,35 +575,37 @@ void LoadAmigaMod(char *FileName, int channels)
                             }
 
                             // FINEVOLUME SLIDEUP.
-                            if(t_argu > 0xa0 && t_argu < 0xb0)
+                            if(t_argu >= 0xa0 && t_argu < 0xb0)
                             {
                                 t_command = 0x19;
                                 t_argu = t_argu - 0xa0;
+                                //t_argu = (int) Convert_AmigaMod_Value(t_argu, 16.0f, 255.0f);
                             }
 
                             // FINEVOLUME SLIDEDOWN.
-                            if(t_argu > 0xb0 && t_argu < 0xc0)
+                            if(t_argu >= 0xb0 && t_argu < 0xc0)
                             {
                                 t_command = 0x1a;
                                 t_argu = t_argu - 0xb0;
+                                //t_argu = (int) Convert_AmigaMod_Value(t_argu, 16.0f, 255.0f);
                             }
 
                             // NOTE RETRIGGER
-                            if(t_argu > 0x90 && t_argu < 0xa0)
+                            if(t_argu >= 0x90 && t_argu < 0xa0)
                             {
                                 t_command = 0xe;
                                 t_argu = t_argu - 0x90;
                             }
 
                             // NOTE CUT
-                            if(t_argu > 0xc0 && t_argu < 0xd0)
+                            if(t_argu >= 0xc0 && t_argu < 0xd0)
                             {
                                 *(RawPatterns + tmo + PATTERN_VOLUME) = (t_argu & 0xf) | 0xf0;
                                 t_command = 0;
                                 t_argu = 0;
                             }
 
-                            if(t_argu > 0xd0 && t_argu < 0xf0)
+                            if(t_argu >= 0xd0 && t_argu < 0xf0)
                             {
                                 t_command = 0;
                                 t_argu = 0;

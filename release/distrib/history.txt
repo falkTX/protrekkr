@@ -2,6 +2,14 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98i:
+
+- Improved the .mod import.
+- Fixed a bug that could confuse the interface when using speed or tempo
+  commands intensively.
+- Modified the pattern loop command (6) so it behave more like in the original
+  protracker.
+
 v1.98h:
 
 - Fixed a nasty bug with polyphony handling.
