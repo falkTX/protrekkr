@@ -9,6 +9,8 @@ v1.98i:
   commands intensively.
 - Modified the pattern loop command (6) so it behave more like in the original
   protracker.
+- Added the possibility to select accidental (sharp or bemol) 
+  for patterns view.
 
 v1.98h:
 

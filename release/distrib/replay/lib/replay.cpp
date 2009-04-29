@@ -417,6 +417,7 @@ float xi2[MAX_TRACKS];
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
 extern int gui_thread_action;
+extern int gui_bpm_action;
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -568,10 +569,6 @@ void Initreverb();
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     void Mas_Compressor_Set_Variables(float treshold, float ratio);
-#endif
-
-#if !defined(__STAND_ALONE__)
-void Display_Beat_Time(void);
 #endif
 
 float Mas_Compressor(float input, float *rms_sum, float *Buffer, float *Env);
@@ -3945,10 +3942,11 @@ void DoEffects(void)
                     SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
                     SamplesPerSub = SamplesPerTick / 6;
                 }
-#if !defined(__STAND_ALONE__)
-                Display_Beat_Time();
-                Actualize_Master(2);
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+                gui_bpm_action = TRUE;
 #endif
+
                 break;
 #endif
 
@@ -3966,9 +3964,8 @@ void DoEffects(void)
                 else shufflestep = (SamplesPerTick * shuffle) / 200;
 #endif
 
-#if !defined(__STAND_ALONE__)
-                Display_Beat_Time();
-                Actualize_Master(2);
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+                gui_bpm_action = TRUE;
 #endif
                 break;
 #endif

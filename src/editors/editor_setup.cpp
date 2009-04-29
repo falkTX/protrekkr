@@ -49,6 +49,8 @@ extern int Nbr_Keyboards;
 extern int Keyboard_Idx;
 extern char Jazz_Edit;
 
+extern char Accidental;
+
 int current_palette_idx;
 
 char Paste_Across;
@@ -126,6 +128,8 @@ void Draw_Master_Ed(void)
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(198, 555, 56, 16, "Edit Play", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(734, 475, 42, 16, "Accid.", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
 void Actualize_Master_Ed(char gode)
@@ -399,6 +403,20 @@ void Actualize_Master_Ed(char gode)
             }
         }
 
+        // Notes type
+        if(gode == 0 || gode == 19)
+        {
+            if(Accidental)
+            {
+                Gui_Draw_Button_Box(780, 475, 14, 16, "b", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(780, 475, 14, 16, "#", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            if(gode == 19) Actupated(0);
+        }
+
     }
 }
 
@@ -567,6 +585,14 @@ void Mouse_Left_Master_Ed(void)
         {
             Jazz_Edit = FALSE;
             teac = 18;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
+        // Play while editing
+        if(zcheckMouse(780, 475, 14, 16))
+        {
+            Accidental ^= TRUE;
+            teac = 19;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
 

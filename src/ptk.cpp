@@ -251,6 +251,7 @@ int Table_Left_Tab_Notes[] =
 };
 
 int gui_thread_action = FALSE;
+int gui_bpm_action = FALSE;
 
 int Keyboard_Events_Channels[256];
 JAZZ_KEY Sub_Channels_NoteOff[MAX_TRACKS][MAX_POLYPHONY];
@@ -1603,11 +1604,17 @@ int Screen_Update(void)
     }
 
     if(display_title)
-    {       
+    {
         if(gui_thread_action)
         {
             gui_thread_action = FALSE;
             Actupated(0);
+        }
+        if(gui_bpm_action)
+        {
+            gui_bpm_action = FALSE;
+            Display_Beat_Time();
+            Actualize_Master(2);
         }
     }
 

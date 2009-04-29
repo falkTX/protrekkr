@@ -101,6 +101,7 @@ extern int Continuous_Scroll;
 extern char *cur_dir;
 extern char Scopish_LeftRight;
 extern char Jazz_Edit;
+extern char Accidental;
 
 int Mod_Length;
 int Mod_Simulate;
@@ -4276,7 +4277,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG8");
+    sprintf(extension, "TWNNCFG9");
     mess_box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -4333,6 +4334,7 @@ void SaveConfig(void)
         
         Write_Data(&Paste_Across, sizeof(char), 1, out);
         Write_Data(&Jazz_Edit, sizeof(char), 1, out);
+        Write_Data(&Accidental, sizeof(char), 1, out);
 
         fclose(out);
 
@@ -4370,7 +4372,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG8") == 0)
+        if(strcmp(extension, "TWNNCFG9") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4417,6 +4419,7 @@ void LoadConfig(void)
 
             Read_Data(&Paste_Across, sizeof(char), 1, in);
             Read_Data(&Jazz_Edit, sizeof(char), 1, in);
+            Read_Data(&Accidental, sizeof(char), 1, in);
 
             if(Patterns_Lines == DISPLAYED_LINES_LARGE)
             {

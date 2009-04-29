@@ -28,4 +28,3 @@ TODO (in no special order):
  - Envelopes scaling.
  - Possibility to link effects to midi commands.
  - Keystroke to insert or delete a row in a note column only.
- - Selection of notes accidentals (# or b).
