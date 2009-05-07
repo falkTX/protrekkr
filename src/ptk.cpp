@@ -47,6 +47,13 @@
 
 // ------------------------------------------------------
 // Variables
+#if defined(__MACOSX__)
+SystemSoundActionID WavActionID;
+#endif
+
+extern short *Player_WL[MAX_TRACKS][MAX_POLYPHONY];
+extern short *Player_WR[MAX_TRACKS][MAX_POLYPHONY];
+
 extern char Use_Cubic;
 extern char Paste_Across;
 
@@ -600,11 +607,25 @@ void Destroy_Context(void)
 }
 
 // ------------------------------------------------------
+// Strictly for Mac OS X
+#if defined(__MACOSX__)
+OSStatus CompletionRoutine(SystemSoundActionID inAction, void *UserDat)
+{
+    SystemSoundRemoveActionID(inAction);
+    return(noErr);
+}
+#endif
+
+// ------------------------------------------------------
 // Update the world
 int Screen_Update(void)
 {
     int FineTune_Value;
     int i;
+
+#if defined(__MACOSX__)
+    FSRef soundFileRef;
+#endif
 
     redraw_everything = FALSE;
     if(Env_Change)
@@ -732,10 +753,22 @@ int Screen_Update(void)
                     lt_curr = broadcast;
                     if(Get_Current_FileType() != _A_SUBDIR)
                     {
-#ifdef __WIN32__
+                        Actualize_Files_List(1);
+#if defined(__WIN32__)
                         PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
 #endif
-                        Actualize_Files_List(1);
+#if defined(__MACOSX__)
+                        if(FSPathMakeRef((Uint8 *) Get_Current_FileName(), &soundFileRef, NULL) == noErr)
+                        {
+                            SystemSoundGetActionID(&soundFileRef, &WavActionID);
+                            SystemSoundSetCompletionRoutine(WavActionID,
+                                                            NULL,
+                                                            NULL,
+                                                            &CompletionRoutine,
+                                                            NULL);
+                            AlertSoundPlayCustomSound(WavActionID);
+                        }
+#endif
                     }
                 }
 
@@ -2553,7 +2586,12 @@ void Stop_Current_Sample(void)
         {
             if(sp_channelsample[u][i] == ped_patsam)
             {
-                if(sp_Stage[u][i] = PLAYING_SAMPLE) sp_Stage[u][i] = PLAYING_NOSAMPLE;
+                if(sp_Stage[u][i] = PLAYING_SAMPLE)
+                {
+                    sp_Stage[u][i] = PLAYING_NOSAMPLE;
+                    Player_WL[u][i] = NULL;
+                    Player_WR[u][i] = NULL;
+                }
             }
         }
         Player_FD[u] = 0;
