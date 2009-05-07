@@ -153,7 +153,6 @@ SDL_TimerID Timer;
 Uint32 Timer_CallBack(Uint32 interval, void *param);
 Uint32 (*Timer_Ptr)(Uint32 interval, void *param) = &Timer_CallBack;
 
-int loading_sample;
 extern s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
 
 extern int done;
@@ -733,7 +732,9 @@ int Screen_Update(void)
                     lt_curr = broadcast;
                     if(Get_Current_FileType() != _A_SUBDIR)
                     {
+#ifdef __WIN32__
                         PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
+#endif
                         Actualize_Files_List(1);
                     }
                 }
@@ -1938,7 +1939,6 @@ void LoadFile(int Freeindex, const char *str)
                     }
                     else
                     {
-                        loading_sample = TRUE;
                         sp_Position[Freeindex][ped_split].absolu = 0;
                         Stop_Current_Sample();
                         switch(channels)
@@ -1991,7 +1991,6 @@ void LoadFile(int Freeindex, const char *str)
                                 mess_box("16 bit WAV PCM loaded.");
                                 break;
                         }
-                        loading_sample = FALSE;
                     }
                 }
 
