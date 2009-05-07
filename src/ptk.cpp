@@ -748,30 +748,34 @@ int Screen_Update(void)
             {
                 int broadcast = lt_index + (Mouse.y - 43) / 12;
                 last_index = -1;
-                if(broadcast != lt_curr)
+                lt_curr = broadcast;
+                if(Get_Current_FileType() != _A_SUBDIR)
                 {
-                    lt_curr = broadcast;
-                    if(Get_Current_FileType() != _A_SUBDIR)
-                    {
-                        Actualize_Files_List(1);
+                    Actualize_Files_List(1);
 #if defined(__WIN32__)
-                        PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
+                    PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
 #endif
 #if defined(__MACOSX__)
-                        if(FSPathMakeRef((Uint8 *) Get_Current_FileName(), &soundFileRef, NULL) == noErr)
-                        {
-                            SystemSoundGetActionID(&soundFileRef, &WavActionID);
-                            SystemSoundSetCompletionRoutine(WavActionID,
-                                                            NULL,
-                                                            NULL,
-                                                            &CompletionRoutine,
-                                                            NULL);
-                            AlertSoundPlayCustomSound(WavActionID);
-                        }
-#endif
+                    if(FSPathMakeRef((Uint8 *) Get_Current_FileName(), &soundFileRef, NULL) == noErr)
+                    {
+                        SystemSoundGetActionID(&soundFileRef, &WavActionID);
+                        SystemSoundSetCompletionRoutine(WavActionID,
+                                                        NULL,
+                                                        NULL,
+                                                        &CompletionRoutine,
+                                                        NULL);
+                        AlertSoundPlayCustomSound(WavActionID);
                     }
-                }
+#endif
+#if defined(__LINUX__)
+                    FILE *fptr;
+                    char temp[1024];
 
+                    sprintf(temp, "aplay %s & > /dev/null", Get_Current_FileName());
+                    fptr = popen(temp, "r");
+                    pclose(fptr);
+#endif
+                }
             }
         }
         // Instruments/synths list slider
