@@ -48,7 +48,7 @@ int lt_index = 0;
 int lt_curr = 0;
 int list_counter;
 
-char SMPT_LIST[2048][64];
+char SMPT_LIST[2048][1024];
 
 unsigned FILETYPE[2048];
 extern int display_title;
