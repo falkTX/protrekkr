@@ -7,7 +7,7 @@ v1.98k:
 - Added a samples directory.
 - Moved all sliders to the right side.
 - Added list of available drives on Windows.
-- Too long directories or filenames are cut on display.
+- Directories or filenames that are too long are cut on display.
 
 v1.98j:
 
