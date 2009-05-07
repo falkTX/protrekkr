@@ -17,7 +17,7 @@ TODO (in no special order):
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
- - Chords editor (see to use a drag'n'drop system).
+ - Chords editor done with intervals (see to use a drag'n'drop system to place them on the patterns).
  - Add a metronome for the recording mode.
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.

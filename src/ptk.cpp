@@ -5885,11 +5885,11 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5911,11 +5911,11 @@ void Draw_Scope_Files_Button(void)
             
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5939,11 +5939,11 @@ void Draw_Scope_Files_Button(void)
 
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5970,11 +5970,11 @@ void Draw_Scope_Files_Button(void)
             Actualize_Files_List(0);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             switch(Scopish)
