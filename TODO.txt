@@ -1,8 +1,7 @@
 TODO (in no special order):
 
-- Adapt codecs packers & depackers to other Operating Systems.
-
 ----------------------------------------------------------
+ - Adapt codecs packers & depackers to other Operating Systems.
  - Create a decent gadgets system (events based).
  - Add a function to wipe the current song
    (removing unused patterns, although this is done for .ptp files, it's not implemented for .ptk).
@@ -24,7 +23,5 @@ TODO (in no special order):
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
  - VSTs support in the samples editor.
- - Load (in a temporary buffer) and play a wav file when clicking on it.
  - Envelopes scaling.
  - Possibility to link effects to midi commands.
- - Keystroke to insert or delete a row in a note column only.

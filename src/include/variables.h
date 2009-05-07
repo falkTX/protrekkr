@@ -106,6 +106,8 @@
 
 #define GUI_CMD_EXPORT_WAV 77
 
+#define GUI_CMD_SET_FILES_LIST_PLAY_WAV 78
+
 #define GUI_CMD_FILELIST_SCROLL 100
 #define GUI_CMD_UPDATE_LOOP_EDITOR_ED 101
 #define GUI_CMD_SAVE_MODULE 102
@@ -473,6 +475,8 @@ void Set_Track_Slider(int pos);
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
 void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif);
 int Delete_Selection(int Position);
+void Insert_Selection(int Cur_Track, int Position);
+void Remove_Selection(int Cur_Track, int Position);
 void Copy_Selection(int Position);
 void Cut_Selection(int Position);
 void Interpolate_Block(int Position);
@@ -483,10 +487,6 @@ void Instrument_Semitone_Up_Block(int Position);
 void Instrument_Semitone_Down_Block(int Position);
 void Unselect_Selection(void);
 void Select_Block_Keyboard(int Type);
-void Insert_Track_Line(int track, int Position);
-void Insert_Pattern_Line(int Position);
-void Remove_Track_Line(int track, int Position);
-void Remove_Pattern_Line(int Position);
 void Calc_selection(void);
 int Next_Line_Pattern_Auto(int *position, int lines, int *line);
 int Get_Free_Midi_Sub_Channel(int track);

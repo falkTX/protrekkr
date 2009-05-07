@@ -153,6 +153,9 @@ SDL_TimerID Timer;
 Uint32 Timer_CallBack(Uint32 interval, void *param);
 Uint32 (*Timer_Ptr)(Uint32 interval, void *param) = &Timer_CallBack;
 
+int loading_sample;
+extern s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];
+
 extern int done;
 extern float local_curr_mas_vol;
 
@@ -718,6 +721,25 @@ int Screen_Update(void)
             }
         }
 
+        // Play a .wav
+        if(gui_action == GUI_CMD_SET_FILES_LIST_PLAY_WAV)
+        {
+            if(lt_items)
+            {
+                int broadcast = lt_index + (Mouse.y - 43) / 12;
+                last_index = -1;
+                if(broadcast != lt_curr)
+                {
+                    lt_curr = broadcast;
+                    if(Get_Current_FileType() != _A_SUBDIR)
+                    {
+                        PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
+                        Actualize_Files_List(1);
+                    }
+                }
+
+            }
+        }
         // Instruments/synths list slider
         if(gui_action == GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER)
         {
@@ -1916,6 +1938,9 @@ void LoadFile(int Freeindex, const char *str)
                     }
                     else
                     {
+                        loading_sample = TRUE;
+                        sp_Position[Freeindex][ped_split].absolu = 0;
+                        Stop_Current_Sample();
                         switch(channels)
                         {
                             case 1:
@@ -1966,6 +1991,7 @@ void LoadFile(int Freeindex, const char *str)
                                 mess_box("16 bit WAV PCM loaded.");
                                 break;
                         }
+                        loading_sample = FALSE;
                     }
                 }
 
@@ -2528,7 +2554,7 @@ void Stop_Current_Sample(void)
         {
             if(sp_channelsample[u][i] == ped_patsam)
             {
-                if(sp_Stage[u][i] = PLAYING_SAMPLE) sp_Stage[u][i] = PLAYING_SAMPLE_NOTEOFF;
+                if(sp_Stage[u][i] = PLAYING_SAMPLE) sp_Stage[u][i] = PLAYING_NOSAMPLE;
             }
         }
         Player_FD[u] = 0;
@@ -2968,7 +2994,10 @@ void Keyboard_Handler(void)
         {
             // INSERT
             if(Get_LShift()) Insert_Pattern_Line(Cur_Position);
-            else Insert_Track_Line(ped_track, Cur_Position);
+            else
+            {
+                Insert_Selection(ped_track, Cur_Position);
+            }
         }
 
         if(snamesel == INPUT_NONE)
@@ -2976,11 +3005,17 @@ void Keyboard_Handler(void)
             if(Keys[SDLK_BACKSPACE] && is_editing)
             {
                 // BACKSPACE
-                if(ped_line)
+                if(Get_LShift())
                 {
-                    ped_line--;
-                    if(Get_LShift()) Remove_Pattern_Line(Cur_Position);
-                    else Remove_Track_Line(ped_track, Cur_Position);
+                    if(ped_line)
+                    {
+                        ped_line--;
+                        Remove_Pattern_Line(Cur_Position);
+                    }
+                }
+                else
+                {
+                    Remove_Selection(ped_track, Cur_Position);
                 }
             }
         }
@@ -4774,7 +4809,7 @@ void Mouse_Handler(void)
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
-                // Select a file
+                // Select
                 if(zcheckMouse(412, 43, 226 + restx, 133))
                 {
                     gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT;
@@ -5214,6 +5249,28 @@ void Mouse_Handler(void)
         Mouse_Right_Master_Ed();
 
         Reset_Pattern_Scrolling_Horiz();
+
+        // Play a .wav
+        switch(Scopish)
+        {
+            case SCOPE_ZONE_INSTR_LIST:
+            case SCOPE_ZONE_SYNTH_LIST:
+                break;
+
+            case SCOPE_ZONE_MOD_DIR:
+            case SCOPE_ZONE_INSTR_DIR:
+            case SCOPE_ZONE_PRESET_DIR:
+            case SCOPE_ZONE_REVERB_DIR:
+            case SCOPE_ZONE_PATTERN_DIR:
+
+                // Play the file
+                if(zcheckMouse(412, 43, 226 + restx, 133))
+                {
+                    gui_action = GUI_CMD_SET_FILES_LIST_PLAY_WAV;
+                }
+                break;
+        }
+
 
     } // RIGHT MOUSE
 }

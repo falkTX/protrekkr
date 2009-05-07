@@ -440,6 +440,174 @@ int Delete_Selection(int Position)
 }
 
 // ------------------------------------------------------
+// Insert a line into a selected block
+void Insert_Selection(int Cur_Track, int Position)
+{
+    COLUMN_TYPE type;
+    int data;
+
+    if(block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
+    {
+        for(int ybc = block_end[Curr_Buff_Block] - 1; ybc > block_start[Curr_Buff_Block] - 1; ybc--)
+        {
+            for(int xbc = block_start_track[Curr_Buff_Block]; xbc < block_end_track[Curr_Buff_Block] + 1; xbc++)
+            {
+                type = Get_Column_Type(Channels_MultiNotes, xbc);
+                switch(type)
+                {
+                    case NOTE:
+                        Set_Pattern_Column(Position, xbc, ybc + 1, Get_Pattern_Column(Position, xbc, ybc));
+                        Set_Pattern_Column(Position, xbc, ybc, 121);
+                        break;
+                    case INSTRHI:
+                    case PANNINGHI:
+                    case VOLUMEHI:
+                        data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
+                        data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf;
+                        Set_Pattern_Column(Position, xbc, ybc + 1, data);
+                        if(xbc < block_end_track[Curr_Buff_Block])
+                        {
+                            // Both selected
+                            Set_Pattern_Column(Position, xbc, ybc, 0xf0 | (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                        }
+                        else
+                        {
+                            Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                        }
+                        break;
+
+                    case INSTRLO:
+                    case VOLUMELO:
+                    case PANNINGLO:
+                        data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
+                        data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf0;
+                        Set_Pattern_Column(Position, xbc, ybc + 1, data);
+                        if(xbc > block_start_track[Curr_Buff_Block])
+                        {
+                            // Both selected
+                            Set_Pattern_Column(Position, xbc, ybc, 0xf | (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                        }
+                        else
+                        {
+                            Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                        }
+                        break;
+
+                    case EFFECTHI:
+                    case EFFECTDATHI:
+                        data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
+                        data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf;
+                        Set_Pattern_Column(Position, xbc, ybc + 1, data);
+                        Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                        break;
+
+                    case EFFECTLO:
+                    case EFFECTDATLO:
+                        data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
+                        data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf0;
+                        Set_Pattern_Column(Position, xbc, ybc + 1, data);
+                        Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                        break;
+                }
+            }
+        }
+        Actupated(0);
+    }
+    else
+    {
+        Insert_Track_Line(Cur_Track, Position);
+    }
+}
+
+// ------------------------------------------------------
+// Remove a line from a selected block
+void Remove_Selection(int Cur_Track, int Position)
+{
+    COLUMN_TYPE type;
+    int data;
+
+    if(block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
+    {
+        if(ped_line > block_start[Curr_Buff_Block])
+        {
+            ped_line--;
+            for(int ybc = block_start[Curr_Buff_Block] + 1; ybc < block_end[Curr_Buff_Block] + 1; ybc++)
+            {
+                for(int xbc = block_start_track[Curr_Buff_Block]; xbc < block_end_track[Curr_Buff_Block] + 1; xbc++)
+                {
+                    type = Get_Column_Type(Channels_MultiNotes, xbc);
+                    switch(type)
+                    {
+                        case NOTE:
+                            Set_Pattern_Column(Position, xbc, ybc - 1, Get_Pattern_Column(Position, xbc, ybc));
+                            Set_Pattern_Column(Position, xbc, ybc, 121);
+                            break;
+                        case INSTRHI:
+                        case PANNINGHI:
+                        case VOLUMEHI:
+                            data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
+                            data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf;
+                            Set_Pattern_Column(Position, xbc, ybc - 1, data);
+                            if(xbc < block_end_track[Curr_Buff_Block])
+                            {
+                                // Both selected
+                                Set_Pattern_Column(Position, xbc, ybc, 0xf0 | (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                            }
+                            else
+                            {
+                                Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                            }
+                            break;
+
+                        case INSTRLO:
+                        case VOLUMELO:
+                        case PANNINGLO:
+                            data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
+                            data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf0;
+                            Set_Pattern_Column(Position, xbc, ybc - 1, data);
+                            if(xbc > block_start_track[Curr_Buff_Block])
+                            {
+                                // Both selected
+                                Set_Pattern_Column(Position, xbc, ybc, 0xf | (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                            }
+                            else
+                            {
+                                Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                            }
+                            break;
+
+                        case EFFECTHI:
+                        case EFFECTDATHI:
+                            data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
+                            data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf;
+                            Set_Pattern_Column(Position, xbc, ybc - 1, data);
+                            Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf));
+                            break;
+
+                        case EFFECTLO:
+                        case EFFECTDATLO:
+                            data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
+                            data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf0;
+                            Set_Pattern_Column(Position, xbc, ybc - 1, data);
+                            Set_Pattern_Column(Position, xbc, ybc, (Get_Pattern_Column(Position, xbc, ybc) & 0xf0));
+                            break;
+                    }
+                }
+            }
+            Actupated(0);
+        }
+    }
+    else
+    {
+        if(ped_line)
+        {
+            ped_line--;
+            Remove_Track_Line(Cur_Track, Position);
+        }
+    }
+}
+
+// ------------------------------------------------------
 // Copy a selected block into a secondary buffer
 void Copy_Selection_To_Buffer(int Position)
 {

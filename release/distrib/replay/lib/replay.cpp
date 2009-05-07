@@ -205,6 +205,10 @@ int right_value;
     extern int done;
 #endif
 
+#if !defined(__STAND_ALONE__)
+    extern int loading_sample;
+#endif
+
 int Subicounter;
 
 #if defined(PTK_MP3)
@@ -2452,150 +2456,160 @@ ByPass_Wav:
 
 #if !defined(__STAND_ALONE__)
                     // Fix a bug that occurs when loading samples while playing
-                    if(Current_Pointer > Player_NS[c][i]) Current_Pointer = Player_NS[c][i] - 1;
+                    if(Current_Pointer >= Player_NS[c][i] - 1) Current_Pointer = Player_NS[c][i] - 1;
 #endif
 
                     if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
                     else Old_Pointer = 0;
 
-                    if(Player_WL[c][i])
+#if !defined(__STAND_ALONE__)
+                    if(!loading_sample)
+#endif
                     {
+                        if(Player_WL[c][i])
+                        {
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
-                        Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
-                                                      *(Player_WL[c][i] + Current_Pointer),
-                                                      *(Player_WL[c][i] + Current_Pointer + 1),
-                                                      *(Player_WL[c][i] + Current_Pointer + 2),
-                                                      res_dec, Current_Pointer,
-                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
-#else
-                        Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
-                                            * sp_Cvol[c][i] * Player_SV[c][i]);
-#endif
-
-#else
-                        if(Use_Cubic)
-                        {
                             Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
                                                           *(Player_WL[c][i] + Current_Pointer),
                                                           *(Player_WL[c][i] + Current_Pointer + 1),
                                                           *(Player_WL[c][i] + Current_Pointer + 2),
                                                           res_dec, Current_Pointer,
                                                           Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
-                        }
-                        else
-                        {
+#else
                             Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
                                                 * sp_Cvol[c][i] * Player_SV[c][i]);
-                        }
 #endif
-                    }
 
-                    // Stereo sample
-                    if(Player_SC[c][i] == 2)
-                    {
-                        grown = TRUE;
+#else
+                            if(Use_Cubic)
+                            {
+                                Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
+                                                              *(Player_WL[c][i] + Current_Pointer),
+                                                              *(Player_WL[c][i] + Current_Pointer + 1),
+                                                              *(Player_WL[c][i] + Current_Pointer + 2),
+                                                              res_dec, Current_Pointer,
+                                                              Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                            }
+                            else
+                            {
+                                Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
+                                                    * sp_Cvol[c][i] * Player_SV[c][i]);
+                            }
+#endif
+                        }
+
+                        // Stereo sample
+                        if(Player_SC[c][i] == 2)
+                        {
+                            grown = TRUE;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
-                        Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
-                                                      *(Player_WR[c][i] + Current_Pointer),
-                                                      *(Player_WR[c][i] + Current_Pointer + 1),
-                                                      *(Player_WR[c][i] + Current_Pointer + 2),
-                                                      res_dec, Current_Pointer,
-                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
-#else
-                        Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
-                                            * sp_Cvol[c][i] * Player_SV[c][i]);
-#endif
-
-#else
-                        if(Use_Cubic)
-                        {
                             Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
                                                           *(Player_WR[c][i] + Current_Pointer),
                                                           *(Player_WR[c][i] + Current_Pointer + 1),
                                                           *(Player_WR[c][i] + Current_Pointer + 2),
                                                           res_dec, Current_Pointer,
                                                           Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
-                        }
-                        else
-                        {
+#else
                             Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
                                                 * sp_Cvol[c][i] * Player_SV[c][i]);
-                        }
 #endif
+
+#else
+                            if(Use_Cubic)
+                            {
+                                Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
+                                                              *(Player_WR[c][i] + Current_Pointer),
+                                                              *(Player_WR[c][i] + Current_Pointer + 1),
+                                                              *(Player_WR[c][i] + Current_Pointer + 2),
+                                                              res_dec, Current_Pointer,
+                                                              Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                            }
+                            else
+                            {
+                                Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
+                                                    * sp_Cvol[c][i] * Player_SV[c][i]);
+                            }
+#endif
+                        }
                     }
 
                     // End of Interpolation algo
-                    if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
+#if !defined(__STAND_ALONE__)
+                    if(!loading_sample)
+#endif
                     {
-                        if((int) sp_Position[c][i].half.first > 0)
+                        if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
                         {
-                            sp_Position[c][i].absolu -= Vstep1[c][i];
+                            if((int) sp_Position[c][i].half.first > 0)
+                            {
+                                sp_Position[c][i].absolu -= Vstep1[c][i];
+                            }
                         }
-                    }
-                    else
-                    {
-                        sp_Position[c][i].absolu += Vstep1[c][i];
-                    }
+                        else
+                        {
+                            sp_Position[c][i].absolu += Vstep1[c][i];
+                        }
 
-                    switch(Player_LT[c][i])
-                    {
-                        case SMP_LOOP_FORWARD:
-                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
-                            {
-                                if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                        switch(Player_LT[c][i])
+                        {
+                            case SMP_LOOP_FORWARD:
+                                if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                                 {
-                                    sp_Position[c][i].half.first = Player_LS[c][i];
+                                    if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                                    {
+                                        sp_Position[c][i].half.first = Player_LS[c][i];
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
+                                else
                                 {
-                                    sp_Position[c][i].half.first = Player_LE[c][i];
+                                    if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
+                                    {
+                                        sp_Position[c][i].half.first = Player_LE[c][i];
+                                    }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case SMP_LOOP_PINGPONG:
-                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
-                            {
-                                if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                            case SMP_LOOP_PINGPONG:
+                                if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                                 {
-                                    sp_Position[c][i].half.first = Player_LE[c][i];
-                                    Player_LW[c][i] = SMP_LOOPING_BACKWARD;
+                                    if(sp_Position[c][i].half.first >= Player_LE[c][i])
+                                    {
+                                        sp_Position[c][i].half.first = Player_LE[c][i];
+                                        Player_LW[c][i] = SMP_LOOPING_BACKWARD;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
+                                else
                                 {
-                                    Player_LW[c][i] = SMP_LOOPING_FORWARD;
-                                    sp_Position[c][i].half.first = Player_LS[c][i];
+                                    if((int) sp_Position[c][i].half.first <= (int) Player_LS[c][i])
+                                    {
+                                        Player_LW[c][i] = SMP_LOOPING_FORWARD;
+                                        sp_Position[c][i].half.first = Player_LS[c][i];
+                                    }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case SMP_LOOP_NONE:
-                            if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
-                            {
-                                if(sp_Position[c][i].half.first >= Player_NS[c][i])
+                            case SMP_LOOP_NONE:
+                                if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                                 {
-                                    sp_Position[c][i].half.first = Player_NS[c][i];
-                                    sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                    if(sp_Position[c][i].half.first >= Player_NS[c][i])
+                                    {
+                                        sp_Position[c][i].half.first = Player_NS[c][i];
+                                        sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if((int) sp_Position[c][i].half.first <= 0)
+                                else
                                 {
-                                    sp_Position[c][i].half.first = 0;
-                                    sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                    if((int) sp_Position[c][i].half.first <= 0)
+                                    {
+                                        sp_Position[c][i].half.first = 0;
+                                        sp_Stage[c][i] = PLAYING_NOSAMPLE;
+                                    }
                                 }
-                            }
-                            break;
+                                break;
+                        }
                     }
 
 #if defined(PTK_SYNTH)
