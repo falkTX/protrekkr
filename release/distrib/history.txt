@@ -10,7 +10,7 @@ v1.98j:
   on selected blocks as well as tracks or patterns lines only.
 - Added function to preview .wav files just by clicking/selecting them before
   any loading is done.
-- Added a function to play a .wav file without loading it by cliking on it 
+- Added a function to play a .wav file without loading it by clicking on it 
   with the right mouse button on the files lists.
 
 v1.98i:
