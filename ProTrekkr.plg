@@ -6,54 +6,6 @@
 --------------------Configuration: ProTrekkr - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSP9.tmp" with contents
-[
-/nologo /ML /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /Fo"Release/" /Fd"Release/" /FD /Gs /c 
-"C:\Src\Pc\ptk\src\ptk.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSP9.tmp" 
-Creating temporary file "C:\DOCUME~1\franck\LOCALS~1\Temp\RSPA.tmp" with contents
-[
-kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi32.lib sdl_draw.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib libcp.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe" 
-.\Release\main.obj
-.\Release\timer.obj
-.\Release\Editor_303.obj
-.\Release\Editor_DiskIO.obj
-.\Release\Editor_Fx_Setup.obj
-.\Release\Editor_Instrument.obj
-.\Release\Editor_Pattern.obj
-.\Release\editor_reverb.obj
-.\Release\Editor_Sample.obj
-.\Release\Editor_Sequencer.obj
-.\Release\Editor_Setup.obj
-.\Release\Editor_Synth.obj
-.\Release\Editor_Track.obj
-.\Release\Editor_Track_Fx.obj
-.\Release\Patterns_Blocks.obj
-.\Release\SoundDriver.obj
-.\Release\endianness.obj
-.\Release\Replay.obj
-.\Release\Samples_Unpack.obj
-.\Release\Synth.obj
-.\Release\TB_303.obj
-.\Release\draw_primitives.obj
-.\Release\Misc_Draw.obj
-.\Release\requesters.obj
-.\Release\xml.obj
-.\Release\Files.obj
-.\Release\Files_List.obj
-.\Release\Samples_Pack.obj
-.\Release\Riff.obj
-.\Release\midi.obj
-.\Release\RtMidi.obj
-.\Release\ptk.obj
-.\Release\Resources.res
-]
-Creating command line "link.exe @C:\DOCUME~1\franck\LOCALS~1\Temp\RSPA.tmp"
-<h3>Output Window</h3>
-Compiling...
-ptk.cpp
-Linking...
 
 
 

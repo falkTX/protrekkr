@@ -2,14 +2,18 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98k:
+
+- Added a samples directory.
+- Moved all sliders to the right side.
+- Added list of available drives on Windows.
+
 v1.98j:
 
 - Fixed another bug which would make the tracker to crash when loading a .wav
   files while another one was still playing in the same slot.
 - Improved the range of the insert/backspace keys so they can operate
-  on selected blocks as well as tracks or patterns lines only.
-- Added function to preview .wav files just by clicking/selecting them before
-  any loading is done.
+  on selected blocks as well as tracks or patterns lines.
 - Added a function to play a .wav file without loading it by clicking
   on it's filename with the right mouse button.
 

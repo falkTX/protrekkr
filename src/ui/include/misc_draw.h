@@ -35,6 +35,7 @@
 // ------------------------------------------------------
 // Includes
 #include <SDL/SDL.h>
+#include "draw_primitives.h"
 
 // ------------------------------------------------------
 // Constants
@@ -174,7 +175,6 @@ void Fillrect(int x1, int y1, int x2, int y2);
 void Copy(SDL_Surface *Source, int x, int y, int x1, int y1, int x2, int y2);
 void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest, int x, int y, int x1, int y1, int x2, int y2);
 void Print_String(char *str, int x, int y, int size_x, int flag);
-void PrintXY(int x, int y, int Font_Type, char *String);
 int Get_Size_Text(char *String);
 SDL_Surface *Load_Picture(char *FileName);
 int Create_Font_Datas(char *FontName);

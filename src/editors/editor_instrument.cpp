@@ -672,7 +672,7 @@ void Mouse_Left_Instrument_Ed(void)
             {
                 sprintf(Name, "Untitled.wav");
             }
-            if(File_Exist("%s"SLASH"%s", Dir_Instrs, Name))
+            if(File_Exist("%s"SLASH"%s", Dir_Samples, Name))
             {
                 Display_Requester(&Overwrite_Requester, GUI_CMD_EXPORT_WAV);
             }
@@ -1138,7 +1138,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
         case SCOPE_ZONE_SYNTH_LIST:
 
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 1, yr + 1, 227 + restx, 135);
+            bjbox(xr - 1, yr + 1, 388, 135);
 
             for(int counter = 0; counter < 11; counter++)
             {
@@ -1149,7 +1149,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                     if(Instrs_index + counter == ped_patsam)
                     {
                         SetColor(COL_PUSHED_MED);
-                        bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
+                        bjbox(xr - 1, yr + (counter * 12) + 1, 387, 12);
                     }
 
                     switch(Scopish)
@@ -1391,15 +1391,15 @@ void Actualize_Instruments_Synths_List(int modeac)
             }
 
             SetColor(COL_SLIDER_LO);
-            bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
+            bjbox(783 - 1, 59 - 1, 15 + 2, 101 + 2);
             SetColor(COL_SLIDER_HI);
-            bjbox(395, 59, 15 + 1, 101 + 1);
+            bjbox(783, 59, 15 + 1, 101 + 1);
             SetColor(COL_SLIDER_MED);
-            bjbox(395, 59, 15, 101);
-            Gui_Draw_Button_Box(394 + 1, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
-            Dump_Instruments_Synths_List(413, 41);
+            bjbox(783, 59, 15, 101);
+            Gui_Draw_Button_Box(783, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
+            Dump_Instruments_Synths_List(395, 41);
 
-            Gui_Draw_Button_Box(394, 24, 314, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             switch(Scopish)
             {
                 case SCOPE_ZONE_INSTR_LIST:

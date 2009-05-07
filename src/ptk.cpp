@@ -4578,13 +4578,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SYNTH_LIST:
 
                 // Scroll the instruments/synths lists
-                if(zcheckMouse(410, 41, 390, 136) == 1)
-                {
-                    Instrs_index--;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
-
-                if(zcheckMouse(394, 58, 16, 103) == 1)
+                if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
                     Instrs_index--;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
@@ -4596,15 +4590,10 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
+            case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Scroll the files lists
-                if(zcheckMouse(410, 41, 390, 136) == 1)
-                {
-                    lt_index--;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
-
-                if(zcheckMouse(394, 58, 16, 103) == 1)
+                if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
                     lt_index--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
@@ -4644,13 +4633,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SYNTH_LIST:
 
                 // Scroll the instruments/synths lists
-                if(zcheckMouse(410, 41, 390, 136) == 1)
-                {
-                    Instrs_index++;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
-
-                if(zcheckMouse(394, 58, 16, 103) == 1)
+                if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
                     Instrs_index++;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
@@ -4662,16 +4645,10 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
+            case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Scroll the files lists
-                if(zcheckMouse(410, 41, 390, 136) == 1)
-                {
-                    lt_index++;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
-
-                // Scroll the files list
-                if(zcheckMouse(394, 58, 16, 103) == 1)
+                if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
                     lt_index++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
@@ -4711,7 +4688,7 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
+                if(zcheckMouse(783, 59, 16, 103)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
                 break;
 
             case SCOPE_ZONE_MOD_DIR:
@@ -4719,7 +4696,8 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
-                if(zcheckMouse(395, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
+            case SCOPE_ZONE_SAMPLE_DIR:
+                if(zcheckMouse(783, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
                 break;
         }
 
@@ -4760,16 +4738,23 @@ void Mouse_Handler(void)
         if(display_title)
         {
             // Modules dir.
-            if(zcheckMouse(710, 24, 18, 16))
+            if(zcheckMouse(692, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_MOD_DIR;
                 Draw_Scope_Files_Button();
             }
 
             // Instruments dir.
-            if(zcheckMouse(728, 24, 18, 16))
+            if(zcheckMouse(710, 24, 18, 16))
             {
                 Scopish = SCOPE_ZONE_INSTR_DIR;
+                Draw_Scope_Files_Button();
+            }
+
+            // Samples dir.
+            if(zcheckMouse(728, 24, 18, 16))
+            {
+                Scopish = SCOPE_ZONE_SAMPLE_DIR;
                 Draw_Scope_Files_Button();
             }
 
@@ -4838,20 +4823,20 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(394, 42, 16, 14))
+                if(zcheckMouse(782, 42, 16, 14))
                 {
                     Instrs_index--;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
-                if(zcheckMouse(394, 162, 16, 14))
+                if(zcheckMouse(782, 162, 16, 14))
                 {
                     Instrs_index++;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
                 // Select
-                if(zcheckMouse(412, 43, 226 + restx, 133))
+                if(zcheckMouse(393, 43, 388, 133))
                 {
                     gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT;
                 }
@@ -4862,23 +4847,24 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
+            case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Files list up
-                if(zcheckMouse(394, 42, 16, 14))
+                if(zcheckMouse(782, 42, 16, 14))
                 {
                     lt_index--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
             
                 // Files list down
-                if(zcheckMouse(394, 162, 16, 14))
+                if(zcheckMouse(782, 162, 16, 14))
                 {
                     lt_index++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
 
                 // Select a file
-                if(zcheckMouse(412, 43, 226 + restx, 133))
+                if(zcheckMouse(393, 43, 388, 133))
                 {
                     gui_action = GUI_CMD_SET_FILES_LIST_SELECT_FILE;
                 }
@@ -5161,6 +5147,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
+            case SCOPE_ZONE_SAMPLE_DIR:
 
                 if(zcheckMouse(394, 42, 16, 14) == 1)
                 {
@@ -5303,9 +5290,10 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_PRESET_DIR:
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
+            case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Play the file
-                if(zcheckMouse(412, 43, 226 + restx, 133))
+                if(zcheckMouse(393, 43, 388, 133))
                 {
                     gui_action = GUI_CMD_SET_FILES_LIST_PLAY_WAV;
                 }
@@ -5894,17 +5882,18 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(393, 42, 406, 135);
             bjbox(393, 24, 353, 17);
-            Gui_Draw_Button_Box(394, 24, 314, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
                 Gui_Draw_Button_Box(746, 6, 16, 16, "T", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
-            Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5926,18 +5915,19 @@ void Draw_Scope_Files_Button(void)
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
-            Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
 
         case SCOPE_ZONE_SYNTH_LIST:
@@ -5953,18 +5943,19 @@ void Draw_Scope_Files_Button(void)
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
-            Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
         
         case SCOPE_ZONE_MOD_DIR:
@@ -5972,9 +5963,10 @@ void Draw_Scope_Files_Button(void)
         case SCOPE_ZONE_PRESET_DIR:
         case SCOPE_ZONE_REVERB_DIR:
         case SCOPE_ZONE_PATTERN_DIR:
+        case SCOPE_ZONE_SAMPLE_DIR:
 
             Read_SMPT();
-            Dump_Files_List(413, 41);
+            Dump_Files_List(395, 41);
             Actualize_Files_List(0);
             if(Scopish_LeftRight)
             {
@@ -5982,14 +5974,15 @@ void Draw_Scope_Files_Button(void)
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5999,8 +5992,21 @@ void Draw_Scope_Files_Button(void)
                     break;
 
                 case SCOPE_ZONE_INSTR_DIR:
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    break;
+
+                case SCOPE_ZONE_SAMPLE_DIR:
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6010,8 +6016,9 @@ void Draw_Scope_Files_Button(void)
                     break;
 
                 case SCOPE_ZONE_PRESET_DIR:
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6021,8 +6028,9 @@ void Draw_Scope_Files_Button(void)
                     break;
 
                 case SCOPE_ZONE_REVERB_DIR:
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6032,8 +6040,9 @@ void Draw_Scope_Files_Button(void)
                     break;
 
                 case SCOPE_ZONE_PATTERN_DIR:
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
@@ -6043,8 +6052,8 @@ void Draw_Scope_Files_Button(void)
                     break;
             }
     
-            Gui_Draw_Button_Box(394, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(394, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
     }
 }

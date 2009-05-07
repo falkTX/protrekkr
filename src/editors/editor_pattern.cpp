@@ -1373,19 +1373,19 @@ void Actupated(int modac)
     draw_pated(gui_track, cur_line, ped_track, ped_col);
     draw_pated_highlight(gui_track, cur_line, ped_track, ped_col);
 
-    Realslider_Vert(781, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 136 + Patterns_Lines_Offset, TRUE);
-    Gui_Draw_Button_Box(781, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(781, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Realslider_Vert(782, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 136 + Patterns_Lines_Offset, TRUE);
+    Gui_Draw_Button_Box(782, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(782, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     
     High[Curr_Buff_Block] = BUTTON_PUSHED;
 
-    Gui_Draw_Button_Box(781, 349 + (16 * 1) + Patterns_Lines_Offset, 16, 14, "1",
+    Gui_Draw_Button_Box(782, 349 + (16 * 1) + Patterns_Lines_Offset, 16, 14, "1",
                         High[0] | BUTTON_TEXT_CENTERED | (Buff_Full[0] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(781, 349 + (16 * 2) + Patterns_Lines_Offset, 16, 14, "2",
+    Gui_Draw_Button_Box(782, 349 + (16 * 2) + Patterns_Lines_Offset, 16, 14, "2",
                         High[1] | BUTTON_TEXT_CENTERED | (Buff_Full[1] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(781, 349 + (16 * 3) + Patterns_Lines_Offset, 16, 14, "3",
+    Gui_Draw_Button_Box(782, 349 + (16 * 3) + Patterns_Lines_Offset, 16, 14, "3",
                         High[2] | BUTTON_TEXT_CENTERED | (Buff_Full[2] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(781, 349 + (16 * 4) + Patterns_Lines_Offset, 16, 14, "4",
+    Gui_Draw_Button_Box(782, 349 + (16 * 4) + Patterns_Lines_Offset, 16, 14, "4",
                         High[3] | BUTTON_TEXT_CENTERED | (Buff_Full[3] ? 0 : BUTTON_LOW_FONT));
 }
 
@@ -1968,14 +1968,14 @@ void Set_Track_Slider(int pos)
     if(Songtracks - Visible_Columns)
     {
         fpos /= Songtracks - Visible_Columns;
-        fpos *= 74 - 16;
+        fpos *= 75 - 16;
     }
     else
     {
         fpos = 0.0f;
     }
     Realslider_Horiz(724, 429 + Patterns_Lines_Offset,
-                     (int) fpos, 16, 74, 74, TRUE);
+                     (int) fpos, 16, 75, 75, TRUE);
 }
 
 // ------------------------------------------------------
@@ -1999,7 +1999,7 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // Rows slider
-    if(zcheckMouse(781, 212, 16 + 1, 136 + Patterns_Lines_Offset) & !Songplaying)
+    if(zcheckMouse(782, 212, 16 + 1, 136 + Patterns_Lines_Offset) & !Songplaying)
     {
         int final_row;
         int Cur_Position = Get_Current_Position();
@@ -2041,40 +2041,44 @@ void Mouse_Left_Pattern_Ed(void)
     }
 
     // Next/Prev rows buttons
-    if(zcheckMouse(781, 196, 16 + 1, 14) & !Songplaying)
+    if(zcheckMouse(782, 196, 16 + 1, 14) & !Songplaying)
     {
         Goto_Previous_Row();
     }
 
-    if(zcheckMouse(781, 349 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
+    if(zcheckMouse(782, 349 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
     {
         Goto_Next_Row();
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
 
-    if(zcheckMouse(781, 349 + (16 * 1) + Patterns_Lines_Offset, 16 + 1, 14))
+    // Set buffer 1
+    if(zcheckMouse(782, 349 + (16 * 1) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 0;
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
-    if(zcheckMouse(781, 349 + (16 * 2) + Patterns_Lines_Offset, 16 + 1, 14))
+    // Set buffer 2
+    if(zcheckMouse(782, 349 + (16 * 2) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 1;
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
-    if(zcheckMouse(781, 349 + (16 * 3) + Patterns_Lines_Offset, 16 + 1, 14))
+    // Set buffer 3
+    if(zcheckMouse(782, 349 + (16 * 3) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 2;
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
-    if(zcheckMouse(781, 349 + (16 * 4) + Patterns_Lines_Offset, 16 + 1, 14))
+    // Set buffer 4
+    if(zcheckMouse(782, 349 + (16 * 4) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 3;
         Actupated(0);

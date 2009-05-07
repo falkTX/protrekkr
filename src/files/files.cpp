@@ -4277,7 +4277,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFG9");
+    sprintf(extension, "TWNNCFGA");
     mess_box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -4326,6 +4326,7 @@ void SaveConfig(void)
         Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, out);
         Write_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, out);
         Write_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, out);
+        Write_Data(&Dir_Samples, sizeof(Dir_Samples), 1, out);
         Write_Data(KeyboardName, MAX_PATH, 1, out);
 
         Write_Data(&rawrender_32float, sizeof(char), 1, out);
@@ -4372,7 +4373,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFG9") == 0)
+        if(strcmp(extension, "TWNNCFGA") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4411,6 +4412,7 @@ void LoadConfig(void)
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
             Read_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, in);
             Read_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, in);
+            Read_Data(&Dir_Samples, sizeof(Dir_Samples), 1, in);
             Read_Data(KeyboardName, MAX_PATH, 1, in);
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
@@ -4499,6 +4501,18 @@ void LoadConfig(void)
         strcat(Dir_Patterns, "\\patterns");
 #else
         strcat(Dir_Patterns, "/patterns");
+#endif
+
+    }
+
+    if(!strlen(Dir_Samples))
+    {
+        GETCWD(Dir_Samples, MAX_PATH);
+
+#if defined(__WIN32__)
+        strcat(Dir_Samples, "\\samples");
+#else
+        strcat(Dir_Samples, "/samples");
 #endif
 
     }

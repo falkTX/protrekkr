@@ -224,10 +224,14 @@ void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
 
 // ------------------------------------------------------
 // Print a string on the screen
-void PrintXY(int x, int y, int Font_Type, char *String)
+void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
 {
     int Idx;
+    int Idx2;
     int i;
+    int pos_x;
+    int start_x;
+    int early_exit = FALSE;
     SDL_Rect Src_Rect;
     SDL_Rect Dst_Rect;
 
@@ -238,12 +242,26 @@ void PrintXY(int x, int y, int Font_Type, char *String)
     Src_Rect.y = 0;
     Src_Rect.h = Font_Height;
 
+    start_x = x;
+
     for(i = 0; i < (int) strlen(String); i++)
     {
         Idx = Get_Char_Position(Font_Ascii, Nbr_Letters, String[i]);
+        pos_x = x;
+        
+        if(max_x != -1)
+        {
+            Idx2 = Get_Char_Position(Font_Ascii, Nbr_Letters, '\015');
+            if((pos_x + Font_Size[Idx2]) >= ((start_x + max_x) - (Font_Size[Idx2]) - 4))
+            {
+                Idx = Idx2;
+                early_exit = TRUE;
+            }
+        }
+
         Src_Rect.x = Font_Pos[Idx];
         Src_Rect.w = Font_Size[Idx];
-        Dst_Rect.x = x;
+        Dst_Rect.x = pos_x;
         Dst_Rect.w = Src_Rect.w;
         if(Font_Type == USE_FONT)
         {
@@ -254,6 +272,7 @@ void PrintXY(int x, int y, int Font_Type, char *String)
             SDL_BlitSurface(FONT_LOW, &Src_Rect, Main_Screen, &Dst_Rect);
         }
         x += Font_Size[Idx];
+        if(early_exit) break;
     }
 }
 

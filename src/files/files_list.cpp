@@ -53,12 +53,17 @@ char SMPT_LIST[2048][64];
 unsigned FILETYPE[2048];
 extern int display_title;
 
+#if defined(__WIN32__)
+char List_Drives[1024 + 1];
+#endif
+
 char Dir_Act[MAX_PATH];
 char Dir_Mods[MAX_PATH];
 char Dir_Instrs[MAX_PATH];
 char Dir_Presets[MAX_PATH];
 char Dir_Reverbs[MAX_PATH];
 char Dir_Patterns[MAX_PATH];
+char Dir_Samples[MAX_PATH];
 char *cur_dir;
 
 // ------------------------------------------------------
@@ -107,6 +112,10 @@ void Set_Current_Dir(void)
         case SCOPE_ZONE_PATTERN_DIR:
             CHDIR(Get_Current_FileName());
             GETCWD(Dir_Patterns, MAX_PATH);
+            break;
+        case SCOPE_ZONE_SAMPLE_DIR:
+            CHDIR(Get_Current_FileName());
+            GETCWD(Dir_Samples, MAX_PATH);
             break;
     }
 }
@@ -194,6 +203,9 @@ void Read_SMPT(void)
         case SCOPE_ZONE_PATTERN_DIR:
             cur_dir = Dir_Patterns;
             break;
+        case SCOPE_ZONE_SAMPLE_DIR:
+            cur_dir = Dir_Samples;
+            break;
     }
     CHDIR(cur_dir);
 
@@ -210,14 +222,13 @@ void Read_SMPT(void)
     }
     else
     {
-        // The first file
+        // The first directory
         sprintf(SMPT_LIST[list_counter], c_file.name);
         FILETYPE[list_counter] = c_file.attrib & _A_SUBDIR;
         lt_items++;
         list_counter++;
 
-        // Find the rest of the files (directories)
-
+        // Find the rest of the directories 
         while(_findnext(hFile, &c_file) == 0)
         {
             if(c_file.attrib & _A_SUBDIR)
@@ -239,7 +250,7 @@ void Read_SMPT(void)
     }
     else
     {
-        // The first file (files)
+        // The first file
         if(!(c_file.attrib & _A_SUBDIR))
         {
             sprintf(SMPT_LIST[list_counter], c_file.name);
@@ -247,7 +258,7 @@ void Read_SMPT(void)
             lt_items++;
             list_counter++;
         }
-        // Find the rest of the files (files)
+        // Find the rest of the files
         while(_findnext(hFile, &c_file) == 0)
         {
             if(!(c_file.attrib & _A_SUBDIR))
@@ -259,6 +270,22 @@ void Read_SMPT(void)
             }
         } // while      
         _findclose(hFile);
+    }
+
+    // Add the available drives
+    int i;
+    char *Ptr_Drives;
+    GetLogicalDriveStrings(1024, List_Drives);
+
+    Ptr_Drives = List_Drives;
+    i = 0;
+    while(Ptr_Drives[0])
+    {
+        sprintf(SMPT_LIST[list_counter], Ptr_Drives);
+        FILETYPE[list_counter] = _A_SUBDIR;
+        Ptr_Drives += strlen(Ptr_Drives) + 1;
+        lt_items++;
+        list_counter++;
     }
 
 #else
@@ -294,28 +321,32 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_PRESET_DIR:
         case SCOPE_ZONE_REVERB_DIR:
         case SCOPE_ZONE_PATTERN_DIR:
+        case SCOPE_ZONE_SAMPLE_DIR:
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 2, yr + 1, 228 + restx, 135);
+            bjbox(xr - 2, yr + 1, 389, 135);
 
             // Current dir background
-            Gui_Draw_Button_Box(394, 24, 154 + restx, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Mods);
+                    PrintXY(398, 26, USE_FONT, Dir_Mods, 296);
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Instrs);
+                    PrintXY(398, 26, USE_FONT, Dir_Instrs, 296);
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Presets);
+                    PrintXY(398, 26, USE_FONT, Dir_Presets, 296);
                     break;
                 case SCOPE_ZONE_REVERB_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Reverbs);
+                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, 296);
                     break;
                 case SCOPE_ZONE_PATTERN_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Patterns);
+                    PrintXY(398, 26, USE_FONT, Dir_Patterns, 296);
+                    break;
+                case SCOPE_ZONE_SAMPLE_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_Samples, 296);
                     break;
             }
 
@@ -331,17 +362,17 @@ void Dump_Files_List(int xr, int yr)
                         if(y + counter == lt_curr)
                         {
                             SetColor(COL_PUSHED_MED);
-                            bjbox(xr - 1, yr + (counter * 12) + 2, 227 + restx, 12);
+                            bjbox(xr - 1, yr + (counter * 12) + 2, 387, 12);
                         }
 
                         if(FILETYPE[rel_val] == _A_SUBDIR)
                         {
-                            PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val]);
+                            PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val], 296);
                             PrintXY(xr + 364, yr + (counter * 12) + 1, USE_FONT_LOW, "<Dir>");
                         }
                         else
                         {
-                            PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val]);
+                            PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val], 296);
                             File = fopen(SMPT_LIST[rel_val], "rb");
                             if(File)
                             {
@@ -396,6 +427,7 @@ void Actualize_Files_List(int modeac)
                 case SCOPE_ZONE_PRESET_DIR:
                 case SCOPE_ZONE_REVERB_DIR:
                 case SCOPE_ZONE_PATTERN_DIR:
+                case SCOPE_ZONE_SAMPLE_DIR:
 
                     if(modeac == 0)
                     {
@@ -419,15 +451,15 @@ void Actualize_Files_List(int modeac)
                     }
 
                     SetColor(COL_SLIDER_LO);
-                    bjbox(395 - 1, 59 - 1, 15 + 2, 101 + 2);
+                    bjbox(783 - 1, 59 - 1, 15 + 2, 101 + 2);
                     SetColor(COL_SLIDER_HI);
-                    bjbox(395, 59, 15 + 1, 101 + 1);
+                    bjbox(783, 59, 15 + 1, 101 + 1);
                     SetColor(COL_SLIDER_MED);
-                    bjbox(395, 59, 15, 101);
-                    Gui_Draw_Button_Box(394 + 1, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
+                    bjbox(783, 59, 15, 101);
+                    Gui_Draw_Button_Box(783, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
                     if(last_index != lt_index)
                     {
-                        Dump_Files_List(413, 41);
+                        Dump_Files_List(395, 41);
                         last_index = lt_index;
                     }
                     break;
