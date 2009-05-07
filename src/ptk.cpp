@@ -2586,7 +2586,7 @@ void Stop_Current_Sample(void)
         {
             if(sp_channelsample[u][i] == ped_patsam)
             {
-                if(sp_Stage[u][i] = PLAYING_SAMPLE)
+                if(sp_Stage[u][i] == PLAYING_SAMPLE)
                 {
                     sp_Stage[u][i] = PLAYING_NOSAMPLE;
                     Player_WL[u][i] = NULL;
