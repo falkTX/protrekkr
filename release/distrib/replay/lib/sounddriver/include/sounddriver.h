@@ -47,6 +47,20 @@
 #include <math.h>
 #endif
 
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+#include <devices/ahi.h>
+#include <proto/exec.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <pthread.h>
+#include <float.h>
+#include <memory.h>
+#include <math.h>
+#endif
+
 #if defined(__MACOSX__)
 #include <AudioUnit/AudioUnit.h>
 #include <unistd.h>
@@ -72,7 +86,7 @@
 #define STDCALL
 #endif
 
-#if !defined(__WIN32__)
+#if !defined(__WIN32__) && !defined(__AROS__)
 #define TRUE 1
 #define FALSE 0
 #endif
@@ -92,9 +106,15 @@
 // ------------------------------------------------------
 // Types
 typedef unsigned int Uint32;
-typedef int int32;
 typedef unsigned char Uint8;
+#if !defined(__AMIGAOS4__)
+typedef int int32;
 typedef char int8;
+#endif
+
+#if defined(__AROS__)
+#define int32 int32_t
+#endif
 
 // ------------------------------------------------------
 // Functions

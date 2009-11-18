@@ -4130,9 +4130,9 @@ void Keyboard_Handler(void)
 
                         // Max instrument
                         if(oldval != 255 && ped_col == (2 + (i * 3)) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 127)
                         {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 127;
                         }
     
                         if(!is_recording) if(!Songplaying)

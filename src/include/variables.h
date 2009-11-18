@@ -46,7 +46,7 @@
 #define MAXLOOPTYPE 1
 #define FULLYESNO 0
 
-#if !defined(__WIN32__)
+#if !defined(__WIN32__) && !defined(__AROS__)
 #define FALSE 0
 #define TRUE 1
 #endif

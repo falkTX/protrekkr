@@ -4,34 +4,40 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
-       -lmingw32 -lsdlmain -lSDL -ldsound -lmsacm32 -lwinmm -lsdldraw -lz
+       -lSDL -lSDL_draw -lz
 
-FLAGS = -mwindows -O3 -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
-        -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __WINDOWS_MM__
+FLAGS = -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
+        -D __AROS__ -D __GCC__ -D __NO_CODEC__ -D __NO_MIDI__ -I./src/include \
+
+CXXFLAGS = $(FLAGS)
 
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_reverb.o editor_instrument.o \
           samples_pack.o files_list.o files.o \
-          midi.o RtMidi.o \
+          midi.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
           riff.o \
-          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o endianness.o \
+          tb_303.o samples_unpack.o replay.o synth.o endianness.o \
+          sounddriver.o
+LIBOBJS = midi.o \
+          tb_303.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver.o
 
-all: ProTrekkr
+all: protrekkr
 
 clean: RemObj
 
 RemObj:
 	-rm -f $(EXEOBJS)
 
-ProTrekkr: $(EXEOBJS)
-	$(CXX) -o ./release/distrib/ptk_win.exe -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
-	strip -s -x ./release/distrib/ptk_win.exe
-	-rm -f $(EXEOBJS)
+protrekkr: $(EXEOBJS)
+    $(CXX) -o ./release/distrib/ptk_aros -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+
+libptkreplay: $(LIBOBJS)
+	$(AR) -crv libptkreplay.a $(LIBOBJS)
 	
 ptk.o: src/ptk.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/$(*).cpp
@@ -112,9 +118,6 @@ riff.o: src/wav/riff.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/wav/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
-
-cubic_spline.o: release/distrib/replay/lib/cubic_spline.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp

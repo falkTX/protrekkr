@@ -31,11 +31,20 @@
 
 // ------------------------------------------------------
 // Includes
-#include "include/files_list.h"
 #include "../include/ptk.h"
+#include "include/files_list.h"
 
 #if defined(__WIN32__)
 #include <shlwapi.h>
+#elif defined(__AMIGAOS4__) || defined(__AROS__)
+#include <dos/dosextens.h>
+#include <proto/dos.h>
+#include <dirent.h>
+#if defined(__AROS__)
+#include <stdint.h>
+#define int32 int32_t
+#define uint32 uint32_t
+#endif
 #else
 #include <ftw.h>
 #endif
@@ -91,30 +100,78 @@ unsigned int Get_Current_FileType(void)
 
 void Set_Current_Dir(void)
 {
+    char filename[MAX_PATH];
+
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+    char *tmp = Dir_Act[0] ? &Dir_Act[strlen(Dir_Act) - 1] : NULL;
+
+    if (tmp && *tmp == '/') *tmp = 0;
+    if (strrchr(Dir_Act, '/') == Dir_Act &&
+        !strcmp(Get_Current_FileName(), ".."))
+    {
+        switch(Scopish)
+        {
+            case SCOPE_ZONE_MOD_DIR:
+                strcpy(Dir_Mods, "/");
+                break;
+            case SCOPE_ZONE_INSTR_DIR:
+                strcpy(Dir_Instrs, "/");
+                break;
+            case SCOPE_ZONE_PRESET_DIR:
+                strcpy(Dir_Presets, "/");
+                break;
+            case SCOPE_ZONE_REVERB_DIR:
+                strcpy(Dir_Reverbs, "/");
+                break;
+            case SCOPE_ZONE_PATTERN_DIR:
+                strcpy(Dir_Patterns, "/");
+                break;
+            case SCOPE_ZONE_SAMPLE_DIR:
+                strcpy(Dir_Samples, "/");
+                break;
+        }
+        return;
+    }
+    if (tmp && *tmp == 0)
+    {
+        *tmp = '/';
+    }    
+    if (!strcmp(Dir_Act, "/"))
+    {
+        strcpy(filename, "/");
+        strcat(filename, Get_Current_FileName());
+    }
+    else
+    {
+        strcpy(filename, Get_Current_FileName());
+    }
+#else
+    strcpy(filename, Get_Current_FileName());
+#endif
     switch(Scopish)
     {
         case SCOPE_ZONE_MOD_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Mods, MAX_PATH);
             break;
         case SCOPE_ZONE_INSTR_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Instrs, MAX_PATH);
             break;
         case SCOPE_ZONE_PRESET_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Presets, MAX_PATH);
             break;
         case SCOPE_ZONE_REVERB_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Reverbs, MAX_PATH);
             break;
         case SCOPE_ZONE_PATTERN_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Patterns, MAX_PATH);
             break;
         case SCOPE_ZONE_SAMPLE_DIR:
-            CHDIR(Get_Current_FileName());
+            CHDIR(filename);
             GETCWD(Dir_Samples, MAX_PATH);
             break;
     }
@@ -167,6 +224,24 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
         }
     }
     return 0;
+}
+#endif
+
+// AROS
+#if defined(__AROS__)
+void CopyStringBSTRToC(BSTR in,
+                       STRPTR out,
+                       uint32_t max)
+{
+    uint32_t i;
+    
+    max = AROS_BSTR_strlen(in);
+    
+    for(i = 0; i < max; i++)
+    {
+        out[i] = *(AROS_BSTR_ADDR(in) + i);
+    }
+    out[i] = 0;
 }
 #endif
 
@@ -286,6 +361,63 @@ void Read_SMPT(void)
         Ptr_Drives += strlen(Ptr_Drives) + 1;
         lt_items++;
         list_counter++;
+    }
+
+#elif defined(__AMIGAOS4__) || defined(__AROS__)
+
+#if defined(__AMIGAOS4__)
+#define LockDosList(f) IDOS->LockDosList(f)
+#define NextDosEntry(d,f) IDOS->NextDosEntry(d, f)
+#define CopyStringBSTRToC(bin,sout,len) IDOS->CopyStringBSTRToC(bin, sout, len)
+#define	UnLockDosList(f) IDOS->UnLockDosList(f)
+#endif
+
+    if (!strcmp(Dir_Act, "/"))
+    {
+        struct DosList *dl;
+        const uint32 flags = LDF_VOLUMES | LDF_READ;
+        dl = LockDosList(flags);
+        while ((dl = NextDosEntry(dl, flags)) != NULL)
+        {
+            CopyStringBSTRToC(dl->dol_Name, SMPT_LIST[list_counter],
+                              sizeof(SMPT_LIST[list_counter]));
+            FILETYPE[list_counter] = _A_SUBDIR;
+            lt_items++;
+            list_counter++;
+        }
+        UnLockDosList(flags);
+    }
+    else
+    {
+        DIR *dirp;
+        struct dirent *dp;
+        dirp = opendir(Dir_Act);
+        if (dirp)
+        {
+            // Add parent directory
+            snprintf(SMPT_LIST[list_counter], sizeof(SMPT_LIST[list_counter]), "/");
+            FILETYPE[list_counter] = _A_SUBDIR;
+            lt_items++;
+            list_counter++;
+    
+            // Add the other directories and files
+            while ((dp = readdir(dirp)) != NULL)
+            {
+                snprintf(SMPT_LIST[list_counter], sizeof(SMPT_LIST[list_counter]),
+                         "%s", dp->d_name);
+                if (dp->d_type == DT_DIR)
+                {
+                    FILETYPE[list_counter] = _A_SUBDIR;
+                }
+                else
+                {
+                    FILETYPE[list_counter] = 0;
+                }
+                lt_items++;
+                list_counter++;
+            }
+            closedir(dirp);
+        }
     }
 
 #else

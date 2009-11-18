@@ -33,6 +33,12 @@
 #define _PATTERNS_BLOCKS_H_
 
 // ------------------------------------------------------
+// Includes
+#if defined(__AROS__)
+#include <string.h>
+#endif
+
+// ------------------------------------------------------
 // Constants
 #define NBR_COPY_BLOCKS 5
 

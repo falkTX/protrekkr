@@ -34,6 +34,7 @@
 
 // ------------------------------------------------------
 // Includes
+#include "../ui/include/xml.h"
 #include "../support/include/main.h"
 
 #include "../wav/include/riff.h"
@@ -41,8 +42,6 @@
 
 #include "../ui/include/misc_draw.h"
 #include "../ui/include/requesters.h"
-#include "../ui/include/xml.h"
-#include "../ui/include/xml.h"
 
 #include "../files/include/files.h"
 #include "../files/include/files_list.h"

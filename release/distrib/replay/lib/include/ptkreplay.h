@@ -39,7 +39,7 @@
 #define PTKEXPORT __stdcall
 #endif
 
-#if defined(__LINUX__) || defined(__MACOSX__) || defined(__PSP__)
+#if defined(__LINUX__) || defined(__MACOSX__) || defined(__PSP__) || defined(__AMIGAOS4__) || defined(__AROS__)
 #define PTKEXPORT
 #endif
 

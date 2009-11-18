@@ -46,7 +46,6 @@
 
 // ------------------------------------------------------
 // Variables
-
 unsigned int AUDIO_To_Fill;
 #if defined(__PSP__)
 int AUDIO_Samples __attribute__((aligned(64)));
@@ -72,6 +71,32 @@ short *AUDIO_SoundBuffer;
 audio_buf_info AUDIO_Info_Buffer;
 pthread_t hThread;
 int volatile Thread_Running;
+#endif
+
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+struct MsgPort *AHImp;
+struct AHIRequest *AHIio;
+struct AHIRequest *AHIio2;
+struct AHIRequest *join;
+short *AHIbuf;
+short *AHIbuf2;
+int volatile Thread_Running;
+#endif
+
+#if defined(__AMIGAOS4__)
+pthread_t hThread;
+#endif
+
+#if defined(__AROS__)
+#define USE_SDL_THREADS
+#include <string.h>
+#if defined(USE_SDL_THREADS)
+#include <SDL/SDL_thread.h>
+SDL_Thread *hThread;
+#else
+#include <pthread.h>
+pthread_t hThread;
+#endif
 #endif
 
 #if defined(__PSP__)
@@ -107,7 +132,12 @@ HANDLE AUDIO_hReplayThread;
 #endif
 
 int AUDIO_Latency;
+
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+int AUDIO_Milliseconds = 100;
+#else
 int AUDIO_Milliseconds = 20;
+#endif
 
 // ------------------------------------------------------
 // Functions
@@ -163,6 +193,127 @@ void *AUDIO_Thread(void *arg)
     }
     Thread_Running = 1; 
     pthread_exit(0);
+    return(0);
+}
+#endif
+
+#if defined(__AMIGAOS4__)
+void *AUDIO_Thread(void *arg)
+{
+    int32 old_sigbit = AHImp->mp_SigBit;
+    void *old_sigtask = AHImp->mp_SigTask;
+    AHImp->mp_SigBit = IExec->AllocSignal(-1);
+    AHImp->mp_SigTask = IExec->FindTask(NULL);
+    while(Thread_Running)
+    {
+        if(AUDIO_Play_Flag && AHIbuf)
+        {
+            struct AHIRequest *io = AHIio;
+            short *buf = AHIbuf;
+    
+            AUDIO_Acknowledge = FALSE;
+            AUDIO_Mixer((Uint8 *)buf, AUDIO_SoundBuffer_Size);
+    
+            io->ahir_Std.io_Message.mn_Node.ln_Pri = 0;
+            io->ahir_Std.io_Command = CMD_WRITE;
+            io->ahir_Std.io_Data = buf;
+            io->ahir_Std.io_Length = AUDIO_SoundBuffer_Size;
+            io->ahir_Std.io_Offset = 0;
+            io->ahir_Frequency = AUDIO_PCM_FREQ;
+            io->ahir_Type = AHIST_S16S;
+            io->ahir_Volume = 0x10000;
+            io->ahir_Position = 0x8000;
+            io->ahir_Link = join;
+            IExec->SendIO((struct IORequest *)io);
+            if (join) IExec->WaitIO((struct IORequest *)join);
+            join = io;
+            AHIio = AHIio2; AHIio2 = io;
+            AHIbuf = AHIbuf2; AHIbuf2 = buf;
+    
+            AUDIO_Samples += AUDIO_SoundBuffer_Size;
+            AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
+        }
+        else
+        {
+            AUDIO_Acknowledge = TRUE;
+            usleep(10);
+        }
+    }
+    if (join)
+    {
+        IExec->AbortIO((struct IORequest *) join);
+        IExec->WaitIO((struct IORequest *) join);
+    }
+    IExec->FreeSignal(AHImp->mp_SigBit);
+    AHImp->mp_SigBit = old_sigbit;
+    AHImp->mp_SigTask = old_sigtask;
+    Thread_Running = 1;
+    pthread_exit(0);
+    return(0);
+}
+#endif
+
+#if defined(__AROS__)
+#if defined(USE_SDL_THREADS)
+int AUDIO_Thread(void *arg)
+#else
+void *AUDIO_Thread(void *arg)
+#endif
+{
+    int32 old_sigbit = AHImp->mp_SigBit;
+    void *old_sigtask = AHImp->mp_SigTask;
+    AHImp->mp_SigBit = AllocSignal(-1);
+    AHImp->mp_SigTask = FindTask(NULL);
+
+    while(Thread_Running)
+    {
+        if(AUDIO_Play_Flag && AHIbuf)
+        {
+            struct AHIRequest *io = AHIio;
+            short *buf = AHIbuf;
+        
+            AUDIO_Acknowledge = FALSE;
+            AUDIO_Mixer((Uint8 *) buf, AUDIO_SoundBuffer_Size);
+        
+            io->ahir_Std.io_Message.mn_Node.ln_Pri = 0;
+            io->ahir_Std.io_Command = CMD_WRITE;
+            io->ahir_Std.io_Data = buf;
+            io->ahir_Std.io_Length = AUDIO_SoundBuffer_Size;
+            io->ahir_Std.io_Offset = 0;
+            io->ahir_Frequency = AUDIO_PCM_FREQ;
+            io->ahir_Type = AHIST_S16S;
+            io->ahir_Volume = 0x10000;
+            io->ahir_Position = 0x8000;
+            io->ahir_Link = join;
+            SendIO((struct IORequest *) io);
+            if (join) WaitIO((struct IORequest *) join);
+            join = io;
+            AHIio = AHIio2; AHIio2 = io;
+            AHIbuf = AHIbuf2; AHIbuf2 = buf;
+        
+            AUDIO_Samples += AUDIO_SoundBuffer_Size;
+            AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
+        }
+        else
+        {
+            AUDIO_Acknowledge = TRUE;
+            usleep(10);
+        }
+        
+    }
+    if (join)
+    {
+        AbortIO((struct IORequest *) join);
+        WaitIO((struct IORequest *) join);
+    }
+    FreeSignal(AHImp->mp_SigBit);
+    AHImp->mp_SigBit = old_sigbit;
+    AHImp->mp_SigTask = old_sigtask;
+    Thread_Running = 1;
+    
+    #if !defined(USE_SDL_THREADS)
+        //pthread_exit(0);
+    #endif
     return(0);
 }
 #endif
@@ -323,6 +474,59 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
     }
 #endif
 
+#if defined(__AMIGAOS4__)
+    AHImp = (struct MsgPort *) IExec->AllocSysObject(ASOT_PORT, NULL);
+    AHIio = (struct AHIRequest *) IExec->AllocSysObjectTags(ASOT_IOREQUEST,
+                                                            ASOIOR_ReplyPort, AHImp,
+                                                            ASOIOR_Size, sizeof(struct AHIRequest),
+                                                            TAG_END);
+    AHIio2 = (struct AHIRequest *) IExec->AllocSysObjectTags(ASOT_IOREQUEST,
+                                                             ASOIOR_ReplyPort, AHImp,
+                                                             ASOIOR_Size, sizeof(struct AHIRequest),
+                                                             TAG_END);
+    join = NULL;
+    if (!AHIio || !AHIio2)
+    {
+        return(FALSE);
+    }
+    AHIio->ahir_Version = 4;
+    if (IExec->OpenDevice("ahi.device", 0, (struct IORequest *) AHIio, 0))
+    {
+        AHIio->ahir_Std.io_Device = NULL;
+        return(FALSE);
+    }
+    IExec->CopyMem(AHIio, AHIio2, sizeof(struct AHIRequest));
+    return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
+#endif
+
+#if defined(__AROS__)
+    AHImp = CreateMsgPort();
+    AHIio = (struct AHIRequest *) CreateIORequest(AHImp, sizeof(struct AHIRequest));
+    AHIio2 = (struct AHIRequest *) CreateIORequest(AHImp, sizeof(struct AHIRequest));
+    join = NULL;
+    
+    //check ahiios are allocated
+    if (!AHIio || !AHIio2)
+    {
+        return(FALSE);
+    }
+    
+    AHIio->ahir_Version = 4;
+    
+    //open ahi
+    if (OpenDevice("ahi.device", 0, (struct IORequest *) AHIio, 0))
+    {
+        AHIio->ahir_Std.io_Device = NULL;
+        return(FALSE);
+    }
+    
+    //copy for double buffering
+    CopyMem(AHIio, AHIio2, sizeof(struct AHIRequest));
+    
+    //create audio buffer
+    return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
+#endif
+
 #if defined(__PSP__)
     return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
 #endif
@@ -465,6 +669,58 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     Thread_Running = 0;
 #endif
 
+#if defined(__AMIGAOS4__)
+    struct sched_param p;
+    
+    AUDIO_SoundBuffer_Size = frag_size << 2;
+    AUDIO_Latency = AUDIO_SoundBuffer_Size;
+    
+    AHIbuf = (short *) IExec->AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_SHARED);
+    AHIbuf2 = (short *) IExec->AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_SHARED);
+    if (!AHIbuf || !AHIbuf2)
+    {
+        return(FALSE);
+    }
+    
+    memset(&p, 0, sizeof(p));
+    p.sched_priority = 1;
+    Thread_Running = 1;
+    pthread_setschedparam(pthread_self(), SCHED_FIFO , &p);
+    if(pthread_create(&hThread, NULL, AUDIO_Thread, NULL) == 0)
+    {
+        return(TRUE);
+    }
+    Thread_Running = 0;
+#endif
+
+#if defined(__AROS__)
+	AUDIO_SoundBuffer_Size = frag_size << 2;
+    AUDIO_Latency = AUDIO_SoundBuffer_Size;
+
+	AHIbuf = (short *) AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_ANY);
+	AHIbuf2 = (short *) AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_ANY);
+	if (!AHIbuf || !AHIbuf2)
+    {
+		return(FALSE);
+	}
+
+    Thread_Running = 1;
+    
+#if defined(USE_SDL_THREADS)
+    if(hThread = SDL_CreateThread(AUDIO_Thread, NULL))
+#else
+    //struct sched_param p;
+    //memset(&p, 0, sizeof(p));
+    //p.sched_priority = 1;
+    //pthread_setschedparam(pthread_self(), SCHED_FIFO , &p);
+    if(pthread_create(&hThread, NULL, AUDIO_Thread, NULL) == 0)
+#endif
+    {
+    return(TRUE);
+    }
+    Thread_Running = 0;
+#endif
+
 #if defined(__WIN32__)
     AUDIO_Sound_Buffer_Desc.dwSize = sizeof(AUDIO_Sound_Buffer_Desc);
     AUDIO_Sound_Buffer_Desc.dwFlags = DSBCAPS_GLOBALFOCUS;
@@ -559,7 +815,7 @@ void AUDIO_Wait_For_Thread(void)
 #if defined(__WIN32__)
             Sleep(10);
 #endif
-#if defined(__LINUX__) 
+#if defined(__LINUX__) || defined(__AMIGAOS4__) || defined(__AROS__) 
             usleep(10);
 #endif
 
@@ -567,8 +823,14 @@ void AUDIO_Wait_For_Thread(void)
     }
     else
     {
-#if defined(__LINUX__)
+#if defined(__LINUX__) || defined(__AMIGAOS4__)
         if(hThread)
+#elif defined(__AROS__)
+    #if defined(USE_SDL_THREADS)
+        if(hThread)     // sdl thread
+    #else
+        if(hThread.p)   // pthreads
+    #endif
 #endif
         {
             while(!AUDIO_Acknowledge)
@@ -577,7 +839,7 @@ void AUDIO_Wait_For_Thread(void)
 #if defined(__WIN32__)
                 Sleep(10);
 #endif
-#if defined(__LINUX__) || defined(__MACOSX__)
+#if defined(__LINUX__) || defined(__MACOSX__) || defined(__AMIGAOS4__) || defined(__AROS__)
                 usleep(10);
 #endif
 
@@ -692,6 +954,40 @@ void AUDIO_Stop_Sound_Buffer(void)
     }
 #endif
 
+#if defined(__AMIGAOS4__)
+    if(hThread)
+    {
+        Thread_Running = 0;
+        while(!Thread_Running)
+        {
+            usleep(10);
+        }
+    }
+    IExec->FreeVec(AHIbuf);
+    IExec->FreeVec(AHIbuf2);
+    AHIbuf = NULL;
+    AHIbuf2 = NULL;
+#endif
+
+#if defined(__AROS__)
+    #if defined(USE_SDL_THREADS)
+        if(hThread) //sdl thread
+    #else
+        if(hThread.p) //pthreads
+    #endif
+    {
+        Thread_Running = 0;
+        while(!Thread_Running)
+        {
+            usleep(10);
+        }
+    }
+    FreeVec(AHIbuf);
+    FreeVec(AHIbuf2);
+    AHIbuf = NULL;
+    AHIbuf2 = NULL;
+#endif
+
 #if defined(__PSP__)
     me_sceKernelDcacheWritebackInvalidateAll();	
     sceSysregMeResetEnable();
@@ -732,6 +1028,32 @@ void AUDIO_Stop_Driver(void)
 #if defined(__LINUX__)
     if(AUDIO_Device) close(AUDIO_Device);
     AUDIO_Device = 0;
+#endif
+
+#if defined(__AMIGAOS4__)
+    if (AHIio && AHIio->ahir_Std.io_Device)
+    {
+        IExec->CloseDevice((struct IORequest *) AHIio);
+    }
+    IExec->FreeSysObject(ASOT_IOREQUEST, AHIio);
+    IExec->FreeSysObject(ASOT_IOREQUEST, AHIio2);
+    IExec->FreeSysObject(ASOT_PORT, AHImp);
+    AHIio = NULL;
+    AHIio2 = NULL;
+    AHImp = NULL;
+#endif
+
+#if defined(__AROS__)
+    if (AHIio && AHIio->ahir_Std.io_Device)
+    {
+        CloseDevice((struct IORequest *) AHIio);
+    }
+    DeleteIORequest((struct IORequest *) AHIio);
+    DeleteIORequest((struct IORequest *) AHIio2);
+    DeleteMsgPort(AHImp);
+    AHIio = NULL;
+    AHIio2 = NULL;
+    AHImp = NULL;
 #endif
 
 #if defined(__WIN32__)

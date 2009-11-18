@@ -32,7 +32,11 @@
 // ------------------------------------------------------
 // Includes
 #include "include/draw_primitives.h"
+#if defined(__AROS__)
+#include <SDL/SDL_draw.h>
+#else
 #include "../extralibs/sdl_draw/include/sdl_draw.h"
+#endif
 #include "../include/ptk.h"
 
 // ------------------------------------------------------

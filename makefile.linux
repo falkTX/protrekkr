@@ -1,10 +1,14 @@
+CXX = g++
+
 LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lasound -lSDL -lsdldraw -lz
+
 FLAGS = -O2 -ffast-math -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D __LINUX__ -D __GCC__ -D __NO_CODEC__ -D __LINUX_ALSASEQ__
+
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
@@ -25,102 +29,102 @@ RemObj:
 	-rm -f $(EXEOBJS)
 
 protrekkr: $(EXEOBJS)
-	g++ -o ./release/distrib/ptk_linux -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	$(CXX) -o ./release/distrib/ptk_linux -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
 	strip -s -x ./release/distrib/ptk_linux
 #	-rm -f $(EXEOBJS)
 	
 ptk.o: src/ptk.cpp
-	g++ -c -o $(@) $(FLAGS) src/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/$(*).cpp
 
 editor_303.o: src/editors/editor_303.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_pattern.o: src/editors/editor_pattern.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_sequencer.o: src/editors/editor_sequencer.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_track.o: src/editors/editor_track.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_track_fx.o: src/editors/editor_track_fx.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 patterns_blocks.o: src/editors/patterns_blocks.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_synth.o: src/editors/editor_synth.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_sample.o: src/editors/editor_sample.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_fx_setup.o: src/editors/editor_fx_setup.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_setup.o: src/editors/editor_setup.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_diskio.o: src/editors/editor_diskio.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_reverb.o: src/editors/editor_reverb.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 editor_instrument.o: src/editors/editor_instrument.cpp
-	g++ -c -o $(@) $(FLAGS) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/editors/$(*).cpp
 
 samples_pack.o: src/files/samples_pack.cpp
-	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 files_list.o: src/files/files_list.cpp
-	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 files.o: src/files/files.cpp
-	g++ -c -o $(@) $(FLAGS) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/files/$(*).cpp
 
 midi.o: src/midi/midi.cpp
-	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/midi/$(*).cpp
 
 RtMidi.o: src/midi/RtMidi.cpp
-	g++ -c -o $(@) $(FLAGS) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/midi/$(*).cpp
 
 timer.o: src/support/timer.cpp
-	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 main.o: src/support/main.cpp
-	g++ -c -o $(@) $(FLAGS) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/support/$(*).cpp
 
 misc_draw.o: src/ui/misc_draw.cpp
-	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 draw_primitives.o: src/ui/draw_primitives.cpp
-	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 requesters.o: src/ui/requesters.cpp
-	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 xml.o: src/ui/xml.cpp
-	g++ -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
 riff.o: src/wav/riff.cpp
-	g++ -c -o $(@) $(FLAGS) src/wav/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/wav/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 replay.o: release/distrib/replay/lib/replay.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 synth.o: release/distrib/replay/lib/synth.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 endianness.o: release/distrib/replay/lib/endianness.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 sounddriver.o: release/distrib/replay/lib/sounddriver/sounddriver.cpp
-	g++ -c -o $(@) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp

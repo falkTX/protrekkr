@@ -31,7 +31,11 @@
 
 // ------------------------------------------------------
 // Includes
+#if defined(__AROS__)
+#define SDL_strcasecmp strcasecmp
+#else
 #include <SDL/SDL_stdinc.h>
+#endif
 #include "../include/ptk.h"
 
 // ------------------------------------------------------

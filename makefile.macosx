@@ -1,45 +1,47 @@
+CXX = g++
+
 LIBS_PPC = src/extralibs/tinyxml/tinyxml.o \
-       src/extralibs/tinyxml/tinyxmlparser.o \
-       src/extralibs/tinyxml/tinystr.o \
-       src/extralibs/tinyxml/tinyxmlerror.o \
-       -lsdldraw_ppc -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
+           src/extralibs/tinyxml/tinyxmlparser.o \
+           src/extralibs/tinyxml/tinystr.o \
+           src/extralibs/tinyxml/tinyxmlerror.o \
+           -lsdldraw_ppc -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
 
 LIBS_X86 = src/extralibs/tinyxml/tinyxml.o \
-       src/extralibs/tinyxml/tinyxmlparser.o \
-       src/extralibs/tinyxml/tinystr.o \
-       src/extralibs/tinyxml/tinyxmlerror.o \
-       -lsdldraw_x86 -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
+           src/extralibs/tinyxml/tinyxmlparser.o \
+           src/extralibs/tinyxml/tinystr.o \
+           src/extralibs/tinyxml/tinyxmlerror.o \
+           -lsdldraw_x86 -lz -framework CoreAudio -framework CoreMidi -framework AudioUnit -framework Cocoa -framework SDL
 
 DEBUG = 
 
 FLAGS_PPC = $(DEBUG) -O3 -mcpu=G4 -fomit-frame-pointer -ffast-math --prefetch-loop-arrays -faltivec -maltivec -mtune=G4 -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
-        -arch ppc -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__ -D __BIG_ENDIAN__
+            -arch ppc -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__ -D __BIG_ENDIAN__
 FLAGS_X86 = $(DEBUG) -O3 -ffast-math --prefetch-loop-arrays -fomit-frame-pointer -fno-rtti -I/Library/Frameworks/SDL.framework/Headers -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 -L/library/frameworks \
-        -arch i386 -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__
+            -arch i386 -D __MACOSX__ -D __GCC__ -D __MACOSX_CORE__ -D __NO_CODEC__
 
 EXEOBJS_PPC = ptk_ppc.o \
-          editor_303_ppc.o editor_pattern_ppc.o editor_sequencer_ppc.o editor_track_ppc.o editor_track_fx_ppc.o \
-          patterns_blocks_ppc.o editor_synth_ppc.o editor_sample_ppc.o editor_fx_setup_ppc.o editor_setup_ppc.o \
-          editor_diskio_ppc.o editor_reverb_ppc.o editor_instrument_ppc.o \
-          samples_pack_ppc.o files_list_ppc.o files_ppc.o \
-          midi_ppc.o RtMidi_ppc.o \
-          timer_ppc.o main_ppc.o sdlmain_ppc.o \
-          misc_draw_ppc.o draw_primitives_ppc.o requesters_ppc.o xml_ppc.o \
-          riff_ppc.o \
-          tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
-          sounddriver_ppc.o
+              editor_303_ppc.o editor_pattern_ppc.o editor_sequencer_ppc.o editor_track_ppc.o editor_track_fx_ppc.o \
+              patterns_blocks_ppc.o editor_synth_ppc.o editor_sample_ppc.o editor_fx_setup_ppc.o editor_setup_ppc.o \
+              editor_diskio_ppc.o editor_reverb_ppc.o editor_instrument_ppc.o \
+              samples_pack_ppc.o files_list_ppc.o files_ppc.o \
+              midi_ppc.o RtMidi_ppc.o \
+              timer_ppc.o main_ppc.o sdlmain_ppc.o \
+              misc_draw_ppc.o draw_primitives_ppc.o requesters_ppc.o xml_ppc.o \
+              riff_ppc.o \
+              tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
+              sounddriver_ppc.o
 
 EXEOBJS_X86 = ptk_x86.o \
-          editor_303_x86.o editor_pattern_x86.o editor_sequencer_x86.o editor_track_x86.o editor_track_fx_x86.o \
-          patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
-          editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o \
-          samples_pack_x86.o files_list_x86.o files_x86.o \
-          midi_x86.o RtMidi_x86.o \
-          timer_x86.o main_x86.o sdlmain_x86.o \
-          misc_draw_x86.o draw_primitives_x86.o requesters_x86.o xml_x86.o \
-          riff_x86.o \
-          tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
-          sounddriver_x86.o
+              editor_303_x86.o editor_pattern_x86.o editor_sequencer_x86.o editor_track_x86.o editor_track_fx_x86.o \
+              patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
+              editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o \
+              samples_pack_x86.o files_list_x86.o files_x86.o \
+              midi_x86.o RtMidi_x86.o \
+              timer_x86.o main_x86.o sdlmain_x86.o \
+              misc_draw_x86.o draw_primitives_x86.o requesters_x86.o xml_x86.o \
+              riff_x86.o \
+              tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
+              sounddriver_x86.o
 
 all: protrekkr
 
@@ -50,8 +52,8 @@ RemObj:
 	-rm -f $(EXEOBJS_X86)
 
 protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
-	g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
-	g++ -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
+	$(CXX) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
+	$(CXX) -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
 	lipo -create ./release/distrib/ptk_macosx_x86 ./release/distrib/ptk_macosx_ppc -output ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	strip -x -X -S ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	-rm -f ./release/distrib/ptk_macosx_ppc
@@ -60,201 +62,201 @@ protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 #	-rm -f $(EXEOBJS_X86)
 	
 ptk_ppc.o: src/ptk.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/ptk.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ptk.cpp
 
 editor_303_ppc.o: src/editors/editor_303.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_303.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_303.cpp
 
 editor_pattern_ppc.o: src/editors/editor_pattern.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_pattern.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_pattern.cpp
 
 editor_sequencer_ppc.o: src/editors/editor_sequencer.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_sequencer.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_sequencer.cpp
 
 editor_track_ppc.o: src/editors/editor_track.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_track.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_track.cpp
 
 editor_track_fx_ppc.o: src/editors/editor_track_fx.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_track_fx.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_track_fx.cpp
 
 patterns_blocks_ppc.o: src/editors/patterns_blocks.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/patterns_blocks.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/patterns_blocks.cpp
 
 editor_synth_ppc.o: src/editors/editor_synth.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_synth.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_synth.cpp
 
 editor_sample_ppc.o: src/editors/editor_sample.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_sample.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_sample.cpp
 
 editor_fx_setup_ppc.o: src/editors/editor_fx_setup.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_fx_setup.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_fx_setup.cpp
 
 editor_setup_ppc.o: src/editors/editor_setup.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_setup.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_setup.cpp
 
 editor_diskio_ppc.o: src/editors/editor_diskio.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_diskio.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_diskio.cpp
 
 editor_reverb_ppc.o: src/editors/editor_reverb.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_reverb.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_reverb.cpp
 
 editor_instrument_ppc.o: src/editors/editor_instrument.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/editors/editor_instrument.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/editor_instrument.cpp
 
 samples_pack_ppc.o: src/files/samples_pack.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/files/samples_pack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/samples_pack.cpp
 
 files_list_ppc.o: src/files/files_list.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/files/files_list.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/files_list.cpp
 
 files_ppc.o: src/files/files.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/files/files.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/files.cpp
 
 midi_ppc.o: src/midi/midi.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/midi/midi.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/midi/midi.cpp
 
 RtMidi_ppc.o: src/midi/RtMidi.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/midi/RtMidi.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/midi/RtMidi.cpp
 
 timer_ppc.o: src/support/timer.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/support/timer.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/timer.cpp
 
 main_ppc.o: src/support/main.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/support/main.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/main.cpp
 
 sdlmain_ppc.o: src/support/sdlmain.m
-	g++ -c -o $(@) $(FLAGS_PPC) src/support/sdlmain.m
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/sdlmain.m
 
 misc_draw_ppc.o: src/ui/misc_draw.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/ui/misc_draw.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/misc_draw.cpp
 
 draw_primitives_ppc.o: src/ui/draw_primitives.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/ui/draw_primitives.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/draw_primitives.cpp
 
 requesters_ppc.o: src/ui/requesters.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/ui/requesters.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/requesters.cpp
 
 xml_ppc.o: src/ui/xml.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/ui/xml.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/xml.cpp
 
 riff_ppc.o: src/wav/riff.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) src/wav/riff.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) src/wav/riff.cpp
 
 tb_303_ppc.o: release/distrib/replay/lib/tb_303.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/tb_303.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/tb_303.cpp
 
 samples_unpack_ppc.o: release/distrib/replay/lib/samples_unpack.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/samples_unpack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/samples_unpack.cpp
 
 replay_ppc.o: release/distrib/replay/lib/replay.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/replay.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/replay.cpp
 
 synth_ppc.o: release/distrib/replay/lib/synth.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/synth.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/synth.cpp
 
 endianness_ppc.o: release/distrib/replay/lib/endianness.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/endianness.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/endianness.cpp
 
 sounddriver_ppc.o: release/distrib/replay/lib/sounddriver/sounddriver.cpp
-	g++ -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/sounddriver/sounddriver.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/sounddriver/sounddriver.cpp
 
 
 
 ptk_x86.o: src/ptk.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/ptk.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/ptk.cpp
 
 editor_303_x86.o: src/editors/editor_303.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_303.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_303.cpp
 
 editor_pattern_x86.o: src/editors/editor_pattern.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_pattern.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_pattern.cpp
 
 editor_sequencer_x86.o: src/editors/editor_sequencer.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_sequencer.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_sequencer.cpp
 
 editor_track_x86.o: src/editors/editor_track.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_track.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_track.cpp
 
 editor_track_fx_x86.o: src/editors/editor_track_fx.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_track_fx.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_track_fx.cpp
 
 patterns_blocks_x86.o: src/editors/patterns_blocks.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/patterns_blocks.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/patterns_blocks.cpp
 
 editor_synth_x86.o: src/editors/editor_synth.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_synth.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_synth.cpp
 
 editor_sample_x86.o: src/editors/editor_sample.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_sample.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_sample.cpp
 
 editor_fx_setup_x86.o: src/editors/editor_fx_setup.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_fx_setup.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_fx_setup.cpp
 
 editor_setup_x86.o: src/editors/editor_setup.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_setup.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_setup.cpp
 
 editor_diskio_x86.o: src/editors/editor_diskio.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_diskio.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_diskio.cpp
 
 editor_reverb_x86.o: src/editors/editor_reverb.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_reverb.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_reverb.cpp
 
 editor_instrument_x86.o: src/editors/editor_instrument.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/editors/editor_instrument.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/editor_instrument.cpp
 
 samples_pack_x86.o: src/files/samples_pack.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/files/samples_pack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/samples_pack.cpp
 
 files_list_x86.o: src/files/files_list.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/files/files_list.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/files_list.cpp
 
 files_x86.o: src/files/files.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/files/files.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/files.cpp
 
 midi_x86.o: src/midi/midi.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/midi/midi.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/midi/midi.cpp
 
 RtMidi_x86.o: src/midi/RtMidi.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/midi/RtMidi.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/midi/RtMidi.cpp
 
 timer_x86.o: src/support/timer.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/support/timer.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/timer.cpp
 
 main_x86.o: src/support/main.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/support/main.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/main.cpp
 
 sdlmain_x86.o: src/support/sdlmain.m
-	g++ -c -o $(@) $(FLAGS_X86) src/support/sdlmain.m
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/sdlmain.m
 
 misc_draw_x86.o: src/ui/misc_draw.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/ui/misc_draw.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/misc_draw.cpp
 
 draw_primitives_x86.o: src/ui/draw_primitives.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/ui/draw_primitives.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/draw_primitives.cpp
 
 requesters_x86.o: src/ui/requesters.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/ui/requesters.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/requesters.cpp
 
 xml_x86.o: src/ui/xml.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/ui/xml.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/xml.cpp
 
 riff_x86.o: src/wav/riff.cpp
-	g++ -c -o $(@) $(FLAGS_X86) src/wav/riff.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) src/wav/riff.cpp
 
 tb_303_x86.o: release/distrib/replay/lib/tb_303.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/tb_303.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/tb_303.cpp
 
 samples_unpack_x86.o: release/distrib/replay/lib/samples_unpack.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/samples_unpack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/samples_unpack.cpp
 
 replay_x86.o: release/distrib/replay/lib/replay.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/replay.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/replay.cpp
 
 synth_x86.o: release/distrib/replay/lib/synth.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/synth.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/synth.cpp
 
 endianness_x86.o: release/distrib/replay/lib/endianness.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/endianness.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/endianness.cpp
 
 sounddriver_x86.o: release/distrib/replay/lib/sounddriver/sounddriver.cpp
-	g++ -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/sounddriver/sounddriver.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/sounddriver/sounddriver.cpp

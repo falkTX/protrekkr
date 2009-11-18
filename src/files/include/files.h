@@ -37,6 +37,12 @@
 #include <stdio.h>
 #include "../../include/variables.h"
 
+#if defined(__AROS__)
+#include <stdint.h>
+#include <string.h>
+#define int32 int32_t
+#endif
+
 // ------------------------------------------------------
 // Constants
 #define SAVE_WRITE 0

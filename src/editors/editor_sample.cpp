@@ -34,6 +34,11 @@
 #include "include/editor_sample.h"
 #include "include/editor_instrument.h"
 
+#if defined(__AROS__)
+#include <stdint.h>
+#define int32 int32_t
+#endif
+
 // ------------------------------------------------------
 // Variables
 extern s_access sp_Position[MAX_TRACKS][MAX_POLYPHONY];

@@ -28,5 +28,4 @@ TODO (in no special order):
  - Add jackd support via libjack.
  - Port to FreeBSD.
  - Port to Linux PPC.
- - Integrate the modifications made for the Amiga OS4 & AROS versions into the repository.
  - Possibility to select a soundcard for rendering.

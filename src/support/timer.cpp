@@ -45,6 +45,8 @@ PtkTimer::PtkTimer()
 // Init the frames counter
 void PtkTimer::Set_Frames_Counter(void)
 {
+    if(!SDL_WasInit(SDL_INIT_TIMER)) SDL_Init(SDL_INIT_TIMER);
+
     Ref_Ticks = ((float) SDL_GetTicks());
 }
 

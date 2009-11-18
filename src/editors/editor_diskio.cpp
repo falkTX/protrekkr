@@ -35,6 +35,10 @@
 #include "../files/include/files.h"
 #include "../ui/include/requesters.h"
 
+#if defined(__AROS__)
+#include <string.h>
+#endif
+
 // ------------------------------------------------------
 // Variables
 extern REQUESTER Overwrite_Requester;

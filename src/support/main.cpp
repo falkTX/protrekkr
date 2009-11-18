@@ -31,7 +31,16 @@
 
 // ------------------------------------------------------
 // Includes
+#include "../include/ptk.h"
+
+#if defined(__AROS__)
+#include <cstdlib>
+#define SDL_putenv putenv
+#define SDL_strcasecmp strcasecmp
+#else
 #define NEED_SDL_GETENV
+#endif
+
 #include <SDL/SDL_types.h>
 #include <string.h>
 #include "include/main.h"
@@ -48,8 +57,6 @@
 #if defined(__MACOSX__)
 #include <mach-o/dyld.h>
 #endif
-
-#include "../include/ptk.h"
 
 // ------------------------------------------------------
 // Constants
@@ -359,7 +366,9 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Uint32 ExePath_Size = MAX_PATH;
 
 #if defined(__MACOSX__)
+
     Uint32 Path_Length;
+
 #endif
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
@@ -380,12 +389,16 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 #if defined(__NO_MIDI__)
     NoMidi = "no midi";
 #endif
+
 #if defined(__NO_CODEC__)
+
 #if defined(__NO_MIDI__)
     NoCodec = " - ";
 #endif
+
     NoCodec = "no codec";
 #endif
+
 #if !defined(__NO_MIDI__) && !defined(__NO_CODEC__)
     NoMidi = "";
 #endif
@@ -438,7 +451,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         }
     }
     CHDIR(ExePath);
+
+#elif defined(__AMIGAOS4__) || defined(__AROS__)
+    CHDIR("/PROGDIR/");
+    GETCWD(ExePath, MAX_PATH);
 #else
+
     #if defined(__MACOSX__)
         Path_Length = ExePath_Size;
         _NSGetExecutablePath(ExePath, &Path_Length);
@@ -600,6 +618,23 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Mouse.y = Startup_Mouse_Pos_y;
     Mouse.old_x = -16;
     Mouse.old_y = -16;
+
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+    char *env_var;
+    int delay_ms = 0;
+
+    env_var = getenv("PROTREKKR_MAIN_LOOP_DELAY");
+    if (env_var)
+    {
+        delay_ms = atol(env_var);
+    }
+    else
+    {
+        delay_ms = 40;
+    }
+    if (delay_ms < 10) delay_ms = 10;
+    if (delay_ms > 1000) delay_ms = 1000;
+#endif
 
     while(!Prog_End)
     {
@@ -853,7 +888,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         Mouse.old_x = Mouse.x;
         Mouse.old_y = Mouse.y;
 
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+        SDL_Delay(delay_ms);
+#else
         SDL_Delay(10);
+#endif
+
     }
     SaveConfig();
 

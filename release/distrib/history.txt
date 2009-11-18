@@ -5,6 +5,7 @@ ProTrekkr releases history
 v1.98l:
 
 - Fixed a nasty bug in packing & depacking functions.
+- Integrated the Amiga OS4 and AROS modifications into the repository.
 
 v1.98k:
 

@@ -39,6 +39,10 @@
 #include <string.h>
 #endif
 
+#if defined(__AROS__)
+#define int32 int32_t
+#endif
+
 #if !defined(__STAND_ALONE__)
 #include "../../../../src/midi/include/midi.h"
 #include "../../../../src/include/variables.h"
