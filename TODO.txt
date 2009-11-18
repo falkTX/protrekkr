@@ -18,7 +18,7 @@ TODO (in no special order):
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
  - Chords editor done with intervals (see to use a drag'n'drop system to place them on the patterns).
- - Add a metronome for the recording mode.
+ - Add an audio metronome for the recording mode.
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
@@ -26,3 +26,7 @@ TODO (in no special order):
  - Envelopes scaling.
  - Possibility to link effects to midi commands.
  - Add jackd support via libjack.
+ - Port to FreeBSD.
+ - Port to Linux PPC.
+ - Integrate the modifications made for the Amiga OS4 & AROS versions into the repository.
+ - Possibility to select a soundcard for rendering.
