@@ -1018,7 +1018,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                 Mod_Dat_Read(&SampleType[swrite][slwrite], sizeof(char));
 
 #if defined(PTK_INSTRUMENTS)
-                if(SampleType[swrite][slwrite] != 0)
+                if(SampleType[swrite][slwrite])
                 {
                     int Apply_Interpolation;
                     Uint32 Save_Len;

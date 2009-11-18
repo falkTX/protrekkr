@@ -203,6 +203,7 @@ void Copy(SDL_Surface *Source,
 
 // ------------------------------------------------------
 // Copy a rectangle onto a given surface
+// Note: Only used during Create_Pattern_font() so no scheduling is necessary.
 void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
                      int x, int y, int x1, int y1, int x2, int y2)
 {
@@ -344,7 +345,6 @@ int Check_Rect(int x, int y, int width, int height)
     }
     return(TRUE);
 }
-
 
 // ------------------------------------------------------
 // Schedule a rectangle to be refreshed

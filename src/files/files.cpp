@@ -895,7 +895,6 @@ void Load_Old_Reverb_Presets(int Type)
 
 // ------------------------------------------------------
 // Load a module file
-// TODO: split this one in 2
 int LoadMod(char *FileName)
 {
     int Ye_Old_Phony_Value;
@@ -1104,8 +1103,7 @@ Read_Mod_File:
 #if !defined(__WINAMP__)
         mess_box("Loading song -> Sample data...");
 #endif
-
-        for(int swrite = 0; swrite < 128; swrite++)
+        for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
         {
             Read_Mod_Data(&nameins[swrite], sizeof(char), 20, in);
             Read_Mod_Data(&Midiprg[swrite], sizeof(char), 1, in);
@@ -1154,10 +1152,10 @@ Read_Mod_File:
                 }
             }
 
-            for(int slwrite = 0; slwrite < 16; slwrite++)
+            for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Read_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
-                if(SampleType[swrite][slwrite] != 0)
+                if(SampleType[swrite][slwrite])
                 {
                     if(Old_Bug) Read_Mod_Data(&SampleName[swrite][slwrite], sizeof(char), 256, in);
                     else Read_Mod_Data(&SampleName[swrite][slwrite], sizeof(char), 64, in);
@@ -2201,7 +2199,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     }
                 }
 
-                Write_Data(&real_fx_nbr, 2, 1, Out_FX);
+                Write_Data(&real_fx_nbr, sizeof(short), 1, Out_FX);
                 for(i = 0; i < real_fx_nbr; i++)
                 {
                     Save_FX(Sync_Fx[i].Pos, Sync_Fx[i].Row, Sync_Fx[i].Data);
@@ -2916,7 +2914,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
             // Compression type
 
             // 16 splits / instrument
-            for(int slwrite = 0; slwrite < 16; slwrite++)
+            for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Write_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
                 if(SampleType[swrite][slwrite])
@@ -3390,9 +3388,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         Write_Mod_Data(&tb303[0].decay, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[0].accent, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[0].waveform, sizeof(char), 1, in);
-        Write_Mod_Data(&tb303[0].patternlength, sizeof(char), 32, in);
-        Write_Mod_Data(&tb303[0].tone, sizeof(char), 32 * 16, in);
-        Write_Mod_Data(&tb303[0].flag, sizeof(struct flag303), 32 * 16, in);
+        Write_Mod_Data(tb303[0].patternlength, sizeof(char), 32, in);
+        Write_Mod_Data(tb303[0].tone, sizeof(char), 32 * 16, in);
+        Write_Mod_Data(tb303[0].flag, sizeof(struct flag303), 32 * 16, in);
     }
 
     Write_Mod_Data(&Store_303_2, sizeof(char), 1, in);
@@ -3406,9 +3404,9 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         Write_Mod_Data(&tb303[1].decay, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[1].accent, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[1].waveform, sizeof(char), 1, in);
-        Write_Mod_Data(&tb303[1].patternlength, sizeof(char), 32, in);
-        Write_Mod_Data(&tb303[1].tone, sizeof(char), 32 * 16, in);
-        Write_Mod_Data(&tb303[1].flag, sizeof(struct flag303), 32 * 16, in);
+        Write_Mod_Data(tb303[1].patternlength, sizeof(char), 32, in);
+        Write_Mod_Data(tb303[1].tone, sizeof(char), 32 * 16, in);
+        Write_Mod_Data(tb303[1].flag, sizeof(struct flag303), 32 * 16, in);
     }
     
     if(Store_303_1) Write_Mod_Data(&tb303engine[0].tbVolume, sizeof(float), 1, in);
@@ -3487,7 +3485,6 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
     if(in != NULL)
     {
-
         if(NewFormat)
         {
             // .ptp
@@ -3541,18 +3538,19 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             for(int pwrite = 0; pwrite < nPatterns; pwrite++)
             {
-                Write_Mod_Data(RawPatterns + (pwrite * PATTERN_LEN), sizeof(char), PATTERN_LEN, in);
+                Write_Mod_Data(RawPatterns + (pwrite * PATTERN_LEN),
+                               sizeof(char), PATTERN_LEN, in);
             }
 
             // Writing sample data
             for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
             {
                 rtrim_string(nameins[swrite], 20);
-                Write_Mod_Data(&nameins[swrite], sizeof(char), 20, in);
+                Write_Mod_Data(nameins[swrite], sizeof(char), 20, in);
                 Write_Mod_Data(&Midiprg[swrite], sizeof(char), 1, in);
                 Write_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
-                Write_Synth_Params(&Write_Mod_Data, &Write_Mod_Data_Swap, in, swrite);
+                Write_Synth_Params(Write_Mod_Data, Write_Mod_Data_Swap, in, swrite);
 
                 // Compression type
                 Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
@@ -3568,13 +3566,13 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 }
 
                 // 16 splits / instrument
-                for(int slwrite = 0; slwrite < 16; slwrite++)
+                for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
                 {
                     Write_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
-                    if(SampleType[swrite][slwrite] != 0)
+                    if(SampleType[swrite][slwrite])
                     {
                         rtrim_string(SampleName[swrite][slwrite], 64);
-                        Write_Mod_Data(&SampleName[swrite][slwrite], sizeof(char), 64, in);
+                        Write_Mod_Data(SampleName[swrite][slwrite], sizeof(char), 64, in);
                         Write_Mod_Data(&Basenote[swrite][slwrite], sizeof(char), 1, in);
                         
                         Write_Mod_Data_Swap(&LoopStart[swrite][slwrite], sizeof(int), 1, in);
@@ -3588,12 +3586,11 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
                         // All samples are converted into 16 bits
                         Write_Unpacked_Sample(Write_Mod_Data, in, swrite, slwrite);
-
                     }// Exist Sample
                 }
             }
 
-            // Writing Track Propertiers
+            // Writing Track Properties
             for(twrite = 0; twrite < MAX_TRACKS; twrite++)
             {
                 Write_Mod_Data_Swap(&TCut[twrite], sizeof(float), 1, in);
@@ -3840,7 +3837,7 @@ void SaveSynth(void)
     if(in != NULL)
     {
         Write_Data(extension, sizeof(char), 9, in);
-        Write_Synth_Params(&Write_Data, &Write_Data_Swap, in, ped_patsam);
+        Write_Synth_Params(Write_Data, Write_Data_Swap, in, ped_patsam);
         fclose(in);
 
         Read_SMPT();
@@ -3913,20 +3910,25 @@ void LoadInst(char *FileName)
         PARASynth[swrite].lfo1_attack = 0;
         PARASynth[swrite].lfo1_decay = 0;
         PARASynth[swrite].lfo1_sustain = 128;
-        PARASynth[swrite].lfo1_release = 128;
+        PARASynth[swrite].lfo1_release = 0x10000;
 
         PARASynth[swrite].lfo2_attack = 0;
         PARASynth[swrite].lfo2_decay = 0;
         PARASynth[swrite].lfo2_sustain = 128;
-        PARASynth[swrite].lfo2_release = 128;
+        PARASynth[swrite].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, swrite,
                           !old_bug, new_adsr, tight, Env_Modulation);
 
         // Gsm by default
-        if(Pack_Scheme) Read_Data(&SampleCompression[swrite], sizeof(char), 1, in);
-        else SampleCompression[swrite] = SMP_PACK_GSM;
-
+        if(Pack_Scheme)
+        {
+            Read_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+        }
+        else
+        {
+            SampleCompression[swrite] = SMP_PACK_GSM;
+        }
         // Load the bitrate
         if(Mp3_Scheme)
         {
@@ -3942,14 +3944,14 @@ void LoadInst(char *FileName)
             }
         }
 
-        for(int slwrite = 0; slwrite < 16; slwrite++)
+        for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
         {
             Read_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
-            if(SampleType[swrite][slwrite] != 0)
+            if(SampleType[swrite][slwrite])
             {
                 if(old_bug) Read_Data(&SampleName[swrite][slwrite], sizeof(char), 256, in);
                 else Read_Data(&SampleName[swrite][slwrite], sizeof(char), 64, in);
-                Read_Data(&Basenote[swrite][slwrite],sizeof(char), 1, in);
+                Read_Data(&Basenote[swrite][slwrite], sizeof(char), 1, in);
                 
                 Read_Data_Swap(&LoopStart[swrite][slwrite], sizeof(int), 1, in);
                 Read_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
@@ -4010,7 +4012,8 @@ void SaveInst(void)
     {
         // Writing header & name...
         Write_Data(extension, sizeof(char), 9, in);
-        Write_Data(&nameins[ped_patsam], sizeof(char), 20, in);
+        rtrim_string(nameins[ped_patsam], 20);
+        Write_Data(nameins[ped_patsam], sizeof(char), 20, in);
 
         // Writing sample data
         int swrite = ped_patsam;
@@ -4031,7 +4034,7 @@ void SaveInst(void)
 
         Write_Data(&synth_prg, sizeof(char), 1, in);
 
-        Write_Synth_Params(&Write_Data, &Write_Data_Swap, in, swrite);
+        Write_Synth_Params(Write_Data, Write_Data_Swap, in, swrite);
 
         Write_Data(&SampleCompression[swrite], sizeof(char), 1, in);
         switch(SampleCompression[swrite])
@@ -4046,16 +4049,19 @@ void SaveInst(void)
         }
 
         swrite = synth_save;
-        for(int slwrite = 0; slwrite < 16; slwrite++)
+        for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
         {
             Write_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
-            if(SampleType[swrite][slwrite] != 0)
+            if(SampleType[swrite][slwrite])
             {
-                Write_Data(&SampleName[swrite][slwrite], sizeof(char), 64, in);
-                Write_Data(&Basenote[swrite][slwrite],sizeof(char), 1, in);
+                rtrim_string(SampleName[swrite][slwrite], 64);
+                Write_Data(SampleName[swrite][slwrite], sizeof(char), 64, in);
+                Write_Data(&Basenote[swrite][slwrite], sizeof(char), 1, in);
+                
                 Write_Data_Swap(&LoopStart[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
+                
                 Write_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                 Write_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
@@ -4125,9 +4131,11 @@ void Save303(void)
     char extension[10];
 
     sprintf(extension, "TWNN3031");
-    sprintf(Temph, "Saving '%s.303' pattern in patterns directory...", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
+    sprintf(Temph, "Saving '%s.303' pattern in patterns directory...",
+            tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     mess_box(Temph);
-    sprintf(Temph, "%s"SLASH"%s.303", Dir_Patterns, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
+    sprintf(Temph, "%s"SLASH"%s.303", Dir_Patterns,
+            tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     in = fopen(Temph, "wb");
 
     if(in != NULL)
@@ -4155,17 +4163,24 @@ void Save303(void)
 Uint8 *Pack_Data(Uint8 *Memory, int *Size)
 {
     z_stream c_stream; // compression stream
-    int Comp_Len;
+    int Comp_Len = -1;
     Uint8 *Final_Mem_Out = (Uint8 *) malloc(*Size);
 
     memset(&c_stream, 0, sizeof(c_stream));
     deflateInit(&c_stream, Z_BEST_COMPRESSION);
-    c_stream.next_in  = (Bytef*) Memory;
+    c_stream.next_in = (Bytef *) Memory;
     c_stream.next_out = Final_Mem_Out;
-    c_stream.avail_in = *Size;
-    c_stream.avail_out = (uInt) &Comp_Len;
-    deflate(&c_stream, Z_FULL_FLUSH);
-    deflate(&c_stream, Z_FINISH);
+    while (c_stream.total_in != *Size)
+    {
+        c_stream.avail_in = 1;
+        c_stream.avail_out = 1;
+        deflate(&c_stream, Z_NO_FLUSH);
+    }
+    for (;;)
+    {
+        c_stream.avail_out = 1;
+        if (deflate(&c_stream, Z_FINISH) == Z_STREAM_END) break;
+    }
     deflateEnd(&c_stream);
     *Size = c_stream.total_out;
     return(Final_Mem_Out);
@@ -4183,11 +4198,15 @@ Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
     {
         memset(&d_stream, 0, sizeof(d_stream));
         d_stream.next_in = (Uint8 *) Memory;
-        d_stream.avail_in = Size_Out;
         d_stream.next_out = Test_Mem;
-        d_stream.avail_out = (Uint32) -1;
         inflateInit(&d_stream);
-        inflate(&d_stream, Z_FULL_FLUSH);
+        while (d_stream.total_out < Size_Out &&
+               d_stream.total_in < Sizen)
+        {
+            d_stream.avail_in = 1;
+            d_stream.avail_out = 1;
+            if (inflate(&d_stream, Z_NO_FLUSH) == Z_STREAM_END) break;
+        }
         inflateEnd(&d_stream);
     }
     return(Test_Mem);

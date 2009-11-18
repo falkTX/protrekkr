@@ -25,3 +25,4 @@ TODO (in no special order):
  - VSTs support in the samples editor.
  - Envelopes scaling.
  - Possibility to link effects to midi commands.
+ - Add jackd support via libjack.
