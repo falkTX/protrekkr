@@ -28,4 +28,4 @@ TODO (in no special order):
  - Add jackd support via libjack.
  - Port to FreeBSD.
  - Port to Linux PPC.
- - Possibility to select a soundcard for rendering.
+ - Possibility to select any soundcard as rendering device.

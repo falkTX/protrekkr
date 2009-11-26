@@ -13,7 +13,6 @@ clean: remobj remlibobj
 
 remobj:
 	-rm -f module.cpp
-	-rm -f bin2c_uni
 	-rm -f $(EXEOBJS_PPC)
 	-rm -f $(EXEOBJS_X86)
 	-rm -f replaytest_ppc
@@ -28,9 +27,6 @@ replaytest: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 	strip -x -X -S replaytest_x86
 	strip -x -X -S replaytest_uni
 	-rm -f module.cpp
-	-rm -f bin2c_uni
-#	-rm -f $(EXEOBJS_PPC)
-#	-rm -f $(EXEOBJS_X86)
 
 test_x86.o: test/test_macosx.cpp
 	g++ -c -o $(@) $(FLAGS_X86) test/test_macosx.cpp
