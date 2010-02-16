@@ -1,4 +1,3 @@
-
 #ifndef NULLSOFT_WINAMP_IN2H
 #define NULLSOFT_WINAMP_IN2H
 #include "out.h"

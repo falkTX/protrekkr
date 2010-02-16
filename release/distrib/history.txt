@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98m:
+
+- Modified the way envs to volumes work with null values.
+
 v1.98l:
 
 - Fixed a nasty bug in packing & depacking functions.
