@@ -594,6 +594,25 @@ void CSynth::EnvRun(int *track, int *track2)
 #if defined(PTK_SYNTH_ENV2)
     ENV2_VOLUME *= Data.ENV2_OSC2_VOLUME;
 #endif
+/*#if !defined(PTK_SYNTH_ENV1) && !defined(PTK_SYNTH_ENV2)
+    // Nullify
+    ENV1_VOLUME = 1.0f;
+    ENV2_VOLUME = 1.0f;
+#endif
+*/
+/*#if defined(PTK_SYNTH_ENV1) || defined(PTK_SYNTH_ENV2)
+    if(Data.ENV1_OSC1_VOLUME == 1.0f &&
+       Data.ENV2_OSC1_VOLUME == 1.0f)
+    {
+        ENV1_VOLUME = 1.0f;
+    }
+    if(Data.ENV1_OSC2_VOLUME == 1.0f &&
+       Data.ENV2_OSC2_VOLUME == 1.0f)
+    {
+        ENV2_VOLUME = 1.0f;
+    }
+#endif
+*/
 
 #if !defined(PTK_SYNTH_LFO1) && !defined(PTK_SYNTH_LFO2)
     ENV1_MIN = 1.0f;
@@ -1692,8 +1711,8 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     Data.ENV1_OSC2_VOLUME =   ((float) TSP.env1_osc2_volume - 64) * 0.015625f;
     Data.ENV1_VCF_CUTOFF =    ((float) TSP.env1_vcf_cutoff - 64) * 0.015625f;
     Data.ENV1_VCF_RESONANCE = ((float) TSP.env1_vcf_resonance - 64) * 0.015625f;
-    if((TSP.env1_osc1_volume - 64) == 0) Data.ENV1_OSC1_VOLUME = 1.0f;
-    if((TSP.env1_osc2_volume - 64) == 0) Data.ENV1_OSC2_VOLUME = 1.0f;
+    //if((TSP.env1_osc1_volume - 64) == 0) Data.ENV1_OSC1_VOLUME = 1.0f;
+    //if((TSP.env1_osc2_volume - 64) == 0) Data.ENV1_OSC2_VOLUME = 1.0f;
 
     Data.ENV2_OSC1_PW =       ((float) TSP.env2_osc1_pw - 64) * 0.015625f;
     Data.ENV2_OSC2_PW =       ((float) TSP.env2_osc2_pw - 64) * 0.015625f;
@@ -1703,8 +1722,8 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     Data.ENV2_OSC2_VOLUME =   ((float) TSP.env2_osc2_volume - 64) * 0.015625f;
     Data.ENV2_VCF_CUTOFF =    ((float) TSP.env2_vcf_cutoff - 64) * 0.015625f;
     Data.ENV2_VCF_RESONANCE = ((float) TSP.env2_vcf_resonance - 64) * 0.015625f;
-    if((TSP.env2_osc1_volume - 64) == 0) Data.ENV2_OSC1_VOLUME = 1.0f;
-    if((TSP.env2_osc2_volume - 64) == 0) Data.ENV2_OSC2_VOLUME = 1.0f;
+    //if((TSP.env2_osc1_volume - 64) == 0) Data.ENV2_OSC1_VOLUME = 1.0f;
+    //if((TSP.env2_osc2_volume - 64) == 0) Data.ENV2_OSC2_VOLUME = 1.0f;
 
     Data.OSC3_VOLUME =        ((float) TSP.osc3_volume - 64) * 0.015625f;
     Data.OSC3_SWITCH =        TSP.osc3_switch;

@@ -217,7 +217,8 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int read_disto,
                        int read_lfo_adsr,
                        int new_version,
-                       int Env_Modulation);
+                       int Env_Modulation,
+                       int New_Env);
 void Write_Synth_Params(int (*Write_Function)(void *, int ,int, FILE *),
                         int (*Write_Function_Swap)(void *, int ,int, FILE *),
                         FILE *in,
@@ -906,6 +907,7 @@ int LoadMod(char *FileName)
     int Sel_Interpolation = FALSE;
     int New_Reverb = FALSE;
     int Env_Modulation = FALSE;
+    int New_Env = FALSE;
 
     char Comp_Flag;
 
@@ -951,6 +953,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'H':
+                New_Env = TRUE;
             case 'G':
                 Env_Modulation = TRUE;
             case 'F':
@@ -1122,7 +1126,7 @@ Read_Mod_File:
             PARASynth[swrite].lfo2_release = 0x10000;
 
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
-                              new_disto, New_adsr, Portable, Env_Modulation);
+                              new_disto, New_adsr, Portable, Env_Modulation, New_Env);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo1_period > 128) PARASynth[swrite].lfo1_period = 128;
@@ -2794,8 +2798,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 if(PARASynth[swrite].env1_osc2_pitch != 64) Store_Synth_Env1 = TRUE;
                 if(PARASynth[swrite].env1_osc1_pitch != 64) Store_Synth_Env1_Pitch = TRUE;
                 if(PARASynth[swrite].env1_osc2_pitch != 64) Store_Synth_Env1_Pitch = TRUE;
-                if(PARASynth[swrite].env1_osc1_volume != 64) Store_Synth_Env1 = TRUE;
-                if(PARASynth[swrite].env1_osc2_volume != 64) Store_Synth_Env1 = TRUE;
+                if(PARASynth[swrite].env1_osc1_volume != 127) Store_Synth_Env1 = TRUE;
+                if(PARASynth[swrite].env1_osc2_volume != 127) Store_Synth_Env1 = TRUE;
                 if(PARASynth[swrite].env1_vcf_cutoff != 64) Store_Synth_Env1 = TRUE;
                 if(PARASynth[swrite].env1_vcf_resonance != 64) Store_Synth_Env1 = TRUE;
 
@@ -2808,10 +2812,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 fvalue = ((float) PARASynth[swrite].env1_osc2_pitch - 64) * 0.015625f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env1_osc1_volume - 64) * 0.015625f;
-                if((PARASynth[swrite].env1_osc1_volume - 64) == 0) fvalue = 1.0f;
+                //if((PARASynth[swrite].env1_osc1_volume - 64) == 0) fvalue = 1.0f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env1_osc2_volume - 64) * 0.015625f;
-                if((PARASynth[swrite].env1_osc2_volume - 64) == 0) fvalue = 1.0f;
+                //if((PARASynth[swrite].env1_osc2_volume - 64) == 0) fvalue = 1.0f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env1_vcf_cutoff - 64) * 0.015625f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
@@ -2830,8 +2834,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 if(PARASynth[swrite].env2_osc2_pitch != 64) Store_Synth_Env2 = TRUE;
                 if(PARASynth[swrite].env2_osc1_pitch != 64) Store_Synth_Env2_Pitch = TRUE;
                 if(PARASynth[swrite].env2_osc2_pitch != 64) Store_Synth_Env2_Pitch = TRUE;
-                if(PARASynth[swrite].env2_osc1_volume != 64) Store_Synth_Env2 = TRUE;
-                if(PARASynth[swrite].env2_osc2_volume != 64) Store_Synth_Env2 = TRUE;
+                if(PARASynth[swrite].env2_osc1_volume != 127) Store_Synth_Env2 = TRUE;
+                if(PARASynth[swrite].env2_osc2_volume != 127) Store_Synth_Env2 = TRUE;
                 if(PARASynth[swrite].env2_vcf_cutoff != 64) Store_Synth_Env2 = TRUE;
                 if(PARASynth[swrite].env2_vcf_resonance != 64) Store_Synth_Env2 = TRUE;
 
@@ -2844,10 +2848,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 fvalue = ((float) PARASynth[swrite].env2_osc2_pitch - 64) * 0.015625f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env2_osc1_volume - 64) * 0.015625f;
-                if((PARASynth[swrite].env2_osc1_volume - 64) == 0) fvalue = 1.0f;
+                //if((PARASynth[swrite].env2_osc1_volume - 64) == 0) fvalue = 1.0f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env2_osc2_volume - 64) * 0.015625f;
-                if((PARASynth[swrite].env2_osc2_volume - 64) == 0) fvalue = 1.0f;
+                //if((PARASynth[swrite].env2_osc2_volume - 64) == 0) fvalue = 1.0f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
                 fvalue = ((float) PARASynth[swrite].env2_vcf_cutoff - 64) * 0.015625f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
@@ -3502,7 +3506,6 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             Write_Mod_Data(pSequence, sizeof(char), MAX_SEQUENCES, in);
 
-
             Swap_Short_Buffer(patternLines, MAX_ROWS);
             Write_Mod_Data(patternLines, sizeof(short), MAX_ROWS, in);
             Swap_Short_Buffer(patternLines, MAX_ROWS);
@@ -3760,6 +3763,7 @@ void LoadSynth(char *FileName)
     FILE *in;
     int new_version = FALSE;
     int Env_Modulation = FALSE;
+    int New_Env = FALSE;
 
     in = fopen(FileName, "rb");
 
@@ -3771,12 +3775,12 @@ void LoadSynth(char *FileName)
 
         switch(extension[7])
         {
+            case '3':
+                New_Env = TRUE;
             case '2':
                 Env_Modulation = TRUE;
-
             case '1':
                 new_version = TRUE;
-
             case '0':
                 break;
         }
@@ -3797,7 +3801,7 @@ void LoadSynth(char *FileName)
         PARASynth[ped_patsam].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, ped_patsam,
-                          TRUE, TRUE, new_version, Env_Modulation);
+                          TRUE, TRUE, new_version, Env_Modulation, New_Env);
 
         // Fix some old Ntk bugs
         if(PARASynth[ped_patsam].lfo1_period > 128) PARASynth[ped_patsam].lfo1_period = 128;
@@ -3827,7 +3831,7 @@ void SaveSynth(void)
     char Temph[MAX_PATH];
     char extension[10];
 
-    sprintf(extension, "TWNNSYN2");
+    sprintf(extension, "TWNNSYN3");
     sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[ped_patsam].presetname);
     mess_box(Temph);
 
@@ -3863,6 +3867,7 @@ void LoadInst(char *FileName)
     int new_adsr = FALSE;
     int tight = FALSE;
     int Env_Modulation = FALSE;
+    int New_Env = FALSE;
 
     mess_box("Attempting to load an instrument file...");
     FILE *in;
@@ -3876,6 +3881,8 @@ void LoadInst(char *FileName)
 
         switch(extension[7])
         {
+            case '7':
+                New_Env = TRUE;
             case '6':
                 Env_Modulation = TRUE;
             case '5':
@@ -3918,7 +3925,7 @@ void LoadInst(char *FileName)
         PARASynth[swrite].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, swrite,
-                          !old_bug, new_adsr, tight, Env_Modulation);
+                          !old_bug, new_adsr, tight, Env_Modulation, New_Env);
 
         // Gsm by default
         if(Pack_Scheme)
@@ -4002,7 +4009,7 @@ void SaveInst(void)
     char synth_prg;
     int synth_save;
 
-    sprintf(extension, "TWNNINS6");
+    sprintf(extension, "TWNNINS7");
     sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[ped_patsam]);
     mess_box(Temph);
     sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]);
@@ -4245,7 +4252,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGG");
+        sprintf(extension, "TWNNSNGH");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
@@ -4621,7 +4628,9 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int idx,
                        int read_disto,
                        int read_lfo_adsr,
-                       int new_version, int Env_Modulation)
+                       int new_version,
+                       int Env_Modulation,
+                       int New_Env)
 {
     if(!new_version)
     {
@@ -4764,7 +4773,16 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
         Swap = PARASynth[idx].env1_osc2_volume;
         PARASynth[idx].env1_osc2_volume = PARASynth[idx].env2_osc1_volume;
         PARASynth[idx].env2_osc1_volume = Swap;
+    }
 
+    if(!New_Env)
+    {
+        // In old versions a 64 value meant ENV = 1.0
+        // In newer ones it's a normal value (0.0)
+        if(PARASynth[idx].env1_osc1_volume == 64) PARASynth[idx].env1_osc1_volume = 127;
+        if(PARASynth[idx].env1_osc2_volume == 64) PARASynth[idx].env1_osc2_volume = 127;
+        if(PARASynth[idx].env2_osc1_volume == 64) PARASynth[idx].env2_osc1_volume = 127;
+        if(PARASynth[idx].env2_osc2_volume == 64) PARASynth[idx].env2_osc2_volume = 127;
     }
 }
 

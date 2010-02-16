@@ -1900,7 +1900,8 @@ void LoadFile(int Freeindex, const char *str)
            strcmp(extension, "TWNNINS3") == 0 ||
            strcmp(extension, "TWNNINS4") == 0 ||
            strcmp(extension, "TWNNINS5") == 0 ||
-           strcmp(extension, "TWNNINS6") == 0)
+           strcmp(extension, "TWNNINS6") == 0 ||
+           strcmp(extension, "TWNNINS7") == 0)
         {
             sprintf(instrname, "%s", Wavfile);
             LoadInst(instrname);
@@ -1920,7 +1921,8 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGD") == 0 ||
                 strcmp(extension, "TWNNSNGE") == 0 ||
                 strcmp(extension, "TWNNSNGF") == 0 ||
-                strcmp(extension, "TWNNSNGG") == 0)
+                strcmp(extension, "TWNNSNGG") == 0 ||
+                strcmp(extension, "TWNNSNGH") == 0)
         {
             sprintf(name, "%s", Wavfile);
             Ptk_Stop();
@@ -1929,7 +1931,8 @@ void LoadFile(int Freeindex, const char *str)
         }
         else if(strcmp(extension, "TWNNSYN0") == 0 ||
                 strcmp(extension, "TWNNSYN1") == 0 ||
-                strcmp(extension, "TWNNSYN2") == 0)
+                strcmp(extension, "TWNNSYN2") == 0 ||
+                strcmp(extension, "TWNNSYN3") == 0)
         {
             sprintf(synthname, "%s", Wavfile);
             LoadSynth(synthname);

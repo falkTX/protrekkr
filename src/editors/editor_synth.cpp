@@ -1677,13 +1677,27 @@ void Actualize_SynthParSlider(void)
 
         case 4: /* Env1->osc1 volume */
             Realslider(563, 487 - 1, Cur_SynthParam->env1_osc1_volume, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            if(Cur_SynthParam->env1_osc1_volume != 64)
+            {
+                outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(563 + 167, 487 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+            }
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc1_volume;
             break;
 
         case 5: /* Env1->osc2 volume */
             Realslider(563, 487 - 1, Cur_SynthParam->env1_osc2_volume, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            if(Cur_SynthParam->env1_osc2_volume != 64)
+            {
+                outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(563 + 167, 487 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+            }
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc2_volume;
             break;
 
@@ -1744,13 +1758,27 @@ void Actualize_SynthParSlider(void)
 
         case 4: /* Env2->osc1 volume */
             Realslider(563, 523 - 1, Cur_SynthParam->env2_osc1_volume, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            if(Cur_SynthParam->env2_osc1_volume != 64)
+            {
+                outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(563 + 167, 523 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+            }
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc1_volume;
             break;
 
         case 5: /* Env2->osc2 volume */
             Realslider(563, 523 - 1, Cur_SynthParam->env2_osc2_volume, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            if(Cur_SynthParam->env2_osc2_volume != 64)
+            {
+                outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(563 + 167, 523 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+            }
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc2_volume;
             break;
 
