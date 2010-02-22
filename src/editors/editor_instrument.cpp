@@ -314,10 +314,9 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 16)
                 {
+#if !defined(__NO_CODEC__)
                     switch(SampleCompression[ped_patsam])
                     {
-
-#if !defined(__NO_CODEC__)
                         case SMP_PACK_GSM:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global_Pushed);
                             Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_Global);
@@ -381,9 +380,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global);
                             Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global_Pushed);
                             break;
-#endif
-
                     }
+#endif
                     if(gode == 16) gode = 19;
                 }
 

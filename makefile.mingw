@@ -18,7 +18,7 @@ EXEOBJS = ptk.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
           riff.o \
-          tb_303.o cubic_spline.o samples_unpack.o replay.o synth.o endianness.o \
+          tb_303.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver.o
 
 all: ProTrekkr
@@ -31,7 +31,7 @@ RemObj:
 ProTrekkr: $(EXEOBJS)
 	$(CXX) -o ./release/distrib/ptk_win.exe -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
 	strip -s -x ./release/distrib/ptk_win.exe
-	-rm -f $(EXEOBJS)
+#	-rm -f $(EXEOBJS)
 	
 ptk.o: src/ptk.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/$(*).cpp
@@ -112,9 +112,6 @@ riff.o: src/wav/riff.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/wav/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
-
-cubic_spline.o: release/distrib/replay/lib/cubic_spline.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
