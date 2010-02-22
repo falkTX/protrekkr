@@ -19,6 +19,7 @@
 *.ptp*
 *.ppb*
 *.303*
+*.wav*
 *module.s*
 *.ptk*
 *stderr*

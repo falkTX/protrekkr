@@ -1249,7 +1249,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                             }
                             else
                             {
-                                PrintXY(xr + 240, yr + (counter * 12), Font, "Pack: -");
+                                PrintXY(xr + 240, yr + (counter * 12), Font, "Pck: -");
                             }
 
                             if(Midiprg[rel_val] == -1)

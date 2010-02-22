@@ -10,6 +10,7 @@
 *.ptk*
 *.ppb*
 *.303*
+*.wav*
 *stderr*
 *stdout*
 *.elf*
