@@ -4,7 +4,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlparser.o \
        src/extralibs/tinyxml/tinystr.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
-       -lSDL -lSDL_draw -lz
+       -lSDL -lsdldraw -lz
 
 FLAGS = -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D __AROS__ -D __GCC__ -D __NO_CODEC__ -D __NO_MIDI__ -I./src/include \
@@ -34,7 +34,7 @@ RemObj:
 	-rm -f $(EXEOBJS)
 
 protrekkr: $(EXEOBJS)
-    $(CXX) -o ./release/distrib/ptk_aros -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	$(CXX) -o ./release/distrib/ptk_aros -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
 
 libptkreplay: $(LIBOBJS)
 	$(AR) -crv libptkreplay.a $(LIBOBJS)
