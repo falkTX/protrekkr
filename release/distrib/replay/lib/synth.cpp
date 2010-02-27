@@ -1155,7 +1155,7 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_LFO2)
                                     + LFO2_VALUE * Data.LFO2_OSC2_VOLUME
 #endif
-                                    ) + ENV2_MIN)
+                                    + 0) + ENV2_MIN)
                                     * ENV2_VOLUME;
 
                     res_dec = pos_osc2->half.last;

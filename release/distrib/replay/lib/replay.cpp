@@ -953,7 +953,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 
         // Allocated the necessary room for the patterns
-        int max_lines = (PATTERN_BYTES * Songtracks * PATTERN_ROW_LEN * nPatterns);
+        int max_lines = (PATTERN_BYTES * Songtracks * PATTERN_ROW_LEN * nPatterns * MAX_ROWS);
 
         // Free the patterns block
         if(RawPatterns) free(RawPatterns);
