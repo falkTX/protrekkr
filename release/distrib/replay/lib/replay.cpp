@@ -2266,7 +2266,7 @@ void Sp_Player(void)
                     {
                         cPosition = 0;
 #if defined(__WINAMP__)
-                        done = 1;
+                        done = TRUE;
 #endif
                     }
                 }
@@ -2320,7 +2320,7 @@ void Sp_Player(void)
                     {
                         cPosition = 0;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-                        done = 1;
+                        done = TRUE;
 #endif
                     }
                 }
@@ -3957,6 +3957,14 @@ void DoEffects(void)
 #if defined(PTK_FX_SETSPEED)
             // $0f Set speed
             case 0x0f:
+                if(pltr_dat_row == 0)
+                {
+                    Songplaying = FALSE;
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+                    gui_action = GUI_CMD_STOP_SONG;
+#endif
+                    break;
+                }
                 TicksPerBeat = (int) pltr_dat_row;
                 if(TicksPerBeat < 1) TicksPerBeat = 1;
                 if(TicksPerBeat > 16) TicksPerBeat = 16;

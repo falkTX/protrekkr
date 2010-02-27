@@ -2333,7 +2333,7 @@ void Goto_Top_Left(void)
 void Goto_Bottom_Right(void)
 {
     Select_Block_Keyboard(BLOCK_MARK_ROWS | BLOCK_MARK_TRACKS);
-    if(!Get_LCtrl()) ped_line = patternLines[pSequence[cPosition_delay]] - 1;
+    if(!Get_LCtrl()) ped_line = patternLines[pSequence[Get_Current_Position()]] - 1;
     else
     {
         ped_col = 0;

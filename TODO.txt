@@ -29,5 +29,4 @@ TODO (in no special order):
  - Port to FreeBSD.
  - Port to Linux PPC.
  - Possibility to select any soundcard as rendering device.
- - End key problem with patterns >64 rows.
  - Troubles with command 03 and volume column.

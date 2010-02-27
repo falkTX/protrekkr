@@ -2,6 +2,13 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98n:
+
+- Fixed a small issue with END key not jumping to proper pattern's end
+  in some cases.
+- Using F00 effect now stops a song.
+- Fixed a crash in the replay.
+
 v1.98m:
 
 - Modified the way envs to volumes work with null values.
