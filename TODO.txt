@@ -31,3 +31,4 @@ TODO (in no special order):
  - Port to Linux PPC.
  - Possibility to select any soundcard as rendering device.
  - Troubles with command 03 and volume column.
+ - See about the latency issue in OSX.
