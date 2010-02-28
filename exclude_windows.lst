@@ -8,9 +8,14 @@
 *.a
 *.ptp*
 *.ptk*
+*.psm*
 *.ppb*
 *.303*
 *.wav*
+*.plg*
+*.map*
+*.ncb*
+*.lib*
 *stderr*
 *stdout*
 *.elf*

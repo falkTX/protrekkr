@@ -17,6 +17,11 @@
 *.a*
 *.lib*
 *.ptp*
+*.psm*
+*.plg*
+*.map*
+*.ncb*
+*.lib*
 *.ptk*
 *.ppb*
 *.303*

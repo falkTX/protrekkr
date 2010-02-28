@@ -17,9 +17,14 @@
 *.a
 *.lib*
 *.ptp*
+*.psm*
 *.ppb*
 *.303*
+*.lib*
 *.wav*
+*.plg*
+*.map*
+*.ncb*
 *module.s*
 *.ptk*
 *stderr*
