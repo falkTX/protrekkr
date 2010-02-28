@@ -22,9 +22,10 @@ TODO (in no special order):
  - Add individual panning data for instruments & synths.
  - Add support for soundfont 2 files.
  - Drag'n'drop blocks in patterns.
- - VSTs support in the samples editor.
+ - VSTs and VSTis support in the samples editor (for waveforms processing and generation).
+ - VSTis in instruments and VSTs in tracks.
  - Envelopes scaling.
- - Possibility to link effects to midi commands.
+ - Possibility to associate effects to midi commands.
  - Add jackd support via libjack.
  - Port to FreeBSD.
  - Port to Linux PPC.

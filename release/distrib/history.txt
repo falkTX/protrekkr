@@ -7,7 +7,7 @@ v1.98n:
 - Fixed a small issue with END key not jumping to proper pattern's end
   in some cases.
 - Using F00 effect now stops a song.
-- Fixed a crash in the replay.
+- Fixed a crash in the replay of .ptp modules.
 
 v1.98m:
 
