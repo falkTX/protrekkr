@@ -77,8 +77,6 @@ void CSynth::Reset(void)
     T_OSC1_VOLUME = 0;
     T_OSC2_VOLUME = 0;
 
-    GLOBAL_VOLUME = 0;
-
     Data.OSC2_DETUNE = 0;        /* No Semitone Detune */
     Data.OSC2_FINETUNE = 0.1f;   /* 1/10 Semitone detune */
 
@@ -475,7 +473,6 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     LFO2_A_COEF = (1.0f - LFO2_ADSR_VALUE) / LFO2b_ATTACK;
 #endif
 
-    GLOBAL_VOLUME = speed;
 }
 
 // ------------------------------------------------------
@@ -1628,7 +1625,7 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 
         GS_VAL2 *= Data.GLB_VOLUME;
-        *Right_Signal += GS_VAL2 * GLOBAL_VOLUME;
+        *Right_Signal += GS_VAL2;
     }
 
     // Advance all, oscillator, envelopes, and lfo's
@@ -1636,7 +1633,7 @@ float CSynth::GetSample(short *Left_Samples,
     LfoAdvance();
 
     // Return value
-    return GS_VAL * GLOBAL_VOLUME;
+    return GS_VAL;
 }
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)

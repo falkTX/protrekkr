@@ -1996,68 +1996,75 @@ void Sp_Player(void)
                 pl_eff_row2 = *(RawPatterns + efactor2 + PATTERN_FX);
                 pl_dat_row2 = *(RawPatterns + efactor2 + PATTERN_FXDATA);
 
-#if defined(PTK_VOLUME_COLUMN)
-                if(pl_vol_row <= 64)
+                // Don't check for potential volume change
+                if(CHAN_ACTIVE_STATE[cPosition][ct])
                 {
-                    for(i = 0; i < Channels_Polyphony[ct]; i++)
+
+#if defined(PTK_VOLUME_COLUMN)
+                    if(pl_vol_row <= 64)
                     {
-                        sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f; // Setting volume.
+                        for(i = 0; i < Channels_Polyphony[ct]; i++)
+                        {
+                            sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f; // Setting volume.
+                        }
                     }
-                }
 #endif
 
 #if defined(PTK_FX_SETVOLUME)
-                if(pl_eff_row == 3)
-                {
-                    for(i = 0; i < Channels_Polyphony[ct]; i++)
+                    if(pl_eff_row == 3)
                     {
-                        sp_Tvol[ct][i] = (float) pl_dat_row * 0.0039062f; // Setting volume.
+                        for(i = 0; i < Channels_Polyphony[ct]; i++)
+                        {
+                            sp_Tvol[ct][i] = (float) pl_dat_row * 0.0039062f; // Setting volume.
+                        }
                     }
-                }
 #endif
 
-                if(pl_pan_row <= 128)
-                {
-                    TPan[ct] = (float) pl_pan_row * 0.0078125f; 
-                    ComputeStereo(ct);
-                }
+                    if(pl_pan_row <= 128)
+                    {
+                        TPan[ct] = (float) pl_pan_row * 0.0078125f; 
+                        ComputeStereo(ct);
+                    }
+
 
 #if !defined(__STAND_ALONE__)
-                if(!sr_isrecording)
+                    if(!sr_isrecording)
 #endif
 #if defined(PTK_303)
-                {
-                    live303(pl_eff_row, pl_dat_row);
-                }
+                    {
+                        live303(pl_eff_row, pl_dat_row);
+                    }
 #endif
 
 #if defined(PTK_303)
-                if(pl_eff_row == 0x31)
-                {
-                    track3031 = ct;
-                    Fire303(pl_dat_row, 0);
-                }
-                if(pl_eff_row == 0x32)
-                {
-                    track3032 = ct;
-                    Fire303(pl_dat_row, 1);
-                }
+                    if(pl_eff_row == 0x31)
+                    {
+                        track3031 = ct;
+                        Fire303(pl_dat_row, 0);
+                    }
+                    if(pl_eff_row == 0x32)
+                    {
+                        track3032 = ct;
+                        Fire303(pl_dat_row, 1);
+                    }
 #endif
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-                /* MidiController commands */
-                if(pl_pan_row == 0x90 && c_midiout != -1 && pl_eff_row < 128)
-                {
-                    Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row, pl_dat_row);
+                    /* MidiController commands */
+                    if(pl_pan_row == 0x90 && c_midiout != -1 && pl_eff_row < 128)
+                    {
+                        Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row, pl_dat_row);
+                    }
+
+                    if(pl_eff_row == 0x80 && c_midiout != -1 && pl_dat_row < 128)
+                    {
+                        Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row);
+                    }
+#endif
+#endif
                 }
 
-                if(pl_eff_row == 0x80 && c_midiout != -1 && pl_dat_row < 128)
-                {
-                    Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row);
-                }
-#endif
-#endif
 
 #if defined(PTK_FX_PATTERNBREAK)
                 if(pl_eff_row == 0xd && pl_dat_row < MAX_ROWS) Patbreak = pl_dat_row;
@@ -2115,6 +2122,7 @@ void Sp_Player(void)
 #if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
                         if(pl_vol_row <= 64 || pl_eff_row == 3)
                         {
+                            // Start to play it with the specified volume
                             Play_Instrument(ct,
                                             free_sub_channel,
                                             pl_note[i],
@@ -3436,7 +3444,7 @@ void Play_Instrument(int channel, int sub_channel,
 #endif // PTK_INSTRUMENTS
 
         {
-            sp_Cvol[channel][sub_channel] = 1.0f;
+            sp_Cvol[channel][sub_channel] = 0.0f;
             Player_SV[channel][sub_channel] = 1.0f;
             if(!glide)
             {

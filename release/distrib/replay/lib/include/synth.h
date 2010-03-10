@@ -358,8 +358,6 @@ class CSynth
         float T_OSC1_VOLUME;
         float T_OSC2_VOLUME;
 
-        float GLOBAL_VOLUME;
-
         int64 OSC1_SPEED;
         int64 OSC2_SPEED;
         int64 OSC3_SPEED;
