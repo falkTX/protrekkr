@@ -2831,6 +2831,7 @@ int Raw_Keys_to_Send[] =
 void Keyboard_Handler(void)
 {
     int Cur_Position;
+    int Done_Value;
 
     if(Songplaying) Cur_Position = cPosition_delay;
     else Cur_Position = cPosition;
@@ -3974,6 +3975,7 @@ void Keyboard_Handler(void)
             }
         }
 
+        Done_Value = FALSE;
         if(!Get_LAlt())
         {
             if(retvalue != NOTE_OFF && is_editing == 1)
@@ -3981,6 +3983,7 @@ void Keyboard_Handler(void)
                 int ped_cell;
                 int i;
                 int j = (Channels_MultiNotes[ped_track] - 1) * 3;
+
                 // Instrument
                 for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
                 {
@@ -3992,6 +3995,7 @@ void Keyboard_Handler(void)
                 }
                 i--;
 
+                // Odd
                 if(ped_col == (1 + (i * 3)) ||
                    ped_col == (3 + j) ||
                    ped_col == (5 + j) ||
@@ -4040,8 +4044,8 @@ void Keyboard_Handler(void)
                             ped_line += ped_pattad;
                             if(!ped_pattad)
                             {
-                                ped_col++;
-                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                Goto_Next_Column();
+                                Done_Value = TRUE;
                             }
                         }
                     }
@@ -4078,8 +4082,8 @@ void Keyboard_Handler(void)
                                 ped_line += ped_pattad;
                                 if(!ped_pattad)
                                 {
-                                    ped_col++;
-                                    gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                    Goto_Next_Column();
+                                    Done_Value = TRUE;
                                 }
                             }
                         }
@@ -4087,75 +4091,40 @@ void Keyboard_Handler(void)
                     Actupated(0);
                 }
 
-                for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
+                if(!Done_Value)
                 {
-                    if(ped_col == 2 +(i * 3))
+                    for(i = 0; i < Channels_MultiNotes[ped_track]; i++)
                     {
-                        i++;
-                        break;
-                    }
-                }
-                i--;
-                if(ped_col == (2 + (i * 3)) ||
-                   ped_col == (4 + j) ||
-                   ped_col == (6 + j) ||
-                   ped_col == (8 + j) ||
-                   ped_col == (10 + j))
-                {
-                    ped_cell = PATTERN_INSTR1 + (i * 2);
-                    if(ped_col == (4 + j)) ped_cell = PATTERN_VOLUME;
-                    if(ped_col == (6 + j)) ped_cell = PATTERN_PANNING;
-                    if(ped_col == (8 + j)) ped_cell = PATTERN_FX;
-                    if(ped_col == (10 + j)) ped_cell = PATTERN_FXDATA;
-
-                    ltretvalue = retvalue;
-                    xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
-                    int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
-
-                    if(retvalue < 16)
-                    {
-                        if(oldval == 255 && ped_col == (2 + (i * 3))) oldval = 0;
-                        if(oldval == 255 && ped_col == (4 + j)) oldval = 0;
-                        if(oldval == 255 && ped_col == (6 + j)) oldval = 0;
-                        oldval = (oldval & 0xf0) + retvalue;
-                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
-
-                        // Max panning
-                        if(oldval != 255 && ped_col == (6 + j) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
+                        if(ped_col == 2 +(i * 3))
                         {
-                            if(oldval != 255 && ped_col == (6 + j) &&
-                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
-                            {
-                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
-                            }
-                        }
-
-                        // Max instrument
-                        if(oldval != 255 && ped_col == (2 + (i * 3)) &&
-                           *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 127)
-                        {
-                            *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 127;
-                        }
-    
-                        if(!is_recording) if(!Songplaying)
-                        {
-                            ped_line += ped_pattad;
-                            if(!ped_pattad)
-                            {
-                                ped_col++;
-                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
-                            }
+                            i++;
+                            break;
                         }
                     }
-                    else
+                    i--;
+                    // Even
+                    if(ped_col == (2 + (i * 3)) ||
+                       ped_col == (4 + j) ||
+                       ped_col == (6 + j) ||
+                       ped_col == (8 + j) ||
+                       ped_col == (10 + j))
                     {
-                        if(!Delete_Selection(Cur_Position))
+                        ped_cell = PATTERN_INSTR1 + (i * 2);
+                        if(ped_col == (4 + j)) ped_cell = PATTERN_VOLUME;
+                        if(ped_col == (6 + j)) ped_cell = PATTERN_PANNING;
+                        if(ped_col == (8 + j)) ped_cell = PATTERN_FX;
+                        if(ped_col == (10 + j)) ped_cell = PATTERN_FXDATA;
+
+                        ltretvalue = retvalue;
+                        xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
+                        int oldval = *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted);
+
+                        if(retvalue < 16)
                         {
-                            oldval = 0;
-                            if(ped_col == (2 + (i * 3))) oldval = 255;
-                            if(ped_col == (4 + j)) oldval = 255;
-                            if(ped_col == (6 + j)) oldval = 255;
+                            if(oldval == 255 && ped_col == (2 + (i * 3))) oldval = 0;
+                            if(oldval == 255 && ped_col == (4 + j)) oldval = 0;
+                            if(oldval == 255 && ped_col == (6 + j)) oldval = 0;
+                            oldval = (oldval & 0xf0) + retvalue;
                             *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
 
                             // Max panning
@@ -4171,23 +4140,60 @@ void Keyboard_Handler(void)
 
                             // Max instrument
                             if(oldval != 255 && ped_col == (2 + (i * 3)) &&
-                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                               *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 127)
                             {
-                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 127;
                             }
-
+    
                             if(!is_recording) if(!Songplaying)
                             {
                                 ped_line += ped_pattad;
                                 if(!ped_pattad)
                                 {
-                                    ped_col++;
-                                    gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                    Goto_Next_Column();
                                 }
                             }
                         }
+                        else
+                        {
+                            if(!Delete_Selection(Cur_Position))
+                            {
+                                oldval = 0;
+                                if(ped_col == (2 + (i * 3))) oldval = 255;
+                                if(ped_col == (4 + j)) oldval = 255;
+                                if(ped_col == (6 + j)) oldval = 255;
+                                *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = oldval;
+
+                                // Max panning
+                                if(oldval != 255 && ped_col == (6 + j) &&
+                                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) != 0x90)
+                                {
+                                    if(oldval != 255 && ped_col == (6 + j) &&
+                                       *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x80)
+                                    {
+                                        *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x80;
+                                    }
+                                }
+
+                                // Max instrument
+                                if(oldval != 255 && ped_col == (2 + (i * 3)) &&
+                                   *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) > 0x7f)
+                                {
+                                    *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 0x7f;
+                                }
+
+                                if(!is_recording) if(!Songplaying)
+                                {
+                                    ped_line += ped_pattad;
+                                    if(!ped_pattad)
+                                    {
+                                        Goto_Next_Column();
+                                    }
+                                }
+                            }
+                        }
+                        Actupated(0);
                     }
-                    Actupated(0);
                 }
             }
         }
@@ -4421,8 +4427,7 @@ No_Key:;
                             ped_line += ped_pattad;
                             if(!ped_pattad)
                             {
-                                ped_col++;
-                                gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                                Goto_Next_Column();
                             }
                         }
                     }
@@ -4469,8 +4474,7 @@ No_Key:;
                     ped_line += ped_pattad;
                     if(!ped_pattad)
                     {
-                        ped_col++;
-                        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                        Goto_Next_Column();
                     }
                 }
                 Actupated(0);
@@ -4510,8 +4514,7 @@ No_Key:;
                         ped_line += ped_pattad;
                         if(!ped_pattad)
                         {
-                            ped_col++;
-                            gui_action = GUI_CMD_SET_FOCUS_TRACK;
+                            Goto_Next_Column();
                         }
                     }
                 }
@@ -5041,7 +5044,6 @@ void Mouse_Handler(void)
         }
 
         // Exit
-
         if(zcheckMouse(0, 6, 16, 16))
         {
             gui_action = GUI_CMD_EXIT;
