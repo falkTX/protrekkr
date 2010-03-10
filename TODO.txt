@@ -27,7 +27,7 @@ TODO (in no special order):
  - Envelopes scaling.
  - Possibility to associate effects to midi commands.
  - Add jackd support via libjack.
- - Port to FreeBSD.
- - Port to Linux PPC.
+ - Port to FreeBSD (eventually).
+ - Port to Linux PPC (eventually).
  - Possibility to select any soundcard as rendering device.
  - See about the latency issue in OSX.
