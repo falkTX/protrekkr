@@ -4026,9 +4026,9 @@ void DoEffects(void)
 
 #if defined(PTK_LFO)
 #if defined(PTK_FX_RESETFILTERLFO)
-            // $16 Reset filter lfo
+            // $16 Set filter lfo value
             case 0x16:
-                LFOGR[trackef] = 0.0f;
+                LFOGR[trackef] = ((float) pltr_dat_row / 255.0f) * 359.0f;
                 break;
 #endif
 #endif
@@ -4232,7 +4232,7 @@ void ResetFilters(int tr)
 }
 
 // ------------------------------------------------------
-// Process LFO
+// Process track filter LFO
 float ApplyLfo(float cy, int trcy)
 {
 

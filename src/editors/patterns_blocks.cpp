@@ -1022,7 +1022,7 @@ void Randomize_Block(int Position)
 
                     case EFFECTDATHI:
                     case EFFECTDATLO:
-                        Write_Pattern_Column(Position, xbc, ybc, (rand() & 0x7f));
+                        Write_Pattern_Column(Position, xbc, ybc, (rand() & 0xff));
                         break;
                 }
             }
