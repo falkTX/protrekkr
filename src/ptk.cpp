@@ -423,13 +423,13 @@ int Load_Font_Datas(char *name)
     char error[256];
 
     pic_filename = XML_get_string("files", "file", name, "value");
-    
+
     if(!pic_filename)
     {
         Message_Error("XML error in files tag.");
         return(FALSE);
     }
-    
+
 #if defined(__WIN32__)
     sprintf(filepath, "skins\\%s", pic_filename);
 #else
@@ -587,7 +587,7 @@ int Init_Context(void)
 
     return(TRUE);
 }
-   
+
 // ------------------------------------------------------
 // Release the allocated resources
 extern int volatile AUDIO_Acknowledge;
@@ -808,7 +808,7 @@ int Screen_Update(void)
             else
             {
                 cPosition--;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
             }
             Actualize_Sequencer();
             Actupated(0);
@@ -824,7 +824,7 @@ int Screen_Update(void)
             else
             {
                 cPosition++;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
             }
             Actualize_Sequencer();
             Actupated(0);
@@ -845,7 +845,7 @@ int Screen_Update(void)
             else
             {
                 pSequence[cPosition]--;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
             }
             Actualize_Sequencer();
             Actupated(0);
@@ -868,7 +868,7 @@ int Screen_Update(void)
             else
             {
                 pSequence[cPosition]++;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
             }
             Actualize_Sequencer();
             Actupated(0);
@@ -1130,7 +1130,7 @@ int Screen_Update(void)
             Actualize_Input();
             retletter[71] = FALSE;
             userscreen = USER_SCREEN_DISKIO_EDIT;
-            Draw_DiskIO_Ed(); 
+            Draw_DiskIO_Ed();
             Actualize_DiskIO_Ed(0);
         }
 
@@ -1140,7 +1140,7 @@ int Screen_Update(void)
             Actualize_Input();
             retletter[71] = FALSE;
             userscreen = USER_SCREEN_REVERB_EDIT;
-            Draw_Reverb_Ed(); 
+            Draw_Reverb_Ed();
             Actualize_Reverb_Ed(0);
         }
 
@@ -1306,7 +1306,7 @@ int Screen_Update(void)
             last_index = -1;
             Actualize_Files_List(0);
         }
- 
+
         if(gui_action == GUI_CMD_SAVE_INSTRUMENT)
         {
             if(snamesel == INPUT_NONE) SaveInst();
@@ -1518,7 +1518,7 @@ int Screen_Update(void)
             {
                 if(pSequence[cPosition] > 9) pSequence[cPosition] -= 10;
                 else pSequence[cPosition] = 0;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
                 Anat(cPosition);
             }
             Actualize_Sequencer();
@@ -1538,7 +1538,7 @@ int Screen_Update(void)
             {
                 if(pSequence[cPosition] < 118) pSequence[cPosition] += 10;
                 else pSequence[cPosition] = 127;
-                Bound_Patt_Pos();          
+                Bound_Patt_Pos();
                 Anat(cPosition);
             }
             Actualize_Sequencer();
@@ -1650,7 +1650,7 @@ int Screen_Update(void)
             Gui_Draw_Button_Box(332, 152, 16, 16, "\012", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(332 + 18, 152, 16, 16, "\013", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(332 + (18 * 2), 152, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            
+
             Refresh_UI_Context();
 
             Actualize_Files_List(0);
@@ -1819,7 +1819,7 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
 
     SampleChannels[n_index][ped_split] = samplechans;
     RawSamples[n_index][0][ped_split] = (short *) malloc(lenfir * 2);
-    if(samplechans == 2) RawSamples[n_index][1][ped_split] = (short *) malloc(lenfir * 2);    
+    if(samplechans == 2) RawSamples[n_index][1][ped_split] = (short *) malloc(lenfir * 2);
 
     LoopStart[n_index][ped_split] = 0;
     LoopEnd[n_index][ped_split] = lenfir;
@@ -1955,7 +1955,7 @@ void LoadFile(int Freeindex, const char *str)
         }
         else
         {
-            mess_box("Attempting of loading a wav file...");   
+            mess_box("Attempting of loading a wav file...");
 
             // We need the length
             if(Wav_File.OpenForRead(Wavfile) == DDC_SUCCESS)
@@ -1994,8 +1994,10 @@ void LoadFile(int Freeindex, const char *str)
 
                             case 2:
                                 AllocateWave(Freeindex, Wav_File.NumSamples(), 2);
+
                                 csamples = RawSamples[Freeindex][0][ped_split];
                                 csamples2 = RawSamples[Freeindex][1][ped_split];
+
                                 for(i = 0; i < Wav_File.NumSamples(); i++)
                                 {
                                     Wav_File.ReadStereoSample(&csamples[i], &csamples2[i]);
@@ -2006,7 +2008,7 @@ void LoadFile(int Freeindex, const char *str)
                         LoopStart[Freeindex][ped_split] = Wav_File.LoopStart();
                         LoopEnd[Freeindex][ped_split] = Wav_File.LoopEnd();
 
-                        sprintf(SampleName[Freeindex][ped_split], "%s", Wavfile); 
+                        sprintf(SampleName[Freeindex][ped_split], "%s", Wavfile);
                         Actualize_Patterned();
                         Actualize_Instrument_Ed(2, 0);
                         NewWav();
@@ -2045,7 +2047,7 @@ void LoadFile(int Freeindex, const char *str)
     }
     else
     {
-        mess_box("File loading error. (Probably: file not found)"); 
+        mess_box("File loading error. (Probably: file not found)");
     }
     gui_action = GUI_CMD_NONE;
     Actualize_DiskIO_Ed(0);
@@ -2293,7 +2295,7 @@ void Newmod(void)
 
     mess_box("Zzaapp done.");
 
-    Refresh_UI_Context();   
+    Refresh_UI_Context();
 }
 
 // ------------------------------------------------------
@@ -2461,7 +2463,7 @@ void WavRenderizer(void)
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 
         rawrender = TRUE;
- 
+
         ped_line = 0;
         ped_line_delay = 0;
         if(rawrender_range)
@@ -2645,7 +2647,7 @@ void ShowInfo(void)
       {
          if(SampleType[pp][z] != 0)
          {
-            sampsize += SampleChannels[pp][z] * SampleNumSamples[pp][z];   
+            sampsize += SampleChannels[pp][z] * SampleNumSamples[pp][z];
          }
       }
    }
@@ -3122,7 +3124,7 @@ void Keyboard_Handler(void)
         {
             retletter[7] = TRUE;
             reelletter = TRUE;
-        }     
+        }
         if(Keys[SDLK_h])
         {
             retletter[8] = TRUE;
@@ -3253,7 +3255,7 @@ void Keyboard_Handler(void)
         {
             retletter[47] = TRUE;
             reelletter = TRUE;
-        }     
+        }
         if(Keys['H'])
         {
             retletter[48] = TRUE;
@@ -3389,7 +3391,7 @@ void Keyboard_Handler(void)
         {
             retletter[30] = TRUE;
             reelletter = TRUE;
-        }     
+        }
         if(Keys[SDLK_KP4])
         {
             retletter[31] = TRUE;
@@ -4144,7 +4146,7 @@ void Keyboard_Handler(void)
                             {
                                 *(RawPatterns + pSequence[Cur_Position] * PATTERN_LEN + xoffseted) = 127;
                             }
-    
+
                             if(!is_recording) if(!Songplaying)
                             {
                                 ped_line += ped_pattad;
@@ -4215,7 +4217,7 @@ void Keyboard_Handler(void)
                 // Key editing
                 switch(Idx & 0x7f)
                 {
-                    case 0x10: 
+                    case 0x10:
                     case 3:
                     case 0x11:
                     case 4:
@@ -4468,7 +4470,7 @@ No_Key:;
 
                 *(RawPatterns + xoffseted + PATTERN_NOTE1 + column) = NOTE_OFF;
                 *(RawPatterns + xoffseted + PATTERN_INSTR1 + column) = NO_INSTR;
-    
+
                 if(!is_recording) if(!Songplaying)
                 {
                     ped_line += ped_pattad;
@@ -4789,7 +4791,7 @@ void Mouse_Handler(void)
             if(zcheckMouse(746, 6, 18, 16))
             {
                 if(Scopish == SCOPE_ZONE_SCOPE)
-                { 
+                {
                     Scopish_LeftRight ^= TRUE;
                 }
                 Scopish = SCOPE_ZONE_SCOPE;
@@ -4861,7 +4863,7 @@ void Mouse_Handler(void)
                     lt_index--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
-            
+
                 // Files list down
                 if(zcheckMouse(782, 162, 16, 14))
                 {
@@ -4977,7 +4979,7 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
             teac = 1;
         }
-    
+
         // Increase the number of BPM
         if(zcheckMouse(368, 62, 16, 16))
         {
@@ -4986,14 +4988,14 @@ void Mouse_Handler(void)
             teac = 1;
         }
 
-        // Decrease the number of TPB       
+        // Decrease the number of TPB
         if(zcheckMouse(324, 80, 16, 16))
         {
             TicksPerBeat--;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
             teac = 2;
         }
-    
+
         // Increase the number of TPB
         if(zcheckMouse(368, 80, 16, 16))
         {
@@ -5064,11 +5066,11 @@ void Mouse_Handler(void)
         {
             gui_action = GUI_CMD_SELECT_FX_EDIT;
             teac = 0;
-        }  
+        }
         if(zcheckMouse(532, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
         if(zcheckMouse(596, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
         if(zcheckMouse(660, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
-       
+
         Mouse_Left_Track_Fx_Ed();
 
         Mouse_Left_Sequencer_Ed();
@@ -5199,14 +5201,14 @@ void Mouse_Handler(void)
             teac = 1;
         }
 
-        // Decrease the number of TPB       
+        // Decrease the number of TPB
         if(zcheckMouse(324, 80, 16, 16))
         {
             TicksPerBeat -= 10;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
             teac = 2;
         }
-    
+
         // Increase the number of TPB
         if(zcheckMouse(368, 80, 16, 16))
         {
@@ -5449,7 +5451,7 @@ void Display_Master_Comp(void)
         Print_String(string, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
     }
 }
-         
+
 // ------------------------------------------------------
 // Display master volume
 void Display_Master_Volume(void)
@@ -5466,7 +5468,7 @@ void Display_Master_Volume(void)
         Print_String(tt, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
     }
 }
-         
+
 // ------------------------------------------------------
 // Display the shuffle amount
 void Display_Shuffle(void)
@@ -5566,7 +5568,7 @@ void Actualize_Master(char gode)
         Actupated(0);
     }
 
-    SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
+    SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     float SamplesPerBeat = (float) MIX_RATE / (((float) BeatsPerMin * 4) / 60);
     SamplesPerSub = SamplesPerTick / 6;
 
@@ -5911,9 +5913,9 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(393, 42, 406, 135);
             bjbox(393, 24, 353, 17);
-            
+
             Actualize_Instruments_Synths_List(0);
-            
+
             if(Scopish_LeftRight)
             {
                 Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -5962,7 +5964,7 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
-        
+
         case SCOPE_ZONE_MOD_DIR:
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
@@ -6056,7 +6058,7 @@ void Draw_Scope_Files_Button(void)
                     Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
             }
-    
+
             Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;

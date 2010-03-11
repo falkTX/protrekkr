@@ -35,10 +35,11 @@ RemObj:
 
 protrekkr: $(EXEOBJS)
 	$(CXX) -o ./release/distrib/ptk_aros -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
+	strip --strip-unneeded ./release/distrib/ptk_aros
 
 libptkreplay: $(LIBOBJS)
 	$(AR) -crv libptkreplay.a $(LIBOBJS)
-	
+
 ptk.o: src/ptk.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/$(*).cpp
 

@@ -20,7 +20,7 @@
 1997 September 14 [Don Cross]
      Fixed a bug in WaveFile::Close.  It was calling Backpatch
      and getting confused when the the file had been opened for read.
-     (Backpatch returns an error in that case, which prevented 
+     (Backpatch returns an error in that case, which prevented
      WaveFile::Close from calling RiffFile::Close.)
 
 2008 April 19 [Franck Charlet]
@@ -148,6 +148,7 @@ DDCRET RiffFile::Open(const char *Filename, RiffFileMode NewMode)
                     fmode = RFM_UNKNOWN;
                     retcode = DDC_FILE_ERROR;
                 }
+
                 break;
 
             default:
@@ -282,6 +283,7 @@ int RiffFile::SeekChunk(const char *ChunkName)
     int data_size;
 
     i = 0;
+
     while(!feof(file))
     {
         Chunk = 0;
@@ -303,7 +305,7 @@ int RiffFile::SeekChunk(const char *ChunkName)
             Seek(i);
             return(1);
         }
-        // Skip the datas
+        // Skip the datas to speed up the process
 
 #if defined(__BIG_ENDIAN__)
         if(Chunk == 'data')
@@ -312,6 +314,7 @@ int RiffFile::SeekChunk(const char *ChunkName)
 #endif
         {
             Read(&data_size, 4);
+
 
             data_size = Swap_32(data_size);
 
@@ -489,7 +492,7 @@ DDCRET WaveFile::OpenForWrite(const char  *Filename,
 DDCRET WaveFile::Close()
 {
     DDCRET rc = DDC_SUCCESS;
-   
+
     if(fmode == RFM_WRITE)
     {
         pcm_data.ckSize = Swap_32(pcm_data.ckSize);
