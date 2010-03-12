@@ -366,9 +366,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Uint32 ExePath_Size = MAX_PATH;
 
 #if defined(__MACOSX__)
-
     Uint32 Path_Length;
-
 #endif
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");

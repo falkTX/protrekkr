@@ -58,8 +58,6 @@ protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 	strip -x -X -S ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	-rm -f ./release/distrib/ptk_macosx_ppc
 	-rm -f ./release/distrib/ptk_macosx_x86
-#	-rm -f $(EXEOBJS_PPC)
-#	-rm -f $(EXEOBJS_X86)
 	
 ptk_ppc.o: src/ptk.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ptk.cpp

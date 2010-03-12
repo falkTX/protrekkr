@@ -604,19 +604,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
                                   &Desc) == noErr)
         {
 	        Amount = sizeof(AudioValueRange);
-            if(AudioDeviceGetProperty(AUDIO_Device,
-                                      0,
-                                      FALSE,
-                                      kAudioDevicePropertyBufferFrameSizeRange,
-                                      &Amount,
-                                      &Frame_Range) != noErr)
-            {
-                AUDIO_SoundBuffer_Size = 4096;
-            }
-            else
-            {
-                AUDIO_SoundBuffer_Size = (int) Frame_Range.mMaximum;
-            }
+            AUDIO_SoundBuffer_Size = frag_size << 2;
             AUDIO_Latency = AUDIO_SoundBuffer_Size;
 
             if(AudioDeviceSetProperty(AUDIO_Device,

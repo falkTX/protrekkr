@@ -143,11 +143,7 @@ void Actualize_Master_Ed(char gode)
         {
             if(AUDIO_Milliseconds < 10) AUDIO_Milliseconds = 10;
             if(AUDIO_Milliseconds > 250) AUDIO_Milliseconds = 250;
-#if defined(__MACOSX__)
-            Gui_Draw_Arrows_Number_Box(391, 455, AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-#else
             Gui_Draw_Arrows_Number_Box(391, 455, AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-#endif
         }
 
         // Create a new sound buffer with the new latency amount
@@ -447,7 +443,6 @@ void Mouse_Left_Master_Ed(void)
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
         // Milliseconds
-#if !defined(__MACOSX__)
         if(zcheckMouse(391, 455, 16, 16) == 1)
         {
             if(AUDIO_Milliseconds > 10)
@@ -468,7 +463,6 @@ void Mouse_Left_Master_Ed(void)
                 teac = 5;
             }
         }
-#endif
 
         // Mousewheel
         if(zcheckMouse(446, 475, 16, 16) == 1)
