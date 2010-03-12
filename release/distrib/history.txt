@@ -9,6 +9,8 @@ v1.98o:
 - Fixed a bug occuring while using volumn columns and/or Set volume FX (0x3)
   with synth instruments.
 - Editing was kinda broken when Step add was 0.
+- Enabled latency control on Mac OSX.
+- Re-enabled use of SDL threads for AROS.
 
 v1.98n:
 
