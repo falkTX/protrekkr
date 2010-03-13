@@ -2,6 +2,15 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.98p:
+
+- Added maximum latency checking on OSX.
+- Updated SDL library to latest for OSX and Windows.
+- LCTRL+L/LCTRL+H: transpose a selected block to 1 octave lower/higher.
+- LCTRL + LSHIFT + L/H: Transpose the note of a selected block
+                        to 1 octave lower/higher but only for the currently
+                        selected instrument.
+
 v1.98o:
 
 - A value can now be specified with Reset Filter LFO FX (0x16).
@@ -61,7 +70,7 @@ v1.98h:
 v1.98g:
 
 - Fixed a bug in multi-notes handling (some notes could disappear sometimes).
-- Inverted ctrl+home/end and home/end commands.
+- Inverted LCTRL+home/end and home/end commands.
 - Fixed a bug that made the tracker to crash when an instrument was being
   loaded while a song being played (& playing that particular instrument).
 - Fixed the random commands of the 303 units.
@@ -459,8 +468,8 @@ v1.8:
 - The C of the synth waveforms was a F & everything was shifted of 5 semitones
   and that bug was present since ntk1/2/3 !
   (Thanks to kaneel for notifying me about that one)
-- LCTRL + LSHIFT + U/D: Transpose the note of a selected block
-                        to 1 seminote higher/lower but only for the currently
+- LCTRL + LSHIFT + D/U: Transpose the note of a selected block
+                        to 1 seminote lower/higher but only for the currently
                         selected instrument.
 - Fixed a bug in the replay routine which would lead to a crash sometimes.
 - Added cut/copy/paste capabilities to the sequencer.
@@ -704,13 +713,13 @@ v1.0:
 
 - Fixed blocks randomize command.
 - Single columns can now be selected instead of whole tracks.
-- Ctrl+D/Ctrl+U: transpose a selected block to 1 semitone lower/higher.
-- Ctrl+A: Select entire current track.
-- Ctrl+Shift+A: Select entire current pattern.
+- LCTRL+D/LCTRL+U: transpose a selected block to 1 semitone lower/higher.
+- LCTRL+A: Select entire current track.
+- LCTRL+LSHIFT+A: Select entire current pattern.
 - Home: jump to start of row.
-- Ctrl+Home: jump to top left of pattern.
+- LCTRL+Home: jump to top left of pattern.
 - End: jump to end of row.
-- Ctrl+End: jump to bottom right of pattern.
+- LCTRL+End: jump to bottom right of pattern.
 - Right Alt: play current pattern.
 - Pattern highlighting can now be turned off.
 - Added a startup logo.
@@ -754,8 +763,8 @@ Release w:
 
 - Improved patterns blocks selection (reversed selections are now handled).
 - Added mouse support for blocks selection (using right mouse button).
-- Fixed a bug with ctrl+letters key strokes.
-- Ctrl + R & Ctrl + I now work on all selected tracks.
+- Fixed a bug with LCTRL+letters key strokes.
+- LCTRL+R & LCTRL+I now work on all selected tracks.
 
 Release v:
 

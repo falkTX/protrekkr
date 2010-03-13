@@ -724,8 +724,8 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 
     s_access *pos_osc1_disto;
-    short *Left_Samples1;
-    short *Right_Samples1;
+    short *Left_Samples1 = NULL;
+    short *Right_Samples1 = NULL;
     unsigned int i_POSITION;
     unsigned int res_dec;
 

@@ -3919,6 +3919,20 @@ void Keyboard_Handler(void)
                     else Semitone_Down_Block(Cur_Position);
                 }
 
+                // Transpose the selection 1 octave higher
+                if(Keys[SDLK_h - UNICODE_OFFSET2] && is_editing)
+                {
+                    if(Get_LShift()) Instrument_Octave_Up_Block(Cur_Position);
+                    else Octave_Up_Block(Cur_Position);
+                }
+
+                // Transpose the selection 1 octave lower
+                if(Keys[SDLK_l - UNICODE_OFFSET2] && is_editing)
+                {
+                    if(Get_LShift()) Instrument_Octave_Down_Block(Cur_Position);
+                    else Octave_Down_Block(Cur_Position);
+                }
+
                 // Select the current track or the current pattern
                 if(Keys[SDLK_a - UNICODE_OFFSET2])
                 {

@@ -1096,6 +1096,70 @@ void Semitone_Down_Block(int Position)
 }
 
 // ------------------------------------------------------
+// Transpose a block to 1 octave higher
+void Octave_Up_Block(int Position)
+{
+    int ybc;
+    int xbc;
+    int note;
+    int max_columns = Get_Max_Nibble_All_Tracks();
+
+    SELECTION Sel = Get_Real_Selection(TRUE);
+    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+    {
+        for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
+        {
+            if(xbc < max_columns && ybc < MAX_ROWS)
+            {
+                if(Get_Column_Type(Channels_MultiNotes, xbc) == NOTE)
+                {
+                    note = Read_Pattern_Column(Position, xbc, ybc);
+                    if(note < 120)
+                    {
+                        note += 12;
+                        if(note > 119) continue;
+                    }
+                    Write_Pattern_Column(Position, xbc, ybc, note);
+                }
+            }
+        }
+    }
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Transpose a block to 1 octave lower
+void Octave_Down_Block(int Position)
+{
+    int ybc;
+    int xbc;
+    int note;
+    int max_columns = Get_Max_Nibble_All_Tracks();
+
+    SELECTION Sel = Get_Real_Selection(TRUE);
+    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+    {
+        for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
+        {
+            if(xbc < max_columns && ybc < MAX_ROWS)
+            {
+                if(Get_Column_Type(Channels_MultiNotes, xbc) == NOTE)
+                {
+                    note = Read_Pattern_Column(Position, xbc, ybc);
+                    if(note < 120)
+                    {
+                        note -= 12;
+                        if(note < 0) continue;
+                    }
+                    Write_Pattern_Column(Position, xbc, ybc, note);
+                }
+            }
+        }
+    }
+    Actupated(0);
+}
+
+// ------------------------------------------------------
 // Transpose a block to 1 semitone higher for the current instrument
 void Instrument_Semitone_Up_Block(int Position)
 {
@@ -1161,6 +1225,82 @@ void Instrument_Semitone_Down_Block(int Position)
                         {
                             note--;
                             if(note < 0) note = 0;
+                        }
+                        Write_Pattern_Column(Position, xbc, ybc, note);
+                    }
+                }
+            }
+        }
+    }
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Transpose a block to 1 octave higher for the current instrument
+void Instrument_Octave_Up_Block(int Position)
+{
+    int ybc;
+    int xbc;
+    int note;
+    int instrument;
+    int max_columns = Get_Max_Nibble_All_Tracks();
+
+    SELECTION Sel = Get_Real_Selection(TRUE);
+    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+    {
+        for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
+        {
+            if(xbc < max_columns && ybc < MAX_ROWS)
+            {
+                if(Get_Column_Type(Channels_MultiNotes, xbc) == NOTE)
+                {
+                    instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
+                    instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
+                    if(instrument == ped_patsam)
+                    {
+                        note = Read_Pattern_Column(Position, xbc, ybc);
+                        if(note < 120)
+                        {
+                            note += 12;
+                            if(note > 119) continue;
+                        }
+                        Write_Pattern_Column(Position, xbc, ybc, note);
+                    }
+                }
+            }
+        }
+    }
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Transpose a block to 1 octave lower for the current instrument
+void Instrument_Octave_Down_Block(int Position)
+{
+    int ybc;
+    int xbc;
+    int note;
+    int instrument;
+    int max_columns = Get_Max_Nibble_All_Tracks();
+
+    SELECTION Sel = Get_Real_Selection(TRUE);
+    for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
+    {
+        for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
+        {
+            if(xbc < max_columns && ybc < MAX_ROWS)
+            {
+                if(Get_Column_Type(Channels_MultiNotes, xbc) == NOTE)
+                {
+                    instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
+                    instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
+                    if(instrument == ped_patsam)
+                    {
+                        note = Read_Pattern_Column(Position, xbc, ybc);
+                        if(note < 120)
+                        {
+                            note -= 12;
+                            if(note < 0) continue;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, note);
                     }
