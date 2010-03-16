@@ -1237,7 +1237,7 @@ int Screen_Update(void)
         {
             char buffer[64];
 
-            mess_box("Writing Wav Header And Sample Data...");
+            Status_Box("Writing Wav Header And Sample Data...");
 
             WaveFile RF;
 
@@ -1300,7 +1300,7 @@ int Screen_Update(void)
             RF.Close();
             if(strlen(SampleName[ped_patsam][ped_split])) sprintf(buffer, "File '%s' saved.", SampleName[ped_patsam][ped_split]);
             else sprintf(buffer, "File 'Untitled.wav' saved.");
-            mess_box(buffer);
+            Status_Box(buffer);
 
             Read_SMPT();
             last_index = -1;
@@ -1433,12 +1433,12 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_MIDI_NOTE_OFF_1_TRACK)
         {
-            mess_box("Notes Off command sent to this track...");
+            Status_Box("Notes Off command sent to this track...");
         }
 
         if(gui_action == GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS)
         {
-            mess_box("Notes Off command sent to all tracks...");
+            Status_Box("Notes Off command sent to all tracks...");
         }
 
         if(gui_action == GUI_CMD_UPDATE_TRACK_FX_ED)
@@ -1570,7 +1570,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_PATTERNS_POOL_EXHAUSTED)
         {
-            mess_box("Maximum number of patterns reached.");
+            Status_Box("Maximum number of patterns reached.");
         }
 
         if(gui_action == GUI_CMD_REFRESH_SAMPLE_ED)
@@ -1608,48 +1608,68 @@ int Screen_Update(void)
 
             if(!Done_Tip)
             {
-                mess_box(tipoftheday);
+                Status_Box(tipoftheday);
                 Done_Tip = TRUE;
             }
             else
             {
-                mess_box("Ready.");
+                Status_Box("Ready.");
             }
 
             Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-            Gui_Draw_Button_Box(0, 178, fsize, 4, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(0, 180, fsize, 2, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-            Gui_Draw_Button_Box(0, 24, 96, 98, "Player", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 44, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL);
-            Gui_Draw_Button_Box(8, 62, 80, 16, "Stop     ", BUTTON_NORMAL);
+            Gui_Draw_Button_Box(0, 24, 96, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(8, 46, 80, 16, "Stop     ", BUTTON_NORMAL);
             StartRec();
             StartEdit();
 
-            Gui_Draw_Button_Box(98, 24, 156, 98, "Sequence", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 44, 80, 16, "Position", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 62, 80, 16, "Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 80, 80, 16, "Song Length", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 98, 80, 16, "Pattern Lines", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(98, 24, 156, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(106, 28, 80, 16, "Position", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(106, 46, 80, 16, "Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(106, 64, 80, 16, "Song Length", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(106, 82, 80, 16, "Pattern Lines", BUTTON_NORMAL | BUTTON_DISABLED);
 
-            Gui_Draw_Button_Box(256, 24, 136, 98, "Song Settings", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(256, 24, 136, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-            Gui_Draw_Button_Box(262, 44, 60, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(262, 62, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(262, 80, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(262, 28, 60, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(262, 46, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(262, 64, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
             Display_Beat_Time();
 
             NewWav();
 
-            Gui_Draw_Button_Box(0, 124, 392, 52, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 152, 80, 16, "Step Add", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(166, 152, 90, 16, "Keyboard Octave", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 134, 80, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(320, 134, 64, 16, "Delete", BUTTON_NORMAL);
+            Gui_Draw_Button_Box(0, 104, 392, 42, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(8, 108, 80, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(320, 108, 64, 16, "Delete", BUTTON_NORMAL);
+            Gui_Draw_Button_Box(8, 126, 80, 16, "Step Add", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(166, 126, 90, 16, "Keyboard Octave", BUTTON_NORMAL | BUTTON_DISABLED);
 
-            Gui_Draw_Button_Box(332, 152, 16, 16, "\012", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(332 + 18, 152, 16, 16, "\013", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(332 + (18 * 2), 152, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            // Tracks sizes
+            Gui_Draw_Button_Box(332, 126, 16, 16, "\012", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(332 + 18, 126, 16, 16, "\013", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(332 + (18 * 2), 126, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(0, 148, 392, 30, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(8, 152, 61, 10, S_ E_ L_ DOT_ SPC_ T_ R_ A_ C_ K_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(8, 164, 61, 10, S_ E_ L_ DOT_ SPC_ N_ O_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+            Gui_Draw_Button_Box(8 + 63, 152, 61, 10, C_ U_ T_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 63, 164, 61, 10, C_ O_ P_ Y_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, I_ N_ T_ E_ R_ P_ O_ L_ A_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(8 + (63 * 4), 164, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+            Gui_Draw_Button_Box(8 + (63 * 5), 152, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(8 + (63 * 5), 164, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
             Refresh_UI_Context();
 
@@ -1771,7 +1791,7 @@ int Screen_Update(void)
     if(Check_Requester(&Exit_Requester) == 1)
     {
         SongStop();
-        mess_box("Seppuku...");
+        Status_Box("Seppuku...");
         return(FALSE);
     }
 
@@ -1955,7 +1975,7 @@ void LoadFile(int Freeindex, const char *str)
         }
         else
         {
-            mess_box("Attempting of loading a wav file...");
+            Status_Box("Attempting of loading a wav file...");
 
             // We need the length
             if(Wav_File.OpenForRead(Wavfile) == DDC_SUCCESS)
@@ -1964,7 +1984,7 @@ void LoadFile(int Freeindex, const char *str)
                 int channels = Wav_File.NumChannels();
                 if(channels != 1 && channels != 2)
                 {
-                    mess_box("Protrekkr can only load mono or stereo samples.");
+                    Status_Box("Protrekkr can only load mono or stereo samples.");
                 }
                 else
                 {
@@ -1975,7 +1995,7 @@ void LoadFile(int Freeindex, const char *str)
                        bits != 32 &&
                        bits != 64)
                     {
-                        mess_box("Protrekkr can only load 8, 12, 16, 24, 32 or 64 bits samples.");
+                        Status_Box("Protrekkr can only load 8, 12, 16, 24, 32 or 64 bits samples.");
                     }
                     else
                     {
@@ -2015,22 +2035,22 @@ void LoadFile(int Freeindex, const char *str)
                         switch(bits)
                         {
                             case 64:
-                                mess_box("64 bit WAV PCM converted into 16 bit format.");
+                                Status_Box("64 bit WAV PCM converted into 16 bit format.");
                                 break;
                             case 32:
-                                mess_box("32 bit WAV PCM converted into 16 bit format.");
+                                Status_Box("32 bit WAV PCM converted into 16 bit format.");
                                 break;
                             case 24:
-                                mess_box("24 bit WAV PCM converted into 16 bit format.");
+                                Status_Box("24 bit WAV PCM converted into 16 bit format.");
                                 break;
                             case 12:
-                                mess_box("12 bit WAV PCM converted into 16 bit format.");
+                                Status_Box("12 bit WAV PCM converted into 16 bit format.");
                                 break;
                             case 8:
-                                mess_box("8 bit WAV PCM converted into 16 bit format.");
+                                Status_Box("8 bit WAV PCM converted into 16 bit format.");
                                 break;
                             default:
-                                mess_box("16 bit WAV PCM loaded.");
+                                Status_Box("16 bit WAV PCM loaded.");
                                 break;
                         }
                     }
@@ -2040,14 +2060,14 @@ void LoadFile(int Freeindex, const char *str)
             }
             else
             {
-                mess_box("Invalid file format. I only accept '.wav' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
+                Status_Box("Invalid file format. I only accept '.wav' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
             }
         }
         fclose(in);
     }
     else
     {
-        mess_box("File loading error. (Probably: file not found)");
+        Status_Box("File loading error. (Probably: file not found)");
     }
     gui_action = GUI_CMD_NONE;
     Actualize_DiskIO_Ed(0);
@@ -2089,13 +2109,13 @@ void SongPlay(void)
 
     if(plx == 0)
     {
-        Gui_Draw_Button_Box(8, 44, 80, 16, "Playing Song", BUTTON_PUSHED);
-        mess_box("Playing song...");
+        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Song", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Status_Box("Playing song...");
     }
     else
     {
-        Gui_Draw_Button_Box(8, 44, 80, 16, "Playing Pattern", BUTTON_PUSHED);
-        mess_box("Playing pattern...");
+        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Pattern", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Status_Box("Playing pattern...");
     }
 }
 
@@ -2106,8 +2126,8 @@ void StartRec(void)
 {
     liveparam = 0;
     livevalue = 0;
-    if(sr_isrecording) Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: On", BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(8, 80, 80, 16, "Live Rec: Off", BUTTON_NORMAL);
+    if(sr_isrecording) Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: On", BUTTON_PUSHED);
+    else Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: Off", BUTTON_NORMAL);
 }
 
 // ------------------------------------------------------
@@ -2116,15 +2136,15 @@ void StartEdit(void)
 {
     if(is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 98, 80, 16, "Editing...", BUTTON_PUSHED);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Editing...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
     }
     if(is_recording)
     {
-        Gui_Draw_Button_Box(8, 98, 80, 16, "Recording...", BUTTON_PUSHED);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Recording...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
     }
     if(!is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 98, 80, 16, "Edit/Record", BUTTON_NORMAL);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Edit/Record", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
     }
 }
 
@@ -2132,8 +2152,8 @@ void StartEdit(void)
 // Stop replaying
 void SongStop(void)
 {
-    Gui_Draw_Button_Box(8, 44, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL);
-    mess_box("Ready...");
+    Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+    Status_Box("Ready...");
 
     Ptk_Stop();
 }
@@ -2293,7 +2313,7 @@ void Newmod(void)
 
     Draw_Scope();
 
-    mess_box("Zzaapp done.");
+    Status_Box("Zzaapp done.");
 
     Refresh_UI_Context();
 }
@@ -2454,12 +2474,12 @@ void WavRenderizer(void)
         if(RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
         {
             sprintf(buffer, "Can't open '%s.wav' file.", name);
-            mess_box(buffer);
+            Status_Box(buffer);
             return;
         }
         SongStop();
         sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
-        mess_box(buffer);
+        Status_Box(buffer);
         SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
 
         rawrender = TRUE;
@@ -2519,7 +2539,7 @@ void WavRenderizer(void)
         int seconds = (filesize - minutes * 10584000) / 176400;
 
         sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
-        mess_box(buffer);
+        Status_Box(buffer);
 
         // Return to the start as all the values will be trashed anyway.
         ped_line = 0;
@@ -2532,7 +2552,7 @@ void WavRenderizer(void)
         Read_SMPT();
         Actualize_Files_List(0);
 
-        mess_box(buffer);
+        Status_Box(buffer);
         Actupated(0);
     }
 }
@@ -2561,7 +2581,7 @@ void DeleteInstrument(void)
         Actualize_Master(0);
         Final_Mod_Length = 0;
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
-        mess_box("Synth deleted.");
+        Status_Box("Synth deleted.");
     }
 
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_INSTRUMENTS)
@@ -2578,7 +2598,7 @@ void DeleteInstrument(void)
             Synthprg[ped_patsam] = 1;
         }
         NewWav();
-        mess_box("Instrument deleted.");
+        Status_Box("Instrument deleted.");
         RefreshSample();
         Actualize_Master(0);
     }
@@ -2652,7 +2672,7 @@ void ShowInfo(void)
       }
    }
    sprintf(tmp, "Sample bank size: %d bytes, pattern bank [%d patterns] size: %d bytes.", sampsize, nPatterns, pattsize);
-   mess_box(tmp);
+   Status_Box(tmp);
 }
 
 // ------------------------------------------------------
@@ -3863,13 +3883,17 @@ void Keyboard_Handler(void)
                 }
 
                 // Cut selected block
-                if(Keys[SDLK_x - UNICODE_OFFSET2] && block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
+                if(Keys[SDLK_x - UNICODE_OFFSET2] &&
+                   block_start_track[Curr_Buff_Block] != -1 &&
+                   block_end_track[Curr_Buff_Block] != -1)
                 {
                     Cut_Selection(Cur_Position);
                 }
 
                 // Copy selected block
-                if(Keys[SDLK_c - UNICODE_OFFSET2] && block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
+                if(Keys[SDLK_c - UNICODE_OFFSET2] &&
+                   block_start_track[Curr_Buff_Block] != -1 &&
+                   block_end_track[Curr_Buff_Block] != -1)
                 {
                     Copy_Selection(Cur_Position);
                 }
@@ -4832,7 +4856,7 @@ void Mouse_Handler(void)
         Mouse_Left_Sample_Ed();
 
         // Change current instrument name
-        if(zcheckMouse(90, 134, 166, 16) && snamesel == INPUT_NONE)
+        if(zcheckMouse(90, 108, 166, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_INSTRUMENT_NAME;
             strcpy(cur_input_name, nameins[ped_patsam]);
@@ -4893,33 +4917,33 @@ void Mouse_Handler(void)
                 break;
         }
 
-        if(zcheckMouse(258, 152, 16, 16)) gui_action = GUI_CMD_LOWER_OCTAVE;
-        if(zcheckMouse(302, 152, 16, 16)) gui_action = GUI_CMD_HIGHER_OCTAVE;
-        if(zcheckMouse(90, 152, 16, 16)) gui_action = GUI_CMD_DECREASE_STEP_ADD;
-        if(zcheckMouse(134, 152, 16, 16)) gui_action = GUI_CMD_INCREASE_STEP_ADD;
-        if(zcheckMouse(258, 134, 16, 16)) gui_action = GUI_CMD_PREV_INSTR;
-        if(zcheckMouse(302, 134, 16, 16)) gui_action = GUI_CMD_NEXT_INSTR;
+        if(zcheckMouse(258, 126, 16, 16)) gui_action = GUI_CMD_LOWER_OCTAVE;
+        if(zcheckMouse(302, 126, 16, 16)) gui_action = GUI_CMD_HIGHER_OCTAVE;
+        if(zcheckMouse(90, 126, 16, 16)) gui_action = GUI_CMD_DECREASE_STEP_ADD;
+        if(zcheckMouse(134, 126, 16, 16)) gui_action = GUI_CMD_INCREASE_STEP_ADD;
+        if(zcheckMouse(258, 108, 16, 16)) gui_action = GUI_CMD_PREV_INSTR;
+        if(zcheckMouse(302, 108, 16, 16)) gui_action = GUI_CMD_NEXT_INSTR;
 
         // --- Player --------------------------------------------
 
-        if(zcheckMouse(8, 44, 80, 16))
+        if(zcheckMouse(8, 28, 80, 16))
         {
             plx = 0;
             gui_action = GUI_CMD_PLAY_SONG;
         }
-        if(zcheckMouse(8, 62, 80, 16))
+        if(zcheckMouse(8, 46, 80, 16))
         {
             gui_action = GUI_CMD_STOP_SONG;
         }
 
-        if(zcheckMouse(8, 80, 80, 16))
+        if(zcheckMouse(8, 64, 80, 16))
         {
             sr_isrecording++;
             if(sr_isrecording > 1) sr_isrecording = 0;
             gui_action = GUI_CMD_RECORD_303;
         }
 
-        if(zcheckMouse(8, 98, 80, 16))
+        if(zcheckMouse(8, 82, 80, 16))
         {
             is_recording = 0;
             is_editing ^= 1;
@@ -4928,40 +4952,40 @@ void Mouse_Handler(void)
 
         // --- Sequence -----------------------------------------
 
-        if(zcheckMouse(188, 44, 16, 16))
+        if(zcheckMouse(188, 28, 16, 16))
         {
             gui_action = GUI_CMD_PREVIOUS_POSITION;
         }
-        if(zcheckMouse(232, 44, 16, 16))
+        if(zcheckMouse(232, 28, 16, 16))
         {
             gui_action = GUI_CMD_NEXT_POSITION;
         }
-        if(zcheckMouse(188, 62, 16, 16) && pSequence[Cur_Position] > 0)
+        if(zcheckMouse(188, 46, 16, 16) && pSequence[Cur_Position] > 0)
         {
             gui_action = GUI_CMD_PREV_PATT;
         }
-        if(zcheckMouse(232, 62, 16, 16) && pSequence[Cur_Position] < 254)
+        if(zcheckMouse(232, 46, 16, 16) && pSequence[Cur_Position] < 254)
         {
             gui_action = GUI_CMD_NEXT_PATT;
         }
-        if(zcheckMouse(188, 80, 16, 16) && sLength > 1)
+        if(zcheckMouse(188, 64, 16, 16) && sLength > 1)
         {
             gui_action = GUI_CMD_REDUCE_SONG_LENGTH;
         }
-        if(zcheckMouse(232, 80, 16, 16) && sLength < 255)
+        if(zcheckMouse(232, 64, 16, 16) && sLength < 255)
         {
             gui_action = GUI_CMD_INCREASE_SONG_LENGTH;
         }
 
         // Decrease the number of lines for this pattern
-        if(zcheckMouse(188, 98, 16, 16) && patternLines[pSequence[Cur_Position]] > 1)
+        if(zcheckMouse(188, 82, 16, 16) && patternLines[pSequence[Cur_Position]] > 1)
         {
             patternLines[pSequence[Cur_Position]]--;
             if(ped_line >= patternLines[pSequence[Cur_Position]]) ped_line = patternLines[pSequence[Cur_Position]] - 1;
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;
         }
         // Increase the number of lines for this pattern
-        if(zcheckMouse(232, 98, 16, 16) && patternLines[pSequence[Cur_Position]] < 128)
+        if(zcheckMouse(232, 82, 16, 16) && patternLines[pSequence[Cur_Position]] < 128)
         {
             patternLines[pSequence[Cur_Position]]++;
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;
@@ -4970,7 +4994,7 @@ void Mouse_Handler(void)
         // --- Song Settings --------------------------------------
 
         // Reduce the number of tracks
-        if(zcheckMouse(324, 44, 16, 16) && Songtracks > 1)
+        if(zcheckMouse(324, 28, 16, 16) && Songtracks > 1)
         {
             Songtracks--;
             if(Songtracks < 1) Songtracks = 1;
@@ -4978,7 +5002,7 @@ void Mouse_Handler(void)
             teac = 4;
         }
         // Increase the number of tracks
-        if(zcheckMouse(368, 44, 16, 16) && Songtracks < 16)
+        if(zcheckMouse(368, 28, 16, 16) && Songtracks < 16)
         {
             Songtracks++;
             if(Songtracks > 16) Songtracks = 16;
@@ -4987,7 +5011,7 @@ void Mouse_Handler(void)
         }
 
         // Reduce the number of BPM
-        if(zcheckMouse(324, 62, 16, 16))
+        if(zcheckMouse(324, 46, 16, 16))
         {
             BeatsPerMin--;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -4995,7 +5019,7 @@ void Mouse_Handler(void)
         }
 
         // Increase the number of BPM
-        if(zcheckMouse(368, 62, 16, 16))
+        if(zcheckMouse(368, 46, 16, 16))
         {
             BeatsPerMin++;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5003,7 +5027,7 @@ void Mouse_Handler(void)
         }
 
         // Decrease the number of TPB
-        if(zcheckMouse(324, 80, 16, 16))
+        if(zcheckMouse(324, 64, 16, 16))
         {
             TicksPerBeat--;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5011,7 +5035,7 @@ void Mouse_Handler(void)
         }
 
         // Increase the number of TPB
-        if(zcheckMouse(368, 80, 16, 16))
+        if(zcheckMouse(368, 64, 16, 16))
         {
             TicksPerBeat++;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5019,13 +5043,13 @@ void Mouse_Handler(void)
         }
 
         // Delete instrument
-        if(zcheckMouse(320, 134, 64, 16))
+        if(zcheckMouse(320, 108, 64, 16))
         {
             Display_Requester(&Delete_Requester, GUI_CMD_DELETE_INSTRUMENT);
         }
 
         // Zoom'em small
-        if(zcheckMouse(332, 152, 16, 16))
+        if(zcheckMouse(332, 126, 16, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -5034,7 +5058,7 @@ void Mouse_Handler(void)
             Actupated(0);
         }
         // Zoom'em normal
-        if(zcheckMouse(332 + (18 * 1), 152, 16, 16))
+        if(zcheckMouse(332 + (18 * 1), 126, 16, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -5043,7 +5067,7 @@ void Mouse_Handler(void)
             Actupated(0);
         }
         // Zoom'em large
-        if(zcheckMouse(332 + (18 * 2), 152, 16, 16))
+        if(zcheckMouse(332 + (18 * 2), 126, 16, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -5051,6 +5075,86 @@ void Mouse_Handler(void)
             }
             Actupated(0);
         }
+
+
+        // Select track
+        if(zcheckMouse(8, 152, 61, 10))
+        {
+            Select_Track_Block();
+        }
+        // Select note
+        if(zcheckMouse(8, 164, 61, 10))
+        {
+            Select_Note_Block();
+        }
+        // Cut
+        if(zcheckMouse(8 + 63, 152, 61, 10))
+        {
+            if(block_start_track[Curr_Buff_Block] != -1 &&
+               block_end_track[Curr_Buff_Block] != -1)
+            {
+                Cut_Selection(Cur_Position);
+            }
+        }
+        // Copy
+        if(zcheckMouse(8 + 63, 164, 61, 10))
+        {
+            if(block_start_track[Curr_Buff_Block] != -1 &&
+               block_end_track[Curr_Buff_Block] != -1)
+            {
+                Copy_Selection(Cur_Position);
+            }
+        }
+        // Paste
+        if(zcheckMouse(8 + (63 * 2), 152, 61, 10))
+        {
+            if(block_start_track_nibble[Curr_Buff_Block] != -1 &&
+               block_end_track_nibble[Curr_Buff_Block] != -1 &&
+               is_editing)
+            {
+                Paste_Block(Cur_Position, Paste_Across, TRUE);
+            }
+        }
+        // Delete
+        if(zcheckMouse(8 + (63 * 2), 164, 61, 10))
+        {
+            if(is_editing)
+            {
+                Delete_Selection(Cur_Position);
+                Actupated(0);
+            }
+        }
+        // Interpolate
+        if(zcheckMouse(8 + (63 * 3), 152, 61, 10))
+        {
+            if(is_editing) Interpolate_Block(Cur_Position);
+        }
+        // Randomize
+        if(zcheckMouse(8 + (63 * 3), 164, 61, 10))
+        {
+            if(is_editing) Randomize_Block(Cur_Position);
+        }
+        // Semitone up
+        if(zcheckMouse(8 + (63 * 4), 152, 61, 10))
+        {
+            if(is_editing) Semitone_Up_Block(Cur_Position);
+        }
+        // Semitone down
+        if(zcheckMouse(8 + (63 * 4), 164, 61, 10))
+        {
+            if(is_editing) Semitone_Down_Block(Cur_Position);
+        }
+        // Octave up
+        if(zcheckMouse(8 + (63 * 5), 152, 61, 10))
+        {
+            if(is_editing) Octave_Up_Block(Cur_Position);
+        }
+        // Octave down
+        if(zcheckMouse(8 + (63 * 5), 164, 61, 10))
+        {
+            if(is_editing) Octave_Down_Block(Cur_Position);
+        }
+
 
         // Switch small / large patterns
         int Add_Offset = (Patterns_Lines == DISPLAYED_LINES_LARGE ? 133 : 0);
@@ -5113,7 +5217,7 @@ void Mouse_Handler(void)
 
         Mouse_Right_Pattern_Ed();
 
-        if(zcheckMouse(188, 98, 16, 16))
+        if(zcheckMouse(188, 82, 16, 16))
         {
             int ltp = patternLines[pSequence[Cur_Position]];
             ltp -= 16;
@@ -5123,7 +5227,7 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;
         }
 
-        if(zcheckMouse(232, 98, 16, 16))
+        if(zcheckMouse(232, 82, 16, 16))
         {
             int ltp = patternLines[pSequence[Cur_Position]];
             ltp += 16;
@@ -5132,16 +5236,16 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;
         }
 
-        if(zcheckMouse(258, 134, 16, 16) == 1)
+        if(zcheckMouse(258, 108, 16, 16) == 1)
         {
             gui_action = GUI_CMD_PREVIOUS_16_INSTR;
         }
-        if(zcheckMouse(302, 134, 16, 16) == 1)
+        if(zcheckMouse(302, 108, 16, 16) == 1)
         {
             gui_action = GUI_CMD_NEXT_16_INSTR;
         }
 
-        if(zcheckMouse(8, 44, 80, 16) == 1)
+        if(zcheckMouse(8, 28, 80, 16) == 1)
         {
             plx = 1;
             gui_action = GUI_CMD_PLAY_SONG;
@@ -5184,7 +5288,7 @@ void Mouse_Handler(void)
         }
 
         // Reduce the number of tracks
-        if(zcheckMouse(324, 44, 16, 16) && Songtracks > 1)
+        if(zcheckMouse(324, 28, 16, 16) && Songtracks > 1)
         {
             Songtracks -= 5;
             if(Songtracks < 1) Songtracks = 1;
@@ -5192,7 +5296,7 @@ void Mouse_Handler(void)
             teac = 4;
         }
         // Increase the number of tracks
-        if(zcheckMouse(368, 44, 16, 16) && Songtracks < 16)
+        if(zcheckMouse(368, 28, 16, 16) && Songtracks < 16)
         {
             Songtracks += 5;
             if(Songtracks > 16) Songtracks = 16;
@@ -5201,14 +5305,14 @@ void Mouse_Handler(void)
         }
 
         // Reduce the number of BPM by 16
-        if(zcheckMouse(324, 62, 16, 16))
+        if(zcheckMouse(324, 46, 16, 16))
         {
             BeatsPerMin -= 16;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
             teac = 1;
         }
         // Increase the number of BPM by 16
-        if(zcheckMouse(368, 62, 16, 16))
+        if(zcheckMouse(368, 46, 16, 16))
         {
             BeatsPerMin += 16;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5216,7 +5320,7 @@ void Mouse_Handler(void)
         }
 
         // Decrease the number of TPB
-        if(zcheckMouse(324, 80, 16, 16))
+        if(zcheckMouse(324, 64, 16, 16))
         {
             TicksPerBeat -= 10;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5224,7 +5328,7 @@ void Mouse_Handler(void)
         }
 
         // Increase the number of TPB
-        if(zcheckMouse(368, 80, 16, 16))
+        if(zcheckMouse(368, 64, 16, 16))
         {
             TicksPerBeat += 10;
             gui_action = GUI_CMD_CHANGE_BPM_TICKS_NBR;
@@ -5232,7 +5336,7 @@ void Mouse_Handler(void)
         }
 
         // Songlength + 10
-        if(zcheckMouse(188, 80, 16, 16) == 1 && sLength != 1)
+        if(zcheckMouse(188, 64, 16, 16) == 1 && sLength != 1)
         {
             int tLength = sLength;
             tLength -= 10;
@@ -5240,7 +5344,7 @@ void Mouse_Handler(void)
             sLength = tLength;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
-        if(zcheckMouse(232, 80, 16, 16) == 1 && sLength != 255)
+        if(zcheckMouse(232, 64, 16, 16) == 1 && sLength != 255)
         {
             int tLength = sLength;
             tLength += 10;
@@ -5250,32 +5354,68 @@ void Mouse_Handler(void)
         }
 
         // -10 positions
-        if(zcheckMouse(188, 44, 16, 16) == 1)
+        if(zcheckMouse(188, 28, 16, 16) == 1)
         {
             gui_action = GUI_CMD_REDUCE_POSITIONS_10;
         }
         // +10 positions
-        if(zcheckMouse(232, 44, 16, 16) == 1)
+        if(zcheckMouse(232, 28, 16, 16) == 1)
         {
             gui_action = GUI_CMD_INCREASE_POSITIONS_10;
         }
 
         // -10 patterns
-        if(zcheckMouse(188, 62, 16, 16) == 1)
+        if(zcheckMouse(188, 46, 16, 16) == 1)
         {
             gui_action = GUI_CMD_REDUCE_PATTERNS_10;
         }
         // +10 patterns
-        if(zcheckMouse(232, 62, 16, 16) == 1)
+        if(zcheckMouse(232, 46, 16, 16) == 1)
         {
             gui_action = GUI_CMD_INCREASE_PATTERNS_10;
         }
 
         // Record mode
-        if(zcheckMouse(8, 98, 80, 16))
+        if(zcheckMouse(8, 82, 80, 16))
         {
             gui_action = GUI_CMD_RECORD_MODE;
         }
+
+
+
+        // Select pattern
+        if(zcheckMouse(8, 152, 61, 10))
+        {
+            Select_Pattern_Block();
+        }
+        // Select notes
+        if(zcheckMouse(8, 164, 61, 10))
+        {
+            Select_All_Notes_Block();
+        }
+        // Semitone up
+        if(zcheckMouse(8 + (63 * 4), 152, 61, 10))
+        {
+            if(is_editing) Instrument_Semitone_Up_Block(Cur_Position);
+        }
+        // Semitone down
+        if(zcheckMouse(8 + (63 * 4), 164, 61, 10))
+        {
+            if(is_editing) Instrument_Semitone_Down_Block(Cur_Position);
+        }
+        // Instrument octave up
+        if(zcheckMouse(8 + (63 * 5), 152, 61, 10))
+        {
+            if(is_editing) Instrument_Octave_Up_Block(Cur_Position);
+        }
+        // Instrument octave down
+        if(zcheckMouse(8 + (63 * 5), 164, 61, 10))
+        {
+            if(is_editing) Instrument_Octave_Down_Block(Cur_Position);
+        }
+
+
+
 
         Mouse_Right_Fx_Ed();
 
@@ -5428,8 +5568,8 @@ void Display_Beat_Time(void)
 {
     char String[64];
     sprintf(String, "1/4 Beat Time: %d ms.", (int) (15000.0f / (float) BeatsPerMin));
-    Gui_Clear_Array(268, 102, 120, 16);
-    PrintXY(268, 102, USE_FONT, String);
+    Gui_Clear_Array(268, 86, 120, 16);
+    PrintXY(268, 86, USE_FONT, String);
 }
 
 // ------------------------------------------------------
@@ -5544,7 +5684,7 @@ void Actualize_Master(char gode)
     {
         if(BeatsPerMin < 32) BeatsPerMin = 32;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
-        Gui_Draw_Arrows_Number_Box(324, 62, BeatsPerMin, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0 || gode == 2)
@@ -5563,17 +5703,17 @@ void Actualize_Master(char gode)
             Actualize_Fx_Ed(10);
             Actualize_Fx_Ed(11);
         }
-        Gui_Draw_Arrows_Number_Box2(324, 80, TicksPerBeat, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0)
     {
-        Gui_Draw_Arrows_Number_Box2(324, 44, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Arrows_Number_Box2(324, 28, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 4)
     {
-        Gui_Draw_Arrows_Number_Box2(324, 44, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Arrows_Number_Box2(324, 28, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
         if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 

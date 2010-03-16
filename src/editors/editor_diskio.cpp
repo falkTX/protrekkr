@@ -134,8 +134,8 @@ void Draw_DiskIO_Ed(void)
 
     Gui_Draw_Button_Box(350, 532, 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(532, 513, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
-    Gui_Draw_Button_Box(532, 534, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(532, 513, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(532, 534, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 }
 
 void Actualize_DiskIO_Ed(int gode)
@@ -488,7 +488,7 @@ void Display_1_Track_To_Render(int nbr)
     {
         if(nbr < Songtracks)
         {
-            Gui_Draw_Button_Box(Tracks_Position[nbr].x, Tracks_Position[nbr].y, 16, 16, Tracks_Labels[nbr], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Tracks_Position[nbr].x, Tracks_Position[nbr].y, 16, 16, Tracks_Labels[nbr], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
         else
         {
@@ -499,7 +499,7 @@ void Display_1_Track_To_Render(int nbr)
     {
         if(nbr < Songtracks)
         {
-            Gui_Draw_Button_Box(Tracks_Position[nbr].x, Tracks_Position[nbr].y, 16, 16, Tracks_Labels[nbr], BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Tracks_Position[nbr].x, Tracks_Position[nbr].y, 16, 16, Tracks_Labels[nbr], BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
         else
         {

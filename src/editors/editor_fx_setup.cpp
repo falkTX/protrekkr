@@ -47,18 +47,18 @@ void Draw_Fx_Ed(void)
 
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("FX Setup (Global)");
-    Gui_Draw_Button_Box(8, 464, 224, 96, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 464, 224, 96, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(18, 480, 56, 16, "Switch", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 498, 56, 16, "Feedback", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 516, 56, 16, "Room Size", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 534, 56, 16, "Filter", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(240, 464, 288, 96, "Stereo Delay Settings", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(240, 464, 288, 96, "Stereo Delay Settings", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(248, 480, 56, 16, "L.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 498, 56, 16, "R.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 516, 56, 16, "L.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 534, 56, 16, "R.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(530, 464, 104, 56, "Ticks Delay Synchro", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(530, 464, 104, 56, "Ticks Delay Synchro", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
     Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL);
     Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL);
@@ -152,13 +152,13 @@ void Actualize_Fx_Ed(char gode)
         {
             if(Ticks_Synchro_Left < 1) Ticks_Synchro_Left = 1;
             if(Ticks_Synchro_Left > TicksPerBeat + 1) Ticks_Synchro_Left = TicksPerBeat + 1;
-            Gui_Draw_Arrows_Number_Box2(534, 480, Ticks_Synchro_Left, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(534, 480, Ticks_Synchro_Left, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
         if(gode == 0 || gode == 11)
         {
             if(Ticks_Synchro_Right < 1) Ticks_Synchro_Right = 1;
             if(Ticks_Synchro_Right > TicksPerBeat + 1) Ticks_Synchro_Right = TicksPerBeat + 1;
-            Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 12)

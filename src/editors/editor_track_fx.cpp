@@ -54,7 +54,7 @@ void Draw_Track_Fx_Ed(void)
     Gui_Draw_Button_Box(8, 526, 64, 16, "LFO Status", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, 544, 64, 16, "Flanger 3D", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(230, 462, 288, 110, "Flanger Settings", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(230, 462, 288, 110, "Flanger Settings", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(238, 479, 56, 16, "Amount", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(238, 497, 56, 16, "Period", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(238, 515, 56, 16, "Amplitude", BUTTON_NORMAL | BUTTON_DISABLED);

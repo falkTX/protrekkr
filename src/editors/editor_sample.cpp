@@ -71,7 +71,7 @@ void Draw_Sample_Ed(void)
 
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("");
-    Gui_Draw_Button_Box(516, 454, CONSOLE_WIDTH - 528, CONSOLE_HEIGHT - 482, "Sample Editor", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(516, 454, CONSOLE_WIDTH - 528, CONSOLE_HEIGHT - 482, "Sample Editor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
     Gui_Draw_Button_Box(582, 476, 60, 16, "Select All", BUTTON_NORMAL);
     Gui_Draw_Button_Box(582, 494, 60, 16, "Unselect", BUTTON_NORMAL);
@@ -458,7 +458,7 @@ void Actualize_Sample_Ed(char gode)
                 outlong(650, 548, sed_real_range_end, 11);
             }
 
-            if(gode == 0 || gode == 6) mess_box("Full Vertical View...");
+            if(gode == 0 || gode == 6) Status_Box("Full Vertical View...");
 
             // Sample Processing plant here
 
@@ -472,7 +472,7 @@ void Actualize_Sample_Ed(char gode)
 
                 if(newsize != 0)
                 {
-                    mess_box("Cutting sample...");
+                    Status_Box("Cutting sample...");
                     Stop_Current_Sample();
                     AUDIO_Stop();
                     SDL_Delay(256);
@@ -537,7 +537,7 @@ void Actualize_Sample_Ed(char gode)
                     outlong(712, 548, sed_display_length, 12);
                     outlong(650, 530, sed_range_start, 10);
                     outlong(650, 548, sed_range_end, 11);
-                    mess_box("Selection cut ok.");
+                    Status_Box("Selection cut ok.");
 
                     Check_Loops();
                     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT) Actualize_Instrument_Ed(0, 4);
@@ -546,14 +546,14 @@ void Actualize_Sample_Ed(char gode)
                 }
                 else
                 {
-                    mess_box("You cannot cut entire sample, use 'delete' on instrument instead.");
+                    Status_Box("You cannot cut entire sample, use 'delete' on instrument instead.");
                 }
             }
 
             // DC adjust
             if(gode == 21)
             {
-                mess_box("Calculating shifting-factor...");
+                Status_Box("Calculating shifting-factor...");
                 SDL_Delay(100);
 
                 char nc = SampleChannels[ped_patsam][ped_split];
@@ -570,7 +570,7 @@ void Actualize_Sample_Ed(char gode)
                 l_shift /= (sed_real_range_end + 1) - sed_real_range_start;
                 r_shift /= (sed_real_range_end + 1) - sed_real_range_start;
 
-                mess_box("Re-building waves...");
+                Status_Box("Re-building waves...");
                 SDL_Delay(100);
 
                 for(wao = sed_real_range_start; wao < sed_real_range_end + 1; wao++)
@@ -594,14 +594,14 @@ void Actualize_Sample_Ed(char gode)
                 }
 
                 draw_sampled_wave = TRUE;
-                mess_box("Selection calibrated...");
+                Status_Box("Selection calibrated...");
             }
 
             // Normalizing
             if(gode == 22)
             {
 
-                mess_box("Searching highest peak...");
+                Status_Box("Searching highest peak...");
                 SDL_Delay(100);
 
                 char nc = SampleChannels[ped_patsam][ped_split];
@@ -625,7 +625,7 @@ void Actualize_Sample_Ed(char gode)
 
                 l_shift = 32768.0f / l_shift;
 
-                mess_box("Amplifying...");
+                Status_Box("Amplifying...");
                 SDL_Delay(100);
 
                 for(wao = sed_real_range_start; wao < sed_real_range_end + 1; wao++)
@@ -649,13 +649,13 @@ void Actualize_Sample_Ed(char gode)
                 }
 
                 draw_sampled_wave = TRUE;
-                mess_box("Selection maximized...");
+                Status_Box("Selection maximized...");
             }
 
             // Fade In
             if(gode == 23)
             {
-                mess_box("Fade In Selection...");
+                Status_Box("Fade In Selection...");
                 SDL_Delay(100);
 
                 char nc = SampleChannels[ped_patsam][ped_split];
@@ -685,13 +685,13 @@ void Actualize_Sample_Ed(char gode)
                 }
 
                 draw_sampled_wave = TRUE;
-                mess_box("Finished...");
+                Status_Box("Finished...");
             }
 
             // Fade Out
             if(gode == 24)
             {
-                mess_box("Fade Out Selection...");
+                Status_Box("Fade Out Selection...");
                 SDL_Delay(100);
 
                 char nc = SampleChannels[ped_patsam][ped_split];
@@ -721,13 +721,13 @@ void Actualize_Sample_Ed(char gode)
                     c_vol -= coef_vol;
                 }
                 draw_sampled_wave = TRUE;
-                mess_box("Finished...");
+                Status_Box("Finished...");
             }
 
             // Half
             if(gode == 25)
             {
-                mess_box("Halving Selection Volume...");
+                Status_Box("Halving Selection Volume...");
                 SDL_Delay(100);
 
                 char nc = SampleChannels[ped_patsam][ped_split];
@@ -749,7 +749,7 @@ void Actualize_Sample_Ed(char gode)
                 }
 
                 draw_sampled_wave = TRUE;
-                mess_box("Finished...");
+                Status_Box("Finished...");
             }
 
             // SAMPLE EDITOR FUNCTIONS

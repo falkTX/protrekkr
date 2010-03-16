@@ -250,30 +250,30 @@ void Actualize_Synth_Ed(char gode)
                     Allow_All = FALSE;
                     Allow_Button = BUTTON_NORMAL | BUTTON_DISABLED;
                     Allow_Button_Pushed = BUTTON_PUSHED | BUTTON_DISABLED;
-                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     Gui_Draw_Button_Box(228 + 18, 450, 24, 16, "Off", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 1:
                     Allow_All = TRUE;
                     Allow_Button = BUTTON_NORMAL;
                     Allow_Button_Pushed = BUTTON_PUSHED;
-                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     Gui_Draw_Button_Box(228 + 18, 450, 24, 16, "Curr", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 default:
                     Allow_All = TRUE;
                     Allow_Button = BUTTON_NORMAL;
                     Allow_Button_Pushed = BUTTON_PUSHED;
-                    value_box(228, 450, (Synthprg[ped_patsam] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    value_box(228, 450, (Synthprg[ped_patsam] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     break;
             }
             Gui_Draw_Button_Box(758, 450, 34, 16, "Save", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(506, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(524, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(294, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(460, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(294, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(460, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actualize_Instruments_Synths_List(1);
         }
 
@@ -366,22 +366,22 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_OSC1 < 0) Pos_Tbl_Synth_OSC1 = 0;
             if(Pos_Tbl_Synth_OSC1 > Size_Tbl_Synth_OSC1) Pos_Tbl_Synth_OSC1 = Size_Tbl_Synth_OSC1;
-            Gui_Draw_Arrows_Number_Box2(62, 469 - 1, Pos_Tbl_Synth_OSC1 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(62, 469 - 1, Pos_Tbl_Synth_OSC1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(62 + 62, 469  - 1, 128, 16, Names_Tbl_Synth_OSC1[Pos_Tbl_Synth_OSC1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
             {
                 Gui_Draw_Button_Box(272, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(254, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(272, 487 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(254, 469 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -390,22 +390,22 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_OSC2 < 0) Pos_Tbl_Synth_OSC2 = 0;
             if(Pos_Tbl_Synth_OSC2 > Size_Tbl_Synth_OSC2) Pos_Tbl_Synth_OSC2 = Size_Tbl_Synth_OSC2;
-            Gui_Draw_Arrows_Number_Box2(62, 523 - 1, Pos_Tbl_Synth_OSC2 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(62, 523 - 1, Pos_Tbl_Synth_OSC2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(62 + 62, 523 - 1, 128, 16, Names_Tbl_Synth_OSC2[Pos_Tbl_Synth_OSC2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
             {
                 Gui_Draw_Button_Box(272, 541 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(254, 523 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(272, 541 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED);
                 Gui_Draw_Button_Box(254, 523 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED);
-                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
 
             Actualize_SynthParSlider();
@@ -415,7 +415,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_VCF < 0) Pos_Tbl_Synth_VCF = 0;
             if(Pos_Tbl_Synth_VCF > Size_Tbl_Synth_VCF) Pos_Tbl_Synth_VCF = Size_Tbl_Synth_VCF;
-            Gui_Draw_Arrows_Number_Box2(331, 469 - 1, Pos_Tbl_Synth_VCF + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(331, 469 - 1, Pos_Tbl_Synth_VCF + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(331 + 62, 469 - 1, 111, 16, Names_Tbl_Synth_VCF[Pos_Tbl_Synth_VCF], BUTTON_NORMAL | BUTTON_DISABLED);
             Actualize_SynthParSlider();
         }
@@ -424,7 +424,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_LFO1 < 0) Pos_Tbl_Synth_LFO1 = 0;
             if(Pos_Tbl_Synth_LFO1 > Size_Tbl_Synth_LFO1) Pos_Tbl_Synth_LFO1 = Size_Tbl_Synth_LFO1;
-            Gui_Draw_Arrows_Number_Box2(331, 505 - 1, Pos_Tbl_Synth_LFO1 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(331, 505 - 1, Pos_Tbl_Synth_LFO1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(331 + 62, 505 - 1, 111, 16, Names_Tbl_Synth_LFO1[Pos_Tbl_Synth_LFO1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
@@ -432,15 +432,15 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(506, 505 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(524, 523 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(506, 505 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(524, 523 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -449,7 +449,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_LFO2 < 0) Pos_Tbl_Synth_LFO2 = 0;
             if(Pos_Tbl_Synth_LFO2 > Size_Tbl_Synth_LFO2) Pos_Tbl_Synth_LFO2 = Size_Tbl_Synth_LFO2;
-            Gui_Draw_Arrows_Number_Box2(331, 541 - 1, Pos_Tbl_Synth_LFO2 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(331, 541 - 1, Pos_Tbl_Synth_LFO2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(331 + 62, 541 - 1, 111, 16, Names_Tbl_Synth_LFO2[Pos_Tbl_Synth_LFO2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
@@ -457,15 +457,15 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(506, 541 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(524, 559 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(506, 541 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(524, 559 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -474,7 +474,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_ENV1 < 0) Pos_Tbl_Synth_ENV1 = 0;
             if(Pos_Tbl_Synth_ENV1 > Size_Tbl_Synth_ENV1) Pos_Tbl_Synth_ENV1 = Size_Tbl_Synth_ENV1;
-            Gui_Draw_Arrows_Number_Box2(583, 469 - 1, Pos_Tbl_Synth_ENV1 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(583, 469 - 1, Pos_Tbl_Synth_ENV1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(583 + 62, 469 - 1, 111, 16, Names_Tbl_Synth_ENV1[Pos_Tbl_Synth_ENV1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
@@ -482,15 +482,15 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(758, 469 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 487 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(758, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -499,7 +499,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_ENV2 < 0) Pos_Tbl_Synth_ENV2 = 0;
             if(Pos_Tbl_Synth_ENV2 > Size_Tbl_Synth_ENV2) Pos_Tbl_Synth_ENV2 = Size_Tbl_Synth_ENV2;
-            Gui_Draw_Arrows_Number_Box2(583, 505 - 1, Pos_Tbl_Synth_ENV2 + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(583, 505 - 1, Pos_Tbl_Synth_ENV2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(583 + 62, 505 - 1, 111, 16, Names_Tbl_Synth_ENV2[Pos_Tbl_Synth_ENV2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
@@ -507,15 +507,15 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(758, 505 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 523 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(758, 505 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 523 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -524,7 +524,7 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_Misc < 0) Pos_Tbl_Synth_Misc = 0;
             if(Pos_Tbl_Synth_Misc > Size_Tbl_Synth_Misc) Pos_Tbl_Synth_Misc = Size_Tbl_Synth_Misc;
-            Gui_Draw_Arrows_Number_Box2(583, 541 - 1, Pos_Tbl_Synth_Misc + 1, Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(583, 541 - 1, Pos_Tbl_Synth_Misc + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(583 + 62, 541 - 1, 111, 16, Names_Tbl_Synth_Misc[Pos_Tbl_Synth_Misc], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
@@ -532,15 +532,15 @@ void Actualize_Synth_Ed(char gode)
             {
                 Gui_Draw_Button_Box(758, 541 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 559 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
                 Gui_Draw_Button_Box(758, 541 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(776, 559 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }

@@ -41,11 +41,12 @@ SDL_Surface *SKIN303;
 
 int Current_copy_buffer;
 int Copied_Buffer[4];
-unsigned char tbEditStep = 0;
 
 int tb303_pattern_buffer_full[4];
 flag303 tb303_pattern_buffer[4][16];
 unsigned char tb303_buffer_tone[4][16];
+
+unsigned char editsteps[2][32];
 
 extern REQUESTER Overwrite_Requester;
 
@@ -102,7 +103,11 @@ void Actualize_303_Ed(char gode)
                 Skincopy(558, 542, 138, 119, 3, 3);
                 Skincopy(577, 542, 143, 119, 3, 3);
             }
-            number303(tbEditStep + 1, 486, 486);
+
+            // Make sure we display the right boundaries
+            if(editsteps[sl3][tb303[sl3].selectedpattern] > tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1) editsteps[sl3][tb303[sl3].selectedpattern] = tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1;
+
+            number303(editsteps[sl3][tb303[sl3].selectedpattern] + 1, 486, 486);
             // Displaying pattern selection leds
             // Bank [A-D]
             int tbank303 = tb303[sl3].selectedpattern / 8;
@@ -149,7 +154,7 @@ void Actualize_303_Ed(char gode)
             Skincopy(200, 515, 120, 55, 162, 34);
     
             // Light Note
-            switch(tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep])
+            switch(tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]])
             {
                 case 0: Skincopy(209, 543, 138, 119, 3, 3); break;
                 case 1: Skincopy(220, 518, 138, 119, 3, 3); break;
@@ -170,7 +175,7 @@ void Actualize_303_Ed(char gode)
         // Light pause/note led
         if(gode == 0 || gode == 10)
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].pause)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause)
             {
                 Skincopy(402, 521, 138, 119, 3, 3);
                 Skincopy(439, 521, 143, 119, 3, 3);
@@ -185,7 +190,7 @@ void Actualize_303_Ed(char gode)
         // Light slide/off led
         if(gode == 0 || gode == 11)
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].slide_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag)
             {
                 Skincopy(456, 543, 138, 119, 3, 3);
             }
@@ -198,7 +203,7 @@ void Actualize_303_Ed(char gode)
         // Light accent/off led
         if(gode == 0 || gode == 12)
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].accent_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag)
             {
                 Skincopy(431, 543, 138, 119, 3, 3);
             }
@@ -211,7 +216,7 @@ void Actualize_303_Ed(char gode)
         // Transpose up flag
         if(gode == 0 || gode == 13)
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposeup_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag)
             {
                 Skincopy(406, 543, 138, 119, 3, 3);
             }
@@ -224,7 +229,7 @@ void Actualize_303_Ed(char gode)
         // Transpose down flag
         if(gode == 0 || gode == 14)
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposedown_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag)
             {
                 Skincopy(381, 543, 138, 119, 3, 3);
             }
@@ -493,8 +498,11 @@ void Mouse_Left_303_Ed(void)
         // Step Forward
         if(zcheckMouse(479, 550, 25, 16))
         {
-            tbEditStep++;
-            if(tbEditStep > 15) tbEditStep = 0;
+            editsteps[sl3][tb303[sl3].selectedpattern]++;
+            if(editsteps[sl3][tb303[sl3].selectedpattern] > tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1)
+            {
+                editsteps[sl3][tb303[sl3].selectedpattern] = 0;
+            }
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
@@ -502,8 +510,8 @@ void Mouse_Left_303_Ed(void)
         // Step Back
         if(zcheckMouse(484, 522, 15, 10))
         {
-            if(tbEditStep == 0) tbEditStep = 15;
-            else tbEditStep--;
+            if(editsteps[sl3][tb303[sl3].selectedpattern] == 0) editsteps[sl3][tb303[sl3].selectedpattern] = tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1;
+            else editsteps[sl3][tb303[sl3].selectedpattern]--;
             teac = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
@@ -514,7 +522,7 @@ void Mouse_Left_303_Ed(void)
         {
             tb303[sl3].patternlength[tb303[sl3].selectedpattern]++;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
-            teac = 1;
+            teac = 0;
         }
 
         // Pattern Steps -1
@@ -522,20 +530,24 @@ void Mouse_Left_303_Ed(void)
            tb303[sl3].patternlength[tb303[sl3].selectedpattern] > 1)
         {
             tb303[sl3].patternlength[tb303[sl3].selectedpattern]--;
+            if(editsteps[sl3][tb303[sl3].selectedpattern] > tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1)
+            {
+                editsteps[sl3][tb303[sl3].selectedpattern] = tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1;
+            }
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
-            teac = 1;
+            teac = 0;
         }
 
         // Pause/Note button
         if(zcheckMouse(450, 518, 15, 10))
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].pause)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].pause = 0;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause = 0;
             }
             else
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].pause = 1;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause = 1;
             }
             teac = 10;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -544,13 +556,13 @@ void Mouse_Left_303_Ed(void)
         // Glide button
         if(zcheckMouse(454, 550, 10, 15))
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].slide_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].slide_flag = 0;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag = 0;
             }
             else
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].slide_flag = 1;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag = 1;
             }
             teac = 11;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -559,13 +571,13 @@ void Mouse_Left_303_Ed(void)
         // Accent button
         if(zcheckMouse(428, 550, 10, 15))
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].accent_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].accent_flag = 0;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag = 0;
             }
             else
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].accent_flag = 1;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag = 1;
             }
             teac = 12;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -574,13 +586,13 @@ void Mouse_Left_303_Ed(void)
         // Transpose up button
         if(zcheckMouse(403, 550, 10, 15))
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposeup_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposeup_flag = 0;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag = 0;
             }
             else
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposeup_flag = 1;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag = 1;
             }
             teac = 13;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -589,13 +601,13 @@ void Mouse_Left_303_Ed(void)
         // Transpose down button
         if(zcheckMouse(378, 550, 10, 15))
         {
-            if(tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposedown_flag)
+            if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag)
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposedown_flag = 0;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag = 0;
             }
             else
             {
-                tb303[sl3].flag[tb303[sl3].selectedpattern][tbEditStep].transposedown_flag = 1;
+                tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag = 1;
             }
             teac = 14;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -612,80 +624,80 @@ void Mouse_Left_303_Ed(void)
         // NoteOn/Off buttons
         if(zcheckMouse(206, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 0;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(217, 524, 11, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 1;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(227, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 2;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 2;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(238, 524, 11, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 3;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 3;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(247, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 4;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 4;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(268, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 5;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 5;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(280, 524, 11, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 6;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 6;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(289, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 7;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 7;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(301, 524, 11, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 8;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 8;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(310, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 9;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 9;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
 
         if(zcheckMouse(322, 524, 11, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 10;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 10;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(331, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 11;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 11;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
         if(zcheckMouse(352, 550, 12, 15))
         {
-            tb303[sl3].tone[tb303[sl3].selectedpattern][tbEditStep] = 12;
+            tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 12;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }

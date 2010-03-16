@@ -253,12 +253,12 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 if(gode == 0 || gode == 8)
                 {
                     value_box(570, 466, ped_split, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED);
+                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
 
                 if(gode == 0 || gode == 9)
                 {
-                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED);
+                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
                 if(gode == 0 || gode == 10)
                 {
@@ -266,8 +266,8 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #if !defined(__NO_MIDI__)
                     if(Midiprg[ped_patsam] == -1)
                     {
-                        Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                        Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                        Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 #else
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
@@ -279,7 +279,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     }
                     else
                     {
-                        Gui_Draw_Arrows_Number_Box(570, 502, Midiprg[ped_patsam], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Arrows_Number_Box(570, 502, Midiprg[ped_patsam], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     }
 
                     Actualize_Instruments_Synths_List(1);
@@ -301,7 +301,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 13)
                 {
-                    Gui_Draw_Arrows_Number_Box(144, 510, beatlines[ped_patsam], Allow_Global | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Arrows_Number_Box(144, 510, beatlines[ped_patsam], Allow_Global | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
 
                 if(gode == 0 || gode == 15)
@@ -410,11 +410,11 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(SamplesSwap[ped_patsam])
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     }
                     else
                     {
-                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     }
                     if(gode == 19)
                     {
@@ -883,7 +883,7 @@ void Mouse_Right_Instrument_Ed(void)
     {
         if(Allow_Global_Sliders)
         {
-            if(zcheckMouse(144, 511, 16, 16) && beatlines[ped_patsam] > 1)
+            if(zcheckMouse(144, 510, 16, 16) && beatlines[ped_patsam] > 1)
             {
                 beatlines[ped_patsam] -= 16;
                 if(beatlines[ped_patsam] < 1) beatlines[ped_patsam] = 1;
@@ -891,7 +891,7 @@ void Mouse_Right_Instrument_Ed(void)
                 teac = 13;
             }
 
-            if(zcheckMouse(188, 511, 16, 16) && beatlines[ped_patsam] < 128)
+            if(zcheckMouse(188, 510, 16, 16) && beatlines[ped_patsam] < 128)
             {
                 beatlines[ped_patsam] += 16;
                 if(beatlines[ped_patsam] > 128) beatlines[ped_patsam] = 128;
@@ -971,11 +971,11 @@ void Mouse_Right_Instrument_Ed(void)
                 }
                 if(SamplesSwap[ped_patsam])
                 {
-                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
                 else
                 {
-                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
                 Actualize_Instruments_Synths_List(1);
             }

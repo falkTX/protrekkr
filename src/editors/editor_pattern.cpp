@@ -1403,12 +1403,12 @@ void Actualize_Patterned(void)
     char tcp[30];
     sprintf(tcp, "%s_", nameins[ped_patsam]);
 
-    if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 134, 166, 16, tcp, BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(90, 134, 166, 16, nameins[ped_patsam], BUTTON_NORMAL);
+    if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 108, 166, 16, tcp, BUTTON_PUSHED);
+    else Gui_Draw_Button_Box(90, 108, 166, 16, nameins[ped_patsam], BUTTON_NORMAL);
 
-    Gui_Draw_Arrows_Number_Box2(90, 152, ped_pattad, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    value_box(258, 152, ped_patoct, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    value_box(258, 134, ped_patsam, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Arrows_Number_Box2(90, 126, ped_pattad, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    value_box(258, 126, ped_patoct, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    value_box(258, 108, ped_patsam, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Actualize_Instruments_Synths_List(2);
 }
 
@@ -2138,12 +2138,12 @@ void Mouse_Right_Pattern_Ed(void)
     int i;
 
     // Decrease/Increase steps
-    if(zcheckMouse(90, 152, 16, 16))
+    if(zcheckMouse(90, 126, 16, 16))
     {
         ped_pattad = 0;
         gui_action = GUI_CMD_UPDATE_PATTERN_ED;
     }
-    if(zcheckMouse(134, 152, 16, 16))
+    if(zcheckMouse(134, 126, 16, 16))
     {
         ped_pattad = 16;
         gui_action = GUI_CMD_UPDATE_PATTERN_ED;

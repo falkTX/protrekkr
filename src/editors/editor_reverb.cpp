@@ -134,7 +134,7 @@ void Actualize_Reverb_Ed(int gode)
         // Echoes
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_ECHOES)
         {
-            Gui_Draw_Arrows_Number_Box2(72, 465, num_echoes, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(72, 465, num_echoes, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DECAY1)

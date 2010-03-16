@@ -384,7 +384,8 @@ int Delete_Selection(int Position)
     COLUMN_TYPE type;
     int data;
 
-    if(block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
+    if(block_start_track[Curr_Buff_Block] != -1 &&
+       block_end_track[Curr_Buff_Block] != -1)
     {
         // Delete the entire selection
         for(int ybc = block_start[Curr_Buff_Block]; ybc < block_end[Curr_Buff_Block] + 1; ybc++)

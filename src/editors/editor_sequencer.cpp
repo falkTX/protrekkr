@@ -90,7 +90,7 @@ void Draw_Sequencer_Ed(void)
     Draw_Editors_Bar(USER_SCREEN_SEQUENCER);
 
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Flat_Box("Track Part Sequencer");
+    Gui_Draw_Flat_Box("Sequencer");
 
     Gui_Draw_Button_Box(4, 466, 80, 16, "Clear All", BUTTON_NORMAL);
     Gui_Draw_Button_Box(4, 484, 80, 16, "Clear Position", BUTTON_NORMAL);
@@ -106,8 +106,8 @@ void Draw_Sequencer_Ed(void)
 
     Gui_Draw_Button_Box(308, 466, 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL);
     Gui_Draw_Button_Box(308, 484, 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
 
     Gui_Draw_Button_Box(288, 466, 16, 16, "\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(288, 484, 16, 16, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -119,12 +119,12 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
 
     Gui_Draw_Button_Box(480, 466, 306, 28, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(745, 472, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(480, 501, 250, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
-    Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(480, 501, 250, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 
     Gui_Draw_Button_Box(600, 524, 60, 16, "Selection", BUTTON_NORMAL);
     Gui_Draw_Button_Box(600, 544, 60, 16, "Track", BUTTON_NORMAL);
@@ -174,7 +174,7 @@ void Actualize_Seq_Ed(char gode)
         {
             if(Remap_From < 0) Remap_From = 0;
             if(Remap_From > 0x7f) Remap_From = 0x7f;
-            value_box(520, 524, Remap_From, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(520, 524, Remap_From, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         // To instrument
@@ -182,7 +182,7 @@ void Actualize_Seq_Ed(char gode)
         {
             if(Remap_To < 0) Remap_To = 0;
             if(Remap_To > 0x7f) Remap_To = 0x7f;
-            value_box(520, 544, Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(520, 544, Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 3)
@@ -706,12 +706,12 @@ void Actualize_Sequencer(void)
     if(value > 127) pSequence[Cur_Position] = 127;
     if(value < 0) pSequence[Cur_Position] = 0;
 
-    Gui_Draw_Arrows_Number_Box(188, 44, Cur_Position, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Arrows_Number_Box(188, 62, pSequence[Cur_Position], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Arrows_Number_Box(188, 28, Cur_Position, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Arrows_Number_Box(188, 46, pSequence[Cur_Position], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Anat(Cur_Position);
-    if(Rows_Decimal) Gui_Draw_Arrows_Number_Box(188, 98, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    else value_box(188, 98, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Arrows_Number_Box(188, 80, sLength, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    if(Rows_Decimal) Gui_Draw_Arrows_Number_Box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    else value_box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Arrows_Number_Box(188, 64, sLength, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
     if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 }

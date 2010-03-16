@@ -48,13 +48,13 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(508, 530, 60, 16, "Solo Track", BUTTON_NORMAL);
     Gui_Draw_Button_Box(508, 548, 60, 16, "Un-mute All", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(8, 468, 224, 96, "Analog Filter Emulation", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 468, 224, 96, "Analog Filter Emulation", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(18, 484, 56, 16, "CutOff Frq.", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 502, 56, 16, "Reso.", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 520, 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, 538, 56, 16, "Inertia", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(240, 468, 260, 96, "Distorsion / Reverb / Pan", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(240, 468, 260, 96, "Distorsion / Reverb / Pan", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(248, 484, 56, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 502, 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 520, 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -62,10 +62,10 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
     Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 
-    Gui_Draw_Button_Box(640, 518, 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(640, 518, 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(714, 539, 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 }
    
@@ -110,32 +110,32 @@ void Actualize_Track_Ed(char gode)
             if(FType[ped_track] >= MAX_FILTER) FType[ped_track] = MAX_FILTER;
             switch(FType[ped_track])
             {
-                case 0: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -12db", BUTTON_NORMAL); break;
-                case 1: Gui_Draw_Button_Box(139, 520, 84, 16, "HiPass", BUTTON_NORMAL); break;
-                case 2: Gui_Draw_Button_Box(139, 520, 84, 16, "BandPass", BUTTON_NORMAL); break;
-                case 3: Gui_Draw_Button_Box(139, 520, 84, 16, "BandReject", BUTTON_NORMAL); break;
-                case 4: Gui_Draw_Button_Box(139, 520, 84, 16, "Filter Off", BUTTON_NORMAL); break;
-                case 5: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -24db", BUTTON_NORMAL); break;
-                case 6: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -48db", BUTTON_NORMAL); break;
-                case 7: Gui_Draw_Button_Box(139, 520, 84, 16, "LP-24 [Stereo]", BUTTON_NORMAL); break;
-                case 8: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Mono]", BUTTON_NORMAL); break;
-                case 9: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Stereo]", BUTTON_NORMAL); break;
-                case 10: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Mono]", BUTTON_NORMAL); break;
-                case 11: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Stereo]", BUTTON_NORMAL); break;
-                case 12: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -15db", BUTTON_NORMAL); break;
-                case 13: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -6db", BUTTON_NORMAL); break;
-                case 14: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +6db", BUTTON_NORMAL); break;
-                case 15: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +15db", BUTTON_NORMAL); break;
-                case 16: Gui_Draw_Button_Box(139, 520, 84, 16, "Custom Delta", BUTTON_NORMAL); break;
-                case 17: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort L", BUTTON_NORMAL); break;
-                case 18: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort M", BUTTON_NORMAL); break;
-                case 19: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort H", BUTTON_NORMAL); break;
-                case 20: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort", BUTTON_NORMAL); break;
-                case 21: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Mono]", BUTTON_NORMAL); break;
-                case 22: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL); break;
-                case 23: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL); break;
+                case 0: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 1: Gui_Draw_Button_Box(139, 520, 84, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 2: Gui_Draw_Button_Box(139, 520, 84, 16, "BandPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 3: Gui_Draw_Button_Box(139, 520, 84, 16, "BandReject", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 4: Gui_Draw_Button_Box(139, 520, 84, 16, "Filter Off", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 5: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -24db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 6: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -48db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 7: Gui_Draw_Button_Box(139, 520, 84, 16, "LP-24 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 8: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 9: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 10: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 11: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 12: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 13: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 14: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 15: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 16: Gui_Draw_Button_Box(139, 520, 84, 16, "Custom Delta", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 17: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort L", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 18: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort M", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 19: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort H", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 20: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 21: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 22: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 23: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
             }
-            value_box(77, 520, FType[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(77, 520, FType[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 5)
@@ -149,7 +149,7 @@ void Actualize_Track_Ed(char gode)
         {
             if(CSend[ped_track] < 0) CSend[ped_track] = 0;
             if(CSend[ped_track] > 127) CSend[ped_track] = 127;
-            value_box(570, 486, CSend[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(570, 486, CSend[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             CCoef[ped_track] = float((float) CSend[ped_track] / 127.0f);
         }
 
@@ -198,7 +198,7 @@ void Actualize_Track_Ed(char gode)
         {
             if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
             if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 14 || gode == 13)
@@ -211,7 +211,7 @@ void Actualize_Track_Ed(char gode)
                 // Zoom it back
                 Clear_Track_Zoom(ped_track);
             }
-            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actupated(0);
         }
 

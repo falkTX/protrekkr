@@ -713,7 +713,7 @@ void LoadAmigaMod(char *FileName, int channels)
     }
     else
     {
-        mess_box("Protracker module loading failed. (Probably: file not found)");
+        Status_Box("Protracker module loading failed. (Probably: file not found)");
     }
 
     Clear_Input();
@@ -938,7 +938,7 @@ int LoadMod(char *FileName)
 #if !defined(__WINAMP__)
     SongStop();
 
-    mess_box("Attempting to load the song file...");
+    Status_Box("Attempting to load the song file...");
 #endif
 
     FILE *in;
@@ -992,7 +992,7 @@ int LoadMod(char *FileName)
 Read_Mod_File:
 
 #if !defined(__WINAMP__)
-        mess_box("Loading song -> Header...");
+        Status_Box("Loading song -> Header...");
 #endif
         Free_Samples();
 
@@ -1105,7 +1105,7 @@ Read_Mod_File:
         }
 
 #if !defined(__WINAMP__)
-        mess_box("Loading song -> Sample data...");
+        Status_Box("Loading song -> Sample data...");
 #endif
         for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
         {
@@ -1193,7 +1193,7 @@ Read_Mod_File:
         }
 
 #if !defined(__WINAMP__)
-        mess_box("Loading song -> Track info, patterns and sequence...");   
+        Status_Box("Loading song -> Track info, patterns and sequence...");   
 #endif
 
         Set_Default_Channels_Polyphony();
@@ -1386,7 +1386,7 @@ Read_Mod_File:
         Init_Tracker_Context_After_ModLoad();
 
 #if !defined(__WINAMP__)
-        mess_box("Module loaded sucessfully...");
+        Status_Box("Module loaded sucessfully...");
 #endif
 
     }
@@ -1394,7 +1394,7 @@ Read_Mod_File:
     {
 
 #if !defined(__WINAMP__)
-        mess_box("Module loading failed. (Probably: file not found)");
+        Status_Box("Module loading failed. (Probably: file not found)");
 #endif
 
         return(FALSE);
@@ -3471,13 +3471,13 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
         if(NewFormat)
         {
             sprintf(Temph, "Saving '%s.ptp' song in modules directory...", FileName);
-            mess_box(Temph);
+            Status_Box(Temph);
             sprintf(Temph, "%s"SLASH"%s.ptp", Dir_Mods, FileName);
         }
         else
         {
             sprintf(Temph, "Saving '%s.ptk' song in modules directory...", FileName);
-            mess_box(Temph);
+            Status_Box(Temph);
             sprintf(Temph, "%s"SLASH"%s.ptk", Dir_Mods, FileName);
         }
         in = fopen(Temph, "wb");
@@ -3743,14 +3743,14 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 {
                     sprintf(name, "Module '%s.ptk' saved succesfully.", FileName);
                 }
-                mess_box(name);
+                Status_Box(name);
             }
         }
-        if(!Ok_Memory) mess_box("Not enough memory.");
+        if(!Ok_Memory) Status_Box("Not enough memory.");
     }
     else
     {
-        if(!Simulate) mess_box("Module save failed.");   
+        if(!Simulate) Status_Box("Module save failed.");   
     }
 
     return(Mod_Length);
@@ -3785,7 +3785,7 @@ void LoadSynth(char *FileName)
                 break;
         }
 
-        mess_box("Loading Synthesizer -> structure...");
+        Status_Box("Loading Synthesizer -> structure...");
         ResetSynthParameters(&PARASynth[ped_patsam]);
 
         PARASynth[ped_patsam].disto = 0;
@@ -3814,12 +3814,12 @@ void LoadSynth(char *FileName)
         Actualize_Instrument_Ed(0, 0);
         Actualize_DiskIO_Ed(0);
         Actualize_Patterned();
-        mess_box("Synthesizer program loaded ok.");
+        Status_Box("Synthesizer program loaded ok.");
         fclose(in);
     }
     else
     {
-        mess_box("Synthesizer program loading failed. (Probably: file not found)");
+        Status_Box("Synthesizer program loading failed. (Probably: file not found)");
     }
 }
 
@@ -3833,7 +3833,7 @@ void SaveSynth(void)
 
     sprintf(extension, "TWNNSYN3");
     sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[ped_patsam].presetname);
-    mess_box(Temph);
+    Status_Box(Temph);
 
     sprintf(Temph, "%s"SLASH"%s.pts", Dir_Presets, PARASynth[ped_patsam].presetname);
 
@@ -3847,11 +3847,11 @@ void SaveSynth(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Synthesizer program saved succesfully."); 
+        Status_Box("Synthesizer program saved succesfully."); 
     }
     else
     {
-        mess_box("Synthesizer program save failed.");
+        Status_Box("Synthesizer program save failed.");
     }
 
     Clear_Input();
@@ -3869,7 +3869,7 @@ void LoadInst(char *FileName)
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
 
-    mess_box("Attempting to load an instrument file...");
+    Status_Box("Attempting to load an instrument file...");
     FILE *in;
     in = fopen(FileName, "rb");
 
@@ -3901,11 +3901,11 @@ void LoadInst(char *FileName)
         }
 
         KillInst(ped_patsam);
-        mess_box("Loading Instrument -> Header..."); 
+        Status_Box("Loading Instrument -> Header..."); 
         Read_Data(&nameins[ped_patsam], sizeof(char), 20, in);
 
         // Reading sample data
-        mess_box("Loading Instrument -> Sample data...");
+        Status_Box("Loading Instrument -> Sample data...");
 
         int swrite = ped_patsam;
 
@@ -3991,9 +3991,9 @@ void LoadInst(char *FileName)
         Actualize_Patterned();
         Actualize_Instrument_Ed(2, 0);
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
-        mess_box("Instrument loaded ok.");
+        Status_Box("Instrument loaded ok.");
     } else {
-        mess_box("Instrument loading failed. (Probably: file not found)");
+        Status_Box("Instrument loading failed. (Probably: file not found)");
     }
     
     Clear_Input();
@@ -4011,7 +4011,7 @@ void SaveInst(void)
 
     sprintf(extension, "TWNNINS7");
     sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[ped_patsam]);
-    mess_box(Temph);
+    Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]);
 
     in = fopen(Temph, "wb");
@@ -4084,11 +4084,11 @@ void SaveInst(void)
         last_index = -1;
         Actualize_Files_List(0);
         Actualize_Patterned();
-        mess_box("Instrument saved succesfully."); 
+        Status_Box("Instrument saved succesfully."); 
     }
     else
     {
-        mess_box("Instrument save failed.");
+        Status_Box("Instrument save failed.");
     }
 
     Clear_Input();
@@ -4110,22 +4110,22 @@ void Load303(char *FileName)
         if(strcmp(extension, "TWNN3031") == 0)
         {
             // Ok, extension matched!
-            mess_box("Loading 303 pattern...");
+            Status_Box("Loading 303 pattern...");
 
             Load_303_Data(Read_Data, Read_Data_Swap, in, sl3, tb303[sl3].selectedpattern);
 
             Actualize_303_Ed(0);
-            mess_box("303 pattern loaded ok.");
+            Status_Box("303 pattern loaded ok.");
         }
         else
         {
-            mess_box("That file is not a "TITLE" 303 pattern file...");
+            Status_Box("That file is not a "TITLE" 303 pattern file...");
         }
         fclose(in);
     }
     else
     {
-        mess_box("303 pattern loading failed. (Probably: file not found)");
+        Status_Box("303 pattern loading failed. (Probably: file not found)");
     }
 }
 
@@ -4140,7 +4140,7 @@ void Save303(void)
     sprintf(extension, "TWNN3031");
     sprintf(Temph, "Saving '%s.303' pattern in patterns directory...",
             tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
-    mess_box(Temph);
+    Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.303", Dir_Patterns,
             tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     in = fopen(Temph, "wb");
@@ -4155,11 +4155,11 @@ void Save303(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("303 pattern saved succesfully.");   
+        Status_Box("303 pattern saved succesfully.");   
     }
     else
     {
-        mess_box("303 pattern save failed.");
+        Status_Box("303 pattern save failed.");
     }
 
     Clear_Input();
@@ -4234,7 +4234,7 @@ int Pack_Module(char *FileName)
     if(!strlen(FileName))
     {
         sprintf(name, "Can't save module without a name...");
-        mess_box(name);
+        Status_Box(name);
         return(FALSE);
     }
 
@@ -4267,7 +4267,7 @@ int Pack_Module(char *FileName)
     if(Final_Mem) free(Final_Mem);
 
     Clear_Input();
-    mess_box(name);
+    Status_Box(name);
     Read_SMPT();
     last_index = -1;
     Actualize_Files_List(0);
@@ -4304,7 +4304,7 @@ void SaveConfig(void)
     signed char phony = -1;
 
     sprintf(extension, "TWNNCFGA");
-    mess_box("Saving 'ptk.cfg'...");
+    Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
 
@@ -4368,11 +4368,11 @@ void SaveConfig(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Configuration file saved succesfully.");  
+        Status_Box("Configuration file saved succesfully.");  
     }
     else
     {
-        mess_box("Configuration file save failed.");
+        Status_Box("Configuration file save failed.");
     }
 }
 
@@ -5215,7 +5215,7 @@ void LoadReverb(char *FileName)
         if(strcmp(extension, "TWNNREV1") == 0)
         {
             // Ok, extension matched!
-            mess_box("Loading Reverb data...");
+            Status_Box("Loading Reverb data...");
 
             Read_Data(Reverb_Name, sizeof(char), 20, in);
 
@@ -5225,17 +5225,17 @@ void LoadReverb(char *FileName)
 
             Actualize_Reverb_Ed(0);
 
-            mess_box("Reverb data loaded ok.");
+            Status_Box("Reverb data loaded ok.");
         }
         else
         {
-            mess_box("That file is not a "TITLE" Reverb file...");
+            Status_Box("That file is not a "TITLE" Reverb file...");
         }
         fclose(in);
     }
     else
     {
-        mess_box("Reverb data loading failed. (Probably: file not found)");
+        Status_Box("Reverb data loading failed. (Probably: file not found)");
     }
 }
 
@@ -5249,7 +5249,7 @@ void SaveReverb(void)
 
     sprintf(extension, "TWNNREV1");
     sprintf(Temph, "Saving '%s.prv' data in reverbs directory...", Reverb_Name);
-    mess_box(Temph);
+    Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.prv", Dir_Reverbs, Reverb_Name);
 
     in = fopen(Temph, "wb");
@@ -5264,11 +5264,11 @@ void SaveReverb(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Reverb data saved succesfully.");   
+        Status_Box("Reverb data saved succesfully.");   
     }
     else
     {
-        mess_box("Reverb data save failed.");
+        Status_Box("Reverb data save failed.");
     }
 
     Clear_Input();
@@ -5282,7 +5282,7 @@ void LoadPattern(char *FileName)
 
     if(!is_editing)
     {
-        mess_box("Edit mode isn't turned on.");
+        Status_Box("Edit mode isn't turned on.");
         return;
     }
 
@@ -5297,7 +5297,7 @@ void LoadPattern(char *FileName)
         if(strcmp(extension, "TWNNBLK1") == 0)
         {
             // Ok, extension matched!
-            mess_box("Loading Pattern data...");
+            Status_Box("Loading Pattern data...");
 
             Read_Data(Selection_Name, sizeof(char), 20, in);
 
@@ -5305,17 +5305,17 @@ void LoadPattern(char *FileName)
 
             Actupated(0);
 
-            mess_box("Pattern data loaded ok.");
+            Status_Box("Pattern data loaded ok.");
         }
         else
         {
-            mess_box("That file is not a "TITLE" Pattern file...");
+            Status_Box("That file is not a "TITLE" Pattern file...");
         }
         fclose(in);
     }
     else
     {
-        mess_box("Pattern data loading failed. (Probably: file not found)");
+        Status_Box("Pattern data loading failed. (Probably: file not found)");
     }
 }
 
@@ -5329,7 +5329,7 @@ void SavePattern(void)
 
     sprintf(extension, "TWNNBLK1");
     sprintf(Temph, "Saving '%s.ppb' data in patterns directory...", Selection_Name);
-    mess_box(Temph);
+    Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name);
 
     in = fopen(Temph, "wb");
@@ -5344,11 +5344,11 @@ void SavePattern(void)
         Read_SMPT();
         last_index = -1;
         Actualize_Files_List(0);
-        mess_box("Pattern data saved succesfully.");   
+        Status_Box("Pattern data saved succesfully.");   
     }
     else
     {
-        mess_box("Pattern data save failed.");
+        Status_Box("Pattern data save failed.");
     }
 
     Clear_Input();

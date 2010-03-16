@@ -88,6 +88,14 @@
 #define COL_NOTE_SEL_BACK_SHADOW 44
 #define COL_NOTE_SEL_FORE_SHADOW 45
 
+#define COL_DOUBLE_HI 46
+#define COL_DOUBLE_MED 47
+#define COL_DOUBLE_LO 48
+
+#define COL_DOUBLE_PUSHED_HI 49
+#define COL_DOUBLE_PUSHED_MED 50
+#define COL_DOUBLE_PUSHED_LO 51
+
 #define NUMBER_COLORS 20
 
 #define BUTTON_NORMAL 1
@@ -96,6 +104,38 @@
 #define BUTTON_DISABLED 8
 #define BUTTON_NO_BORDER 16
 #define BUTTON_LOW_FONT 32
+#define BUTTON_TEXT_VTOP 64
+#define BUTTON_RIGHT_MOUSE 128
+
+#define A_ "\216"
+#define B_ "\217"
+#define C_ "\220"
+#define D_ "\221"
+#define E_ "\222"
+#define F_ "\223"
+#define G_ "\224"
+#define H_ "\225"
+#define I_ "\226"
+#define J_ "\227"
+#define K_ "\230"
+#define L_ "\231"
+#define M_ "\232"
+#define N_ "\233"
+#define O_ "\234"
+#define P_ "\235"
+#define Q_ "\236"
+#define R_ "\237"
+#define S_ "\240"
+#define T_ "\241"
+#define U_ "\242"
+#define V_ "\243"
+#define W_ "\244"
+#define X_ "\245"
+#define Y_ "\246"
+#define Z_ "\247"
+#define DOT_ "\250"
+#define TIR_ "\251"
+#define SPC_ "\252"
 
 // ------------------------------------------------------
 // Structures
@@ -144,7 +184,7 @@ void Gui_Clear_Array(int x, int y, int sx, int sy);
 void bjbox(int x, int y, int sx, int sy);
 
 void Draw_Editors_Bar(int Highlight);
-void mess_box(char const *str);
+void Status_Box(char const *str);
 
 void Realslider(int x, int y, int val, int Enabled);
 void Realslider_Size(int x, int y, int size, int val, int Enabled);

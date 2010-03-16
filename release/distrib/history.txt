@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v1.98p:
+v1.99:
 
 - Added maximum latency checking on OSX.
 - Updated SDL library to latest for OSX and Windows.
@@ -10,6 +10,10 @@ v1.98p:
 - LCTRL + LSHIFT + L/H: Transpose the note of a selected block
                         to 1 octave lower/higher but only for the currently
                         selected instrument.
+- Added buttons for block commands.
+- Buttons with right mouse button functions are now shown
+  with a complemented color.
+- Improved 303 editing by keeping current steps for each patterns/banks/units.
 
 v1.98o:
 

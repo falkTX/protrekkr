@@ -51,7 +51,13 @@ int curr_tab_highlight;
 
 int Nbr_Letters;
 int Font_Height = 11;
-char *Font_Ascii = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014\015 ";
+char *Font_Ascii =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014\015"
+    //A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z   .   -   
+    "\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251\252"
+    " ";
 int Font_Pos[256];
 int Font_Size[256];
 
@@ -210,6 +216,7 @@ char *Labels_Palette[] =
     "Track On / Play"
 };
 
+// Real colors
 int Idx_Palette[] =
 {
     1,
@@ -304,6 +311,14 @@ SDL_Color Default_Palette[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
     { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
     { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
 };
 
 LONGRGB Phony_Palette[sizeof(Default_Palette) / sizeof(SDL_Color)];
@@ -482,6 +497,36 @@ void Set_Phony_Palette(void)
                 Ptk_Palette[i].r = Phony_Palette[i].r;
                 Ptk_Palette[i].g = Phony_Palette[i].g;
                 Ptk_Palette[i].b = Phony_Palette[i].b;
+                break;
+
+            case COL_DOUBLE_HI:
+            case COL_DOUBLE_MED:
+            case COL_DOUBLE_LO:
+                ComponentR = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].r;
+                ComponentG = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].g;
+                ComponentB = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].b;
+                ComponentR -= 0x30;
+                ComponentB += 0x30;
+                if(ComponentR < 0) ComponentR = 0;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
+                break;
+
+            case COL_DOUBLE_PUSHED_HI:
+            case COL_DOUBLE_PUSHED_MED:
+            case COL_DOUBLE_PUSHED_LO:
+                ComponentR = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].r;
+                ComponentG = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].g;
+                ComponentB = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].b;
+                ComponentR -= 0x30;
+                ComponentB += 0x30;
+                if(ComponentR < 0) ComponentR = 0;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 break;
 
             default:
@@ -775,6 +820,18 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
 {
     int x2 = x + sx;
     int y2 = y + sy;
+    int y_center;
+    int Col_Idx = (pushed & BUTTON_RIGHT_MOUSE) ? 3: 0;
+    int Colors_Norm[] =
+    {
+        COL_MED, COL_HI, COL_LO,
+        COL_DOUBLE_MED, COL_DOUBLE_HI, COL_DOUBLE_LO
+    };
+    int Colors_Pushed[] =
+    {
+        COL_PUSHED_MED, COL_PUSHED_HI, COL_PUSHED_LO,
+        COL_DOUBLE_PUSHED_MED, COL_DOUBLE_PUSHED_HI, COL_DOUBLE_PUSHED_LO
+    };
 
     if(!(pushed & BUTTON_NO_BORDER))
     {
@@ -793,12 +850,12 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
             }
             else
             {
-                SetColor(COL_MED);
+                SetColor(Colors_Norm[Col_Idx]);
                 Fillrect(x, y, x2, y2 + 1);
-                SetColor(COL_HI);
+                SetColor(Colors_Norm[Col_Idx + 1]);
                 DrawLine(x, y, x2 - 1, y);
                 DrawLine(x, y, x, y2);
-                SetColor(COL_LO);
+                SetColor(Colors_Norm[Col_Idx + 2]);
                 DrawLine(x, y2, x2, y2);
                 DrawLine(x2, y, x2, y2);
             }
@@ -818,25 +875,36 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
             }
             else
             {
-                SetColor(COL_PUSHED_MED);
+                SetColor(Colors_Pushed[Col_Idx]);
                 Fillrect(x, y, x2, y2 + 1);
-                SetColor(COL_PUSHED_LO);
+                SetColor(Colors_Pushed[Col_Idx + 2]);
                 DrawLine(x, y, x2 - 1, y);
                 DrawLine(x, y, x, y2);
-                SetColor(COL_PUSHED_HI);
+                SetColor(Colors_Pushed[Col_Idx + 1]);
                 DrawLine(x, y2, x2, y2);
                 DrawLine(x2, y, x2, y2);
             }
         }
     }
-    if(pushed & BUTTON_TEXT_CENTERED)
+
+    if(pushed & BUTTON_TEXT_VTOP)
     {
-        x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
-        PrintXY(x, y + 2, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        y_center = 2;
     }
     else
     {
-        PrintXY(x + 4, y + 2, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        y_center = ((sy - Font_Height) / 2);
+    }
+
+    if(pushed & BUTTON_TEXT_CENTERED)
+    {
+        x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
+        
+        PrintXY(x, y + y_center, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+    }
+    else
+    {
+        PrintXY(x + 4, y + y_center, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
 }
 
@@ -867,7 +935,7 @@ void bjbox(int x, int y, int sx, int sy)
 
 // ------------------------------------------------------
 // Display a status message at the bottom of the screen
-void mess_box(char const *str)
+void Status_Box(char const *str)
 {
     Gui_Draw_Button_Box(0, CONSOLE_HEIGHT - 21, fsize, 18, str, BUTTON_NORMAL | BUTTON_DISABLED);
 }
