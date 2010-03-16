@@ -4825,15 +4825,21 @@ void Mouse_Handler(void)
                 Draw_Scope_Files_Button();
             }
 
-            // Tracks/Stereo scopes.
+            // Tracks scopes.
             if(zcheckMouse(746, 6, 18, 16))
             {
-                if(Scopish == SCOPE_ZONE_SCOPE)
+                if(Scopish != SCOPE_ZONE_SCOPE)
                 {
-                    Scopish_LeftRight ^= TRUE;
+                    Scopish_LeftRight = FALSE;
+                    Scopish = SCOPE_ZONE_SCOPE;
+                    Draw_Scope_Files_Button();
                 }
-                Scopish = SCOPE_ZONE_SCOPE;
-                Draw_Scope_Files_Button();
+                if(Scopish == SCOPE_ZONE_SCOPE && Scopish_LeftRight == TRUE)
+                {
+                    Scopish_LeftRight = FALSE;
+                    Scopish = SCOPE_ZONE_SCOPE;
+                    Draw_Scope_Files_Button();
+                }
             }
 
             // Instrument list
@@ -5414,8 +5420,22 @@ void Mouse_Handler(void)
             if(is_editing) Instrument_Octave_Down_Block(Cur_Position);
         }
 
-
-
+        // Stereo scopes.
+        if(zcheckMouse(746, 6, 18, 16))
+        {
+            if(Scopish != SCOPE_ZONE_SCOPE)
+            {
+                Scopish_LeftRight = TRUE;
+                Scopish = SCOPE_ZONE_SCOPE;
+                Draw_Scope_Files_Button();
+            }
+            if(Scopish == SCOPE_ZONE_SCOPE && Scopish_LeftRight == FALSE)
+            {
+                Scopish_LeftRight = TRUE;
+                Scopish = SCOPE_ZONE_SCOPE;
+                Draw_Scope_Files_Button();
+            }
+        }
 
         Mouse_Right_Fx_Ed();
 
@@ -6046,11 +6066,11 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6072,11 +6092,11 @@ void Draw_Scope_Files_Button(void)
 
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
 
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6100,7 +6120,7 @@ void Draw_Scope_Files_Button(void)
 
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
@@ -6131,11 +6151,11 @@ void Draw_Scope_Files_Button(void)
             Actualize_Files_List(0);
             if(Scopish_LeftRight)
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
 
             switch(Scopish)

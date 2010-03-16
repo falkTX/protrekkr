@@ -505,8 +505,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].b;
-                ComponentR -= 0x30;
-                ComponentB += 0x30;
+                ComponentR -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
                 Ptk_Palette[i].r = ComponentR;
@@ -520,8 +520,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].b;
-                ComponentR -= 0x30;
-                ComponentB += 0x30;
+                ComponentR -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
                 Ptk_Palette[i].r = ComponentR;
