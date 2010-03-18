@@ -34,7 +34,7 @@
 
 // ------------------------------------------------------
 // Constants
-#define TITLE "ProTrekkr"
+#define TITLE "Protrekkr"
 #define VER_VER "1"
 #define VER_REV "99"
 #define VERSION TITLE " v"VER_VER"."VER_REV

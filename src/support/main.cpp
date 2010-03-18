@@ -58,6 +58,10 @@
 #include <mach-o/dyld.h>
 #endif
 
+#if defined(__AMIGAOS4__) || defined(__AROS__)
+const char *AMIGA_VERSION = "\0$VER: " TITLE " " VER_VER "." VER_REV "\0";
+#endif
+
 // ------------------------------------------------------
 // Constants
 #define MAX_EVENTS 16
