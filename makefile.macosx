@@ -52,6 +52,9 @@ RemObj:
 	-rm -f $(EXEOBJS_X86)
 
 protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
+	(cd src/extralibs/sdl_draw; make -f makefile.macosx)
+	(cd src/extralibs/tinyxml; make.macosx)
+	(cd src/extralibs/zlib-1.2.3; make.macosx)
 	$(CXX) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o ./release/distrib/ptk_macosx_x86 -L./ $(FLAGS_X86) $(EXEOBJS_X86) $(LIBS_X86)
 	$(CXX) -o ./release/distrib/ptk_macosx_ppc -L./ $(FLAGS_PPC) $(EXEOBJS_PPC) $(LIBS_PPC)
 	lipo -create ./release/distrib/ptk_macosx_x86 ./release/distrib/ptk_macosx_ppc -output ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr

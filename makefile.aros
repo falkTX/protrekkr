@@ -34,6 +34,9 @@ RemObj:
 	-rm -f $(EXEOBJS)
 
 protrekkr: $(EXEOBJS)
+	(cd src/extralibs/sdl_draw; make -f makefile.aros)
+	(cd src/extralibs/tinyxml; make)
+	(cd src/extralibs/zlib-1.2.3; make)
 	$(CXX) -o ./release/distrib/ptk_aros -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
 	strip --strip-unneeded ./release/distrib/ptk_aros
 
