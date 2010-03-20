@@ -375,7 +375,9 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
     SDL_putenv("SDL_VIDEO_CENTERED=1");
-    SDL_putenv("SDL_VIDEO_DRIVER=opengl");
+#if defined(__WIN32__)
+    SDL_putenv("SDL_VIDEO_DRIVER=windib");
+#endif
 
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0)
     {
