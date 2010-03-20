@@ -474,7 +474,7 @@ void Set_Track_Slider(int pos);
 #define BLOCK_MARK_TRACKS 1
 #define BLOCK_MARK_ROWS 2
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
-void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif);
+void Mark_Block_End(int end_nibble, int start_track, int start_line, int Modif);
 int Delete_Selection(int Position);
 void Insert_Selection(int Cur_Track, int Position);
 void Remove_Selection(int Cur_Track, int Position);

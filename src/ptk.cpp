@@ -1942,7 +1942,8 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGE") == 0 ||
                 strcmp(extension, "TWNNSNGF") == 0 ||
                 strcmp(extension, "TWNNSNGG") == 0 ||
-                strcmp(extension, "TWNNSNGH") == 0)
+                strcmp(extension, "TWNNSNGH") == 0 ||
+                strcmp(extension, "TWNNSNGI") == 0)
         {
             sprintf(name, "%s", Wavfile);
             Ptk_Stop();
@@ -4040,13 +4041,17 @@ void Keyboard_Handler(void)
                    ped_col == (3 + j) ||
                    ped_col == (5 + j) ||
                    ped_col == (7 + j) ||
-                   ped_col == (9 + j))
+                   ped_col == (9 + j) ||
+                   ped_col == (11 + j) ||
+                   ped_col == (13 + j))
                 {
                     ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
                     if(ped_col == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
                     if(ped_col == (5 + j)) ped_cell = PATTERN_PANNING;      // panning
                     if(ped_col == (7 + j)) ped_cell = PATTERN_FX;           // fx
                     if(ped_col == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
+                    if(ped_col == (11 + j)) ped_cell = PATTERN_FX2;         // fx 2
+                    if(ped_col == (13 + j)) ped_cell = PATTERN_FXDATA2;     // fx 2 data
 
                     ltretvalue = retvalue;
                     xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
@@ -4147,13 +4152,17 @@ void Keyboard_Handler(void)
                        ped_col == (4 + j) ||
                        ped_col == (6 + j) ||
                        ped_col == (8 + j) ||
-                       ped_col == (10 + j))
+                       ped_col == (10 + j) ||
+                       ped_col == (12 + j) ||
+                       ped_col == (14 + j))
                     {
                         ped_cell = PATTERN_INSTR1 + (i * 2);
                         if(ped_col == (4 + j)) ped_cell = PATTERN_VOLUME;
                         if(ped_col == (6 + j)) ped_cell = PATTERN_PANNING;
                         if(ped_col == (8 + j)) ped_cell = PATTERN_FX;
                         if(ped_col == (10 + j)) ped_cell = PATTERN_FXDATA;
+                        if(ped_col == (12 + j)) ped_cell = PATTERN_FX2;
+                        if(ped_col == (14 + j)) ped_cell = PATTERN_FXDATA2;
 
                         ltretvalue = retvalue;
                         xoffseted = (ped_track * PATTERN_BYTES) + (ped_line * PATTERN_ROW_LEN) + ped_cell;
@@ -5630,7 +5639,7 @@ void Display_Master_Comp(void)
 // Display master volume
 void Display_Master_Volume(void)
 {
-    char tt[64];
+    char String[64];
 
     if(display_title)
     {
@@ -5638,8 +5647,8 @@ void Display_Master_Volume(void)
         if(mas_vol > 1.0f) mas_vol = 1.0f;
         Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED);
         Realslider(394 + 44, 6, (int) (mas_vol * 128.0f), TRUE);
-        sprintf(tt, "%d%%", (int) (mas_vol * 100.0f));
-        Print_String(tt, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
+        sprintf(String, "%d%%", (int) (mas_vol * 100.0f));
+        Print_String(String, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
     }
 }
 

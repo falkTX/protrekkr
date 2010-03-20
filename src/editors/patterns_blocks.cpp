@@ -144,6 +144,8 @@ void Clear_Buff(int Idx)
         *(BuffBlock[Idx] + ipcut + PATTERN_PANNING) = 255;
         *(BuffBlock[Idx] + ipcut + PATTERN_FX) = 0;
         *(BuffBlock[Idx] + ipcut + PATTERN_FXDATA) = 0;
+        *(BuffBlock[Idx] + ipcut + PATTERN_FX2) = 0;
+        *(BuffBlock[Idx] + ipcut + PATTERN_FXDATA2) = 0;
     }
 }
 
@@ -178,15 +180,15 @@ void Mark_Block_Start(int start_nibble, int start_track, int start_line)
 
 // ------------------------------------------------------
 // Validate the block marking stuff
-void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif)
+void Mark_Block_End(int end_nibble, int start_track, int start_line, int Modif)
 {
     int swap_value;
 
-    start_nibble += Get_Track_Nibble_Start(Channels_MultiNotes, start_track);
+    end_nibble += Get_Track_Nibble_Start(Channels_MultiNotes, start_track);
 
     if(Modif & BLOCK_MARK_TRACKS)
     {
-        swap_value = start_nibble + start_track;
+        swap_value = end_nibble + start_track;
         if(swap_block_start_track[Curr_Buff_Block] >= swap_value)
         {
             block_start_track[Curr_Buff_Block] = swap_value;
@@ -224,14 +226,14 @@ int Get_Pattern_Column(int Position, int xbc, int ybc)
 {
    return(*(RawPatterns + (pSequence[Position] * PATTERN_LEN) +
            (ybc * PATTERN_ROW_LEN) + (Get_Track_From_Nibble(Channels_MultiNotes, xbc) * PATTERN_BYTES) +
-           Get_Byte_From_Column(Channels_MultiNotes, xbc)));
+                                      Get_Byte_From_Column(Channels_MultiNotes, xbc)));
 }
 
 void Set_Pattern_Column(int Position, int xbc, int ybc, int Data)
 {
     *(RawPatterns + (pSequence[Position] * PATTERN_LEN) +
-     (ybc * PATTERN_ROW_LEN) + (Get_Track_From_Nibble(Channels_MultiNotes, xbc) * PATTERN_BYTES)
-     + Get_Byte_From_Column(Channels_MultiNotes, xbc)) = Data;
+     (ybc * PATTERN_ROW_LEN) + (Get_Track_From_Nibble(Channels_MultiNotes, xbc) * PATTERN_BYTES) +
+                                Get_Byte_From_Column(Channels_MultiNotes, xbc)) = Data;
 }
 
 void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
@@ -239,7 +241,7 @@ void Set_Buff_Column(int Position, int xbc, int ybc, int Data)
     Buff_Full[Curr_Buff_Block] = TRUE;
     *(BuffBlock[Curr_Buff_Block] + (ybc * PATTERN_ROW_LEN) +
      (Get_Track_From_Nibble(Buff_MultiNotes[Curr_Buff_Block], xbc) * PATTERN_BYTES) +
-     Get_Byte_From_Column(Buff_MultiNotes[Curr_Buff_Block], xbc)) = Data;
+      Get_Byte_From_Column(Buff_MultiNotes[Curr_Buff_Block], xbc)) = Data;
 }
 
 int Get_Buff_Column(int Position, int xbc, int ybc)
@@ -263,12 +265,16 @@ int Read_Pattern_Column(int Position, int xbc, int ybc)
         case PANNINGHI:
         case EFFECTHI:
         case EFFECTDATHI:
+        case EFFECT2HI:
+        case EFFECT2DATHI:
             return(Get_Pattern_Column(Position, xbc, ybc) & 0xf0);
         case INSTRLO:
         case VOLUMELO:
         case PANNINGLO:
         case EFFECTLO:
         case EFFECTDATLO:
+        case EFFECT2LO:
+        case EFFECT2DATLO:
             return(Get_Pattern_Column(Position, xbc, ybc) & 0xf);
         default:
             // Something went awfully wrong if we're reaching this point
@@ -293,6 +299,8 @@ void Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
         case PANNINGHI:
         case EFFECTHI:
         case EFFECTDATHI:
+        case EFFECT2HI:
+        case EFFECT2DATHI:
             datas_nibble = Get_Pattern_Column(Position, xbc, ybc);
             datas_nibble &= 0x0f;
             datas_nibble |= datas;
@@ -303,6 +311,8 @@ void Write_Pattern_Column(int Position, int xbc, int ybc, int datas)
         case PANNINGLO:
         case EFFECTLO:
         case EFFECTDATLO:
+        case EFFECT2LO:
+        case EFFECT2DATLO:
             datas_nibble = Get_Pattern_Column(Position, xbc, ybc);
             datas_nibble &= 0xf0;
             datas_nibble |= datas;
@@ -327,12 +337,16 @@ int Read_Buff_Column(int Position, int xbc, int ybc)
         case PANNINGHI:
         case EFFECTHI:
         case EFFECTDATHI:
+        case EFFECT2HI:
+        case EFFECT2DATHI:
             return(Get_Buff_Column(Position, xbc, ybc) & 0xf0);
         case INSTRLO:
         case VOLUMELO:
         case PANNINGLO:
         case EFFECTLO:
         case EFFECTDATLO:
+        case EFFECT2LO:
+        case EFFECT2DATLO:
             return(Get_Buff_Column(Position, xbc, ybc) & 0xf);
         default:
             // Something went awfully wrong if we're reaching this point
@@ -357,6 +371,8 @@ void Write_Buff_Column(int Position, int xbc, int ybc, int datas)
         case PANNINGHI:
         case EFFECTHI:
         case EFFECTDATHI:
+        case EFFECT2HI:
+        case EFFECT2DATHI:
             datas_nibble = Get_Buff_Column(Position, xbc, ybc);
             datas_nibble &= 0x0f;
             datas_nibble |= datas;
@@ -367,6 +383,8 @@ void Write_Buff_Column(int Position, int xbc, int ybc, int datas)
         case PANNINGLO:
         case EFFECTLO:
         case EFFECTDATLO:
+        case EFFECT2LO:
+        case EFFECT2DATLO:
             datas_nibble = Get_Buff_Column(Position, xbc, ybc);
             datas_nibble &= 0xf0;
             datas_nibble |= datas;
@@ -430,6 +448,10 @@ int Delete_Selection(int Position)
                     case EFFECTHI:
                     case EFFECTDATHI:
                     case EFFECTDATLO:
+                    case EFFECT2LO:
+                    case EFFECT2HI:
+                    case EFFECT2DATHI:
+                    case EFFECT2DATLO:
                         Set_Pattern_Column(Position, xbc, ybc, 0);
                         break;
                 }
@@ -496,6 +518,8 @@ void Insert_Selection(int Cur_Track, int Position)
 
                     case EFFECTHI:
                     case EFFECTDATHI:
+                    case EFFECT2HI:
+                    case EFFECT2DATHI:
                         data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
                         data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf;
                         Set_Pattern_Column(Position, xbc, ybc + 1, data);
@@ -504,6 +528,8 @@ void Insert_Selection(int Cur_Track, int Position)
 
                     case EFFECTLO:
                     case EFFECTDATLO:
+                    case EFFECT2LO:
+                    case EFFECT2DATLO:
                         data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
                         data |= Get_Pattern_Column(Position, xbc, ybc + 1) & 0xf0;
                         Set_Pattern_Column(Position, xbc, ybc + 1, data);
@@ -579,6 +605,8 @@ void Remove_Selection(int Cur_Track, int Position)
 
                         case EFFECTHI:
                         case EFFECTDATHI:
+                        case EFFECT2HI:
+                        case EFFECT2DATHI:
                             data = Get_Pattern_Column(Position, xbc, ybc) & 0xf0;
                             data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf;
                             Set_Pattern_Column(Position, xbc, ybc - 1, data);
@@ -587,6 +615,8 @@ void Remove_Selection(int Cur_Track, int Position)
 
                         case EFFECTLO:
                         case EFFECTDATLO:
+                        case EFFECT2LO:
+                        case EFFECT2DATLO:
                             data = Get_Pattern_Column(Position, xbc, ybc) & 0xf;
                             data |= Get_Pattern_Column(Position, xbc, ybc - 1) & 0xf0;
                             Set_Pattern_Column(Position, xbc, ybc - 1, data);
@@ -631,7 +661,7 @@ void Copy_Selection_To_Buffer(int Position)
         for(int xbc = block_start_track_nibble[Curr_Buff_Block]; xbc < block_end_track_nibble[Curr_Buff_Block] + 1; xbc++)
         {
             Buff_MultiNotes[Curr_Buff_Block][Get_Track_From_Nibble(Channels_MultiNotes, xbc) - relative_track] =
-                                             (Get_Max_Nibble_Track_From_Nibble(Channels_MultiNotes, xbc) - 8) / 3;
+                                             (Get_Max_Nibble_Track_From_Nibble(Channels_MultiNotes, xbc) - EXTRA_NIBBLE_DAT) / 3;
             Write_Buff_Column(Position, axbc, aybc, Read_Pattern_Column(Position, xbc, ybc));
             axbc++;
         }
@@ -907,6 +937,8 @@ void Interpolate_Block(int Position)
 
             case EFFECTDATHI:
             case EFFECTDATLO:
+            case EFFECT2DATHI:
+            case EFFECT2DATLO:
                 startvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
                 endvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
@@ -932,6 +964,8 @@ void Interpolate_Block(int Position)
 
             case EFFECTDATHI:
             case EFFECTDATLO:
+            case EFFECT2DATHI:
+            case EFFECT2DATLO:
                 start_value = startvalue[2];
                 end_value = endvalue[2];
                 break;
@@ -952,6 +986,8 @@ void Interpolate_Block(int Position)
 
                 case EFFECTDATHI:
                 case EFFECTDATLO:
+                case EFFECT2DATHI:
+                case EFFECT2DATLO:
                     if(start_value != 0xff || end_value != 0xff)
                     {
                         ranlen = Sel.y_end - Sel.y_start;
@@ -1023,6 +1059,8 @@ void Randomize_Block(int Position)
 
                     case EFFECTDATHI:
                     case EFFECTDATLO:
+                    case EFFECT2DATHI:
+                    case EFFECT2DATLO:
                         Write_Pattern_Column(Position, xbc, ybc, (rand() & 0xff));
                         break;
                 }
@@ -1445,7 +1483,7 @@ void Select_All_Notes_Block(void)
     {
         Mark_Block_Start(0, ped_track, 0);
         nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1 - 8,
+        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1 - EXTRA_NIBBLE_DAT,
                        ped_track,
                        nlines,
                        BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
@@ -1522,6 +1560,8 @@ void Insert_Track_Line(int track, int Position)
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FXDATA) = *(RawPatterns + xoffseted + PATTERN_FXDATA);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FX2) = *(RawPatterns + xoffseted + PATTERN_FX2);
+        *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FXDATA2) = *(RawPatterns + xoffseted + PATTERN_FXDATA2);
     }
     xoffseted = Get_Pattern_Offset(pSequence[Position], track, ped_line);
  
@@ -1563,6 +1603,8 @@ void Remove_Track_Line(int track, int Position)
         *(RawPatterns + xoffseted2 + PATTERN_PANNING) = *(RawPatterns + xoffseted + PATTERN_PANNING);
         *(RawPatterns + xoffseted2 + PATTERN_FX) = *(RawPatterns + xoffseted + PATTERN_FX);
         *(RawPatterns + xoffseted2 + PATTERN_FXDATA) = *(RawPatterns + xoffseted + PATTERN_FXDATA);
+        *(RawPatterns + xoffseted2 + PATTERN_FX2) = *(RawPatterns + xoffseted + PATTERN_FX2);
+        *(RawPatterns + xoffseted2 + PATTERN_FXDATA2) = *(RawPatterns + xoffseted + PATTERN_FXDATA2);
     }
     xoffseted = Get_Pattern_Offset(pSequence[Position], track, 0) + (PATTERN_LEN - PATTERN_ROW_LEN);
 
@@ -1602,6 +1644,8 @@ void Clear_Track_Data(int offset)
     *(RawPatterns + offset + PATTERN_PANNING) = 255;
     *(RawPatterns + offset + PATTERN_FX) = 0;
     *(RawPatterns + offset + PATTERN_FXDATA) = 0;
+    *(RawPatterns + offset + PATTERN_FX2) = 0;
+    *(RawPatterns + offset + PATTERN_FXDATA2) = 0;
 }
 
 // ------------------------------------------------------
@@ -1627,14 +1671,14 @@ int Alloc_Patterns_Pool(void)
 // Return the number of nibbles in a track
 int Get_Max_Nibble_Track(char *Buffer, int track)
 {
-    return((Buffer[track] * 3) + 8);
+    return((Buffer[track] * 3) + EXTRA_NIBBLE_DAT);
 }
 
 // ------------------------------------------------------
 // Obtain a track from a nibble and return it's number nibbles
 int Get_Max_Nibble_Track_From_Nibble(char *Buffer, int nibble)
 {
-    return((Buffer[Get_Track_From_Nibble(Buffer, nibble)] * 3) + 8);
+    return((Buffer[Get_Track_From_Nibble(Buffer, nibble)] * 3) + EXTRA_NIBBLE_DAT);
 }
 
 // ------------------------------------------------------
@@ -1675,7 +1719,7 @@ int Get_Track_From_Nibble(char *Buffer, int nibble)
 // Return the byte index from a given column
 int Get_Byte_From_Column(char *Buffer, int column)
 {
-    int max_notes = (Get_Max_Nibble_Track_From_Nibble(Buffer, column) - 8) / 3;
+    int max_notes = (Get_Max_Nibble_Track_From_Nibble(Buffer, column) - EXTRA_NIBBLE_DAT) / 3;
     int byte = 0;
     int i;
 
@@ -1705,6 +1749,14 @@ int Get_Byte_From_Column(char *Buffer, int column)
     if(column == ((i * 3) + 9)) return(PATTERN_FXDATA);
     if(column == ((i * 3) + 10)) return(PATTERN_FXDATA);
 
+    // Fx 2
+    if(column == ((i * 3) + 11)) return(PATTERN_FX2);
+    if(column == ((i * 3) + 12)) return(PATTERN_FX2);
+
+    // Fx 2 data
+    if(column == ((i * 3) + 13)) return(PATTERN_FXDATA2);
+    if(column == ((i * 3) + 14)) return(PATTERN_FXDATA2);
+
     return(byte);
 }
 
@@ -1714,7 +1766,7 @@ COLUMN_TYPE Get_Column_Type(char *Buffer, int column)
 {
     int track = Get_Track_From_Nibble(Buffer, column);
     int i;
-    int notes = (Get_Max_Nibble_Track(Buffer, track) - 8) / 3;
+    int notes = (Get_Max_Nibble_Track(Buffer, track) - EXTRA_NIBBLE_DAT) / 3;
 
     column = Get_Track_Relative_Column(Buffer, column);
 
@@ -1733,6 +1785,10 @@ COLUMN_TYPE Get_Column_Type(char *Buffer, int column)
     if(column == ((i * 3) + 8)) return(EFFECTLO);
     if(column == ((i * 3) + 9)) return(EFFECTDATHI);
     if(column == ((i * 3) + 10)) return(EFFECTDATLO);
+    if(column == ((i * 3) + 11)) return(EFFECT2HI);
+    if(column == ((i * 3) + 12)) return(EFFECT2LO);
+    if(column == ((i * 3) + 13)) return(EFFECT2DATHI);
+    if(column == ((i * 3) + 14)) return(EFFECT2DATLO);
     return(NOTE);
 }
 

@@ -86,6 +86,8 @@ void Draw_303_Ed(void)
 
 void Actualize_303_Ed(char gode)
 {
+    char tcp[40];
+    
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         if(gode == 0 || gode == 1) number303(tb303[sl3].patternlength[tb303[sl3].selectedpattern], 118, 556);
@@ -269,7 +271,6 @@ void Actualize_303_Ed(char gode)
 
         if(gode == 0 || gode == 18)
         {
-            char tcp[40];
             sprintf(tcp, "%s_", tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
 
             if(snamesel == INPUT_303_PATTERN)

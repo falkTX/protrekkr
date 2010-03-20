@@ -908,6 +908,7 @@ int LoadMod(char *FileName)
     int New_Reverb = FALSE;
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
+    int Fx2 = FALSE;
 
     char Comp_Flag;
 
@@ -953,6 +954,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'I':
+                Fx2 = TRUE;
             case 'H':
                 New_Env = TRUE;
             case 'G':
@@ -1100,6 +1103,12 @@ Read_Mod_File:
                     Read_Mod_Data(TmpPatterns_Notes + PATTERN_PANNING, sizeof(char), 1, in);
                     Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX, sizeof(char), 1, in);
                     Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA, sizeof(char), 1, in);
+                    if(Fx2)
+                    {
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX2, sizeof(char), 1, in);
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA2, sizeof(char), 1, in);
+                    }
+
                 }
             }
         }
@@ -2079,6 +2088,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 break;
                             
                             case PATTERN_FX:
+                            case PATTERN_FX2:
                                 // Count the number of synchro fxs
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -2144,7 +2154,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                             for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                             {   // Rows
                                 TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                if(i == PATTERN_FX)
+                                if(i == PATTERN_FX || i == PATTERN_FX2)
                                 {
                                     // Don't save FX 7
                                     if(TmpPatterns_Notes[i] == 0x7)
@@ -2180,7 +2190,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                                 {   // Rows
                                     TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                    if(i == PATTERN_FX)
+                                    if(i == PATTERN_FX || i == PATTERN_FX2)
                                     {
                                         // Don't save FX 7
                                         if(TmpPatterns_Notes[i] == 0x7)
@@ -2245,7 +2255,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         }
 
                         // Check the effects column
-                        if(i == PATTERN_FX)
+                        if(i == PATTERN_FX || i == PATTERN_FX2)
                         {
                             switch(TmpPatterns_Notes[i])
                             {
@@ -2481,6 +2491,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                         switch(i)
                         {
                             case PATTERN_FX:
+                            case PATTERN_FX2:
                                 // Don't save FX 7
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -2493,6 +2504,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                 break;
 
                             case PATTERN_FXDATA:
+                            case PATTERN_FXDATA2:
                                 // Don't save Fx 7 datas
                                 if(TmpPatterns_Notes[i - 1] == 0x7)
                                 {
@@ -3533,6 +3545,8 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                         cur_pattern[PATTERN_PANNING] = 255;
                         cur_pattern[PATTERN_FX] = 0;
                         cur_pattern[PATTERN_FXDATA] = 0;
+                        cur_pattern[PATTERN_FX2] = 0;
+                        cur_pattern[PATTERN_FXDATA2] = 0;
                         // Next line
                         cur_pattern += PATTERN_ROW_LEN;
                     }
@@ -4252,7 +4266,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGH");
+        sprintf(extension, "TWNNSNGI");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
@@ -4991,9 +5005,10 @@ int Calc_Length(void)
 {
     int i;
     int k;
+    int l;
     int pos_patt;
-    int patt_cmd;
-    int patt_datas;
+    int patt_cmd[MAX_FX];
+    int patt_datas[MAX_FX];
     Uint8 *Cur_Patt;
     float Ticks = (float) TicksPerBeat;
     float BPM = (float) BeatsPerMin;
@@ -5030,51 +5045,57 @@ int Calc_Length(void)
                 {
                     // Check if there's a pattern loop command
                     // or a change in the tempo/ticks
-                    patt_cmd = Cur_Patt[PATTERN_FX];
-                    patt_datas = Cur_Patt[PATTERN_FXDATA];
-                    switch(patt_cmd)
+                    patt_cmd[0] = Cur_Patt[PATTERN_FX];
+                    patt_datas[0] = Cur_Patt[PATTERN_FXDATA];
+                    patt_cmd[1] = Cur_Patt[PATTERN_FX2];
+                    patt_datas[1] = Cur_Patt[PATTERN_FXDATA2];
+
+                    for(l = 0; l < MAX_FX; l++)
                     {
-                        case 0x6:
-                            if(!patt_datas)
-                            {
-                                rep_counter = -1;
-                                rep_pos = pos_patt;
-                            }
-                            else
-                            {
-                                if(rep_counter == -1)
+                        switch(patt_cmd[l])
+                        {
+                            case 0x6:
+                                if(!patt_datas[l])
                                 {
-                                    rep_counter = (int) patt_datas;
-                                    pos_patt = rep_pos;
+                                    rep_counter = -1;
+                                    rep_pos = pos_patt;
                                 }
                                 else
                                 {
-                                    // count
-                                    rep_counter--;
-                                    if(rep_counter)
+                                    if(rep_counter == -1)
                                     {
+                                        rep_counter = (int) patt_datas[l];
                                         pos_patt = rep_pos;
                                     }
                                     else
                                     {
-                                        rep_counter = -1;
-                                        rep_pos = 0;
+                                        // count
+                                        rep_counter--;
+                                        if(rep_counter)
+                                        {
+                                            pos_patt = rep_pos;
+                                        }
+                                        else
+                                        {
+                                            rep_counter = -1;
+                                            rep_pos = 0;
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case 0xd:
-                            if(patt_datas < MAX_ROWS) have_break = patt_datas;
-                            break;
+                            case 0xd:
+                                if(patt_datas[l] < MAX_ROWS) have_break = patt_datas[l];
+                                break;
                         
-                        case 0xf:
-                            Ticks = (float) patt_datas;
-                            break;
+                            case 0xf:
+                                Ticks = (float) patt_datas[l];
+                                break;
     
-                        case 0xf0:
-                            BPM = (float) patt_datas;
-                            break;
+                            case 0xf0:
+                                BPM = (float) patt_datas[l];
+                                break;
+                        }
                     }
                     Cur_Patt += PATTERN_BYTES;
                 }

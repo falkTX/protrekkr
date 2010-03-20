@@ -41,6 +41,7 @@
 // ------------------------------------------------------
 // Constants
 #define NBR_COPY_BLOCKS 5
+#define EXTRA_NIBBLE_DAT 12
 
 // ------------------------------------------------------
 // Enumerations
@@ -56,7 +57,11 @@ enum COLUMN_TYPE
     EFFECTHI,
     EFFECTLO,
     EFFECTDATHI,
-    EFFECTDATLO
+    EFFECTDATLO,
+    EFFECT2HI,
+    EFFECT2LO,
+    EFFECT2DATHI,
+    EFFECT2DATLO
 };
 
 // ------------------------------------------------------
@@ -89,7 +94,7 @@ extern char Buff_MultiNotes[NBR_COPY_BLOCKS][MAX_TRACKS];
 // Functions
 int Init_Block_Work(void);
 void Mark_Block_Start(int start_nibble, int start_track, int start_line);
-void Mark_Block_End(int start_nibble, int start_track, int start_line, int Modif);
+void Mark_Block_End(int end_nibble, int start_track, int start_line, int Modif);
 int Delete_Selection(int Position);
 void Copy_Selection_To_Buffer(int Position);
 void Paste_Selection_From_Buffer(int Position, int Go_Across);

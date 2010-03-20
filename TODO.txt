@@ -5,6 +5,13 @@ TODO (in no special order):
  - Create a decent gadgets system (events based).
  - Click on numbers & move the mouse to modify them (or use the wheel).
  - Alternate way to enter notes (a la fruity loops or something).
+   We could have 00-7f colors for the different instruments.
+   Multi notes could be viewed horizontally (eg. line 01*number of notes slots) and a vertical piano roll.
+   Volumes and pannings positions could be viewed as thin blocks or lines (2 pixels) (waving horizontally).
+   Instruments without adsr would be viewed as small blocks.
+   Effects would be viewed the same as volumes and pannings bujt with selected colors.
+   Let the user select the colors of the instruments and effects among a palette.
+   (Nothing has been determined yet).
  - Use more xml scripting to completely customize the interface
    (when a decent gadgets system will be implemented, that is).
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.

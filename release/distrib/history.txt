@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.99b:
+
+- Long time running bug making text to disappear when using the 303 units
+  should be (hopefully) gone now.
+- Each track now have 2 columns of effects.
+
 v1.99:
 
 - Added maximum latency checking on OSX.
@@ -11,8 +17,8 @@ v1.99:
                         to 1 octave lower/higher but only for the currently
                         selected instrument.
 - Added buttons for block commands.
-- Buttons with right mouse button functions are now shown
-  with a complemented color.
+- Commands with right mouse button functions are now shown
+  with slightly different colors.
 - Improved 303 editing by keeping current steps for each patterns/banks/units.
 
 v1.98o:

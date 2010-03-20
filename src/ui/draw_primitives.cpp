@@ -197,6 +197,9 @@ void Copy(SDL_Surface *Source,
     Src_Rect.w = Dst_Rect.w + 1;
     Src_Rect.h = Dst_Rect.h + 1;
 
+    if(Main_Screen->locked) SDL_UnlockSurface(Main_Screen);
+    if(Source->locked) SDL_UnlockSurface(Source);
+
     SDL_BlitSurface(Source, &Src_Rect, Main_Screen, &Dst_Rect);
     Push_Update_Rect(x, y, x2 - x1, y2 - y1);
 }
@@ -264,12 +267,16 @@ void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
         Src_Rect.w = Font_Size[Idx];
         Dst_Rect.x = pos_x;
         Dst_Rect.w = Src_Rect.w;
+
+        if(Main_Screen->locked) SDL_UnlockSurface(Main_Screen);
         if(Font_Type == USE_FONT)
         {
+            if(FONT->locked) SDL_UnlockSurface(FONT);
             SDL_BlitSurface(FONT, &Src_Rect, Main_Screen, &Dst_Rect);
         }
         else
         {
+            if(FONT_LOW->locked) SDL_UnlockSurface(FONT_LOW);
             SDL_BlitSurface(FONT_LOW, &Src_Rect, Main_Screen, &Dst_Rect);
         }
         x += Font_Size[Idx];
@@ -282,7 +289,6 @@ void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
 void Display_Mouse_Pointer(int x, int y, int clear)
 {
     while(SDL_LockSurface(POINTER) < 0);
-    while(SDL_LockSurface(Main_Screen) < 0);
 
     int i;
     int j;
@@ -307,7 +313,7 @@ void Display_Mouse_Pointer(int x, int y, int clear)
                     {
                         if(SrcPix[Src_offset])
                         {
-                            DstPix[Dst_offset] = Pointer_BackBuf[Src_offset];
+                            DrawPixel((i + x), (j + y), Pointer_BackBuf[Src_offset]);
                         }
                     } 
                     else
@@ -315,14 +321,13 @@ void Display_Mouse_Pointer(int x, int y, int clear)
                         if(SrcPix[Src_offset])
                         {
                             Pointer_BackBuf[Src_offset] = DstPix[Dst_offset];
-                            DstPix[Dst_offset] = SrcPix[Src_offset];
+                            DrawPixel((i + x), (j + y), SrcPix[Src_offset]);
                         }
                     }
                 }
             }
         }
     }
-    SDL_UnlockSurface(Main_Screen);
     SDL_UnlockSurface(POINTER);
     Push_Update_Rect(x, y, POINTER->w, POINTER->h);
 }
