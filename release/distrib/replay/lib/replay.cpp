@@ -65,8 +65,8 @@ int SamplesPerTick;
 #endif
 
 #if defined(PTK_FX_AUTOFADEMODE)
-    char FADEMODE[MAX_TRACKS];    // 0 - Off, 1- In, 2 - Out;
-    float FADECOEF[MAX_TRACKS];
+    char FADEMODE[MAX_TRACKS][MAX_POLYPHONY];    // 0 - Off, 1- In, 2 - Out;
+    float FADECOEF[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
 #if defined(PTK_SYNTH)
@@ -1693,11 +1693,6 @@ void Pre_Song_Init(void)
 
         Player_FD[ini] = 0.0f;
 
-#if defined(PTK_FX_AUTOFADEMODE)
-        FADEMODE[ini] = 0;
-        FADECOEF[ini] = 0.0f;
-#endif
-
         ResetFilters(ini);
 
 #if !defined(__STAND_ALONE__)
@@ -1877,6 +1872,11 @@ void Post_Song_Init(void)
 #if defined(PTK_FX_VIBRATO)
             Vibrato_BaseNote[i][j] = 0;
             Vstep_vib[i][j] = 0;
+#endif
+
+#if defined(PTK_FX_AUTOFADEMODE)
+            FADEMODE[i][j] = 0;
+            FADECOEF[i][j] = 0.0f;
 #endif
 
         }
@@ -3175,10 +3175,6 @@ void Play_Instrument(int channel, int sub_channel,
                      int glide, int Play_Selection, int midi_sub_channel)
 {
 
-#if defined(PTK_FX_AUTOFADEMODE)
-    FADEMODE[channel] = 0;
-#endif
-
     int Cur_Position;
     int note2;
     float note;
@@ -3717,9 +3713,7 @@ void DoEffects(void)
             pltr_sample[i] = *(RawPatterns + tefactor + PATTERN_INSTR1 + (i * 2));
         }
 
-#if defined(PTK_FX_NOTECUT) || defined(PTK_FX_NOTERETRIGGER)
         unsigned char pltr_vol_row = *(RawPatterns + tefactor + PATTERN_VOLUME);
-#endif
 
 #if defined(PTK_FX_0) || defined(PTK_FX_X)
         pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
@@ -3734,7 +3728,7 @@ void DoEffects(void)
         {
             for(i = 0; i < Channels_MultiNotes[trackef]; i++)
             {
-                if(pltr_note[i] == 121 && pltr_sample[i] != 255)
+                if(pltr_note[i] == 121 && pltr_sample[i] != 255 && pltr_vol_row > 64)
                 {
                     sp_Tvol[trackef][Reserved_Sub_Channels[trackef][i]] = CustomVol[pltr_sample[i]];
                 }
@@ -3743,33 +3737,30 @@ void DoEffects(void)
 
 #if defined(PTK_FX_AUTOFADEMODE)
         // Autofade routine
-        switch(FADEMODE[trackef])
+        for(i = 0; i < Channels_Polyphony[trackef]; i++)
         {
-            case 1:
-                for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                {
-                    sp_Tvol[trackef][i] += FADECOEF[trackef];
+            switch(FADEMODE[trackef][i])
+            {
+                case 1:
+                    sp_Tvol[trackef][i] += FADECOEF[trackef][i];
 
                     if(sp_Tvol[trackef][i] > 1.0f)
                     {
                         sp_Tvol[trackef][i] = 1.0f;
-                        FADEMODE[trackef] = 0;
+                        FADEMODE[trackef][i] = 0;
                     }
-                }
-                break;
+                    break;
 
-            case 2:
-                for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                {
-                    sp_Tvol[trackef][i] -= FADECOEF[trackef];
+                case 2:
+                    sp_Tvol[trackef][i] -= FADECOEF[trackef][i];
 
                     if(sp_Tvol[trackef][i] < 0.0f)
                     {   
                         sp_Tvol[trackef][i] = 0.0f;
-                        FADEMODE[trackef] = 0;
+                        FADEMODE[trackef][i] = 0;
                     }
-                }
-                break;
+                    break;
+            }
         }
 #endif
 
@@ -3860,8 +3851,6 @@ void DoEffects(void)
                 case 0x4:
                     for(i = 0; i < Channels_Polyphony[trackef]; i++)
                     {
-                        if(Subicounter == 0) sp_Tvol[trackef][i] = 1.0f;
-
                         if(Subicounter >= pltr_dat_row[k]) sp_Tvol[trackef][i] = 0;
                     }
                     break;
@@ -4131,8 +4120,18 @@ void DoEffects(void)
                 case 0x17:
                     if(pltr_dat_row[k] > 0)
                     {
-                        FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row[k];
-                        FADEMODE[trackef] = 1;
+                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                        {
+                            FADECOEF[trackef][i] = 0.1666667f / (float) pltr_dat_row[k];
+                            FADEMODE[trackef][i] = 1;
+                        }
+                    }
+                    else
+                    {
+                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                        {
+                            FADEMODE[trackef][i] = 0;
+                        }
                     }
                     break;
 #endif
@@ -4142,8 +4141,18 @@ void DoEffects(void)
                 case 0x18:
                     if(pltr_dat_row[k] > 0)
                     {
-                        FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row[k];
-                        FADEMODE[trackef] = 2;
+                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                        {
+                            FADECOEF[trackef][i] = 0.1666667f / (float) pltr_dat_row[k];
+                            FADEMODE[trackef][i] = 2;
+                        }
+                    }
+                    else
+                    {
+                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
+                        {
+                            FADEMODE[trackef][i] = 0;
+                        }
                     }
                     break;
 #endif

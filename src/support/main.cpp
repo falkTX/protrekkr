@@ -353,8 +353,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 #endif
 
 {
-    int Startup_Mouse_Pos_x;
-    int Startup_Mouse_Pos_y;
     SDL_KeyboardEvent *kb_evnt;
     char KbFileName[MAX_PATH];
     char KbFileNameToLoad[MAX_PATH];
@@ -375,9 +373,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
     SDL_putenv("SDL_VIDEO_CENTERED=1");
-#if defined(__WIN32__)
-    SDL_putenv("SDL_VIDEO_DRIVER=windib");
-#endif
 
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0)
     {
@@ -416,17 +411,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         sprintf(Window_Title, "%s", VERSION);
     }
     SDL_WM_SetCaption(Window_Title, NULL);
-
-    // Obtain SDL window
-    SDL_GetWMInfo(&WMInfo);
-
-#if defined(__WIN32__)
-    Main_Window = WMInfo.window;
-    // Set the icon of the window
-    SetClassLong(Main_Window, GCL_HICON,
-                 (LONG) LoadIcon(GetModuleHandle(NULL),
-                 MAKEINTRESOURCE(IDI_ICON1)));
-#endif
 
     ExePath = (char *) malloc(ExePath_Size + 1);
     if(ExePath == NULL)
@@ -617,9 +601,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         exit(0);
     }
 
-    SDL_GetMouseState((int *) &Startup_Mouse_Pos_x, (int *) &Startup_Mouse_Pos_y);
-    Mouse.x = Startup_Mouse_Pos_x;
-    Mouse.y = Startup_Mouse_Pos_y;
+    SDL_GetMouseState((int *) &Mouse.x, (int *) &Mouse.y);
     Mouse.old_x = -16;
     Mouse.old_y = -16;
 
@@ -935,6 +917,17 @@ int Switch_FullScreen(void)
     {
         return(FALSE);
     }
+    // Obtain SDL window
+    SDL_GetWMInfo(&WMInfo);
+
+#if defined(__WIN32__)
+    Main_Window = WMInfo.window;
+    // Set the icon of the window
+    SetClassLong(Main_Window, GCL_HICON,
+                 (LONG) LoadIcon(GetModuleHandle(NULL),
+                 MAKEINTRESOURCE(IDI_ICON1)));
+#endif
+
     Init_UI();
 
     SDL_ShowCursor(0);

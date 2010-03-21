@@ -2,6 +2,16 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.99c:
+
+- Slicer effect (4) now uses the current volume
+  (from instrument's, column's or volume fx (3)).
+- Better handling of the volume column.
+- Changed the behaviour of auto fading effects (17 & 18): playing a new note
+  on a track which is currently auto fading won't stop the fading process
+  which now have to be switched off by using either 1700 or 1800.
+- Auto fading was kinda broken with multi notes tracks.
+
 v1.99b:
 
 - Long time running bug making text to disappear when using the 303 units
