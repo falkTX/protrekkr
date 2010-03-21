@@ -121,6 +121,10 @@ typedef char int8;
 extern int AUDIO_Latency;
 extern int AUDIO_Milliseconds;
 
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+void Message_Error(char *Message);
+#endif
+
 #if defined(__WIN32__)
 int AUDIO_Init_Driver(HWND hWnd, void (STDCALL *Mixer)(Uint8 *, Uint32));
 #else

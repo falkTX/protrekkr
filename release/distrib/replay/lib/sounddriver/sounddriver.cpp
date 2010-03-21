@@ -460,7 +460,23 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
         {
             return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
         }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        else
+        {
+            Message_Error("Error while calling AudioDeviceAddIOProc()");
+        }
+#endif
+
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    else
+    {
+        Message_Error("Error while calling AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice)");
+    }
+#endif
+
 #endif
 
 #if defined(__LINUX__)
@@ -472,10 +488,27 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
     {
         return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
     }
+    
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    else
+    {
+        Message_Error("Error while calling open(\"/dev/dsp\")");
+    }
+#endif
+
 #endif
 
 #if defined(__AMIGAOS4__)
     AHImp = (struct MsgPort *) IExec->AllocSysObject(ASOT_PORT, NULL);
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    if(!AHImp)
+    {
+        Message_Error("Error while calling IExec->AllocSysObject()");
+        return(FALSE);
+    }
+#endif
+
     AHIio = (struct AHIRequest *) IExec->AllocSysObjectTags(ASOT_IOREQUEST,
                                                             ASOIOR_ReplyPort, AHImp,
                                                             ASOIOR_Size, sizeof(struct AHIRequest),
@@ -487,12 +520,22 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
     join = NULL;
     if (!AHIio || !AHIio2)
     {
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling IExec->AllocSysObjectTags()");
+#endif
+
         return(FALSE);
     }
     AHIio->ahir_Version = 4;
     if (IExec->OpenDevice("ahi.device", 0, (struct IORequest *) AHIio, 0))
     {
         AHIio->ahir_Std.io_Device = NULL;
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling IExec->OpenDevice()");
+#endif
+
         return(FALSE);
     }
     IExec->CopyMem(AHIio, AHIio2, sizeof(struct AHIRequest));
@@ -501,29 +544,48 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 
 #if defined(__AROS__)
     AHImp = CreateMsgPort();
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    if(!AHImp)
+    {
+        Message_Error("Error while calling CreateMsgPort()");
+        return(FALSE);
+    }
+#endif
+
     AHIio = (struct AHIRequest *) CreateIORequest(AHImp, sizeof(struct AHIRequest));
     AHIio2 = (struct AHIRequest *) CreateIORequest(AHImp, sizeof(struct AHIRequest));
     join = NULL;
     
-    //check ahiios are allocated
+    // Check ahiios are allocated
     if (!AHIio || !AHIio2)
     {
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling CreateIORequest()");
+#endif
+
         return(FALSE);
     }
     
     AHIio->ahir_Version = 4;
     
-    //open ahi
+    // Open ahi
     if (OpenDevice("ahi.device", 0, (struct IORequest *) AHIio, 0))
     {
         AHIio->ahir_Std.io_Device = NULL;
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling OpenDevice()");
+#endif
+
         return(FALSE);
     }
     
-    //copy for double buffering
+    // Copy for double buffering
     CopyMem(AHIio, AHIio2, sizeof(struct AHIRequest));
-    
-    //create audio buffer
+
+    // Create audio buffer
     return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
 #endif
 
@@ -538,7 +600,23 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
         {
             return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
         }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        else
+        {
+            Message_Error("Error while calling AUDIO_DSound_Context->SetCooperativeLevel()");
+        }
+#endif
+
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    else
+    {
+        Message_Error("Error while calling DirectSoundCreate()");
+    }
+#endif
+
 #endif
     return(FALSE);
 }
@@ -632,8 +710,32 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
             {
                 return(TRUE);
             }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+            else
+            {
+                Message_Error("Error while calling AudioDeviceSetProperty(kAudioDevicePropertyBufferFrameSize)");
+            }
+#endif
+
         }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        else
+        {
+            Message_Error("Error while calling AudioDeviceSetProperty(kAudioDevicePropertyStreamFormat)");
+        }
+#endif
+
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    else
+    {
+        Message_Error("Error while calling AudioDeviceGetProperty(kAudioDevicePropertyStreamFormat)");
+    }
+#endif
+
 #endif
 
 #if defined(__LINUX__)
@@ -669,6 +771,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     {
         return(TRUE);
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    Message_Error("Error while calling pthread_create()");
+#endif
+
     Thread_Running = 0;
 #endif
 
@@ -682,6 +789,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     AHIbuf2 = (short *) IExec->AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_SHARED);
     if (!AHIbuf || !AHIbuf2)
     {
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling IExec->AllocVec()");
+#endif
+
         return(FALSE);
     }
     
@@ -693,6 +805,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     {
         return(TRUE);
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    Message_Error("Error while calling pthread_create()");
+#endif
+
     Thread_Running = 0;
 #endif
 
@@ -704,6 +821,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 	AHIbuf2 = (short *) AllocVec(AUDIO_SoundBuffer_Size << 1, MEMF_ANY);
 	if (!AHIbuf || !AHIbuf2)
     {
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+        Message_Error("Error while calling AllocVec()");
+#endif
+
 		return(FALSE);
 	}
 
@@ -712,15 +834,16 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 #if defined(USE_SDL_THREADS)
     if(hThread = SDL_CreateThread(AUDIO_Thread, NULL))
 #else
-    //struct sched_param p;
-    //memset(&p, 0, sizeof(p));
-    //p.sched_priority = 1;
-    //pthread_setschedparam(pthread_self(), SCHED_FIFO , &p);
     if(pthread_create(&hThread, NULL, AUDIO_Thread, NULL) == 0)
 #endif
     {
-    return(TRUE);
+        return(TRUE);
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    Message_Error("Error while calling pthread_create()");
+#endif
+
     Thread_Running = 0;
 #endif
 
@@ -745,6 +868,11 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
         SetThreadPriority(AUDIO_hReplayThread, THREAD_PRIORITY_TIME_CRITICAL);
         return(TRUE);
     }
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    Message_Error("Error while calling AUDIO_DSound_Context->CreateSoundBuffer()");
+#endif
+
 #endif
 
 #if defined(__PSP__)

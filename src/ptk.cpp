@@ -529,7 +529,6 @@ int Init_Context(void)
 #endif
     {
         Ptk_ReleaseDriver();
-        Message_Error("Can't initialize audio driver.");
         return(FALSE);
     }
 
