@@ -40,22 +40,34 @@ typedef unsigned long long Uint64;
 
 // ------------------------------------------------------
 // Functions
-#if defined(__BIG_ENDIAN__)
 
+#if defined(__BIG_ENDIAN__)
 Uint64 __Swap_64(Uint64 Value);
 int __Swap_32(int Value);
 short __Swap_16(short Value);
-
 #define Swap_64(x) __Swap_64((Uint64) x)
 #define Swap_32(x) __Swap_32((int) x)
 #define Swap_16(x) __Swap_16((int) x)
-
 #else
-
 #define Swap_64(x) (Uint64) x
 #define Swap_32(x) (int) x
 #define Swap_16(x) (int) x
+#endif
 
+// Only used inside the tracker to load Audio IFF files
+#if defined(__MOT_SWAP__)
+#if defined(__BIG_ENDIAN__)
+#define Mot_Swap_64(x) (Uint64) x
+#define Mot_Swap_32(x) (int) x
+#define Mot_Swap_16(x) (int) x
+#else
+Uint64 __Swap_64(Uint64 Value);
+int __Swap_32(int Value);
+short __Swap_16(short Value);
+#define Mot_Swap_64(x) __Swap_64((Uint64) x)
+#define Mot_Swap_32(x) __Swap_32((int) x)
+#define Mot_Swap_16(x) __Swap_16((int) x)
+#endif
 #endif
 
 #endif

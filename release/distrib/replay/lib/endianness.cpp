@@ -35,7 +35,7 @@
 
 // ------------------------------------------------------
 // Functions
-#if defined(__BIG_ENDIAN__)
+#if defined(__BIG_ENDIAN__) || defined(__MOT_SWAP__)
 
 Uint64 __Swap_64(Uint64 Value)
 {

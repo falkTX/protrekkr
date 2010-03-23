@@ -513,7 +513,7 @@ void Mouse_Left_Sequencer_Ed(void)
             }
         }
 
-        // Start reverb name input
+        // Start selection name input
         if(zcheckMouse(579, 472, 164, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_SELECTION_NAME;

@@ -7,7 +7,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        -lasound -lSDL -lsdldraw -lz
 
 FLAGS = -O2 -ffast-math -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
-        -D __LINUX__ -D __GCC__ -D __NO_CODEC__ -D __LINUX_ALSASEQ__
+        -D __LINUX__ -D __GCC__ -D __NO_CODEC__ -D __LINUX_ALSASEQ__ -D __MOT_SWAP__
 
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \

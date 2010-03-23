@@ -381,7 +381,7 @@ void LoadAmigaMod(char *FileName, int channels)
             Finetune[swrite][0] *= 16;
             CustomVol[swrite] = Convert_AmigaMod_Value(fgetc(in), 64.0f, 1.0f);
             SampleVol[swrite][0] = 1.0f;
-            Basenote[swrite][0] = 48 - 5 + 12 + 12 + 12 + 12 - 2;
+            Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
 
             SampleType[swrite][0] = 0;    // NO SAMPLE
 

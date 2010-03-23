@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v1.99d:
+
+- Added support for Audio IFF files loading.
+
 v1.99c:
 
 - Slicer effect (4) now uses the current volume

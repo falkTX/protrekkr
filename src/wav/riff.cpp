@@ -67,7 +67,6 @@ unsigned long FourCC(const char *ChunkName)
 }
 
 // ------------------------------------------------------
-
 RiffFile::RiffFile()
 {
     file = 0;
@@ -284,6 +283,7 @@ int RiffFile::SeekChunk(const char *ChunkName)
 
     i = 0;
 
+    Seek(i);
     while(!feof(file))
     {
         Chunk = 0;
@@ -326,7 +326,6 @@ int RiffFile::SeekChunk(const char *ChunkName)
 }
 
 // ------------------------------------------------------
-
 WaveFile::WaveFile()
 {
     pcm_data.ckID = FourCC("data");
@@ -845,5 +844,3 @@ void WaveFile::Int64ToDouble(UINT64 *Dest, UINT64 Source)
 {
     *Dest = Source;
 }
-
-/*--- end of file riff.cpp ---*/

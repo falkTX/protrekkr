@@ -18,10 +18,10 @@
 
 ===========================================================================*/
 
-#include "ddc.h"
+#ifndef _RIFF_H_
+#define _RIFF_H_
 
-#ifndef __DDC_RIFF_H
-#define __DDC_RIFF_H
+#include "ddc.h"
 
 #include "../../../release/distrib/replay/lib/include/endianness.h"
 
@@ -321,5 +321,3 @@ class WaveFile: private RiffFile
 #pragma pack(pop)
 
 #endif /* __DDC_RIFF_H */
-
-/*--- end of file riff.h ---*/

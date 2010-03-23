@@ -53,6 +53,8 @@
 #define MIX_RATE 44100
 #define fMIX_RATE 44100.0f
 
+#define DEFAULT_BASE_NOTE 48
+
 #define SMP_PACK_GSM 0
 #define SMP_PACK_MP3 1
 #define SMP_PACK_TRUESPEECH 2

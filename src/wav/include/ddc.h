@@ -12,8 +12,8 @@
 
 ============================================================================*/
 
-#ifndef __DDC_DDC_H
-#define __DDC_DDC_H
+#ifndef _DDC_H_
+#define _DDC_H_
 
 // If you add something to DDCRET, please add the appropriate string
 // to the function DDCRET_String() in the file 'source\ddcret.cpp'.
@@ -40,5 +40,3 @@ typedef unsigned short int UINT16;
 typedef signed short int INT16;
 
 #endif /* __DDC_DDC_H */
-
-/*--- end of file ddc.h ---*/

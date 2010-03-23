@@ -7,7 +7,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        -lSDL -lsdldraw -lz
 
 FLAGS = -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
-        -D USE_SDL_THREADS -D __AROS__ -D __GCC__ -D __NO_CODEC__ -D __NO_MIDI__ -I./src/include \
+        -D USE_SDL_THREADS -D __AROS__ -D __GCC__ -D __NO_CODEC__ -D __NO_MIDI__ -D __MOT_SWAP__ -I./src/include \
 
 CXXFLAGS = $(FLAGS)
 

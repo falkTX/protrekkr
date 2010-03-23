@@ -1661,7 +1661,7 @@ int Screen_Update(void)
             Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-            Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, I_ N_ T_ E_ R_ P_ O_ L_ A_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, S_ P_ R_ E_ A_ D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
             Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
@@ -1860,6 +1860,7 @@ void LoadFile(int Freeindex, const char *str)
     int Freeindex2 = 0;
     FILE *in;
     WaveFile Wav_File;
+    AIFFFile AIFF_File;
 
     int rate = 0;
     int bits = 0;
@@ -1868,11 +1869,12 @@ void LoadFile(int Freeindex, const char *str)
     short inx = 0;
     int fmtchklen = 0;
 
-    const char *Wavfile = str;
+    const char *FileName = str;
 
-    if(Wavfile != NULL && (in = fopen(Wavfile, "rb")) != NULL)
+    if(FileName != NULL && (in = fopen(FileName, "rb")) != NULL)
     {
         char extension[10];
+        int extension_AIFF[3];
         unsigned extension_New;
         int modext;
         int found_mod;
@@ -1888,6 +1890,9 @@ void LoadFile(int Freeindex, const char *str)
         fseek(in, 0, SEEK_SET);
         fread(&extension_New, sizeof(char), 4, in);
 
+        fseek(in, 0, SEEK_SET);
+        fread(&extension_AIFF, sizeof(char), 12, in);
+
         found_mod = 0;
         for(i = 0; i < sizeof(mt_tags) / sizeof(int); i++)
         {
@@ -1900,7 +1905,7 @@ void LoadFile(int Freeindex, const char *str)
 
         if(found_mod)
         {
-            sprintf(name, "%s", Wavfile);
+            sprintf(name, "%s", FileName);
             // name / number of channels
             LoadAmigaMod(name, found_mod);
             NewWav();
@@ -1922,7 +1927,7 @@ void LoadFile(int Freeindex, const char *str)
            strcmp(extension, "TWNNINS6") == 0 ||
            strcmp(extension, "TWNNINS7") == 0)
         {
-            sprintf(instrname, "%s", Wavfile);
+            sprintf(instrname, "%s", FileName);
             LoadInst(instrname);
             NewWav();
         }
@@ -1944,7 +1949,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGH") == 0 ||
                 strcmp(extension, "TWNNSNGI") == 0)
         {
-            sprintf(name, "%s", Wavfile);
+            sprintf(name, "%s", FileName);
             Ptk_Stop();
             LoadMod(name);
             NewWav();
@@ -1954,113 +1959,230 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSYN2") == 0 ||
                 strcmp(extension, "TWNNSYN3") == 0)
         {
-            sprintf(synthname, "%s", Wavfile);
+            sprintf(synthname, "%s", FileName);
             LoadSynth(synthname);
         }
         else if(strcmp(extension, "TWNN3030") == 0 ||
                 strcmp(extension, "TWNN3031") == 0)
         {
-            sprintf(name303, "%s", Wavfile);
+            sprintf(name303, "%s", FileName);
             Load303(name303);
         }
         else if(strcmp(extension, "TWNNREV1") == 0)
         {
-            sprintf(namerev, "%s", Wavfile);
+            sprintf(namerev, "%s", FileName);
             LoadReverb(namerev);
         }
         else if(strcmp(extension, "TWNNBLK1") == 0)
         {
-            sprintf(namerev, "%s", Wavfile);
+            sprintf(namerev, "%s", FileName);
             LoadPattern(namerev);
         }
         else
         {
-            Status_Box("Attempting of loading a wav file...");
-
-            // We need the length
-            if(Wav_File.OpenForRead(Wavfile) == DDC_SUCCESS)
+            if((extension_AIFF[0] == FormID &&
+               extension_AIFF[2] == AIFFID) ||
+               (extension_AIFF[0] == FormID &&
+               extension_AIFF[2] == AIFCID))
             {
-                int bits = Wav_File.BitsPerSample();
-                int channels = Wav_File.NumChannels();
-                if(channels != 1 && channels != 2)
+                Status_Box("Attempting of loading an Audio IFF file...");
+                if(AIFF_File.Open(FileName))
                 {
-                    Status_Box("Protrekkr can only load mono or stereo samples.");
-                }
-                else
-                {
-                    if(bits != 8 &&
-                       bits != 12 &&
-                       bits != 16 &&
-                       bits != 24 &&
-                       bits != 32 &&
-                       bits != 64)
+                    int bits = AIFF_File.BitsPerSample();
+                    int channels = AIFF_File.NumChannels();
+
+                    if(channels != 1 && channels != 2)
                     {
-                        Status_Box("Protrekkr can only load 8, 12, 16, 24, 32 or 64 bits samples.");
+                        Status_Box("Protrekkr can only load mono or stereo samples.");
                     }
                     else
                     {
-                        sp_Position[Freeindex][ped_split].absolu = 0;
-                        Stop_Current_Sample();
-                        switch(channels)
+                        if(bits != 8 &&
+                           bits != 12 &&
+                           bits != 16 &&
+                           bits != 24 &&
+                           bits != 32 &&
+                           bits != 64)
                         {
-                            case 1:
-                                AllocateWave(Freeindex, Wav_File.NumSamples(), 1);
-                                csamples = RawSamples[Freeindex][0][ped_split];
-                                for(i = 0; i < Wav_File.NumSamples(); i++)
-                                {
-                                    Wav_File.ReadMonoSample(&csamples[i]);
-                                }
-                                break;
-
-                            case 2:
-                                AllocateWave(Freeindex, Wav_File.NumSamples(), 2);
-
-                                csamples = RawSamples[Freeindex][0][ped_split];
-                                csamples2 = RawSamples[Freeindex][1][ped_split];
-
-                                for(i = 0; i < Wav_File.NumSamples(); i++)
-                                {
-                                    Wav_File.ReadStereoSample(&csamples[i], &csamples2[i]);
-                                }
-                                break;
+                            Status_Box("Protrekkr can only load 8, 12, 16, 24, 32 or 64 bits samples.");
                         }
-                        LoopType[Freeindex][ped_split] = Wav_File.LoopType();
-                        LoopStart[Freeindex][ped_split] = Wav_File.LoopStart();
-                        LoopEnd[Freeindex][ped_split] = Wav_File.LoopEnd();
-
-                        sprintf(SampleName[Freeindex][ped_split], "%s", Wavfile);
-                        Actualize_Patterned();
-                        Actualize_Instrument_Ed(2, 0);
-                        NewWav();
-                        switch(bits)
+                        else
                         {
-                            case 64:
-                                Status_Box("64 bit WAV PCM converted into 16 bit format.");
-                                break;
-                            case 32:
-                                Status_Box("32 bit WAV PCM converted into 16 bit format.");
-                                break;
-                            case 24:
-                                Status_Box("24 bit WAV PCM converted into 16 bit format.");
-                                break;
-                            case 12:
-                                Status_Box("12 bit WAV PCM converted into 16 bit format.");
-                                break;
-                            case 8:
-                                Status_Box("8 bit WAV PCM converted into 16 bit format.");
-                                break;
-                            default:
-                                Status_Box("16 bit WAV PCM loaded.");
-                                break;
+                            sp_Position[Freeindex][ped_split].absolu = 0;
+                            Stop_Current_Sample();
+                            switch(channels)
+                            {
+                                case 1:
+                                    AllocateWave(Freeindex, AIFF_File.NumSamples(), 1);
+                                    csamples = RawSamples[Freeindex][0][ped_split];
+                                    for(i = 0; i < AIFF_File.NumSamples(); i++)
+                                    {
+                                        AIFF_File.ReadMonoSample(&csamples[i]);
+                                    }
+                                    break;
+
+                                case 2:
+                                    AllocateWave(Freeindex, AIFF_File.NumSamples(), 2);
+
+                                    csamples = RawSamples[Freeindex][0][ped_split];
+                                    csamples2 = RawSamples[Freeindex][1][ped_split];
+
+                                    for(i = 0; i < AIFF_File.NumSamples(); i++)
+                                    {
+                                        AIFF_File.ReadStereoSample(&csamples[i], &csamples2[i]);
+                                    }
+                                    break;
+                            }
+                            LoopStart[Freeindex][ped_split] = 0;
+                            LoopEnd[Freeindex][ped_split] = 0;
+                            LoopType[Freeindex][ped_split] = SMP_LOOP_NONE;
+                            Basenote[Freeindex][ped_split] = DEFAULT_BASE_NOTE;
+
+                            if(AIFF_File.BaseNote())
+                            {
+                                Basenote[Freeindex][ped_split] = AIFF_File.BaseNote();
+                            }
+
+                            if(AIFF_File.LoopType())
+                            {
+                                LoopType[Freeindex][ped_split] = AIFF_File.LoopType();
+                                LoopStart[Freeindex][ped_split] = AIFF_File.LoopStart();
+                                LoopEnd[Freeindex][ped_split] = AIFF_File.LoopEnd();
+                            }
+
+                            sprintf(SampleName[Freeindex][ped_split], "%s", FileName);
+                            Actualize_Patterned();
+                            Actualize_Instrument_Ed(2, 0);
+                            NewWav();
+                            switch(bits)
+                            {
+                                case 64:
+                                    Status_Box("64 bit Audio IFF PCM converted into 16 bit format.");
+                                    break;
+                                case 32:
+                                    Status_Box("32 bit Audio IFF PCM converted into 16 bit format.");
+                                    break;
+                                case 24:
+                                    Status_Box("24 bit Audio IFF PCM converted into 16 bit format.");
+                                    break;
+                                case 12:
+                                    Status_Box("12 bit Audio IFF PCM converted into 16 bit format.");
+                                    break;
+                                case 8:
+                                    Status_Box("8 bit Audio IFF PCM converted into 16 bit format.");
+                                    break;
+                                default:
+                                    Status_Box("16 bit Audio IFF PCM loaded.");
+                                    break;
+                            }
                         }
                     }
-                }
 
-                Wav_File.Close();
+                    AIFF_File.Close();
+                }
+                else
+                {
+                    Status_Box("Corrupted or unsupported Audio IFF file.");
+                }
             }
             else
             {
-                Status_Box("Invalid file format. I only accept '.wav' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
+
+                Status_Box("Attempting of loading a RIFF file...");
+
+                // We need the length
+                if(Wav_File.OpenForRead(FileName) == DDC_SUCCESS)
+                {
+                    int bits = Wav_File.BitsPerSample();
+                    int channels = Wav_File.NumChannels();
+                    if(channels != 1 && channels != 2)
+                    {
+                        Status_Box("Protrekkr can only load mono or stereo samples.");
+                    }
+                    else
+                    {
+                        if(bits != 8 &&
+                           bits != 12 &&
+                           bits != 16 &&
+                           bits != 24 &&
+                           bits != 32 &&
+                           bits != 64)
+                        {
+                            Status_Box("Protrekkr can only load 8, 12, 16, 24, 32 or 64 bits samples.");
+                        }
+                        else
+                        {
+                            sp_Position[Freeindex][ped_split].absolu = 0;
+                            Stop_Current_Sample();
+                            switch(channels)
+                            {
+                                case 1:
+                                    AllocateWave(Freeindex, Wav_File.NumSamples(), 1);
+                                    csamples = RawSamples[Freeindex][0][ped_split];
+                                    for(i = 0; i < Wav_File.NumSamples(); i++)
+                                    {
+                                        Wav_File.ReadMonoSample(&csamples[i]);
+                                    }
+                                    break;
+
+                                case 2:
+                                    AllocateWave(Freeindex, Wav_File.NumSamples(), 2);
+
+                                    csamples = RawSamples[Freeindex][0][ped_split];
+                                    csamples2 = RawSamples[Freeindex][1][ped_split];
+
+                                    for(i = 0; i < Wav_File.NumSamples(); i++)
+                                    {
+                                        Wav_File.ReadStereoSample(&csamples[i], &csamples2[i]);
+                                    }
+                                    break;
+                            }
+                            LoopStart[Freeindex][ped_split] = 0;
+                            LoopEnd[Freeindex][ped_split] = 0;
+                            LoopType[Freeindex][ped_split] = SMP_LOOP_NONE;
+                            Basenote[Freeindex][ped_split] = DEFAULT_BASE_NOTE;
+
+                            if(Wav_File.LoopType())
+                            {
+                                LoopType[Freeindex][ped_split] = Wav_File.LoopType();
+                                LoopStart[Freeindex][ped_split] = Wav_File.LoopStart();
+                                LoopEnd[Freeindex][ped_split] = Wav_File.LoopEnd();
+                            }
+
+                            sprintf(SampleName[Freeindex][ped_split], "%s", FileName);
+                            Actualize_Patterned();
+                            Actualize_Instrument_Ed(2, 0);
+                            NewWav();
+                            switch(bits)
+                            {
+                                case 64:
+                                    Status_Box("64 bit WAV PCM converted into 16 bit format.");
+                                    break;
+                                case 32:
+                                    Status_Box("32 bit WAV PCM converted into 16 bit format.");
+                                    break;
+                                case 24:
+                                    Status_Box("24 bit WAV PCM converted into 16 bit format.");
+                                    break;
+                                case 12:
+                                    Status_Box("12 bit WAV PCM converted into 16 bit format.");
+                                    break;
+                                case 8:
+                                    Status_Box("8 bit WAV PCM converted into 16 bit format.");
+                                    break;
+                                default:
+                                    Status_Box("16 bit WAV PCM loaded.");
+                                    break;
+                            }
+                        }
+                    }
+
+                    Wav_File.Close();
+                }
+                else
+                {
+                    Status_Box("Invalid file format. I only accept '.wav' '.aiff' '.aifc' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
+                }
             }
         }
         fclose(in);

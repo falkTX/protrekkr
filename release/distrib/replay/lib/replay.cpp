@@ -3251,7 +3251,7 @@ void Play_Instrument(int channel, int sub_channel,
             glide = 0;
         }
 
-        note2 = inote - 48;
+        note2 = inote - DEFAULT_BASE_NOTE;
 
 #if defined(PTK_INSTRUMENTS)
         note = (float) inote;
@@ -4957,7 +4957,7 @@ void KillInst(int inst_nbr)
         Finetune[inst_nbr][z] = 0;
         SampleVol[inst_nbr][z] = 0.0f;
         FDecay[inst_nbr][z] = 0.0f;
-        Basenote[inst_nbr][z] = 48;
+        Basenote[inst_nbr][z] = DEFAULT_BASE_NOTE;
 
 #if !defined(__STAND_ALONE__)
         sprintf(SampleName[inst_nbr][z], "Untitled");

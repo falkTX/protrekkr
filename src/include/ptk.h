@@ -38,6 +38,7 @@
 #include "../support/include/main.h"
 
 #include "../wav/include/riff.h"
+#include "../aiff/include/aiff.h"
 #include "../include/variables.h"
 
 #include "../ui/include/misc_draw.h"
