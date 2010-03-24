@@ -5,10 +5,10 @@ ProTrekkr releases history
 v1.99d:
 
 - Added support for Audio IFF files loading.
-- Auto zomming of multi-notes tracks fixed
+- Auto zooming of multi-notes tracks fixed
   (tracks sizes are now properly being reduced to fit entirely on the screen).
-- Added support for german keyboard layout.
-- Fixed a signal overflow which occured with 2nd 303 unit when 1st wasn't active.
+- Added support for German keyboard layout.
+- Fixed a signal overflow which occurred with 2nd 303 unit when 1st wasn't active.
 
 v1.99c:
 
