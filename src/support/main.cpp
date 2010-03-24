@@ -679,7 +679,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         {
                             Scancode = Translate_Locale_Key(Symbol);
 
-                            //printf("%x %d %x %d\n", Symbol, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
+                         //   printf("%x %d %x %d\n", Symbol, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
 
                             Keys_Raw[Scancode] = TRUE;
                             Keys_Raw_Off[Scancode] = FALSE;

@@ -45,10 +45,12 @@
 #define FormID 'FORM'
 #define AiffID 'AIFF'
 #define AifcID 'AIFC'
+#define SoundDataID 'SSND'
 #else
 #define FormID 'MROF'
 #define AiffID 'FFIA'
 #define AifcID 'CFIA'
+#define SoundDataID 'DNSS'
 #endif
 
 #define NoLooping 0
