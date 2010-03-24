@@ -1941,7 +1941,7 @@ void Sp_Player(void)
 #endif
 
 #if defined(PTK_303)
-    float Signal_303;
+    float Signal_303 = 0.0f;
 #endif
 
     char gotsome;
@@ -4840,7 +4840,7 @@ void noteoff303(char strack)
     if(strack == track3031)
     {
         tb303engine[0].RampVolume = 0.0f;
-        track3032 = 255;
+        track3031 = 255;
     }
 
     if(strack == track3032)
