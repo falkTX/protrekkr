@@ -29,76 +29,27 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _SOUNDDRIVER_H_
-#define _SOUNDDRIVER_H_
+#ifndef _SOUNDDRIVER_PSP_H_
+#define _SOUNDDRIVER_PSP_H_
 
 // ------------------------------------------------------
 // Includes
-#if defined(__LINUX__)
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <linux/soundcard.h>
-#include <sys/ioctl.h>
-#include <pthread.h>
-#include <float.h>
-#include <memory.h>
-#include <math.h>
-#endif
-
-#if defined(__AMIGAOS4__) || defined(__AROS__)
-#include <devices/ahi.h>
-#include <proto/exec.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <pthread.h>
-#include <float.h>
-#include <memory.h>
-#include <math.h>
-#endif
-
-#if defined(__MACOSX__)
-#include <AudioUnit/AudioUnit.h>
-#include <unistd.h>
-#endif
-
-#if defined(__PSP__)
 #include <pspkernel.h>
 #include <pspaudio.h>
 #include <malloc.h>
 #include <string.h>
-#endif
 
-#if defined(__WIN32__)
-#if !defined(__GCC__)
-#define _WIN32_WINNT 0x0500
-#endif
-#include <windows.h>
-#endif
-
-#if defined(__WIN32__)
-#define STDCALL __stdcall
-#else
 #define STDCALL
-#endif
 
-#if !defined(__WIN32__) && !defined(__AROS__)
 #define TRUE 1
 #define FALSE 0
-#endif
 
 // ------------------------------------------------------
 // Constants
 #define AUDIO_PCM_FREQ 44100
 
-#if defined(__PSP__)
 #define AUDIO_THREAD_STACKSIZE (1024 * 4)
 #define AUDIO_THREAD_PRIORITY 2
-#endif
 
 #define AUDIO_DBUF_CHANNELS 2
 #define AUDIO_DBUF_RESOLUTION 16
@@ -107,14 +58,8 @@
 // Types
 typedef unsigned int Uint32;
 typedef unsigned char Uint8;
-#if !defined(__AMIGAOS4__)
 typedef int int32;
 typedef char int8;
-#endif
-
-#if defined(__AROS__)
-#define int32 int32_t
-#endif
 
 // ------------------------------------------------------
 // Functions
@@ -125,11 +70,7 @@ extern int AUDIO_Milliseconds;
 void Message_Error(char *Message);
 #endif
 
-#if defined(__WIN32__)
-int AUDIO_Init_Driver(HWND hWnd, void (STDCALL *Mixer)(Uint8 *, Uint32));
-#else
 int AUDIO_Init_Driver(void (STDCALL *Mixer)(Uint8 *, Uint32));
-#endif
 int AUDIO_Create_Sound_Buffer(int milliseconds);
 void AUDIO_Stop_Sound_Buffer(void);
 void AUDIO_Stop_Driver(void);
