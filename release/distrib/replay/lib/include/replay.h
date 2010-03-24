@@ -48,6 +48,8 @@
 #include "../sounddriver/include/sounddriver_aos4.h"
 #elif defined(__PSP__)
 #include "../sounddriver/include/sounddriver_psp.h"
+#else
+#error "Can't work without any sound driver !"
 #endif
 #include "samples_unpack.h"
 #include "ptkreplay.h"

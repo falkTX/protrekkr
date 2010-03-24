@@ -154,7 +154,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\SoundDriver\SoundDriver.cpp">
+				RelativePath=".\sounddriver\sounddriver_windows.cpp">
 			</File>
 			<File
 				RelativePath="Synth.cpp">
@@ -209,7 +209,7 @@
 				RelativePath="include\Samples_Unpack.h">
 			</File>
 			<File
-				RelativePath=".\SoundDriver\include\SoundDriver.h">
+				RelativePath=".\sounddriver\include\sounddriver_windows.h">
 			</File>
 			<File
 				RelativePath="include\Synth.h">
