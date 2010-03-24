@@ -26,6 +26,8 @@
 *.ppb*
 *.303*
 *.wav*
+*.snd*
+*.aif*
 *stderr*
 *stdout*
 *windows*

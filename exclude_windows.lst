@@ -16,6 +16,9 @@
 *.map*
 *.ncb*
 *.lib*
+*.wav*
+*.snd*
+*.aif*
 *stderr*
 *stdout*
 *.elf*

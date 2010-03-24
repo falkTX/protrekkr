@@ -25,6 +25,9 @@
 *.plg*
 *.map*
 *.ncb*
+*.wav*
+*.snd*
+*.aif*
 *module.s*
 *.ptk*
 *stderr*

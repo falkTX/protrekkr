@@ -8,6 +8,7 @@ v1.99d:
 - Auto zomming of multi-notes tracks fixed
   (tracks sizes are now properly being reduced to fit entirely on the screen).
 - Added support for german keyboard layout.
+- Fixed a signal overflow which occured in 2nd 303 unit when 1st wasn't active.
 
 v1.99c:
 
