@@ -518,10 +518,10 @@ void Display_Delays_Arrows(void)
 
     for(i = 0; i < 10; i++)
     {
-        Gui_Draw_Button_Box(Table_Arrows[i].x, Table_Arrows[i].y, 16, 16, "\05", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 18, Table_Arrows[i].y, 16, 16, "\03", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 82, Table_Arrows[i].y, 16, 16, "\04", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 82 + 18, Table_Arrows[i].y, 16, 16, "\06", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(Table_Arrows[i].x, Table_Arrows[i].y, 16, 16, "\05", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 18, Table_Arrows[i].y, 16, 16, "\03", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 82, Table_Arrows[i].y, 16, 16, "\04", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 82 + 18, Table_Arrows[i].y, 16, 16, "\06", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 }
 

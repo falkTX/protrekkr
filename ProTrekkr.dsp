@@ -297,12 +297,12 @@ SOURCE=.\Release\Distrib\Replay\lib\include\TB_303.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\Release\Distrib\Replay\lib\SoundDriver\include\SoundDriver.h
+SOURCE=.\release\distrib\replay\lib\sounddriver\include\sounddriver_windows.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\Release\Distrib\Replay\lib\SoundDriver\SoundDriver.cpp
+SOURCE=.\release\distrib\replay\lib\sounddriver\sounddriver_windows.cpp
 # End Source File
 # End Group
 # Begin Source File

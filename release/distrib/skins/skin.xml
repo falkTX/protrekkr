@@ -6,5 +6,5 @@
     <file name="logo" value="neural.bmp" width="728" height="224" bkcol="8"/>
     <file name="logo_bkcol" value="151f20"/>
     <file name="303" value="303.bmp"/>
-    <file name="keyboards" value="kben.txt kbfr.txt kbfr_macosx.txt kben_macosx.txt"/>
+    <file name="keyboards" value="kben.txt kbfr.txt kbde.txt kbfr_macosx.txt kben_macosx.txt kbde_macosx.txt"/>
 </files>

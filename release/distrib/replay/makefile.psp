@@ -37,7 +37,7 @@ LIBS     := $(LIBS) $(PSPSDK_LIBS) -lc -lpspnet \
 			-lpsputility -lpspuser -lpspkernel
 
 # the library itself #
-include lib/makefile
+include lib/makefile.psp
 
 all: $(EXTRA_TARGETS) $(TARGET).elf
 

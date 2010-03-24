@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /Gz /W3 /O1 /Gy /D "__WIN32__" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "__STAND_ALONE__" /FD /c
+# ADD CPP /nologo /Gz /W3 /O1 /D "__WIN32__" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "__STAND_ALONE__" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
 # ADD RSC /l 0x40c /d "NDEBUG"
@@ -94,7 +94,7 @@ SOURCE=.\Samples_Unpack.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SoundDriver\SoundDriver.cpp
+SOURCE=.\sounddriver\sounddriver_windows.cpp
 # End Source File
 # Begin Source File
 
@@ -126,7 +126,7 @@ SOURCE=.\include\Samples_Unpack.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\SoundDriver\include\SoundDriver.h
+SOURCE=.\sounddriver\include\sounddriver_windows.h
 # End Source File
 # Begin Source File
 

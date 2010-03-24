@@ -617,6 +617,8 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             p_a = *(RawPatterns + offset_t + PATTERN_NOTE1 + (i * 2));
             p_b = *(RawPatterns + offset_t + PATTERN_INSTR1 + (i * 2));
             p_bh = p_b & 0xf;
+
+            if(dover + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
      
             Cur_Note_Function[cur_track].Fnc(dover, y, p_a, cur_color, cur_color + 7);
 
@@ -954,6 +956,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 p_bh = p_b & 0xf;
 
                 // Note
+                if(dover + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack) Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, 48, 48 + 15);
                 else Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track] * 3;
@@ -2621,7 +2624,7 @@ void Set_Track_Zoom(int track, TRACK_TYPE type)
         case TRACK_NORMAL:
 
             // Track is too damn large to be displayed normally
-            if(Channels_MultiNotes[track] > 14)
+            if(Channels_MultiNotes[track] > MAX_TRACKS_NORMAL)
             {
                 Set_Track_Zoom(track, TRACK_SMALL);
             }
@@ -2633,7 +2636,7 @@ void Set_Track_Zoom(int track, TRACK_TYPE type)
 
         case TRACK_LARGE:
             // Track is too damn large to be zoomed
-            if(Channels_MultiNotes[track] > 10)
+            if(Channels_MultiNotes[track] > MAX_TRACKS_LARGE)
             {
                 Set_Track_Zoom(track, TRACK_NORMAL);
             }

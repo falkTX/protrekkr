@@ -51,6 +51,9 @@
 #define TRUE 1
 #endif
 
+#define MAX_TRACKS_LARGE 10
+#define MAX_TRACKS_NORMAL 14
+
 #define GUI_CMD_NONE 0
 
 #define GUI_CMD_SET_FILES_LIST_SLIDER 1

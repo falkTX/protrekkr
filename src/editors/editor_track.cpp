@@ -206,11 +206,11 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
             if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
-            if(Get_Track_Type(ped_track) == TRACK_LARGE && Channels_MultiNotes[ped_track] > 10)
+            if(Get_Track_Type(ped_track) == TRACK_LARGE && Channels_MultiNotes[ped_track] > MAX_TRACKS_LARGE)
             {
                 Set_Track_Zoom(ped_track, TRACK_NORMAL);
             }
-            if(Get_Track_Type(ped_track) == TRACK_NORMAL && Channels_MultiNotes[ped_track] > 14)
+            if(Get_Track_Type(ped_track) == TRACK_NORMAL && Channels_MultiNotes[ped_track] > MAX_TRACKS_NORMAL)
             {
                 Set_Track_Zoom(ped_track, TRACK_SMALL);
             }

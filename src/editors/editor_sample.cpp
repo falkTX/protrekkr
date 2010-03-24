@@ -756,7 +756,7 @@ void Actualize_Sample_Ed(char gode)
         }
         else
         {
-            Gui_Draw_Button_Box(650, 530, 122, 34, "No Sample Loaded", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(650, 530, 122, 34, "No Sample Loaded", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
         }
     }
 }

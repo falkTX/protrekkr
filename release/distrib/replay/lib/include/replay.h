@@ -36,7 +36,19 @@
 // Includes
 #include "tb_303.h"
 #include "cubic_spline.h"
-#include "../sounddriver/include/sounddriver.h"
+#if defined(__WIN32__)
+#include "../sounddriver/include/sounddriver_windows.h"
+#elif defined(__LINUX__)
+#include "../sounddriver/include/sounddriver_linux.h"
+#elif defined(__MACOSX__)
+#include "../sounddriver/include/sounddriver_macosx.h"
+#elif defined(__AROS__)
+#include "../sounddriver/include/sounddriver_aros.h"
+#elif defined(__AMIGAOS4__)
+#include "../sounddriver/include/sounddriver_aos4.h"
+#elif defined(__PSP__)
+#include "../sounddriver/include/sounddriver_psp.h"
+#endif
 #include "samples_unpack.h"
 #include "ptkreplay.h"
 #include "synth.h"

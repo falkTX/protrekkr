@@ -458,15 +458,15 @@ void Actualize_Instrument_Ed(int typex, char gode)
             case 1:
 
                 Gui_Draw_Button_Box(424, 506, 58, 16, "Exit Editor", Allow_Buttons);
-                Gui_Draw_Button_Box(78, 470, 16, 16, "\05", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(78, 470, 16, 16, "\05", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Gui_Draw_Button_Box(96, 470, 16, 16, "\03", Allow_Buttons | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(176, 470, 16, 16, "\04", Allow_Buttons | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(194, 470, 16, 16, "\06", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(194, 470, 16, 16, "\06", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Gui_Draw_Button_Box(220, 470, 56, 16, "Loop End", Allow_Buttons | BUTTON_DISABLED);
-                Gui_Draw_Button_Box(278, 470, 16, 16, "\05", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(278, 470, 16, 16, "\05", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Gui_Draw_Button_Box(296, 470, 16, 16, "\03", Allow_Buttons | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(376, 470, 16, 16, "\04", Allow_Buttons | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(394, 470, 16, 16, "\06", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(394, 470, 16, 16, "\06", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
                 // Fine loop editor mode
                 if(typex == 0)

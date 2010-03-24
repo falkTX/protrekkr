@@ -708,7 +708,10 @@ int STDCALL Ptk_InitDriver(void)
     float incr = 1.0f / fMIX_RATE;
     float stop = 2.0f;
     float x;
+
+#if defined(PTK_SYNTH_SAW)
     unsigned short temp_saw;
+#endif
 
 #if defined(PTK_SYNTH_SIN)
     short *wav_sin = STOCK_SIN;
@@ -1932,8 +1935,10 @@ void Post_Song_Init(void)
 // Main Player Routine
 void Sp_Player(void)
 {
+#if defined(PTK_INSTRUMENTS)
     unsigned int Old_Pointer;
     unsigned int res_dec;
+#endif
 
 #if defined(PTK_303)
     float Signal_303;
@@ -3177,7 +3182,11 @@ void Play_Instrument(int channel, int sub_channel,
 
     int Cur_Position;
     int note2;
+
+#if defined(PTK_INSTRUMENTS)
     float note;
+#endif
+
     int associated_sample;
     int no_retrig_adsr = FALSE;
 
@@ -3696,7 +3705,11 @@ void DoEffects_tick0_b(void)
 void DoEffects(void)
 {
     int i;
+
+#if defined(PTK_FX_NOTERETRIGGER)
     int j;
+#endif
+
     int k;
     int pltr_note[MAX_POLYPHONY];
     int pltr_sample[MAX_POLYPHONY];

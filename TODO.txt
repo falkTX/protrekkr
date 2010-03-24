@@ -9,7 +9,7 @@ TODO (in no special order):
    Multi notes could be viewed horizontally (eg. line 01*number of notes slots) and a vertical piano roll.
    Volumes and pannings positions could be viewed as thin blocks or lines (2 pixels) (waving horizontally).
    Instruments without adsr would be viewed as small blocks.
-   Effects would be viewed the same as volumes and pannings bujt with selected colors.
+   Effects would be viewed the same as volumes and pannings but with selected colors.
    Let the user select the colors of the instruments and effects among a palette.
    (Nothing has been determined yet).
  - Use more xml scripting to completely customize the interface
@@ -17,20 +17,20 @@ TODO (in no special order):
  - Graphical way to set ADSR (when the interface will be in 1024x768) or at least a gfx display of the ADSR values.
  - Drag'n'drop blocks in patterns.
  - Global synchro editor.
- - Add customization for the keys shortcuts in the xml file (may be ok like that).
+ - Add customization for the keys shortcuts in the xml file (may be ok without).
  - Copy/paste functions in the samples editor.
  - Undo functions for samples editor and patterns.
- - Chords editor done with intervals (see to use a drag'n'drop system to place them on the patterns).
+ - Chords editor done with intervals (see to use drag'n'drop and/or double clicks to place them on the patterns).
  - VSTs and VSTis support in the samples editor (for waveforms processing and generation).
 
 [ENGINE]
- - Adapt codecs packers & depackers to other Operating Systems.
+ - Adapt codecs packers & depackers to other Operating Systems (especially OSX).
  - Save the synchro data as milliseconds too (+ add a Ptk_GetTime function).
- - Ability to load a new module without interrupting the currently playing one (what is it for ? djing ?).
+ - Ability to load a new module without interrupting the currently playing one (djing ?).
  - Add individual panning data for instruments & synths.
  - VSTis in instruments and VSTs in tracks.
  - Envelopes scaling.
- - Possibility to associate effects to midi commands.
+ - Possibility to associate effects to midi commands for live rec.
  - Add jackd support via libjack.
  - Possibility to select any soundcard as rendering device.
 
@@ -40,5 +40,6 @@ TODO (in no special order):
  - Import .mid files.
  - Add an audio metronome for the recording mode.
  - Add support for soundfont 2 files loading.
- - Port to FreeBSD (eventually).
- - Port to Linux PPC (eventually).
+ - Port to FreeBSD (done but there's a severe issue with SDL).
+ - Port to Linux PPC (should be a matter of doing the appropriate makefile, hopefully).
+ - Split the sounddriver files.
