@@ -148,11 +148,11 @@ SOURCE=..\..\release\distrib\replay\lib\include\samples_unpack.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\release\distrib\replay\lib\sounddriver\sounddriver.cpp
+SOURCE=..\..\release\distrib\replay\lib\sounddriver\sounddriver_windows.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\release\distrib\replay\lib\sounddriver\include\sounddriver.h
+SOURCE=..\..\release\distrib\replay\lib\sounddriver\include\sounddriver_windows.h
 # End Source File
 # Begin Source File
 
