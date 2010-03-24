@@ -32,7 +32,7 @@
 
 // ------------------------------------------------------
 // Includes
-#include "include/aiff.h"
+#include "include/aiff_inc.h"
 
 AIFFFile::AIFFFile()
 {

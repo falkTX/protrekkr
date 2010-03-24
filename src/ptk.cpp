@@ -1981,9 +1981,9 @@ void LoadFile(int Freeindex, const char *str)
         else
         {
             if((extension_AIFF[0] == FormID &&
-               extension_AIFF[2] == AIFFID) ||
+               extension_AIFF[2] == AiffID) ||
                (extension_AIFF[0] == FormID &&
-               extension_AIFF[2] == AIFCID))
+               extension_AIFF[2] == AifcID))
             {
                 Status_Box("Attempting of loading an Audio IFF file...");
                 if(AIFF_File.Open(FileName))

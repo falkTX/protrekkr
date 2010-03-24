@@ -43,26 +43,12 @@
 // Constants
 #if defined(__BIG_ENDIAN__)
 #define FormID 'FORM'
-#define AIFFID 'AIFF'
-#define AIFCID 'AIFC'
-#define CommonID 'COMM'
-#define SoundDataID 'SSND'
-#define MarkID 'MARK'
-#define InstrumentID 'INST'
-#define MIDIDataID 'MIDI'
-#define alawID 'ALAW'
-#define ulawID 'ULAW'
+#define AiffID 'AIFF'
+#define AifcID 'AIFC'
 #else
 #define FormID 'MROF'
-#define AIFFID 'FFIA'
-#define AIFCID 'CFIA'
-#define CommonID 'MMOC'
-#define SoundDataID 'DNSS'
-#define MarkID 'KRAM'
-#define InstrumentID 'TSNI'
-#define MIDIDataID 'IDIM'
-#define alawID 'WALA'
-#define ulawID 'WALU'
+#define AiffID 'FFIA'
+#define AifcID 'CFIA'
 #endif
 
 #define NoLooping 0

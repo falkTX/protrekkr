@@ -38,12 +38,10 @@
 #include "../../include/variables.h"
 #include "../../ui/include/misc_draw.h"
 #include "../../wav/include/riff.h"
-#include "../../aiff/include/aiff.h"
 #else
 #include "../include/variables.h"
 #include "../ui/include/misc_draw.h"
 #include "../wav/include/riff.h"
-#include "../aiff/include/aiff.h"
 #endif
 
 // ------------------------------------------------------
