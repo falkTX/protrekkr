@@ -5,6 +5,8 @@ ProTrekkr releases history
 v1.99d:
 
 - Added support for Audio IFF files loading.
+- Auto zomming of multi-notes tracks fixed
+  (tracks sizes are now properly being reduced to fit entirely on the screen).
 
 v1.99c:
 

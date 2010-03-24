@@ -208,8 +208,11 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
             if(Get_Track_Type(ped_track) == TRACK_LARGE && Channels_MultiNotes[ped_track] > 10)
             {
-                // Zoom it back
-                Clear_Track_Zoom(ped_track);
+                Set_Track_Zoom(ped_track, TRACK_NORMAL);
+            }
+            if(Get_Track_Type(ped_track) == TRACK_NORMAL && Channels_MultiNotes[ped_track] > 14)
+            {
+                Set_Track_Zoom(ped_track, TRACK_SMALL);
             }
             Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actupated(0);

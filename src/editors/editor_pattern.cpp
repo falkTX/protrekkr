@@ -2619,17 +2619,29 @@ void Set_Track_Zoom(int track, TRACK_TYPE type)
             break;
 
         case TRACK_NORMAL:
-            Clear_Track_Zoom(track);
+
+            // Track is too damn large to be displayed normally
+            if(Channels_MultiNotes[track] > 14)
+            {
+                Set_Track_Zoom(track, TRACK_SMALL);
+            }
+            else
+            {
+                Clear_Track_Zoom(track);
+            }
             break;
 
         case TRACK_LARGE:
-            Cur_Char_size[track] = PAT_COL_CHAR_LARGE;
-            Cur_Char_Function[track].Fnc = Large_Letter;
-            Cur_Note_Function[track].Fnc = blitlargenote;
             // Track is too damn large to be zoomed
             if(Channels_MultiNotes[track] > 10)
             {
-                Clear_Track_Zoom(track);
+                Set_Track_Zoom(track, TRACK_NORMAL);
+            }
+            else
+            {
+                Cur_Char_size[track] = PAT_COL_CHAR_LARGE;
+                Cur_Char_Function[track].Fnc = Large_Letter;
+                Cur_Note_Function[track].Fnc = blitlargenote;
             }
             break;
     }
