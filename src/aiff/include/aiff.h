@@ -36,6 +36,7 @@
 // Includes
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "../../../release/distrib/replay/lib/include/endianness.h"
 
 // ------------------------------------------------------
@@ -154,7 +155,7 @@ class AIFFFile
     public:
         AIFFFile();
         ~AIFFFile();
-        Open(const char *Filename);
+        int Open(const char *Filename);
         void Close();
         int BitsPerSample();
         int NumChannels();
@@ -169,10 +170,10 @@ class AIFFFile
 
     private:
         unsigned long FourCC(const char *ChunkName);
-        Read(void *Data, unsigned NumBytes);
+        int Read(void *Data, unsigned NumBytes);
         long CurrentFilePosition();
-        Seek(long offset);
-        SeekChunk(const char *ChunkName);
+        int Seek(long offset);
+        int SeekChunk(const char *ChunkName);
         int Get_Marker(int Marker_Id);
         void IntToFloat(int *Dest, int Source);
         void Int64ToDouble(UINT64 *Dest, UINT64 Source);
