@@ -648,7 +648,7 @@ DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
             }
             else
             {
-                *Sample = (short) (int_y / 65535);
+                *Sample = (short) (int_y / 65536);
             }
             break;
 
@@ -727,8 +727,8 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
             }
             else
             {
-                *L = (short) (int_z[0] / 65535);
-                *R = (short) (int_z[1] / 65535);
+                *L = (short) (int_z[0] / 65536);
+                *R = (short) (int_z[1] / 65536);
             }
             break;
 

@@ -39,6 +39,9 @@ int Ticks_Synchro_Left = 1;
 int Ticks_Synchro_Right = 1;
 extern char Use_Cubic;
 
+int Table_Interpolation_Dec[] = { 0, SPLINE_INT, 0 };
+int Table_Interpolation_Inc[] = { SPLINE_INT, CUBIC_INT, CUBIC_INT };
+
 // ------------------------------------------------------
 // Functions
 void Draw_Fx_Ed(void)
@@ -164,13 +167,17 @@ void Actualize_Fx_Ed(char gode)
         if(gode == 0 || gode == 12)
         {
             Gui_Draw_Button_Box(706, 464, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            if(Use_Cubic)
+            switch(Use_Cubic)
             {
-                Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Cubic", BUTTON_NORMAL | BUTTON_DISABLED);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+                case CUBIC_INT:
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Cubic", BUTTON_NORMAL | BUTTON_DISABLED);
+                    break;
+                case SPLINE_INT:
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Linear", BUTTON_NORMAL | BUTTON_DISABLED);
+                    break;
+                default:
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+                    break;
             }
             Gui_Draw_Button_Box(706 + (18 + 42) + 2, 464, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
@@ -340,13 +347,19 @@ void Mouse_Left_Fx_Ed(void)
 
         if(zcheckMouse(706, 464, 16, 16))
         {
-            Use_Cubic = FALSE;
+            if(Use_Cubic > 0)
+            {
+                Use_Cubic = Table_Interpolation_Dec[Use_Cubic];
+            }
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 12;
         }
         if(zcheckMouse(706 + (18 + 42) + 2, 464, 16, 16))
         {
-            Use_Cubic = TRUE;
+            if(Use_Cubic <= SPLINE_INT)
+            {
+                Use_Cubic = Table_Interpolation_Inc[Use_Cubic];
+            }
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 12;
         }

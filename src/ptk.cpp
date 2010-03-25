@@ -2387,7 +2387,7 @@ void Newmod(void)
 
     if(ZzaappOMatic == ZZAAPP_ALL)
     {
-        Use_Cubic = TRUE;
+        Use_Cubic = CUBIC_INT;
         sprintf(Reverb_Name, "Untitled");
         sprintf(name, "Untitled");
         sprintf(artist, "Somebody");

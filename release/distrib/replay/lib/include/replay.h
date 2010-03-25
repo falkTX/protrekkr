@@ -36,6 +36,7 @@
 // Includes
 #include "tb_303.h"
 #include "cubic_spline.h"
+#include "spline.h"
 #if defined(__WIN32__)
 #include "../sounddriver/include/sounddriver_windows.h"
 #elif defined(__LINUX__)
@@ -66,6 +67,9 @@
 
 #define MIX_RATE 44100
 #define fMIX_RATE 44100.0f
+
+#define CUBIC_INT 1
+#define SPLINE_INT 2
 
 #define DEFAULT_BASE_NOTE 48
 

@@ -28,7 +28,7 @@ EXEOBJS_PPC = ptk_ppc.o \
               timer_ppc.o main_ppc.o sdlmain_ppc.o \
               misc_draw_ppc.o draw_primitives_ppc.o requesters_ppc.o xml_ppc.o \
               aiff_ppc.o riff_ppc.o \
-              tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
+              spline_ppc.o tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
               sounddriver_macosx_ppc.o
 
 EXEOBJS_X86 = ptk_x86.o \
@@ -40,7 +40,7 @@ EXEOBJS_X86 = ptk_x86.o \
               timer_x86.o main_x86.o sdlmain_x86.o \
               misc_draw_x86.o draw_primitives_x86.o requesters_x86.o xml_x86.o \
               aiff_x86.o riff_x86.o \
-              tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
+              spline_x86.o tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
               sounddriver_macosx_x86.o
 
 all: protrekkr
@@ -146,6 +146,9 @@ aiff_ppc.o: src/aiff/aiff.cpp
 riff_ppc.o: src/wav/riff.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) src/wav/riff.cpp
 
+spline_ppc.o: release/distrib/replay/lib/spline.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/spline.cpp
+
 tb_303_ppc.o: release/distrib/replay/lib/tb_303.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/tb_303.cpp
 
@@ -249,6 +252,9 @@ aiff_x86.o: src/aiff/aiff.cpp
 
 riff_x86.o: src/wav/riff.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) src/wav/riff.cpp
+
+spline_x86.o: release/distrib/replay/lib/spline.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/spline.cpp
 
 tb_303_x86.o: release/distrib/replay/lib/tb_303.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/tb_303.cpp

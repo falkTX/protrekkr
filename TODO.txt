@@ -42,4 +42,3 @@ TODO (in no special order):
  - Add support for soundfont 2 files loading.
  - Port to FreeBSD (done but there's a severe issue with SDL).
  - Port to Linux PPC (should be a matter of doing the appropriate makefile, hopefully).
- - Split the sounddriver files.

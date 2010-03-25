@@ -98,6 +98,10 @@ SOURCE=.\sounddriver\sounddriver_windows.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\spline.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Synth.cpp
 # End Source File
 # Begin Source File
@@ -127,6 +131,10 @@ SOURCE=.\include\Samples_Unpack.h
 # Begin Source File
 
 SOURCE=.\sounddriver\include\sounddriver_windows.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\spline.h
 # End Source File
 # Begin Source File
 

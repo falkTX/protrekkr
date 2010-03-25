@@ -284,7 +284,7 @@ int AIFFFile::ReadMonoSample(short *Sample)
             int_y = 0;
             retcode = Read(&int_y, 3);
             int_y = Mot_Swap_32(int_y);
-            *Sample = (short) (int_y / 65535);
+            *Sample = (short) (int_y / 65536);
             break;
 
         case 32:
@@ -298,7 +298,7 @@ int AIFFFile::ReadMonoSample(short *Sample)
             }
             else
             {
-                *Sample = (short) (int_y / 65535);
+                *Sample = (short) (int_y / 65536);
             }
             break;
 
@@ -353,8 +353,8 @@ int AIFFFile::ReadStereoSample(short *L, short *R)
             retcode = Read(&int_z[1], 3);
             int_z[0] = Mot_Swap_32(int_z[0]);
             int_z[1] = Mot_Swap_32(int_z[1]);
-            *L = (short) (int_z[0] / 65535);
-            *R = (short) (int_z[1] / 65535);
+            *L = (short) (int_z[0] / 65536);
+            *R = (short) (int_z[1] / 65536);
             break;
 
         case 32:
@@ -371,8 +371,8 @@ int AIFFFile::ReadStereoSample(short *L, short *R)
             }
             else
             {
-                *L = (short) (int_z[0] / 65535);
-                *R = (short) (int_z[1] / 65535);
+                *L = (short) (int_z[0] / 65536);
+                *R = (short) (int_z[1] / 65536);
             }
             break;
 
@@ -428,7 +428,7 @@ int AIFFFile::Get_Marker(int Marker_Id)
     }
     else
     {
-        // Everything is broken so disable everything
+        // Everything is broken so disable looping
         SustainLoop.PlayMode = NoLooping;
         return(-1);
     }

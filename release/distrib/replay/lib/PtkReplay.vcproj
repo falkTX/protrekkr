@@ -157,6 +157,9 @@
 				RelativePath=".\sounddriver\sounddriver_windows.cpp">
 			</File>
 			<File
+				RelativePath=".\spline.cpp">
+			</File>
+			<File
 				RelativePath="Synth.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -210,6 +213,9 @@
 			</File>
 			<File
 				RelativePath=".\sounddriver\include\sounddriver_windows.h">
+			</File>
+			<File
+				RelativePath=".\include\spline.h">
 			</File>
 			<File
 				RelativePath="include\Synth.h">

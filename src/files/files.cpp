@@ -1043,7 +1043,7 @@ Read_Mod_File:
         Songtracks = MAX_TRACKS;
         Read_Mod_Data(&sLength, sizeof(char), 1, in);
 
-        Use_Cubic = TRUE;
+        Use_Cubic = CUBIC_INT;
 
         if(Sel_Interpolation)
         {
@@ -2549,7 +2549,21 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-    Save_Constant("PTK_USE_CUBIC", Use_Cubic);
+    switch(Use_Cubic)
+    {
+        case CUBIC_INT:
+            Save_Constant("PTK_USE_CUBIC", TRUE);
+            Save_Constant("PTK_USE_SPLINE", FALSE);
+            break;
+        case SPLINE_INT:
+            Save_Constant("PTK_USE_CUBIC", FALSE);
+            Save_Constant("PTK_USE_SPLINE", TRUE);
+            break;
+        default:
+            Save_Constant("PTK_USE_CUBIC", FALSE);
+            Save_Constant("PTK_USE_SPLINE", FALSE);
+            break;
+    }
 
     Save_Constant("PTK_303", Store_303_1 | Store_303_2);
 
