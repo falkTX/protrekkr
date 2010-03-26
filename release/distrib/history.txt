@@ -4,16 +4,16 @@ ProTrekkr releases history
 
 v1.99e:
 
-- Test release on Linux 64 bit.
+- Test release for Linux 64 bit.
 - Linear interpolation can now be selected (beside none or cubic) it's faster
   than cubic and still gives better results than none.
-- Fixed a clipping bug in samples loading.
+- Fixed a clipping bug in samples loading (for both .wav and .aif/aifc).
 
 v1.99d:
 
 - Added support for Audio IFF files loading.
 - Auto zooming of multi-notes tracks fixed
-  (tracks sizes are now properly being reduced to fit entirely on the screen).
+  (tracks are now properly being reduced to fit entirely on the screen).
 - Added support for German keyboard layout.
 - Fixed a signal overflow which occurred with 2nd 303 unit when 1st wasn't active.
 

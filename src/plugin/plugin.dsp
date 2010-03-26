@@ -156,6 +156,14 @@ SOURCE=..\..\release\distrib\replay\lib\sounddriver\include\sounddriver_windows.
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\release\distrib\replay\lib\spline.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\release\distrib\replay\lib\include\spline.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\release\distrib\replay\lib\synth.cpp
 # End Source File
 # Begin Source File
