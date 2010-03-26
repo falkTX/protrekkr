@@ -4,6 +4,7 @@ ProTrekkr releases history
 
 v1.99e:
 
+- Test release on Linux 64 bit.
 - Linear interpolation can now be selected (beside none or cubic) it's faster
   than cubic and still gives better results than none.
 - Fixed a clipping bug in samples loading.
