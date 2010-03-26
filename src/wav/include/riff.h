@@ -33,9 +33,14 @@ typedef unsigned int UINT32;
 typedef int INT32;
 
 #if defined(__WIN32__) && !defined(__GCC__)
-typedef unsigned __int64 UINT64;
+typedef unsigned __int64 Uint64;
 #else
-typedef unsigned long long UINT64;
+#if defined(__LINUX__)
+typedef unsigned long uint64_t;
+typedef uint64_t Uint64;
+#else
+typedef unsigned long long Uint64;
+#endif
 #endif
 
 #if !defined(__GCC__)
@@ -314,7 +319,7 @@ class WaveFile: private RiffFile
         int Flip12;
 
         void IntToFloat(int *Dest, int Source);
-        void Int64ToDouble(UINT64 *Dest, UINT64 Source);
+        void Int64ToDouble(Uint64 *Dest, Uint64 Source);
         int FloatToInt(int *Source);
 };
 

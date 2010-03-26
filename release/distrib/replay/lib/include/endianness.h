@@ -35,7 +35,12 @@
 #if defined(__WIN32__) && !defined(__GCC__)
 typedef unsigned __int64 Uint64;
 #else
+#if defined(__LINUX__)
+typedef unsigned long uint64_t;
+typedef uint64_t Uint64;
+#else
 typedef unsigned long long Uint64;
+#endif
 #endif
 
 // ------------------------------------------------------

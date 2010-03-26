@@ -611,7 +611,7 @@ DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
     float y;
     UINT32 int_y;
     double y64;
-    UINT64 int_y64;
+    Uint64 int_y64;
 
     switch(wave_format.data.nBitsPerSample)
     {
@@ -656,7 +656,7 @@ DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
             retcode = Read(&int_y64, 8);
             int_y64 = Swap_64(int_y64);
 
-            Int64ToDouble((UINT64 *) &y64, int_y64);
+            Int64ToDouble((Uint64 *) &y64, int_y64);
             *Sample = (short) (y64 * 32767.0);
             break;
 
@@ -675,7 +675,7 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
     float z[2];
     double z64[2];
     INT32 int_z[2];
-    UINT64 int_z64[2];
+    Uint64 int_z64[2];
 
     switch(wave_format.data.nBitsPerSample)
     {
@@ -738,8 +738,8 @@ DDCRET WaveFile::ReadStereoSample(INT16 *L, INT16 *R)
             int_z64[0] = Swap_64(int_z64[0]);
             int_z64[1] = Swap_64(int_z64[1]);
 
-            Int64ToDouble((UINT64 *) &z64[0], int_z64[0]);
-            Int64ToDouble((UINT64 *) &z64[1], int_z64[1]);
+            Int64ToDouble((Uint64 *) &z64[0], int_z64[0]);
+            Int64ToDouble((Uint64 *) &z64[1], int_z64[1]);
             *L = (short) (z64[0] * 32767.0);
             *R = (short) (z64[1] * 32767.0);
             break;
@@ -840,7 +840,7 @@ int WaveFile::FloatToInt(int *Source)
     return(*Source);
 }
 
-void WaveFile::Int64ToDouble(UINT64 *Dest, UINT64 Source)
+void WaveFile::Int64ToDouble(Uint64 *Dest, Uint64 Source)
 {
     *Dest = Source;
 }
