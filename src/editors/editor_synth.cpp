@@ -2649,8 +2649,8 @@ void IniCsParNames(void)
     sprintf(Names_Tbl_Synth_VCF[1], "Resonance");
 
     sprintf(Names_Tbl_Synth_LFO1[0], "Period");
-    sprintf(Names_Tbl_Synth_LFO1[1], "-> Osc1 Phase Pulse");
-    sprintf(Names_Tbl_Synth_LFO1[2], "-> Osc2 Phase Pulse");
+    sprintf(Names_Tbl_Synth_LFO1[1], "-> Osc1 Pulse Phase");
+    sprintf(Names_Tbl_Synth_LFO1[2], "-> Osc2 Pulse Phase");
     sprintf(Names_Tbl_Synth_LFO1[3], "-> Osc1 Pitch");
     sprintf(Names_Tbl_Synth_LFO1[4], "-> Osc2 Pitch");
     sprintf(Names_Tbl_Synth_LFO1[5], "-> Osc1 Volume");
@@ -2663,8 +2663,8 @@ void IniCsParNames(void)
     sprintf(Names_Tbl_Synth_LFO1[12], "Release");
 
     sprintf(Names_Tbl_Synth_LFO2[0], "Period");
-    sprintf(Names_Tbl_Synth_LFO2[1], "-> Osc1 Phase Pulse");
-    sprintf(Names_Tbl_Synth_LFO2[2], "-> Osc2 Phase Pulse");
+    sprintf(Names_Tbl_Synth_LFO2[1], "-> Osc1 Pulse Phase");
+    sprintf(Names_Tbl_Synth_LFO2[2], "-> Osc2 Pulse Phase");
     sprintf(Names_Tbl_Synth_LFO2[3], "-> Osc1 Pitch");
     sprintf(Names_Tbl_Synth_LFO2[4], "-> Osc2 Pitch");
     sprintf(Names_Tbl_Synth_LFO2[5], "-> Osc1 Volume");
@@ -2676,8 +2676,8 @@ void IniCsParNames(void)
     sprintf(Names_Tbl_Synth_LFO2[11], "Sustain Level");
     sprintf(Names_Tbl_Synth_LFO2[12], "Release");
 
-    sprintf(Names_Tbl_Synth_ENV1[0], "-> Osc1 Phase Pulse");
-    sprintf(Names_Tbl_Synth_ENV1[1], "-> Osc2 Phase Pulse");
+    sprintf(Names_Tbl_Synth_ENV1[0], "-> Osc1 Pulse Phase");
+    sprintf(Names_Tbl_Synth_ENV1[1], "-> Osc2 Pulse Phase");
     sprintf(Names_Tbl_Synth_ENV1[2], "-> Osc1 Pitch");
     sprintf(Names_Tbl_Synth_ENV1[3], "-> Osc2 Pitch");
     sprintf(Names_Tbl_Synth_ENV1[4], "-> Osc1 Volume");
@@ -2685,8 +2685,8 @@ void IniCsParNames(void)
     sprintf(Names_Tbl_Synth_ENV1[6], "-> Vcf CutOff");
     sprintf(Names_Tbl_Synth_ENV1[7], "-> Vcf Resonance");
 
-    sprintf(Names_Tbl_Synth_ENV2[0], "-> Osc1 Phase Pulse");
-    sprintf(Names_Tbl_Synth_ENV2[1], "-> Osc2 Phase Pulse");
+    sprintf(Names_Tbl_Synth_ENV2[0], "-> Osc1 Pulse Phase");
+    sprintf(Names_Tbl_Synth_ENV2[1], "-> Osc2 Pulse Phase");
     sprintf(Names_Tbl_Synth_ENV2[2], "-> Osc1 Pitch");
     sprintf(Names_Tbl_Synth_ENV2[3], "-> Osc2 Pitch");
     sprintf(Names_Tbl_Synth_ENV2[4], "-> Osc1 Volume");

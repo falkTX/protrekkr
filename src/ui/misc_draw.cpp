@@ -769,13 +769,13 @@ void Set_Phony_Palette(void)
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
-      /*          ComponentR += 0x20;
-                ComponentG += 0x20;
-                ComponentB += 0x20;
+                ComponentR += 0x15;
+                ComponentG += 0x15;
+                ComponentB += 0x15;
                 if(ComponentR > 0xff) ComponentR = 0xff;
                 if(ComponentG > 0xff) ComponentG = 0xff;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-*/
+
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -792,13 +792,13 @@ void Set_Phony_Palette(void)
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
-  /*              ComponentR += 0x20;
-                ComponentG += 0x20;
-                ComponentB += 0x20;
+                ComponentR += 0x15;
+                ComponentG += 0x15;
+                ComponentB += 0x15;
                 if(ComponentR > 0xff) ComponentR = 0xff;
                 if(ComponentG > 0xff) ComponentG = 0xff;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-    */
+    
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -814,14 +814,14 @@ void Set_Phony_Palette(void)
                 ComponentB += 0x10;
                 if(ComponentG < 0) ComponentG = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-/*
-                ComponentR += 0x20;
-                ComponentG += 0x20;
-                ComponentB += 0x20;
+
+                ComponentR += 0x15;
+                ComponentG += 0x15;
+                ComponentB += 0x15;
                 if(ComponentR > 0xff) ComponentR = 0xff;
                 if(ComponentG > 0xff) ComponentG = 0xff;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-*/
+
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -838,13 +838,13 @@ void Set_Phony_Palette(void)
                 if(ComponentG < 0) ComponentG = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
-/*                ComponentR += 0x20;
-                ComponentG += 0x20;
-                ComponentB += 0x20;
+                ComponentR += 0x15;
+                ComponentG += 0x15;
+                ComponentB += 0x15;
                 if(ComponentR > 0xff) ComponentR = 0xff;
                 if(ComponentG > 0xff) ComponentG = 0xff;
                 if(ComponentB > 0xff) ComponentB = 0xff;
-*/
+
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -1492,6 +1492,8 @@ void Letter(int x, int y, char ltr, int ys, int y2)
         case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
         case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
+        case 34: Copy(Temp_PFONT, x, y, 56, ys, 56, y2); break; // Blank (1 pixels)
     }
 }
 

@@ -7,7 +7,7 @@ v2.0:
 - Tempo can now go down to 20 BPM.
 - Major overhaul of the 303 units,
   they now should behave and sound more like the one found in Rebirth.
-- Files browsers entries are now sorted.
+- Files entries are now sorted.
 - Input zones now have different colors.
 - New color schemes available.
 
