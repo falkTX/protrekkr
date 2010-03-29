@@ -317,7 +317,7 @@ int Conv_Amiga_Note(int note)
 
 // ------------------------------------------------------
 // Scale an amiga protracker .mod effect data
-float Convert_AmigaMod_Value(int value, float scale1, float scale2)
+float Scale_AmigaMod_Value(int value, float scale1, float scale2)
 {
     float newvalue = (float) value;
     newvalue /= scale1;
@@ -342,14 +342,16 @@ void LoadAmigaMod(char *FileName, int channels)
     Uint32 x;
     int ramp;
     float ramp_vol;
-    int old_volslide[16];
     int i;
+    int vib_chan[16];
+    int arp_chan[16];
 
     SongStop();
 
     for(i = 0; i < 16; i++)
     {
-        old_volslide[i] = 0;
+        vib_chan[i] = 0;
+        arp_chan[i] = 0;
     }
 
     in = fopen(FileName, "rb");
@@ -377,15 +379,14 @@ void LoadAmigaMod(char *FileName, int channels)
             // Jump over 3 unhandled bytes for PTK samplename.
             fseek(in, 3, SEEK_CUR);
 
+            Clear_Instrument_Dat(swrite, 0, 0);
+
             SampleNumSamples[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
             SampleNumSamples[swrite][0] *= 2;
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
             Finetune[swrite][0] *= 16;
-            CustomVol[swrite] = Convert_AmigaMod_Value(fgetc(in), 64.0f, 1.0f);
-            SampleVol[swrite][0] = 1.0f;
+            CustomVol[swrite] = Scale_AmigaMod_Value(fgetc(in), 63.0f, 0.99f);
             Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
-
-            SampleType[swrite][0] = 0;    // NO SAMPLE
 
             // Calculate/Adapt AMIGA loop points to ptk LoopPoints:
 
@@ -396,18 +397,18 @@ void LoadAmigaMod(char *FileName, int channels)
 
             if(Replen > 2)
             {
-                LoopEnd[swrite][0] = LoopStart[swrite][0] + Replen - 2;
+                LoopEnd[swrite][0] = LoopStart[swrite][0] + Replen;
                 LoopType[swrite][0] = SMP_LOOP_FORWARD;
             }
             else
             {
-                LoopEnd[swrite][0] = SampleNumSamples[swrite][0] - 1;
+                LoopEnd[swrite][0] = SampleNumSamples[swrite][0];
                 LoopType[swrite][0] = SMP_LOOP_NONE;
             }
 
-            if(LoopEnd[swrite][0] >= SampleNumSamples[swrite][0])
+            if(LoopEnd[swrite][0] > SampleNumSamples[swrite][0])
             {
-                LoopEnd[swrite][0] = SampleNumSamples[swrite][0] - 1;
+                LoopEnd[swrite][0] = LoopEnd[swrite][0] - SampleNumSamples[swrite][0];
             }
         } // FOR
 
@@ -431,6 +432,9 @@ void LoadAmigaMod(char *FileName, int channels)
         {
             for(li2 = 0; li2 < 64; li2++)
             {
+                // Note: effects like 1 2 5 6 a depend on the current speed in .mods.
+                //       (the faster the less effect).
+
                 for(pw2 = 0; pw2 < channels; pw2++)
                 {
                     int tmo = Get_Pattern_Offset(pwrite, pw2, li2);
@@ -444,82 +448,116 @@ void LoadAmigaMod(char *FileName, int channels)
                     if(t_sample == 0) t_sample = 255;
                     if(t_sample != 255) t_sample--;
 
-                    int t_note = 121;
-                    int t_argu = fgetc(in);
+                    int Note = 121;
+                    int Cmd_Dat = fgetc(in);
 
                     // Period Conversion Table
-                    t_note = Conv_Amiga_Note(t_period);
+                    Note = Conv_Amiga_Note(t_period);
 
-                    *(RawPatterns + tmo + PATTERN_NOTE1) = t_note;
+                    *(RawPatterns + tmo + PATTERN_NOTE1) = Note;
                     *(RawPatterns + tmo + PATTERN_INSTR1) = t_sample;
+
+                    // There was a vibrato
+                    if(vib_chan[pw2] == TRUE)
+                    {
+                        // But no more
+                        if(t_command != 4)
+                        {
+                            // Stop it or delay it
+                            if(!*(RawPatterns + tmo + PATTERN_FX2))
+                            {
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1d;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                vib_chan[pw2] = FALSE;
+                            }
+                        }
+                    }
+
+                    // There was an arpeggio
+                    if(arp_chan[pw2] == TRUE)
+                    {
+                        // But no more
+                        if(t_command != 0)
+                        {
+                            // Stop it or delay it
+                            if(!*(RawPatterns + tmo + PATTERN_FX2))
+                            {
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1b;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                arp_chan[pw2] = FALSE;
+                            }
+                        }
+                    }
 
                     // Pattern effect adapter:
                     switch(t_command)
                     {
                         // SPEED [not accurate]
                         case 0xf:
-                            if(t_argu > 31)
+                            if(Cmd_Dat > 31)
                             {
                                 t_command = 240;
                             }
                             else
                             {
-                                switch(t_argu)
+                                switch(Cmd_Dat)
                                 {
-                                    case 1: t_argu = 10; break;
-                                    case 2: t_argu = 9; break;
-                                    case 3: t_argu = 8; break;
-                                    case 4: t_argu = 6; break;
-                                    case 5: t_argu = 5; break;
-                                    case 6: t_argu = 4; break;
-                                    case 7: t_argu = 3; break;
-                                    case 8: t_argu = 3; break;
-                                    case 9: t_argu = 2; break;
-                                    case 10: t_argu = 1; break;
-                                    case 11: t_argu = 1; break;
-                                    case 12: t_argu = 1; break;
-                                    case 13: t_argu = 1; break;
-                                    case 14: t_argu = 1; break;
-                                    case 15: t_argu = 1; break;
-                                    case 16: t_argu = 1; break;
-                                    case 17: t_argu = 1; break;
-                                    case 18: t_argu = 1; break;
-                                    case 19: t_argu = 1; break;
-                                    case 20: t_argu = 1; break;
-                                    case 21: t_argu = 1; break;
-                                    case 22: t_argu = 1; break;
-                                    case 23: t_argu = 1; break;
-                                    case 24: t_argu = 1; break;
-                                    case 25: t_argu = 1; break;
-                                    case 26: t_argu = 1; break;
-                                    case 27: t_argu = 1; break;
-                                    case 28: t_argu = 1; break;
-                                    case 29: t_argu = 1; break;
-                                    case 30: t_argu = 1; break;
-                                    case 31: t_argu = 1; break;
+                                    case 1: Cmd_Dat = 10; break;
+                                    case 2: Cmd_Dat = 9; break;
+                                    case 3: Cmd_Dat = 8; break;
+                                    case 4: Cmd_Dat = 6; break;
+                                    case 5: Cmd_Dat = 5; break;
+                                    case 6: Cmd_Dat = 4; break;
+                                    case 7: Cmd_Dat = 3; break;
+                                    case 8: Cmd_Dat = 3; break;
+                                    case 9: Cmd_Dat = 2; break;
+                                    case 10: Cmd_Dat = 1; break;
+                                    case 11: Cmd_Dat = 1; break;
+                                    case 12: Cmd_Dat = 1; break;
+                                    case 13: Cmd_Dat = 1; break;
+                                    case 14: Cmd_Dat = 1; break;
+                                    case 15: Cmd_Dat = 1; break;
+                                    case 16: Cmd_Dat = 1; break;
+                                    case 17: Cmd_Dat = 1; break;
+                                    case 18: Cmd_Dat = 1; break;
+                                    case 19: Cmd_Dat = 1; break;
+                                    case 20: Cmd_Dat = 1; break;
+                                    case 21: Cmd_Dat = 1; break;
+                                    case 22: Cmd_Dat = 1; break;
+                                    case 23: Cmd_Dat = 1; break;
+                                    case 24: Cmd_Dat = 1; break;
+                                    case 25: Cmd_Dat = 1; break;
+                                    case 26: Cmd_Dat = 1; break;
+                                    case 27: Cmd_Dat = 1; break;
+                                    case 28: Cmd_Dat = 1; break;
+                                    case 29: Cmd_Dat = 1; break;
+                                    case 30: Cmd_Dat = 1; break;
+                                    case 31: Cmd_Dat = 1; break;
                                 }
                             }
                             break;
 
                         // ARPEGGIO
                         case 0:
-                            if(t_argu) t_command = 0x1b;
+                            if(Cmd_Dat) t_command = 0x1b;
                             else t_command = 0;
+                            if(Cmd_Dat) arp_chan[pw2] = TRUE;
                             break;
 
                         // PITCH UP
                         case 1:
-                            t_argu >>= 1;
+                            Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 255.0f, 45.0f);
+                            //Cmd_Dat >>= 1;
                             break;
 
                         // PITCH UP
                         case 2:
-                            t_argu >>= 1;
+                            Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 255.0f, 45.0f);
                             break;
 
                         // GLIDE
                         case 5:
-                            t_argu = 0;
+                            Cmd_Dat = 0;
                         case 3:
                             t_command = 5;
                             break;
@@ -527,8 +565,10 @@ void LoadAmigaMod(char *FileName, int channels)
                         // VIBRATO
                         case 4:
                             t_command = 0x1d;
+                            // our vibratos are different from theirs
+                            if(Cmd_Dat == 0) t_command = 0;
+                            vib_chan[pw2] = TRUE;
                             break;
-
 
                         // DEMOSYNCHRO SIGNAL???
                         case 8:
@@ -539,31 +579,29 @@ void LoadAmigaMod(char *FileName, int channels)
                         case 6:
                         // Volume Sliders
                         case 0xa:
-                            if(t_argu >= 16)
+                            if(Cmd_Dat >= 16)
                             {
                                 t_command = 0x19; // Vol SlideUp
-                                if(t_argu >> 4) old_volslide[pw2] =t_argu >> 4;
-                                t_argu = (int) Convert_AmigaMod_Value(old_volslide[pw2], 16.0f, 60.0f);
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, 15.0f, 65.0f);
                             }
                             else
                             {
                                 t_command = 0x1a; // Vol Slide Down
-                                if(t_argu & 0xf) old_volslide[pw2] = t_argu & 0xf;
-                                t_argu = (int) Convert_AmigaMod_Value(old_volslide[pw2], 16.0f, 60.0f);
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, 15.0f, 63.0f);
                             }
                             break;
 
                         // VOLUME
                         case 0xc:
                             t_command = 3;
-                            t_argu = (int) Convert_AmigaMod_Value(t_argu, 64.0f, 255.0f);
+                            Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 63.0f, 255.0f);
                             break;
 
                         // Pattern Jump Amiga Mod stylee
                         case 0xd:
-                            t_hi = t_argu / 16;
-                            t_lo = t_argu - t_hi * 16;
-                            t_argu = t_hi * 10 + t_lo;
+                            t_hi = Cmd_Dat / 16;
+                            t_lo = Cmd_Dat - t_hi * 16;
+                            Cmd_Dat = t_hi * 10 + t_lo;
                             break;
 
                         // EXX Special Effects
@@ -572,67 +610,63 @@ void LoadAmigaMod(char *FileName, int channels)
                             t_command = 0;
 
                             // PATTERN LOOP
-                            if(t_argu >= 0x60 && t_argu < 0x70)
+                            if(Cmd_Dat >= 0x60 && Cmd_Dat < 0x70)
                             {
                                 t_command = 0x06;
-                                t_argu = t_argu - 0x60;
+                                Cmd_Dat = Cmd_Dat - 0x60;
                             }
 
                             // FINEVOLUME SLIDEUP.
-                            if(t_argu >= 0xa0 && t_argu < 0xb0)
+                            if(Cmd_Dat >= 0xa0 && Cmd_Dat < 0xb0)
                             {
                                 t_command = 0x19;
-                                t_argu = t_argu - 0xa0;
-                                //t_argu = (int) Convert_AmigaMod_Value(t_argu, 16.0f, 255.0f);
+                                Cmd_Dat = Cmd_Dat - 0xa0;
                             }
 
                             // FINEVOLUME SLIDEDOWN.
-                            if(t_argu >= 0xb0 && t_argu < 0xc0)
+                            if(Cmd_Dat >= 0xb0 && Cmd_Dat < 0xc0)
                             {
                                 t_command = 0x1a;
-                                t_argu = t_argu - 0xb0;
-                                //t_argu = (int) Convert_AmigaMod_Value(t_argu, 16.0f, 255.0f);
+                                Cmd_Dat = Cmd_Dat - 0xb0;
                             }
 
                             // NOTE RETRIGGER
-                            if(t_argu >= 0x90 && t_argu < 0xa0)
+                            if(Cmd_Dat >= 0x90 && Cmd_Dat < 0xa0)
                             {
                                 t_command = 0xe;
-                                t_argu = t_argu - 0x90;
+                                Cmd_Dat = Cmd_Dat - 0x90;
                             }
 
                             // NOTE CUT
-                            if(t_argu >= 0xc0 && t_argu < 0xd0)
+                            if(Cmd_Dat >= 0xc0 && Cmd_Dat < 0xd0)
                             {
-                                *(RawPatterns + tmo + PATTERN_VOLUME) = (t_argu & 0xf) | 0xf0;
+                                *(RawPatterns + tmo + PATTERN_VOLUME) = (Cmd_Dat & 0xf) | 0xf0;
                                 t_command = 0;
-                                t_argu = 0;
+                                Cmd_Dat = 0;
                             }
 
-                            if(t_argu >= 0xd0 && t_argu < 0xf0)
+                            if(Cmd_Dat >= 0xd0 && Cmd_Dat < 0xf0)
                             {
                                 t_command = 0;
-                                t_argu = 0;
+                                Cmd_Dat = 0;
                             }
                             break;
 
                     } // Pattern FX adapter end.
 
                     *(RawPatterns + tmo + PATTERN_FX) = t_command;
-                    *(RawPatterns + tmo + PATTERN_FXDATA) = t_argu;
+                    *(RawPatterns + tmo + PATTERN_FXDATA) = Cmd_Dat;
                 }
             }
         }
 
+        // Load the samples
         for(swrite = 0; swrite < 31; swrite++)
         {
             if(SampleNumSamples[swrite][0] > 8)
             {
-                SampleChannels[swrite][0] = 1;
-                SampleType[swrite][0] = 1;
-
                 // Reserving space for 16-Bit Signed Short Data.
-                RawSamples[swrite][0][0] = (short *) malloc((SampleNumSamples[swrite][0] * sizeof(short)));
+                AllocateWave(swrite, 0, SampleNumSamples[swrite][0], 1, FALSE);
                 for(x = 0; x < SampleNumSamples[swrite][0]; x++)
                 {
                     *(RawSamples[swrite][0][0] + x) = (short) fgetc(in) << 8;
@@ -667,23 +701,6 @@ void LoadAmigaMod(char *FileName, int channels)
                         ramp_vol += 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
                     }
                 }
-                else
-                {
-                    if(LoopStart[swrite][0] >= MOD_RAMP_SIZE)
-                    {
-                        ramp_vol = 0.0f;
-                        for(ramp = 0;
-                            ramp < MOD_RAMP_SIZE; ramp++)
-                        {
-                            volume = (float) (*(RawSamples[swrite][0][0] + ramp));
-                            volume /= 32767;
-                            volume *= ramp_vol;
-
-                            *(RawSamples[swrite][0][0] + ramp) = (short) (volume * 32767.0f);
-                            ramp_vol += 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
-                        }
-                    }
-                }
             }
             else
             {
@@ -701,6 +718,7 @@ void LoadAmigaMod(char *FileName, int channels)
         ComputeStereo(2);
         ComputeStereo(3);
 
+        Use_Cubic = NONE_INT;
         BeatsPerMin = 125;
         TicksPerBeat = 4;
         mas_vol = 0.75f;
@@ -1185,7 +1203,7 @@ Read_Mod_File:
                     Read_Mod_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
                     Read_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
-                    RawSamples[swrite][0][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short));
+                    AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
                     Read_Mod_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
                     Swap_Sample(RawSamples[swrite][0][slwrite], swrite, slwrite);
                     *RawSamples[swrite][0][slwrite] = 0;
@@ -3999,7 +4017,7 @@ void LoadInst(char *FileName)
                 Read_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
                 Read_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
-                RawSamples[swrite][0][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short));
+                AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
 
                 // Samples data
                 Read_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);

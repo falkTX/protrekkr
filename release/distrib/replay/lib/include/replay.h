@@ -68,6 +68,7 @@
 #define MIX_RATE 44100
 #define fMIX_RATE 44100.0f
 
+#define NONE_INT 0
 #define CUBIC_INT 1
 #define SPLINE_INT 2
 
@@ -380,5 +381,12 @@ void Mas_Compressor_Set_Variables(float treshold, float ratio);
 int Get_Free_Sub_Channel(int channel, int polyphony);
 int Get_Pattern_Offset(int pattern, int track, int row);
 void InitRevervbFilter(void);
+void Set_Spline_Boundaries(unsigned int Position,
+                           unsigned int *Boundaries,
+                           int LoopType,
+                           unsigned int LoopWay,
+                           unsigned int Length,
+                           unsigned int LoopEnd,
+                           unsigned int LoopStart);
 
 #endif

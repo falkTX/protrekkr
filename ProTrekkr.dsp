@@ -406,26 +406,6 @@ SOURCE=.\src\Files\Files_List.cpp
 SOURCE=.\src\Files\Samples_Pack.cpp
 # End Source File
 # End Group
-# Begin Group "Wav"
-
-# PROP Default_Filter ""
-# Begin Group "Wav Include"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\src\Wav\include\ddc.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\Wav\include\riff.h
-# End Source File
-# End Group
-# Begin Source File
-
-SOURCE=.\src\Wav\Riff.cpp
-# End Source File
-# End Group
 # Begin Group "Midi"
 
 # PROP Default_Filter ""
@@ -450,6 +430,9 @@ SOURCE=.\src\midi\midi.cpp
 SOURCE=.\src\midi\RtMidi.cpp
 # End Source File
 # End Group
+# Begin Group "Samples"
+
+# PROP Default_Filter ""
 # Begin Group "Aiff"
 
 # PROP Default_Filter ""
@@ -458,12 +441,45 @@ SOURCE=.\src\midi\RtMidi.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\aiff\include\aiff.h
+SOURCE=.\src\samples\aiff\include\aiff.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\src\aiff\aiff.cpp
+SOURCE=.\src\samples\aiff\aiff.cpp
+# End Source File
+# End Group
+# Begin Group "Wav"
+
+# PROP Default_Filter ""
+# Begin Group "Wav Include"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\samples\wav\include\ddc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\wav\include\riff.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\src\samples\wav\riff.cpp
+# End Source File
+# End Group
+# Begin Group "Samples Include"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\samples\include\samples_ops.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\src\samples\samples_ops.cpp
 # End Source File
 # End Group
 # Begin Source File

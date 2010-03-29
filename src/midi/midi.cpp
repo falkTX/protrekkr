@@ -159,7 +159,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
                 Clear_Input();
                 Actualize_Patterned();
                 RefreshSample();
-                NewWav();
+                Renew_Sample_Ed();
                 Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
             }
             break;

@@ -9,7 +9,10 @@ v2.0:
   they now should behave and sound more like the one found in Rebirth.
 - Files entries are now sorted.
 - Input zones now have different colors.
-- New color schemes available.
+- 4 default color schemes are now available.
+- Range selection in sample editor speeded up.
+- Improved .mod import.
+- Fixed the samples looping (1 byte was always missing).
 
 v1.99e:
 

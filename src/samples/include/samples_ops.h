@@ -29,16 +29,25 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _SPLINE_H_
-#define _SPLINE_H_
+#ifndef _SAMPLES_OPS_H_
+#define _SAMPLES_OPS_H_
 
 // ------------------------------------------------------
-// Constants
-#define RESOLUTION 1024
+// Includes
+#if defined(__GCC__)
+#include "../../include/variables.h"
+#else
+#include "../../include/variables.h"
+#endif
 
 // ------------------------------------------------------
 // Functions
-void Spline_Init(void);
-float Spline_Work(float yo, float y0, float y1, float y2, unsigned int res);
+void Status_Box(char const *str);
+int Sample_Cut(int32 range_start, int32 range_end);
+void Sample_DC_Adjust(int32 range_start, int32 range_end);
+void Sample_Maximize(int32 range_start, int32 range_end);
+void Sample_FadeIn(int32 range_start, int32 range_end);
+void Sample_FadeOut(int32 range_start, int32 range_end);
+void Sample_Half(int32 range_start, int32 range_end);
 
 #endif

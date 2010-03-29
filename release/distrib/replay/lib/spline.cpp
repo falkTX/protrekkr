@@ -66,12 +66,8 @@ void Spline_Init(void)
 //      on the spline conversion table. [256 by default]
 // If you are using 256 is assumed you are using 8 bit decimal
 // fixed point offsets for resampling.
-float Spline_Work(float yo, float y0, float y1, float y2,
-                  unsigned int res, long offset, long length)
+float Spline_Work(float yo, float y0, float y1, float y2, unsigned int res)
 {
     res = res >> 22;
-    if(offset == 0) yo = 0;
-    if(offset + 2 > length) y1 = 0;
-    if(offset + 3 > length) y2 = 0;
     return (at[res] * yo + bt[res] * y0 + ct[res] * y1 + dt[res] * y2);
 }

@@ -558,7 +558,7 @@ void Mouse_Left_Instrument_Ed(void)
             teac = 5;
         }
         if(zcheckMouse(376, 470, 16, 16) &&
-           LoopEnd[ped_patsam][ped_split] < SampleNumSamples[ped_patsam][ped_split] - 1 &&
+           LoopEnd[ped_patsam][ped_split] < SampleNumSamples[ped_patsam][ped_split] &&
            SampleType[ped_patsam][ped_split])
         {
             LoopEnd[ped_patsam][ped_split]++;
@@ -580,14 +580,14 @@ void Mouse_Left_Instrument_Ed(void)
             ped_split--;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 0;
-            NewWav();
+            Renew_Sample_Ed();
         }
         if(zcheckMouse(614, 466, 16, 16) && ped_split < 15)
         {
             ped_split++;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 0;
-            NewWav();
+            Renew_Sample_Ed();
         }
 
 #if !defined(__NO_MIDI__)
@@ -1081,7 +1081,7 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split] - 1)
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split])
         {
             *Cur_Loop_End += 1;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
@@ -1120,10 +1120,10 @@ void Mouse_Sliders_Right_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split] - 1)
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split])
         {
             *Cur_Loop_End += 10;
-            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split] - 1) *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split] - 1;
+            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split]) *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split];
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }

@@ -37,8 +37,8 @@
 #include "../ui/include/xml.h"
 #include "../support/include/main.h"
 
-#include "../wav/include/riff.h"
-#include "../aiff/include/aiff.h"
+#include "../samples/wav/include/riff.h"
+#include "../samples/aiff/include/aiff.h"
 #include "../include/variables.h"
 
 #include "../ui/include/misc_draw.h"

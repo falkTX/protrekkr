@@ -308,7 +308,7 @@ float Curr_Signal_L[MAX_POLYPHONY];
 float Curr_Signal_R[MAX_POLYPHONY];
 float All_Signal_L;
 float All_Signal_R;
-unsigned int Current_Pointer;
+unsigned int Current_Pointer[4];
 
 #if defined(PTK_SYNTH)
 char Synth_Was[MAX_TRACKS][MAX_POLYPHONY];
@@ -316,7 +316,6 @@ char Synth_Was[MAX_TRACKS][MAX_POLYPHONY];
 
 short *Player_WL[MAX_TRACKS][MAX_POLYPHONY];
 short *Player_WR[MAX_TRACKS][MAX_POLYPHONY];
-unsigned int Rns[MAX_TRACKS][MAX_POLYPHONY];
 float Player_SV[MAX_TRACKS][MAX_POLYPHONY];
 char Player_SC[MAX_TRACKS][MAX_POLYPHONY];
 char Player_LT[MAX_TRACKS][MAX_POLYPHONY];
@@ -371,17 +370,17 @@ SYNTH_DATA PARASynth[128];
 #endif
 #endif
 
-char LoopType[MAX_INSTRS][16];
-Uint32 LoopStart[MAX_INSTRS][16];
-Uint32 LoopEnd[MAX_INSTRS][16];
-Uint32 SampleNumSamples[MAX_INSTRS][16];
+char LoopType[MAX_INSTRS][MAX_INSTRS_SPLITS];
+Uint32 LoopStart[MAX_INSTRS][MAX_INSTRS_SPLITS];
+Uint32 LoopEnd[MAX_INSTRS][MAX_INSTRS_SPLITS];
+Uint32 SampleNumSamples[MAX_INSTRS][MAX_INSTRS_SPLITS];
 char beatsync[MAX_INSTRS];
 short beatlines[MAX_INSTRS];
 int64 sp_Step[MAX_TRACKS][MAX_POLYPHONY];
-float SampleVol[MAX_INSTRS][16];
-char SampleChannels[MAX_INSTRS][16];
-float FDecay[MAX_INSTRS][16];
-short *RawSamples[MAX_INSTRS][2][16];
+float SampleVol[MAX_INSTRS][MAX_INSTRS_SPLITS];
+char SampleChannels[MAX_INSTRS][MAX_INSTRS_SPLITS];
+float FDecay[MAX_INSTRS][MAX_INSTRS_SPLITS];
+short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
 
 #if defined(PTK_COMPRESSOR)
     int currentCounter;
@@ -1629,6 +1628,9 @@ void Pre_Song_Init(void)
 
     glide = 0;
 
+    sprintf(artist, "Somebody");
+    sprintf(style, "Anything Goes");
+
     for(int ini = 0; ini < MAX_TRACKS; ini++)
     {
         for(i = 0; i < MAX_POLYPHONY; i++)
@@ -1650,7 +1652,6 @@ void Pre_Song_Init(void)
 
             Player_WL[ini][i] = 0;
             Player_WR[ini][i] = 0;
-            Rns[ini][i] = 0;
             Player_SV[ini][i] = 0;
             Player_SC[ini][i] = 0;
             Player_LT[ini][i] = 0;
@@ -1944,7 +1945,6 @@ void Post_Song_Init(void)
 void Sp_Player(void)
 {
 #if defined(PTK_INSTRUMENTS)
-    unsigned int Old_Pointer;
     unsigned int res_dec;
 #endif
 
@@ -2530,36 +2530,33 @@ ByPass_Wav:
                     // We had some signal (on any channel)
                     gotsome = TRUE;
 
-                    Current_Pointer = sp_Position[c][i].half.first;
-
-#if !defined(__STAND_ALONE__)
-                    // Fix a bug that occurs when loading samples while playing
-                    if(Current_Pointer >= Player_NS[c][i] - 1) Current_Pointer = Player_NS[c][i] - 1;
-#endif
-
-                    if(Current_Pointer) Old_Pointer = Current_Pointer - 1;
-                    else Old_Pointer = 0;
+                    Set_Spline_Boundaries(sp_Position[c][i].half.first,
+                                          Current_Pointer,
+                                          Player_LT[c][i],
+                                          Player_LW[c][i],
+                                          Player_NS[c][i],
+                                          Player_LE[c][i],
+                                          Player_LS[c][i]);
 
                     if(Player_WL[c][i])
                     {
+
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
-                        Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
-                                                      *(Player_WL[c][i] + Current_Pointer),
-                                                      *(Player_WL[c][i] + Current_Pointer + 1),
-                                                      *(Player_WL[c][i] + Current_Pointer + 2),
-                                                      res_dec, Current_Pointer,
-                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Current_Pointer[3]),
+                                                      *(Player_WL[c][i] + Current_Pointer[0]),
+                                                      *(Player_WL[c][i] + Current_Pointer[1]),
+                                                      *(Player_WL[c][i] + Current_Pointer[2]),
+                                                      res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
 #elif defined(PTK_USE_SPLINE)
-                        Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Old_Pointer),
-                                                       *(Player_WL[c][i] + Current_Pointer),
-                                                       *(Player_WL[c][i] + Current_Pointer + 1),
-                                                       *(Player_WL[c][i] + Current_Pointer + 2),
-                                                       res_dec, Current_Pointer,
-                                                       Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Current_Pointer[3]),
+                                                       *(Player_WL[c][i] + Current_Pointer[0]),
+                                                       *(Player_WL[c][i] + Current_Pointer[1]),
+                                                       *(Player_WL[c][i] + Current_Pointer[2]),
+                                                       res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
 
 #else
-                        Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
+                        Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer[0])
                                             * sp_Cvol[c][i] * Player_SV[c][i]);
 #endif
 
@@ -2567,23 +2564,21 @@ ByPass_Wav:
                         switch(Use_Cubic)
                         {
                             case CUBIC_INT:
-                                Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Old_Pointer),
-                                                              *(Player_WL[c][i] + Current_Pointer),
-                                                              *(Player_WL[c][i] + Current_Pointer + 1),
-                                                              *(Player_WL[c][i] + Current_Pointer + 2),
-                                                              res_dec, Current_Pointer,
-                                                              Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                                Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Current_Pointer[3]),
+                                                              *(Player_WL[c][i] + Current_Pointer[0]),
+                                                              *(Player_WL[c][i] + Current_Pointer[1]),
+                                                              *(Player_WL[c][i] + Current_Pointer[2]),
+                                                              res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
                                 break;
                             case SPLINE_INT:
-                                Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Old_Pointer),
-                                                               *(Player_WL[c][i] + Current_Pointer),
-                                                               *(Player_WL[c][i] + Current_Pointer + 1),
-                                                               *(Player_WL[c][i] + Current_Pointer + 2),
-                                                               res_dec, Current_Pointer,
-                                                               Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                                Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Current_Pointer[3]),
+                                                               *(Player_WL[c][i] + Current_Pointer[0]),
+                                                               *(Player_WL[c][i] + Current_Pointer[1]),
+                                                               *(Player_WL[c][i] + Current_Pointer[2]),
+                                                               res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
                                 break;
                             default:
-                                Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer)
+                                Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer[0])
                                                     * sp_Cvol[c][i] * Player_SV[c][i]);
                                 break;
                         }
@@ -2597,21 +2592,19 @@ ByPass_Wav:
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
-                        Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
-                                                      *(Player_WR[c][i] + Current_Pointer),
-                                                      *(Player_WR[c][i] + Current_Pointer + 1),
-                                                      *(Player_WR[c][i] + Current_Pointer + 2),
-                                                      res_dec, Current_Pointer,
-                                                      Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Current_Pointer[3]),
+                                                      *(Player_WR[c][i] + Current_Pointer[0]),
+                                                      *(Player_WR[c][i] + Current_Pointer[1]),
+                                                      *(Player_WR[c][i] + Current_Pointer[2]),
+                                                      res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
 #elif defined(PTK_USE_SPLINE)
-                        Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Old_Pointer),
-                                                       *(Player_WR[c][i] + Current_Pointer),
-                                                       *(Player_WR[c][i] + Current_Pointer + 1),
-                                                       *(Player_WR[c][i] + Current_Pointer + 2),
-                                                       res_dec, Current_Pointer,
-                                                       Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                        Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Current_Pointer[3]),
+                                                       *(Player_WR[c][i] + Current_Pointer[0]),
+                                                       *(Player_WR[c][i] + Current_Pointer[1]),
+                                                       *(Player_WR[c][i] + Current_Pointer[2]),
+                                                       res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
 #else
-                        Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
+                        Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer[0])
                                             * sp_Cvol[c][i] * Player_SV[c][i]);
 #endif
 
@@ -2619,23 +2612,21 @@ ByPass_Wav:
                         switch(Use_Cubic)
                         {
                             case CUBIC_INT:
-                                Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Old_Pointer),
-                                                              *(Player_WR[c][i] + Current_Pointer),
-                                                              *(Player_WR[c][i] + Current_Pointer + 1),
-                                                              *(Player_WR[c][i] + Current_Pointer + 2),
-                                                              res_dec, Current_Pointer,
-                                                              Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                                Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Current_Pointer[3]),
+                                                              *(Player_WR[c][i] + Current_Pointer[0]),
+                                                              *(Player_WR[c][i] + Current_Pointer[1]),
+                                                              *(Player_WR[c][i] + Current_Pointer[2]),
+                                                              res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
                                 break;
                             case SPLINE_INT:
-                                Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Old_Pointer),
-                                                               *(Player_WR[c][i] + Current_Pointer),
-                                                               *(Player_WR[c][i] + Current_Pointer + 1),
-                                                               *(Player_WR[c][i] + Current_Pointer + 2),
-                                                               res_dec, Current_Pointer,
-                                                               Rns[c][i]) * sp_Cvol[c][i] * Player_SV[c][i];
+                                Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Current_Pointer[3]),
+                                                               *(Player_WR[c][i] + Current_Pointer[0]),
+                                                               *(Player_WR[c][i] + Current_Pointer[1]),
+                                                               *(Player_WR[c][i] + Current_Pointer[2]),
+                                                               res_dec) * sp_Cvol[c][i] * Player_SV[c][i];
                                 break;
                             default:
-                                Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer)
+                                Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer[0])
                                                     * sp_Cvol[c][i] * Player_SV[c][i]);
                                 break;
                         }
@@ -2643,6 +2634,7 @@ ByPass_Wav:
                     }
 
                     // End of Interpolation algo
+                    // check the carrier against looping infos
                     if(Player_LW[c][i] == SMP_LOOPING_BACKWARD)
                     {
                         if((int) sp_Position[c][i].half.first > 0)
@@ -2739,7 +2731,6 @@ ByPass_Wav:
                                                                 Player_LT[c][i] > SMP_LOOP_NONE ? Player_LE[c][i]: Player_NS[c][i],
                                                                 Player_LT[c][i] > SMP_LOOP_NONE ? Player_LL[c][i]: 0,
                                                                 &Curr_Signal_R[i],
-                                                                Rns[c][i],
                                                                 sp_Cvol[c][i] * Player_SV[c][i],
                                                                 &sp_Stage2[c][i],
                                                                 &sp_Stage3[c][i],
@@ -3510,7 +3501,6 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
             Player_LL[channel][sub_channel] = Player_LE[channel][sub_channel] - Player_LS[channel][sub_channel];
 
-            Rns[channel][sub_channel] = SampleNumSamples[associated_sample][split];
             Player_SV[channel][sub_channel] = SampleVol[associated_sample][split];
             Player_LT[channel][sub_channel] = LoopType[associated_sample][split];
             Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
@@ -4963,7 +4953,7 @@ void KillInst(int inst_nbr)
     beatsync[inst_nbr] = FALSE;
     beatlines[inst_nbr] = 16;
 
-    for(int z = 0; z < 16; z++)
+    for(int z = 0; z < MAX_INSTRS_SPLITS; z++)
     {
         if(RawSamples[inst_nbr][0][z])
         {
@@ -5383,4 +5373,69 @@ float Do_RMS(float input, float *rms_sum, float *buffer)
 int Get_Pattern_Offset(int pattern, int track, int row)
 {
     return((track * PATTERN_BYTES) + (row * PATTERN_ROW_LEN) + (pattern * PATTERN_LEN));
+}
+
+// ------------------------------------------------------
+// Calculate the bondaries of a carrier for splines calculatation
+void Set_Spline_Boundaries(unsigned int Position,
+                           unsigned int *Boundaries,
+                           int LoopType,
+                           unsigned int LoopWay,
+                           unsigned int Length,
+                           unsigned int LoopEnd,
+                           unsigned int LoopStart)
+{
+    Boundaries[0] = Position;
+    Boundaries[3] = 0;
+    if(Boundaries[0]) Boundaries[3] = Boundaries[0] - 1;
+    Boundaries[1] = Boundaries[0] + 1;
+    Boundaries[2] = Boundaries[0] + 2;
+
+    switch(LoopType)
+    {
+        case SMP_LOOP_FORWARD:
+            if(LoopWay == SMP_LOOPING_FORWARD)
+            {
+                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopStart;
+                if(Boundaries[1] >= LoopEnd) Boundaries[1] = LoopStart;
+                if(Boundaries[2] >= LoopEnd) Boundaries[2] = LoopStart;
+            }
+            else
+            {
+                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopEnd;
+                if((int) Boundaries[1] <= (int) LoopStart) Boundaries[1] = LoopEnd;
+                if((int) Boundaries[2] <= (int) LoopStart) Boundaries[2] = LoopEnd;
+            }
+            break;
+
+        case SMP_LOOP_PINGPONG:
+            if(LoopWay == SMP_LOOPING_FORWARD)
+            {
+                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopEnd;
+                if(Boundaries[1] >= LoopEnd) Boundaries[1] = LoopEnd;
+                if(Boundaries[2] >= LoopEnd) Boundaries[2] = LoopEnd;
+            }
+            else
+            {
+                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopStart;
+                if((int) Boundaries[1] <= (int) LoopStart) Boundaries[1] = LoopStart;
+                if((int) Boundaries[2] <= (int) LoopStart) Boundaries[2] = LoopStart;
+            }
+            break;
+
+        case SMP_LOOP_NONE:
+            if(LoopWay == SMP_LOOPING_FORWARD)
+            {
+                if(Boundaries[3] >= Length) Boundaries[3] = Length;
+                if(Boundaries[1] >= Length) Boundaries[1] = Length;
+                if(Boundaries[2] >= Length) Boundaries[2] = Length;
+            }
+            else
+            {
+                if((int) Boundaries[3] <= 0) Boundaries[3] = 0;
+                if((int) Boundaries[1] <= 0) Boundaries[1] = 0;
+                if((int) Boundaries[2] <= 0) Boundaries[2] = 0;
+            }
+            break;
+    }
 }

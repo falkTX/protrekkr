@@ -318,7 +318,7 @@ class CSynth
                         unsigned int Length,
                         unsigned int Loop_Sub,
                         float *Right_Signal,
-                        unsigned int Rns, float vol,
+                        float vol,
                         int *track,
                         int *track2,
                         Uint64 *position_osc1,

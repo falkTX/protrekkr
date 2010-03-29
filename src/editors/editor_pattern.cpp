@@ -873,10 +873,13 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
     }
 
-    // Complete it
-    if(old_dover < CONSOLE_WIDTH - 19)
+    // Complete it if necessary
+    if(dover >= MAX_PATT_SCREEN_X)
     {
-        Fillrect(old_dover, y, CONSOLE_WIDTH - 19, y + 7 + 1);
+        if(old_dover < CONSOLE_WIDTH - 19)
+        {
+            Fillrect(old_dover, y, CONSOLE_WIDTH - 19, y + 7 + 1);
+        }
     }
 
     ptr_table_decimal = table_decimal + (rel * 3);
@@ -1422,11 +1425,14 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             } // Close is recording
         }
 
-        // Complete it
-        if(old_dover < CONSOLE_WIDTH - 19)
+        // Complete it if necessary
+        if(dover >= MAX_PATT_SCREEN_X)
         {
-            SetColor(COL_PATTERN_SEL_BACK);
-            Fillrect(old_dover, YVIEW, CONSOLE_WIDTH - 19, YVIEW + 15 + 1);
+            if(old_dover < CONSOLE_WIDTH - 19)
+            {
+                SetColor(COL_PATTERN_SEL_BACK);
+                Fillrect(old_dover, YVIEW, CONSOLE_WIDTH - 19, YVIEW + 15 + 1);
+            }
         }
 
         // Row number

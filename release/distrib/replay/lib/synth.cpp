@@ -704,7 +704,6 @@ float CSynth::GetSample(short *Left_Samples,
                         unsigned int Length,
                         unsigned int Loop_Sub,
                         float *Right_Signal,
-                        unsigned int Rns,
                         float vol,
                         int *track,
                         int *track2,
@@ -723,25 +722,21 @@ float CSynth::GetSample(short *Left_Samples,
     s_access *pos_osc3 = (s_access *) position_osc3;
 #endif
 
-    s_access *pos_osc1_disto;
     short *Left_Samples1 = NULL;
     short *Right_Samples1 = NULL;
-    unsigned int i_POSITION;
     unsigned int res_dec;
 
-    unsigned int Old_Pointer;
     int64 osc_speed1;
     int64 osc_speed1b;
     int64 osc_speed2;
     int64 osc_speed_tune;
     float mul_datL;
     float mul_datR;
+    unsigned int i_POSITION[4];
 
     GS_VAL = 0;
     GS_VAL2 = 0;
 
-    unsigned int Rns1 = Rns;
-    unsigned int Rns2 = Rns;
     char Loop_Type1 = Loop_Type;
     char Loop_Type2 = Loop_Type;
 
@@ -859,19 +854,22 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 
                     Length1 = SIZE_WAVEFORMS;
-                    Rns1 = SIZE_WAVEFORMS;
+                    //Rns1 = SIZE_WAVEFORMS;
                     Loop_Sub1 = SIZE_WAVEFORMS;
                     Loop_Type1 = SMP_LOOP_FORWARD;
                 }
 
                 if(Left_Samples1)
                 {
-                    pos_osc1_disto = pos_osc1;
-
-                    res_dec = pos_osc1_disto->half.last;
-                    i_POSITION = pos_osc1_disto->half.first;
-                    if(Loop_Type1 == SMP_LOOP_NONE) if(i_POSITION > Length1 - 2) i_POSITION = Length1 - 2;
-                    if((int) i_POSITION < 0) i_POSITION = 0;
+                    res_dec = pos_osc1->half.last;
+                    
+                    Set_Spline_Boundaries(pos_osc1->half.first,
+                                          i_POSITION,
+                                          Loop_Type1,
+                                          ENV1_LOOP_BACKWARD,
+                                          Length1,
+                                          Length1,
+                                          Length1 - Loop_Sub1);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -894,31 +892,28 @@ float CSynth::GetSample(short *Left_Samples,
                                  + (ENV2_VALUE * Data.ENV2_OSC1_PW)
 #endif
                                 );
-                        if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples1 + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
-
-                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
-                    else Old_Pointer = 0;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                     GS_VAL = (Cubic_Work(
-                                (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                res_dec) * vol) * T_OSC1_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL = (Spline_Work(
-                                (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                res_dec) * vol) * T_OSC1_VOLUME;
 #else
-                    GS_VAL = (*(Left_Samples1 + i_POSITION) * mul_datL)
+                    GS_VAL = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
                               * vol * T_OSC1_VOLUME;
 #endif
 
@@ -927,22 +922,22 @@ float CSynth::GetSample(short *Left_Samples,
                     {
                         case CUBIC_INT:
                             GS_VAL = (Cubic_Work(
-                                        (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                        res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                        (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                        res_dec) * vol) * T_OSC1_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL = (Spline_Work(
-                                        (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                        res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                        (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                        (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                        res_dec) * vol) * T_OSC1_VOLUME;
                             break;
                         default:
-                            GS_VAL = (*(Left_Samples1 + i_POSITION) * mul_datL)
+                            GS_VAL = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
                                       * vol * T_OSC1_VOLUME;
                             break;
                     }
@@ -955,20 +950,20 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                         GS_VAL2 = (Cubic_Work(
-                                     (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                     res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                     (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                     res_dec) * vol) * T_OSC1_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 = (Spline_Work(
-                                     (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                     res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                     (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                     (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                     res_dec) * vol) * T_OSC1_VOLUME;
 #else
-                        GS_VAL2 = (*(Right_Samples1 + i_POSITION) * mul_datR)
+                        GS_VAL2 = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
                                    * vol * T_OSC1_VOLUME;
 #endif
 
@@ -977,22 +972,22 @@ float CSynth::GetSample(short *Left_Samples,
                         {
                             case CUBIC_INT:
                                 GS_VAL2 = (Cubic_Work(
-                                             (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                             res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                             (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                             res_dec) * vol) * T_OSC1_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 = (Spline_Work(
-                                             (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                             res_dec, i_POSITION, Rns1) * vol) * T_OSC1_VOLUME;
+                                             (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                             (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                             res_dec) * vol) * T_OSC1_VOLUME;
                                 break;
                             default:
-                                GS_VAL2 = (*(Right_Samples1 + i_POSITION) * mul_datR)
+                                GS_VAL2 = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
                                            * vol * T_OSC1_VOLUME;
                                 break;
                         }
@@ -1174,7 +1169,6 @@ float CSynth::GetSample(short *Left_Samples,
 
                     osc_speed2 *= 65;
                     Length2 = SIZE_WAVEFORMS;
-                    Rns2 = SIZE_WAVEFORMS;
                     Loop_Sub2 = SIZE_WAVEFORMS;
                     Loop_Type2 = SMP_LOOP_FORWARD;
                 }
@@ -1192,9 +1186,14 @@ float CSynth::GetSample(short *Left_Samples,
                                     * ENV2_VOLUME;
 
                     res_dec = pos_osc2->half.last;
-                    i_POSITION = pos_osc2->half.first;
-                    if(Loop_Type2 == SMP_LOOP_NONE) if(i_POSITION > Length2 - 2) i_POSITION = Length2 - 2;
-                    if((int) i_POSITION < 0) i_POSITION = 0;
+
+                    Set_Spline_Boundaries(pos_osc2->half.first,
+                                          i_POSITION,
+                                          Loop_Type2,
+                                          ENV2_LOOP_BACKWARD,
+                                          Length2,
+                                          Length2,
+                                          Length2 - Loop_Sub2);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -1217,31 +1216,28 @@ float CSynth::GetSample(short *Left_Samples,
                                     + (ENV2_VALUE * Data.ENV2_OSC2_PW)
 #endif
                                    );
-                        if(*(Left_Samples + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
-
-                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
-                    else Old_Pointer = 0;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                     GS_VAL += (Cubic_Work(
-                                (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                (float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
+                                res_dec) * vol) * T_OSC2_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL += (Spline_Work(
-                                (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
-                                (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
-                                res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                (float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
+                                (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
+                                res_dec) * vol) * T_OSC2_VOLUME;
 #else
-                    GS_VAL += (*(Left_Samples + i_POSITION) * mul_datL)
+                    GS_VAL += (*(Left_Samples + i_POSITION[0]) * mul_datL)
                                * vol * T_OSC2_VOLUME;
 #endif
 
@@ -1250,22 +1246,22 @@ float CSynth::GetSample(short *Left_Samples,
                     {
                         case CUBIC_INT:
                             GS_VAL += (Cubic_Work(
-                                        (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
-                                        res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                        (float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
+                                        res_dec) * vol) * T_OSC2_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL += (Spline_Work(
-                                        (float) (*(Left_Samples + Old_Pointer)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION + 1)) * mul_datL,
-                                        (float) (*(Left_Samples + i_POSITION + 2)) * mul_datL,
-                                        res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                        (float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
+                                        (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
+                                        res_dec) * vol) * T_OSC2_VOLUME;
                             break;
                         default:
-                            GS_VAL += (*(Left_Samples + i_POSITION) * mul_datL)
+                            GS_VAL += (*(Left_Samples + i_POSITION[0]) * mul_datL)
                                        * vol * T_OSC2_VOLUME;
                             break;
                     }
@@ -1278,20 +1274,20 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                         GS_VAL2 += (Cubic_Work(
-                                    (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                    res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                    (float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
+                                    res_dec) * vol) * T_OSC2_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 += (Spline_Work(
-                                    (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                    (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                    res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                    (float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
+                                    (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
+                                    res_dec) * vol) * T_OSC2_VOLUME;
 #else
-                        GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                        GS_VAL2 += (*(Right_Samples + i_POSITION[0]) * mul_datR)
                                     * vol * T_OSC2_VOLUME;
 #endif
 
@@ -1300,22 +1296,22 @@ float CSynth::GetSample(short *Left_Samples,
                         {
                             case CUBIC_INT:
                                 GS_VAL2 += (Cubic_Work(
-                                            (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                            res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                            (float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
+                                            res_dec) * vol) * T_OSC2_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 += (Spline_Work(
-                                            (float) (*(Right_Samples + Old_Pointer)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION + 1)) * mul_datR,
-                                            (float) (*(Right_Samples + i_POSITION + 2)) * mul_datR,
-                                            res_dec, i_POSITION, Rns2) * vol) * T_OSC2_VOLUME;
+                                            (float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
+                                            (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
+                                            res_dec) * vol) * T_OSC2_VOLUME;
                                 break;
                             default:
-                                GS_VAL2 += (*(Right_Samples + i_POSITION) * mul_datR)
+                                GS_VAL2 += (*(Right_Samples + i_POSITION[0]) * mul_datR)
                                             * vol * T_OSC2_VOLUME;
                                 break;
                         }
@@ -1436,7 +1432,7 @@ float CSynth::GetSample(short *Left_Samples,
                     osc_speed1 *= 65;
 #endif
                     Length = SIZE_WAVEFORMS;
-                    Rns = SIZE_WAVEFORMS;
+                    //Rns = SIZE_WAVEFORMS;
                     Loop_Sub = SIZE_WAVEFORMS;
                     Loop_Type = SMP_LOOP_FORWARD;
                     Stereo = 1;
@@ -1445,9 +1441,14 @@ float CSynth::GetSample(short *Left_Samples,
                 if(Left_Samples1)
                 {
                     res_dec = pos_osc3->half.last;
-                    i_POSITION = pos_osc3->half.first;
-                    if(Loop_Type == SMP_LOOP_NONE) if(i_POSITION > Length - 2) i_POSITION = Length - 2;
-                    if((int) i_POSITION < 0) i_POSITION = 0;
+
+                    Set_Spline_Boundaries(pos_osc3->half.first,
+                                          i_POSITION,
+                                          Loop_Type,
+                                          ENV2_LOOP_BACKWARD,
+                                          Length,
+                                          Length,
+                                          Length - Loop_Sub);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -1471,31 +1472,28 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                                 );
 
-                        if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples1 + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
-
-                    if(i_POSITION) Old_Pointer = i_POSITION - 1;
-                    else Old_Pointer = 0;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                     GS_VAL += (Cubic_Work(
-                                    (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                    res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                    (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                    res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL += (Spline_Work(
-                                    (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                    (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                    res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                    (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                    (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                    res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
-                    GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
+                    GS_VAL += (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
                                * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
@@ -1504,22 +1502,22 @@ float CSynth::GetSample(short *Left_Samples,
                     {
                         case CUBIC_INT:
                             GS_VAL += (Cubic_Work(
-                                            (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                            res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                            (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                            res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL += (Spline_Work(
-                                            (float) (*(Left_Samples1 + Old_Pointer)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION + 1)) * mul_datL,
-                                            (float) (*(Left_Samples1 + i_POSITION + 2)) * mul_datL,
-                                            res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                            (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
+                                            (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
+                                            res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                         default:
-                            GS_VAL += (*(Left_Samples1 + i_POSITION) * mul_datL)
+                            GS_VAL += (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
                                        * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                     }
@@ -1531,20 +1529,20 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
 #if defined(PTK_USE_CUBIC)
                         GS_VAL2 += (Cubic_Work(
-                                        (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                        (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                        res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 += (Spline_Work(
-                                        (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                        (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                        res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                        (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                        (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                        res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
-                        GS_VAL2 += (*(Right_Samples1 + i_POSITION) * mul_datR)
+                        GS_VAL2 += (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
                                     * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
@@ -1553,22 +1551,22 @@ float CSynth::GetSample(short *Left_Samples,
                         {
                             case CUBIC_INT:
                                 GS_VAL2 += (Cubic_Work(
-                                                (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                                res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                                (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                                res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 += (Spline_Work(
-                                                (float) (*(Right_Samples1 + Old_Pointer)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION + 1)) * mul_datR,
-                                                (float) (*(Right_Samples1 + i_POSITION + 2)) * mul_datR,
-                                                res_dec, i_POSITION, Rns) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                                (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
+                                                (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
+                                                res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                             default:
-                                GS_VAL2 += (*(Right_Samples1 + i_POSITION) * mul_datR)
+                                GS_VAL2 += (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
                                             * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                         }

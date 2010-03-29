@@ -61,7 +61,7 @@ int Allow_Phase_Distortion_OSC2 = TRUE;
 void Actualize_Patterned(void);
 void Actualize_SynthParSlider(void);
 void Actualize_Sequencer(void);
-void NewWav(void);
+void Renew_Sample_Ed(void);
 void Center_SynthParam_OSC1(void);
 void Center_SynthParam_OSC2(void);
 void Center_SynthParam_VCF(void);

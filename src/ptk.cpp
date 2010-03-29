@@ -62,7 +62,7 @@ unsigned char sl3 = 0;
 int Display_Pointer = FALSE;
 
 int CONSOLE_WIDTH = 800;
-int CHANNELS_WIDTH = 800 - 21;
+int CHANNELS_WIDTH = 800 - 20;
 int CONSOLE_HEIGHT = 600;
 int CONSOLE_HEIGHT2 = 600;
 int fluzy = -1;
@@ -637,7 +637,7 @@ int Screen_Update(void)
     if(Scopish == SCOPE_ZONE_SCOPE) Draw_Scope();
 
     // Sample ed.
-    Draw_Sampled_Wave();
+    Draw_Wave_Data();
 
     int Lt_vu = (int) (MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER));
     int Rt_vu = (int) (MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER));
@@ -781,7 +781,7 @@ int Screen_Update(void)
             Actualize_Instruments_Synths_List(1);
             Actualize_Patterned();
             RefreshSample();
-            NewWav();
+            Renew_Sample_Ed();
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
@@ -925,24 +925,20 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_PREV_INSTR)
         {
             ped_patsam--;
-
             Clear_Input();
-
             Actualize_Patterned();
             RefreshSample();
-            NewWav();
+            Renew_Sample_Ed();
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
         if(gui_action == GUI_CMD_NEXT_INSTR)
         {
             ped_patsam++;
-
             Clear_Input();
-
             Actualize_Patterned();
             RefreshSample();
-            NewWav();
+            Renew_Sample_Ed();
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
@@ -1447,7 +1443,7 @@ int Screen_Update(void)
             ped_patsam -= 16;
             Actualize_Patterned();
             RefreshSample();
-            NewWav();
+            Renew_Sample_Ed();
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
@@ -1456,7 +1452,7 @@ int Screen_Update(void)
             ped_patsam += 16;
             Actualize_Patterned();
             RefreshSample();
-            NewWav();
+            Renew_Sample_Ed();
             Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
@@ -1630,8 +1626,6 @@ int Screen_Update(void)
         Gui_Draw_Button_Box(262, 64, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
         Display_Beat_Time();
 
-        NewWav();
-
         Gui_Draw_Button_Box(0, 104, 392, 42, "", BUTTON_NORMAL | BUTTON_DISABLED);
         Gui_Draw_Button_Box(8, 108, 80, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
         Gui_Draw_Button_Box(320, 108, 64, 16, "Delete", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -1791,35 +1785,24 @@ int Screen_Update(void)
 }
 
 // ------------------------------------------------------
-// Allocate space for a waveform
-void AllocateWave(int n_index, long lenfir, int samplechans)
+// Clear the data of a given instrument
+void Clear_Instrument_Dat(int n_index, int split, int lenfir)
 {
-    // Freeing if memory was allocated before -----------------------
-    if(SampleType[n_index][ped_split] != 0)
-    {
-        if(RawSamples[n_index][0][ped_split]) free(RawSamples[n_index][0][ped_split]);
-        RawSamples[n_index][0][ped_split] = NULL;
-        if(SampleChannels[n_index][ped_split] == 2)
-        {
-            if(RawSamples[n_index][1][ped_split]) free(RawSamples[n_index][1][ped_split]);
-            RawSamples[n_index][1][ped_split] = NULL;
-        }
+    SampleType[n_index][split] = 0;
+    LoopStart[n_index][split] = 0;
+    LoopEnd[n_index][split] = lenfir;
+    LoopType[n_index][split] = SMP_LOOP_NONE;
+    SampleNumSamples[n_index][split] = lenfir;
+    Finetune[n_index][split] = 0;
+    SampleVol[n_index][split] = 1.0f;
+    FDecay[n_index][split] = 0.0f;
+    Basenote[n_index][split] = DEFAULT_BASE_NOTE;
+    CustomVol[n_index] = 1.0f;
+    Midiprg[n_index] = -1;
+    Synthprg[n_index] = SYNTH_WAVE_OFF;
+    beatsync[n_index] = FALSE;
 
-#if !defined(__NO_CODEC__)
-        if(RawSamples_Swap[n_index][0][ped_split]) free(RawSamples_Swap[n_index][0][ped_split]);
-        RawSamples_Swap[n_index][0][ped_split] = NULL;
-        if(SampleChannels[n_index][ped_split] == 2)
-        {
-            if(RawSamples_Swap[n_index][1][ped_split]) free(RawSamples_Swap[n_index][1][ped_split]);
-            RawSamples_Swap[n_index][1][ped_split] = NULL;
-        }
-#endif
-
-    }
-
-    SampleType[n_index][ped_split] = 1;
-    // Gsm by default
-
+    // Gsm is default compression
 #if !defined(__NO_CODEC__)
     SampleCompression[n_index] = SMP_PACK_GSM;
     SamplesSwap[n_index] = FALSE;
@@ -1828,17 +1811,42 @@ void AllocateWave(int n_index, long lenfir, int samplechans)
 #endif
     Mp3_BitRate[n_index] = 0;
     At3_BitRate[n_index] = 0;
+}
 
-    SampleChannels[n_index][ped_split] = samplechans;
-    RawSamples[n_index][0][ped_split] = (short *) malloc(lenfir * 2);
-    if(samplechans == 2) RawSamples[n_index][1][ped_split] = (short *) malloc(lenfir * 2);
+// ------------------------------------------------------
+// Allocate space for a waveform
+void AllocateWave(int n_index, int split, long lenfir, int samplechans, int clear)
+{
+    // Freeing if memory was allocated before -----------------------
+    if(SampleType[n_index][split] != 0)
+    {
+        if(RawSamples[n_index][0][split]) free(RawSamples[n_index][0][split]);
+        RawSamples[n_index][0][split] = NULL;
+        if(SampleChannels[n_index][split] == 2)
+        {
+            if(RawSamples[n_index][1][split]) free(RawSamples[n_index][1][split]);
+            RawSamples[n_index][1][split] = NULL;
+        }
 
-    LoopStart[n_index][ped_split] = 0;
-    LoopEnd[n_index][ped_split] = lenfir;
-    LoopType[n_index][ped_split] = SMP_LOOP_NONE;
-    SampleNumSamples[n_index][ped_split] = lenfir;
-    Finetune[n_index][ped_split] = 0;
-    SampleVol[n_index][ped_split] = 1.0f;
+#if !defined(__NO_CODEC__)
+        if(RawSamples_Swap[n_index][0][split]) free(RawSamples_Swap[n_index][0][split]);
+        RawSamples_Swap[n_index][0][split] = NULL;
+        if(SampleChannels[n_index][split] == 2)
+        {
+            if(RawSamples_Swap[n_index][1][split]) free(RawSamples_Swap[n_index][1][split]);
+            RawSamples_Swap[n_index][1][split] = NULL;
+        }
+#endif
+
+    }
+
+    if(clear) Clear_Instrument_Dat(n_index, split, lenfir);
+
+    SampleType[n_index][split] = 1;
+
+    SampleChannels[n_index][split] = samplechans;
+    RawSamples[n_index][0][split] = (short *) malloc(lenfir * 2);
+    if(samplechans == 2) RawSamples[n_index][1][split] = (short *) malloc(lenfir * 2);
 }
 
 // ------------------------------------------------------
@@ -1901,7 +1909,7 @@ void LoadFile(int Freeindex, const char *str)
             sprintf(name, "%s", FileName);
             // name / number of channels
             LoadAmigaMod(name, found_mod);
-            NewWav();
+            Renew_Sample_Ed();
             fclose(in);
             gui_action = GUI_CMD_NONE;
             Actualize_DiskIO_Ed(0);
@@ -1922,7 +1930,7 @@ void LoadFile(int Freeindex, const char *str)
         {
             sprintf(instrname, "%s", FileName);
             LoadInst(instrname);
-            NewWav();
+            Renew_Sample_Ed();
         }
         else if(strcmp(extension, "TWNNSNG2") == 0 ||
                 strcmp(extension, "TWNNSNG3") == 0 ||
@@ -1945,7 +1953,7 @@ void LoadFile(int Freeindex, const char *str)
             sprintf(name, "%s", FileName);
             Ptk_Stop();
             LoadMod(name);
-            NewWav();
+            Renew_Sample_Ed();
         }
         else if(strcmp(extension, "TWNNSYN0") == 0 ||
                 strcmp(extension, "TWNNSYN1") == 0 ||
@@ -2006,7 +2014,7 @@ void LoadFile(int Freeindex, const char *str)
                             switch(channels)
                             {
                                 case 1:
-                                    AllocateWave(Freeindex, AIFF_File.NumSamples(), 1);
+                                    AllocateWave(Freeindex, ped_split, AIFF_File.NumSamples(), 1, TRUE);
                                     csamples = RawSamples[Freeindex][0][ped_split];
                                     for(i = 0; i < AIFF_File.NumSamples(); i++)
                                     {
@@ -2015,11 +2023,9 @@ void LoadFile(int Freeindex, const char *str)
                                     break;
 
                                 case 2:
-                                    AllocateWave(Freeindex, AIFF_File.NumSamples(), 2);
-
+                                    AllocateWave(Freeindex, ped_split, AIFF_File.NumSamples(), 2, TRUE);
                                     csamples = RawSamples[Freeindex][0][ped_split];
                                     csamples2 = RawSamples[Freeindex][1][ped_split];
-
                                     for(i = 0; i < AIFF_File.NumSamples(); i++)
                                     {
                                         AIFF_File.ReadStereoSample(&csamples[i], &csamples2[i]);
@@ -2046,7 +2052,7 @@ void LoadFile(int Freeindex, const char *str)
                             sprintf(SampleName[Freeindex][ped_split], "%s", FileName);
                             Actualize_Patterned();
                             Actualize_Instrument_Ed(2, 0);
-                            NewWav();
+                            Renew_Sample_Ed();
                             switch(bits)
                             {
                                 case 64:
@@ -2110,7 +2116,7 @@ void LoadFile(int Freeindex, const char *str)
                             switch(channels)
                             {
                                 case 1:
-                                    AllocateWave(Freeindex, Wav_File.NumSamples(), 1);
+                                    AllocateWave(Freeindex, ped_split, Wav_File.NumSamples(), 1, TRUE);
                                     csamples = RawSamples[Freeindex][0][ped_split];
                                     for(i = 0; i < Wav_File.NumSamples(); i++)
                                     {
@@ -2119,11 +2125,9 @@ void LoadFile(int Freeindex, const char *str)
                                     break;
 
                                 case 2:
-                                    AllocateWave(Freeindex, Wav_File.NumSamples(), 2);
-
+                                    AllocateWave(Freeindex, ped_split, Wav_File.NumSamples(), 2, TRUE);
                                     csamples = RawSamples[Freeindex][0][ped_split];
                                     csamples2 = RawSamples[Freeindex][1][ped_split];
-
                                     for(i = 0; i < Wav_File.NumSamples(); i++)
                                     {
                                         Wav_File.ReadStereoSample(&csamples[i], &csamples2[i]);
@@ -2145,7 +2149,7 @@ void LoadFile(int Freeindex, const char *str)
                             sprintf(SampleName[Freeindex][ped_split], "%s", FileName);
                             Actualize_Patterned();
                             Actualize_Instrument_Ed(2, 0);
-                            NewWav();
+                            Renew_Sample_Ed();
                             switch(bits)
                             {
                                 case 64:
@@ -2306,7 +2310,7 @@ void Newmod(void)
                 Synthprg[i] = 1;
             }
         }
-        NewWav();
+        Renew_Sample_Ed();
     }
 
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_SYNTHS)
@@ -2381,10 +2385,11 @@ void Newmod(void)
     if(ZzaappOMatic == ZZAAPP_ALL)
     {
         Use_Cubic = CUBIC_INT;
+        sprintf(Selection_Name, "Untitled");
         sprintf(Reverb_Name, "Untitled");
         sprintf(name, "Untitled");
         sprintf(artist, "Somebody");
-        sprintf(style, "Goa Trance");
+        sprintf(style, "Anything Goes");
         namesize = 8;
         BeatsPerMin = 125;
         TicksPerBeat = 4;
@@ -2712,7 +2717,7 @@ void DeleteInstrument(void)
         {
             Synthprg[ped_patsam] = 1;
         }
-        NewWav();
+        Renew_Sample_Ed();
         Status_Box("Instrument deleted.");
         RefreshSample();
         Actualize_Master(0);

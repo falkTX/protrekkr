@@ -37,11 +37,11 @@
 #if defined(__GCC__)
 #include "../../include/variables.h"
 #include "../../ui/include/misc_draw.h"
-#include "../../wav/include/riff.h"
+#include "../../samples/wav/include/riff.h"
 #else
 #include "../include/variables.h"
 #include "../ui/include/misc_draw.h"
-#include "../wav/include/riff.h"
+#include "../samples/wav/include/riff.h"
 #endif
 
 // ------------------------------------------------------
