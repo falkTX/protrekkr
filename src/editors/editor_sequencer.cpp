@@ -92,31 +92,31 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Sequencer");
 
-    Gui_Draw_Button_Box(4, 466, 80, 16, "Clear All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 484, 80, 16, "Clear Position", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 522, 80, 16, "Reset All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(4, 540, 80, 16, "Reset Position", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(4, 466, 80, 16, "Clear All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, 484, 80, 16, "Clear Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, 522, 80, 16, "Reset All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, 540, 80, 16, "Reset Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(396, 466, 32, 16, "Cut", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396 + 34, 466, 32, 16, "Copy", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396, 484, 66, 16, "Paste", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(396, 502, 66, 16, "Insert/Paste", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(396, 466, 32, 16, "Cut", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396 + 34, 466, 32, 16, "Copy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396, 484, 66, 16, "Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396, 502, 66, 16, "Insert/Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Display_Seq_Buffer();
 
-    Gui_Draw_Button_Box(308, 466, 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 484, 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
-    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Button_Box(308, 466, 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, 484, 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(288, 466, 16, 16, "\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(288, 484, 16, 16, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(288, 522, 16, 16, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(288, 540, 16, 16, "\10", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(89, 466, 25, 90, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(257, 466, 25, 90, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(120, 466, 131, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(89, 466, 24, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(257, 466, 24, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(120, 466, 132, 90, "", BUTTON_NORMAL);
 
     Gui_Draw_Button_Box(480, 466, 306, 28, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
@@ -126,24 +126,28 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(600, 524, 60, 16, "Selection", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(600, 544, 60, 16, "Track", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(662, 524, 60, 16, "Pattern", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(662, 544, 60, 16, "Song", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(600, 524, 60, 16, "Selection", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, 544, 60, 16, "Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(662, 524, 60, 16, "Pattern", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(662, 544, 60, 16, "Song", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 void Actualize_Seq_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
+        SetColor(COL_BLACK);
+        bjbox(91, 468, 21, 87);
+        bjbox(122, 468, 129, 87);
+        bjbox(259, 468, 21, 87);
         SetColor(COL_BACKGROUND);
-        bjbox(92, 469, 20, 85);
-        bjbox(124, 469, 124, 85);
-        bjbox(260, 469, 20, 85);
+        bjbox(91 + 1, 468 + 1, 21 - 2, 87 - 2);
+        bjbox(122 + 1, 468 + 1, 129 - 2, 87 - 2);
+        bjbox(259 + 1, 468 + 1, 21 - 2, 87 - 2);
 
-        // Green bar
+        // Current pos bar
         SetColor(COL_PUSHED_MED);
-        bjbox(124, 505, 124, 12);
+        bjbox(123, 505, 127, 12);
 
         for(int lseq = -3; lseq < 4; lseq++)
         {
@@ -192,11 +196,11 @@ void Actualize_Seq_Ed(char gode)
 
             if(snamesel == INPUT_SELECTION_NAME)
             {
-                Gui_Draw_Button_Box(579, 472, 164, 16, tcp, BUTTON_PUSHED);
+                Gui_Draw_Button_Box(579, 472, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(579, 472, 164, 16, Selection_Name, BUTTON_NORMAL);
+                Gui_Draw_Button_Box(579, 472, 164, 16, Selection_Name, BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
     }

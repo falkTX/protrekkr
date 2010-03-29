@@ -96,6 +96,16 @@
 #define COL_DOUBLE_PUSHED_MED 50
 #define COL_DOUBLE_PUSHED_LO 51
 
+#define COL_INPUT_HI 52
+#define COL_INPUT_MED 53
+#define COL_INPUT_LO 54
+
+#define COL_INPUT_PUSHED_HI 55
+#define COL_INPUT_PUSHED_MED 56
+#define COL_INPUT_PUSHED_LO 57
+
+#define COL_BLACK 58
+
 #define NUMBER_COLORS 20
 
 #define BUTTON_NORMAL 1
@@ -106,6 +116,7 @@
 #define BUTTON_LOW_FONT 32
 #define BUTTON_TEXT_VTOP 64
 #define BUTTON_RIGHT_MOUSE 128
+#define BUTTON_INPUT 256
 
 #define A_ "\216"
 #define B_ "\217"
@@ -156,16 +167,23 @@ typedef struct
 // Variables
 extern char *Labels_Palette[];
 extern SDL_Color Ptk_Palette[256 * 2];
+extern int Default_Beveled1;
+extern SDL_Color Default_Palette1[COL_BLACK + 1];
+extern int Default_Beveled2;
+extern SDL_Color Default_Palette2[COL_BLACK + 1];
+extern int Default_Beveled3;
+extern SDL_Color Default_Palette3[COL_BLACK + 1];
+extern int Default_Beveled4;
+extern SDL_Color Default_Palette4[COL_BLACK + 1];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
 extern int curr_tab_highlight;
 extern int Font_Height;
+extern int Beveled;
 
 // ------------------------------------------------------
 // Functions
-void out_note(int x, int y, int note, int color);
 void out_decchar(int x,int y, int number, char smith);
-void out_hexchar(int x,int y, int number, char smith, int color);
 void value_box(int x, int y, int val, int flags);
 void Gui_Draw_Arrows_Number_Box(int x, int y, int val, int flags);
 void Gui_Draw_Arrows_Number_Box2(int x, int y, int val, int flags);
@@ -177,8 +195,7 @@ void outfloat(int x, int y, float cant, int mode);
 void outfloat_small(int x, int y, float cant, int mode, int size, int flags);
 
 void Gui_Draw_Flat_Box(const char* str);
-void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int pushed);
-void Gui_Draw_Static_Box(int x, int y, int sx, int sy, const char *str, int flags);
+void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int flags);
 
 void Gui_Clear_Array(int x, int y, int sx, int sy);
 void bjbox(int x, int y, int sx, int sy);
@@ -225,7 +242,7 @@ void Refresh_Palette(void);
 void Init_UI(void);
 void Get_Phony_Palette(void);
 void Set_Phony_Palette(void);
-void Restore_Default_Palette(void);
+void Restore_Default_Palette(SDL_Color *Def, int DefBevel);
 void Display_Mouse_Pointer(int x, int y, int clear);
 void Destroy_UI(void);
 

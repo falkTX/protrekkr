@@ -34,7 +34,12 @@
 #include "../include/ptk.h"
 
 // ------------------------------------------------------
+// Constants
+#define BEVEL_SIZE 3
+
+// ------------------------------------------------------
 // Variables
+extern int redraw_everything;
 int In_Requester = FALSE;
 int Requester_Action = GUI_CMD_NOP;
 static int Size_X;
@@ -50,16 +55,21 @@ static int Buttons_Pos[64];
 static int Buttons_Keys[64];
 static char *Buttons_Text[64];
 LPREQUESTER Current_Requester;
-static int Pressed_Button;
-static int Default_Button;
+int Req_Pressed_Button;
+int Req_Default_Button;
 static int Cancel_Button;
+SDL_Surface *Req_Picture;
+SDL_Surface *Req_Back;
+int Req_TimeOut;
+int Req_Timer;
 
 // ------------------------------------------------------
 // Functions
 void Kill_Requester(void);
+void Restore_Background_Requester();
 
 // ------------------------------------------------------
-// Start a requester
+// Initialize a requester
 int Display_Requester(LPREQUESTER Requester, int Action)
 {
     int i;
@@ -72,7 +82,7 @@ int Display_Requester(LPREQUESTER Requester, int Action)
     Size_X = 0;
     Size_Y = 0;
 
-    // Register the action to return
+    // Register the extra action to perform
     Requester_Action = Action;
 
     // Parse the text
@@ -84,11 +94,15 @@ int Display_Requester(LPREQUESTER Requester, int Action)
     Nbr_Lines = 0;
     Nbr_Buttons = 0;
     Max_Buttons_Size = 0;
+    Req_Timer = 0;
+    Req_TimeOut = Requester->TimeOut;
+    Req_Picture = NULL;
+    if(Requester->Picture) Req_Picture = *Requester->Picture;
     
-    Default_Button = -1;
+    Req_Default_Button = -1;
     Cancel_Button = -1;
 
-    Pressed_Button = 0;
+    Req_Pressed_Button = 0;
 
     memset(Req_Txt_Lines, 0, sizeof(Req_Txt_Lines));
 
@@ -143,7 +157,7 @@ int Display_Requester(LPREQUESTER Requester, int Action)
         switch(Button->Type)
         {
             case BUTTON_DEFAULT:
-                Default_Button = Nbr_Buttons + 1;
+                Req_Default_Button = Nbr_Buttons + 1;
                 break;
 
             case BUTTON_CANCEL:
@@ -162,7 +176,14 @@ int Display_Requester(LPREQUESTER Requester, int Action)
 
     if(Max_Buttons_Size > Size_X) Size_X = Max_Buttons_Size;
 
-    Size_X += 150;
+    if(!Size_X)
+    {
+        Size_X = Req_Picture->w + ((BEVEL_SIZE) * 2) + 1;
+    }
+    else
+    {
+        Size_X += 150;
+    }
 
     float Si = (float) Size_X / (float) Nbr_Buttons;
     float Pos_Si = 0.0f;
@@ -178,15 +199,31 @@ int Display_Requester(LPREQUESTER Requester, int Action)
         Req_Txt_Pos_X[i] = (Size_X - Req_Txt_Pos_X[i]) / 2;
     }
 
-    Size_Y = (((Nbr_Lines + 5) * Font_Height) + 18);
+    if(!Nbr_Lines)
+    {
+        Size_Y = Req_Picture->h + ((BEVEL_SIZE) * 2);
+    }
+    else
+    {
+        Size_Y = (((Nbr_Lines + 5) * Font_Height) + 18);
+    }
 
     Pos_X = (CONSOLE_WIDTH - Size_X) / 2;
     Pos_Y = (CONSOLE_HEIGHT - Size_Y) / 2;
+
+    Req_Back = SDL_AllocSurface(SDL_SWSURFACE, Size_X + 1, Size_Y + 1, 32, 0xff0000, 0xff00, 0xff, 0xff000000);
+    if(Req_Back)
+    {
+        Copy_To_Surface(Main_Screen, Req_Back, 0, 0,
+                        Pos_X, Pos_Y,
+                        Pos_X + Size_X + 1,
+                        Pos_Y + Size_Y + 1);
+    }
     return(0);
 }
 
 // ------------------------------------------------------
-// Start a requester
+// Check if a requester has been initialized and display it
 int Check_Requester(LPREQUESTER Requester)
 {
     int Pressed = 0;
@@ -194,8 +231,27 @@ int Check_Requester(LPREQUESTER Requester)
     {
         int i;
         Gui_Draw_Button_Box(Pos_X, Pos_Y, Size_X, Size_Y, "", BUTTON_NORMAL | BUTTON_DISABLED);
-        Gui_Draw_Button_Box(Pos_X + 3, Pos_Y + 3, Size_X - 6, Size_Y - 6, "", BUTTON_PUSHED | BUTTON_DISABLED);
-        Gui_Draw_Button_Box(Pos_X + 4, Pos_Y + 4, Size_X - 8, Size_Y - 8, "", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(Pos_X + BEVEL_SIZE - 1, Pos_Y + BEVEL_SIZE - 1,
+                            Size_X - ((BEVEL_SIZE - 1) * 2), Size_Y - ((BEVEL_SIZE - 1) * 2),
+                            "", BUTTON_PUSHED | BUTTON_DISABLED);
+        if(Req_Picture)
+        {
+            SetColor(COL_BLACK);
+            Fillrect(Pos_X + BEVEL_SIZE,
+                     Pos_Y + BEVEL_SIZE,
+                     Pos_X + BEVEL_SIZE + Size_X - (BEVEL_SIZE * 2) + 1,
+                     Pos_Y + BEVEL_SIZE + Size_Y - (BEVEL_SIZE * 2) + 1);
+            // Display the picture
+            Copy(Req_Picture, Pos_X + BEVEL_SIZE + 1, Pos_Y + BEVEL_SIZE + 1,
+                 0, 0, Req_Picture->w, Req_Picture->h - 2);
+        }
+        else
+        {
+            // Or the intern box
+            Gui_Draw_Button_Box(Pos_X + (BEVEL_SIZE + 1), Pos_Y + (BEVEL_SIZE + 1),
+                                Size_X - ((BEVEL_SIZE + 1) * 2), Size_Y - ((BEVEL_SIZE + 1) * 2),
+                                "", BUTTON_NORMAL | BUTTON_DISABLED);
+        }
 
         for(i = 0; i < Nbr_Lines; i++)
         {
@@ -208,7 +264,7 @@ int Check_Requester(LPREQUESTER Requester)
         {
             Gui_Draw_Button_Box(Pos_X + Buttons_Pos[i] - 1, Pos_Y + (Size_Y - Font_Height) - 16 - 1,
                                 Buttons_Size[i] + 2, 16 + 2, "", BUTTON_PUSHED | BUTTON_DISABLED);
-            if(Default_Button == i + 1)
+            if(Req_Default_Button == i + 1)
             {
                 // Add a box around the default button
                 Gui_Draw_Button_Box(Pos_X + Buttons_Pos[i] - 2, Pos_Y + (Size_Y - Font_Height) - 16 - 2,
@@ -220,11 +276,11 @@ int Check_Requester(LPREQUESTER Requester)
                                 Buttons_Text[i],
                                 BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
-        if(Pressed_Button)
+        if(Req_Pressed_Button)
         {
             Kill_Requester();
-            Pressed = Pressed_Button;
-            Pressed_Button = 0;
+            Pressed = Req_Pressed_Button;
+            Req_Pressed_Button = 0;
             gui_action = Requester_Action;
             Requester_Action = GUI_CMD_NOP;
         }
@@ -234,57 +290,78 @@ int Check_Requester(LPREQUESTER Requester)
 }
 
 // ------------------------------------------------------
-// Mouse Handler
+// Handle the mouse buttons
 void Mouse_Handler_Requester(void)
 {
     int i;
 
-    if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
+    // If no buttons then the whole surface is used
+    if(!Nbr_Buttons)
     {
-        for(i = 0; i < Nbr_Buttons; i++)
+        if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON ||
+           Mouse.button_oneshot & MOUSE_MIDDLE_BUTTON ||
+           Mouse.button_oneshot & MOUSE_RIGHT_BUTTON)
         {
-            if(zcheckMouse(Pos_X + Buttons_Pos[i],
-                           Pos_Y + (Size_Y - Font_Height) - 16, Buttons_Size[i], 16))
+            Req_Pressed_Button = 1;
+        }
+    }
+    else
+    {
+        if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
+        {
+            for(i = 0; i < Nbr_Buttons; i++)
             {
-                Pressed_Button = i + 1;
+                if(zcheckMouse(Pos_X + Buttons_Pos[i],
+                               Pos_Y + (Size_Y - Font_Height) - 16, Buttons_Size[i], 16))
+                {
+                    Req_Pressed_Button = i + 1;
+                }
             }
         }
     }
 }
 
 // ------------------------------------------------------
-// KeyBoard ShortCut Handler
+// Handle the keyboard shortcuts
 void Keyboard_Handler_Requester(void)
 {
     int i;
 
-    for(i = 0; i < Nbr_Buttons; i++)
+    // No buttons then the anykey is used
+    if(!Nbr_Buttons)
     {
-        if(Keys[Buttons_Keys[i]])
-        {
-            Pressed_Button = i + 1;
-        }
+        if(key_on) Req_Pressed_Button = 1;
     }
-
-    if(Keys[SDLK_ESCAPE])
+    else
     {
-        if(Cancel_Button != -1)
+        for(i = 0; i < Nbr_Buttons; i++)
         {
-            Pressed_Button = Cancel_Button;
+            if(Keys[Buttons_Keys[i]])
+            {
+                Req_Pressed_Button = i + 1;
+            }
         }
-    }
 
-    if(Keys[SDLK_RETURN] || Keys[SDLK_KP_ENTER])
-    {
-        if(Default_Button != -1)
+        if(Keys[SDLK_ESCAPE])
         {
-            Pressed_Button = Default_Button;
+            if(Cancel_Button != -1)
+            {
+                Req_Pressed_Button = Cancel_Button;
+            }
+        }
+
+        if(Keys[SDLK_RETURN] || Keys[SDLK_KP_ENTER])
+        {
+            if(Req_Default_Button != -1)
+            {
+                Req_Pressed_Button = Req_Default_Button;
+            }
         }
     }
 }
 
 // ------------------------------------------------------
-// Free requester resources
+// Remove the requester and free allocated resources
 void Kill_Requester(void)
 {
     int i;
@@ -294,6 +371,25 @@ void Kill_Requester(void)
         if(Req_Txt_Lines[Nbr_Lines]) free(Req_Txt_Lines[Nbr_Lines]);
         Req_Txt_Lines[Nbr_Lines] = NULL;
     }
+    Set_Main_Palette();
+    Refresh_Palette();
+    Restore_Background_Requester();
     Current_Requester = NULL;
-    Actupated(0);
+    Req_TimeOut = 0;
+    Env_Change = TRUE;
+}
+
+// ------------------------------------------------------
+// Restore the background below the requester and free it's surface
+void Restore_Background_Requester()
+{
+    if(Req_Back)
+    {
+        Copy_To_Surface(Req_Back, Main_Screen, Pos_X, Pos_Y,
+                        0, 0,
+                        Pos_X + Size_X + 1,
+                        Pos_Y + Size_Y + 1);
+        SDL_FreeSurface(Req_Back);
+        Req_Back = NULL;
+    }
 }

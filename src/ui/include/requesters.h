@@ -51,12 +51,18 @@ typedef struct
 {
     char *Text;
     LPREQUESTER_BUTTON Buttons;
+    SDL_Surface **Picture;
+    int TimeOut;
 } REQUESTER, *LPREQUESTER;
 
 // ------------------------------------------------------
 // Variables
 extern int In_Requester;
 extern int Requester_Action;
+extern int Req_Timer;
+extern int Req_TimeOut;
+extern int Req_Pressed_Button;
+extern int Req_Default_Button;
 extern LPREQUESTER Current_Requester;
 
 // ------------------------------------------------------

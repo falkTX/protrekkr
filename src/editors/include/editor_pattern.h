@@ -45,7 +45,7 @@
 // ------------------------------------------------------
 // Constants
 #define PAT_COL_SHIFT 4
-#define PAT_COL_NOTE 24
+#define PAT_COL_NOTE 23
 
 #define PAT_COL_CHAR 8
 #define PAT_COL_CHAR_LARGE 11
@@ -54,7 +54,7 @@
 #define DISPLAYED_LINES_SMALL 28
 #define DISPLAYED_LINES_LARGE 44
 
-#define MAX_PATT_SCREEN_X 778
+#define MAX_PATT_SCREEN_X 771
 
 // ------------------------------------------------------
 // Enumerations
@@ -115,5 +115,6 @@ void Toggle_Track_Zoom(int track, int large);
 void Clear_Track_Zoom(int track);
 TRACK_TYPE Get_Track_Type(int track);
 void Set_Track_Zoom(int track, TRACK_TYPE type);
+void Draw_Pattern_Right_Stuff();
 
 #endif

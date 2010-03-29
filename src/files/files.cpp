@@ -29,6 +29,8 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
+// TODO: Maybe this file should be splitted.
+
 // ------------------------------------------------------
 // Includes
 #include "../extralibs/zlib-1.2.3/zlib.h"

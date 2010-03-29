@@ -1,6 +1,11 @@
 TODO (in no special order):
 ----------------------------------------------------------
 
+v2.0:
+
+ - Complete the 303 (the env mod stuff).
+ - Clean the sample editor up a bit.
+ 
 [UI]
  - Create a decent gadgets system (events based).
  - Click on numbers & move the mouse to modify them (or use the wheel).

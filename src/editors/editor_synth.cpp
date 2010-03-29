@@ -339,11 +339,11 @@ void Actualize_Synth_Ed(char gode)
 
             if(snamesel == INPUT_SYNTH_NAME)
             {
-                Gui_Draw_Button_Box(592, 450, 164, 16, tcp, BUTTON_PUSHED);
+                Gui_Draw_Button_Box(592, 450, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[ped_patsam].presetname, Allow_Button);
+                Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[ped_patsam].presetname, Allow_Button | BUTTON_INPUT);
             }
             Actualize_Instruments_Synths_List(1);
         }

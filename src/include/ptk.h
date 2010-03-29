@@ -118,6 +118,8 @@ extern HWND Main_Window;
 #define A_SUBDIR FA_DIREC
 #define _A_SUBDIR FA_DIREC
 #endif
+#define _A_FILE 0
+#define _A_SEP -1
 
 // ------------------------------------------------------
 // Functions

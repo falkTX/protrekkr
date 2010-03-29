@@ -50,17 +50,25 @@
 #endif
 
 // ------------------------------------------------------
+// Structures
+typedef struct
+{
+    char Name[1024];
+    int Type;
+} FILEENTRY, *LPFILEENTRY;
+
+// ------------------------------------------------------
 // Variables
-int lt_ykar = 200;
+int lt_ykar = 0;
 int lt_items = 0;
 int lt_index = 0;
 int lt_curr = 0;
 int list_counter;
+int sort_files = TRUE;
 
-char SMPT_LIST[2048][1024];
-
-unsigned FILETYPE[2048];
-extern int display_title;
+FILEENTRY SMPT_LIST[2048];
+char UpName1[1024];
+char UpName2[1024];
 
 #if defined(__WIN32__)
 char List_Drives[1024 + 1];
@@ -79,23 +87,81 @@ char *cur_dir;
 // Functions
 void Clear_Files_List(void)
 {
-    for(unsigned int listcleaner = 0; listcleaner < 2048; listcleaner++)
+    for(int listcleaner = 0; listcleaner < 2048; listcleaner++)
     {
-        for(int listcleaner2 = 0; listcleaner2 < 64; listcleaner2++)
-        {
-            SMPT_LIST[listcleaner][listcleaner2] = 0;
-        }
+        memset(SMPT_LIST[listcleaner].Name, 0, sizeof(SMPT_LIST[0]));
     }
 }
 
-char *Get_Current_FileName(void)
+void Add_Entry(char *Name, int Type)
 {
-   return(SMPT_LIST[lt_curr]);
+    sprintf(SMPT_LIST[list_counter].Name, Name);
+    SMPT_LIST[list_counter].Type = Type;
+    lt_items++;
+    list_counter++;
 }
 
-unsigned int Get_Current_FileType(void)
+void Insert_Entry(char *Name, int Type, int idx)
 {
-   return(FILETYPE[lt_curr]);
+    int i;
+    for(i = list_counter - 1; i >= idx; i--)
+    {
+        memcpy(&SMPT_LIST[i + 1], &SMPT_LIST[i], sizeof(FILEENTRY));
+    }
+    sprintf(SMPT_LIST[idx].Name, Name);
+    SMPT_LIST[idx].Type = Type;
+    lt_items++;
+    list_counter++;
+}
+
+char *Get_FileName(int idx)
+{
+    return(SMPT_LIST[idx].Name);
+}
+
+int Get_FileType(int idx)
+{
+    return(SMPT_LIST[idx].Type);
+}
+
+int FileComp(const void *elem1, const void *elem2)
+{
+    int i;
+    LPFILEENTRY Ent1 = (LPFILEENTRY) elem1;
+    LPFILEENTRY Ent2 = (LPFILEENTRY) elem2;
+    for(i = 0; Ent1->Name[i]; i++)
+    {
+        UpName1[i] = toupper(Ent1->Name[i]);
+    }
+    for(i = 0; Ent2->Name[i]; i++)
+    {
+        UpName2[i] = toupper(Ent2->Name[i]);
+    }
+    return strcmp(UpName1, UpName2);
+}
+
+int FileComp_Files(const void *elem1, const void *elem2)
+{
+    int i;
+    LPFILEENTRY Ent1 = (LPFILEENTRY) elem1;
+    LPFILEENTRY Ent2 = (LPFILEENTRY) elem2;
+    if(Ent1->Type == _A_SUBDIR && Ent2->Type == 0) return 1;
+    if(Ent1->Type == 0 && Ent2->Type == _A_SUBDIR) return -1;
+
+    if(Ent1->Type == 0 && Ent2->Type == 0 ||
+       Ent1->Type == _A_SUBDIR && Ent1->Type == _A_SUBDIR)
+    {
+        for(i = 0; Ent1->Name[i]; i++)
+        {
+            UpName1[i] = toupper(Ent1->Name[i]);
+        }
+        for(i = 0; Ent2->Name[i]; i++)
+        {
+            UpName2[i] = toupper(Ent2->Name[i]);
+        }
+        return strcmp(UpName1, UpName2);
+    }
+    return 0;
 }
 
 void Set_Current_Dir(void)
@@ -107,7 +173,7 @@ void Set_Current_Dir(void)
 
     if (tmp && *tmp == '/') *tmp = 0;
     if (strrchr(Dir_Act, '/') == Dir_Act &&
-        !strcmp(Get_Current_FileName(), ".."))
+        !strcmp(Get_FileName(lt_curr), ".."))
     {
         switch(Scopish)
         {
@@ -139,15 +205,16 @@ void Set_Current_Dir(void)
     if (!strcmp(Dir_Act, "/"))
     {
         strcpy(filename, "/");
-        strcat(filename, Get_Current_FileName());
+        strcat(filename, Get_FileName(lt_curr));
     }
     else
     {
-        strcpy(filename, Get_Current_FileName());
+        strcpy(filename, Get_FileName(lt_curr));
     }
 #else
-    strcpy(filename, Get_Current_FileName());
+    strcpy(filename, Get_FileName(lt_curr));
 #endif
+ 
     switch(Scopish)
     {
         case SCOPE_ZONE_MOD_DIR:
@@ -199,10 +266,8 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
                             break;
                         }
                     }
-                    sprintf(SMPT_LIST[list_counter], &fpath[len_name]);
-                    FILETYPE[list_counter] = _A_SUBDIR;
-                    lt_items++;
-                    list_counter++;
+                    
+                    Add_Entry(&fpath[len_name], _A_SUBDIR);
                     break;
 
                 case FTW_F:
@@ -215,10 +280,8 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
                             break;
                         }
                     }
-                    sprintf(SMPT_LIST[list_counter], &fpath[len_name]);
-                    FILETYPE[list_counter] = 0;
-                    lt_items++;
-                    list_counter++;
+                    
+                    Add_Entry(&fpath[len_name], 0);
                     break;
             }
         }
@@ -292,75 +355,72 @@ void Read_SMPT(void)
 
     if((hFile = _findfirst(Dir_Act, &c_file)) == -1L)
     {
-        sprintf(SMPT_LIST[0], "No files in current directory.");
-        FILETYPE[0] = 0;
+        Add_Entry("No files in current directory.", 0);
     }
     else
     {
         // The first directory
-        sprintf(SMPT_LIST[list_counter], c_file.name);
-        FILETYPE[list_counter] = c_file.attrib & _A_SUBDIR;
-        lt_items++;
-        list_counter++;
+        if(c_file.attrib & _A_SUBDIR)
+        {
+            if(strcmp(c_file.name, ".") &&
+               strcmp(c_file.name, ".."))
+            {
+               Add_Entry(c_file.name, _A_SUBDIR);
+            }
+        }
 
         // Find the rest of the directories 
         while(_findnext(hFile, &c_file) == 0)
         {
             if(c_file.attrib & _A_SUBDIR)
             {
-                sprintf(SMPT_LIST[list_counter], c_file.name);
-                FILETYPE[list_counter] = _A_SUBDIR;
-                lt_items++;
-                list_counter++;
+                if(strcmp(c_file.name, ".") &&
+                   strcmp(c_file.name, ".."))
+                {
+                   Add_Entry(c_file.name, _A_SUBDIR);
+                }
             }
         }
         // End dir
         _findclose(hFile);
-    }
 
-    if((hFile = _findfirst(Dir_Act, &c_file)) == -1L)
-    {
-        sprintf(SMPT_LIST[0], "No files in current directory.");
-        FILETYPE[0] = 0;
-    }
-    else
-    {
-        // The first file
-        if(!(c_file.attrib & _A_SUBDIR))
+        if((hFile = _findfirst(Dir_Act, &c_file)) != -1L)
         {
-            sprintf(SMPT_LIST[list_counter], c_file.name);
-            FILETYPE[list_counter] = 0;
-            lt_items++;
-            list_counter++;
-        }
-        // Find the rest of the files
-        while(_findnext(hFile, &c_file) == 0)
-        {
+            // The first file
             if(!(c_file.attrib & _A_SUBDIR))
             {
-                sprintf(SMPT_LIST[list_counter], c_file.name);
-                FILETYPE[list_counter] = 0;
-                lt_items++;
-                list_counter++;
+                Add_Entry(c_file.name, 0);
             }
-        } // while      
-        _findclose(hFile);
+            // Find the rest of the files
+            while(_findnext(hFile, &c_file) == 0)
+            {
+                if(!(c_file.attrib & _A_SUBDIR))
+                {
+                    Add_Entry(c_file.name, 0);
+                }
+            } // while      
+            _findclose(hFile);
+
+            if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+
+            Insert_Entry("", _A_SEP, 0);
+            Insert_Entry("..", _A_SUBDIR, 0);
+            Insert_Entry(".", _A_SUBDIR, 0);
+        }
     }
 
-    // Add the available drives
+    // Add the available drives to the end of the list
     int i;
     char *Ptr_Drives;
     GetLogicalDriveStrings(1024, List_Drives);
 
     Ptr_Drives = List_Drives;
     i = 0;
+    if(Ptr_Drives[0]) Add_Entry("", _A_SEP);
     while(Ptr_Drives[0])
     {
-        sprintf(SMPT_LIST[list_counter], Ptr_Drives);
-        FILETYPE[list_counter] = _A_SUBDIR;
+        Add_Entry(Ptr_Drives, _A_SUBDIR);
         Ptr_Drives += strlen(Ptr_Drives) + 1;
-        lt_items++;
-        list_counter++;
     }
 
 #elif defined(__AMIGAOS4__) || defined(__AROS__)
@@ -374,16 +434,16 @@ void Read_SMPT(void)
 
     if (!strcmp(Dir_Act, "/"))
     {
+        // Only display volumes
         struct DosList *dl;
         const uint32 flags = LDF_VOLUMES | LDF_READ;
+        char BString[1024];
         dl = LockDosList(flags);
         while ((dl = NextDosEntry(dl, flags)) != NULL)
         {
-            CopyStringBSTRToC(dl->dol_Name, SMPT_LIST[list_counter],
-                              sizeof(SMPT_LIST[list_counter]));
-            FILETYPE[list_counter] = _A_SUBDIR;
-            lt_items++;
-            list_counter++;
+            // Convert it first
+            CopyStringBSTRToC(dl->dol_Name, BString, sizeof(BString));
+            Add_Entry(BString, _A_SUBDIR);
         }
         UnLockDosList(flags);
     }
@@ -391,51 +451,65 @@ void Read_SMPT(void)
     {
         DIR *dirp;
         struct dirent *dp;
+
         dirp = opendir(Dir_Act);
         if (dirp)
         {
-            // Add parent directory
-            snprintf(SMPT_LIST[list_counter], sizeof(SMPT_LIST[list_counter]), "/");
-            FILETYPE[list_counter] = _A_SUBDIR;
-            lt_items++;
-            list_counter++;
-    
-            // Add the other directories and files
+            // Add the directories first
             while ((dp = readdir(dirp)) != NULL)
             {
-                snprintf(SMPT_LIST[list_counter], sizeof(SMPT_LIST[list_counter]),
-                         "%s", dp->d_name);
-                if (dp->d_type == DT_DIR)
+                if(dp->d_type == DT_DIR)
                 {
-                    FILETYPE[list_counter] = _A_SUBDIR;
+                    Add_Entry(dp->d_name, _A_SUBDIR);
                 }
-                else
-                {
-                    FILETYPE[list_counter] = 0;
-                }
-                lt_items++;
-                list_counter++;
             }
             closedir(dirp);
         }
+
+        dirp = opendir(Dir_Act);
+        if (dirp)
+        {
+            // Then add the files
+            while ((dp = readdir(dirp)) != NULL)
+            {
+                if(dp->d_type != DT_DIR)
+                {
+                    Add_Entry(dp->d_name, 0);
+                }
+            }
+            closedir(dirp);
+        }
+
+        if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+
+        // Insert parent directory at the top
+        Insert_Entry("", _A_SEP, 0);
+        Insert_Entry("/", _A_SUBDIR, 0);
     }
 
 #else
 
-    sprintf(SMPT_LIST[list_counter], "./");
-    FILETYPE[list_counter] = _A_SUBDIR;
-    lt_items++;
-    list_counter++;
-
-    sprintf(SMPT_LIST[list_counter], "../");
-    FILETYPE[list_counter] = _A_SUBDIR;
-    lt_items++;
-    list_counter++;
-
+    // Enum them
     nftw(Dir_Act, &list_file, FTW_PHYS, 0);
+
+    if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+
+    // Always insert them at the top of the list
+    Insert_Entry("", _A_SEP, 0);
+    Insert_Entry("../", _A_SUBDIR, 0);
+    Insert_Entry("./", _A_SUBDIR, 0);
 
 #endif
 
+    // Insert a separator between files and directories
+    for(i = list_counter - 1; i >= 0; i--)
+    {
+        if(SMPT_LIST[i].Type == _A_FILE)
+        {
+            Insert_Entry("", _A_SEP, i + 1);
+            break;
+        }
+    }
 }
 
 // ------------------------------------------------------
@@ -445,6 +519,7 @@ void Dump_Files_List(int xr, int yr)
     int y = lt_index;
     FILE *File;
     char Size_String[64];
+    int space = Font_Height + 1;
 
     switch(Scopish)
     {
@@ -455,7 +530,7 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_PATTERN_DIR:
         case SCOPE_ZONE_SAMPLE_DIR:
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 2, yr + 1, 389, 135);
+            bjbox(xr - 1, yr + 1, 387, 137);
 
             // Current dir background
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -494,37 +569,46 @@ void Dump_Files_List(int xr, int yr)
                         if(y + counter == lt_curr)
                         {
                             SetColor(COL_PUSHED_MED);
-                            bjbox(xr - 1, yr + (counter * 12) + 2, 387, 12);
+                            bjbox(xr - 1, yr + (counter * space) + 2, 387, space);
                         }
 
-                        if(FILETYPE[rel_val] == _A_SUBDIR)
+                        switch(Get_FileType(rel_val))
                         {
-                            PrintXY(xr, yr + (counter * 12), USE_FONT_LOW, SMPT_LIST[rel_val], 296);
-                            PrintXY(xr + 364, yr + (counter * 12) + 1, USE_FONT_LOW, "<Dir>");
-                        }
-                        else
-                        {
-                            PrintXY(xr, yr + (counter * 12) + 1, USE_FONT, SMPT_LIST[rel_val], 296);
-                            File = fopen(SMPT_LIST[rel_val], "rb");
-                            if(File)
-                            {
-                                int Size = Get_File_Size(File);
-                                if(Size == 0)
+                            case _A_SUBDIR:
+                                PrintXY(xr, yr + (counter * space), USE_FONT_LOW, Get_FileName(rel_val), 296);
+                                PrintXY(xr + 364, yr + (counter * space) + 1, USE_FONT_LOW, "<Dir>");
+                                break;
+                            case _A_FILE:
+                                PrintXY(xr, yr + (counter * space) + 1, USE_FONT, Get_FileName(rel_val), 296);
+                                File = fopen(Get_FileName(rel_val), "rb");
+                                if(File)
                                 {
-                                    sprintf(Size_String, "0");
+                                    int Size = Get_File_Size(File);
+                                    if(Size == 0)
+                                    {
+                                        sprintf(Size_String, "0");
+                                    }
+                                    else sprintf(Size_String, "%9.d", Size);
+                                    int pos = (xr + 385) - Get_Size_Text(Size_String);
+                                    PrintXY(pos, yr + (counter * space) + 1, USE_FONT, Size_String);
+                                    fclose(File);
                                 }
-                                else sprintf(Size_String, "%9.d", Size);
-                                int pos = (xr + 385) - Get_Size_Text(Size_String);
-                                PrintXY(pos, yr + (counter * 12) + 1, USE_FONT, Size_String);
-                                fclose(File);
-                            }
+                                else
+                                {
+                                    PrintXY(xr + 340, yr + (counter * space) + 1, USE_FONT_LOW, "<Locked>");
+                                }
+                                break;
+                            case _A_SEP:
+                                SetColor(COL_PUSHED_HI);
+                                bjbox(xr - 1, yr + (counter * space) + (space / 2) + 1, 387, 1);
+                                break;
                         }
                     }
                 }
             }
             else
             {
-                PrintXY(xr, yr, USE_FONT_LOW, SMPT_LIST[0]);
+                PrintXY(xr, yr, USE_FONT_LOW, Get_FileName(0));
             }
             break;
     }
@@ -536,66 +620,60 @@ void Actualize_Files_List(int modeac)
 {
     int const brolim = lt_items - 11;
 
-    switch(display_title)
+    switch(Scopish)
     {
-        case 0:
-            break;
+        case SCOPE_ZONE_MOD_DIR:
+        case SCOPE_ZONE_INSTR_DIR:
+        case SCOPE_ZONE_PRESET_DIR:
+        case SCOPE_ZONE_REVERB_DIR:
+        case SCOPE_ZONE_PATTERN_DIR:
+        case SCOPE_ZONE_SAMPLE_DIR:
 
-        case 1:
-            display_title = 2;
-            break;
-
-        case 2:
-            display_title = 3;
-            Refresh_Palette();
-            // No break on purpose to display the files list slider
-
-        case 3:
-
-            switch(Scopish)
+            if(modeac == 0)
             {
-                case SCOPE_ZONE_MOD_DIR:
-                case SCOPE_ZONE_INSTR_DIR:
-                case SCOPE_ZONE_PRESET_DIR:
-                case SCOPE_ZONE_REVERB_DIR:
-                case SCOPE_ZONE_PATTERN_DIR:
-                case SCOPE_ZONE_SAMPLE_DIR:
+                if(lt_ykar > 70) lt_ykar = 70;
+                if(lt_ykar < 0) lt_ykar = 0;
+                lt_index = (lt_ykar * brolim) / 70;
+            }
 
-                    if(modeac == 0)
-                    {
-                        if(lt_ykar > 70) lt_ykar = 70;
-                        if(lt_ykar < 0) lt_ykar = 0;
-                        lt_index = (lt_ykar * brolim) / 70;
-                    }
+            if(lt_index > brolim) lt_index = brolim;
+            if(lt_index < 0) lt_index = 0;
+            if(modeac != 0)
+            {
+                if(brolim)
+                {
+                    lt_ykar = (lt_index * 70) / brolim;
+                }
+                else
+                {
+                    lt_ykar = (lt_index * 70);
+                }
+            }
 
-                    if(lt_index > brolim) lt_index = brolim;
-                    if(lt_index < 0) lt_index = 0;
-                    if(modeac != 0)
-                    {
-                        if(brolim)
-                        {
-                            lt_ykar = (lt_index * 70) / brolim;
-                        }
-                        else
-                        {
-                            lt_ykar = (lt_index * 70);
-                        }
-                    }
-
-                    SetColor(COL_SLIDER_LO);
-                    bjbox(783 - 1, 59 - 1, 15 + 2, 101 + 2);
-                    SetColor(COL_SLIDER_HI);
-                    bjbox(783, 59, 15 + 1, 101 + 1);
-                    SetColor(COL_SLIDER_MED);
-                    bjbox(783, 59, 15, 101);
-                    Gui_Draw_Button_Box(783, 58 + lt_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
-                    if(last_index != lt_index)
-                    {
-                        Dump_Files_List(395, 41);
-                        last_index = lt_index;
-                    }
-                    break;
+            // Draw the files slider
+            Draw_Lists_Slider(lt_ykar);
+            if(last_index != lt_index)
+            {
+                Dump_Files_List(395, 41);
+                last_index = lt_index;
             }
             break;
     }
+}
+
+// ------------------------------------------------------
+// Draw the slider beside the list
+void Draw_Lists_Slider(int idx)
+{
+    SetColor(COL_BLACK);
+    bjbox(781, 42, 18, 136);
+    SetColor(COL_SLIDER_LO);
+    bjbox(783 - 1, 59 - 1, 15 + 2, 103 + 2);
+    SetColor(COL_SLIDER_HI);
+    bjbox(783, 59, 15 + 1, 103 + 1);
+    SetColor(COL_SLIDER_MED);
+    bjbox(783, 59, 15, 103);
+    Gui_Draw_Button_Box(783, 58 + idx + 1, 16 - 2, 32, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(782, 164, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }

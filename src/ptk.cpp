@@ -59,6 +59,8 @@ extern char Paste_Across;
 
 unsigned char sl3 = 0;
 
+int Display_Pointer = FALSE;
+
 int CONSOLE_WIDTH = 800;
 int CHANNELS_WIDTH = 800 - 21;
 int CONSOLE_HEIGHT = 600;
@@ -171,7 +173,6 @@ char See_Prev_Next_Pattern = FALSE;
 
 char cur_input_name[1024];
 
-char *test_text = TITLE" was written by hitchhikr / Neural.";
 SDL_Surface *LOGOPIC;
 int wait_title;
 int display_title = 0;
@@ -214,10 +215,6 @@ int Values_AutoSave[] =
 };
 
 char Prog_Path[MAX_PATH];
-
-int LOGO_WIDTH;
-int LOGO_HEIGHT;
-int LOGO_BKCOL;
 
 int Table_Right_Tab_Notes[] =
 {
@@ -354,28 +351,34 @@ REQUESTER_BUTTON Requester_Btn_All_Delete =
     SDLK_a
 };
 
+extern REQUESTER Title_Requester;
+
 REQUESTER Exit_Requester =
 {
     "Do you really want to quit ?",
-    &Requester_Btn_Yes
+    &Requester_Btn_Yes,
+    NULL, 0
 };
 
 REQUESTER Overwrite_Requester =
 {
     "",
-    &Requester_Btn_Yes
+    &Requester_Btn_Yes,
+    NULL, 0
 };
 
 REQUESTER Zzaapp_Requester =
 {
     "What do you want to Zzaapp ?",
-    &Requester_Btn_All
+    &Requester_Btn_All,
+    NULL, 0
 };
 
 REQUESTER Delete_Requester =
 {
     "What do you want to delete ?",
-    &Requester_Btn_All_Delete
+    &Requester_Btn_All_Delete,
+    NULL, 0
 };
 
 char OverWrite_Name[1024];
@@ -488,7 +491,7 @@ int Init_Context(void)
     sprintf(Reverb_Name, "Untitled");
     sprintf(name, "Untitled");
     sprintf(artist, "Somebody");
-    sprintf(style, "Goa Trance");
+    sprintf(style, "Anything goes");
 
     namesize = 8;
     IniCsParNames();
@@ -542,26 +545,8 @@ int Init_Context(void)
 
     Initreverb();
 
-    char *toto = test_text;
-
     LOGOPIC = Load_Skin_Picture("logo");
     if(!LOGOPIC) return(FALSE);
-
-    if(!XML_get_integer("files", "file", "logo", "width", &LOGO_WIDTH))
-    {
-        Message_Error("logo width key missing.");
-        return(FALSE);
-    }
-    if(!XML_get_integer("files", "file", "logo", "height", &LOGO_HEIGHT))
-    {
-        Message_Error("logo height key missing.");
-        return(FALSE);
-    }
-    if(!XML_get_integer("files", "file", "logo", "bkcol", &LOGO_BKCOL))
-    {
-        Message_Error("logo bkcol key missing.");
-        return(FALSE);
-    }
 
     POINTER = Load_Skin_Picture("pointer");
     if(!POINTER) return(FALSE);
@@ -649,55 +634,50 @@ int Screen_Update(void)
         }
     }
 
-    if(display_title)
+    if(Scopish == SCOPE_ZONE_SCOPE) Draw_Scope();
+
+    // Sample ed.
+    Draw_Sampled_Wave();
+
+    int Lt_vu = (int) (MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER));
+    int Rt_vu = (int) (MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER));
+    int Lt_vu_Peak = Lt_vu;
+    int Rt_vu_Peak = Rt_vu;
+    if(Lt_vu_Peak > MAX_VUMETER - 2) Lt_vu_Peak = MAX_VUMETER - 2;
+    if(Rt_vu_Peak > MAX_VUMETER - 2) Rt_vu_Peak = MAX_VUMETER - 2;
+    if(Lt_vu > MIN_PEAK) Lt_vu = MIN_PEAK;
+    if(Rt_vu > MIN_PEAK) Rt_vu = MIN_PEAK;
+
+    // Draw the vu meters
+    for(i = MIN_VUMETER ; i < Lt_vu; i += 2)
     {
-        if(Scopish == SCOPE_ZONE_SCOPE) Draw_Scope();
-
-        // Sample ed.
-        Draw_Sampled_Wave();
-
-        int Lt_vu = (int) (MIN_VUMETER + (((float) L_MaxLevel / 32767.0f) * LARG_VUMETER));
-        int Rt_vu = (int) (MIN_VUMETER + (((float) R_MaxLevel / 32767.0f) * LARG_VUMETER));
-        int Lt_vu_Peak = Lt_vu;
-        int Rt_vu_Peak = Rt_vu;
-        if(Lt_vu_Peak > MAX_VUMETER - 1) Lt_vu_Peak = MAX_VUMETER - 1;
-        if(Rt_vu_Peak > MAX_VUMETER - 1) Rt_vu_Peak = MAX_VUMETER - 1;
-        if(Lt_vu > MIN_PEAK) Lt_vu = MIN_PEAK;
-        if(Rt_vu > MIN_PEAK) Rt_vu = MIN_PEAK;
-
-        // Draw the vu meters
-        DrawHLine(10, MIN_VUMETER, Lt_vu, COL_VUMETER);
-        DrawHLine(11, MIN_VUMETER, Lt_vu, COL_VUMETER);
-        DrawHLine(12, MIN_VUMETER, Lt_vu, COL_VUMETER);
-        DrawHLine(13, MIN_VUMETER, Lt_vu, COL_VUMETER);
-
-        DrawHLine(15, MIN_VUMETER, Rt_vu, COL_VUMETER);
-        DrawHLine(16, MIN_VUMETER, Rt_vu, COL_VUMETER);
-        DrawHLine(17, MIN_VUMETER, Rt_vu, COL_VUMETER);
-        DrawHLine(18, MIN_VUMETER, Rt_vu, COL_VUMETER);
-
-        DrawHLine(10, Lt_vu, Lt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(11, Lt_vu, Lt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(12, Lt_vu, Lt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(13, Lt_vu, Lt_vu_Peak, COL_VUMETERPEAK);
-
-        DrawHLine(15, Rt_vu, Rt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(16, Rt_vu, Rt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(17, Rt_vu, Rt_vu_Peak, COL_VUMETERPEAK);
-        DrawHLine(18, Rt_vu, Rt_vu_Peak, COL_VUMETERPEAK);
-
-        DrawHLine(10, Lt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(11, Lt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(12, Lt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(13, Lt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-
-        DrawHLine(15, Rt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(16, Rt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(17, Rt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-        DrawHLine(18, Rt_vu_Peak, MAX_VUMETER - 1, COL_BACKGROUND);
-
-        if(actuloop) Afloop();
+        DrawVLine(i, 10, 13, COL_VUMETER);
     }
+    for(i = MIN_VUMETER ; i < Rt_vu; i += 2)
+    {
+        DrawVLine(i, 15, 18, COL_VUMETER);
+    }
+    for(i = Lt_vu + 1; i < Lt_vu_Peak; i += 2)
+    {
+        DrawVLine(i, 10, 13, COL_VUMETERPEAK);
+    }
+    for(i = Rt_vu + 1; i < Rt_vu_Peak; i += 2)
+    {
+        DrawVLine(i, 15, 18, COL_VUMETERPEAK);
+    }
+
+    // Clear
+    DrawHLine(10, Lt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(11, Lt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(12, Lt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(13, Lt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+
+    DrawHLine(15, Rt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(16, Rt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(17, Rt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+    DrawHLine(18, Rt_vu_Peak, MAX_VUMETER - 2, COL_BACKGROUND);
+
+    if(actuloop) Afloop();
 
     if(gui_action != 0)
     { // There are some for me today.....:)
@@ -714,27 +694,31 @@ int Screen_Update(void)
         {
             if(lt_items)
             {
-                int broadcast = lt_index + (Mouse.y - 43) / 12;
-                last_index = -1;
-                if(broadcast != lt_curr)
+                int broadcast = lt_index + (Mouse.y - 43) / (Font_Height + 1);
+                if(Get_FileType(broadcast) != _A_SEP)
                 {
-                    lt_curr = broadcast;
-                    Actualize_Files_List(1);
-                }
-                else
-                {
-                    if(Get_Current_FileType() != _A_SUBDIR)
+                    last_index = -1;
+                    if(broadcast != lt_curr)
                     {
-                        Stop_Current_Sample();
-                        LoadFile(ped_patsam, Get_Current_FileName());
-                        AUDIO_Stop();
-                        AUDIO_Play();
+                        lt_curr = broadcast;
+                        Actualize_Files_List(1);
                     }
                     else
                     {
-                        Set_Current_Dir();
-                        Read_SMPT();
-                        Actualize_Files_List(0);
+                        switch(Get_FileType(lt_curr))
+                        {
+                            case _A_FILE:
+                                Stop_Current_Sample();
+                                LoadFile(ped_patsam, Get_FileName(lt_curr));
+                                AUDIO_Stop();
+                                AUDIO_Play();
+                                break;
+                            case _A_SUBDIR:
+                                Set_Current_Dir();
+                                Read_SMPT();
+                                Actualize_Files_List(0);
+                                break;
+                        }
                     }
                 }
             }
@@ -748,32 +732,38 @@ int Screen_Update(void)
                 int broadcast = lt_index + (Mouse.y - 43) / 12;
                 last_index = -1;
                 lt_curr = broadcast;
-                if(Get_Current_FileType() != _A_SUBDIR)
+                switch(Get_FileType(lt_curr) )
                 {
-                    Actualize_Files_List(1);
+                    case _A_FILE:
+                        Actualize_Files_List(1);
 #if defined(__WIN32__)
-                    PlaySound(Get_Current_FileName(), NULL, SND_FILENAME | SND_ASYNC);
+                        PlaySound(Get_FileName(lt_curr), NULL, SND_FILENAME | SND_ASYNC);
 #endif
 #if defined(__MACOSX__)
-                    if(FSPathMakeRef((Uint8 *) Get_Current_FileName(), &soundFileRef, NULL) == noErr)
-                    {
-                        SystemSoundGetActionID(&soundFileRef, &WavActionID);
-                        SystemSoundSetCompletionRoutine(WavActionID,
-                                                        NULL,
-                                                        NULL,
-                                                        &CompletionRoutine,
-                                                        NULL);
-                        AlertSoundPlayCustomSound(WavActionID);
-                    }
+                        if(FSPathMakeRef((Uint8 *) Get_FileName(lt_curr), &soundFileRef, NULL) == noErr)
+                        {
+                            SystemSoundGetActionID(&soundFileRef, &WavActionID);
+                            SystemSoundSetCompletionRoutine(WavActionID,
+                                                            NULL,
+                                                            NULL,
+                                                            &CompletionRoutine,
+                                                            NULL);
+                            AlertSoundPlayCustomSound(WavActionID);
+                        }
 #endif
 #if defined(__LINUX__)
-                    FILE *fptr;
-                    char temp[1024];
+                        FILE *fptr;
+                        char temp[1024];
 
-                    sprintf(temp, "aplay %s & > /dev/null", Get_Current_FileName());
-                    fptr = popen(temp, "r");
-                    pclose(fptr);
+                        sprintf(temp, "aplay %s & > /dev/null", Get_FileName(lt_curr));
+                        fptr = popen(temp, "r");
+                        pclose(fptr);
 #endif
+#if defined(__AROS__) || defined(__AMIGAOS4__)
+                        // TODO
+#endif
+
+                        break;
                 }
             }
         }
@@ -1106,6 +1096,7 @@ int Screen_Update(void)
                 VIEWLINE = 22;
                 VIEWLINE2 = -22;
                 YVIEW = 372;
+                Draw_Pattern_Right_Stuff();
                 Actupated(0);
                 Draw_Editors_Bar(USER_SCREEN_LARGE_PATTERN);
              }
@@ -1117,6 +1108,7 @@ int Screen_Update(void)
                 VIEWLINE = 15;
                 VIEWLINE2 = -13;
                 YVIEW = 300;
+                Draw_Pattern_Right_Stuff();
                 Actupated(0);
                 Draw_Editors_Bar(-1);
                 Refresh_UI_Context();
@@ -1577,6 +1569,11 @@ int Screen_Update(void)
             Actualize_Sample_Ed(teac);
         }
 
+        if(gui_action == GUI_CMD_REFRESH_PALETTE)
+        {
+            Display_Pointer = TRUE;
+        }
+
         if(gui_action == GUI_CMD_EXIT)
         {
             Display_Requester(&Exit_Requester, GUI_CMD_NOP);
@@ -1588,113 +1585,107 @@ int Screen_Update(void)
     // Draw the main windows layout
     if(redraw_everything)
     {
-        if(!display_title)
+        SetColor(COL_BLACK);
+        Fillrect(0, 4, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+
+        last_index = -1;
+        Gui_Draw_Button_Box(MIN_VUMETER - 4, 6, (MAX_VUMETER - MIN_VUMETER) + 6, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+
+        Display_Master_Comp();
+        Display_Master_Volume();
+        Display_Shuffle();
+
+        Draw_Scope_Files_Button();
+
+        if(!Done_Tip)
         {
-            SetColor(LOGO_BKCOL);
-            Fillrect(0, 0, 800, 600);
-            Copy(LOGOPIC, (800 - LOGO_WIDTH) / 2, (600 - LOGO_HEIGHT) / 2, 0, 0, LOGO_WIDTH, LOGO_HEIGHT);
+            Status_Box(tipoftheday);
+            Done_Tip = TRUE;
         }
         else
         {
-            last_index = -1;
-            Gui_Draw_Button_Box(MIN_VUMETER - 4, 6, (MAX_VUMETER - MIN_VUMETER) + 6, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-
-            Display_Master_Comp();
-            Display_Master_Volume();
-            Display_Shuffle();
-
-            Draw_Scope_Files_Button();
-
-            if(!Done_Tip)
-            {
-                Status_Box(tipoftheday);
-                Done_Tip = TRUE;
-            }
-            else
-            {
-                Status_Box("Ready.");
-            }
-
-            Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-
-            Gui_Draw_Button_Box(0, 180, fsize, 2, "", BUTTON_NORMAL | BUTTON_DISABLED);
-
-            Gui_Draw_Button_Box(0, 24, 96, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(8, 46, 80, 16, "Stop     ", BUTTON_NORMAL);
-            StartRec();
-            StartEdit();
-
-            Gui_Draw_Button_Box(98, 24, 156, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 28, 80, 16, "Position", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 46, 80, 16, "Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 64, 80, 16, "Song Length", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(106, 82, 80, 16, "Pattern Lines", BUTTON_NORMAL | BUTTON_DISABLED);
-
-            Gui_Draw_Button_Box(256, 24, 136, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
-
-            Gui_Draw_Button_Box(262, 28, 60, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(262, 46, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(262, 64, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
-            Display_Beat_Time();
-
-            NewWav();
-
-            Gui_Draw_Button_Box(0, 104, 392, 42, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 108, 80, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(320, 108, 64, 16, "Delete", BUTTON_NORMAL);
-            Gui_Draw_Button_Box(8, 126, 80, 16, "Step Add", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(166, 126, 90, 16, "Keyboard Octave", BUTTON_NORMAL | BUTTON_DISABLED);
-
-            // Tracks sizes
-            Gui_Draw_Button_Box(332, 126, 16, 16, "\012", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(332 + 18, 126, 16, 16, "\013", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(332 + (18 * 2), 126, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-
-            Gui_Draw_Button_Box(0, 148, 392, 30, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(8, 152, 61, 10, S_ E_ L_ DOT_ SPC_ T_ R_ A_ C_ K_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(8, 164, 61, 10, S_ E_ L_ DOT_ SPC_ N_ O_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-
-            Gui_Draw_Button_Box(8 + 63, 152, 61, 10, C_ U_ T_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(8 + 63, 164, 61, 10, C_ O_ P_ Y_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-
-            Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-
-            Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, S_ P_ R_ E_ A_ D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-
-            Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(8 + (63 * 4), 164, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-
-            Gui_Draw_Button_Box(8 + (63 * 5), 152, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(8 + (63 * 5), 164, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-
-            Refresh_UI_Context();
-
-            Actualize_Files_List(0);
-
-            // Vu meters background
-            SetColor(COL_BACKGROUND);
-            Fillrect(MIN_VUMETER - 1, 9, MAX_VUMETER, 20);
-
-            Actupated(0);
+            Status_Box("Ready.");
         }
+
+        Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+        Gui_Draw_Button_Box(0, 180, fsize, 2, "", BUTTON_NORMAL | BUTTON_DISABLED);
+
+        Gui_Draw_Button_Box(0, 24, 96, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 46, 80, 16, "Stop", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        StartRec();
+        StartEdit();
+
+        Gui_Draw_Button_Box(98, 24, 156, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(106, 28, 80, 16, "Position", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(106, 46, 80, 16, "Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(106, 64, 80, 16, "Song Length", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(106, 82, 80, 16, "Pattern Lines", BUTTON_NORMAL | BUTTON_DISABLED);
+
+        Gui_Draw_Button_Box(256, 24, 136, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
+
+        Gui_Draw_Button_Box(262, 28, 60, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(262, 46, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(262, 64, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
+        Display_Beat_Time();
+
+        NewWav();
+
+        Gui_Draw_Button_Box(0, 104, 392, 42, "", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(8, 108, 80, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(320, 108, 64, 16, "Delete", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 126, 80, 16, "Step Add", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(166, 126, 90, 16, "Keyboard Octave", BUTTON_NORMAL | BUTTON_DISABLED);
+
+        // Tracks sizes
+        Gui_Draw_Button_Box(332, 126, 16, 16, "\012", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(332 + 18, 126, 16, 16, "\013", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(332 + (18 * 2), 126, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+        Gui_Draw_Button_Box(0, 148, 392, 30, "", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(8, 152, 61, 10, S_ E_ L_ DOT_ SPC_ T_ R_ A_ C_ K_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 164, 61, 10, S_ E_ L_ DOT_ SPC_ N_ O_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+        Gui_Draw_Button_Box(8 + 63, 152, 61, 10, C_ U_ T_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + 63, 164, 61, 10, C_ O_ P_ Y_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+        Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+        Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, S_ P_ R_ E_ A_ D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+        Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8 + (63 * 4), 164, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+        Gui_Draw_Button_Box(8 + (63 * 5), 152, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8 + (63 * 5), 164, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+        Refresh_UI_Context();
+
+        Actualize_Files_List(0);
+
+        // Vu meters background
+        SetColor(COL_BLACK);
+        Fillrect(MIN_VUMETER - 1, 9, MAX_VUMETER, 20);
+        SetColor(COL_BACKGROUND);
+        Fillrect(MIN_VUMETER, 10, MAX_VUMETER - 1, 19);
+
+        Draw_Pattern_Right_Stuff();
+        Actupated(0);
     }
 
-    if(display_title)
+    if(gui_thread_action)
     {
-        if(gui_thread_action)
-        {
-            gui_thread_action = FALSE;
-            Actupated(0);
-        }
-        if(gui_bpm_action)
-        {
-            gui_bpm_action = FALSE;
-            Display_Beat_Time();
-            Actualize_Master(2);
-        }
+        gui_thread_action = FALSE;
+        Actupated(0);
+    }
+    if(gui_bpm_action)
+    {
+        gui_bpm_action = FALSE;
+        Display_Beat_Time();
+        Actualize_Master(2);
     }
 
     if(Songplaying && ped_line_delay != player_line)
@@ -1724,6 +1715,8 @@ int Screen_Update(void)
             gui_action = GUI_CMD_TIMED_REFRESH_SEQUENCER;
         }
     }
+
+    Check_Requester(&Title_Requester);
 
     if(Check_Requester(&Overwrite_Requester) == 2)
     {
@@ -2231,12 +2224,12 @@ void SongPlay(void)
 
     if(plx == 0)
     {
-        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Song", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Song", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
         Status_Box("Playing song...");
     }
     else
     {
-        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Pattern", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 28, 80, 16, "Playing Pattern", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
         Status_Box("Playing pattern...");
     }
 }
@@ -2248,8 +2241,8 @@ void StartRec(void)
 {
     liveparam = 0;
     livevalue = 0;
-    if(sr_isrecording) Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: On", BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: Off", BUTTON_NORMAL);
+    if(sr_isrecording) Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+    else Gui_Draw_Button_Box(8, 64, 80, 16, "Live Rec: Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
@@ -2258,15 +2251,15 @@ void StartEdit(void)
 {
     if(is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Editing...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Editing...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
     if(is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Recording...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Recording...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
     if(!is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Edit/Record", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 82, 80, 16, "Edit/Record", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
 }
 
@@ -2801,24 +2794,22 @@ void ShowInfo(void)
 // Function called each second mainly for autosaving purposes
 Uint32 Timer_CallBack(Uint32 interval, void *param)
 {
-    if(!display_title)
+    if(Req_TimeOut)
     {
-        wait_title++;
-        if(wait_title > 6) Remove_Title();
+        Req_Timer++;
+        if(Req_Timer > Req_TimeOut) Req_Pressed_Button = 1;
     }
 
-    if(display_title)
+    // Don't save during a requester
+    if(AutoSave && Current_Requester == NULL)
     {
-        if(AutoSave)
+        wait_AutoSave++;
+        // Autosave module
+        if(wait_AutoSave > Values_AutoSave[AutoSave])
         {
-            wait_AutoSave++;
-            // Autosave module
-            if(wait_AutoSave > Values_AutoSave[AutoSave])
-            {
-                strcpy(autosavename, name);
-                strcat(autosavename, "_bak");
-                Pack_Module(autosavename);
-            }
+            strcpy(autosavename, name);
+            strcat(autosavename, "_bak");
+            Pack_Module(autosavename);
         }
     }
 
@@ -4864,7 +4855,7 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(783, 59, 16, 103)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
+                if(zcheckMouse(783, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
                 break;
 
             case SCOPE_ZONE_MOD_DIR:
@@ -4873,7 +4864,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
             case SCOPE_ZONE_SAMPLE_DIR:
-                if(zcheckMouse(783, 59, 16, 103)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
+                if(zcheckMouse(783, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
                 break;
         }
 
@@ -4911,80 +4902,77 @@ void Mouse_Handler(void)
 
     if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
     {
-        if(display_title)
+        // Modules dir.
+        if(zcheckMouse(692, 24, 18, 16))
         {
-            // Modules dir.
-            if(zcheckMouse(692, 24, 18, 16))
+            Scopish = SCOPE_ZONE_MOD_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Instruments dir.
+        if(zcheckMouse(710, 24, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_INSTR_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Samples dir.
+        if(zcheckMouse(728, 24, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_SAMPLE_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Presets dir.
+        if(zcheckMouse(746, 24, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_PRESET_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Reverbs dir.
+        if(zcheckMouse(764, 24, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_REVERB_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Patterns dir.
+        if(zcheckMouse(782, 24, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_PATTERN_DIR;
+            Draw_Scope_Files_Button();
+        }
+
+        // Tracks scopes.
+        if(zcheckMouse(746, 6, 18, 16))
+        {
+            if(Scopish != SCOPE_ZONE_SCOPE)
             {
-                Scopish = SCOPE_ZONE_MOD_DIR;
+                Scopish_LeftRight = FALSE;
+                Scopish = SCOPE_ZONE_SCOPE;
                 Draw_Scope_Files_Button();
             }
-
-            // Instruments dir.
-            if(zcheckMouse(710, 24, 18, 16))
+            if(Scopish == SCOPE_ZONE_SCOPE && Scopish_LeftRight == TRUE)
             {
-                Scopish = SCOPE_ZONE_INSTR_DIR;
+                Scopish_LeftRight = FALSE;
+                Scopish = SCOPE_ZONE_SCOPE;
                 Draw_Scope_Files_Button();
             }
+        }
 
-            // Samples dir.
-            if(zcheckMouse(728, 24, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_SAMPLE_DIR;
-                Draw_Scope_Files_Button();
-            }
+        // Instrument list
+        if(zcheckMouse(764, 6, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_INSTR_LIST;
+            Draw_Scope_Files_Button();
+        }
 
-            // Presets dir.
-            if(zcheckMouse(746, 24, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_PRESET_DIR;
-                Draw_Scope_Files_Button();
-            }
-
-            // Reverbs dir.
-            if(zcheckMouse(764, 24, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_REVERB_DIR;
-                Draw_Scope_Files_Button();
-            }
-
-            // Patterns dir.
-            if(zcheckMouse(782, 24, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_PATTERN_DIR;
-                Draw_Scope_Files_Button();
-            }
-
-            // Tracks scopes.
-            if(zcheckMouse(746, 6, 18, 16))
-            {
-                if(Scopish != SCOPE_ZONE_SCOPE)
-                {
-                    Scopish_LeftRight = FALSE;
-                    Scopish = SCOPE_ZONE_SCOPE;
-                    Draw_Scope_Files_Button();
-                }
-                if(Scopish == SCOPE_ZONE_SCOPE && Scopish_LeftRight == TRUE)
-                {
-                    Scopish_LeftRight = FALSE;
-                    Scopish = SCOPE_ZONE_SCOPE;
-                    Draw_Scope_Files_Button();
-                }
-            }
-
-            // Instrument list
-            if(zcheckMouse(764, 6, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_INSTR_LIST;
-                Draw_Scope_Files_Button();
-            }
-
-            // Synth list
-            if(zcheckMouse(782, 6, 18, 16))
-            {
-                Scopish = SCOPE_ZONE_SYNTH_LIST;
-                Draw_Scope_Files_Button();
-            }
+        // Synth list
+        if(zcheckMouse(782, 6, 18, 16))
+        {
+            Scopish = SCOPE_ZONE_SYNTH_LIST;
+            Draw_Scope_Files_Button();
         }
 
         Mouse_Left_303_Ed();
@@ -5011,7 +4999,7 @@ void Mouse_Handler(void)
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
-                if(zcheckMouse(782, 162, 16, 14))
+                if(zcheckMouse(782, 164, 16, 14))
                 {
                     Instrs_index++;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
@@ -5039,7 +5027,7 @@ void Mouse_Handler(void)
                 }
 
                 // Files list down
-                if(zcheckMouse(782, 162, 16, 14))
+                if(zcheckMouse(782, 164, 16, 14))
                 {
                     lt_index++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
@@ -5728,32 +5716,29 @@ void Display_Master_Comp(void)
 {
     char string[64];
 
-    if(display_title)
+    Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
+    Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold * 0.5f), TRUE);
+    if(mas_comp_ratio <= 0.01f)
     {
-        Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold * 0.5f), TRUE);
-        if(mas_comp_ratio <= 0.01f)
-        {
-            sprintf(string, "Off");
-        }
-        else
-        {
-            sprintf(string, "%d%%", (int) (mas_comp_threshold));
-        }
-        Print_String(string, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
-
-        Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio * 0.5f), TRUE);
-        if(mas_comp_ratio <= 0.01f)
-        {
-            sprintf(string, "Off");
-        }
-        else
-        {
-            sprintf(string, "%d%%", (int) (mas_comp_ratio));
-        }
-        Print_String(string, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
+        sprintf(string, "Off");
     }
+    else
+    {
+        sprintf(string, "%d%%", (int) (mas_comp_threshold));
+    }
+    Print_String(string, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
+
+    Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
+    Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio * 0.5f), TRUE);
+    if(mas_comp_ratio <= 0.01f)
+    {
+        sprintf(string, "Off");
+    }
+    else
+    {
+        sprintf(string, "%d%%", (int) (mas_comp_ratio));
+    }
+    Print_String(string, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
@@ -5762,15 +5747,12 @@ void Display_Master_Volume(void)
 {
     char String[64];
 
-    if(display_title)
-    {
-        if(mas_vol < 0.01f) mas_vol = 0.01f;
-        if(mas_vol > 1.0f) mas_vol = 1.0f;
-        Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED);
-        Realslider(394 + 44, 6, (int) (mas_vol * 128.0f), TRUE);
-        sprintf(String, "%d%%", (int) (mas_vol * 100.0f));
-        Print_String(String, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
-    }
+    if(mas_vol < 0.01f) mas_vol = 0.01f;
+    if(mas_vol > 1.0f) mas_vol = 1.0f;
+    Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED);
+    Realslider(394 + 44, 6, (int) (mas_vol * 128.0f), TRUE);
+    sprintf(String, "%d%%", (int) (mas_vol * 100.0f));
+    Print_String(String, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
@@ -5779,52 +5761,46 @@ void Display_Shuffle(void)
 {
     char string[64];
 
-    if(display_title)
-    {
-        if(shuffle > 100) shuffle = 100;
-        if(shuffle < 0) shuffle = 0;
-        Gui_Draw_Button_Box(586, 6, 40, 16, "Shuffle", BUTTON_NORMAL | BUTTON_DISABLED);
+    if(shuffle > 100) shuffle = 100;
+    if(shuffle < 0) shuffle = 0;
+    Gui_Draw_Button_Box(586, 6, 40, 16, "Shuffle", BUTTON_NORMAL | BUTTON_DISABLED);
 
-        Realslider_Size(586 + 40, 6, 100, shuffle, TRUE);
-        sprintf(string, "%d%%", shuffle);
-        Print_String(string, 586 + 40, 8, 116, BUTTON_TEXT_CENTERED);
-    }
+    Realslider_Size(586 + 40, 6, 100, shuffle, TRUE);
+    sprintf(string, "%d%%", shuffle);
+    Print_String(string, 586 + 40, 8, 116, BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
 // Handle the mouse event of the top bar
 void Mouse_Sliders_Master_Shuffle(void)
 {
-    if(display_title)
+    // Compressor threshold
+    if(zcheckMouse(213, 6, 67, 18))
     {
-        // Compressor threshold
-        if(zcheckMouse(213, 6, 67, 18))
-        {
-            Mas_Compressor_Set_Variables((Mouse.x - 223.0f) * 2.0f, mas_comp_ratio);
-            Display_Master_Comp();
-        }
+        Mas_Compressor_Set_Variables((Mouse.x - 223.0f) * 2.0f, mas_comp_ratio);
+        Display_Master_Comp();
+    }
 
-        // Compressor ratio
-        if(zcheckMouse(324, 6, 67, 18))
-        {
-            Mas_Compressor_Set_Variables(mas_comp_threshold, (Mouse.x - 334.0f) * 2.0f);
-            Display_Master_Comp();
-        }
+    // Compressor ratio
+    if(zcheckMouse(324, 6, 67, 18))
+    {
+        Mas_Compressor_Set_Variables(mas_comp_threshold, (Mouse.x - 334.0f) * 2.0f);
+        Display_Master_Comp();
+    }
 
-        // Master volume
-        if(zcheckMouse(438, 6, 148, 18))
-        {
-            // Normalized
-            mas_vol = (Mouse.x - 448.0f) / 128.0f;
-            Display_Master_Volume();
-        }
+    // Master volume
+    if(zcheckMouse(438, 6, 148, 18))
+    {
+        // Normalized
+        mas_vol = (Mouse.x - 448.0f) / 128.0f;
+        Display_Master_Volume();
+    }
 
-        // Shuffle
-        if(zcheckMouse(586 + 40, 6, 120, 18))
-        {
-            shuffle = (int) ((Mouse.x - (586 + 40 + 10)));
-            Display_Shuffle();
-        }
+    // Shuffle
+    if(zcheckMouse(586 + 40, 6, 120, 18))
+    {
+        shuffle = (int) ((Mouse.x - (586 + 40 + 10)));
+        Display_Shuffle();
     }
 }
 
@@ -5832,7 +5808,7 @@ void Actualize_Master(char gode)
 {
     if(gode == 0 || gode == 1)
     {
-        if(BeatsPerMin < 32) BeatsPerMin = 32;
+        if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
         Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
@@ -5866,9 +5842,6 @@ void Actualize_Master(char gode)
         Gui_Draw_Arrows_Number_Box2(324, 28, Songtracks, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
         if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
-
-        SetColor(COL_BACKGROUND);
-        bjbox(0, 186, fsize, 242);
         Actupated(0);
     }
 
@@ -6191,8 +6164,7 @@ void Draw_Scope_Files_Button(void)
     {
         case SCOPE_ZONE_SCOPE:
             SetColor(COL_BACKGROUND);
-            bjbox(393, 42, 406, 135);
-            bjbox(393, 24, 353, 17);
+            bjbox(394, 42, 405, 137);
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             if(Scopish_LeftRight)
             {
@@ -6214,10 +6186,6 @@ void Draw_Scope_Files_Button(void)
             break;
 
         case SCOPE_ZONE_INSTR_LIST:
-            SetColor(COL_BACKGROUND);
-            bjbox(393, 42, 406, 135);
-            bjbox(393, 24, 353, 17);
-
             Actualize_Instruments_Synths_List(0);
 
             if(Scopish_LeftRight)
@@ -6237,15 +6205,9 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
 
         case SCOPE_ZONE_SYNTH_LIST:
-            SetColor(COL_BACKGROUND);
-            bjbox(393, 42, 406, 135);
-            bjbox(393, 24, 353, 17);
-
             Actualize_Instruments_Synths_List(0);
 
             if(Scopish_LeftRight)
@@ -6265,8 +6227,6 @@ void Draw_Scope_Files_Button(void)
             Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
 
         case SCOPE_ZONE_MOD_DIR:
@@ -6362,9 +6322,6 @@ void Draw_Scope_Files_Button(void)
                     Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
             }
-
-            Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 162, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
     }
 }

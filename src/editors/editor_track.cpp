@@ -43,10 +43,10 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Track: Properties & Fx Send");
 
-    Gui_Draw_Button_Box(508, 468, 60, 16, "Track", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(570, 468, 60, 16, "Delay Send", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(508, 530, 60, 16, "Solo Track", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(508, 548, 60, 16, "Un-mute All", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(508, 468, 60, 16, "Track", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(570, 468, 60, 16, "Delay Send", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, 530, 60, 16, "Solo Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, 548, 60, 16, "Un-mute All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(8, 468, 224, 96, "Analog Filter Emulation", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(18, 484, 56, 16, "CutOff Frq.", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -59,8 +59,8 @@ void Draw_Track_Ed(void)
     Gui_Draw_Button_Box(248, 502, 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 520, 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 538, 56, 16, "Pan", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
@@ -79,8 +79,8 @@ void Actualize_Track_Ed(char gode)
             if(ped_track < 0) ped_track = MAX_TRACKS - 1;
             value_box(508, 486, ped_track, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
-            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
         }
 
         if(gode == 0 || gode == 1)
@@ -177,8 +177,8 @@ void Actualize_Track_Ed(char gode)
 
         if(gode == 0 || gode == 10)
         {
-            if(CHAN_MUTE_STATE[ped_track]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED);
-            else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL);
+            if(CHAN_MUTE_STATE[ped_track]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 11)
@@ -190,8 +190,8 @@ void Actualize_Track_Ed(char gode)
 
         if(gode == 0 || gode == 12)
         {
-            if(Disclap[ped_track]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED);
-            else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL);
+            if(Disclap[ped_track]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 13)

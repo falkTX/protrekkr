@@ -244,9 +244,98 @@ int Idx_Palette[] =
     32
 };
 
-SDL_Color Default_Palette[] =
+int Default_Beveled1 = TRUE;
+SDL_Color Default_Palette1[] =
 {
-    { 0x00, 0x00, 0x00, 0x00 },      // 0 real background
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0xff, 0xfc, 0xf2, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0xbc, 0xd6, 0xe2, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0xc2, 0xe0, 0xc6, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x88, 0xb8, 0xf2, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0xa2, 0xba, 0xd8, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0x30, 0x60, 0x32, 0x00 },
+    { 0xcc, 0x82, 0x6c, 0x00 },
+    { 0x24, 0x38, 0x64, 0x00 },
+
+    { 0x06, 0x0e, 0x28, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0xff, 0xfc, 0xf2, 0x00 },
+    { 0x3a, 0x60, 0x9e, 0x00 },
+
+    { 0xff, 0xf0, 0xd4, 0x00 },
+    { 0x16, 0x46, 0x60, 0x00 },
+
+    { 0xdc, 0xf0, 0xff, 0x00 },
+    { 0x20, 0x22, 0x36, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0x34, 0x62, 0x90, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0x0e, 0x56, 0x76, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0x00, 0x1c, 0x40, 0x00 },
+
+    { 0xff, 0x54, 0x28, 0x00 },
+    { 0x5c, 0x9e, 0xff, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled2 = TRUE;
+SDL_Color Default_Palette2[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
 
     { 0x00, 0x00, 0x00, 0x00 },      // 1
 
@@ -266,8 +355,8 @@ SDL_Color Default_Palette[] =
     { 0x40, 0x4c, 0x7c, 0x00 },      // 12
     { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
 
-    { 0x00, 0x94, 0x7c, 0x00 },      // 14 vumeter
-    { 0x82, 0xc8, 0xff, 0x00 },      // 15 vumeter peak
+    { 0x10, 0xea, 0xb0, 0x00 },      // 14 vumeter
+    { 0xff, 0xc8, 0x7e, 0x00 },      // 15 vumeter peak / Caret
     { 0x88, 0xd0, 0xff, 0x00 },      // 16 scopes / samples
 
     { 0xdc, 0xf2, 0xff, 0x00 },      // 17 Font hi
@@ -319,9 +408,196 @@ SDL_Color Default_Palette[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
     { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
     { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black
 };
 
-LONGRGB Phony_Palette[sizeof(Default_Palette) / sizeof(SDL_Color)];
+int Default_Beveled3 = FALSE;
+SDL_Color Default_Palette3[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x30, 0x66, 0x1a, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x10, 0x38, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x00, 0x1c, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0xa6, 0xea, 0x32, 0x00 },
+    { 0xff, 0x30, 0x00, 0x00 },
+    { 0x64, 0xea, 0x24, 0x00 },
+
+    { 0xe6, 0xff, 0xbc, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0x4a, 0xc2, 0x3a, 0x00 },
+
+    { 0x00, 0x26, 0x00, 0x00 },
+    { 0x4e, 0xff, 0x32, 0x00 },
+
+    { 0x34, 0x00, 0x00, 0x00 },
+    { 0xba, 0xff, 0x98, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0xc4, 0xff, 0x88, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0xc4, 0xff, 0x88, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xce, 0xff, 0x9a, 0x00 },
+
+    { 0x16, 0x4e, 0x00, 0x00 },
+    { 0x46, 0xba, 0x00, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled4 = TRUE;
+SDL_Color Default_Palette4[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x44, 0x4a, 0x4c, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x56, 0x5e, 0x62, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x3c, 0x40, 0x44, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x1c, 0x1e, 0x20, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0xff, 0xff, 0xff, 0x00 },
+    { 0xff, 0x8c, 0x5e, 0x00 },
+    { 0xff, 0x8c, 0x5e, 0x00 },
+
+    { 0xe2, 0xf2, 0xff, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x44, 0x4a, 0x4c, 0x00 },
+    { 0xd8, 0xe6, 0xee, 0x00 },
+
+    { 0x2e, 0x32, 0x36, 0x00 },
+    { 0xb0, 0xbc, 0xc4, 0x00 },
+
+    { 0x2e, 0x32, 0x36, 0x00 },
+    { 0xff, 0x8c, 0x5e, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0xd8, 0xe6, 0xee, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0xb0, 0xbc, 0xc4, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xff, 0x8c, 0x5e, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0x92, 0x9e, 0xa4, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+
+LONGRGB Phony_Palette[sizeof(Default_Palette2) / sizeof(SDL_Color)];
 
 SDL_Surface *POINTER;
 unsigned char *Pointer_BackBuf;
@@ -335,33 +611,16 @@ SDL_Surface *Note_Alt_Surface;
 
 void Blit_note(int x, int y, int note, int y1, int y2, int size, int acc);
 
-void out_note(int x, int y, int note, int color)
-{
-    if(Accidental)
-    {
-        PrintXY(x, y, USE_FONT, Notes_b[note]);
-    }
-    else
-    {
-        PrintXY(x, y, USE_FONT, Notes[note]);
-    }
-}
-
 void out_decchar(int x, int y, int number, char smith)
 {
     PrintXY(x, y, USE_FONT, DecChar[number]);
-}
-
-void out_decchar2(int x, int y, int number, char smith)
-{
-    PrintXY(x, y, USE_FONT, DecChar2[number]);
 }
 
 void Get_Phony_Palette(void)
 {
     int i;
 
-    for(i = 0; i < sizeof(Default_Palette) / sizeof(SDL_Color); i++)
+    for(i = 0; i < sizeof(Default_Palette2) / sizeof(SDL_Color); i++)
     {
         Phony_Palette[i].r = Ptk_Palette[i].r;
         Phony_Palette[i].g = Ptk_Palette[i].g;
@@ -376,7 +635,7 @@ void Set_Phony_Palette(void)
     int ComponentG;
     int ComponentB;
 
-    for(i = 0; i < sizeof(Default_Palette) / sizeof(SDL_Color); i++)
+    for(i = 0; i < sizeof(Default_Palette2) / sizeof(SDL_Color); i++)
     {
         switch(i)
         {
@@ -505,10 +764,18 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].b;
-                ComponentR -= 0x20;
-                ComponentB += 0x20;
+                ComponentR -= 0x10;
+                ComponentB += 0x10;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
+
+      /*          ComponentR += 0x20;
+                ComponentG += 0x20;
+                ComponentB += 0x20;
+                if(ComponentR > 0xff) ComponentR = 0xff;
+                if(ComponentG > 0xff) ComponentG = 0xff;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+*/
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -520,10 +787,64 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].b;
-                ComponentR -= 0x20;
-                ComponentB += 0x20;
+                ComponentR -= 0x10;
+                ComponentB += 0x10;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
+
+  /*              ComponentR += 0x20;
+                ComponentG += 0x20;
+                ComponentB += 0x20;
+                if(ComponentR > 0xff) ComponentR = 0xff;
+                if(ComponentG > 0xff) ComponentG = 0xff;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+    */
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
+                break;
+
+            case COL_INPUT_HI:
+            case COL_INPUT_MED:
+            case COL_INPUT_LO:
+                ComponentR = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].r;
+                ComponentG = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].g;
+                ComponentB = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].b;
+                ComponentG -= 0x10;
+                ComponentB += 0x10;
+                if(ComponentG < 0) ComponentG = 0;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+/*
+                ComponentR += 0x20;
+                ComponentG += 0x20;
+                ComponentB += 0x20;
+                if(ComponentR > 0xff) ComponentR = 0xff;
+                if(ComponentG > 0xff) ComponentG = 0xff;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+*/
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
+                break;
+
+            case COL_INPUT_PUSHED_HI:
+            case COL_INPUT_PUSHED_MED:
+            case COL_INPUT_PUSHED_LO:
+                ComponentR = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].r;
+                ComponentG = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].g;
+                ComponentB = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].b;
+                ComponentG -= 0x10;
+                ComponentB += 0x10;
+                if(ComponentG < 0) ComponentG = 0;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+
+/*                ComponentR += 0x20;
+                ComponentG += 0x20;
+                ComponentB += 0x20;
+                if(ComponentR > 0xff) ComponentR = 0xff;
+                if(ComponentG > 0xff) ComponentG = 0xff;
+                if(ComponentB > 0xff) ComponentB = 0xff;
+*/
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -538,56 +859,44 @@ void Set_Phony_Palette(void)
     }
 }
 
-void out_hexchar(int x, int y, int number, char smith, int color)
-{
-    switch(number)
-    {
-        case 255:
-            if(smith == 0) PrintXY(x, y, USE_FONT, "FF");
-            if(smith == 1) PrintXY(x, y, USE_FONT, "..");
-            break;
-        default:
-            PrintXY(x, y, USE_FONT, HexTab[number]);
-            break;
-    }
-}
-
 void value_box(int x, int y, int val, int flags)
 {
     Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
-    Gui_Draw_Button_Box(x + 18, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
-    out_hexchar(x + 24, y + 2, val, 0, 0);
+    Gui_Draw_Button_Box(x + 18, y, 24, 16, HexTab[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 }
 
 void Gui_Draw_Arrows_Number_Box(int x, int y, int val, int flags)
 {
     Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
-    Gui_Draw_Button_Box(x + 18, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(x + 18, y, 24, 16, DecChar[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
-    out_decchar(x + 22, y + 2, val, 0);
 }
 
 void Gui_Draw_Arrows_Number_Box2(int x, int y, int val, int flags)
 {
     Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
-    Gui_Draw_Button_Box(x + 18, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(x + 18, y, 24, 16, DecChar2[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
-    out_decchar2(x + 24, y + 2, val, 0);
 }
 
 void value_box4(int x, int y, int val)
 {
-    Gui_Draw_Button_Box(x, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    out_hexchar(x + 7, y + 2, val, 0, 0);
+    Gui_Draw_Button_Box(x, y, 24, 16, HexTab[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 }
 
 void value_box3(int x, int y, char val, int flags)
 {
     Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
-    Gui_Draw_Button_Box(x + 18, y, 24, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
-    out_note(x + 21, y + 2, val, 0xFFFFFF);
+    if(Accidental)
+    {
+        Gui_Draw_Button_Box(x + 18, y, 24, 16, Notes_b[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    }
+    else
+    {
+        Gui_Draw_Button_Box(x + 18, y, 24, 16, Notes[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    }
 }
 
 void outlong_small(int x, int y, int value, int mode, int size, int flags)
@@ -666,6 +975,8 @@ void outfloat_small(int x, int y, float cant, int mode, int size, int flags)
     Gui_Draw_Button_Box(x, y, size - 1, 16, xstr, flags);
 }
 
+// ------------------------------------------------------
+// Draw the editors buttons bar
 void Draw_Editors_Bar(int Highlight)
 {
     int Highlight_Tab[] =
@@ -686,7 +997,7 @@ void Draw_Editors_Bar(int Highlight)
     
     if(Highlight == -1)
     {
-        SetColor(COL_BACKGROUND);
+        SetColor(COL_BLACK);
         bjbox(0, 428, 800, 19);
         Highlight = curr_tab_highlight;
     }
@@ -694,7 +1005,7 @@ void Draw_Editors_Bar(int Highlight)
     {
         if(Patterns_Lines_Offset)
         {
-            SetColor(COL_BACKGROUND);
+            SetColor(COL_BLACK);
             bjbox(0, 428, 800, 19);
         }
         Highlight_Tab[Highlight] = BUTTON_PUSHED;
@@ -708,7 +1019,7 @@ void Draw_Editors_Bar(int Highlight)
     else
     {
         userscreen = USER_SCREEN_LARGE_PATTERN;
-        SetColor(COL_BACKGROUND);
+        SetColor(COL_BLACK);
         bjbox(0, 428 + Patterns_Lines_Offset, 800, 19);
         Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
         Actupated(0);
@@ -816,28 +1127,32 @@ void Print_String(char *str, int x, int y, int size_x, int flags)
 
 // ------------------------------------------------------
 // Draw a clickable box with a text
-void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int pushed)
+void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int flags)
 {
     int x2 = x + sx;
     int y2 = y + sy;
     int y_center;
-    int Col_Idx = (pushed & BUTTON_RIGHT_MOUSE) ? 3: 0;
+    int Col_Idx = (flags & BUTTON_RIGHT_MOUSE) ? 4: 0;
+    Col_Idx |= (flags & BUTTON_INPUT) ? 8: 0;
+    
     int Colors_Norm[] =
     {
-        COL_MED, COL_HI, COL_LO,
-        COL_DOUBLE_MED, COL_DOUBLE_HI, COL_DOUBLE_LO
+        COL_MED, COL_HI, COL_LO, 0, 
+        COL_DOUBLE_MED, COL_DOUBLE_HI, COL_DOUBLE_LO, 0,
+        COL_INPUT_MED, COL_INPUT_HI, COL_INPUT_LO, 0
     };
     int Colors_Pushed[] =
     {
-        COL_PUSHED_MED, COL_PUSHED_HI, COL_PUSHED_LO,
-        COL_DOUBLE_PUSHED_MED, COL_DOUBLE_PUSHED_HI, COL_DOUBLE_PUSHED_LO
+        COL_PUSHED_MED, COL_PUSHED_HI, COL_PUSHED_LO, 0,
+        COL_DOUBLE_PUSHED_MED, COL_DOUBLE_PUSHED_HI, COL_DOUBLE_PUSHED_LO, 0,
+        COL_INPUT_PUSHED_MED, COL_INPUT_PUSHED_HI, COL_INPUT_PUSHED_LO, 0 
     };
 
-    if(!(pushed & BUTTON_NO_BORDER))
+    if(!(flags & BUTTON_NO_BORDER))
     {
-        if(pushed & BUTTON_NORMAL)
+        if(flags & BUTTON_NORMAL)
         {
-            if(pushed & BUTTON_DISABLED)
+            if(flags & BUTTON_DISABLED)
             {
                 SetColor(COL_STATIC_MED);
                 Fillrect(x, y, x2, y2 + 1);
@@ -862,7 +1177,7 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
         }
         else
         {
-            if(pushed & BUTTON_DISABLED)
+            if(flags & BUTTON_DISABLED)
             {
                 SetColor(COL_STATIC_MED);
                 Fillrect(x, y, x2, y2 + 1);
@@ -887,7 +1202,7 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
         }
     }
 
-    if(pushed & BUTTON_TEXT_VTOP)
+    if(flags & BUTTON_TEXT_VTOP)
     {
         y_center = 2;
     }
@@ -896,15 +1211,15 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int push
         y_center = ((sy - Font_Height) / 2);
     }
 
-    if(pushed & BUTTON_TEXT_CENTERED)
+    if(flags & BUTTON_TEXT_CENTERED)
     {
         x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
         
-        PrintXY(x, y + y_center, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        PrintXY(x, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
     else
     {
-        PrintXY(x + 4, y + y_center, pushed & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        PrintXY(x + 4, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
 }
 
@@ -1923,17 +2238,18 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset,
 }
 
 // ------------------------------------------------------
-// Set the main palette with the default one
-void Restore_Default_Palette(void)
+// Set the main palette with a default one
+void Restore_Default_Palette(SDL_Color *Def, int DefBevel)
 {
     int i;
-    for(i = 0; i < sizeof(Default_Palette) / sizeof(SDL_Color); i++)
+    for(i = 0; i < sizeof(Default_Palette2) / sizeof(SDL_Color); i++)
     {
-        Ptk_Palette[i].r = Default_Palette[i].r;
-        Ptk_Palette[i].g = Default_Palette[i].g;
-        Ptk_Palette[i].b = Default_Palette[i].b;
-        Ptk_Palette[i].unused = Default_Palette[i].unused;
+        Ptk_Palette[i].r = Def[i].r;
+        Ptk_Palette[i].g = Def[i].g;
+        Ptk_Palette[i].b = Def[i].b;
+        Ptk_Palette[i].unused = Def[i].unused;
     }
+    Beveled = DefBevel;
 }
 
 // ------------------------------------------------------
@@ -1944,7 +2260,7 @@ int Set_Pictures_Colors(void)
     unsigned char *Pix;
 
     SDL_Palette *Pic_Palette;
-    int min_idx = sizeof(Default_Palette) / sizeof(SDL_Color);
+    int min_idx = sizeof(Default_Palette2) / sizeof(SDL_Color);
 
     Pix = (unsigned char *) FONT->pixels;
     for(i = 0; i < FONT->w * FONT->h; i++)
@@ -1976,7 +2292,6 @@ int Set_Pictures_Colors(void)
         if(Pix[i] > max_colors_logo) max_colors_logo = Pix[i];
         Pix[i] += min_idx;
     }
-    LOGO_BKCOL += min_idx;
     max_colors_logo++;
 
     Pic_Palette = SKIN303->format->palette;

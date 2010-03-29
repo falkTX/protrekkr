@@ -2775,7 +2775,7 @@ ByPass_Wav:
         }
         if(track3032 == c && CHAN_ACTIVE_STATE[cPosition][c])
         {
-            Signal_303 += tb303engine[1].tbGetSample();
+            Signal_303 = tb303engine[1].tbGetSample();
             All_Signal_L += Signal_303;
             if(grown) All_Signal_R += Signal_303;
             gotsome = TRUE;
@@ -4080,7 +4080,7 @@ void DoEffects(void)
 #if defined(PTK_FX_SETBPM)
                 // $f0 Set BPM
                 case 0xf0:
-                    if(pltr_dat_row[k] > 32)
+                    if(pltr_dat_row[k] > 20)
                     {
                         BeatsPerMin = (int) pltr_dat_row[k];
                         SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
@@ -4882,17 +4882,8 @@ void Fire303(unsigned char number, int unit)
 
 void noteoff303(char strack)
 {
-    if(strack == track3031)
-    {
-        tb303engine[0].RampVolume = 0.0f;
-        track3031 = 255;
-    }
-
-    if(strack == track3032)
-    {
-        tb303engine[1].RampVolume = 0.0f;
-        track3032 = 255;
-    }
+    if(strack == track3031) tb303engine[0].RampVolume = 0.0f;
+    if(strack == track3032) tb303engine[1].RampVolume = 0.0f;
 }
 
 void Go303(void)

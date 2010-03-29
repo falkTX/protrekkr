@@ -122,10 +122,10 @@ void Draw_DiskIO_Ed(void)
 
     Gui_Draw_Button_Box(8, 506, 80, 16, "Title", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, 524, 80, 16, "Produced By", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(8, 542, 80, 16, "Style", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(8, 470, 80, 16, "Zzaapp", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(8, 542, 80, 16, "Message", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 470, 80, 16, "Zzaapp", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(342, 470, 304, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
@@ -200,46 +200,46 @@ void Actualize_DiskIO_Ed(int gode)
 
         if(allow_save)
         {
-            Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL);
+            Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(254, 470, 80, 16, "Save .ptp", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
         else
         {
-            Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(8, 488, 80, 16, "Save Module", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(254, 470, 80, 16, "Save .ptp", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
 
         if(snamesel == INPUT_MODULE_NAME)
         {
             sprintf(tname, "%s_", name);
-            Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_PUSHED);
+            Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_PUSHED | BUTTON_INPUT);
         }
         else
         {
             sprintf(tname, "%s", name);
-            Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_NORMAL);
+            Gui_Draw_Button_Box(90, 506, 162, 16, tname, BUTTON_NORMAL | BUTTON_INPUT);
         }
 
         if(snamesel == INPUT_MODULE_ARTIST)
         {
             sprintf(tname, "%s_", artist);
-            Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_PUSHED);
+            Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_PUSHED | BUTTON_INPUT);
         }
         else
         {
             sprintf(tname, "%s", artist);
-            Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_NORMAL);
+            Gui_Draw_Button_Box(90, 524, 162, 16, tname, BUTTON_NORMAL | BUTTON_INPUT);
         }
 
         if(snamesel == INPUT_MODULE_STYLE)
         {
             sprintf(tname, "%s_", style);
-            Gui_Draw_Button_Box(90, 542, 162, 16, tname, BUTTON_PUSHED);
+            Gui_Draw_Button_Box(90, 542, 162, 16, tname, BUTTON_PUSHED | BUTTON_INPUT);
         }
         else
         {
             sprintf(tname, "%s", style);
-            Gui_Draw_Button_Box(90, 542, 162, 16, tname, BUTTON_NORMAL);
+            Gui_Draw_Button_Box(90, 542, 162, 16, tname, BUTTON_NORMAL | BUTTON_INPUT);
         }
     }
 }

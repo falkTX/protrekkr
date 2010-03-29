@@ -57,6 +57,10 @@
 #define TB303_WAVEFORM_SAW 0
 #define TB303_WAVEFORM_SQUARE 1
 
+#define TB303_LOPASS 0
+#define TB303_HIPASS 1
+#define TB303_BANDPASS 2
+
 // ------------------------------------------------------
 // Structures
 
@@ -131,6 +135,7 @@ struct para303
 // ------------------------------------------------------
 // Variables
 extern int SamplesPerTick;
+extern int PosInTick;
 
 // ------------------------------------------------------
 // Classes
@@ -149,9 +154,9 @@ class gear303
 
         float tbGetSample(void);
         char hpf;
-        float tbBuf0;
-        float tbBuf1;
+        float tbBuf[5];
         float tbVolume;
+        float TickPos;
 
         float RampVolume;
 
@@ -163,10 +168,16 @@ class gear303
         float tbCutoff;
         float tbResonance;
         float tbEnvmod;
+        float tbEnvmodInv;
         float tbDecay;
         float tbAccent;
         float tbSample;
         float tbRealCutoff;
+        float tbRealCutoff2;
+        float tbRealResonance;
+        float tbLastCutoff;
+        float tbLastEnvmod;
+        float tbRealEnvmod;
         float tbRealVolume;
         float tbOscSpeedFreak;
         float tbTargetVolume;
@@ -175,8 +186,15 @@ class gear303
         // Oscillator variables
         float tbOscPosition;
         float tbOscSpeed;
+        float tbFadeCutOffTime;
+        float tbFadeCutOffInterval;
 
-        float Cur_RampVolume;
+        float tbRampVolume;
+        float tbRampCutOff;
+
+        int tbAutoSlide;
+        int tbAutoMod;
+        int tbFirstRow;
 
         // Waveform Type
         char tbWaveform;

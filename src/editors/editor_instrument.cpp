@@ -97,7 +97,7 @@ void Draw_Instrument_Ed(void)
     switch(seditor)
     {
         case 0:
-            Gui_Draw_Flat_Box("Instrument Editor [Sampler]");
+            Gui_Draw_Flat_Box("Instrument Editor [Sample]");
 
 #if !defined(__NO_CODEC__)
             Gui_Draw_Button_Box(640, 466, 80, 16, "Packing", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -127,9 +127,10 @@ void Draw_Instrument_Ed(void)
 
         case 1:
             Gui_Draw_Flat_Box("Instrument Editor [Loop Editor]");
-            Gui_Draw_Button_Box(424, 470, 58, 16, "LS. Value", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(424, 488, 58, 16, "LE. Value", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(427, 470, 58, 16, "LS. Value", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(427, 488, 58, 16, "LE. Value", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(20, 470, 56, 16, "Loop Start", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(20, 488, 403, 68, "", BUTTON_NORMAL);
             break;
     } //Switch Sampler Screen
 }
@@ -158,9 +159,9 @@ void Actualize_Instrument_Ed(int typex, char gode)
         switch(seditor)
         {
             case 0:
-                Gui_Draw_Button_Box(268, 466, 88, 16, "Fine Loop Editor", Allow_Buttons);
-                Gui_Draw_Button_Box(268, 492, 88, 16, "Save Instrument", Allow_Global);
-                Gui_Draw_Button_Box(268, 510, 88, 16, "Export .Wav File", Allow_Buttons);
+                Gui_Draw_Button_Box(268, 466, 88, 16, "Fine Loop Editor", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(268, 492, 88, 16, "Save Instrument", Allow_Global | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(268, 510, 88, 16, "Export .Wav File", Allow_Buttons | BUTTON_TEXT_CENTERED);
 
                 // Instrument editor mode
                 if(gode == 0 || gode == 1)
@@ -231,21 +232,21 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     switch(LoopType[ped_patsam][ped_split])
                     {
                         case SMP_LOOP_FORWARD:
-                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons_Pushed);
-                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons);
-                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons);
+                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons_Pushed | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons | BUTTON_TEXT_CENTERED);
                             break;
 
                         case SMP_LOOP_PINGPONG:
-                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons);
-                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons_Pushed);
-                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons);
+                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons_Pushed | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons | BUTTON_TEXT_CENTERED);
                             break;
 
                         case SMP_LOOP_NONE:
-                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons);
-                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons);
-                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons_Pushed);
+                            Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62, 520, 58, 16, "Ping Pong", Allow_Buttons | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(448 + 62 * 2 - 2, 520, 60, 16, "Off", Allow_Buttons_Pushed | BUTTON_TEXT_CENTERED);
                             break;
                     }
                 }
@@ -289,13 +290,13 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(beatsync[ped_patsam])
                     {
-                        Gui_Draw_Button_Box(144, 492, 28, 16, "Off", Allow_Global);
-                        Gui_Draw_Button_Box(176, 492, 28, 16, "On", Allow_Global_Pushed);
+                        Gui_Draw_Button_Box(144, 492, 28, 16, "Off", Allow_Global | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(176, 492, 28, 16, "On", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                     }
                     else
                     {
-                        Gui_Draw_Button_Box(144, 492, 28, 16, "Off", Allow_Global_Pushed);
-                        Gui_Draw_Button_Box(176, 492, 28, 16, "On", Allow_Global);
+                        Gui_Draw_Button_Box(144, 492, 28, 16, "Off", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
+                        Gui_Draw_Button_Box(176, 492, 28, 16, "On", Allow_Global | BUTTON_TEXT_CENTERED);
                     }
                 }
 
@@ -457,7 +458,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
             case 1:
 
-                Gui_Draw_Button_Box(424, 506, 58, 16, "Exit Editor", Allow_Buttons);
+                Gui_Draw_Button_Box(427, 506, 58, 16, "Exit Editor", Allow_Buttons | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(78, 470, 16, 16, "\05", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Gui_Draw_Button_Box(96, 470, 16, 16, "\03", Allow_Buttons | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(176, 470, 16, 16, "\04", Allow_Buttons | BUTTON_TEXT_CENTERED);
@@ -471,22 +472,22 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 // Fine loop editor mode
                 if(typex == 0)
                 {
-                    outlong(484, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
+                    outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
                     outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
                     actuloop = 1;
                 }
 
                 if(typex == 1)
                 {
-                    outlong(484, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
+                    outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
                     outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
                     actuloop = 2;
                 }
 
                 if(typex == 2)
                 {
-                    outlong(484, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
-                    outlong(484, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
+                    outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
+                    outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
                     outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
                     outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
                     actuloop = 3;
@@ -565,7 +566,7 @@ void Mouse_Left_Instrument_Ed(void)
             teac = 5;
         }
         // Return to instrument editor
-        if(zcheckMouse(424, 506, 58, 16))
+        if(zcheckMouse(427, 506, 58, 16))
         {
             seditor = 0;
             gui_action = GUI_CMD_SELECT_INSTRUMENT_EDIT;
@@ -1014,14 +1015,18 @@ void Afloop(void)
             if(ose < SampleNumSamples[ped_patsam][ped_split])
             {
                 int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
-                DrawVLine(a + 220, 552, 520 - v, COL_VUMETER);
-                DrawVLine(a + 220, 520 - v, 488, COL_BACKGROUND);
+                DrawVLine(a + 222, 554, 522 - v, COL_VUMETER);
+                DrawVLine(a + 222, 522 - v, 490, COL_BACKGROUND);
             }
             else
             {
-                DrawVLine(a + 20, 488, 552, COL_BACKGROUND);
+                DrawVLine(a + 22, 490, 554, COL_BACKGROUND);
             }
         }
+        DrawHLine(490, 22, 421, COL_BLACK);
+        DrawHLine(554, 22, 421, COL_BLACK);
+        DrawVLine(22, 490, 554, COL_BLACK);
+        DrawVLine(421, 490, 554, COL_BLACK);
     }
 
     if(actuloop == 2 || actuloop == 3)
@@ -1033,14 +1038,18 @@ void Afloop(void)
             if(iose > -1 && ose < SampleNumSamples[ped_patsam][ped_split])
             {
                 int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
-                DrawVLine(b + 20, 552, 520 - v, COL_VUMETERPEAK);
-                DrawVLine(b + 20, 520 - v, 488, COL_BACKGROUND);
+                DrawVLine(b + 22, 554, 522 - v, COL_VUMETERPEAK);
+                DrawVLine(b + 22, 522 - v, 490, COL_BACKGROUND);
             }
             else
             {
-                DrawVLine(b + 20, 488, 552, COL_BACKGROUND);
+                DrawVLine(b + 22, 490, 554, COL_BACKGROUND);
             }
         }
+        DrawHLine(490, 22, 421, COL_BLACK);
+        DrawHLine(554, 22, 421, COL_BLACK);
+        DrawVLine(22, 490, 554, COL_BLACK);
+        DrawVLine(421, 490, 554, COL_BLACK);
     }
     actuloop = 0;
 }
@@ -1136,7 +1145,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
         case SCOPE_ZONE_SYNTH_LIST:
 
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 1, yr + 1, 388, 135);
+            bjbox(xr - 1, yr + 1, 387, 137);
 
             for(int counter = 0; counter < 11; counter++)
             {
@@ -1388,13 +1397,7 @@ void Actualize_Instruments_Synths_List(int modeac)
                 }
             }
 
-            SetColor(COL_SLIDER_LO);
-            bjbox(783 - 1, 59 - 1, 15 + 2, 101 + 2);
-            SetColor(COL_SLIDER_HI);
-            bjbox(783, 59, 15 + 1, 101 + 1);
-            SetColor(COL_SLIDER_MED);
-            bjbox(783, 59, 15, 101);
-            Gui_Draw_Button_Box(783, 58 + Instrs_ykar + 1, 16 - 2, 32 - 2, "", BUTTON_NORMAL);
+            Draw_Lists_Slider(Instrs_ykar);
             Dump_Instruments_Synths_List(395, 41);
 
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);

@@ -73,21 +73,21 @@ void Draw_Sample_Ed(void)
     Gui_Draw_Flat_Box("");
     Gui_Draw_Button_Box(516, 454, CONSOLE_WIDTH - 528, CONSOLE_HEIGHT - 482, "Sample Editor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(582, 476, 60, 16, "Select All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(582, 494, 60, 16, "Unselect", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(582, 476, 60, 16, "Select All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED );
+    Gui_Draw_Button_Box(582, 494, 60, 16, "Unselect", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(582, 512, 60, 16, "View All", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(582, 530, 60, 16, "VZoom In", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(582, 548, 60, 16, "VZoom Out", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(582, 512, 60, 16, "View All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(582, 530, 60, 16, "VZoom In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(582, 548, 60, 16, "VZoom Out", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(650, 476, 60, 16, "Zoom In", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(650, 494, 60, 16, "Zoom Out", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(650, 476, 60, 16, "Zoom In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(650, 494, 60, 16, "Zoom Out", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(650, 512, 60, 16, "Range", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(712, 512, 60, 16, "View", BUTTON_NORMAL | BUTTON_DISABLED);
         
-    Gui_Draw_Button_Box(712, 476, 60, 16, "Set Loop S.", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(712, 494, 60, 16, "Set Loop E.", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(712, 476, 60, 16, "Set Loop S.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(712, 494, 60, 16, "Set Loop E.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     NewWav();
 }
@@ -143,6 +143,10 @@ void Draw_Sampled_Wave(void)
                     // No sample
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
+                    DrawHLine(450, 1, 512 - 1, COL_BLACK);
+                    DrawHLine(SAMPLE_HEIGHT - 1, 0, 512 - 1, COL_BLACK);
+                    DrawVLine(512 - 1, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
+                    DrawVLine(0, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -165,10 +169,10 @@ void Draw_Sampled_Wave(void)
                             rcolor2 = COL_BACKGROUND;
                         }
 
-                        // Background
+                        // Selection
                         if(rcolor2 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450, SAMPLE_HEIGHT, rcolor2);
+                            DrawVLine(s_ex, 450 + 1, SAMPLE_HEIGHT - 2, rcolor2);
                         }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
@@ -183,6 +187,10 @@ void Draw_Sampled_Wave(void)
                     // No sample
                     SetColor(COL_BACKGROUND);
                     Fillrect(0, 450, 512, SAMPLE_HEIGHT);
+                    DrawHLine(450, 1, 512 - 1, COL_BLACK);
+                    DrawHLine(SAMPLE_HEIGHT - 1, 0, 512 - 1, COL_BLACK);
+                    DrawVLine(512 - 1, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
+                    DrawVLine(0, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
 
                     for(int32 s_ex = 0; s_ex < 512; s_ex++)
                     {
@@ -214,14 +222,14 @@ void Draw_Sampled_Wave(void)
                             rcolor4 = COL_BACKGROUND;
                         }
 
-                        // Background
+                        // Selections
                         if(rcolor2 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450, 450 + (SAMPLE_LINES_HEIGHT / 2), rcolor2);
+                            DrawVLine(s_ex, 450 + 1, 450 + (SAMPLE_LINES_HEIGHT / 2), rcolor2);
                         }
                         if(rcolor4 != COL_BACKGROUND)
                         {
-                            DrawVLine(s_ex, 450 + (SAMPLE_LINES_HEIGHT / 2), SAMPLE_HEIGHT, rcolor4);
+                            DrawVLine(s_ex, 450 + (SAMPLE_LINES_HEIGHT / 2), SAMPLE_HEIGHT - 2, rcolor4);
                         }
                         // Sample datas
                         DrawVLine(s_ex, s_ey, s_y, rcolor1);
@@ -269,6 +277,10 @@ void Draw_Sampled_Wave(void)
                 // No sample
                 SetColor(COL_BACKGROUND);
                 Fillrect(0, 450, 512, SAMPLE_HEIGHT);
+                DrawHLine(450, 1, 512 - 1, COL_BLACK);
+                DrawHLine(SAMPLE_HEIGHT - 1, 0, 512 - 1, COL_BLACK);
+                DrawVLine(512 - 1, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
+                DrawVLine(0, 450, SAMPLE_HEIGHT - 1, COL_BLACK);
             }
 
             draw_sampled_wave = FALSE;
@@ -412,7 +424,6 @@ void Actualize_Sample_Ed(char gode)
 
     if(userscreen == USER_SCREEN_SAMPLE_EDIT)
     {
-
         if(gode == 0)
         {
 #if !defined(__NO_CODEC__)
@@ -422,12 +433,12 @@ void Actualize_Sample_Ed(char gode)
             {
                 Disabled = 0;
             }
-            Gui_Draw_Button_Box(520, 476, 29, 16, "Cut", BUTTON_NORMAL | Disabled);
-            Gui_Draw_Button_Box(551, 476, 29, 16, "Half", BUTTON_NORMAL | Disabled);
-            Gui_Draw_Button_Box(520, 494, 60, 16, "Maximize", BUTTON_NORMAL | Disabled);
-            Gui_Draw_Button_Box(520, 512, 60, 16, "DC Adjust", BUTTON_NORMAL | Disabled);
-            Gui_Draw_Button_Box(520, 530, 60, 16, "Fade In", BUTTON_NORMAL | Disabled);
-            Gui_Draw_Button_Box(520, 548, 60, 16, "Fade Out", BUTTON_NORMAL | Disabled);
+            Gui_Draw_Button_Box(520, 476, 29, 16, "Cut", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(551, 476, 29, 16, "Half", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, 494, 60, 16, "Maximize", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, 512, 60, 16, "DC Adjust", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, 530, 60, 16, "Fade In", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, 548, 60, 16, "Fade Out", BUTTON_NORMAL | Disabled | BUTTON_TEXT_CENTERED);
         }
 
         sed_real_range_start = sed_range_start;

@@ -148,6 +148,8 @@
 #define GUI_CMD_SAVE_REVERB 127
 #define GUI_CMD_SAVE_PATTERN 128
 
+#define GUI_CMD_REFRESH_PALETTE 129
+
 #define GUI_CMD_UPDATE_SYNTH_ED 150
 
 #define GUI_CMD_MIDI_NOTE_OFF_1_TRACK 151
@@ -242,7 +244,7 @@
 #define MIN_VUMETER 22
 #define MAX_VUMETER 155
 #define LARG_VUMETER 134
-#define MIN_PEAK MAX_VUMETER - 12
+#define MIN_PEAK MAX_VUMETER - 18
 
 #define MAX_PATH 260
 
@@ -381,9 +383,6 @@ extern float Scope_Dats_LeftRight[2][128];
 
 extern SDL_Surface *SKIN303;
 extern SDL_Surface *LOGOPIC;
-extern int LOGO_WIDTH;
-extern int LOGO_HEIGHT;
-extern int LOGO_BKCOL;
 
 extern int MouseWheel_Multiplier;
 extern char Rows_Decimal;
@@ -418,8 +417,6 @@ void Initreverb();
 void init_sample_bank(void);
 void AllocateWave(int n_index, long lenfir, int samplechans);
 void LoadFile(int Freeindex, const char *str);
-void out_hexchar(int x,int y, int number, char smith, int color);
-void out_note(int x,int y, int note, int color);
 void RefreshSample(void);
 void value_box(int x, int y, int val, int flags);
 void value_box3(int x, int y, char val, int flags);

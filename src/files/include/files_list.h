@@ -61,7 +61,8 @@ void Read_SMPT(void);
 void Dump_Files_List(int xr, int yr);
 void Actualize_Files_List(int modeac);
 void Clear_Files_List(void);
-char *Get_Current_FileName(void);
-unsigned int Get_Current_FileType(void);
+char *Get_FileName(int idx);
+int Get_FileType(int idx);
+void Draw_Lists_Slider(int idx);
 
 #endif

@@ -318,8 +318,8 @@ void draw_pated(int track, int line, int petrack, int row)
     }
 
     // Clear headers line
-    SetColor(COL_BACKGROUND);
-    bjbox(0, 183, CONSOLE_WIDTH, 13);
+    SetColor(COL_PATTERN_LO_BACK);
+    bjbox(1, 184, CONSOLE_WIDTH - 20, 12);
 
     dover = PAT_COL_NOTE;
 
@@ -329,7 +329,7 @@ void draw_pated(int track, int line, int petrack, int row)
         cur_track = track + liner;
 
         if(ped_track == cur_track) SetColor(COL_PUSHED_MED);
-        else SetColor(COL_BACKGROUND);
+        else SetColor(COL_PATTERN_LO_BACK);
 
         dover += 2;
         if(dover >= MAX_PATT_SCREEN_X) break;
@@ -357,7 +357,7 @@ void draw_pated(int track, int line, int petrack, int row)
         // Caret track marker
         if((dover + Cur_Char_size[cur_track] + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
         if(ped_track == cur_track) SetColor(COL_VUMETERPEAK);
-        else SetColor(COL_BACKGROUND);
+        else SetColor(COL_PATTERN_LO_BACK);
         bjbox(dover + Cur_Char_size[cur_track] + 29 + 29 + 17, 187, 12, 7);
 
         // On / off
@@ -423,9 +423,9 @@ void draw_pated(int track, int line, int petrack, int row)
     In_Prev_Next2 = FALSE;
 
     SetColor(COL_PATTERN_LO_BACK);
-    bjbox(0,
+    bjbox(1,
           196,
-          CONSOLE_WIDTH ,
+          CONSOLE_WIDTH - 20,
           (8 * (Patterns_Lines + 1) + (Patterns_Lines == DISPLAYED_LINES_LARGE ? 4 : 0))
          );
 
@@ -837,15 +837,15 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     // Display the row index
     if(Rows_Decimal)
     {
-        Letter(0, y, ptr_table_decimal[0], high_color, high_color + 7);
-        Letter(8, y, ptr_table_decimal[1], high_color, high_color + 7);
-        Letter(16, y, ptr_table_decimal[2], high_color, high_color + 7);
+        Letter(1, y, ptr_table_decimal[0], high_color, high_color + 7);
+        Letter(9, y, ptr_table_decimal[1], high_color, high_color + 7);
+        Letter(17, y, ptr_table_decimal[2], high_color, high_color + 7);
     }
     else
     {
-        Letter(0, y, 20, high_color, high_color + 7);
-        Letter(8, y, rel >> 4, high_color, high_color + 7);
-        Letter(16, y, rel & 0xf, high_color, high_color + 7);
+        Letter(1, y, 20, high_color, high_color + 7);
+        Letter(9, y, rel >> 4, high_color, high_color + 7);
+        Letter(17, y, rel & 0xf, high_color, high_color + 7);
     }
 
     // Display the synchro marker
@@ -908,7 +908,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         }
 
         SetColor(COL_PATTERN_LO_BACK);
-        bjbox(0, YVIEW, CHANNELS_WIDTH + 2, 16);
+        bjbox(1, YVIEW, CHANNELS_WIDTH - 1, 16);
 
         dover = PAT_COL_NOTE;
 
@@ -1341,15 +1341,15 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         ptr_table_decimal = table_decimal + (line * 3);
         if(Rows_Decimal)
         {
-            Letter(0, YVIEW, ptr_table_decimal[0], 16, 16 + 15);
-            Letter(8, YVIEW, ptr_table_decimal[1], 16, 16 + 15);
-            Letter(16, YVIEW, ptr_table_decimal[2], 16, 16 + 15);
+            Letter(1, YVIEW, ptr_table_decimal[0], 16, 16 + 15);
+            Letter(9, YVIEW, ptr_table_decimal[1], 16, 16 + 15);
+            Letter(17, YVIEW, ptr_table_decimal[2], 16, 16 + 15);
         }
         else
         {
-            Letter(0, YVIEW, 20, 16, 16 + 15);
-            Letter(8, YVIEW, line >> 4, 16, 16 + 15);
-            Letter(16, YVIEW, line & 0xf, 16, 16 + 15);
+            Letter(1, YVIEW, 20, 16, 16 + 15);
+            Letter(9, YVIEW, line >> 4, 16, 16 + 15);
+            Letter(17, YVIEW, line & 0xf, 16, 16 + 15);
         }
 
         // Synchro marker
@@ -1368,13 +1368,6 @@ void Actupated(int modac)
     int Cur_Position;
     int cur_line;
     // Buffers blocks
-    int High[] =
-    {
-        BUTTON_NORMAL,
-        BUTTON_NORMAL,
-        BUTTON_NORMAL,
-        BUTTON_NORMAL
-    };
 
     if(is_editing > 1)
     {
@@ -1521,10 +1514,39 @@ void Actupated(int modac)
     draw_pated(gui_track, cur_line, ped_track, ped_col);
     draw_pated_highlight(gui_track, cur_line, ped_track, ped_col);
 
-    Realslider_Vert(782, 212, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 136 + Patterns_Lines_Offset, TRUE);
-    Gui_Draw_Button_Box(782, 196, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Realslider_Vert(782, 200, cur_line, Patterns_Lines, patternLines[pSequence[Cur_Position]] + Patterns_Lines, 148 + Patterns_Lines_Offset, TRUE);
+}
+
+// ------------------------------------------------------
+// Draw the slider and the buttons located at the right of the pattern
+void Draw_Pattern_Right_Stuff()
+{
+    int cur_line;
+    int High[] =
+    {
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL
+    };
+
+    if(Songplaying)
+    {
+        cur_line = ped_line_delay;
+    }
+    else
+    {
+        cur_line = ped_line;
+    }
+
+    SetColor(COL_BLACK);
+    Fillrect(781, 184, 782 + 19, 349 + (16 * 5) + Patterns_Lines_Offset);
+
+    DrawVLine(0, 184, 349 + (16 * 5) + Patterns_Lines_Offset, COL_BLACK);
+    // 196
+    Gui_Draw_Button_Box(782, 184, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(782, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    
+
     High[Curr_Buff_Block] = BUTTON_PUSHED;
 
     Gui_Draw_Button_Box(782, 349 + (16 * 1) + Patterns_Lines_Offset, 16, 14, "1",
@@ -1551,8 +1573,8 @@ void Actualize_Patterned(void)
     char tcp[30];
     sprintf(tcp, "%s_", nameins[ped_patsam]);
 
-    if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 108, 166, 16, tcp, BUTTON_PUSHED);
-    else Gui_Draw_Button_Box(90, 108, 166, 16, nameins[ped_patsam], BUTTON_NORMAL);
+    if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 108, 166, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+    else Gui_Draw_Button_Box(90, 108, 166, 16, nameins[ped_patsam], BUTTON_NORMAL | BUTTON_INPUT);
 
     Gui_Draw_Arrows_Number_Box2(90, 126, ped_pattad, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     value_box(258, 126, ped_patoct, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -1715,7 +1737,7 @@ int Get_Visible_Tracks_Size(void)
 }
 
 // ------------------------------------------------------
-// Return the index of the tracker located under the mouse pointer
+// Return the index of the track located under the mouse pointer
 int Get_Track_Over_Mouse(void)
 {
     int i;
@@ -2176,13 +2198,13 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // Rows slider
-    if(zcheckMouse(782, 212, 16 + 1, 136 + Patterns_Lines_Offset) & !Songplaying)
+    if(zcheckMouse(782, 200, 16 + 1, 148 + Patterns_Lines_Offset) & !Songplaying)
     {
         int final_row;
         int Cur_Position = Get_Current_Position();
         int max_length = patternLines[pSequence[Cur_Position]] + Patterns_Lines;
-        int Center = Slider_Get_Center(Patterns_Lines, max_length, 136 + Patterns_Lines_Offset);
-        float Pos_Mouse = ((float) ((Mouse.y - 212) - (Center / 2))) / (136.0f + (float) Patterns_Lines_Offset);
+        int Center = Slider_Get_Center(Patterns_Lines, max_length, 148 + Patterns_Lines_Offset);
+        float Pos_Mouse = ((float) ((Mouse.y - 200) - (Center / 2))) / (148.0f + (float) Patterns_Lines_Offset);
         if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
         float s_offset = (Pos_Mouse * max_length);
         if(s_offset > (float) (max_length - Patterns_Lines))
@@ -2218,7 +2240,7 @@ void Mouse_Left_Pattern_Ed(void)
     }
 
     // Next/Prev rows buttons
-    if(zcheckMouse(782, 196, 16 + 1, 14) & !Songplaying)
+    if(zcheckMouse(782, 184, 16 + 1, 14) & !Songplaying)
     {
         Goto_Previous_Row();
     }
@@ -2234,6 +2256,7 @@ void Mouse_Left_Pattern_Ed(void)
     if(zcheckMouse(782, 349 + (16 * 1) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 0;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -2242,6 +2265,7 @@ void Mouse_Left_Pattern_Ed(void)
     if(zcheckMouse(782, 349 + (16 * 2) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 1;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -2250,6 +2274,7 @@ void Mouse_Left_Pattern_Ed(void)
     if(zcheckMouse(782, 349 + (16 * 3) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 2;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -2258,6 +2283,7 @@ void Mouse_Left_Pattern_Ed(void)
     if(zcheckMouse(782, 349 + (16 * 4) + Patterns_Lines_Offset, 16 + 1, 14))
     {
         Curr_Buff_Block = 3;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
         teac = 0;
         gui_action = GUI_CMD_UPDATE_SEQUENCER;

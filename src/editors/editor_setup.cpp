@@ -102,12 +102,12 @@ void Draw_Master_Ed(void)
 
     Gui_Draw_Button_Box(12, 484, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(12, 502, 56, 16, "Midi OUT", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(12, 522, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL
+    Gui_Draw_Button_Box(12, 522, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
     );
-    Gui_Draw_Button_Box(138, 522, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL
+    Gui_Draw_Button_Box(138, 522, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
@@ -121,13 +121,16 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(330, 535, 114, 16, "Show Prev/Next Patt.", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, 555, 114, 16, "Continuous Scroll", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(520, 455, 60, 16, "Auto save", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(520, 455, 60, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(670, 455, 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, 475, 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 40, 16, "Default", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16, "Default #1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16, "Default #2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16, "Default #3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16, "Default #4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(198, 555, 56, 16, "Edit Play", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(194, 555, 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(734, 475, 42, 16, "Accid.", BUTTON_NORMAL | BUTTON_DISABLED);
 }
@@ -193,13 +196,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(Rows_Decimal)
             {
-                Gui_Draw_Button_Box(446, 515, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(446 + 31, 515, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(446, 515, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 515, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(446, 515, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(446 + 31, 515, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(446, 515, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 515, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -207,13 +210,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(See_Prev_Next_Pattern)
             {
-                Gui_Draw_Button_Box(446, 535, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(446 + 31, 535, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(446, 535, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 535, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(446, 535, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(446 + 31, 535, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(446, 535, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 535, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -221,13 +224,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(Continuous_Scroll)
             {
-                Gui_Draw_Button_Box(446, 555, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(446 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(446, 555, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 555, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(446, 555, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(446 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(446, 555, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(446 + 31, 555, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -235,13 +238,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(FullScreen)
             {
-                Gui_Draw_Button_Box(734, 455, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(734 + 31, 455, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(734, 455, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(734 + 31, 455, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(734, 455, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(734 + 31, 455, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(734, 455, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(734 + 31, 455, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -251,7 +254,7 @@ void Actualize_Master_Ed(char gode)
             if(current_palette_idx < 0) current_palette_idx = 0;
             if(current_palette_idx > (NUMBER_COLORS - 1)) current_palette_idx = NUMBER_COLORS - 1;
             Gui_Draw_Button_Box(520, 495, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(520 + 16 + 2, 495, 108, 16, Labels_Palette[current_palette_idx], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(520 + 16 + 2, 495, 108, 16, Labels_Palette[current_palette_idx], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(520 + (18 + 108) + 2, 495, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Real_Palette_Idx = Idx_Palette[current_palette_idx];
             if(Phony_Palette[Real_Palette_Idx].r < 0) Phony_Palette[Real_Palette_Idx].r = 0;
@@ -271,15 +274,15 @@ void Actualize_Master_Ed(char gode)
         }
 
         // Bevel on/off
-        if(gode == 0 || gode == 13)
+        if(gode == 0 || gode == 10 || gode == 13)
         {
             if(Beveled)
             {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             Set_Phony_Palette();
             Refresh_Palette();
@@ -291,7 +294,7 @@ void Actualize_Master_Ed(char gode)
             if(AutoSave < 0) AutoSave = 0;
             if(AutoSave >= sizeof(Labels_AutoSave) / sizeof(char *)) AutoSave = sizeof(Labels_AutoSave) / sizeof(char *) - 1;
             Gui_Draw_Button_Box(520 + 62 + 2, 455, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520 + 62 + 2 + 18, 455, 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(520 + 62 + 2 + 18, 455, 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(520 + 62 + 2 + 48 + 18, 455, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
@@ -311,7 +314,7 @@ void Actualize_Master_Ed(char gode)
             Gui_Draw_Button_Box(520 + 62 + 2, 475, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif            
 
-            Gui_Draw_Button_Box(520 + 62 + 2 + 18, 475, 106, 16, Get_Keyboard_Label(), BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(520 + 62 + 2 + 18, 475, 106, 16, Get_Keyboard_Label(), BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
 #if defined(__WIN32__)
             Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, 475, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
@@ -374,13 +377,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(Paste_Across)
             {
-                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(120, 555, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(120 + 31, 555, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -389,13 +392,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(Jazz_Edit)
             {
-                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(258, 555, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, 555, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -628,17 +631,44 @@ void Mouse_Left_Master_Ed(void)
             teac = 10;
         }
 
-        // restore default palette
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20, 495, 40, 16))
+        // set default palette 1
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16))
         {
-            Restore_Default_Palette();
+            Restore_Default_Palette(Default_Palette1, Default_Beveled1);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }  
+
+        // Set default palette 2
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16))
+        {
+            Restore_Default_Palette(Default_Palette2, Default_Beveled2);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }  
+
+        // Set default palette 3
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16))
+        {
+            Restore_Default_Palette(Default_Palette3, Default_Beveled3);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }  
+
+        // Set default palette 4
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16))
+        {
+            Restore_Default_Palette(Default_Palette4, Default_Beveled4);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
         }  
 
         // Turn beveling on/off
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 44, 495, 14, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20, 495, 14, 16))
         {
             Beveled ^= TRUE;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;

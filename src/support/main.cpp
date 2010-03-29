@@ -84,6 +84,15 @@ HWND Main_Window;
 #define SDL_NEED
 #endif
 
+REQUESTER Title_Requester =
+{
+    "",
+    NULL,
+    &LOGOPIC, 5
+};
+
+extern Display_Pointer;
+int Burn_Title;
 SDL_Surface *Main_Screen;
 SDL_SysWMinfo WMInfo;
 int Prog_End;
@@ -107,7 +116,6 @@ int Env_Change;
 int key_on = 0;
 float delay_refresh;
 float delay_refresh2;
-extern int display_title;
 
 extern int Nbr_Update_Rects;
 extern SDL_Rect Update_Stack[2048];
@@ -127,29 +135,28 @@ char Keyboard_Name[MAX_PATH];
 // The currently used keyboard
 KEYCORE Keyboard[] =
 {
-    {  0, 0x03, '2' },     // Do#
-    {  0, 0x04, '3' },     // Re#
-    {  0, 0x06, '5' },     // Fa#
-    {  0, 0x07, '6' },     // Sol#
-    {  0, 0x08, '7' },     // La#
-    {  0, 0x0a, '9' },     // Do#
-    {  0, 0x0b, '0' },     // Re#
-    {  0, 0x0d, '=' },     // Fa#
+    {  0, 0x03, '2' },     // Do# / C#
+    {  0, 0x04, '3' },     // Re# / D#
+    {  0, 0x06, '5' },     // Fa# / F#
+    {  0, 0x07, '6' },     // Sol# / G#
+    {  0, 0x08, '7' },     // La# / A#
+    {  0, 0x0a, '9' },     // Do# / C#
+    {  0, 0x0b, '0' },     // Re# / D#
+    {  0, 0x0d, '=' },     // Fa# / F#
 
-    {  0, 0x10, 'q' },     // Do
-    {  0, 0x11, 'w' },     // Re
-    {  0, 0x12, 'e' },     // Mi
-    {  0, 0x13, 'r' },     // Fa
-    {  0, 0x14, 't' },     // Sol
-    {  0, 0x15, 'y' },     // La
-    {  0, 0x16, 'u' },     // Si
-    {  0, 0x17, 'i' },     // Do
-    {  0, 0x18, 'o' },     // Re
-    {  0, 0x19, 'p' },     // Mi
-    {  0, 0x1a, '[' },     // Fa
-    {  0, 0x1b, ']' },     // Sol
-
-    {  0, 0x1f, 's' },     // Do#
+    {  0, 0x10, 'q' },     // Do / C
+    {  0, 0x11, 'w' },     // Re / D
+    {  0, 0x12, 'e' },     // Mi / E
+    {  0, 0x13, 'r' },     // Fa / F
+    {  0, 0x14, 't' },     // Sol / G
+    {  0, 0x15, 'y' },     // La / A
+    {  0, 0x16, 'u' },     // Si / B
+    {  0, 0x17, 'i' },     // Do / C
+    {  0, 0x18, 'o' },     // Re / D
+    {  0, 0x19, 'p' },     // Mi / E
+    {  0, 0x1a, '[' },     // Fa / F
+    {  0, 0x1b, ']' },     // Sol / G
+    {  0, 0x1f, 's' },     // Do# / etc.
     {  0, 0x20, 'd' },     // Re#
     {  0, 0x22, 'g' },     // Fa#
     {  0, 0x23, 'h' },     // Sol#
@@ -488,8 +495,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Nbr_Keyboards = 1;
     Cur_Keyboard = Default_Keyboard;
 
-    // Load the configuration file
-    Restore_Default_Palette();
+    // Set the default palette before loading the config file
+    Restore_Default_Palette(Default_Palette1, Default_Beveled1);
     LoadConfig();
 
     if(!strlen(Keyboard_Name)) sprintf(Keyboard_Name, "%s", "kben.txt");
@@ -622,6 +629,9 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     if (delay_ms > 1000) delay_ms = 1000;
 #endif
 
+    Set_Phony_Palette();
+    Refresh_Palette();
+
     while(!Prog_End)
     {
         Mouse.wheel = 0;
@@ -642,7 +652,10 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         {
             if(In_Requester)
             {
-                if(Current_Requester == NULL) In_Requester = FALSE;
+                if(Current_Requester == NULL)
+                {
+                    In_Requester = FALSE;
+                }
                 memset(Keys, 0, sizeof(Keys));
                 memset(Keys_Sym, 0, sizeof(Keys_Sym));
                 memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
@@ -654,7 +667,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
             switch(Events[i].type)
             {
                 case SDL_KEYDOWN:
-                    Remove_Title();
 
                     Key_Unicode = Events[i].key.keysym.unicode;
 
@@ -723,7 +735,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     break;
 
                 case SDL_KEYUP:
-                    Remove_Title();
 
                     kb_evnt = (SDL_KeyboardEvent *) &Events[i];
                     if(kb_evnt->state == SDL_RELEASED)
@@ -768,63 +779,56 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     Mouse.x = Events[i].button.x;
                     Mouse.y = Events[i].button.y;
 
-                    if(!display_title)
+                    switch(Events[i].button.state)
                     {
-                        Remove_Title();
-                    }
-                    else
-                    {
-                        switch(Events[i].button.state)
-                        {
-                            case SDL_PRESSED:
-                                switch(Events[i].button.button)
-                                {
-                                    case SDL_MOUSE_LEFT_BUTTON:
-                                        Mouse.button |= MOUSE_LEFT_BUTTON;
-                                        Mouse.button_oneshot |= MOUSE_LEFT_BUTTON;
-                                        break;
+                        case SDL_PRESSED:
+                            switch(Events[i].button.button)
+                            {
+                                case SDL_MOUSE_LEFT_BUTTON:
+                                    Mouse.button |= MOUSE_LEFT_BUTTON;
+                                    Mouse.button_oneshot |= MOUSE_LEFT_BUTTON;
+                                    break;
 
-                                    case SDL_MOUSE_MIDDLE_BUTTON:
-                                        Mouse.button |= MOUSE_MIDDLE_BUTTON;
-                                        Mouse.button_oneshot |= MOUSE_MIDDLE_BUTTON;
-                                        break;
+                                case SDL_MOUSE_MIDDLE_BUTTON:
+                                    Mouse.button |= MOUSE_MIDDLE_BUTTON;
+                                    Mouse.button_oneshot |= MOUSE_MIDDLE_BUTTON;
+                                    break;
 
-                                    case SDL_MOUSE_RIGHT_BUTTON:
-                                        Mouse.button |= MOUSE_RIGHT_BUTTON;
-                                        Mouse.button_oneshot |= MOUSE_RIGHT_BUTTON;
-                                        break;
-                                }
-                                if(Events[i].button.button == 4)
-                                {
-                                    Mouse.wheel = 1;
-                                }
-                                if(Events[i].button.button == 5)
-                                {
-                                    Mouse.wheel = -1;
-                                }
-                                break;
+                                case SDL_MOUSE_RIGHT_BUTTON:
+                                    Mouse.button |= MOUSE_RIGHT_BUTTON;
+                                    Mouse.button_oneshot |= MOUSE_RIGHT_BUTTON;
+                                    break;
+                            }
+                            if(Events[i].button.button == 4)
+                            {
+                                Mouse.wheel = 1;
+                            }
+                            if(Events[i].button.button == 5)
+                            {
+                                Mouse.wheel = -1;
+                            }
+                            break;
 
-                            case SDL_RELEASED:
-                                switch(Events[i].button.button)
-                                {
-                                    case SDL_MOUSE_LEFT_BUTTON:
-                                        Mouse.button &= ~MOUSE_LEFT_BUTTON;
-                                        Mouse.button_oneshot &= ~MOUSE_LEFT_BUTTON;
-                                        gui_pushed &= ~MOUSE_LEFT_BUTTON;
-                                        break;
-                                    case SDL_MOUSE_MIDDLE_BUTTON:
-                                        Mouse.button &= ~MOUSE_MIDDLE_BUTTON;
-                                        Mouse.button_oneshot &= ~MOUSE_MIDDLE_BUTTON;
-                                        gui_pushed &= ~MOUSE_MIDDLE_BUTTON;
-                                        break;
-                                    case SDL_MOUSE_RIGHT_BUTTON:
-                                        Mouse.button &= ~MOUSE_RIGHT_BUTTON;
-                                        Mouse.button_oneshot &= ~MOUSE_RIGHT_BUTTON;
-                                        gui_pushed &= ~MOUSE_RIGHT_BUTTON;
-                                        break;
-                                }
-                                break;
-                        }
+                        case SDL_RELEASED:
+                            switch(Events[i].button.button)
+                            {
+                                case SDL_MOUSE_LEFT_BUTTON:
+                                    Mouse.button &= ~MOUSE_LEFT_BUTTON;
+                                    Mouse.button_oneshot &= ~MOUSE_LEFT_BUTTON;
+                                    gui_pushed &= ~MOUSE_LEFT_BUTTON;
+                                    break;
+                                case SDL_MOUSE_MIDDLE_BUTTON:
+                                    Mouse.button &= ~MOUSE_MIDDLE_BUTTON;
+                                    Mouse.button_oneshot &= ~MOUSE_MIDDLE_BUTTON;
+                                    gui_pushed &= ~MOUSE_MIDDLE_BUTTON;
+                                    break;
+                                case SDL_MOUSE_RIGHT_BUTTON:
+                                    Mouse.button &= ~MOUSE_RIGHT_BUTTON;
+                                    Mouse.button_oneshot &= ~MOUSE_RIGHT_BUTTON;
+                                    gui_pushed &= ~MOUSE_RIGHT_BUTTON;
+                                    break;
+                            }
+                            break;
                     }
                     break;
 
@@ -861,11 +865,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
             }
         }
 
-        if(display_title == 3) Display_Mouse_Pointer(Mouse.old_x, Mouse.old_y, TRUE);
+        if(Display_Pointer) Display_Mouse_Pointer(Mouse.old_x, Mouse.old_y, TRUE);
 
         if(!Screen_Update()) break;
 
-        if(display_title == 3) Display_Mouse_Pointer(Mouse.x, Mouse.y, FALSE);
+        if(Display_Pointer) Display_Mouse_Pointer(Mouse.x, Mouse.y, FALSE);
 
         // Flush all pending blits
         if(Nbr_Update_Rects) SDL_UpdateRects(Main_Screen, Nbr_Update_Rects, Update_Stack);
@@ -873,6 +877,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
         Mouse.old_x = Mouse.x;
         Mouse.old_y = Mouse.y;
+
+        // Display the title requester once
+        if(!Burn_Title)
+        {
+            Display_Requester(&Title_Requester, GUI_CMD_REFRESH_PALETTE);
+            Burn_Title = TRUE;
+        }
 
 #if defined(__AMIGAOS4__) || defined(__AROS__)
         SDL_Delay(delay_ms);
@@ -932,19 +943,4 @@ int Switch_FullScreen(void)
 
     SDL_ShowCursor(0);
     return(TRUE);
-}
-
-// ------------------------------------------------------
-// Remove the title pic
-void Remove_Title(void)
-{
-    if(!display_title)
-    {
-        Set_Phony_Palette();
-        Set_Main_Palette();
-        SetColor(COL_BACKGROUND);
-        Fillrect(0, 0, 800, 600);
-        display_title = 1;
-        Env_Change = TRUE;
-    }
 }

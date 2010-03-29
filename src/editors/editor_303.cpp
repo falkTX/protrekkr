@@ -65,19 +65,19 @@ void Draw_303_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("303s Gear");
 
-    Gui_Draw_Button_Box(8, 466, 64, 16, "Reset Patt.", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(8, 484, 64, 16, "Clear Patt.", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(8, 502, 64, 16, "Rnd.NoteOn", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(8, 520, 64, 16, "Rand.Tones", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(8, 538, 64, 16, "Rand.Flags", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(8, 466, 64, 16, "Reset Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, 484, 64, 16, "Clear Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, 502, 64, 16, "Rnd.NoteOn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, 520, 64, 16, "Rand.Tones", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, 538, 64, 16, "Rand.Flags", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(600, 502, 64, 16, "All Notes Up", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(668, 502, 64, 16, "All Notes Dn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(600, 522, 64, 16, "Copy Patt.", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(600, 540, 64, 16, "Paste Patt.", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(600, 522, 64, 16, "Copy Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, 540, 64, 16, "Paste Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(600, 462, 56, 16, "Patt. Name", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(658, 462, 34, 16, "Save", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(658, 462, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Skincopy(80, 460, 0, 0, 510, 114);
 
@@ -275,11 +275,11 @@ void Actualize_303_Ed(char gode)
 
             if(snamesel == INPUT_303_PATTERN)
             {
-                Gui_Draw_Button_Box(600, 480, 164, 16, tcp, BUTTON_PUSHED);
+                Gui_Draw_Button_Box(600, 480, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(600, 480, 164, 16, tb303[sl3].pattern_name[tb303[sl3].selectedpattern], BUTTON_NORMAL);
+                Gui_Draw_Button_Box(600, 480, 164, 16, tb303[sl3].pattern_name[tb303[sl3].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
     }
@@ -805,8 +805,8 @@ void Mouse_Left_303_Ed(void)
         // hipass filter on/off
         if(zcheckMouse(176, 536, 15, 10))
         {
-            if(tb303engine[sl3].hpf) tb303engine[sl3].hpf = FALSE;
-            else tb303engine[sl3].hpf = TRUE;
+            if(tb303engine[sl3].hpf) tb303engine[sl3].hpf = TB303_LOPASS;
+            else tb303engine[sl3].hpf = TB303_HIPASS;
             teac = 16;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
@@ -982,9 +982,9 @@ void Mouse_Sliders_303_Ed(void)
         // Tune Knob
         if(zcheckMouse(229, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].tune;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].tune;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].tune = tempz;
@@ -997,9 +997,9 @@ void Mouse_Sliders_303_Ed(void)
         // CutOff Knob
         if(zcheckMouse(262, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].cutoff;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].cutoff;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].cutoff = tempz;
@@ -1012,9 +1012,9 @@ void Mouse_Sliders_303_Ed(void)
         // Reso knob
         if(zcheckMouse(295, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].resonance;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].resonance;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].resonance = tempz;
@@ -1027,9 +1027,9 @@ void Mouse_Sliders_303_Ed(void)
         // Envmod knob
         if(zcheckMouse(328, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].envmod;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].envmod;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].envmod = tempz;
@@ -1042,9 +1042,9 @@ void Mouse_Sliders_303_Ed(void)
         // Decay knob
         if(zcheckMouse(361, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].decay;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].decay;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].decay = tempz;
@@ -1057,9 +1057,9 @@ void Mouse_Sliders_303_Ed(void)
         // Accent knob
         if(zcheckMouse(394, 476, 24, 24))
         {
-            if(fluzy == -1) fluzy = Mouse.y + tb303[sl3].accent;
+            if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].accent;
 
-            int tempz = fluzy - Mouse.y;
+            int tempz = fluzy - (Mouse.y * 3);
             if(tempz < 0) tempz = 0;
             if(tempz > 127) tempz = 127;
             tb303[sl3].accent = tempz;

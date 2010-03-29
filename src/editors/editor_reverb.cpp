@@ -244,11 +244,11 @@ void Actualize_Reverb_Ed(int gode)
 
             if(snamesel == INPUT_REVERB_NAME)
             {
-                Gui_Draw_Button_Box(583, 458, 164, 16, tcp, BUTTON_PUSHED);
+                Gui_Draw_Button_Box(583, 458, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(583, 458, 164, 16, Reverb_Name, BUTTON_NORMAL);
+                Gui_Draw_Button_Box(583, 458, 164, 16, Reverb_Name, BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
     }

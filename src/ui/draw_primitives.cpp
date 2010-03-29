@@ -206,7 +206,6 @@ void Copy(SDL_Surface *Source,
 
 // ------------------------------------------------------
 // Copy a rectangle onto a given surface
-// Note: Only used during Create_Pattern_font() so no scheduling is necessary.
 void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
                      int x, int y, int x1, int y1, int x2, int y2)
 {
@@ -223,7 +222,11 @@ void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
     Dst_Rect.w = (x2 - x1);
     Dst_Rect.h = (y2 - y1);
 
+    if(dest->locked) SDL_UnlockSurface(dest);
+    if(Source->locked) SDL_UnlockSurface(Source);
+
     SDL_BlitSurface(Source, &Src_Rect, dest, &Dst_Rect);
+    Push_Update_Rect(x, y, x2 - x1, y2 - y1);
 }
 
 // ------------------------------------------------------

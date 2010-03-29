@@ -63,8 +63,8 @@ void Draw_Fx_Ed(void)
     Gui_Draw_Button_Box(248, 534, 56, 16, "R.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(530, 464, 104, 56, "Ticks Delay Synchro", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(596, 480, 32, 16, "Set", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(640, 464, 64, 16, "Interpolation", BUTTON_NORMAL | BUTTON_DISABLED);
 }
@@ -134,13 +134,13 @@ void Actualize_Fx_Ed(char gode)
         {
             if(compressor == 0)
             {
-                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_NORMAL);
-                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_PUSHED);
+                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_PUSHED);
-                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_NORMAL);
+                Gui_Draw_Button_Box(79, 480, 32, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(113, 480, 32, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -170,13 +170,13 @@ void Actualize_Fx_Ed(char gode)
             switch(Use_Cubic)
             {
                 case CUBIC_INT:
-                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Cubic", BUTTON_NORMAL | BUTTON_DISABLED);
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Cubic", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case SPLINE_INT:
-                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Linear", BUTTON_NORMAL | BUTTON_DISABLED);
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "Linear", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 default:
-                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+                    Gui_Draw_Button_Box(706 + 16 + 2, 464, 42, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
             }
             Gui_Draw_Button_Box(706 + (18 + 42) + 2, 464, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
