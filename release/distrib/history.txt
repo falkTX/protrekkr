@@ -12,7 +12,8 @@ v2.0:
 - 4 default color schemes are now available.
 - Range selection in sample editor speeded up.
 - Improved .mod import.
-- Fixed the samples looping (1 byte was always missing).
+- Fixed a bug in samples looping (1 byte was always missing from the loop).
+- Improved shadow patterns rendering.
 
 v1.99e:
 

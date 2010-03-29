@@ -634,6 +634,9 @@ void Set_Phony_Palette(void)
     int ComponentR;
     int ComponentG;
     int ComponentB;
+    int ComponentR2;
+    int ComponentG2;
+    int ComponentB2;
 
     for(i = 0; i < sizeof(Default_Palette2) / sizeof(SDL_Color); i++)
     {
@@ -719,31 +722,96 @@ void Set_Phony_Palette(void)
                 break;
 
             case COL_PATTERN_LO_BACK:
-            case COL_PATTERN_LO_FORE:
-            case COL_PATTERN_HI_BACK:
-            case COL_PATTERN_HI_FORE:
             case COL_PATTERN_SEL_BACK:
-            case COL_PATTERN_SEL_FORE:
-            case COL_NOTE_LO_FORE:
-            case COL_NOTE_HI_FORE:
-            case COL_NOTE_SEL_FORE:
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
-                Ptk_Palette[i].r = ComponentR;
-                Ptk_Palette[i].g = ComponentG;
-                Ptk_Palette[i].b = ComponentB;
-
-                ComponentR >>= 1;
-                ComponentG >>= 1;
-                ComponentB >>= 1;
-                
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
                 Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
                 Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
                 Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
+                break;
+            
+            case COL_PATTERN_HI_BACK:
+                ComponentR = Phony_Palette[i].r;
+                ComponentG = Phony_Palette[i].g;
+                ComponentB = Phony_Palette[i].b;
+                ComponentR2 = Phony_Palette[COL_PATTERN_LO_BACK].r;
+                ComponentG2 = Phony_Palette[COL_PATTERN_LO_BACK].g;
+                ComponentB2 = Phony_Palette[COL_PATTERN_LO_BACK].b;
+                ComponentR = (ComponentR - ComponentR2);
+                ComponentG = (ComponentG - ComponentG2);
+                ComponentB = (ComponentB - ComponentB2);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
+                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
+                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
+                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].r = ComponentR;
+                Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].g = ComponentG;
+                Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].b = ComponentB;
+                Phony_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].r = ComponentR;
+                Phony_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].g = ComponentG;
+                Phony_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].b = ComponentB;
+                break;
+
+            case COL_PATTERN_HI_FORE:
+            case COL_NOTE_HI_FORE:
+                ComponentR = Phony_Palette[i].r;
+                ComponentG = Phony_Palette[i].g;
+                ComponentB = Phony_Palette[i].b;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
+                ComponentR2 = Phony_Palette[COL_PATTERN_HI_BACK].r;
+                ComponentG2 = Phony_Palette[COL_PATTERN_HI_BACK].g;
+                ComponentB2 = Phony_Palette[COL_PATTERN_HI_BACK].b;
+                ComponentR = (ComponentR - ComponentR2);
+                ComponentG = (ComponentG - ComponentG2);
+                ComponentB = (ComponentB - ComponentB2);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
+                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
+                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
+                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].r = ComponentR;
+                Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].g = ComponentG;
+                Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].b = ComponentB;
+                Phony_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].r = ComponentR;
+                Phony_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].g = ComponentG;
+                Phony_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].b = ComponentB;
+                break;
+
+            case COL_PATTERN_LO_FORE:
+            case COL_NOTE_LO_FORE:
+                ComponentR = Phony_Palette[i].r;
+                ComponentG = Phony_Palette[i].g;
+                ComponentB = Phony_Palette[i].b;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
+                ComponentR2 = Phony_Palette[COL_PATTERN_LO_BACK].r;
+                ComponentG2 = Phony_Palette[COL_PATTERN_LO_BACK].g;
+                ComponentB2 = Phony_Palette[COL_PATTERN_LO_BACK].b;
+                ComponentR = (ComponentR - ComponentR2);
+                ComponentG = (ComponentG - ComponentG2);
+                ComponentB = (ComponentB - ComponentB2);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
+                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
+                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
+                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].r = ComponentR;
+                Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].g = ComponentG;
+                Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].b = ComponentB;
+                Phony_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].r = ComponentR;
+                Phony_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].g = ComponentG;
+                Phony_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].b = ComponentB;
                 break;
 
             case COL_MUTE:

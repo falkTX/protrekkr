@@ -17,7 +17,7 @@ EXEOBJS = ptk.o \
           midi.o RtMidi.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
-          aiff.o riff.o \
+          samples_ops.o aiff.o riff.o \
           spline.o tb_303.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver_windows.o
 
@@ -111,11 +111,14 @@ requesters.o: src/ui/requesters.cpp
 xml.o: src/ui/xml.cpp
 	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
 
-aiff.o: src/aiff/aiff.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/aiff/$(*).cpp
+samples_ops.o: src/samples/samples_ops.cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/samples/$(*).cpp
 
-riff.o: src/wav/riff.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/wav/$(*).cpp
+aiff.o: src/samples/aiff/aiff.cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/samples/aiff/$(*).cpp
+
+riff.o: src/samples/wav/riff.cpp
+	$(CXX) -c -o $(@) $(FLAGS) src/samples/wav/$(*).cpp
 
 spline.o: release/distrib/replay/lib/spline.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp

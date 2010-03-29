@@ -260,22 +260,22 @@ void Draw_Wave_Data(void)
                     if(LSX >= 0 && LSX <= 512)
                     {
                         DrawVLine(LSX + WAVE_LEFT + 1, 450 + 1, SAMPLE_HEIGHT - 2, COL_VUMETERPEAK);
-                        DrawHLine(450 + 10, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
-                        DrawHLine(450 + 11, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 2, COL_VUMETERPEAK);
-                        DrawHLine(450 + 12, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
-                        DrawHLine(450 + 13, LSX + WAVE_LEFT + 1 + 5, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
-                        DrawHLine(450 + 14, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
+                        DrawHLine(450 + 5, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
+                        DrawHLine(450 + 6, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 2, COL_VUMETERPEAK);
+                        DrawHLine(450 + 7, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
+                        DrawHLine(450 + 8, LSX + WAVE_LEFT + 1 + 5, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
+                        DrawHLine(450 + 9, LSX + WAVE_LEFT + 1 + 2, LSX + WAVE_LEFT + 1 + 5, COL_VUMETERPEAK);
                     }
 
                     if(LEX >= 0 && LEX <= 512)
                     {
                         if(LEX == 512) LEX--;
                         DrawVLine(LEX + WAVE_LEFT + 1 + 1, 450 + 1, SAMPLE_HEIGHT - 2, COL_VUMETERPEAK);
-                        DrawHLine(SAMPLE_HEIGHT - 14, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
-                        DrawHLine(SAMPLE_HEIGHT - 13, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 5, COL_VUMETERPEAK);
-                        DrawHLine(SAMPLE_HEIGHT - 12, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
-                        DrawHLine(SAMPLE_HEIGHT - 11, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 5, COL_VUMETERPEAK);
-                        DrawHLine(SAMPLE_HEIGHT - 10, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
+                        DrawHLine(SAMPLE_HEIGHT - 9, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
+                        DrawHLine(SAMPLE_HEIGHT - 8, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 5, COL_VUMETERPEAK);
+                        DrawHLine(SAMPLE_HEIGHT - 7, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
+                        DrawHLine(SAMPLE_HEIGHT - 6, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 5, COL_VUMETERPEAK);
+                        DrawHLine(SAMPLE_HEIGHT - 5, LEX + WAVE_LEFT + 1 - 5, LEX + WAVE_LEFT + 1 - 2, COL_VUMETERPEAK);
                     }
                 }
             }

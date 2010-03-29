@@ -4,13 +4,15 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
+
  - Enhance the samples editor a bit:
 
    - Fix "Select All" and add "Select View".
    - Add rotate left/right.
    - Add Cut/copy/paste (need a back buffer).
    - Option to make the selection to become the whole sample.
- - See to add a third filter to the synth (moog like).
+
+ - See to add a third filter to the synth (analog like).
 
 [UI]
  - Create a decent gadgets system (events based).
