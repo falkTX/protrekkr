@@ -1486,17 +1486,20 @@ void Lock_Sample(int instr_nbr, int split)
             RawSamples_Swap[instr_nbr][i][split] = NULL;
         }
 
-        RawSamples_Swap[instr_nbr][i][split] = (short *) malloc(Size * 2);
+        RawSamples_Swap[instr_nbr][i][split] = (short *) malloc(Size * 2 + 8);
+        memset(RawSamples_Swap[instr_nbr][i][split], 0, Size * 2 + 8);
 
         Save_WaveForm(instr_nbr, i, split);
 
-        Dest_Buffer = (short *) malloc(Size * 2);
+        Dest_Buffer = (short *) malloc(Size * 2 + 8);
+        memset(Dest_Buffer, 0, Size * 2 + 8);
 
         if(Pack_Type != SMP_PACK_NONE)
         {
             // Halve the sample
             Size /= 2;
-            Smp_Dats = (short *) malloc(Size * 2);
+            Smp_Dats = (short *) malloc(Size * 2 + 8);
+            memset(Smp_Dats, 0, Size * 2 + 8);
             for(iSmp = 0; iSmp < Size; iSmp++)
             {
                 Smp_Dats[iSmp] = *(Sample + (iSmp * 2));
@@ -1508,35 +1511,35 @@ void Lock_Sample(int instr_nbr, int split)
         switch(Pack_Type)
         {
             case SMP_PACK_AT3:
-                PackedSample = (short *) malloc(Size * 2);
-                memset(PackedSample, 0, Size * 2);
+                PackedSample = (short *) malloc(Size * 2 + 8);
+                memset(PackedSample, 0, Size * 2 + 8);
                 PackedLen = ToAT3(Sample, PackedSample, Size * 2, BitRate);
                 break;
 
             case SMP_PACK_GSM:
-                PackedSample = (short *) malloc(Size * 2);
-                memset(PackedSample, 0, Size * 2);
+                PackedSample = (short *) malloc(Size * 2 + 8);
+                memset(PackedSample, 0, Size * 2 + 8);
                 PackedLen = ToGSM(Sample, PackedSample, Size * 2);
                 break;
 
             case SMP_PACK_MP3:
-                PackedSample = (short *) malloc(Size * 2);
-                memset(PackedSample, 0, Size * 2);
+                PackedSample = (short *) malloc(Size * 2 + 8);
+                memset(PackedSample, 0, Size * 2 + 8);
                 PackedLen = ToMP3(Sample, PackedSample, Size * 2, BitRate);
                 break;
 
             case SMP_PACK_TRUESPEECH:
                 Aligned_Size = (Size * 2) + 0x400;
-                AlignedSample = (short *) malloc(Aligned_Size);
+                AlignedSample = (short *) malloc(Aligned_Size + 8);
                 if(AlignedSample)
                 {
-                    memset(AlignedSample, 0, Aligned_Size);
+                    memset(AlignedSample, 0, Aligned_Size + 8);
                     memcpy(AlignedSample, Sample, Size * 2);
                     // Size must be aligned
-                    PackedSample = (short *) malloc(Aligned_Size);
+                    PackedSample = (short *) malloc(Aligned_Size + 8);
                     if(PackedSample)
                     {
-                        memset(PackedSample, 0, Aligned_Size);
+                        memset(PackedSample, 0, Aligned_Size + 8);
                         PackedLen = ToTrueSpeech(AlignedSample, PackedSample, Aligned_Size);
                     }
                     free(AlignedSample);
@@ -1545,16 +1548,16 @@ void Lock_Sample(int instr_nbr, int split)
 
             case SMP_PACK_ADPCM:
                 Aligned_Size = (Size * 2) + 0x1000;
-                AlignedSample = (short *) malloc(Aligned_Size);
+                AlignedSample = (short *) malloc(Aligned_Size + 8);
                 if(AlignedSample)
                 {
-                    memset(AlignedSample, 0, Aligned_Size);
+                    memset(AlignedSample, 0, Aligned_Size + 8);
                     memcpy(AlignedSample, Sample, Size * 2);
                     // Size must be aligned
-                    PackedSample = (short *) malloc(Aligned_Size);
+                    PackedSample = (short *) malloc(Aligned_Size + 8);
                     if(PackedSample)
                     {
-                        memset(PackedSample, 0, Aligned_Size);
+                        memset(PackedSample, 0, Aligned_Size + 8);
                         PackedLen = ToADPCM(AlignedSample, PackedSample, Aligned_Size);
                     }
                     free(AlignedSample);
@@ -1562,8 +1565,8 @@ void Lock_Sample(int instr_nbr, int split)
                 break;
 
             case SMP_PACK_8BIT:
-                PackedSample = (short *) malloc(Size * 2);
-                memset(PackedSample, 0, Size * 2);
+                PackedSample = (short *) malloc(Size * 2 + 8);
+                memset(PackedSample, 0, Size * 2 + 8);
                 // (Size is the size in samples)
                 // (PackedLen is the size in bytes)
                 PackedLen = To8Bit(Sample, PackedSample, Size);

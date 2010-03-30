@@ -99,8 +99,8 @@ void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &GSM_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 2));
-    memset(dwDest, 0, (Real_Size * 2));
+    short *dwDest = (short *) malloc((Real_Size * 2) + 8);
+    memset(dwDest, 0, (Real_Size * 2) + 8);
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;
@@ -161,8 +161,8 @@ void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &At3_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, 0);
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 4));
-    memset(dwDest, 0, (Real_Size * 4));
+    short *dwDest = (short *) malloc((Real_Size * 4) + 8);
+    memset(dwDest, 0, (Real_Size * 4) + 8);
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;
@@ -207,8 +207,8 @@ void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &TrueSpeech_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 2));
-    memset(dwDest, 0, (Real_Size * 2));
+    short *dwDest = (short *) malloc((Real_Size * 2) + 8);
+    memset(dwDest, 0, (Real_Size * 2) + 8);
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;
@@ -253,8 +253,8 @@ void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &MP3_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, 0 );
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 2) + (MP3_FRAMES_DELAG * 4));
-    memset(dwDest, 0, (Real_Size * 2) + (MP3_FRAMES_DELAG * 4));
+    short *dwDest = (short *) malloc((Real_Size * 2) + (MP3_FRAMES_DELAG * 4) + 8);
+    memset(dwDest, 0, (Real_Size * 2) + (MP3_FRAMES_DELAG * 4) + 8);
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;
@@ -297,8 +297,8 @@ void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     acmStreamOpen(&Unpack_Stream, NULL, (LPWAVEFORMATEX) &ADPCM_Format, (LPWAVEFORMATEX) &Wave_Format, NULL, 0, 0, ACM_STREAMOPENF_NONREALTIME);
 
     acmStreamSize(Unpack_Stream, Src_Size, (DWORD *) &Real_Size, ACM_STREAMSIZEF_SOURCE);
-    short *dwDest = (short *) malloc((Real_Size * 2));
-    memset(dwDest, 0, (Real_Size * 2));
+    short *dwDest = (short *) malloc((Real_Size * 2) + 8);
+    memset(dwDest, 0, (Real_Size * 2) + 8);
     Unpack_Stream_Head.cbStruct = sizeof(ACMSTREAMHEADER);
     Unpack_Stream_Head.pbSrc = Source;
     Unpack_Stream_Head.cbSrcLength = Src_Size;

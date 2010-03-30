@@ -80,10 +80,10 @@ int ToGSM(short *Source, short *Dest, int Size)
     Src_size = Size;
     unsigned long rawbufsize = 0;
     acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
-    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size);
-    memset(Pack_Buf, 0, Src_size);
-    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize);
-    memset(rawbuf, 0, rawbufsize);
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + 8);
+    memset(Pack_Buf, 0, Src_size + 8);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + 8);
+    memset(rawbuf, 0, rawbufsize + 8);
 
     ACMSTREAMHEADER Pack_Stream_Head;
     ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));
@@ -158,8 +158,8 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
     At3_Format.abReserved[6] = 1;
     acmStreamOpen(&Pack_Stream, NULL, (LPWAVEFORMATEX) &Wave_Format, (LPWAVEFORMATEX) &At3_Format, NULL, 0, 0, 0);
 
-    short *dwSource = (short *) malloc(Size * 2);
-    memset(dwSource, 0, Size * 2);
+    short *dwSource = (short *) malloc(Size * 2 + 8);
+    memset(dwSource, 0, Size * 2 + 8);
     for(i = 0; i < Size / 2; i++)
     {
         dwSource[(i * 2)] = Source[i];
@@ -172,10 +172,10 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
     Src_size = Size;
     unsigned long rawbufsize = 0;
     acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
-    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size);
-    memset(Pack_Buf, 0, Src_size);
-    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize);
-    memset(rawbuf, 0, rawbufsize);
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + 8);
+    memset(Pack_Buf, 0, Src_size + 8);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + 8);
+    memset(rawbuf, 0, rawbufsize + 8);
 
     ACMSTREAMHEADER Pack_Stream_Head;
     ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));
@@ -242,10 +242,10 @@ int ToMP3(short *Source, short *Dest, int Size, int BitRate)
     unsigned long rawbufsize = 0;
     acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
     rawbufsize += MP3_FRAMES_LAG * 2;
-    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + (MP3_FRAMES_LAG * 4));
-    memset(Pack_Buf, 0, Src_size + (MP3_FRAMES_LAG * 4));
-    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + (MP3_FRAMES_LAG * 4));
-    memset(rawbuf, 0, rawbufsize + (MP3_FRAMES_LAG * 4));
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + (MP3_FRAMES_LAG * 4) + 8);
+    memset(Pack_Buf, 0, Src_size + (MP3_FRAMES_LAG * 4) + 8);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + (MP3_FRAMES_LAG * 4) + 8);
+    memset(rawbuf, 0, rawbufsize + (MP3_FRAMES_LAG * 4) + 8);
 
     ACMSTREAMHEADER Pack_Stream_Head;
     ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));
@@ -299,10 +299,10 @@ int ToTrueSpeech(short *Source, short *Dest, int Size)
     Src_size = Size;
     unsigned long rawbufsize = 0;
     acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
-    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size);
-    memset(Pack_Buf, 0, Src_size);
-    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize);
-    memset(rawbuf, 0, rawbufsize);
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + 8);
+    memset(Pack_Buf, 0, Src_size + 8);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + 8);
+    memset(rawbuf, 0, rawbufsize + 8);
 
     ACMSTREAMHEADER Pack_Stream_Head;
     ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));
@@ -356,10 +356,10 @@ int ToADPCM(short *Source, short *Dest, int Size)
     Src_size = Size;
     unsigned long rawbufsize = 0;
     acmStreamSize(Pack_Stream, Src_size, &rawbufsize, ACM_STREAMSIZEF_SOURCE);
-    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size);
-    memset(Pack_Buf, 0, Src_size);
-    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize);
-    memset(rawbuf, 0, rawbufsize);
+    Uint8 *Pack_Buf = (Uint8 *) malloc(Src_size + 8);
+    memset(Pack_Buf, 0, Src_size + 8);
+    Uint8 *rawbuf = (Uint8 *) malloc(rawbufsize + 8);
+    memset(rawbuf, 0, rawbufsize + 8);
 
     ACMSTREAMHEADER Pack_Stream_Head;
     ZeroMemory(&Pack_Stream_Head, sizeof(ACMSTREAMHEADER));

@@ -858,7 +858,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         {
             high_color = 71 + 87;
             Fx_Color = 32;
-            SetColor(COL_PATTERN_HI_BACK_SHADOW);
+            SetColor(COL_PATTERN_LO_BACK_SHADOW);
         }
         else
         {
@@ -873,7 +873,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         {
             high_color = 71;
             Fx_Color = 32;
-            SetColor(COL_PATTERN_HI_BACK);
+            SetColor(COL_PATTERN_LO_BACK);
         }
         else
         {
@@ -1440,7 +1440,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         {
             if(old_dover < CONSOLE_WIDTH - 19)
             {
-                SetColor(COL_PATTERN_SEL_BACK);
+                SetColor(COL_PATTERN_LO_BACK);
                 Fillrect(old_dover, YVIEW, CONSOLE_WIDTH - 19, YVIEW + 15 + 1);
             }
         }

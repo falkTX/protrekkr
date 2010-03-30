@@ -5,13 +5,13 @@ ProTrekkr releases history
 v2.0:
 
 - Tempo can now go down to 20 BPM.
-- Major overhaul of the 303 units,
-  they now should behave and sound more like the one found in Rebirth.
+- Major overhaul of the 303 units, they now should behave and sound more like
+  the one found in Propellerhead's Rebirth.
 - Files entries are now sorted.
-- Input zones now have different colors.
+- Input zones are now displayed with altered colors.
 - 4 default color schemes are now available.
 - Range selection in sample editor speeded up.
-- Improved .mod import.
+- .mod import function is now much more accurate.
 - Fixed a bug in samples looping (1 byte was always missing from the loop).
 - Improved shadow patterns rendering.
 - Patterns shading is also displayed for track which are turned off
@@ -25,6 +25,13 @@ v2.0:
   - Select view / Select all.
   - Reverse (invert the selected part of a waveform).
   - Selection shifting.
+- Added position jump effect (1F) (Can be combined with pattern break (0D)).
+- Added fine volume slide up and down effects (20 & 21).
+- Added fine pitch up and down effects (22 & 23).
+- Speed can now go up to 32.
+- BPM weren't refresh properly on screen when being changed inside patterns.
+- Multi notes channels of modules weren't re-initialized & that could lead
+  to a potential crash.
 
 v1.99e:
 
@@ -72,9 +79,9 @@ v1.99:
 
 v1.98o:
 
-- A value can now be specified with Reset Filter LFO FX (0x16).
-- Randomize block command range is now 0x0 to 0xff on effects data columns.
-- Fixed a bug occuring while using volumn columns and/or Set volume FX (0x3)
+- A value can now be specified with Reset Filter LFO FX (16).
+- Randomize block command range is now 00 to ff on effects data columns.
+- Fixed a bug occuring while using volumn columns and/or Set volume FX (03)
   with synth instruments.
 - Editing was kinda broken when Step add was 0.
 - Enabled latency control on Mac OSX.
@@ -154,9 +161,9 @@ v1.98e:
 v1.98d:
 
 - Forward looping wasn't working correctly for instruments.
-- New effect: Select playing way (0x1e)
-              0x1e00: Play forward.
-              0x1e01: Play backward.
+- New effect: Select playing way (1E)
+              1E00: Play forward.
+              1E01: Play backward.
 - Added a requester before deleting an instrument to let the user select
   what part of the instrument to discard (All, Instrument or Synth).
 - Fixed the tracks disto.
@@ -199,9 +206,9 @@ v1.98:
 v1.97c:
 
 - Even more constants (Especially for modules not using instruments).
-- Constants weren't generated correctly when using command 0x15.
-- Implemented vibrato effect (0x1dxy) x = speed y = depth
-  (can't be used if arpeggio (0x1b) is turned on).
+- Constants weren't generated correctly when using command 15.
+- Implemented vibrato effect (1Dxy) x = speed y = depth
+  (can't be used if arpeggio (1B) is turned on).
 
 v1.97b:
 
@@ -258,8 +265,8 @@ v1.94:
 - Fixed a nasty memory leak in the PSP replay
   (also only necessary data are now allocated).
 - Space char wasn't available during names input.
-- Added effects 0x41 and 0x42 to control the volumes of the 2 303 units.
-- Added effect 0x1c: set global volume.
+- Added effects 41 and 42 to control the volumes of the 2 303 units.
+- Added effect 1C: set global volume.
 - Start & stop song cleaned up (clicks should be gone or at least reduced).
 - Fixed a small issue regarding latency in the Mac OS X version.
 
@@ -290,7 +297,7 @@ v1.91b:
 
 v1.91:
 
-- Midi controller modification command (0x90) wasn't accessible anymore
+- Midi controller modification command (90) wasn't accessible anymore
   in panning row, fixed.
 - Fixed an issue that could occur with rand() function under linux.
 - Introduced zoomed tracks; Each track can be zoomed independantly
@@ -301,8 +308,8 @@ v1.91:
 v1.90e:
 
 - Midi notes off command was broken.
-- Effect 0xAxx (Set Random Cutoff) slightly modified, the xx value is now
-  the amplitude of the calculated random value from 0 to 0xff.
+- Effect 0Axx (Set Random Cutoff) slightly modified, the xx value is now
+  the amplitude of the calculated random value from 0 to ff.
 
 v1.90d:
 
@@ -472,7 +479,7 @@ v1.83:
 - Source distribution package now contains SDL_draw.lib, it's source code
   as well as tinyxml.lib & zlib.lib.
 - Added Ordinary-zero.ptk module by Nula/Clrsrc.
-- New fx: 0x7 (FX Synchro):
+- New fx: 07 (FX Synchro):
   a .psy file containing synchro informations is now created
   whenever a .ptp module is saved (if the effect 7 isn't used in a module
   such file won't be created at all).
@@ -495,13 +502,13 @@ v1.82:
   (like pitch bend, volume etc).
 - ADSRs values extended.
 - Better multi channels allocations.
-- Fixed a bug in note retrigger effect (0xe).
+- Fixed a bug in note retrigger effect (0E).
 - Fixed all the presets and instruments.
 - The tracker now uses 3 separates directories
   for the Modules/Instruments & Presets.
 - Fixed a small issue with the numeric keypad slash key.
 - Now send a note off when a channel has been turned off.
-- Fixed the glider effect (0x5).
+- Fixed the glider effect (05).
 - MingW replay is now included in distribution.
 - Source code released.
 

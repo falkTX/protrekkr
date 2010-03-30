@@ -935,8 +935,7 @@ int Switch_FullScreen(void)
     Main_Window = WMInfo.window;
     // Set the icon of the window
     SetClassLong(Main_Window, GCL_HICON,
-                 (LONG) LoadIcon(GetModuleHandle(NULL),
-                 MAKEINTRESOURCE(IDI_ICON1)));
+                 (LONG) LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)));
 #endif
 
     Init_UI();

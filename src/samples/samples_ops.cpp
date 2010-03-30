@@ -78,7 +78,7 @@ int Sample_Rotate_Left(int32 range_start, int32 range_end, int amount)
             if(nc == 2) RawSamples[ped_patsam][1][ped_split][i] = sample2;
         }
 
-        Status_Box("Done.");
+        Status_Box("Shift left done.");
         return 1;
     }
     return 0;
@@ -117,7 +117,7 @@ int Sample_Rotate_Right(int32 range_start, int32 range_end, int amount)
             if(nc == 2) RawSamples[ped_patsam][1][ped_split][range_start] = sample2;
         }
 
-        Status_Box("Done.");
+        Status_Box("Shift right done.");
         return 1;
     }
     return 0;
@@ -153,7 +153,7 @@ int Sample_Reverse(int32 range_start, int32 range_end)
             }
             p_s--;
         }
-        Status_Box("Done.");
+        Status_Box("Reverse done.");
         return 1;
     }
     return 0;
@@ -173,16 +173,18 @@ int Sample_Crop(int32 range_start, int32 range_end)
     {
         nc = SampleChannels[ped_patsam][ped_split];
 
-        NewBuffer[0] = (short *) malloc(cropsize * 2);
+        NewBuffer[0] = (short *) malloc(cropsize * 2 + 8);
         if(!NewBuffer[0]) return 0;
+        memset(NewBuffer[0], 0, cropsize * 2 + 8);
         if(nc == 2)
         {
-            NewBuffer[1] = (short *) malloc(cropsize * 2);
+            NewBuffer[1] = (short *) malloc(cropsize * 2 + 8);
             if(!NewBuffer[1])
             {
                 free(NewBuffer[0]);
                 return 0;
             }
+            memset(NewBuffer[1], 0, cropsize * 2 + 8);
         }
 
         p_s = 0;
@@ -205,7 +207,7 @@ int Sample_Crop(int32 range_start, int32 range_end)
         }
 
         SampleNumSamples[ped_patsam][ped_split] = cropsize;
-        Status_Box("Done.");
+        Status_Box("Crop done.");
         return 1;
     }
     return 0;
@@ -230,16 +232,18 @@ int Sample_Copy(int32 range_start, int32 range_end)
         Sample_Back[cur_sample_buffer][1] = NULL;
 
         // Copy the data into the back buffer
-        Sample_Back[cur_sample_buffer][0] = (short *) malloc(copysize * 2);
+        Sample_Back[cur_sample_buffer][0] = (short *) malloc(copysize * 2 + 8);
         if(!Sample_Back[cur_sample_buffer][0]) return 0;
+        memset(Sample_Back[cur_sample_buffer][0], 0, copysize * 2 + 8);
         if(nc == 2)
         {
-            Sample_Back[cur_sample_buffer][1] = (short *) malloc(copysize * 2);
+            Sample_Back[cur_sample_buffer][1] = (short *) malloc(copysize * 2 + 8);
             if(!Sample_Back[cur_sample_buffer][1])
             {
                 free(Sample_Back[cur_sample_buffer][0]);
                 return 0;
             }
+            memset(Sample_Back[cur_sample_buffer][1], 0, copysize * 2 + 8);
         }
         Sample_Back_Channels[cur_sample_buffer] = nc;
         Sample_Back_Size[cur_sample_buffer] = copysize;
@@ -252,6 +256,7 @@ int Sample_Copy(int32 range_start, int32 range_end)
             *dest_mono++ = *(RawSamples[ped_patsam][0][ped_split] + i);
             if(nc == 2) *dest_stereo++ = *(RawSamples[ped_patsam][1][ped_split] + i);
         }
+        Status_Box("Copy done.");
         return 1;
     }
     return 0;
@@ -274,18 +279,19 @@ int Sample_Paste(int32 range_start)
 
         // Allocate the destination buffer(s)
         // (We need to clear the second one as the back buffer may not be stereo).
-        NewBuffer[0] = (short *) malloc(newsize * 2);
+        NewBuffer[0] = (short *) malloc(newsize * 2 + 8);
         if(!NewBuffer[0]) return 0;
+        memset(NewBuffer[0], 0, newsize * 2 + 8);
 
         if(nc == 2)
         {
-            NewBuffer[1] = (short *) malloc(newsize * 2);
+            NewBuffer[1] = (short *) malloc(newsize * 2 + 8);
             if(!NewBuffer[1])
             {
                 free(NewBuffer[0]);
                 return 0;
             }
-            memset(NewBuffer[1], 0, newsize * 2);
+            memset(NewBuffer[1], 0, newsize * 2 + 8);
         }
 
         p_s = 0;
@@ -329,7 +335,7 @@ int Sample_Paste(int32 range_start)
         }
 
         SampleNumSamples[ped_patsam][ped_split] = newsize;
-        Status_Box("Done.");
+        Status_Box("Paste done.");
         return 1;
     }
     return 0;
@@ -348,7 +354,6 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
 
     if(newsize)
     {
-        Status_Box("Cutting sample...");
         Stop_Current_Sample();
         AUDIO_Stop();
         SDL_Delay(100);
@@ -356,16 +361,18 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
         nc = SampleChannels[ped_patsam][ped_split];
 
         // Allocate the wav with the minus the block to cut
-        NewBuffer[0] = (short *) malloc(newsize * 2);
+        NewBuffer[0] = (short *) malloc(newsize * 2 + 8);
         if(!NewBuffer[0]) return 0;
+        memset(NewBuffer[0], 0, newsize * 2 + 8);
         if(nc == 2)
         {
-            NewBuffer[1] = (short *) malloc(newsize * 2);
+            NewBuffer[1] = (short *) malloc(newsize * 2 + 8);
             if(!NewBuffer[1])
             {
                 free(NewBuffer[0]);
                 return 0;
             }
+            memset(NewBuffer[1], 0, newsize * 2 + 8);
         }
 
         if(do_copy)
@@ -411,7 +418,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
         }
 
         SampleNumSamples[ped_patsam][ped_split] = newsize;
-        Status_Box("Done.");
+        Status_Box("Cut done.");
         return 1;
     }
     else
@@ -437,9 +444,7 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
     float l_shift = 0;
     float r_shift = 0;
 
-    Status_Box("Calculating shifting-factor...");
-
-    for(i = range_start; i < range_end + 1; i++)
+     for(i = range_start; i < range_end + 1; i++)
     {
         l_shift += *(RawSamples[ped_patsam][0][ped_split] + i);
         if(nc == 2) r_shift += *(RawSamples[ped_patsam][1][ped_split] + i);
@@ -447,8 +452,6 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
 
     l_shift /= (range_end + 1) - range_start;
     r_shift /= (range_end + 1) - range_start;
-
-    Status_Box("Re-building waves...");
 
     for(i = range_start; i < range_end + 1; i++)
     {
@@ -471,7 +474,7 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
     }
 
     draw_sampled_wave = TRUE;
-    Status_Box("Selection calibrated.");
+    Status_Box("DC adjust done.");
 }
 
 // ------------------------------------------------------
@@ -481,8 +484,6 @@ void Sample_Maximize(int32 range_start, int32 range_end)
     int32 i;
     char nc = SampleChannels[ped_patsam][ped_split];
     float l_shift = 0;
-
-    Status_Box("Searching highest peak...");
 
     for(i = range_start; i < range_end + 1; i++)
     {
@@ -500,8 +501,6 @@ void Sample_Maximize(int32 range_start, int32 range_end)
     }
 
     l_shift = 32768.0f / l_shift;
-
-    Status_Box("Amplifying...");
 
     for(i = range_start; i < range_end + 1; i++)
     {
@@ -524,7 +523,7 @@ void Sample_Maximize(int32 range_start, int32 range_end)
     }
 
     draw_sampled_wave = TRUE;
-    Status_Box("Selection maximized.");
+    Status_Box("Maximize done.");
 }
 
 // ------------------------------------------------------
@@ -535,8 +534,6 @@ void Sample_FadeIn(int32 range_start, int32 range_end)
     char nc = SampleChannels[ped_patsam][ped_split];
     float c_vol = 0.0f;
     float const coef_vol = 1.0f / ((range_end + 1) - range_start);
-
-    Status_Box("Fade In Selection...");
 
     for(i = range_start; i < range_end + 1; i++)
     {
@@ -560,7 +557,7 @@ void Sample_FadeIn(int32 range_start, int32 range_end)
     }
 
     draw_sampled_wave = TRUE;
-    Status_Box("Done.");
+    Status_Box("Fade in done.");
 }
 
 // ------------------------------------------------------
@@ -598,7 +595,7 @@ void Sample_FadeOut(int32 range_start, int32 range_end)
     }
 
     draw_sampled_wave = TRUE;
-    Status_Box("Finished.");
+    Status_Box("Fade out done.");
 }
 
 // ------------------------------------------------------
@@ -606,8 +603,6 @@ void Sample_FadeOut(int32 range_start, int32 range_end)
 void Sample_Half(int32 range_start, int32 range_end)
 {
     int32 i;
-
-    Status_Box("Halving Selection Volume...");
 
     char nc = SampleChannels[ped_patsam][ped_split];
 
@@ -628,5 +623,5 @@ void Sample_Half(int32 range_start, int32 range_end)
     }
 
     draw_sampled_wave = TRUE;
-    Status_Box("Done.");
+    Status_Box("Half done.");
 }

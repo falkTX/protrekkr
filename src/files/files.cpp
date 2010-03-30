@@ -344,19 +344,30 @@ void LoadAmigaMod(char *FileName, int channels)
     int ramp;
     float ramp_vol;
     int i;
+    int j;
+    int k;
     int vib_chan[16];
+    int vib_last[16];
     int arp_chan[16];
+    int cur_tempo = 125;
+    int cur_speed = 6;
+    int found_tempo;
+    int found_speed;
 
     SongStop();
 
     for(i = 0; i < 16; i++)
     {
         vib_chan[i] = 0;
+        vib_last[i] = 0;
         arp_chan[i] = 0;
     }
 
     in = fopen(FileName, "rb");
-    if(in != NULL) {
+    if(in != NULL)
+    {
+        Songplaying = FALSE;
+
         Free_Samples();
         Clear_Patterns_Pool();
 
@@ -387,10 +398,10 @@ void LoadAmigaMod(char *FileName, int channels)
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
             Finetune[swrite][0] *= 16;
             CustomVol[swrite] = Scale_AmigaMod_Value(fgetc(in), 63.0f, 0.99f);
+            SampleVol[swrite][0] = 0.5f;
             Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
 
-            // Calculate/Adapt AMIGA loop points to ptk LoopPoints:
-
+            // Calculate/Adapt AMIGA loop points to ptk LoopPoints
             LoopStart[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
             LoopStart[swrite][0] *= 2;
             long Replen = ((int) (fgetc(in) << 8) + (int) fgetc(in));
@@ -429,22 +440,28 @@ void LoadAmigaMod(char *FileName, int channels)
         // JUMP OVER THE HEADER
         fseek(in, 4, SEEK_CUR);
 
-        for(pwrite = 0; pwrite < nPatterns; pwrite++)
+        for(pwrite = 0; pwrite < sLength; pwrite++)
         {
+
+            // Jump to the pattern to retrieve
+            fseek(in, 1084 + (pSequence[pwrite] * (4 * channels * 64)), SEEK_SET);
+
+            // Always 64 rows in .mod
             for(li2 = 0; li2 < 64; li2++)
             {
-                // Note: effects like 1 2 5 6 a depend on the current speed in .mods.
-                //       (the faster the less effect).
+                
+                // TODO: effects like 1 2 3 5 6 a depend on the current speed in .mods.
+                //       (the faster the speed, the less effect).
 
                 for(pw2 = 0; pw2 < channels; pw2++)
                 {
-                    int tmo = Get_Pattern_Offset(pwrite, pw2, li2);
+                    int tmo = Get_Pattern_Offset(pSequence[pwrite], pw2, li2);
                     int f_byte = fgetc(in);
                     int t_sample = f_byte >> 4;
                     int t_period = (f_byte - (t_sample << 4)) * 256 + (int) fgetc(in);
                     int t_byte = fgetc(in);
                     int t_sample2 = t_byte >> 4;
-                    int t_command = t_byte - (t_sample2 << 4);
+                    int Cmd = t_byte - (t_sample2 << 4);
                     t_sample = (t_sample << 4) + t_sample2;
                     if(t_sample == 0) t_sample = 255;
                     if(t_sample != 255) t_sample--;
@@ -462,14 +479,21 @@ void LoadAmigaMod(char *FileName, int channels)
                     if(vib_chan[pw2] == TRUE)
                     {
                         // But no more
-                        if(t_command != 4)
+                        if(Cmd != 4 && Cmd != 6)
                         {
-                            // Stop it or delay it
-                            if(!*(RawPatterns + tmo + PATTERN_FX2))
+                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1d00)
                             {
-                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1d;
-                                *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
                                 vib_chan[pw2] = FALSE;
+                            }
+                            else
+                            {
+                                // Stop it or delay it
+                                if(!*(RawPatterns + tmo + PATTERN_FX2))
+                                {
+                                    *(RawPatterns + tmo + PATTERN_FX2) = 0x1d;
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                    vib_chan[pw2] = FALSE;
+                                }
                             }
                         }
                     }
@@ -478,188 +502,350 @@ void LoadAmigaMod(char *FileName, int channels)
                     if(arp_chan[pw2] == TRUE)
                     {
                         // But no more
-                        if(t_command != 0)
+                        if(Cmd != 0 || (Cmd == 0 && Cmd_Dat == 0))
                         {
-                            // Stop it or delay it
-                            if(!*(RawPatterns + tmo + PATTERN_FX2))
+                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1b00)
                             {
-                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1b;
-                                *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
                                 arp_chan[pw2] = FALSE;
+                            }
+                            else
+                            {
+                                // Stop it or delay it
+                                if(!*(RawPatterns + tmo + PATTERN_FX2))
+                                {
+                                    *(RawPatterns + tmo + PATTERN_FX2) = 0x1b;
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                    arp_chan[pw2] = FALSE;
+                                }
                             }
                         }
                     }
 
                     // Pattern effect adapter:
-                    switch(t_command)
+                    switch(Cmd)
                     {
-                        // SPEED [not accurate]
-                        case 0xf:
-                            if(Cmd_Dat > 31)
-                            {
-                                t_command = 240;
-                            }
-                            else
-                            {
-                                switch(Cmd_Dat)
-                                {
-                                    case 1: Cmd_Dat = 10; break;
-                                    case 2: Cmd_Dat = 9; break;
-                                    case 3: Cmd_Dat = 8; break;
-                                    case 4: Cmd_Dat = 6; break;
-                                    case 5: Cmd_Dat = 5; break;
-                                    case 6: Cmd_Dat = 4; break;
-                                    case 7: Cmd_Dat = 3; break;
-                                    case 8: Cmd_Dat = 3; break;
-                                    case 9: Cmd_Dat = 2; break;
-                                    case 10: Cmd_Dat = 1; break;
-                                    case 11: Cmd_Dat = 1; break;
-                                    case 12: Cmd_Dat = 1; break;
-                                    case 13: Cmd_Dat = 1; break;
-                                    case 14: Cmd_Dat = 1; break;
-                                    case 15: Cmd_Dat = 1; break;
-                                    case 16: Cmd_Dat = 1; break;
-                                    case 17: Cmd_Dat = 1; break;
-                                    case 18: Cmd_Dat = 1; break;
-                                    case 19: Cmd_Dat = 1; break;
-                                    case 20: Cmd_Dat = 1; break;
-                                    case 21: Cmd_Dat = 1; break;
-                                    case 22: Cmd_Dat = 1; break;
-                                    case 23: Cmd_Dat = 1; break;
-                                    case 24: Cmd_Dat = 1; break;
-                                    case 25: Cmd_Dat = 1; break;
-                                    case 26: Cmd_Dat = 1; break;
-                                    case 27: Cmd_Dat = 1; break;
-                                    case 28: Cmd_Dat = 1; break;
-                                    case 29: Cmd_Dat = 1; break;
-                                    case 30: Cmd_Dat = 1; break;
-                                    case 31: Cmd_Dat = 1; break;
-                                }
-                            }
-                            break;
-
                         // ARPEGGIO
                         case 0:
-                            if(Cmd_Dat) t_command = 0x1b;
-                            else t_command = 0;
-                            if(Cmd_Dat) arp_chan[pw2] = TRUE;
+                            if(Cmd_Dat)
+                            {
+                                // Our arpeggios are different from theirs
+                                Cmd = 0x1b;
+                                arp_chan[pw2] = TRUE;
+                            }
+                            else Cmd = 0;
                             break;
 
                         // PITCH UP
                         case 1:
                             Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 255.0f, 45.0f);
-                            //Cmd_Dat >>= 1;
                             break;
 
-                        // PITCH UP
+                        // PITCH DOWN
                         case 2:
                             Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 255.0f, 45.0f);
                             break;
 
-                        // GLIDE
-                        case 5:
-                            Cmd_Dat = 0;
+                        // TONE PORTAMENTO
                         case 3:
-                            t_command = 5;
+                            Cmd = 5;
                             break;
 
                         // VIBRATO
                         case 4:
-                            t_command = 0x1d;
-                            // our vibratos are different from theirs
-                            if(Cmd_Dat == 0) t_command = 0;
+                            Cmd = 0x1d;
+                            // Our vibratos are different from theirs
+                            if(Cmd_Dat == 0) Cmd_Dat = vib_last[pw2];
+                            else vib_last[pw2] = Cmd_Dat;
                             vib_chan[pw2] = TRUE;
                             break;
 
-                        // DEMOSYNCHRO SIGNAL???
-                        case 8:
-                            t_command = 7;
+                        // TONE PORTAMENTO + VOL SLIDE
+                        case 5:
+                            // Use the 2nd fx slot to mix both commands
+                            if(Cmd_Dat >= 16)
+                            {
+                                // Vol SlideUp
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x19;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, 15.0f, 65.0f);
+                            }
+                            else
+                            {
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1a;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, 15.0f, 63.0f);
+                            }
+                            // (The portamento retains the value initiated with command 3)
+                            Cmd = 5;
+                            Cmd_Dat = 0;
                             break;
 
-                        // (Only handle the volume slide part of the command)
+                        // VIBRATO + VOL SLIDE
                         case 6:
-                        // Volume Sliders
+                            // Use the 2nd fx slot to mix both commands
+                            if(Cmd_Dat >= 16)
+                            {
+                                // Vol SlideUp
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x19;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, 15.0f, 65.0f);
+                            }
+                            else
+                            {
+                                *(RawPatterns + tmo + PATTERN_FX2) = 0x1a;
+                                *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, 15.0f, 63.0f);
+                            }
+                            // (The vibrato retains the value initiated with command 4)
+                            Cmd = 0x1d;
+                            Cmd_Dat = vib_last[pw2];
+                            vib_chan[pw2] = TRUE;
+                            break;
+
+                        // DEMOSYNCHRO SIGNAL ?
+                        case 8:
+                            Cmd = 7;
+                            break;
+
+                        // SAMPLE OFFSET
+                        case 9:
+                            // We use 256 bytes instead of 128
+                            Cmd_Dat <<= 1;
+                            break;
+
+                        // VOLSLIDE
                         case 0xa:
                             if(Cmd_Dat >= 16)
                             {
-                                t_command = 0x19; // Vol SlideUp
+                                Cmd = 0x19; // Vol SlideUp
                                 Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, 15.0f, 65.0f);
                             }
                             else
                             {
-                                t_command = 0x1a; // Vol Slide Down
+                                Cmd = 0x1a; // Vol Slide Down
                                 Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, 15.0f, 63.0f);
                             }
                             break;
 
+                        // POSITION JUMP
+                        case 0xb:
+                            Cmd = 0x1f;
+                            break;
+
                         // VOLUME
                         case 0xc:
-                            t_command = 3;
+                            Cmd = 3;
                             Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat, 63.0f, 255.0f);
                             break;
 
-                        // Pattern Jump Amiga Mod stylee
+                        // PATTERN BREAK
                         case 0xd:
-                            t_hi = Cmd_Dat / 16;
-                            t_lo = Cmd_Dat - t_hi * 16;
-                            Cmd_Dat = t_hi * 10 + t_lo;
+                            // Protracker handles this as BCD
+                            // So convert it to hex
+                            t_hi = (Cmd_Dat >> 4);
+                            t_lo = Cmd_Dat - (t_hi << 4);
+                            Cmd_Dat = (t_hi * 10) + t_lo;
                             break;
 
                         // EXX Special Effects
                         // [not a full implementation of all Protracker MOD Exx commands]
                         case 0xe:
-                            t_command = 0;
+                            Cmd = 0;
+
+                            // FILTER (not supported)
+                            if(Cmd_Dat >= 0x00 && Cmd_Dat < 0x10)
+                            {
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
+
+                            // FINE PORTAMENTO UP
+                            if(Cmd_Dat >= 0x10 && Cmd_Dat < 0x20)
+                            {
+                                Cmd = 0x22;
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0x10, 15.0f, 255.0f);
+                            }
+
+                            // FINE PORTAMENTO DOWN
+                            if(Cmd_Dat >= 0x20 && Cmd_Dat < 0x30)
+                            {
+                                Cmd = 0x23;
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0x20, 15.0f, 255.0f);
+                            }
+
+                            // SET GLISS CONTROL (not supported)
+                            if(Cmd_Dat >= 0x30 && Cmd_Dat < 0x40)
+                            {
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
+
+                            // SET VIBRATO CONTROL (not supported)
+                            if(Cmd_Dat >= 0x40 && Cmd_Dat < 0x50)
+                            {
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
+
+                            // SET FINETUNE (not supported)
+                            if(Cmd_Dat >= 0x50 && Cmd_Dat < 0x60)
+                            {
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
 
                             // PATTERN LOOP
                             if(Cmd_Dat >= 0x60 && Cmd_Dat < 0x70)
                             {
-                                t_command = 0x06;
+                                Cmd = 0x06;
                                 Cmd_Dat = Cmd_Dat - 0x60;
                             }
 
-                            // FINEVOLUME SLIDEUP.
-                            if(Cmd_Dat >= 0xa0 && Cmd_Dat < 0xb0)
+                            // SET TREMOLO CONTROL (not supported)
+                            if(Cmd_Dat >= 0x70 && Cmd_Dat < 0x80)
                             {
-                                t_command = 0x19;
-                                Cmd_Dat = Cmd_Dat - 0xa0;
+                                Cmd = 0;
+                                Cmd_Dat = 0;
                             }
 
-                            // FINEVOLUME SLIDEDOWN.
-                            if(Cmd_Dat >= 0xb0 && Cmd_Dat < 0xc0)
+                            // NOTHING
+                            if(Cmd_Dat >= 0x80 && Cmd_Dat < 0x90)
                             {
-                                t_command = 0x1a;
-                                Cmd_Dat = Cmd_Dat - 0xb0;
+                                Cmd = 0;
+                                Cmd_Dat = 0;
                             }
 
                             // NOTE RETRIGGER
                             if(Cmd_Dat >= 0x90 && Cmd_Dat < 0xa0)
                             {
-                                t_command = 0xe;
+                                Cmd = 0xe;
                                 Cmd_Dat = Cmd_Dat - 0x90;
+                            }
+
+                            // FINEVOLUME SLIDEUP
+                            if(Cmd_Dat >= 0xa0 && Cmd_Dat < 0xb0)
+                            {
+                                Cmd = 0x20;
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xa0, 15.0f, 255.0f);
+                            }
+
+                            // FINEVOLUME SLIDEDOWN
+                            if(Cmd_Dat >= 0xb0 && Cmd_Dat < 0xc0)
+                            {
+                                Cmd = 0x21;
+                                Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xb0, 15.0f, 255.0f);
                             }
 
                             // NOTE CUT
                             if(Cmd_Dat >= 0xc0 && Cmd_Dat < 0xd0)
                             {
                                 *(RawPatterns + tmo + PATTERN_VOLUME) = (Cmd_Dat & 0xf) | 0xf0;
-                                t_command = 0;
+                                Cmd = 0;
                                 Cmd_Dat = 0;
                             }
 
-                            if(Cmd_Dat >= 0xd0 && Cmd_Dat < 0xf0)
+                            // NOTE DELAY (not supported)
+                            if(Cmd_Dat >= 0xd0 && Cmd_Dat < 0xe0)
                             {
-                                t_command = 0;
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
+
+                            // PATTERN DELAY (not supported)
+                            if(Cmd_Dat >= 0xe0 && Cmd_Dat < 0xf0)
+                            {
+                                Cmd = 0;
+                                Cmd_Dat = 0;
+                            }
+
+                            // FUNKIT (not supported)
+                            if(Cmd_Dat >= 0xf0 && Cmd_Dat <= 0xff)
+                            {
+                                Cmd = 0;
                                 Cmd_Dat = 0;
                             }
                             break;
 
+                        // SPEED
+                        case 0xf:
+                            if(Cmd_Dat > 31) cur_tempo = Cmd_Dat;
+                            else cur_speed = Cmd_Dat;
+
+                            // Get the speed to find
+                            int found_exact_st;
+                            int found_free_chan;
+                            float speed_to_find = cur_tempo / 125.0f * 50.0f / (float) cur_speed;
+                            speed_to_find *= 60.0f;
+
+                            // Now we need to find the exact match for that speed
+                            // the ugly big bad brute force way :D
+                
+                            Cmd = 0;
+                            Cmd_Dat = 0;
+
+                            // Loop over speeds
+                            found_exact_st = FALSE;
+                            for(j = 1; j < 32; j++)
+                            {
+                                // Loop over tempos
+                                for(i = 20; i < 255; i++)
+                                {
+                                    if((int) speed_to_find == (int) (((float) i * (float) j)))
+                                    {
+                                        found_exact_st = TRUE;
+                                        found_tempo = i;
+                                        found_speed = j;
+                                        // Always use the 2nd fx to set the tempo
+                                        
+                                        // We can put this on any track so look for a free one
+
+                                        found_free_chan = FALSE;
+                                        // Check if we already have recorded it
+                                        for(k = 0; k < channels; k++)
+                                        {
+                                            int free_chan = Get_Pattern_Offset(pSequence[pwrite], k, li2);
+                                            if(*(RawPatterns + free_chan + PATTERN_FX2) == 0xf0 &&
+                                               *(RawPatterns + free_chan + PATTERN_FXDATA2) == found_tempo)
+                                            {
+                                                found_free_chan = TRUE;
+                                            }
+                                        }
+
+                                        if(!found_free_chan)
+                                        {
+                                            for(k = 0; k < channels; k++)
+                                            {
+                                                int free_chan = Get_Pattern_Offset(pSequence[pwrite], k, li2);
+                                                if(!*(RawPatterns + free_chan + PATTERN_FX2))
+                                                {
+                                                    found_free_chan = TRUE;
+                                                    *(RawPatterns + free_chan + PATTERN_FX2) = 0xf0;
+                                                    *(RawPatterns + free_chan + PATTERN_FXDATA2) = found_tempo;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if(!found_free_chan)
+                                        {
+                                            // Overwrite is the worst case scenario
+                                            *(RawPatterns + tmo + PATTERN_FX2) = 0xf0;
+                                            *(RawPatterns + tmo + PATTERN_FXDATA2) = found_tempo;
+                                        }
+                                        Cmd = 0xf;
+                                        Cmd_Dat = found_speed;
+                                        break;
+                                    }
+                                }
+                                if(found_exact_st) break;
+                            }
+
+                            break;
+
                     } // Pattern FX adapter end.
 
-                    *(RawPatterns + tmo + PATTERN_FX) = t_command;
+                    *(RawPatterns + tmo + PATTERN_FX) = Cmd;
                     *(RawPatterns + tmo + PATTERN_FXDATA) = Cmd_Dat;
                 }
             }
         }
+
+        fseek(in, 1084 + (nPatterns * (4 * channels * 64)), SEEK_SET);
 
         // Load the samples
         for(swrite = 0; swrite < 31; swrite++)
@@ -969,6 +1155,8 @@ int LoadMod(char *FileName)
 
     if(in != NULL)
     {
+        Songplaying = FALSE;
+
         // Reading and checking extension...
         char extension[10];
         Read_Data(extension, sizeof(char), 9, in);
@@ -1213,7 +1401,8 @@ Read_Mod_File:
                     Read_Mod_Data(&SampleChannels[swrite][slwrite], sizeof(char), 1, in);
                     if(SampleChannels[swrite][slwrite] == 2)
                     {
-                        RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short));
+                        RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
+                        memset(RawSamples[swrite][1][slwrite], 0, SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
                         Read_Mod_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
                         Swap_Sample(RawSamples[swrite][1][slwrite], swrite, slwrite);
                         *RawSamples[swrite][1][slwrite] = 0;
@@ -1454,7 +1643,8 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
     if(Packed_Length == -1)
     {
         // Sample wasn't packed
-        Packed_Read_Buffer = (Uint8 *) malloc(Dest_Length * 2);
+        Packed_Read_Buffer = (Uint8 *) malloc(Dest_Length * 2 + 8);
+        memset(Packed_Read_Buffer, 0, Dest_Length * 2 + 8);
         Read_Mod_Data(Packed_Read_Buffer, sizeof(char), Dest_Length * 2, FileHandle);
         return((short *) Packed_Read_Buffer);
     }
@@ -1465,8 +1655,8 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
         // Read the packer buffer
         Read_Mod_Data(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
-        Dest_Buffer = (short *) malloc(Dest_Length * 2);
-        memset(Dest_Buffer, 0, Dest_Length * 2);
+        Dest_Buffer = (short *) malloc(Dest_Length * 2 + 8);
+        memset(Dest_Buffer, 0, Dest_Length * 2 + 8);
 
         switch(Pack_Type)
         {
@@ -1514,35 +1704,35 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
     switch(Pack_Type)
     {
         case SMP_PACK_AT3:
-            PackedSample = (short *) malloc(Size * 2);
-            memset(PackedSample, 0, Size * 2);
+            PackedSample = (short *) malloc(Size * 2 + 8);
+            memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToAT3(Sample, PackedSample, Size * 2, BitRate);
             break;
 
         case SMP_PACK_GSM:
-            PackedSample = (short *) malloc(Size * 2);
-            memset(PackedSample, 0, Size * 2);
+            PackedSample = (short *) malloc(Size * 2 + 8);
+            memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToGSM(Sample, PackedSample, Size * 2);
             break;
 
         case SMP_PACK_MP3:
-            PackedSample = (short *) malloc(Size * 2);
-            memset(PackedSample, 0, Size * 2);
+            PackedSample = (short *) malloc(Size * 2 + 8);
+            memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToMP3(Sample, PackedSample, Size * 2, BitRate);
             break;
 
         case SMP_PACK_TRUESPEECH:
             Aligned_Size = (Size * 2) + 0x400;
-            AlignedSample = (short *) malloc(Aligned_Size);
+            AlignedSample = (short *) malloc(Aligned_Size + 8);
             if(AlignedSample)
             {
-                memset(AlignedSample, 0, Aligned_Size);
+                memset(AlignedSample, 0, Aligned_Size + 8);
                 memcpy(AlignedSample, Sample, Size * 2);
                 // Size must be aligned
-                PackedSample = (short *) malloc(Aligned_Size);
+                PackedSample = (short *) malloc(Aligned_Size + 8);
                 if(PackedSample)
                 {
-                    memset(PackedSample, 0, Aligned_Size);
+                    memset(PackedSample, 0, Aligned_Size + 8);
                     PackedLen = ToTrueSpeech(AlignedSample, PackedSample, Aligned_Size);
                 }
                 free(AlignedSample);
@@ -1551,16 +1741,16 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
 
         case SMP_PACK_ADPCM:
             Aligned_Size = (Size * 2) + 0x1000;
-            AlignedSample = (short *) malloc(Aligned_Size);
+            AlignedSample = (short *) malloc(Aligned_Size + 8);
             if(AlignedSample)
             {
-                memset(AlignedSample, 0, Aligned_Size);
+                memset(AlignedSample, 0, Aligned_Size + 8);
                 memcpy(AlignedSample, Sample, Size * 2);
                 // Size must be aligned
-                PackedSample = (short *) malloc(Aligned_Size);
+                PackedSample = (short *) malloc(Aligned_Size + 8);
                 if(PackedSample)
                 {
-                    memset(PackedSample, 0, Aligned_Size);
+                    memset(PackedSample, 0, Aligned_Size + 8);
                     PackedLen = ToADPCM(AlignedSample, PackedSample, Aligned_Size);
                 }
                 free(AlignedSample);
@@ -1568,8 +1758,8 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
             break;
 
         case SMP_PACK_8BIT:
-            PackedSample = (short *) malloc(Size * 2);
-            memset(PackedSample, 0, Size * 2);
+            PackedSample = (short *) malloc(Size * 2 + 8);
+            memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = To8Bit(Sample, PackedSample, Size);
             break;
 
@@ -1920,6 +2110,11 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_Arpeggio = FALSE;
     int Store_FX_Vibrato = FALSE;
     int Store_FX_Reverse = FALSE;
+    int Store_FX_PosJump = FALSE;
+    int Store_FX_FineVolumeSlideUp = FALSE;
+    int Store_FX_FineVolumeSlideDown = FALSE;
+    int Store_FX_FinePitchUp = FALSE;
+    int Store_FX_FinePitchDown = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -2493,9 +2688,34 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_Vibrato = TRUE;
                                     break;
 
-                                // $1d Reverse playing way
+                                // $1e Reverse playing way
                                 case 0x1e:
                                     Store_FX_Reverse = TRUE;
+                                    break;
+
+                                // $1f Position jump
+                                case 0x1f:
+                                    Store_FX_PosJump = TRUE;
+                                    break;
+
+                                // $20 Fine volume slide up
+                                case 0x20:
+                                    Store_FX_FineVolumeSlideUp = TRUE;
+                                    break;
+
+                                // $20 Fine volume slide down
+                                case 0x21:
+                                    Store_FX_FineVolumeSlideDown = TRUE;
+                                    break;
+
+                                // $22 Fine pitch up
+                                case 0x22:
+                                    Store_FX_FinePitchUp = TRUE;
+                                    break;
+
+                                // $22 Fine pitch down
+                                case 0x23:
+                                    Store_FX_FinePitchDown = TRUE;
                                     break;
 
                                 // $31 First TB303 control
@@ -2648,8 +2868,15 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_ARPEGGIO", Store_FX_Arpeggio);
     Save_Constant("PTK_FX_VIBRATO", Store_FX_Vibrato);
     Save_Constant("PTK_FX_REVERSE", Store_FX_Reverse);
+    Save_Constant("PTK_FX_POSJUMP", Store_FX_PosJump);
+    Save_Constant("PTK_FX_FINEVOLUMESLIDEUP", Store_FX_FineVolumeSlideUp);
+    Save_Constant("PTK_FX_FINEVOLUMESLIDEDOWN", Store_FX_FineVolumeSlideDown);
+    Save_Constant("PTK_FX_FINEPITCHUP", Store_FX_FinePitchUp);
+    Save_Constant("PTK_FX_FINEPITCHDOWN", Store_FX_FinePitchDown);
 
-    Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio | Store_FX_PatternLoop);
+    // Special but only at tick 0
+    Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio |
+                                  Store_FX_PatternLoop | Store_FX_Reverse);
 
     // Remap the used instruments
     for(i = 0; i < MAX_INSTRS; i++)
@@ -3048,7 +3275,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     if(Apply_Interpolation)
                     {
                         Calc_Len /= 2;
-                        Smp_Dats = (short *) malloc(Real_Len * 2);
+                        Smp_Dats = (short *) malloc(Real_Len * 2 + 8);
+                        memset(Smp_Dats, 0, Real_Len * 2 + 8);
                         // Halve the sample
                         short *Sample = Get_WaveForm(swrite, 0, slwrite);
                         for(iSmp = 0; iSmp < Calc_Len; iSmp++)
@@ -4029,7 +4257,8 @@ void LoadInst(char *FileName)
                 Read_Data(&SampleChannels[swrite][slwrite], sizeof(char), 1, in);
                 if(SampleChannels[swrite][slwrite] == 2)
                 {
-                    RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short));
+                    RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
+                    memset(RawSamples[swrite][1][slwrite], 0, SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
                     Read_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
                     Swap_Sample(RawSamples[swrite][1][slwrite], swrite, slwrite);
                     *RawSamples[swrite][1][slwrite] = 0;
@@ -4629,7 +4858,8 @@ void Swap_Sample(short *buffer, int sample, int bank)
 short *Swap_New_Sample(short *buffer, int sample, int bank)
 {
 #if defined(__BIG_ENDIAN__)
-    short *new_buffer = (short *) malloc(SampleNumSamples[sample][bank] * sizeof(short));
+    short *new_buffer = (short *) malloc(SampleNumSamples[sample][bank] * sizeof(short) + 8);
+    memset(new_buffer, 0, SampleNumSamples[sample][bank] * sizeof(short) + 8);
     memcpy(new_buffer, buffer, SampleNumSamples[sample][bank] * sizeof(short));
     Swap_Sample(new_buffer, sample, bank);
     return(new_buffer);
@@ -5061,6 +5291,7 @@ int Calc_Length(void)
     int nbr_ticks;
     int Samples;
     int ilen;
+    int early_exit = FALSE;
 
     shuffle_switch = -1;
     Samples = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
@@ -5070,7 +5301,8 @@ int Calc_Length(void)
     PosTicks = 0;
     nbr_ticks = 0;
     len = 0;
-    for(i = 0; i < sLength; i++)
+    i = 0;
+    while(i < sLength)
     {
         if(have_break < MAX_ROWS) pos_patt = have_break;
         else pos_patt = 0;
@@ -5127,6 +5359,17 @@ int Calc_Length(void)
                                 if(patt_datas[l] < MAX_ROWS) have_break = patt_datas[l];
                                 break;
                         
+                            case 0x1f:
+                                // Avoid looping the song when jumping
+                                if(i == (sLength - 1) || patt_datas[l] <= i)
+                                {
+                                    early_exit = TRUE;
+                                }
+                                i = patt_datas[l];
+                                // Was there a break already ?
+                                if(have_break >= MAX_ROWS) have_break = 0;
+                                break;
+                        
                             case 0xf:
                                 Ticks = (float) patt_datas[l];
                                 break;
@@ -5171,6 +5414,8 @@ int Calc_Length(void)
                 }
             }
         }
+        if(early_exit) break;
+        i++;
     }
     len /= MIX_RATE;
 

@@ -198,7 +198,8 @@ void Draw_Wave_Data(void)
                 if(set_start_rect)
                 {
                     SetColor(COL_SCOPESSAMPLES);
-                    Fillrect(start_rect + WAVE_LEFT + 1, 450 + 1, end_rect + WAVE_LEFT + 1 + 1, SAMPLE_HEIGHT - 1);
+                    if(end_rect == start_rect) end_rect++;
+                    Fillrect(start_rect + WAVE_LEFT + 1, 450 + 1, end_rect + WAVE_LEFT + 1, SAMPLE_HEIGHT - 1);
                 }
 
                 // Now draw the sample data

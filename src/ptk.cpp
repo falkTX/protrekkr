@@ -1010,8 +1010,8 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_CHANGE_BPM_TICKS_NBR)
         {
-            Display_Beat_Time();
             Actualize_Master(teac);
+            Display_Beat_Time();
         }
 
         if(gui_action == GUI_CMD_CHANGE_TRACKS_NBR)
@@ -1847,8 +1847,13 @@ void AllocateWave(int n_index, int split, long lenfir, int samplechans, int clea
     SampleType[n_index][split] = 1;
 
     SampleChannels[n_index][split] = samplechans;
-    RawSamples[n_index][0][split] = (short *) malloc(lenfir * 2);
-    if(samplechans == 2) RawSamples[n_index][1][split] = (short *) malloc(lenfir * 2);
+    RawSamples[n_index][0][split] = (short *) malloc((lenfir * 2) + 8);
+    memset(RawSamples[n_index][0][split], 0, (lenfir * 2) + 8);
+    if(samplechans == 2)
+    {
+        RawSamples[n_index][1][split] = (short *) malloc((lenfir * 2) + 8);
+        memset(RawSamples[n_index][1][split], 0, (lenfir * 2) + 8);
+    }
 }
 
 // ------------------------------------------------------
@@ -2273,7 +2278,7 @@ void StartEdit(void)
 // Stop replaying
 void SongStop(void)
 {
-    Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Button_Box(8, 28, 80, 16, "Play Sng./Patt.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     Status_Box("Ready...");
 
     Ptk_Stop();
@@ -5779,7 +5784,7 @@ void Mouse_Sliders_Master_Shuffle(void)
 
 void Actualize_Master(char gode)
 {
-    if(gode == 0 || gode == 1)
+    if(gode == 0 || gode == 1 || gode == 2)
     {
         if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
@@ -5789,7 +5794,7 @@ void Actualize_Master(char gode)
     if(gode == 0 || gode == 2)
     {
         if(TicksPerBeat < 1) TicksPerBeat = 1;
-        if(TicksPerBeat > 16) TicksPerBeat = 16;
+        if(TicksPerBeat > 32) TicksPerBeat = 32;
         if((TicksPerBeat + 1) < Ticks_Synchro_Left)
         {
             Ticks_Synchro_Left = TicksPerBeat + 1;

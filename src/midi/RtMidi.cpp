@@ -657,8 +657,9 @@ extern "C" void *alsaMidiHandler( void *ptr )
     data->doInput = false;
     return 0;
   }
-  unsigned char *buffer = (unsigned char *) malloc( apiData->bufferSize );
-  if ( buffer == NULL ) {
+  unsigned char *buffer = (unsigned char *) malloc(apiData->bufferSize);
+  if ( buffer == NULL )
+  {
     data->doInput = false;
     return 0;
   }
