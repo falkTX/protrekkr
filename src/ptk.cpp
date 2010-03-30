@@ -1336,6 +1336,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_UPDATE_LOOP_EDITOR_ED)
         {
+            // 1 = loop end
             Actualize_Instrument_Ed(1, teac);
         }
 
@@ -1380,6 +1381,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_UPDATE_INSTRUMENT_ED)
         {
+            // 0 loop start
             Actualize_Instrument_Ed(0, teac);
         }
 
@@ -4841,16 +4843,13 @@ void Mouse_Handler(void)
 
         // Scroll the knobs
         Mouse_Wheel_303_Ed(-MouseWheel_Multiplier);
-
         Mouse_Wheel_Sample_Ed(-MouseWheel_Multiplier);
     }
 
     if(Mouse.button & MOUSE_RIGHT_BUTTON)
     {
         Mouse_Sliders_Right_Pattern_Ed();
-
         Mouse_Sliders_Right_Instrument_Ed();
-
         Mouse_Sliders_Right_Reverb_Ed();
     }
 
@@ -4874,27 +4873,16 @@ void Mouse_Handler(void)
         }
 
         Mouse_Left_Repeat_Instrument_Ed();
-
         Mouse_Sliders_303_Ed();
-
         Mouse_Sliders_Sample_Ed();
-
         Mouse_Sliders_Instrument_Ed();
-
         Mouse_Sliders_Master_Ed();
-
         Mouse_Sliders_Synth_Ed();
-
         Mouse_Sliders_Track_Fx_Ed();
-
         Mouse_Sliders_Fx_Ed();
-
         Mouse_Sliders_Track_Ed();
-
         Mouse_Sliders_Master_Shuffle();
-
         Mouse_Sliders_Pattern_Ed();
-
         Mouse_Sliders_Reverb_Ed();
     }
     else
@@ -4981,7 +4969,6 @@ void Mouse_Handler(void)
         }
 
         Mouse_Left_303_Ed();
-
         Mouse_Left_Sample_Ed();
 
         // Change current instrument name
@@ -5205,7 +5192,6 @@ void Mouse_Handler(void)
             Actupated(0);
         }
 
-
         // Select track
         if(zcheckMouse(8, 152, 61, 10))
         {
@@ -5284,7 +5270,6 @@ void Mouse_Handler(void)
             if(is_editing) Octave_Down_Block(Cur_Position);
         }
 
-
         // Switch small / large patterns
         int Add_Offset = (Patterns_Lines == DISPLAYED_LINES_LARGE ? 133 : 0);
         if(zcheckMouse(0, 429 + Add_Offset, 18, 16))
@@ -5319,30 +5304,21 @@ void Mouse_Handler(void)
         if(zcheckMouse(660, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
 
         Mouse_Left_Track_Fx_Ed();
-
         Mouse_Left_Sequencer_Ed();
-
         Mouse_Left_Reverb_Ed();
-
         Mouse_Left_DiskIO_Ed();
-
         Mouse_Left_Track_Ed();
-
         Mouse_Left_Instrument_Ed();
-
         Mouse_Left_Fx_Ed();
-
         Mouse_Left_Synth_Ed();
-
         Mouse_Left_Master_Ed();
-
         Mouse_Left_Pattern_Ed();
     }
 
     // Right mouse button
     if(Mouse.button_oneshot & MOUSE_RIGHT_BUTTON)
     {
-        gui_action = GUI_CMD_NOP;
+//        gui_action = GUI_CMD_NOP;
 
         Mouse_Right_Pattern_Ed();
 
@@ -5509,8 +5485,6 @@ void Mouse_Handler(void)
         {
             gui_action = GUI_CMD_RECORD_MODE;
         }
-
-
 
         // Select pattern
         if(zcheckMouse(8, 152, 61, 10))

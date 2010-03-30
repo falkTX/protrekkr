@@ -470,27 +470,27 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 Gui_Draw_Button_Box(394, 470, 16, 16, "\06", Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
                 // Fine loop editor mode
-                if(typex == 0)
+                switch(typex)
                 {
-                    outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
-                    outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
-                    actuloop = 1;
-                }
+                    case 0:
+                        outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
+                        outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
+                        actuloop = 1;
+                        break;
 
-                if(typex == 1)
-                {
-                    outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
-                    outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
-                    actuloop = 2;
-                }
+                    case 1:
+                        outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
+                        outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
+                        actuloop = 2;
+                        break;
 
-                if(typex == 2)
-                {
-                    outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
-                    outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
-                    outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
-                    outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
-                    actuloop = 3;
+                    case 2:
+                        outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
+                        outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
+                        outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
+                        outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
+                        actuloop = 3;
+                        break;
                 }
 
                 break;
@@ -1116,14 +1116,20 @@ void Mouse_Sliders_Right_Instrument_Ed(void)
         if(zcheckMouse(278, 470, 16, 16) && *Cur_Loop_End > *Cur_Loop_Start)
         {
             *Cur_Loop_End -= 10;
-            if(*Cur_Loop_End < *Cur_Loop_Start) *Cur_Loop_End = *Cur_Loop_Start;
+            if(*Cur_Loop_End < *Cur_Loop_Start)
+            {
+                *Cur_Loop_End = *Cur_Loop_Start;
+            }
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
         if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split])
         {
             *Cur_Loop_End += 10;
-            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split]) *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split];
+            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split])
+            {
+                *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split];
+            }
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }

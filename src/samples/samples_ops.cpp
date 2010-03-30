@@ -40,64 +40,208 @@
 
 // ------------------------------------------------------
 // Variables
-short *Sample_Back;
-int Sample_Back_Channels;
-int Sample_Back_Size;
+int cur_sample_buffer;
+short *Sample_Back[4][2];
+int Sample_Back_Channels[4];
+int Sample_Back_Size[4];
+
+// ------------------------------------------------------
+// Copy part of a sample
+int Sample_Copy(int32 range_start, int32 range_end)
+{
+    int i;
+    short *dest_mono;
+    short *dest_stereo;
+    long copysize = (range_end - range_start);
+    char nc = SampleChannels[ped_patsam][ped_split];
+
+    if(copysize)
+    {
+        // Free both back buffers
+        if(Sample_Back[cur_sample_buffer][0]) free(Sample_Back[cur_sample_buffer][0]);
+        if(Sample_Back[cur_sample_buffer][1]) free(Sample_Back[cur_sample_buffer][1]);
+        Sample_Back[cur_sample_buffer][0] = NULL;
+        Sample_Back[cur_sample_buffer][1] = NULL;
+
+        // Copy the data into the back buffer
+        Sample_Back[cur_sample_buffer][0] = (short *) malloc(copysize * 2);
+        if(!Sample_Back[cur_sample_buffer][0]) return 0;
+        if(nc == 2)
+        {
+            Sample_Back[cur_sample_buffer][1] = (short *) malloc(copysize * 2);
+            if(!Sample_Back[cur_sample_buffer][1])
+            {
+                free(Sample_Back[cur_sample_buffer][0]);
+                return 0;
+            }
+        }
+        Sample_Back_Channels[cur_sample_buffer] = nc;
+        Sample_Back_Size[cur_sample_buffer] = copysize;
+
+        // Copy the selection into the back buffer
+        dest_mono = Sample_Back[cur_sample_buffer][0];
+        dest_stereo = Sample_Back[cur_sample_buffer][1];
+        for(i = range_start; i < range_end; i++)
+        {
+            *dest_mono++ = *(RawSamples[ped_patsam][0][ped_split] + i);
+            if(nc == 2) *dest_stereo++ = *(RawSamples[ped_patsam][1][ped_split] + i);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
+// Paste a back buffer into a sample
+int Sample_Paste(int32 range_start)
+{
+    int32 i;
+    short *NewBuffer[2];
+    char nc;
+    long p_s;
+    long cutsize = Sample_Back_Size[cur_sample_buffer];
+    long newsize = SampleNumSamples[ped_patsam][ped_split] + cutsize;
+
+    if(cutsize)
+    {
+        nc = SampleChannels[ped_patsam][ped_split];
+
+        // Allocate the destination buffer(s)
+        // (We need to clear the second one as the back buffer may not be stereo).
+        NewBuffer[0] = (short *) malloc(newsize * 2);
+        if(!NewBuffer[0]) return 0;
+
+        if(nc == 2)
+        {
+            NewBuffer[1] = (short *) malloc(newsize * 2);
+            if(!NewBuffer[1])
+            {
+                free(NewBuffer[0]);
+                return 0;
+            }
+            memset(NewBuffer[1], 0, newsize * 2);
+        }
+
+        p_s = 0;
+        if(range_start > 0)
+        {
+            // Copy the original data into the new buffer
+            for(i = 0; i < range_start; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                p_s++;
+            }
+        }
+
+        // Copy the back buffer(s) now
+        for(i = 0; i < cutsize; i++)
+        {
+            *(NewBuffer[0] + p_s) = *(Sample_Back[cur_sample_buffer][0] + i);
+            if(Sample_Back_Size[cur_sample_buffer] == 2 && nc == 2) *(NewBuffer[1] + p_s) = *(Sample_Back[cur_sample_buffer][1] + i);
+            p_s++;
+        }
+
+        if((SampleNumSamples[ped_patsam][ped_split] - range_start) > 0)
+        {
+            // Add the rest of the original data
+            for(i = range_start; i < (int32) SampleNumSamples[ped_patsam][ped_split]; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                p_s++;
+            }
+        }
+
+        // Set the new buffer as current sample
+        if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
+        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
+        if(nc == 2)
+        {
+            if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
+            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
+        }
+
+        SampleNumSamples[ped_patsam][ped_split] = newsize;
+        Status_Box("Done.");
+        return 1;
+    }
+    return 0;
+}
 
 // ------------------------------------------------------
 // Cut part of a sample
-int Sample_Cut(int32 range_start, int32 range_end)
+int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
 {
     int32 i;
-    long cutsize = (range_end - range_start) + 1;
+    short *NewBuffer[2];
+    char nc;
+    long p_s;
+    long cutsize = (range_end - range_start);
     long newsize = SampleNumSamples[ped_patsam][ped_split] - cutsize;
 
-    if(newsize != 0)
+    if(newsize)
     {
         Status_Box("Cutting sample...");
         Stop_Current_Sample();
         AUDIO_Stop();
-        SDL_Delay(256);
-        char nc = SampleChannels[ped_patsam][ped_split];
+        SDL_Delay(100);
 
-        short *Mono = (short *) malloc(newsize * 2);
+        nc = SampleChannels[ped_patsam][ped_split];
 
-        short *Stereo;
-        if(nc == 2) Stereo = (short *) malloc(newsize * 2);
+        // Allocate the wav with the minus the block to cut
+        NewBuffer[0] = (short *) malloc(newsize * 2);
+        if(!NewBuffer[0]) return 0;
+        if(nc == 2)
+        {
+            NewBuffer[1] = (short *) malloc(newsize * 2);
+            if(!NewBuffer[1])
+            {
+                free(NewBuffer[0]);
+                return 0;
+            }
+        }
 
-        long p_s = 0;
+        if(do_copy)
+        {
+            if(!Sample_Copy(range_start, range_end))
+            {
+                free(NewBuffer[1]);
+                free(NewBuffer[0]);
+                return 0;
+            }
+        }
 
+        p_s = 0;
         if(range_start > 0)
         {
+            // Copy the data located before the range start
             for(i = 0; i < range_start; i++)
             {
-                *(Mono + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-
-                if(nc == 2)
-                {
-                    *(Stereo + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
-                }
+                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
                 p_s++;
             }
         }
 
-        if(SampleNumSamples[ped_patsam][ped_split] - range_end > 1)
+        if((SampleNumSamples[ped_patsam][ped_split] - range_end) > 0)
         {
-            for(i = range_end + 1; i < (int32) SampleNumSamples[ped_patsam][ped_split]; i++)
+            // Add the data located after the range end
+            for(i = range_end; i < (int32) SampleNumSamples[ped_patsam][ped_split]; i++)
             {
-                *(Mono + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-                if(nc == 2) *(Stereo + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
                 p_s++;
             }
         }
 
+        // Set the new buffer as current sample
         if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
-        RawSamples[ped_patsam][0][ped_split] = Mono;
-
+        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
         if(nc == 2)
         {
             if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
-            RawSamples[ped_patsam][1][ped_split] = Stereo;
+            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
         }
 
         SampleNumSamples[ped_patsam][ped_split] = newsize;

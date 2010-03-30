@@ -568,7 +568,6 @@ DDCRET WaveFile::WriteStereoSample(INT16 LeftSample,
     return retcode;
 }
 
-
 DDCRET WaveFile::WriteStereoFloatSample(float LeftSample,
                                         float RightSample)
 {
@@ -603,7 +602,6 @@ DDCRET WaveFile::WriteStereoFloatSample(float LeftSample,
 
     return retcode;
 }
-
 
 DDCRET WaveFile::ReadMonoSample(INT16 *Sample)
 {

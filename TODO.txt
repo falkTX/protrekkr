@@ -7,10 +7,9 @@ v2.0:
 
  - Enhance the samples editor a bit:
 
-   - Fix "Select All" and add "Select View".
+   - Reverse command.
    - Add rotate left/right.
-   - Add Cut/copy/paste (need a back buffer).
-   - Option to make the selection to become the whole sample.
+   - Option to make the selection to become the whole sample (crop).
 
  - See to add a third filter to the synth (analog like).
 

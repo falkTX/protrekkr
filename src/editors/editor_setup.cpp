@@ -276,13 +276,17 @@ void Actualize_Master_Ed(char gode)
         // Bevel on/off
         if(gode == 0 || gode == 10 || gode == 13)
         {
-            if(Beveled)
+            switch(Beveled)
             {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                case 2:
+                    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+                    break;
+                case 1:
+                    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    break;
+                case 0:
+                    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20, 495, 14, 16, "B", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+                    break;
             }
             Set_Phony_Palette();
             Refresh_Palette();
@@ -437,6 +441,15 @@ void Mouse_Right_Master_Ed(void)
             current_palette_idx += 10;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
+        }
+
+        // Turn beveling type 2 on/off
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20, 495, 14, 16))
+        {
+            if(Beveled == 2) Beveled = 0;
+            else Beveled = 2;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 13;
         }
     }
 }
@@ -667,10 +680,11 @@ void Mouse_Left_Master_Ed(void)
             teac = 10;
         }  
 
-        // Turn beveling on/off
+        // Turn beveling type 1 on/off
         if(zcheckMouse(520 + (18 + 108) + 2 + 20, 495, 14, 16))
         {
-            Beveled ^= TRUE;
+            if(Beveled == 1) Beveled = 0;
+            else Beveled = 1;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 13;
         }

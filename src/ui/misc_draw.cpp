@@ -35,6 +35,10 @@
 #include "include/draw_primitives.h"
 
 // ------------------------------------------------------
+// Constants
+#define SHADOW_FACTOR 3.2f
+
+// ------------------------------------------------------
 // Variables
 int max_colors_logo;
 int max_colors_303;
@@ -44,7 +48,7 @@ SDL_Surface *Temp_SMALLPFONT;
 SDL_Surface *Temp_NOTEPFONT;
 SDL_Surface *Temp_NOTELARGEPFONT;
 SDL_Surface *Temp_NOTESMALLPFONT;
-int Beveled = TRUE;
+int Beveled = 1;
 
 int max_colors_Pointer;
 int curr_tab_highlight;
@@ -244,7 +248,7 @@ int Idx_Palette[] =
     32
 };
 
-int Default_Beveled1 = TRUE;
+int Default_Beveled1 = 1;
 SDL_Color Default_Palette1[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
@@ -332,7 +336,7 @@ SDL_Color Default_Palette1[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
 };
 
-int Default_Beveled2 = TRUE;
+int Default_Beveled2 = 1;
 SDL_Color Default_Palette2[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
@@ -420,7 +424,7 @@ SDL_Color Default_Palette2[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black
 };
 
-int Default_Beveled3 = FALSE;
+int Default_Beveled3 = 0;
 SDL_Color Default_Palette3[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
@@ -508,7 +512,7 @@ SDL_Color Default_Palette3[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
 };
 
-int Default_Beveled4 = TRUE;
+int Default_Beveled4 = 1;
 SDL_Color Default_Palette4[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
@@ -649,12 +653,26 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i + 1].r;
                 ComponentG = Phony_Palette[i + 1].g;
                 ComponentB = Phony_Palette[i + 1].b;
-                ComponentR += 0x20;
-                ComponentG += 0x20;
-                ComponentB += 0x20;
-                if(ComponentR > 0xff) ComponentR = 0xff;
-                if(ComponentG > 0xff) ComponentG = 0xff;
-                if(ComponentB > 0xff) ComponentB = 0xff;
+                switch(Beveled)
+                {
+                    case 0:
+                    case 1:
+                        ComponentR += 0x18;
+                        ComponentG += 0x18;
+                        ComponentB += 0x18;
+                        if(ComponentR > 0xff) ComponentR = 0xff;
+                        if(ComponentG > 0xff) ComponentG = 0xff;
+                        if(ComponentB > 0xff) ComponentB = 0xff;
+                        break;
+                    case 2:
+                        ComponentR -= 0x18;
+                        ComponentG -= 0x18;
+                        ComponentB -= 0x18;
+                        if(ComponentR < 0) ComponentR = 0;
+                        if(ComponentG < 0) ComponentG = 0;
+                        if(ComponentB < 0) ComponentB = 0;
+                        break;
+                }
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
                 Ptk_Palette[i].b = ComponentB;
@@ -667,23 +685,25 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i - 1].r;
                 ComponentG = Phony_Palette[i - 1].g;
                 ComponentB = Phony_Palette[i - 1].b;
-                if(!Beveled)
+                switch(Beveled)
                 {
-                    ComponentR += 0x20;
-                    ComponentG += 0x20;
-                    ComponentB += 0x20;
-                    if(ComponentR > 0xff) ComponentR = 0xff;
-                    if(ComponentG > 0xff) ComponentG = 0xff;
-                    if(ComponentB > 0xff) ComponentB = 0xff;
-                }
-                else
-                {
-                    ComponentR -= 0x20;
-                    ComponentG -= 0x20;
-                    ComponentB -= 0x20;
-                    if(ComponentR < 0) ComponentR = 0;
-                    if(ComponentG < 0) ComponentG = 0;
-                    if(ComponentB < 0) ComponentB = 0;
+                    case 0:
+                        ComponentR += 0x18;
+                        ComponentG += 0x18;
+                        ComponentB += 0x18;
+                        if(ComponentR > 0xff) ComponentR = 0xff;
+                        if(ComponentG > 0xff) ComponentG = 0xff;
+                        if(ComponentB > 0xff) ComponentB = 0xff;
+                        break;
+                    case 1:
+                    case 2:
+                        ComponentR -= 0x18;
+                        ComponentG -= 0x18;
+                        ComponentB -= 0x18;
+                        if(ComponentR < 0) ComponentR = 0;
+                        if(ComponentG < 0) ComponentG = 0;
+                        if(ComponentB < 0) ComponentB = 0;
+                        break;
                 }
                 Ptk_Palette[i].r = ComponentR;
                 Ptk_Palette[i].g = ComponentG;
@@ -733,7 +753,7 @@ void Set_Phony_Palette(void)
                 Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
                 Phony_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
                 break;
-            
+
             case COL_PATTERN_HI_BACK:
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
@@ -744,12 +764,12 @@ void Set_Phony_Palette(void)
                 ComponentR = (ComponentR - ComponentR2);
                 ComponentG = (ComponentG - ComponentG2);
                 ComponentB = (ComponentB - ComponentB2);
-                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
-                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
-                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
-                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
-                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
-                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                else ComponentR = Phony_Palette[i].r + (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                else ComponentG = Phony_Palette[i].g + (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
+                else ComponentB = Phony_Palette[i].b + (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
                 Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_HI_BACK_SHADOW - COL_PATTERN_HI_BACK)].b = ComponentB;
@@ -772,12 +792,12 @@ void Set_Phony_Palette(void)
                 ComponentR = (ComponentR - ComponentR2);
                 ComponentG = (ComponentG - ComponentG2);
                 ComponentB = (ComponentB - ComponentB2);
-                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
-                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
-                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
-                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
-                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
-                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                else ComponentR = Phony_Palette[i].r + (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                else ComponentG = Phony_Palette[i].g + (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
+                else ComponentB = Phony_Palette[i].b + (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
                 Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_HI_FORE_SHADOW - COL_PATTERN_HI_FORE)].b = ComponentB;
@@ -800,12 +820,12 @@ void Set_Phony_Palette(void)
                 ComponentR = (ComponentR - ComponentR2);
                 ComponentG = (ComponentG - ComponentG2);
                 ComponentB = (ComponentB - ComponentB2);
-                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (abs(ComponentR) * 2 / 3);
-                else ComponentR = Phony_Palette[i].r + (abs(ComponentR) * 2 / 3);
-                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (abs(ComponentG) * 2 / 3);
-                else ComponentG = Phony_Palette[i].g + (abs(ComponentG) * 2 / 3);
-                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (abs(ComponentB) * 2 / 3);
-                else ComponentB = Phony_Palette[i].b + (abs(ComponentB) * 2 / 3);
+                if(ComponentR > 0) ComponentR = Phony_Palette[i].r - (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                else ComponentR = Phony_Palette[i].r + (int) (abs(ComponentR) * 2.0f / SHADOW_FACTOR);
+                if(ComponentG > 0) ComponentG = Phony_Palette[i].g - (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                else ComponentG = Phony_Palette[i].g + (int) (abs(ComponentG) * 2.0f / SHADOW_FACTOR);
+                if(ComponentB > 0) ComponentB = Phony_Palette[i].b - (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
+                else ComponentB = Phony_Palette[i].b + (int) (abs(ComponentB) * 2.0f / SHADOW_FACTOR);
                 Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_LO_FORE_SHADOW - COL_PATTERN_LO_FORE)].b = ComponentB;
@@ -2047,7 +2067,7 @@ int Get_Size_Text(char *String)
     int i;
 
     len = 0;
-    for(i = 0; i < (int) strlen(String); i++)
+    for(i = 0; String[i]; i++)
     {
         Idx = Get_Char_Position(Font_Ascii, Nbr_Letters, String[i]);
         len += Font_Size[Idx];
