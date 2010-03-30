@@ -14,6 +14,8 @@ v2.0:
 - Improved .mod import.
 - Fixed a bug in samples looping (1 byte was always missing from the loop).
 - Improved shadow patterns rendering.
+- Patterns shading is also displayed for track which are turned off
+  in the sequencer (shading can be turned on/off globally).
 
 v1.99e:
 

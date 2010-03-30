@@ -36,7 +36,7 @@
 
 // ------------------------------------------------------
 // Constants
-#define SHADOW_FACTOR 3.2f
+#define SHADOW_FACTOR 3.4f
 
 // ------------------------------------------------------
 // Variables
@@ -49,6 +49,7 @@ SDL_Surface *Temp_NOTEPFONT;
 SDL_Surface *Temp_NOTELARGEPFONT;
 SDL_Surface *Temp_NOTESMALLPFONT;
 int Beveled = 1;
+char Use_Shadows = TRUE;
 
 int max_colors_Pointer;
 int curr_tab_highlight;

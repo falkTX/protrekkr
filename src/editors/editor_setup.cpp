@@ -42,6 +42,7 @@ extern int patt_highlight;
 extern char FullScreen;
 extern char AutoSave;
 extern int Beveled;
+extern char Use_Shadows;
 extern int Continuous_Scroll;
 extern int wait_AutoSave;
 
@@ -124,10 +125,10 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(520, 455, 60, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(670, 455, 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, 475, 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16, "Model #1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16, "Model #2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16, "Model #3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16, "Model #4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16, "Theme #1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16, "Theme #2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16, "Theme #3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16, "Theme #4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(194, 555, 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -420,6 +421,21 @@ void Actualize_Master_Ed(char gode)
             if(gode == 19) Actupated(0);
         }
 
+        // Bevel on/off
+        if(gode == 0 || gode == 20)
+        {
+            switch(Use_Shadows)
+            {
+                case 0:
+                    Gui_Draw_Button_Box(520 + 18 + (18 + 108) + 2 + 20, 495, 40, 16, "Shades", BUTTON_NORMAL| BUTTON_TEXT_CENTERED);
+                    break;
+                case 1:
+                    Gui_Draw_Button_Box(520 + 18 + (18 + 108) + 2 + 20, 495, 40, 16, "Shades", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    break;
+            }
+            Actupated(0);
+        }
+
     }
 }
 
@@ -687,6 +703,14 @@ void Mouse_Left_Master_Ed(void)
             else Beveled = 1;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 13;
+        }
+
+        // Turn shadows on/off
+        if(zcheckMouse(520 + 18 + (18 + 108) + 2 + 20, 495, 40, 16))
+        {
+            Use_Shadows ^= TRUE;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 20;
         }
 
         // Autosave

@@ -99,6 +99,7 @@ extern int patt_highlight;
 extern char FullScreen;
 extern char AutoSave;
 extern int Beveled;
+extern char Use_Shadows;
 extern int Continuous_Scroll;
 extern char *cur_dir;
 extern char Scopish_LeftRight;
@@ -4351,7 +4352,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "TWNNCFGA");
+    sprintf(extension, "TWNNCFGB");
     Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -4411,6 +4412,8 @@ void SaveConfig(void)
         Write_Data(&Jazz_Edit, sizeof(char), 1, out);
         Write_Data(&Accidental, sizeof(char), 1, out);
 
+        Write_Data(&Use_Shadows, sizeof(char), 1, out);
+
         fclose(out);
 
         Read_SMPT();
@@ -4447,7 +4450,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "TWNNCFGA") == 0)
+        if(strcmp(extension, "TWNNCFGB") == 0)
         {
             Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -4496,6 +4499,8 @@ void LoadConfig(void)
             Read_Data(&Paste_Across, sizeof(char), 1, in);
             Read_Data(&Jazz_Edit, sizeof(char), 1, in);
             Read_Data(&Accidental, sizeof(char), 1, in);
+
+            Read_Data(&Use_Shadows, sizeof(char), 1, in);
 
             if(Patterns_Lines == DISPLAYED_LINES_LARGE)
             {

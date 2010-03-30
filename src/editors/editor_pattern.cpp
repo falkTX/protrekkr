@@ -54,6 +54,8 @@ int Continuous_Scroll;
 
 MARKER Patterns_Marker;
 
+extern char Use_Shadows;
+
 int ped_pattad = 1;
 int ped_patoct = 4;
 
@@ -61,6 +63,8 @@ char sr_isrecording = 0;
 
 int color_1b[11];
 int color_2b[11];
+
+int shadow_tracks[MAX_TRACKS];
 
 char table_decimal[] =
 {
@@ -339,6 +343,12 @@ void draw_pated(int track, int line, int petrack, int row)
 
         Cur_Char_Function[cur_track].Fnc(dover - 1, 187, cur_track, 71, 71 + 6);
 
+        shadow_tracks[cur_track] = FALSE;
+        if(!CHAN_ACTIVE_STATE[Cur_Position][cur_track])
+        {
+            shadow_tracks[cur_track] = Use_Shadows;
+        }
+
         // Mute on/off
         if((dover + (Cur_Char_size[cur_track])) >= MAX_PATT_SCREEN_X) break;
         if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track], 187, 25, 0, 0);
@@ -551,8 +561,8 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     int cur_track;
     int i;
 
-    if(!In_Prev_Next) Shadow_Pattern = 0;
-    else Shadow_Pattern = 1;
+    if(!In_Prev_Next) Shadow_Pattern = FALSE;
+    else Shadow_Pattern = Use_Shadows;
 
     multip = FALSE;
     if(patt_highlight > 1)
@@ -605,7 +615,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         unsigned char p_f2h = p_f2 & 0xf;
 
         // Row
-        cur_color = Get_Nibble_Color(rel, cur_column, multip, Shadow_Pattern);
+        cur_color = Get_Nibble_Color(rel, cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
         Letter(dover, y, 20, cur_color, cur_color + 7);
         old_dover = dover;
         dover += 2;
@@ -630,7 +640,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             dover += Cur_Char_size[cur_track] * 3;
             if(dover >= MAX_PATT_SCREEN_X) break;
 
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
             old_dover = dover;
             dover += PAT_COL_SHIFT - 2;
@@ -642,7 +652,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
                 old_dover = dover;
                 dover += Cur_Char_size[cur_track];
                 if(dover >= MAX_PATT_SCREEN_X) break;
-                cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+                cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
                 Cur_Char_Function[cur_track].Fnc(dover, y, p_bh, cur_color, cur_color + 7);
                 old_dover = dover;
                 dover += Cur_Char_size[cur_track];
@@ -654,13 +664,13 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
                 old_dover = dover;
                 dover += Cur_Char_size[cur_track];
                 if(dover >= MAX_PATT_SCREEN_X) break;
-                cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+                cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
                 Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
                 old_dover = dover;
                 dover += Cur_Char_size[cur_track];
                 if(dover >= MAX_PATT_SCREEN_X) break;
             }
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
             old_dover = dover;
             dover += 2;
@@ -678,7 +688,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_ch, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -690,14 +700,14 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         }
 
-        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         old_dover = dover;
         dover += PAT_COL_SHIFT;
@@ -708,7 +718,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             Cur_Char_Function[cur_track].Fnc(dover, y, p_d >> 4, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_dh, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -720,14 +730,14 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         }
 
-        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+        cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
         // Effect
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         old_dover = dover;
@@ -741,19 +751,19 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -766,19 +776,19 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_eh, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f >> 4, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_fh, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -787,25 +797,25 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
 
         if(!p_e2 && !p_f2)
         {
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -813,25 +823,25 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
         else
         {
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_e2 >> 4, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_e2h, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f2 >> 4, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
         
-            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern);
+            cur_color = Get_Nibble_Color(rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f2h, cur_color, cur_color + 7);
             old_dover = dover;
             dover += Cur_Char_size[cur_track];
@@ -1686,14 +1696,11 @@ int Get_Nibble_Color(int row, int column, int multi, int Shadow)
 {
     int color = (Shadow * 87);
     
-    if(!Shadow)
+    if(column >= block_start_track[Curr_Buff_Block] &&
+       column <= block_end_track[Curr_Buff_Block] &&
+       row >= block_start[Curr_Buff_Block] && row <= block_end[Curr_Buff_Block])
     {
-        if(column >= block_start_track[Curr_Buff_Block] &&
-           column <= block_end_track[Curr_Buff_Block] &&
-           row >= block_start[Curr_Buff_Block] && row <= block_end[Curr_Buff_Block])
-        {
-            color = 8;
-        }
+        color = 8;
     }
     if(multi) color += 71;
     return(color);
@@ -1704,6 +1711,7 @@ int Get_Nibble_Color(int row, int column, int multi, int Shadow)
 int Get_Nibble_Color_Highlight(int row, int column)
 {
     int color = 0;
+
     if(column >= block_start_track[Curr_Buff_Block] &&
        column <= block_end_track[Curr_Buff_Block] &&
        row >= block_start[Curr_Buff_Block] && row <= block_end[Curr_Buff_Block])
