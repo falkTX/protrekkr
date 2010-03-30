@@ -5315,11 +5315,15 @@ void Mouse_Handler(void)
         Mouse_Left_Pattern_Ed();
     }
 
+    // Middle mouse button
+    if(Mouse.button_oneshot & MOUSE_MIDDLE_BUTTON)
+    {
+        Mouse_Middle_Sample_Ed();
+    }
+
     // Right mouse button
     if(Mouse.button_oneshot & MOUSE_RIGHT_BUTTON)
     {
-//        gui_action = GUI_CMD_NOP;
-
         Mouse_Right_Pattern_Ed();
 
         if(zcheckMouse(188, 82, 16, 16))
@@ -5535,25 +5539,15 @@ void Mouse_Handler(void)
         }
 
         Mouse_Right_Fx_Ed();
-
         Mouse_Right_303_Ed();
-
         Mouse_Right_Reverb_Ed();
-
         Mouse_Right_DiskIO_Ed();
-
         Mouse_Right_Sample_Ed();
-
         Mouse_Right_Track_Ed();
-
         Mouse_Right_Instrument_Ed();
-
         Mouse_Right_Sequencer_Ed();
-
         Mouse_Right_Synth_Ed();
-
         Mouse_Right_Master_Ed();
-
         Reset_Pattern_Scrolling_Horiz();
 
         // Play a .wav

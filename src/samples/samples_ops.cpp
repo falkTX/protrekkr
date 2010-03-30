@@ -46,6 +46,172 @@ int Sample_Back_Channels[4];
 int Sample_Back_Size[4];
 
 // ------------------------------------------------------
+// Rotate a selection to the left by a given amount
+int Sample_Rotate_Left(int32 range_start, int32 range_end, int amount)
+{
+    int32 i;
+    int j;
+    short sample1;
+    short sample2;
+    char nc;
+    long shiftsize = (range_end - range_start);
+ 
+    if(shiftsize)
+    {
+        nc = SampleChannels[ped_patsam][ped_split];
+
+        for(j = 0; j < amount; j++)
+        {
+            sample1 = RawSamples[ped_patsam][0][ped_split][range_start];
+            if(nc == 2) sample2 = RawSamples[ped_patsam][1][ped_split][range_start];
+ 
+            // Shift it
+            for(i = range_start; i < range_end - 1; i++)
+            {
+                RawSamples[ped_patsam][0][ped_split][i] = RawSamples[ped_patsam][0][ped_split][i + 1];
+                if(nc == 2)
+                {
+                    RawSamples[ped_patsam][1][ped_split][i] = RawSamples[ped_patsam][1][ped_split][i + 1];
+                }
+            }
+            RawSamples[ped_patsam][0][ped_split][i] = sample1;
+            if(nc == 2) RawSamples[ped_patsam][1][ped_split][i] = sample2;
+        }
+
+        Status_Box("Done.");
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
+// Rotate a selection to the right by a given amount
+int Sample_Rotate_Right(int32 range_start, int32 range_end, int amount)
+{
+    int32 i;
+    int j;
+    short sample1;
+    short sample2;
+    char nc;
+    long shiftsize = (range_end - range_start);
+ 
+    if(shiftsize)
+    {
+        nc = SampleChannels[ped_patsam][ped_split];
+
+        for(j = 0; j < amount; j++)
+        {
+            sample1 = RawSamples[ped_patsam][0][ped_split][range_end - 1];
+            if(nc == 2) sample2 = RawSamples[ped_patsam][1][ped_split][range_end - 1];
+ 
+            // Shift it
+            for(i = range_end - 2; i >= range_start; i--)
+            {
+                RawSamples[ped_patsam][0][ped_split][i + 1] = RawSamples[ped_patsam][0][ped_split][i];
+                if(nc == 2)
+                {
+                    RawSamples[ped_patsam][1][ped_split][i + 1] = RawSamples[ped_patsam][1][ped_split][i];
+                }
+            }
+            RawSamples[ped_patsam][0][ped_split][range_start] = sample1;
+            if(nc == 2) RawSamples[ped_patsam][1][ped_split][range_start] = sample2;
+        }
+
+        Status_Box("Done.");
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
+// Swap the data of a selection
+int Sample_Reverse(int32 range_start, int32 range_end)
+{
+    int32 i;
+    short sample;
+    char nc;
+    long p_s;
+    long reversesize = (range_end - range_start) / 2;
+ 
+    if(reversesize)
+    {
+        nc = SampleChannels[ped_patsam][ped_split];
+
+        p_s = range_end - 1;
+
+        // Reverse it
+        for(i = range_start; i < (range_start + reversesize); i++)
+        {
+            sample = RawSamples[ped_patsam][0][ped_split][p_s];
+            RawSamples[ped_patsam][0][ped_split][p_s] = RawSamples[ped_patsam][0][ped_split][i];
+            RawSamples[ped_patsam][0][ped_split][i] = sample;
+            if(nc == 2)
+            {
+                sample = RawSamples[ped_patsam][1][ped_split][p_s];
+                RawSamples[ped_patsam][1][ped_split][p_s] = RawSamples[ped_patsam][1][ped_split][i];
+                RawSamples[ped_patsam][1][ped_split][i] = sample;
+            }
+            p_s--;
+        }
+        Status_Box("Done.");
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
+// Convert a selection into a whole sample
+int Sample_Crop(int32 range_start, int32 range_end)
+{
+    int32 i;
+    short *NewBuffer[2];
+    char nc;
+    long p_s;
+    long cropsize = (range_end - range_start);
+ 
+    if(cropsize)
+    {
+        nc = SampleChannels[ped_patsam][ped_split];
+
+        NewBuffer[0] = (short *) malloc(cropsize * 2);
+        if(!NewBuffer[0]) return 0;
+        if(nc == 2)
+        {
+            NewBuffer[1] = (short *) malloc(cropsize * 2);
+            if(!NewBuffer[1])
+            {
+                free(NewBuffer[0]);
+                return 0;
+            }
+        }
+
+        p_s = 0;
+
+        // Copy the selection
+        for(i = range_start; i < range_end; i++)
+        {
+            *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
+            if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+            p_s++;
+        }
+
+        // Set the new buffer as current sample
+        if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
+        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
+        if(nc == 2)
+        {
+            if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
+            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
+        }
+
+        SampleNumSamples[ped_patsam][ped_split] = cropsize;
+        Status_Box("Done.");
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
 // Copy part of a sample
 int Sample_Copy(int32 range_start, int32 range_end)
 {
@@ -250,7 +416,14 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
     }
     else
     {
-        Status_Box("You cannot cut entire sample, use 'delete' on instrument instead.");
+        if(do_copy)
+        {
+            Status_Box("You cannot cut entire sample, use 'delete' on instrument instead.");
+        }
+        else
+        {
+            Status_Box("You cannot zap entire sample, use 'delete' on instrument instead.");
+        }
         return 0;
     }
 }

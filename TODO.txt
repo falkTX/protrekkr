@@ -4,10 +4,6 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
- - Enhance the samples editor a bit:
-   - Reverse command.
-   - Add rotate left/right.
-   - Option to make the selection to become the whole sample (crop).
  - See to add a third filter to the synth (analog like).
  - Add functions to transpose patterns (as a sub option of remapping).
 

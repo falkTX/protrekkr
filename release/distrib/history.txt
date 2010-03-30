@@ -16,6 +16,15 @@ v2.0:
 - Improved shadow patterns rendering.
 - Patterns shading is also displayed for track which are turned off
   in the sequencer (shading can be turned on/off globally).
+- Improved sample editor:
+  - Speeded up (especially the selection) and overall cleaner processing.
+  - Middle mouse button can now be used to zoom in/out.
+  - Added cut/copy/paste with 4 copy buffers.
+  - Crop function (remove everything from a waveform but the selection).
+  - Zap (delete a selected part of a waveform without copying it).
+  - Select view / Select all.
+  - Reverse (invert the selected part of a waveform).
+  - Selection shifting.
 
 v1.99e:
 

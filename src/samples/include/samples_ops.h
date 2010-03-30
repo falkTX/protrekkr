@@ -48,6 +48,10 @@ extern int Sample_Back_Size[4];
 // ------------------------------------------------------
 // Functions
 void Status_Box(char const *str);
+int Sample_Rotate_Left(int32 range_start, int32 range_end, int amount);
+int Sample_Rotate_Right(int32 range_start, int32 range_end, int amount);
+int Sample_Reverse(int32 range_start, int32 range_end);
+int Sample_Crop(int32 range_start, int32 range_end);
 int Sample_Copy(int32 range_start, int32 range_end);
 int Sample_Paste(int32 range_start);
 int Sample_Cut(int32 range_start, int32 range_end, int do_copy);
