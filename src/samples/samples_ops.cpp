@@ -168,9 +168,12 @@ int Sample_Crop(int32 range_start, int32 range_end)
     char nc;
     long p_s;
     long cropsize = (range_end - range_start);
- 
+
     if(cropsize)
     {
+        Stop_Current_Sample();
+        AUDIO_Stop();
+        SDL_Delay(10);
         nc = SampleChannels[ped_patsam][ped_split];
 
         NewBuffer[0] = (short *) malloc(cropsize * 2 + 8);
@@ -208,6 +211,7 @@ int Sample_Crop(int32 range_start, int32 range_end)
 
         SampleNumSamples[ped_patsam][ped_split] = cropsize;
         Status_Box("Crop done.");
+        AUDIO_Play();
         return 1;
     }
     return 0;
@@ -356,7 +360,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
     {
         Stop_Current_Sample();
         AUDIO_Stop();
-        SDL_Delay(100);
+        SDL_Delay(10);
 
         nc = SampleChannels[ped_patsam][ped_split];
 
@@ -419,6 +423,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
 
         SampleNumSamples[ped_patsam][ped_split] = newsize;
         Status_Box("Cut done.");
+        AUDIO_Play();
         return 1;
     }
     else

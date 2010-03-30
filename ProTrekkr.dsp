@@ -491,9 +491,5 @@ SOURCE=.\src\Support\Project.ico
 SOURCE=.\src\ptk.cpp
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\src\support\cursor1.cur
-# End Source File
 # End Target
 # End Project
