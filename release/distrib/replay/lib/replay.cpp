@@ -3436,7 +3436,7 @@ void Play_Instrument(int channel, int sub_channel,
 #endif
 
 #if defined(PTK_SYNTH)
-        if(!no_retrig_adsr)
+        if(!no_retrig_adsr && !no_retrig_note)
         {
             Synthesizer[channel][sub_channel].Data.OSC1_WAVEFORM = WAVEFORM_NONE;
             Synthesizer[channel][sub_channel].Data.OSC2_WAVEFORM = WAVEFORM_NONE;
@@ -3478,14 +3478,17 @@ void Play_Instrument(int channel, int sub_channel,
         Vibrato_BaseNote[channel][sub_channel] = (float) note2;
 #endif
 
-        if(glide)
+        if(!no_retrig_note)
         {
-            sp_Step[channel][sub_channel] = (int64) spreadnote;
-        }
-        else
-        {
-            Vstep1[channel][sub_channel] = (int64) spreadnote;
-            sp_Step[channel][sub_channel] = (int64) spreadnote;
+            if(glide)
+            {
+                sp_Step[channel][sub_channel] = (int64) spreadnote;
+            }
+            else
+            {
+                Vstep1[channel][sub_channel] = (int64) spreadnote;
+                sp_Step[channel][sub_channel] = (int64) spreadnote;
+            }
         }
 
         // Only synth
@@ -3566,8 +3569,11 @@ void Play_Instrument(int channel, int sub_channel,
                 Vstep_vib[channel][sub_channel] = (int64) spreadnote;
 #endif
 
-                Vstep1[channel][sub_channel] = (int64) spreadnote;
-                sp_Step[channel][sub_channel] = (int64) spreadnote;
+                if(!no_retrig_note)
+                {
+                        Vstep1[channel][sub_channel] = (int64) spreadnote;
+                        sp_Step[channel][sub_channel] = (int64) spreadnote;
+                }
             }
             else
             {
@@ -3582,14 +3588,17 @@ void Play_Instrument(int channel, int sub_channel,
                 Vstep_vib[channel][sub_channel] = (int64) spreadnote;
 #endif
 
-                if(glide)
+                if(!no_retrig_note)
                 {
-                    sp_Step[channel][sub_channel] = (int64) spreadnote;
-                }
-                else
-                {
-                    Vstep1[channel][sub_channel] = (int64) spreadnote;
-                    sp_Step[channel][sub_channel] = (int64) spreadnote;
+                    if(glide)
+                    {
+                        sp_Step[channel][sub_channel] = (int64) spreadnote;
+                    }
+                    else
+                    {
+                        Vstep1[channel][sub_channel] = (int64) spreadnote;
+                        sp_Step[channel][sub_channel] = (int64) spreadnote;
+                    }
                 }
             }
 
@@ -3639,7 +3648,18 @@ void Play_Instrument(int channel, int sub_channel,
 
             Player_SV[channel][sub_channel] = SampleVol[associated_sample][split];
             Player_LT[channel][sub_channel] = LoopType[associated_sample][split];
-            Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
+            if(!no_retrig_note)
+            {
+                Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
+            }
+            else
+            {
+                // It may already be playing backward so don't change it in that case
+                if(Player_LT[channel][sub_channel] != SMP_LOOP_PINGPONG)
+                {
+                    Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
+                }
+            }
             Player_SC[channel][sub_channel] = SampleChannels[associated_sample][split];
 
             // I know this isn't exactly correct but using a sub channel for this
@@ -3668,27 +3688,31 @@ void Play_Instrument(int channel, int sub_channel,
         }
 
         // Sample is out of range
-        if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
+        // (synths can have SampleNumSamples = 0)
+        if(SampleNumSamples[associated_sample][split])
         {
-            if(LoopType[associated_sample][split])
+            if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
             {
-                // Don't cross the boundaries of the loop data
-                sp_Position[channel][sub_channel].absolu = 0;
-                sp_Position[channel][sub_channel].half.first = Player_LE[channel][sub_channel];
-            }
-            else
-            {
+                if(LoopType[associated_sample][split])
+                {
+                    // Don't cross the boundaries of the loop data
+                    sp_Position[channel][sub_channel].absolu = 0;
+                    sp_Position[channel][sub_channel].half.first = Player_LE[channel][sub_channel];
+                }
+                else
+                {
 
 #if defined(PTK_INSTRUMENTS)
-                sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
+                    sp_Stage[channel][sub_channel] = PLAYING_NOSAMPLE;
 #endif
 
 #if defined(PTK_SYNTH)
-                sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
-                sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
+                    sp_Stage2[channel][sub_channel] = PLAYING_NOSAMPLE;
+                    sp_Stage3[channel][sub_channel] = PLAYING_NOSAMPLE;
 #endif
-            }
+                }
 
+            }
         }
 
 #if defined(PTK_SYNTH)

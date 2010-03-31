@@ -854,7 +854,6 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 
                     Length1 = SIZE_WAVEFORMS;
-                    //Rns1 = SIZE_WAVEFORMS;
                     Loop_Sub1 = SIZE_WAVEFORMS;
                     Loop_Type1 = SMP_LOOP_FORWARD;
                 }

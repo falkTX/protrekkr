@@ -32,6 +32,10 @@ v2.0:
 - BPM weren't refresh properly on screen when being changed inside patterns.
 - Multi notes channels of modules weren't re-initialized & that could lead
   to a potential crash.
+- Instruments used without notes won't retrig the note but only change
+  the waveform (like in the original protracker).
+- Filelists won't be redrawn after a loading process
+  (so they won't jump to top).
 
 v1.99e:
 
