@@ -260,14 +260,15 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
 void Init_Tracker_Context_After_ModLoad(void)
 {
 #if !defined(__WINAMP__)
-    ped_track = 0;
-    ped_patsam = 0;
-    ped_col = 0;
+    Track_Under_Caret = 0;
+    Current_Sample = 0;
+    Column_Under_Caret = 0;
 #endif
 
-    ped_line_delay = 0;
-    cPosition = 0;
-    cPosition_delay = 0;
+    Pattern_Line = 0;
+    Pattern_Line_Visual = 0;
+    Song_Position = 0;
+    Song_Position_Visual = 0;
 
     Final_Mod_Length = 0;
 
@@ -356,8 +357,6 @@ void LoadAmigaMod(char *FileName, int channels)
     int last_speed;
     int last_tempo;
 
-    SongStop();
-
     for(i = 0; i < 16; i++)
     {
         vib_chan[i] = 0;
@@ -368,6 +367,8 @@ void LoadAmigaMod(char *FileName, int channels)
     in = fopen(FileName, "rb");
     if(in != NULL)
     {
+        SongStop();
+
         Songplaying = FALSE;
 
         Free_Samples();
@@ -490,7 +491,7 @@ void LoadAmigaMod(char *FileName, int channels)
                                 // Loop over tempos
                                 for(i = 20; i < 255; i++)
                                 {
-                                    if((int) speed_to_find == (int) (((float) i * (float) j)))
+                                    if(speed_to_find == (((float) i * (float) j)))
                                     {
                                         found_exact_st = TRUE;
                                         found_tempo = i;
@@ -934,10 +935,10 @@ void LoadAmigaMod(char *FileName, int channels)
             }
         }
 
-        TPan[0] = 0.8f;
-        TPan[1] = 0.2f;
-        TPan[2] = 0.2f;
-        TPan[3] = 0.8f;
+        TPan[0] = 0.2f;
+        TPan[1] = 0.8f;
+        TPan[2] = 0.8f;
+        TPan[3] = 0.2f;
         ComputeStereo(0);
         ComputeStereo(1);
         ComputeStereo(2);
@@ -1181,18 +1182,18 @@ int LoadMod(char *FileName)
     Mod_Mem_Pos = 0;
     Mod_Memory = NULL;
 
-#if !defined(__WINAMP__)
-    SongStop();
-
-    Status_Box("Attempting to load the song file...");
-#endif
-
     FILE *in;
     in = fopen(FileName, "rb");
     Old_Ntk = FALSE;
 
     if(in != NULL)
     {
+
+#if !defined(__WINAMP__)
+        SongStop();
+        Status_Box("Attempting to load the song file...");
+#endif
+
         Songplaying = FALSE;
 
         // Reading and checking extension...
@@ -4101,29 +4102,29 @@ void LoadSynth(char *FileName)
         }
 
         Status_Box("Loading Synthesizer -> structure...");
-        ResetSynthParameters(&PARASynth[ped_patsam]);
+        ResetSynthParameters(&PARASynth[Current_Sample]);
 
-        PARASynth[ped_patsam].disto = 0;
+        PARASynth[Current_Sample].disto = 0;
 
-        PARASynth[ped_patsam].lfo1_attack = 0;
-        PARASynth[ped_patsam].lfo1_decay = 0;
-        PARASynth[ped_patsam].lfo1_sustain = 128;
-        PARASynth[ped_patsam].lfo1_release = 0x10000;
+        PARASynth[Current_Sample].lfo1_attack = 0;
+        PARASynth[Current_Sample].lfo1_decay = 0;
+        PARASynth[Current_Sample].lfo1_sustain = 128;
+        PARASynth[Current_Sample].lfo1_release = 0x10000;
 
-        PARASynth[ped_patsam].lfo2_attack = 0;
-        PARASynth[ped_patsam].lfo2_decay = 0;
-        PARASynth[ped_patsam].lfo2_sustain = 128;
-        PARASynth[ped_patsam].lfo2_release = 0x10000;
+        PARASynth[Current_Sample].lfo2_attack = 0;
+        PARASynth[Current_Sample].lfo2_decay = 0;
+        PARASynth[Current_Sample].lfo2_sustain = 128;
+        PARASynth[Current_Sample].lfo2_release = 0x10000;
 
-        Read_Synth_Params(Read_Data, Read_Data_Swap, in, ped_patsam,
+        Read_Synth_Params(Read_Data, Read_Data_Swap, in, Current_Sample,
                           TRUE, TRUE, new_version, Env_Modulation, New_Env);
 
         // Fix some old Ntk bugs
-        if(PARASynth[ped_patsam].lfo1_period > 128) PARASynth[ped_patsam].lfo1_period = 128;
-        if(PARASynth[ped_patsam].lfo2_period > 128) PARASynth[ped_patsam].lfo2_period = 128;
+        if(PARASynth[Current_Sample].lfo1_period > 128) PARASynth[Current_Sample].lfo1_period = 128;
+        if(PARASynth[Current_Sample].lfo2_period > 128) PARASynth[Current_Sample].lfo2_period = 128;
 
-        Synthprg[ped_patsam] = SYNTH_WAVE_CURRENT;
-        sprintf(nameins[ped_patsam],PARASynth[ped_patsam].presetname);
+        Synthprg[Current_Sample] = SYNTH_WAVE_CURRENT;
+        sprintf(nameins[Current_Sample],PARASynth[Current_Sample].presetname);
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
 
         Actualize_Instrument_Ed(0, 0);
@@ -4147,16 +4148,16 @@ void SaveSynth(void)
     char extension[10];
 
     sprintf(extension, "TWNNSYN3");
-    sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[ped_patsam].presetname);
+    sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[Current_Sample].presetname);
     Status_Box(Temph);
 
-    sprintf(Temph, "%s"SLASH"%s.pts", Dir_Presets, PARASynth[ped_patsam].presetname);
+    sprintf(Temph, "%s"SLASH"%s.pts", Dir_Presets, PARASynth[Current_Sample].presetname);
 
     in = fopen(Temph, "wb");
     if(in != NULL)
     {
         Write_Data(extension, sizeof(char), 9, in);
-        Write_Synth_Params(Write_Data, Write_Data_Swap, in, ped_patsam);
+        Write_Synth_Params(Write_Data, Write_Data_Swap, in, Current_Sample);
         fclose(in);
 
         Read_SMPT();
@@ -4215,14 +4216,14 @@ void LoadInst(char *FileName)
                 break;
         }
 
-        KillInst(ped_patsam);
+        KillInst(Current_Sample);
         Status_Box("Loading Instrument -> Header..."); 
-        Read_Data(&nameins[ped_patsam], sizeof(char), 20, in);
+        Read_Data(&nameins[Current_Sample], sizeof(char), 20, in);
 
         // Reading sample data
         Status_Box("Loading Instrument -> Sample data...");
 
-        int swrite = ped_patsam;
+        int swrite = Current_Sample;
 
         Read_Data(&Midiprg[swrite], sizeof(char), 1, in);
         Read_Data(&Synthprg[swrite], sizeof(char), 1, in);
@@ -4326,20 +4327,20 @@ void SaveInst(void)
     int synth_save;
 
     sprintf(extension, "TWNNINS7");
-    sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[ped_patsam]);
+    sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Sample]);
     Status_Box(Temph);
-    sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]);
+    sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Sample]);
 
     in = fopen(Temph, "wb");
     if(in != NULL)
     {
         // Writing header & name...
         Write_Data(extension, sizeof(char), 9, in);
-        rtrim_string(nameins[ped_patsam], 20);
-        Write_Data(nameins[ped_patsam], sizeof(char), 20, in);
+        rtrim_string(nameins[Current_Sample], 20);
+        Write_Data(nameins[Current_Sample], sizeof(char), 20, in);
 
         // Writing sample data
-        int swrite = ped_patsam;
+        int swrite = Current_Sample;
 
         Write_Data(&Midiprg[swrite], sizeof(char), 1, in);
         switch(Synthprg[swrite])
@@ -4631,7 +4632,7 @@ void SaveConfig(void)
     if(out != NULL)
     {
         Write_Data(extension, sizeof(char), 9, out);
-        Write_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, out);
+        Write_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, out);
         Write_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, out);
         Write_Data_Swap(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, out);
 
@@ -4719,7 +4720,7 @@ void LoadConfig(void)
         Read_Data(extension, sizeof(char), 9, in);
         if(strcmp(extension, "TWNNCFGB") == 0)
         {
-            Read_Data_Swap(&ped_pattad, sizeof(ped_pattad), 1, in);
+            Read_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
             Read_Data_Swap(&AUDIO_Milliseconds, sizeof(AUDIO_Milliseconds), 1, in);
 
@@ -5703,10 +5704,7 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in)
 {
-    int Cur_Position;
-
-    if(Songplaying) Cur_Position = cPosition_delay;
-    else Cur_Position = cPosition;
+    int Cur_Position = Get_Song_Position();
 
     int Old_Curr_Buff_Block = Curr_Buff_Block;
 
@@ -5739,10 +5737,7 @@ void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in)
 {
-    int Cur_Position;
-
-    if(Songplaying) Cur_Position = cPosition_delay;
-    else Cur_Position = cPosition;
+    int Cur_Position = Get_Song_Position();
 
     int Old_Curr_Buff_Block = Curr_Buff_Block;
     Curr_Buff_Block = NBR_COPY_BLOCKS - 1;

@@ -82,6 +82,12 @@ float oldspawn[MAX_TRACKS];
 float roldspawn[MAX_TRACKS];
 char LFO_ON[MAX_TRACKS];
 
+int Delay_Sound_Buffer;
+int Cur_Delay_Sound_Buffer;
+int Max_Delay_Sound_Buffer;
+int Delays_Lines_Sound_Buffer[256];
+int Delays_Pos_Sound_Buffer[256];
+
 #if defined(PTK_LFO)
     float LFO_RATE[MAX_TRACKS];
     float LFO_AMPL[MAX_TRACKS];
@@ -232,16 +238,13 @@ int Type_At3_BitRate[] =
 // 255 when no jump or yes on patbreak < 128 = line to jump.
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int Patbreak_Line = 255;
-    int Patbreak_Line_Delay = 255;
 #else
     int Patbreak_Line;
-    int Patbreak_Line_Delay;
 #endif
 #endif
 
 #if defined(PTK_FX_POSJUMP)
 int PosJump = -1;
-int PosJump_Delay = -1;
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -253,13 +256,13 @@ int PosJump_Delay = -1;
 char Channels_Polyphony[MAX_TRACKS];
 char Channels_MultiNotes[MAX_TRACKS];
 
-int ped_line;
 unsigned char pSequence[256];
-int cPosition;
-int cPosition_delay;
-int ped_line_delay;
-int pl_eff_row_delay[MAX_FX];
-int pl_dat_row2[MAX_FX];
+
+int Pattern_Line;
+int Song_Position;
+int Song_Position_Visual;
+int Pattern_Line_Visual;
+
 int pl_note[MAX_POLYPHONY];
 int pl_sample[MAX_POLYPHONY];
 int pl_vol_row;
@@ -638,7 +641,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             // Gather datas for the scopes and the vumeters
 
 #if !defined(__WINAMP__)
-            if(Songplaying_Pattern)
+            //if(Songplaying_Pattern)
 #endif
             {
                 clamp_left_value = (float) left_value;
@@ -676,13 +679,6 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
         {
             Reset_Values();
         }
-
-#if !defined(__WINAMP__)
-        if(AUDIO_GetSamples() > ((AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) >> 3)) / 4))
-        {
-            Songplaying_Pattern = TRUE;
-        }
-#endif
 
 #if !defined(__STAND_ALONE__)
     } //RawRender
@@ -1360,7 +1356,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].hpf, sizeof(char));
 #endif
 
-        cPosition = start_position;
+        Song_Position = start_position;
 
         Post_Song_Init();
 
@@ -1388,11 +1384,11 @@ void PTKEXPORT Ptk_ReleaseDriver(void)
 // Retrieve the current position in the song
 int PTKEXPORT Ptk_GetRow(void)
 {
-    return(ped_line_delay);
+    return(Pattern_Line_Visual);
 }
 int PTKEXPORT Ptk_GetPosition(void)
 {
-    return(cPosition_delay);
+    return(Song_Position_Visual);
 }
 
 // ------------------------------------------------------
@@ -1402,24 +1398,24 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     if(new_position >= sLength) new_position = sLength - 1;
     if(new_position < 0) new_position = 0;
 
-#if !defined(__WINAMP__)
-    Songplaying_Pattern = FALSE;
-#endif
+/*#if !defined(__WINAMP__)
+    Songplaying_Pattern = 0;
+#endif*/
 
-    cPosition = new_position;
-    cPosition_delay = new_position;
+    Song_Position = new_position;
+    Pattern_Line = 0;
+    //Song_Position_Visual = new_position;
     PosInTick = 0;
     SubCounter = 0;
+    Subicounter = 0;
 
 #if defined(PTK_FX_PATTERNLOOP)
-    repeat_loop_pos = -1;       // No repeat loop
+    // No repeat loop
+    repeat_loop_pos = -1;
     repeat_loop_counter = 0;
     repeat_loop_counter_in = 0;
 #endif
 
-    ped_line = 0;
-    ped_line_delay = 0;
-    Subicounter = 0;
 }
 
 // ------------------------------------------------------
@@ -1523,13 +1519,6 @@ void Reset_Values(void)
         // Clear all midi channels
         Clear_Midi_Channels_Pool();
 #endif
-
-        // Store the visual position (not the replayed one)
-        if(Songplaying)
-        {
-            cPosition = cPosition_delay;
-            ped_line = ped_line_delay;
-        }
 
 #if defined(__PSP__)
         volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
@@ -1871,9 +1860,10 @@ void Post_Song_Init(void)
     }
 
     SubCounter = 0;
+    Subicounter = 0;
 
 #if defined(PTK_FX_PATTERNLOOP)
-    repeat_loop_pos = -1;       // No repeat loop
+    repeat_loop_pos = -1;
     repeat_loop_counter = 0;
     repeat_loop_counter_in = 0;
 #endif
@@ -1923,12 +1913,9 @@ void Post_Song_Init(void)
     SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     PosInTick = 0;
     SamplesPerSub = SamplesPerTick / 6;
-    ped_line = 0;
-    ped_line_delay = 0;
 
-#if !defined(__WINAMP__)
-    Songplaying_Pattern = FALSE;
-#endif
+    Pattern_Line_Visual = Pattern_Line;
+    Song_Position_Visual = Song_Position;
 
 #if defined(PTK_SHUFFLE)
     if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle) / 200);
@@ -1941,8 +1928,6 @@ void Post_Song_Init(void)
     local_mas_vol = 1.0f;
     local_curr_mas_vol = 0.0f;
 
-    cPosition_delay = cPosition;
-
     // Start as the last known position
     for(int spl = 0; spl < MAX_TRACKS; spl++)
     {
@@ -1951,9 +1936,36 @@ void Post_Song_Init(void)
     }
 
 #if !defined(__WINAMP__)
+    Songplaying_Pattern = 0;
     AUDIO_ResetTimer();
+    Delay_Sound_Buffer = 0;
+    Max_Delay_Sound_Buffer = 0;
+    Cur_Delay_Sound_Buffer = 0;
 #endif
 
+}
+
+// ------------------------------------------------------
+// Record and set the visual patterns lines and song positions
+void Proc_Next_Visual_Line()
+{
+    if(Max_Delay_Sound_Buffer == 0)
+    {
+        Pattern_Line_Visual = Pattern_Line;
+        Song_Position_Visual = Song_Position;
+    }
+    else
+    {
+        Pattern_Line_Visual = Delays_Lines_Sound_Buffer[Delay_Sound_Buffer];
+        Song_Position_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer];
+        Delay_Sound_Buffer++;
+        if(Delay_Sound_Buffer >= Max_Delay_Sound_Buffer) Delay_Sound_Buffer = 0;
+
+        if(Cur_Delay_Sound_Buffer >= Max_Delay_Sound_Buffer) Cur_Delay_Sound_Buffer = 0;
+        Delays_Lines_Sound_Buffer[Cur_Delay_Sound_Buffer] = Pattern_Line;
+        Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer] = Song_Position;
+        Cur_Delay_Sound_Buffer++;
+    }
 }
 
 // ------------------------------------------------------
@@ -1991,28 +2003,15 @@ void Sp_Player(void)
             DoEffects_tick0();
 #endif
 
-#if defined(PTK_FX_PATTERNLOOP)
-            if(repeat_loop_counter_in)
-            {
-                ped_line -= repeat_loop_pos + 1;
-                ped_line_delay -= repeat_loop_pos + 1;
-                if(ped_line < 0) ped_line = 0;
-                if(ped_line_delay < 0) ped_line_delay = 0;
-                repeat_loop_counter_in = 0;
-            }
-#endif
-
             Subicounter = 0;
 
 #if defined(PTK_FX_PATTERNBREAK)
             Patbreak_Line = 255;
-            Patbreak_Line_Delay = 255;
 #endif
 
             for(int ct = 0; ct < Songtracks; ct++)
             {
-                int efactor = Get_Pattern_Offset(pSequence[cPosition], ct, ped_line);
-                int efactor2 = Get_Pattern_Offset(pSequence[cPosition_delay], ct, ped_line_delay);
+                int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
                 
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
@@ -2024,15 +2023,11 @@ void Sp_Player(void)
                 pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
                 pl_eff_row[0] = *(RawPatterns + efactor + PATTERN_FX);
                 pl_dat_row[0] = *(RawPatterns + efactor + PATTERN_FXDATA);
-                pl_eff_row_delay[0] = *(RawPatterns + efactor2 + PATTERN_FX);
-                pl_dat_row2[0] = *(RawPatterns + efactor2 + PATTERN_FXDATA);
                 pl_eff_row[1] = *(RawPatterns + efactor + PATTERN_FX2);
                 pl_dat_row[1] = *(RawPatterns + efactor + PATTERN_FXDATA2);
-                pl_eff_row_delay[1] = *(RawPatterns + efactor2 + PATTERN_FX2);
-                pl_dat_row2[1] = *(RawPatterns + efactor2 + PATTERN_FXDATA2);
 
                 // Don't check for potential volume change
-                if(CHAN_ACTIVE_STATE[cPosition][ct])
+                if(CHAN_ACTIVE_STATE[Song_Position][ct])
                 {
 
 #if defined(PTK_VOLUME_COLUMN)
@@ -2109,7 +2104,7 @@ void Sp_Player(void)
                 }
 #endif
 
-                if(CHAN_ACTIVE_STATE[cPosition][ct])
+                if(CHAN_ACTIVE_STATE[Song_Position][ct])
                 {
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
@@ -2144,14 +2139,6 @@ void Sp_Player(void)
                 {
                     Patbreak_Line = pl_dat_row[1];
                 }
-                if(pl_eff_row_delay[0] == 0xd && pl_dat_row2[0] < MAX_ROWS)
-                {
-                    Patbreak_Line_Delay = pl_dat_row2[0];
-                }
-                if(pl_eff_row_delay[1] == 0xd && pl_dat_row2[1] < MAX_ROWS)
-                {
-                    Patbreak_Line_Delay = pl_dat_row2[1];
-                }
 #endif
 
 #if defined(PTK_FX_POSJUMP)
@@ -2164,16 +2151,6 @@ void Sp_Player(void)
                 {
                     if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
                     PosJump = pl_dat_row[1];
-                }
-                if(pl_eff_row_delay[0] == 0x1f)
-                {
-                    if(Patbreak_Line_Delay >= MAX_ROWS) Patbreak_Line_Delay = 0;
-                    PosJump_Delay = pl_dat_row2[0];
-                }
-                if(pl_eff_row_delay[1] == 0x1f)
-                {
-                    if(Patbreak_Line_Delay >= MAX_ROWS) Patbreak_Line_Delay = 0;
-                    PosJump_Delay = pl_dat_row2[1];
                 }
 #endif
 
@@ -2313,6 +2290,9 @@ void Sp_Player(void)
 
         }// Pos in tick == 0
 
+
+        // ---------------------------------------
+
         if(!SubCounter) DoEffects();
 
         SubCounter++;
@@ -2346,247 +2326,185 @@ void Sp_Player(void)
             SubCounter = 0;
             PosInTick = 0;
 
-#if defined(PTK_FX_PATTERNBREAK)
-            if(Patbreak_Line > 127)
+            // Record the lines & positions
+            switch(Songplaying_Pattern)
             {
-                ped_line++;
+                case 0:
+                    // Record the first lines/pos for calibration
+                    Delays_Lines_Sound_Buffer[Cur_Delay_Sound_Buffer] = Pattern_Line;
+                    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer] = Song_Position;
+                    Cur_Delay_Sound_Buffer++;
+                    break;
+                case 1:
+                    Proc_Next_Visual_Line();
+                    break;
+            }
+
+            // ------------------------------
+            // Pattern movements
+
+#if defined(PTK_FX_PATTERNLOOP)
+            // Check if we're in a loop
+            if(repeat_loop_counter_in)
+            {
+                Pattern_Line -= repeat_loop_pos + 1;
+                if(Pattern_Line < 0) Pattern_Line = 0;
+                repeat_loop_counter_in = 0;
             }
             else
+#endif
             {
 
-                // Break the pattern
-#if !defined(__STAND_ALONE__)
-                if(is_recording_2)
-                {
-                    Next_Line_Pattern_Auto(&cPosition, Patbreak_Line, &ped_line);
-                }
-                else
-#endif
-                {
-
-#if !defined(__STAND_ALONE__)
-                    if(!plx)            // Playing a pattern or not ?
-#endif
-                    {
-
-                        // Position jump and pattern break can be combined
-#if defined(PTK_FX_POSJUMP)
-                        if(PosJump > 0)
-                        {
-#if defined(__WINAMP__)
-                            if(PosJump <= cPosition)
-                            {
-                                done = TRUE;
-                            }
-#endif
-                            cPosition = PosJump;
-                            PosJump = -1;
-                        }
-                        else
-                        {
-                            cPosition++;
-                        }
-#else
-                        cPosition++;
-#endif
-                    }
-                }
-
-                // Pattern break specified line
-                ped_line = Patbreak_Line;
-
-#if !defined(__STAND_ALONE__)
-                if(!is_recording_2)
-#endif
-                {
-                    if(cPosition >= sLength)
-                    {
-                        cPosition = 0;
-#if defined(__WINAMP__)
-                        done = TRUE;
-#endif
-                    }
-                }
-
-#if !defined(__STAND_ALONE__)
-                for(i = 0; i < MAX_TRACKS; i++)
-                {
-                    CHAN_HISTORY_STATE[cPosition][i] = FALSE;
-                }
-#endif
-
-#if defined(PTK_FX_PATTERNLOOP)
-                repeat_loop_pos = -1;
-                repeat_loop_counter = 0;
-                repeat_loop_counter_in = 0;
-#endif
-
-            }
-#else
-            ped_line++;
-#endif  // PTK_FX_PATTERNBREAK
-
-            // Normal end of pattern
-            if(ped_line == patternLines[pSequence[cPosition]])
-            {
-
-#if !defined(__STAND_ALONE__)
-                if(is_recording_2)
-                {
-                    Next_Line_Pattern_Auto(&cPosition, patternLines[pSequence[cPosition]], &ped_line);
-                }
-                else
-#endif
-                {
-
-#if !defined(__STAND_ALONE__)
-                    if(!plx)
-#endif
-                    {
-
-#if defined(PTK_FX_POSJUMP)
-                        if(PosJump > 0)
-                        {
-
-#if defined(__WINAMP__)
-                            if(PosJump <= cPosition)
-                            {
-                                done = TRUE;
-                            }
-#endif
-                            cPosition = PosJump;
-                            PosJump = -1;
-                        }
-                        else
-                        {
-                            cPosition++;
-                        }
-#else
-                        cPosition++;
-#endif
-                    }
-                }
-
-                // Normal end of pattern
-                ped_line = 0;
-
-#if !defined(__STAND_ALONE__)
-                if(!is_recording_2)
-#endif
-                {
-                    if(cPosition >= sLength)
-                    {
-                        cPosition = 0;
-#if defined(__WINAMP__)
-                        done = TRUE;
-#endif
-                    }
-                }
-
-#if !defined(__STAND_ALONE__)
-                for(i = 0; i < MAX_TRACKS; i++)
-                {
-                    CHAN_HISTORY_STATE[cPosition][i] = FALSE;
-                }
-#endif
-
-#if defined(PTK_FX_PATTERNLOOP)
-                repeat_loop_pos = -1;
-				repeat_loop_counter = 0;
-                repeat_loop_counter_in = 0;
-#endif
-
-            }
-
-            // Delayed pattern
-
-#if !defined(__WINAMP__)
-            if(Songplaying_Pattern)
-            {
 
 #if defined(PTK_FX_PATTERNBREAK)
-                if(Patbreak_Line_Delay > 127)
+                if(Patbreak_Line > 127)
                 {
-                    ped_line_delay++;
+                    Pattern_Line++;
                 }
                 else
                 {
-
+                    // Break the pattern
 #if !defined(__STAND_ALONE__)
-                    if(!plx)
+                    if(is_recording_2)
+                    {
+                        Next_Line_Pattern_Auto(&Song_Position, Patbreak_Line, &Pattern_Line);
+                    }
+                    else
 #endif
                     {
 
+#if !defined(__STAND_ALONE__)
+                        if(!plx)            // Playing a pattern or not ?
+#endif
+                        {
+
+                            // Position jump and pattern break can be combined
 #if defined(PTK_FX_POSJUMP)
-                        if(PosJump_Delay > 0)
-                        {
-
-#if defined(__WINAMP__)
-                            if(PosJump_Delay <= cPosition_delay)
+                            if(PosJump > 0)
                             {
-                                done = TRUE;
+#if defined(__WINAMP__)
+                                if(PosJump <= Song_Position)
+                                {
+                                    done = TRUE;
+                                }
+#endif
+                                Song_Position = PosJump;
+                                PosJump = -1;
                             }
-#endif
-                            cPosition_delay = PosJump_Delay;
-                            PosJump_Delay = -1;
-                        }
-                        else
-                        {
-                            cPosition_delay++;
-                        }
+                            else
+                            {
+                                Song_Position++;
+                            }
 #else
-                        cPosition_delay++;
+                            Song_Position++;
+#endif
+                        }
+                    }
+
+                    // Pattern break specified line
+                    Pattern_Line = Patbreak_Line;
+
+#if !defined(__STAND_ALONE__)
+                    if(!is_recording_2)
+#endif
+                    {
+                        if(Song_Position >= sLength)
+                        {
+                            Song_Position = 0;
+#if defined(__WINAMP__)
+                            done = TRUE;
+#endif
+                        }
+                    }
+
+#if !defined(__STAND_ALONE__)
+                    for(i = 0; i < MAX_TRACKS; i++)
+                    {
+                        CHAN_HISTORY_STATE[Song_Position][i] = FALSE;
+                    }
 #endif
 
-                    }
-                    if(cPosition_delay >= sLength) cPosition_delay = 0;
-
-                    ped_line_delay = Patbreak_Line_Delay;
+#if defined(PTK_FX_PATTERNLOOP)
+                    // Loops between patterns wouldn't make sense
+                    repeat_loop_pos = -1;
+                    repeat_loop_counter = 0;
+                    repeat_loop_counter_in = 0;
+#endif
                 }
 #else
-                ped_line_delay++;
-#endif // PTK_FX_PATTERNBREAK
- 
-                // No pattern break
-				if(ped_line_delay == patternLines[pSequence[cPosition_delay]])
+                Pattern_Line++;
+#endif  // PTK_FX_PATTERNBREAK
+
+                // Normal end of pattern
+                if(Pattern_Line == patternLines[pSequence[Song_Position]])
                 {
 
 #if !defined(__STAND_ALONE__)
-                    if(!plx)
+                    if(is_recording_2)
+                    {
+                        Next_Line_Pattern_Auto(&Song_Position, patternLines[pSequence[Song_Position]], &Pattern_Line);
+                    }
+                    else
 #endif
-
                     {
 
-#if defined(PTK_FX_POSJUMP)
-                        if(PosJump_Delay > 0)
+#if !defined(__STAND_ALONE__)
+                        if(!plx)
+#endif
                         {
+
+#if defined(PTK_FX_POSJUMP)
+                            if(PosJump > 0)
+                            {
 
 #if defined(__WINAMP__)
-                            if(PosJump_Delay <= cPosition_delay)
-                            {
-                                done = TRUE;
+                                if(PosJump <= Song_Position)
+                                {
+                                    done = TRUE;
+                                }
+#endif
+                                Song_Position = PosJump;
+                                PosJump = -1;
                             }
-#endif
-                            cPosition_delay = PosJump_Delay;
-                            PosJump_Delay = -1;
-                        }
-                        else
-                        {
-                            cPosition_delay++;
-                        }
+                            else
+                            {
+                                Song_Position++;
+                            }
 #else
-                        cPosition_delay++;
+                            Song_Position++;
+#endif
+                        }
+                    }
+
+                    Pattern_Line = 0;
+
+#if !defined(__STAND_ALONE__)
+                    if(!is_recording_2)
+#endif
+                    {
+                        if(Song_Position >= sLength)
+                        {
+                            Song_Position = 0;
+#if defined(__WINAMP__)
+                            done = TRUE;
+#endif
+                        }
+                    }
+
+#if !defined(__STAND_ALONE__)
+                    for(i = 0; i < MAX_TRACKS; i++)
+                    {
+                        CHAN_HISTORY_STATE[Song_Position][i] = FALSE;
+                    }
 #endif
 
-                    }
-                    if(cPosition_delay >= sLength) cPosition_delay = 0;
-
-                    ped_line_delay = 0;
+#if defined(PTK_FX_PATTERNLOOP)
+                    repeat_loop_pos = -1;
+				    repeat_loop_counter = 0;
+                    repeat_loop_counter_in = 0;
+#endif
                 }
             }
-
-#endif // __WINAMP__
-
         }
     }
 
@@ -2880,14 +2798,14 @@ ByPass_Wav:
         }
 
 #if defined(PTK_303)
-        if(track3031 == c && CHAN_ACTIVE_STATE[cPosition][c])
+        if(track3031 == c && CHAN_ACTIVE_STATE[Song_Position][c])
         {
             Signal_303 = tb303engine[0].tbGetSample();
             All_Signal_L += Signal_303;
             if(grown) All_Signal_R += Signal_303;
             gotsome = TRUE;
         }
-        if(track3032 == c && CHAN_ACTIVE_STATE[cPosition][c])
+        if(track3032 == c && CHAN_ACTIVE_STATE[Song_Position][c])
         {
             Signal_303 = tb303engine[1].tbGetSample();
             All_Signal_L += Signal_303;
@@ -2897,17 +2815,17 @@ ByPass_Wav:
 #endif
 
         // Send a note off if the channel is being turned off
-        if(!CHAN_ACTIVE_STATE[cPosition][c]
+        if(!CHAN_ACTIVE_STATE[Song_Position][c]
 
 #if !defined(__STAND_ALONE__)
-           && !CHAN_HISTORY_STATE[cPosition][c]
+           && !CHAN_HISTORY_STATE[Song_Position][c]
 #endif
 
           )
         {
 
 #if !defined(__STAND_ALONE__)
-            CHAN_HISTORY_STATE[cPosition][c] = TRUE;
+            CHAN_HISTORY_STATE[Song_Position][c] = TRUE;
 #endif
 
             // We send a note off to all sub channels
@@ -3268,9 +3186,10 @@ ByPass_Wav:
             right_chorus += All_Signal_R * DC;
         }
 
+        // Store the data for the scopes
 #if !defined(__STAND_ALONE__)
 #if !defined(__WINAMP__)
-        if(Songplaying_Pattern)
+        //if(Songplaying_Pattern)
 #endif
         {
             if(!CHAN_MUTE_STATE[c])
@@ -3286,7 +3205,6 @@ ByPass_Wav:
         }
 #endif
     }
-
 }
 
 // ------------------------------------------------------
@@ -3377,7 +3295,7 @@ void Play_Instrument(int channel, int sub_channel,
     associated_sample = sample;
 #endif
 
-    Cur_Position = cPosition;
+    Cur_Position = Song_Position;
 
 #if defined(PTK_SYNTH)
     if(!no_retrig_note)
@@ -3771,7 +3689,6 @@ void DoEffects_tick0(void)
 {
 
 #if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE)
-    int temp_ped_line = ped_line;
     int i;
     int j;
     int pltr_eff_row[MAX_FX];
@@ -3779,7 +3696,7 @@ void DoEffects_tick0(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, temp_ped_line);
+        int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
         pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
         pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
         pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
@@ -3839,14 +3756,13 @@ void DoEffects_tick0(void)
 #if defined(PTK_FX_PATTERNLOOP)
 void DoEffects_tick0_b(void)
 {
-    int temp_ped_line = ped_line;
     int j;
     int pltr_eff_row[MAX_FX];
     int pltr_dat_row[MAX_FX];
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, temp_ped_line);
+        int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
         pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
         pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
         pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
@@ -3862,7 +3778,7 @@ void DoEffects_tick0_b(void)
                     {
                         if(repeat_loop_counter == 0)
                         {
-                            repeat_loop_pos = ped_line;
+                            repeat_loop_pos = Pattern_Line;
                         }
                     }
                     else
@@ -3871,8 +3787,8 @@ void DoEffects_tick0_b(void)
                         {
                             if(repeat_loop_counter == 0)
                             {
-                                repeat_loop_counter = (int) pltr_dat_row[j];
-                                repeat_loop_pos = (ped_line - repeat_loop_pos);
+                                repeat_loop_counter = ((int) pltr_dat_row[j]);
+                                repeat_loop_pos = (Pattern_Line - repeat_loop_pos);
                                 repeat_loop_counter_in = 1;
                             }
                             else
@@ -3922,8 +3838,9 @@ void DoEffects(void)
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
-        int tefactor = Get_Pattern_Offset(pSequence[cPosition], trackef, ped_line);
+        int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
 
+        // Get the notes for this track
         for(i = 0; i < Channels_MultiNotes[trackef]; i++)
         {
             pltr_note[i] = *(RawPatterns + tefactor + PATTERN_NOTE1 + (i * 2));
@@ -4630,13 +4547,32 @@ void ComputeStereo(int channel)
     RVol[channel] = sqrtf(TPan[channel]);
 }
 
+int max_row;
+int delays_stuff;
+
+
 // ------------------------------------------------------
 // Main mixing routine
 void GetPlayerValues(void)
 {
     left_chorus = 0.0f;
     right_chorus = 0.0f;
+
     Sp_Player();
+
+    // Wait for the audio latency before starting to play
+    if(Songplaying)
+    {
+        if(Songplaying_Pattern == 0)
+        {
+            if(AUDIO_GetSamples() >= (int) (((float) AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) / 8.0f)) / 4.0f))
+            {
+                Delay_Sound_Buffer = 0;
+                Max_Delay_Sound_Buffer = Cur_Delay_Sound_Buffer;
+                Songplaying_Pattern = 1;
+            }
+        }
+    }
 
     if(++lchorus_counter > (MIX_RATE * 2)) lchorus_counter = MIX_RATE;
     if(++rchorus_counter > (MIX_RATE * 2)) rchorus_counter = MIX_RATE;
@@ -4715,7 +4651,8 @@ void GetPlayerValues(void)
 
     #if defined(__LINUX__)
         // It looks like the maximum range for OSS is -8192 +8192
-        // (higher than that will produce heavily satured signals)
+        // (higher than that will produce heavily satured signals
+        //  i don't know if it's a bug in drivers in Linux mixer or anything)
         left_float *= 8192.0f;
         right_float *= 8192.0f;
     #else

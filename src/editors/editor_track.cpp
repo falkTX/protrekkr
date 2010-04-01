@@ -75,40 +75,40 @@ void Actualize_Track_Ed(char gode)
     {
         if(gode == 0)
         {
-            if(ped_track > MAX_TRACKS - 1) ped_track = 0;
-            if(ped_track < 0) ped_track = MAX_TRACKS - 1;
-            value_box(508, 486, ped_track, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(Track_Under_Caret > MAX_TRACKS - 1) Track_Under_Caret = 0;
+            if(Track_Under_Caret < 0) Track_Under_Caret = MAX_TRACKS - 1;
+            value_box(508, 486, Track_Under_Caret, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
-            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[ped_track] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
         }
 
         if(gode == 0 || gode == 1)
         {
-            if(TCut[ped_track] < 0) TCut[ped_track] = 0;
-            if(TCut[ped_track] > 127) TCut[ped_track] = 127;
-            Realslider(77, 484, (int) TCut[ped_track], FType[ped_track] != 4);
+            if(TCut[Track_Under_Caret] < 0) TCut[Track_Under_Caret] = 0;
+            if(TCut[Track_Under_Caret] > 127) TCut[Track_Under_Caret] = 127;
+            Realslider(77, 484, (int) TCut[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 2)
         {
-            if(FRez[ped_track] < 0) FRez[ped_track] = 0;
-            if(FRez[ped_track] > 127) FRez[ped_track] = 127;
-            Realslider(77, 502, FRez[ped_track], FType[ped_track] != 4);
+            if(FRez[Track_Under_Caret] < 0) FRez[Track_Under_Caret] = 0;
+            if(FRez[Track_Under_Caret] > 127) FRez[Track_Under_Caret] = 127;
+            Realslider(77, 502, FRez[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 3)
         {
-            if(ICut[ped_track] > 0.0078125f) ICut[ped_track] = 0.0078125f;
-            if(ICut[ped_track] < 0.00006103515625f) ICut[ped_track] = 0.00006103515625f;
-            Realslider(77, 538, (int) (ICut[ped_track] * 16384.0f), FType[ped_track] != 4);
+            if(ICut[Track_Under_Caret] > 0.0078125f) ICut[Track_Under_Caret] = 0.0078125f;
+            if(ICut[Track_Under_Caret] < 0.00006103515625f) ICut[Track_Under_Caret] = 0.00006103515625f;
+            Realslider(77, 538, (int) (ICut[Track_Under_Caret] * 16384.0f), FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 4)
         {
-            if(FType[ped_track] < 0) FType[ped_track] = 0;
-            if(FType[ped_track] >= MAX_FILTER) FType[ped_track] = MAX_FILTER;
-            switch(FType[ped_track])
+            if(FType[Track_Under_Caret] < 0) FType[Track_Under_Caret] = 0;
+            if(FType[Track_Under_Caret] >= MAX_FILTER) FType[Track_Under_Caret] = MAX_FILTER;
+            switch(FType[Track_Under_Caret])
             {
                 case 0: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
                 case 1: Gui_Draw_Button_Box(139, 520, 84, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
@@ -135,86 +135,86 @@ void Actualize_Track_Ed(char gode)
                 case 22: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
                 case 23: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
             }
-            value_box(77, 520, FType[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(77, 520, FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 5)
         {
-            if(DSend[ped_track] < 0) DSend[ped_track] = 0;
-            if(DSend[ped_track] > 1.0f) DSend[ped_track] = 1.0f;
-            Realslider(308, 520, int(DSend[ped_track] * 128.0f), compressor != 0);
+            if(DSend[Track_Under_Caret] < 0) DSend[Track_Under_Caret] = 0;
+            if(DSend[Track_Under_Caret] > 1.0f) DSend[Track_Under_Caret] = 1.0f;
+            Realslider(308, 520, int(DSend[Track_Under_Caret] * 128.0f), compressor != 0);
         }
 
         if(gode == 0 || gode == 6)
         {
-            if(CSend[ped_track] < 0) CSend[ped_track] = 0;
-            if(CSend[ped_track] > 127) CSend[ped_track] = 127;
-            value_box(570, 486, CSend[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            CCoef[ped_track] = float((float) CSend[ped_track] / 127.0f);
+            if(CSend[Track_Under_Caret] < 0) CSend[Track_Under_Caret] = 0;
+            if(CSend[Track_Under_Caret] > 127) CSend[Track_Under_Caret] = 127;
+            value_box(570, 486, CSend[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            CCoef[Track_Under_Caret] = float((float) CSend[Track_Under_Caret] / 127.0f);
         }
 
         if(gode == 0 || gode == 7)
         {
-            if(DThreshold[ped_track] < 0) DThreshold[ped_track] = 0;
-            if(DThreshold[ped_track] > 32767) DThreshold[ped_track] = 32767;
-            Realslider(308, 484, (int) DThreshold[ped_track] / 256, Disclap[ped_track]);
+            if(DThreshold[Track_Under_Caret] < 0) DThreshold[Track_Under_Caret] = 0;
+            if(DThreshold[Track_Under_Caret] > 32767) DThreshold[Track_Under_Caret] = 32767;
+            Realslider(308, 484, (int) DThreshold[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
         if(gode == 0 || gode == 8)
         {
-            if(DClamp[ped_track] < 0) DClamp[ped_track] = 0;
-            if(DClamp[ped_track] > 32767) DClamp[ped_track] = 32767;
-            Realslider(308, 502, (int) DClamp[ped_track] / 256, Disclap[ped_track]);
+            if(DClamp[Track_Under_Caret] < 0) DClamp[Track_Under_Caret] = 0;
+            if(DClamp[Track_Under_Caret] > 32767) DClamp[Track_Under_Caret] = 32767;
+            Realslider(308, 502, (int) DClamp[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
         if(gode == 0 || gode == 9)
         {
-            if(TPan[ped_track] < 0.0f) TPan[ped_track] = 0.0f;
-            if(TPan[ped_track] > 1.0f) TPan[ped_track] = 1.0f;
-            ComputeStereo(ped_track);
-            Realslider(308, 538, (int) (TPan[ped_track] * 127.0f), TRUE);
+            if(TPan[Track_Under_Caret] < 0.0f) TPan[Track_Under_Caret] = 0.0f;
+            if(TPan[Track_Under_Caret] > 1.0f) TPan[Track_Under_Caret] = 1.0f;
+            ComputeStereo(Track_Under_Caret);
+            Realslider(308, 538, (int) (TPan[Track_Under_Caret] * 127.0f), TRUE);
         }
 
         if(gode == 0 || gode == 10)
         {
-            if(CHAN_MUTE_STATE[ped_track]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            if(CHAN_MUTE_STATE[Track_Under_Caret]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 11)
         {
-            if(CHAN_MIDI_PRG[ped_track] > 15) CHAN_MIDI_PRG[ped_track] = 0;
-            if(CHAN_MIDI_PRG[ped_track] < 0) CHAN_MIDI_PRG[ped_track] = 15;
-            Gui_Draw_Arrows_Number_Box2(570, 530, CHAN_MIDI_PRG[ped_track] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(CHAN_MIDI_PRG[Track_Under_Caret] > 15) CHAN_MIDI_PRG[Track_Under_Caret] = 0;
+            if(CHAN_MIDI_PRG[Track_Under_Caret] < 0) CHAN_MIDI_PRG[Track_Under_Caret] = 15;
+            Gui_Draw_Arrows_Number_Box2(570, 530, CHAN_MIDI_PRG[Track_Under_Caret] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 12)
         {
-            if(Disclap[ped_track]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            if(Disclap[Track_Under_Caret]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 13)
         {
-            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
-            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
+            if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
+            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 14 || gode == 13)
         {
-            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
-            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
-            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
-            if(Get_Track_Type(ped_track) == TRACK_LARGE && Channels_MultiNotes[ped_track] > MAX_TRACKS_LARGE)
+            if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
+            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
+            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
+            if(Get_Track_Type(Track_Under_Caret) == TRACK_LARGE && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_LARGE)
             {
-                Set_Track_Zoom(ped_track, TRACK_NORMAL);
+                Set_Track_Zoom(Track_Under_Caret, TRACK_NORMAL);
             }
-            if(Get_Track_Type(ped_track) == TRACK_NORMAL && Channels_MultiNotes[ped_track] > MAX_TRACKS_NORMAL)
+            if(Get_Track_Type(Track_Under_Caret) == TRACK_NORMAL && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_NORMAL)
             {
-                Set_Track_Zoom(ped_track, TRACK_SMALL);
+                Set_Track_Zoom(Track_Under_Caret, TRACK_SMALL);
             }
-            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[ped_track], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actupated(0);
         }
 
@@ -232,17 +232,17 @@ void Mouse_Left_Track_Ed(void)
     {
 
         // Filter type
-        if(zcheckMouse(77, 520, 16, 16) && FType[ped_track] > 0)
+        if(zcheckMouse(77, 520, 16, 16) && FType[Track_Under_Caret] > 0)
         {
-            ResetFilters(ped_track);
-            FType[ped_track]--;
+            ResetFilters(Track_Under_Caret);
+            FType[Track_Under_Caret]--;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, 520, 16, 16) && FType[ped_track] < MAX_FILTER)
+        if(zcheckMouse(121, 520, 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
-            ResetFilters(ped_track);
-            FType[ped_track]++;
+            ResetFilters(Track_Under_Caret);
+            FType[Track_Under_Caret]++;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
@@ -250,7 +250,7 @@ void Mouse_Left_Track_Ed(void)
         // Previous track
         if(zcheckMouse(508, 486, 16, 16))
         {
-            ped_track--;
+            Track_Under_Caret--;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
@@ -259,7 +259,7 @@ void Mouse_Left_Track_Ed(void)
         // Next track
         if(zcheckMouse(552, 486, 16, 16))
         {
-            ped_track++;
+            Track_Under_Caret++;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
@@ -268,26 +268,26 @@ void Mouse_Left_Track_Ed(void)
         // Delay send
         if(zcheckMouse(570, 486, 16, 16))
         {
-            CSend[ped_track]--;
+            CSend[Track_Under_Caret]--;
             teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
         if(zcheckMouse(614, 486, 16, 16))
         {
-            CSend[ped_track]++;
+            CSend[Track_Under_Caret]++;
             teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(456, 484, 40, 16) && Disclap[ped_track])
+        if(zcheckMouse(456, 484, 40, 16) && Disclap[Track_Under_Caret])
         {
-            DThreshold[ped_track] = DClamp[ped_track];
+            DThreshold[Track_Under_Caret] = DClamp[Track_Under_Caret];
             teac = 7;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(456, 502, 40, 16) && Disclap[ped_track])
+        if(zcheckMouse(456, 502, 40, 16) && Disclap[Track_Under_Caret])
         {
-            DClamp[ped_track] = DThreshold[ped_track];
+            DClamp[Track_Under_Caret] = DThreshold[Track_Under_Caret];
             teac = 8;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
@@ -295,7 +295,7 @@ void Mouse_Left_Track_Ed(void)
         // Channel panning
         if(zcheckMouse(456, 538, 40, 16))
         {
-            TPan[ped_track] = 0.5f;
+            TPan[Track_Under_Caret] = 0.5f;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 9;
         }
@@ -303,13 +303,13 @@ void Mouse_Left_Track_Ed(void)
         // Midi channel
         if(zcheckMouse(570, 530, 16, 16))
         {
-            CHAN_MIDI_PRG[ped_track]--;
+            CHAN_MIDI_PRG[Track_Under_Caret]--;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 11;
         }
         if(zcheckMouse(614, 530, 16, 16))
         {
-            CHAN_MIDI_PRG[ped_track]++;
+            CHAN_MIDI_PRG[Track_Under_Caret]++;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 11;
         }
@@ -317,7 +317,7 @@ void Mouse_Left_Track_Ed(void)
         // Distortion
         if(zcheckMouse(570, 548, 60, 16))
         {
-            Disclap[ped_track] = !Disclap[ped_track];
+            Disclap[Track_Under_Caret] = !Disclap[Track_Under_Caret];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 0;
         }
@@ -325,8 +325,8 @@ void Mouse_Left_Track_Ed(void)
         // Mute track
         if(zcheckMouse(508, 512, 64, 16))
         {
-            if(CHAN_MUTE_STATE[ped_track] == 0) CHAN_MUTE_STATE[ped_track] = 1;
-            else CHAN_MUTE_STATE[ped_track] = 0;
+            if(CHAN_MUTE_STATE[Track_Under_Caret] == 0) CHAN_MUTE_STATE[Track_Under_Caret] = 1;
+            else CHAN_MUTE_STATE[Track_Under_Caret] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 10;
             trkchan = TRUE;
@@ -339,7 +339,7 @@ void Mouse_Left_Track_Ed(void)
             {
                 CHAN_MUTE_STATE[solify] = 1;
             }
-            CHAN_MUTE_STATE[ped_track] = 0;
+            CHAN_MUTE_STATE[Track_Under_Caret] = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             trkchan = TRUE;
             teac = 10;
@@ -360,16 +360,16 @@ void Mouse_Left_Track_Ed(void)
         // Channels polyphony
         if(zcheckMouse(650, 489, 16, 16) == 1)
         {
-            Channels_Polyphony[ped_track]--;
-            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
-            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+            Channels_Polyphony[Track_Under_Caret]--;
+            if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
+            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
         if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
         {
-            Channels_Polyphony[ped_track]++;
-            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
+            Channels_Polyphony[Track_Under_Caret]++;
+            if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
@@ -377,19 +377,19 @@ void Mouse_Left_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[ped_track]--;
-            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
+            Channels_MultiNotes[Track_Under_Caret]--;
+            if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[ped_track]++;
-            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track])
+            Channels_MultiNotes[Track_Under_Caret]++;
+            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret])
             {
-                Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+                Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             }
-            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -403,26 +403,26 @@ void Mouse_Right_Track_Ed(void)
     {
         if(zcheckMouse(570, 486, 16, 16) == 1)
         {
-            CSend[ped_track] -= 16;
+            CSend[Track_Under_Caret] -= 16;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
         if(zcheckMouse(614, 486, 16, 16) == 1)
         {
-            CSend[ped_track] += 16;
+            CSend[Track_Under_Caret] += 16;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(77, 520, 16, 16) && FType[ped_track] > 0)
+        if(zcheckMouse(77, 520, 16, 16) && FType[Track_Under_Caret] > 0)
         {
-            ResetFilters(ped_track);
-            FType[ped_track] -= 16;
+            ResetFilters(Track_Under_Caret);
+            FType[Track_Under_Caret] -= 16;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, 520, 16, 16) && FType[ped_track] < MAX_FILTER)
+        if(zcheckMouse(121, 520, 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
-            ResetFilters(ped_track);
-            FType[ped_track] += 16;
+            ResetFilters(Track_Under_Caret);
+            FType[Track_Under_Caret] += 16;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
@@ -430,16 +430,16 @@ void Mouse_Right_Track_Ed(void)
         // Channels polyphony
         if(zcheckMouse(650, 489, 16, 16) == 1)
         {
-            Channels_Polyphony[ped_track] -= 10;
-            if(Channels_Polyphony[ped_track] < 1) Channels_Polyphony[ped_track] = 1;
-            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track]) Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+            Channels_Polyphony[Track_Under_Caret] -= 10;
+            if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
+            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
         if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
         {
-            Channels_Polyphony[ped_track] += 10;
-            if(Channels_Polyphony[ped_track] > MAX_POLYPHONY) Channels_Polyphony[ped_track] = MAX_POLYPHONY;
+            Channels_Polyphony[Track_Under_Caret] += 10;
+            if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
@@ -447,19 +447,19 @@ void Mouse_Right_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[ped_track] -= 10;
-            if(Channels_MultiNotes[ped_track] < 1) Channels_MultiNotes[ped_track] = 1;
+            Channels_MultiNotes[Track_Under_Caret] -= 10;
+            if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[ped_track] += 10;
-            if(Channels_MultiNotes[ped_track] > Channels_Polyphony[ped_track])
+            Channels_MultiNotes[Track_Under_Caret] += 10;
+            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret])
             {
-                Channels_MultiNotes[ped_track] = Channels_Polyphony[ped_track];
+                Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             }
-            if(Channels_MultiNotes[ped_track] > MAX_POLYPHONY - 1) Channels_MultiNotes[ped_track] = MAX_POLYPHONY - 1;
+            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -470,11 +470,11 @@ void Mouse_Sliders_Track_Ed(void)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-        if(zcheckMouse(77, 484, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
-        if(zcheckMouse(77, 502, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
-        if(zcheckMouse(77, 538, 148, 16) && FType[ped_track] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
-        if(zcheckMouse(308, 484, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
-        if(zcheckMouse(308, 502, 148, 16) && Disclap[ped_track]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
+        if(zcheckMouse(77, 484, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
+        if(zcheckMouse(77, 502, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
+        if(zcheckMouse(77, 538, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
+        if(zcheckMouse(308, 484, 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
+        if(zcheckMouse(308, 502, 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
         if(compressor != 0) if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
         if(zcheckMouse(308, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
     }

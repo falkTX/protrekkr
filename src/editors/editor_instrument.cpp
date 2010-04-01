@@ -78,7 +78,7 @@ void set_instr_global(void)
     
     for(i = 0; i < 16; i++)
     {
-        if(SampleType[ped_patsam][i])
+        if(SampleType[Current_Sample][i])
         {
             Allow_Global = BUTTON_NORMAL;
             Allow_Global_Pushed = BUTTON_PUSHED;
@@ -142,7 +142,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
     {
-        if(SampleType[ped_patsam][ped_split])
+        if(SampleType[Current_Sample][Current_Sample_Split])
         {
             Allow_Buttons = BUTTON_NORMAL;
             Allow_Buttons_Pushed = BUTTON_PUSHED;
@@ -166,33 +166,33 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 // Instrument editor mode
                 if(gode == 0 || gode == 1)
                 {
-                    if(SampleVol[ped_patsam][ped_split] > 4.0f) SampleVol[ped_patsam][ped_split] = 4.0f;
-                    if(SampleVol[ped_patsam][ped_split] < 0) SampleVol[ped_patsam][ped_split] = 0;
-                    Realslider(426, 538, (int) (SampleVol[ped_patsam][ped_split] * 32.0f), Allow_Sliders);
-                    outlong_small(575, 538, (int) (SampleVol[ped_patsam][ped_split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
+                    if(SampleVol[Current_Sample][Current_Sample_Split] > 4.0f) SampleVol[Current_Sample][Current_Sample_Split] = 4.0f;
+                    if(SampleVol[Current_Sample][Current_Sample_Split] < 0) SampleVol[Current_Sample][Current_Sample_Split] = 0;
+                    Realslider(426, 538, (int) (SampleVol[Current_Sample][Current_Sample_Split] * 32.0f), Allow_Sliders);
+                    outlong_small(575, 538, (int) (SampleVol[Current_Sample][Current_Sample_Split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
                 }
 
                 if(gode == 0 || gode == 2)
                 {
-                    FineTune_Value = Finetune[ped_patsam][ped_split];
+                    FineTune_Value = Finetune[Current_Sample][Current_Sample_Split];
                     if(FineTune_Value > 127)
                     {
-                        Finetune[ped_patsam][ped_split] = 127;
+                        Finetune[Current_Sample][Current_Sample_Split] = 127;
                     }
                     if(FineTune_Value < -127)
                     {
-                        Finetune[ped_patsam][ped_split] = -127;
+                        Finetune[Current_Sample][Current_Sample_Split] = -127;
                     }
-                    Realslider(426, 556, 64 + (Finetune[ped_patsam][ped_split] / 2), Allow_Sliders);
-                    outlong_small(575, 556, (long) Finetune[ped_patsam][ped_split], 0, 56, BUTTON_NORMAL | BUTTON_DISABLED);
+                    Realslider(426, 556, 64 + (Finetune[Current_Sample][Current_Sample_Split] / 2), Allow_Sliders);
+                    outlong_small(575, 556, (long) Finetune[Current_Sample][Current_Sample_Split], 0, 56, BUTTON_NORMAL | BUTTON_DISABLED);
                 }
 
                 if(gode == 0 || gode == 3)
                 {
-                    if(FDecay[ped_patsam][ped_split] > 0.015625f) FDecay[ped_patsam][ped_split] = 0.015625f;
-                    if(FDecay[ped_patsam][ped_split] < 0.0f) FDecay[ped_patsam][ped_split] = 0.0f;
-                    Realslider(52, 528, (int) (FDecay[ped_patsam][ped_split] * 8192.0f), Allow_Sliders);
-                    outlong(201, 528, (int) (FDecay[ped_patsam][ped_split] * 8192.0f), 0);
+                    if(FDecay[Current_Sample][Current_Sample_Split] > 0.015625f) FDecay[Current_Sample][Current_Sample_Split] = 0.015625f;
+                    if(FDecay[Current_Sample][Current_Sample_Split] < 0.0f) FDecay[Current_Sample][Current_Sample_Split] = 0.0f;
+                    Realslider(52, 528, (int) (FDecay[Current_Sample][Current_Sample_Split] * 8192.0f), Allow_Sliders);
+                    outlong(201, 528, (int) (FDecay[Current_Sample][Current_Sample_Split] * 8192.0f), 0);
                 }
 
                 char temprout[256];
@@ -200,15 +200,15 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(typex == 0 || typex == 1 || typex == 2)
                     {
-                        if(SampleType[ped_patsam][ped_split] != 0)
+                        if(SampleType[Current_Sample][Current_Sample_Split] != 0)
                         {
-                            if(SampleChannels[ped_patsam][ped_split] == 2)
+                            if(SampleChannels[Current_Sample][Current_Sample_Split] == 2)
                             {
-                                sprintf(temprout, "%s [Stereo]", SampleName[ped_patsam][ped_split]);
+                                sprintf(temprout, "%s [Stereo]", SampleName[Current_Sample][Current_Sample_Split]);
                             }
                             else
                             {
-                                sprintf(temprout, "%s [Mono]", SampleName[ped_patsam][ped_split]);
+                                sprintf(temprout, "%s [Mono]", SampleName[Current_Sample][Current_Sample_Split]);
                             }
                         }
                         else
@@ -221,15 +221,15 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 4)
                 {
-                    outlong(448, 466, SampleNumSamples[ped_patsam][ped_split], 0);
+                    outlong(448, 466, SampleNumSamples[Current_Sample][Current_Sample_Split], 0);
                 }
 
                 if(gode == 0 || gode == 5)
                 {
-                    outlong(448, 484, LoopStart[ped_patsam][ped_split], 0);
-                    outlong(448, 502, LoopEnd[ped_patsam][ped_split], 0);
+                    outlong(448, 484, LoopStart[Current_Sample][Current_Sample_Split], 0);
+                    outlong(448, 502, LoopEnd[Current_Sample][Current_Sample_Split], 0);
 
-                    switch(LoopType[ped_patsam][ped_split])
+                    switch(LoopType[Current_Sample][Current_Sample_Split])
                     {
                         case SMP_LOOP_FORWARD:
                             Gui_Draw_Button_Box(448, 520, 60, 16, "Forward", Allow_Buttons_Pushed | BUTTON_TEXT_CENTERED);
@@ -253,19 +253,19 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 8)
                 {
-                    value_box(570, 466, ped_split, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    value_box(570, 466, Current_Sample_Split, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    value_box3(570, 484, Basenote[Current_Sample][Current_Sample_Split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
 
                 if(gode == 0 || gode == 9)
                 {
-                    value_box3(570, 484, Basenote[ped_patsam][ped_split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    value_box3(570, 484, Basenote[Current_Sample][Current_Sample_Split], Allow_Buttons | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
                 if(gode == 0 || gode == 10)
                 {
 
 #if !defined(__NO_MIDI__)
-                    if(Midiprg[ped_patsam] == -1)
+                    if(Midiprg[Current_Sample] == -1)
                     {
                         Gui_Draw_Button_Box(570, 502, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                         Gui_Draw_Button_Box(570 + 44, 502, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
@@ -280,7 +280,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     }
                     else
                     {
-                        Gui_Draw_Arrows_Number_Box(570, 502, Midiprg[ped_patsam], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                        Gui_Draw_Arrows_Number_Box(570, 502, Midiprg[Current_Sample], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     }
 
                     Actualize_Instruments_Synths_List(1);
@@ -288,7 +288,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 }
                 if(gode == 0 || gode == 12)
                 {
-                    if(beatsync[ped_patsam])
+                    if(beatsync[Current_Sample])
                     {
                         Gui_Draw_Button_Box(144, 492, 28, 16, "Off", Allow_Global | BUTTON_TEXT_CENTERED);
                         Gui_Draw_Button_Box(176, 492, 28, 16, "On", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
@@ -302,21 +302,21 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 13)
                 {
-                    Gui_Draw_Arrows_Number_Box(144, 510, beatlines[ped_patsam], Allow_Global | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Arrows_Number_Box(144, 510, beatlines[Current_Sample], Allow_Global | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
 
                 if(gode == 0 || gode == 15)
                 {
-                    if(CustomVol[ped_patsam] > 1.0f) CustomVol[ped_patsam] = 1.0f;
-                    if(CustomVol[ped_patsam] < 0.0f) CustomVol[ped_patsam] = 0.0f;
-                    Realslider(52, 546, (int) (CustomVol[ped_patsam] * 128.0f), Allow_Global_Sliders);
-                    outlong(201, 546, (int) (CustomVol[ped_patsam] * 100.0f), 1);
+                    if(CustomVol[Current_Sample] > 1.0f) CustomVol[Current_Sample] = 1.0f;
+                    if(CustomVol[Current_Sample] < 0.0f) CustomVol[Current_Sample] = 0.0f;
+                    Realslider(52, 546, (int) (CustomVol[Current_Sample] * 128.0f), Allow_Global_Sliders);
+                    outlong(201, 546, (int) (CustomVol[Current_Sample] * 100.0f), 1);
                 }
 
                 if(gode == 0 || gode == 16)
                 {
 #if !defined(__NO_CODEC__)
-                    switch(SampleCompression[ped_patsam])
+                    switch(SampleCompression[Current_Sample])
                     {
                         case SMP_PACK_GSM:
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_Global_Pushed);
@@ -389,9 +389,9 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #if !defined(__NO_CODEC__)
                 if(gode == 0 || gode == 17)
                 {
-                    if(Mp3_BitRate[ped_patsam] < 0) Mp3_BitRate[ped_patsam] = 0;
-                    if(Mp3_BitRate[ped_patsam] > 5) Mp3_BitRate[ped_patsam] = 5;
-                    Gui_Draw_Arrows_Number_Box(729, 484, Type_Mp3_BitRate[Mp3_BitRate[ped_patsam]], Allow_Global | BUTTON_TEXT_CENTERED);
+                    if(Mp3_BitRate[Current_Sample] < 0) Mp3_BitRate[Current_Sample] = 0;
+                    if(Mp3_BitRate[Current_Sample] > 5) Mp3_BitRate[Current_Sample] = 5;
+                    Gui_Draw_Arrows_Number_Box(729, 484, Type_Mp3_BitRate[Mp3_BitRate[Current_Sample]], Allow_Global | BUTTON_TEXT_CENTERED);
                     if(gode == 17) gode = 19;
                 }
 #endif
@@ -399,9 +399,9 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #if !defined(__NO_CODEC__)
                 if(gode == 0 || gode == 18)
                 {
-                    if(At3_BitRate[ped_patsam] < 0) At3_BitRate[ped_patsam] = 0;
-                    if(At3_BitRate[ped_patsam] > 2) At3_BitRate[ped_patsam] = 2;
-                    Gui_Draw_Arrows_Number_Box(729, 524, Type_At3_BitRate[At3_BitRate[ped_patsam]], Allow_Global | BUTTON_TEXT_CENTERED);
+                    if(At3_BitRate[Current_Sample] < 0) At3_BitRate[Current_Sample] = 0;
+                    if(At3_BitRate[Current_Sample] > 2) At3_BitRate[Current_Sample] = 2;
+                    Gui_Draw_Arrows_Number_Box(729, 524, Type_At3_BitRate[At3_BitRate[Current_Sample]], Allow_Global | BUTTON_TEXT_CENTERED);
                     if(gode == 18) gode = 19;
                 }
 #endif
@@ -409,7 +409,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
 #if !defined(__NO_CODEC__)
                 if(gode == 0 || gode == 19)
                 {
-                    if(SamplesSwap[ped_patsam])
+                    if(SamplesSwap[Current_Sample])
                     {
                         Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     }
@@ -420,28 +420,28 @@ void Actualize_Instrument_Ed(int typex, char gode)
                     if(gode == 19)
                     {
                         int i;
-                        if(SamplesSwap[ped_patsam])
+                        if(SamplesSwap[Current_Sample])
                         {
                             for(i = 0; i < 16; i++)
                             {
-                                Lock_Sample(ped_patsam, i);
+                                Lock_Sample(Current_Sample, i);
                             }
                         }
                         else
                         {
                             for(i = 0; i < 16; i++)
                             {
-                                Restore_WaveForm(ped_patsam, 0, i);
-                                Restore_WaveForm(ped_patsam, 1, i);
-                                if(RawSamples_Swap[ped_patsam][0][i])
+                                Restore_WaveForm(Current_Sample, 0, i);
+                                Restore_WaveForm(Current_Sample, 1, i);
+                                if(RawSamples_Swap[Current_Sample][0][i])
                                 {
-                                    free(RawSamples_Swap[ped_patsam][0][i]);
-                                    RawSamples_Swap[ped_patsam][0][i] = NULL;
+                                    free(RawSamples_Swap[Current_Sample][0][i]);
+                                    RawSamples_Swap[Current_Sample][0][i] = NULL;
                                 }
-                                if(RawSamples_Swap[ped_patsam][1][i])
+                                if(RawSamples_Swap[Current_Sample][1][i])
                                 {
-                                    free(RawSamples_Swap[ped_patsam][1][i]);
-                                    RawSamples_Swap[ped_patsam][1][i] = NULL;
+                                    free(RawSamples_Swap[Current_Sample][1][i]);
+                                    RawSamples_Swap[Current_Sample][1][i] = NULL;
                                 }
                             }
                         }
@@ -473,22 +473,22 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 switch(typex)
                 {
                     case 0:
-                        outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
-                        outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
+                        outlong(487, 470, *(RawSamples[Current_Sample][0][Current_Sample_Split] + LoopStart[Current_Sample][Current_Sample_Split]), 0);
+                        outlong(114, 470, LoopStart[Current_Sample][Current_Sample_Split], 0);
                         actuloop = 1;
                         break;
 
                     case 1:
-                        outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
-                        outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
+                        outlong(487, 488, *(RawSamples[Current_Sample][0][Current_Sample_Split] + LoopEnd[Current_Sample][Current_Sample_Split]), 0);
+                        outlong(314, 470, LoopEnd[Current_Sample][Current_Sample_Split], 0);
                         actuloop = 2;
                         break;
 
                     case 2:
-                        outlong(487, 470, *(RawSamples[ped_patsam][0][ped_split] + LoopStart[ped_patsam][ped_split]), 0);
-                        outlong(487, 488, *(RawSamples[ped_patsam][0][ped_split] + LoopEnd[ped_patsam][ped_split]), 0);
-                        outlong(114, 470, LoopStart[ped_patsam][ped_split], 0);
-                        outlong(314, 470, LoopEnd[ped_patsam][ped_split], 0);
+                        outlong(487, 470, *(RawSamples[Current_Sample][0][Current_Sample_Split] + LoopStart[Current_Sample][Current_Sample_Split]), 0);
+                        outlong(487, 488, *(RawSamples[Current_Sample][0][Current_Sample_Split] + LoopEnd[Current_Sample][Current_Sample_Split]), 0);
+                        outlong(114, 470, LoopStart[Current_Sample][Current_Sample_Split], 0);
+                        outlong(314, 470, LoopEnd[Current_Sample][Current_Sample_Split], 0);
                         actuloop = 3;
                         break;
                 }
@@ -502,7 +502,7 @@ void Mouse_Sliders_Instrument_Ed(void)
 {
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
     {
-        if(SampleType[ped_patsam][ped_split])
+        if(SampleType[Current_Sample][Current_Sample_Split])
         {
             if(zcheckMouse(426, 538, 148, 16))
             {
@@ -521,7 +521,7 @@ void Mouse_Sliders_Instrument_Ed(void)
         {
             if(zcheckMouse(52, 546, 148, 16))
             {
-                CustomVol[ped_patsam] = float(Mouse.x - 62) * 0.0078125f;
+                CustomVol[Current_Sample] = float(Mouse.x - 62) * 0.0078125f;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 15;
             }
@@ -534,34 +534,34 @@ void Mouse_Left_Instrument_Ed(void)
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 1)
     {
         if(zcheckMouse(96, 470, 16, 16) &&
-           LoopStart[ped_patsam][ped_split] > 0 &&
-           SampleType[ped_patsam][ped_split])
+           LoopStart[Current_Sample][Current_Sample_Split] > 0 &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            LoopStart[ped_patsam][ped_split]--;
+            LoopStart[Current_Sample][Current_Sample_Split]--;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 5;
         }
         if(zcheckMouse(176, 470, 16, 16) &&
-           LoopStart[ped_patsam][ped_split] < LoopEnd[ped_patsam][ped_split] &&
-           SampleType[ped_patsam][ped_split])
+           LoopStart[Current_Sample][Current_Sample_Split] < LoopEnd[Current_Sample][Current_Sample_Split] &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            LoopStart[ped_patsam][ped_split]++;
+            LoopStart[Current_Sample][Current_Sample_Split]++;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 5;
         }
         if(zcheckMouse(296, 470, 16, 16) &&
-           LoopEnd[ped_patsam][ped_split] > LoopStart[ped_patsam][ped_split] &&
-           SampleType[ped_patsam][ped_split])
+           LoopEnd[Current_Sample][Current_Sample_Split] > LoopStart[Current_Sample][Current_Sample_Split] &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            LoopEnd[ped_patsam][ped_split]--;
+            LoopEnd[Current_Sample][Current_Sample_Split]--;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
         if(zcheckMouse(376, 470, 16, 16) &&
-           LoopEnd[ped_patsam][ped_split] < SampleNumSamples[ped_patsam][ped_split] &&
-           SampleType[ped_patsam][ped_split])
+           LoopEnd[Current_Sample][Current_Sample_Split] < SampleNumSamples[Current_Sample][Current_Sample_Split] &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            LoopEnd[ped_patsam][ped_split]++;
+            LoopEnd[Current_Sample][Current_Sample_Split]++;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
@@ -575,31 +575,31 @@ void Mouse_Left_Instrument_Ed(void)
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 0)
     {
-        if(zcheckMouse(570, 466, 16, 16) && ped_split > 0)
+        if(zcheckMouse(570, 466, 16, 16) && Current_Sample_Split > 0)
         {
-            ped_split--;
+            Current_Sample_Split--;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 0;
             Renew_Sample_Ed();
         }
-        if(zcheckMouse(614, 466, 16, 16) && ped_split < 15)
+        if(zcheckMouse(614, 466, 16, 16) && Current_Sample_Split < 15)
         {
-            ped_split++;
+            Current_Sample_Split++;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 0;
             Renew_Sample_Ed();
         }
 
 #if !defined(__NO_MIDI__)
-        if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
+        if(zcheckMouse(570, 502, 16, 16) && Midiprg[Current_Sample] > -1)
         {
-            Midiprg[ped_patsam]--;
+            Midiprg[Current_Sample]--;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 10;
         }
-        if(zcheckMouse(614, 502, 16, 16) && Midiprg[ped_patsam] < 127)
+        if(zcheckMouse(614, 502, 16, 16) && Midiprg[Current_Sample] < 127)
         {
-            Midiprg[ped_patsam]++;
+            Midiprg[Current_Sample]++;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 10;
         }
@@ -609,13 +609,13 @@ void Mouse_Left_Instrument_Ed(void)
         {
             if(zcheckMouse(144, 492, 28, 16))
             {
-                beatsync[ped_patsam] = FALSE;
+                beatsync[Current_Sample] = FALSE;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 12;
             }
             if(zcheckMouse(176, 492, 28, 16))
             {
-                beatsync[ped_patsam] = TRUE;
+                beatsync[Current_Sample] = TRUE;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 12;
             }
@@ -623,22 +623,22 @@ void Mouse_Left_Instrument_Ed(void)
 
         if(Allow_Global_Sliders)
         {
-            if(zcheckMouse(144, 510, 16, 16) && beatlines[ped_patsam] > 1)
+            if(zcheckMouse(144, 510, 16, 16) && beatlines[Current_Sample] > 1)
             {
-                beatlines[ped_patsam]--;
+                beatlines[Current_Sample]--;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 13;
             }
-            if(zcheckMouse(188, 510, 16, 16) && beatlines[ped_patsam] < 128)
+            if(zcheckMouse(188, 510, 16, 16) && beatlines[Current_Sample] < 128)
             {
-                beatlines[ped_patsam]++;
+                beatlines[Current_Sample]++;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 13;
             }
         }
 
         // Go to loop editor
-        if(zcheckMouse(268, 466, 88, 16) && SampleType[ped_patsam][ped_split])
+        if(zcheckMouse(268, 466, 88, 16) && SampleType[Current_Sample][Current_Sample_Split])
         {
             seditor = 1;
             gui_action = GUI_CMD_SELECT_INSTRUMENT_EDIT;
@@ -648,7 +648,7 @@ void Mouse_Left_Instrument_Ed(void)
         {
             if(zcheckMouse(268, 492, 88, 16))
             {
-                if(File_Exist("%s"SLASH"%s.pti", Dir_Instrs, nameins[ped_patsam]))
+                if(File_Exist("%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Sample]))
                 {
                     Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_INSTRUMENT);
                 }
@@ -660,12 +660,12 @@ void Mouse_Left_Instrument_Ed(void)
         }
 
         // Export .wav
-        if(zcheckMouse(268, 510, 88, 16) && SampleType[ped_patsam][ped_split])
+        if(zcheckMouse(268, 510, 88, 16) && SampleType[Current_Sample][Current_Sample_Split])
         {
             char Name[MAX_PATH];
-            if(strlen(SampleName[ped_patsam][ped_split]))
+            if(strlen(SampleName[Current_Sample][Current_Sample_Split]))
             {
-                sprintf(Name, "%s", SampleName[ped_patsam][ped_split]);
+                sprintf(Name, "%s", SampleName[Current_Sample][Current_Sample_Split]);
             }
             else
             {
@@ -682,19 +682,19 @@ void Mouse_Left_Instrument_Ed(void)
         }
 
         if(zcheckMouse(570, 484, 16, 16) &&
-           Basenote[ped_patsam][ped_split] > 0 &&
-           SampleType[ped_patsam][ped_split])
+           Basenote[Current_Sample][Current_Sample_Split] > 0 &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            Basenote[ped_patsam][ped_split]--;
+            Basenote[Current_Sample][Current_Sample_Split]--;
             teac = 9;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
         }
 
         if(zcheckMouse(614, 484, 16, 16) &&
-           Basenote[ped_patsam][ped_split] < 119 &&
-           SampleType[ped_patsam][ped_split])
+           Basenote[Current_Sample][Current_Sample_Split] < 119 &&
+           SampleType[Current_Sample][Current_Sample_Split])
         {
-            Basenote[ped_patsam][ped_split]++;
+            Basenote[Current_Sample][Current_Sample_Split]++;
             teac = 9;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
         }
@@ -707,11 +707,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select GSM
             if(zcheckMouse(640, 484, 39, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_GSM)
+                if(SampleCompression[Current_Sample] != SMP_PACK_GSM)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_GSM;
+                SampleCompression[Current_Sample] = SMP_PACK_GSM;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -719,11 +719,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select MP3
             if(zcheckMouse(681, 484, 39, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_MP3)
+                if(SampleCompression[Current_Sample] != SMP_PACK_MP3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_MP3;
+                SampleCompression[Current_Sample] = SMP_PACK_MP3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -731,11 +731,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select ADPCM
             if(zcheckMouse(640, 484 + (18 * 1), 80, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_ADPCM)
+                if(SampleCompression[Current_Sample] != SMP_PACK_ADPCM)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_ADPCM;
+                SampleCompression[Current_Sample] = SMP_PACK_ADPCM;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -743,11 +743,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select TRUESPEECH
             if(zcheckMouse(640, 484 + (18 * 2), 80, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_TRUESPEECH)
+                if(SampleCompression[Current_Sample] != SMP_PACK_TRUESPEECH)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_TRUESPEECH;
+                SampleCompression[Current_Sample] = SMP_PACK_TRUESPEECH;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -755,11 +755,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select AT3
             if(zcheckMouse(640, 484 + (18 * 3), 80, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_AT3)
+                if(SampleCompression[Current_Sample] != SMP_PACK_AT3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_AT3;
+                SampleCompression[Current_Sample] = SMP_PACK_AT3;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -767,11 +767,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select 8BIT
             if(zcheckMouse(640, 484 + (18 * 4), 39, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_8BIT)
+                if(SampleCompression[Current_Sample] != SMP_PACK_8BIT)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_8BIT;
+                SampleCompression[Current_Sample] = SMP_PACK_8BIT;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -779,11 +779,11 @@ void Mouse_Left_Instrument_Ed(void)
             // Select NONE
             if(zcheckMouse(681, 484 + (18 * 4), 39, 16))
             {
-                if(SampleCompression[ped_patsam] != SMP_PACK_NONE)
+                if(SampleCompression[Current_Sample] != SMP_PACK_NONE)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SampleCompression[ped_patsam] = SMP_PACK_NONE;
+                SampleCompression[Current_Sample] = SMP_PACK_NONE;
                 teac = 16;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             }
@@ -791,12 +791,12 @@ void Mouse_Left_Instrument_Ed(void)
             // Mp3 BitRate
             if(zcheckMouse(729, 484, 16, 16))
             {
-                if(SampleCompression[ped_patsam] == SMP_PACK_MP3)
+                if(SampleCompression[Current_Sample] == SMP_PACK_MP3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SamplesSwap[ped_patsam] = FALSE;
-                Mp3_BitRate[ped_patsam]--;
+                SamplesSwap[Current_Sample] = FALSE;
+                Mp3_BitRate[Current_Sample]--;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 17;
             }
@@ -804,12 +804,12 @@ void Mouse_Left_Instrument_Ed(void)
             // Mp3 BitRate
             if(zcheckMouse(729 + 44, 484, 16, 16))
             {
-                if(SampleCompression[ped_patsam] == SMP_PACK_MP3)
+                if(SampleCompression[Current_Sample] == SMP_PACK_MP3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SamplesSwap[ped_patsam] = FALSE;
-                Mp3_BitRate[ped_patsam]++;
+                SamplesSwap[Current_Sample] = FALSE;
+                Mp3_BitRate[Current_Sample]++;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 17;
             }
@@ -817,12 +817,12 @@ void Mouse_Left_Instrument_Ed(void)
             // At3 BitRate
             if(zcheckMouse(729, 524, 16, 16))
             {
-                if(SampleCompression[ped_patsam] == SMP_PACK_AT3)
+                if(SampleCompression[Current_Sample] == SMP_PACK_AT3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SamplesSwap[ped_patsam] = FALSE;
-                At3_BitRate[ped_patsam]--;
+                SamplesSwap[Current_Sample] = FALSE;
+                At3_BitRate[Current_Sample]--;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 18;
             }
@@ -830,12 +830,12 @@ void Mouse_Left_Instrument_Ed(void)
             // At3 BitRate
             if(zcheckMouse(729 + 44, 524, 16, 16))
             {
-                if(SampleCompression[ped_patsam] == SMP_PACK_AT3)
+                if(SampleCompression[Current_Sample] == SMP_PACK_AT3)
                 {
-                    SamplesSwap[ped_patsam] = FALSE;
+                    SamplesSwap[Current_Sample] = FALSE;
                 }
-                SamplesSwap[ped_patsam] = FALSE;
-                At3_BitRate[ped_patsam]++;
+                SamplesSwap[Current_Sample] = FALSE;
+                At3_BitRate[Current_Sample]++;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 18;
             }
@@ -843,7 +843,7 @@ void Mouse_Left_Instrument_Ed(void)
             // Lock sample
             if(zcheckMouse(729, 484 + (18 * 4), 60, 16))
             {
-                SamplesSwap[ped_patsam] = !SamplesSwap[ped_patsam];
+                SamplesSwap[Current_Sample] = !SamplesSwap[Current_Sample];
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 19;
             }
@@ -851,25 +851,25 @@ void Mouse_Left_Instrument_Ed(void)
 
         }
 
-        if(SampleType[ped_patsam][ped_split])
+        if(SampleType[Current_Sample][Current_Sample_Split])
         {
             if(zcheckMouse(448, 520, 60, 16))
             {
-                LoopType[ped_patsam][ped_split] = SMP_LOOP_FORWARD;
+                LoopType[Current_Sample][Current_Sample_Split] = SMP_LOOP_FORWARD;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 draw_sampled_wave = TRUE;
             }
             if(zcheckMouse(448 + 62, 520, 58, 16))
             {
-                LoopType[ped_patsam][ped_split] = SMP_LOOP_PINGPONG;
+                LoopType[Current_Sample][Current_Sample_Split] = SMP_LOOP_PINGPONG;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 draw_sampled_wave = TRUE;
             }
             if(zcheckMouse(448 + 62 * 2 - 2, 520, 60, 16))
             {
-                LoopType[ped_patsam][ped_split] = SMP_LOOP_NONE;
+                LoopType[Current_Sample][Current_Sample_Split] = SMP_LOOP_NONE;
                 teac = 5;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 draw_sampled_wave = TRUE;
@@ -884,36 +884,36 @@ void Mouse_Right_Instrument_Ed(void)
     {
         if(Allow_Global_Sliders)
         {
-            if(zcheckMouse(144, 510, 16, 16) && beatlines[ped_patsam] > 1)
+            if(zcheckMouse(144, 510, 16, 16) && beatlines[Current_Sample] > 1)
             {
-                beatlines[ped_patsam] -= 16;
-                if(beatlines[ped_patsam] < 1) beatlines[ped_patsam] = 1;
+                beatlines[Current_Sample] -= 16;
+                if(beatlines[Current_Sample] < 1) beatlines[Current_Sample] = 1;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 13;
             }
 
-            if(zcheckMouse(188, 510, 16, 16) && beatlines[ped_patsam] < 128)
+            if(zcheckMouse(188, 510, 16, 16) && beatlines[Current_Sample] < 128)
             {
-                beatlines[ped_patsam] += 16;
-                if(beatlines[ped_patsam] > 128) beatlines[ped_patsam] = 128;
+                beatlines[Current_Sample] += 16;
+                if(beatlines[Current_Sample] > 128) beatlines[Current_Sample] = 128;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 13;
             }
         }
 
 #if !defined(__NO_MIDI__)
-        if(zcheckMouse(570, 502, 16, 16) && Midiprg[ped_patsam] > -1)
+        if(zcheckMouse(570, 502, 16, 16) && Midiprg[Current_Sample] > -1)
         {
-            if(Midiprg[ped_patsam] > 14) Midiprg[ped_patsam] -= 16;
-            else Midiprg[ped_patsam] = -1;
+            if(Midiprg[Current_Sample] > 14) Midiprg[Current_Sample] -= 16;
+            else Midiprg[Current_Sample] = -1;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 10;
         }
 
-        if(zcheckMouse(614, 502, 16, 16) && Midiprg[ped_patsam] < 127)
+        if(zcheckMouse(614, 502, 16, 16) && Midiprg[Current_Sample] < 127)
         {
-            if(Midiprg[ped_patsam] < 111) Midiprg[ped_patsam] += 16;
-            else Midiprg[ped_patsam] = 127;
+            if(Midiprg[Current_Sample] < 111) Midiprg[Current_Sample] += 16;
+            else Midiprg[Current_Sample] = 127;
             gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
             teac = 10;
         }
@@ -970,7 +970,7 @@ void Mouse_Right_Instrument_Ed(void)
                         }
                     }
                 }
-                if(SamplesSwap[ped_patsam])
+                if(SamplesSwap[Current_Sample])
                 {
                     Gui_Draw_Button_Box(729, 484 + (18 * 4), 60, 16, "Lock / All", Allow_Global_Pushed | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 }
@@ -983,20 +983,20 @@ void Mouse_Right_Instrument_Ed(void)
         }
 #endif
 
-        if(SampleType[ped_patsam][ped_split])
+        if(SampleType[Current_Sample][Current_Sample_Split])
         {
-            if(zcheckMouse(570, 484, 16, 16) && Basenote[ped_patsam][ped_split] > 0)
+            if(zcheckMouse(570, 484, 16, 16) && Basenote[Current_Sample][Current_Sample_Split] > 0)
             {
-                if(Basenote[ped_patsam][ped_split] > 11) Basenote[ped_patsam][ped_split] -= 12;
-                else Basenote[ped_patsam][ped_split] = 0;
+                if(Basenote[Current_Sample][Current_Sample_Split] > 11) Basenote[Current_Sample][Current_Sample_Split] -= 12;
+                else Basenote[Current_Sample][Current_Sample_Split] = 0;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 9;
             }
 
-            if(zcheckMouse(614, 484, 16, 16) && Basenote[ped_patsam][ped_split] < 119)
+            if(zcheckMouse(614, 484, 16, 16) && Basenote[Current_Sample][Current_Sample_Split] < 119)
             {
-                if(Basenote[ped_patsam][ped_split] < 107) Basenote[ped_patsam][ped_split] += 12;
-                else Basenote[ped_patsam][ped_split] = 119;
+                if(Basenote[Current_Sample][Current_Sample_Split] < 107) Basenote[Current_Sample][Current_Sample_Split] += 12;
+                else Basenote[Current_Sample][Current_Sample_Split] = 119;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 9;
             }
@@ -1011,10 +1011,10 @@ void Afloop(void)
     {
         for(int a = 0; a < 200; a++)
         {
-            Uint32 ose = a + LoopStart[ped_patsam][ped_split];
-            if(ose < SampleNumSamples[ped_patsam][ped_split])
+            Uint32 ose = a + LoopStart[Current_Sample][Current_Sample_Split];
+            if(ose < SampleNumSamples[Current_Sample][Current_Sample_Split])
             {
-                int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
+                int v = *(RawSamples[Current_Sample][0][Current_Sample_Split] + ose) / 1024;
                 DrawVLine(a + 222, 554, 522 - v, COL_VUMETER);
                 DrawVLine(a + 222, 522 - v, 490, COL_BACKGROUND);
             }
@@ -1033,11 +1033,11 @@ void Afloop(void)
     {
         for(int b = 0; b < 200; b++)
         {
-            Uint32 ose = (LoopEnd[ped_patsam][ped_split] - 200) + b;
+            Uint32 ose = (LoopEnd[Current_Sample][Current_Sample_Split] - 200) + b;
             iose = ose;
-            if(iose > -1 && ose < SampleNumSamples[ped_patsam][ped_split])
+            if(iose > -1 && ose < SampleNumSamples[Current_Sample][Current_Sample_Split])
             {
-                int v = *(RawSamples[ped_patsam][0][ped_split] + ose) / 1024;
+                int v = *(RawSamples[Current_Sample][0][Current_Sample_Split] + ose) / 1024;
                 DrawVLine(b + 22, 554, 522 - v, COL_VUMETERPEAK);
                 DrawVLine(b + 22, 522 - v, 490, COL_BACKGROUND);
             }
@@ -1056,8 +1056,8 @@ void Afloop(void)
 
 void Mouse_Left_Repeat_Instrument_Ed(void)
 {
-    int32 *Cur_Loop_Start = (int32 *) &LoopStart[ped_patsam][ped_split];
-    int32 *Cur_Loop_End = (int32 *) &LoopEnd[ped_patsam][ped_split];
+    int32 *Cur_Loop_Start = (int32 *) &LoopStart[Current_Sample][Current_Sample_Split];
+    int32 *Cur_Loop_End = (int32 *) &LoopEnd[Current_Sample][Current_Sample_Split];
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 1)
     {
@@ -1081,7 +1081,7 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split])
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[Current_Sample][Current_Sample_Split])
         {
             *Cur_Loop_End += 1;
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
@@ -1092,8 +1092,8 @@ void Mouse_Left_Repeat_Instrument_Ed(void)
 
 void Mouse_Sliders_Right_Instrument_Ed(void)
 {
-    int32 *Cur_Loop_Start = (int32 *) &LoopStart[ped_patsam][ped_split];
-    int32 *Cur_Loop_End = (int32 *) &LoopEnd[ped_patsam][ped_split];
+    int32 *Cur_Loop_Start = (int32 *) &LoopStart[Current_Sample][Current_Sample_Split];
+    int32 *Cur_Loop_End = (int32 *) &LoopEnd[Current_Sample][Current_Sample_Split];
 
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT && seditor == 1)
     {
@@ -1123,12 +1123,12 @@ void Mouse_Sliders_Right_Instrument_Ed(void)
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
         }
-        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[ped_patsam][ped_split])
+        if(zcheckMouse(394, 470, 16, 16) && *Cur_Loop_End < (int32) SampleNumSamples[Current_Sample][Current_Sample_Split])
         {
             *Cur_Loop_End += 10;
-            if(*Cur_Loop_End > (int32) SampleNumSamples[ped_patsam][ped_split])
+            if(*Cur_Loop_End > (int32) SampleNumSamples[Current_Sample][Current_Sample_Split])
             {
-                *Cur_Loop_End = SampleNumSamples[ped_patsam][ped_split];
+                *Cur_Loop_End = SampleNumSamples[Current_Sample][Current_Sample_Split];
             }
             gui_action = GUI_CMD_UPDATE_LOOP_EDITOR_ED;
             teac = 5;
@@ -1159,7 +1159,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
 
                 if(Instrs_index + counter < MAX_INSTRS)
                 {
-                    if(Instrs_index + counter == ped_patsam)
+                    if(Instrs_index + counter == Current_Sample)
                     {
                         SetColor(COL_PUSHED_MED);
                         bjbox(xr - 1, yr + (counter * 12) + 1, 387, 12);
@@ -1378,14 +1378,14 @@ void Actualize_Instruments_Synths_List(int modeac)
 
             if(modeac == 2)
             {
-                if(ped_patsam >= Instrs_index + 11)
+                if(Current_Sample >= Instrs_index + 11)
                 {
-                    Instrs_index += ped_patsam - (Instrs_index + 10);
+                    Instrs_index += Current_Sample - (Instrs_index + 10);
                 }
 
-                if(ped_patsam < Instrs_index)
+                if(Current_Sample < Instrs_index)
                 {
-                    Instrs_index -= Instrs_index - ped_patsam;
+                    Instrs_index -= Instrs_index - Current_Sample;
                 }
             }
 

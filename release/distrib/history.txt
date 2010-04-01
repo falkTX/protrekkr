@@ -9,7 +9,7 @@ v2.0:
   the one found in Propellerhead's Rebirth.
 - Files entries are now sorted.
 - Input zones are now displayed with altered colors.
-- 4 default color schemes are now available.
+- 6 default color themes are now available.
 - Range selection in sample editor speeded up.
 - .mod import function is now much more accurate.
 - Fixed a bug in samples looping (1 byte was always missing from the loop).
@@ -28,14 +28,25 @@ v2.0:
 - Added position jump effect (1F) (Can be combined with pattern break (0D)).
 - Added fine volume slide up and down effects (20 & 21).
 - Added fine pitch up and down effects (22 & 23).
-- Speed can now go up to 32.
+- Speed can now go up to 32 ticks/beat.
 - BPM weren't refresh properly on screen when being changed inside patterns.
 - Multi notes channels of modules weren't re-initialized & that could lead
   to a potential crash.
 - Instruments used without notes won't retrig the note but only change
   the waveform (like in the original protracker).
 - Filelists won't be redrawn after a loading process
-  (so they won't jump to top).
+  (so they won't jump back to the top).
+- Fixed a bug in Pattner loop command (6).
+- Splitted the play button into 2, 1st one to play song,
+  2nd one to play pattern, right mouse button on those to play song
+  or pattern from current row (using left mouse button starts from top row).
+  Shortcuts:
+    RCTRL: Play song from start of pattern.
+    LSHIFT + RCTRL: Play song from current position.
+    RALT: Play pattern from start of pattern.
+    LSHIFT + RALT: Play pattern from current position.
+- Added transposing capability to the instruments remapping functions.
+- Changed LCTRL+H & LCTRL+LSHIFT+H to LCTRL+K & LCTRL+LSHIFT+K
 
 v1.99e:
 
@@ -73,9 +84,9 @@ v1.99:
 - Added maximum latency checking on OSX.
 - Updated SDL library to latest for OSX and Windows.
 - LCTRL+L/LCTRL+H: transpose a selected block to 1 octave lower/higher.
-- LCTRL + LSHIFT + L/H: Transpose the note of a selected block
-                        to 1 octave lower/higher but only for the currently
-                        selected instrument.
+- LCTRL+LSHIFT+L/H: Transpose the note of a selected block
+                    to 1 octave lower/higher but only for the currently
+                    selected instrument.
 - Added buttons for block commands.
 - Commands with right mouse button functions are now shown
   with slightly different colors.

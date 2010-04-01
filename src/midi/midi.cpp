@@ -43,7 +43,7 @@
 // Variables
 extern int Nbr_Sub_NoteOff;
 extern int key_record_first_time;
-extern int old_key_ped_line;
+extern int old_key_Pattern_Line;
 
 char Midi_In_Name[256];
 char Midi_Out_Name[256];
@@ -119,9 +119,9 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             is_record_key = FALSE;
             is_editing = TRUE;
             Songplaying = TRUE;
-            ped_line_delay = ped_line;
+            Pattern_Line_Visual = Pattern_Line;
             key_record_first_time = FALSE;
-            old_key_ped_line = ped_line;
+            old_key_Pattern_Line = Pattern_Line_Visual;
             Clear_Midi_Channels_Pool();
         }
     }
@@ -155,7 +155,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             Instrument_Number = Midi_GetProgram((Param1 >> 8) & 0xff);
             if(Instrument_Number > -1)
             {
-                ped_patsam = Instrument_Number;
+                Current_Sample = Instrument_Number;
                 Clear_Input();
                 Actualize_Patterned();
                 RefreshSample();
@@ -185,7 +185,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
                 }
                 if(is_recording_2 || !is_editing)
                 { 
-                    Note_Jazz(ped_track, tmp_note);
+                    Note_Jazz(Track_Under_Caret, tmp_note);
                 }
             }
             else

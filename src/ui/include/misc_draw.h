@@ -175,6 +175,10 @@ extern int Default_Beveled3;
 extern SDL_Color Default_Palette3[COL_BLACK + 1];
 extern int Default_Beveled4;
 extern SDL_Color Default_Palette4[COL_BLACK + 1];
+extern int Default_Beveled5;
+extern SDL_Color Default_Palette5[COL_BLACK + 1];
+extern int Default_Beveled6;
+extern SDL_Color Default_Palette6[COL_BLACK + 1];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
 extern int curr_tab_highlight;
@@ -185,6 +189,7 @@ extern int Beveled;
 // Functions
 void out_decchar(int x,int y, int number, char smith);
 void value_box(int x, int y, int val, int flags);
+void value_box_format(int x, int y, int val, int flags, char *format);
 void Gui_Draw_Arrows_Number_Box(int x, int y, int val, int flags);
 void Gui_Draw_Arrows_Number_Box2(int x, int y, int val, int flags);
 void value_box4(int x, int y, int val);

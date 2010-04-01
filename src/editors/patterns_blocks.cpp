@@ -555,9 +555,9 @@ void Remove_Selection(int Cur_Track, int Position)
 
     if(block_start_track[Curr_Buff_Block] != -1 && block_end_track[Curr_Buff_Block] != -1)
     {
-        if(ped_line > block_start[Curr_Buff_Block])
+        if(Pattern_Line > block_start[Curr_Buff_Block])
         {
-            ped_line--;
+            Pattern_Line--;
             for(int ybc = block_start[Curr_Buff_Block] + 1; ybc < block_end[Curr_Buff_Block] + 1; ybc++)
             {
                 for(int xbc = block_start_track[Curr_Buff_Block]; xbc < block_end_track[Curr_Buff_Block] + 1; xbc++)
@@ -630,9 +630,9 @@ void Remove_Selection(int Cur_Track, int Position)
     }
     else
     {
-        if(ped_line)
+        if(Pattern_Line)
         {
-            ped_line--;
+            Pattern_Line--;
             Remove_Track_Line(Cur_Track, Position);
         }
     }
@@ -678,7 +678,7 @@ void Paste_Selection_From_Buffer(int Position, int Go_Across)
     int axbc;
     int expanded = 0;
     // Dest start
-    int start_x = Get_Track_Nibble_Start(Channels_MultiNotes, ped_track) + ped_col + ped_track;
+    int start_x = Get_Track_Nibble_Start(Channels_MultiNotes, Track_Under_Caret) + Column_Under_Caret + Track_Under_Caret;
     int byte;
     COLUMN_TYPE type_src;
     COLUMN_TYPE type_dst;
@@ -724,7 +724,7 @@ void Paste_Selection_From_Buffer(int Position, int Go_Across)
         }
     }
 
-    ybc = ped_line;
+    ybc = Pattern_Line;
     for(int aybc = 0; aybc < b_buff_ysize[Curr_Buff_Block]; aybc++)
     {
         axbc = Get_Track_Relative_Column(Buff_MultiNotes[Curr_Buff_Block], start_buff_nibble[Curr_Buff_Block]);
@@ -871,7 +871,7 @@ SELECTION Select_Track(int Track)
 
     // Default selection
     Cur_Sel.y_start = 0;
-    Cur_Sel.y_end = patternLines[pSequence[cPosition]] - 1;
+    Cur_Sel.y_end = patternLines[pSequence[Song_Position]] - 1;
     Cur_Sel.x_start = 0;
     for(i = 0; i < Track; i++)
     {
@@ -894,7 +894,7 @@ SELECTION Get_Real_Selection(int Default)
     {
         if(!(block_end_track[Curr_Buff_Block] - block_start_track[Curr_Buff_Block]) || !(block_end[Curr_Buff_Block] - block_start[Curr_Buff_Block]))
         {
-            Cur_Sel = Select_Track(ped_track);
+            Cur_Sel = Select_Track(Track_Under_Caret);
         }
     }
     return(Cur_Sel);
@@ -1202,13 +1202,20 @@ void Octave_Down_Block(int Position)
 // Transpose a block to 1 semitone higher for the current instrument
 void Instrument_Semitone_Up_Block(int Position)
 {
+    Instrument_Semitone_Up_Sel(Position, Get_Real_Selection(TRUE), 1, Current_Sample);
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Transpose a given selection to 1 semitone higher for the current instrument
+void Instrument_Semitone_Up_Sel(int Position, SELECTION Sel, int Amount, int Instr)
+{
     int ybc;
     int xbc;
     int note;
     int instrument;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -1219,12 +1226,12 @@ void Instrument_Semitone_Up_Block(int Position)
                 {
                     instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
                     instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
-                    if(instrument == ped_patsam)
+                    if(instrument == Instr)
                     {
                         note = Read_Pattern_Column(Position, xbc, ybc);
                         if(note < 120)
                         {
-                            note++;
+                            note += Amount;
                             if(note > 119) note = 119;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, note);
@@ -1233,12 +1240,19 @@ void Instrument_Semitone_Up_Block(int Position)
             }
         }
     }
-    Actupated(0);
 }
 
 // ------------------------------------------------------
 // Transpose a block to 1 semitone lower for the current instrument
 void Instrument_Semitone_Down_Block(int Position)
+{
+    Instrument_Semitone_Down_Sel(Position, Get_Real_Selection(TRUE), 1, Current_Sample);
+    Actupated(0);
+}
+
+// ------------------------------------------------------
+// Transpose a given selection to 1 semitone lower for the current instrument
+void Instrument_Semitone_Down_Sel(int Position, SELECTION Sel, int Amount, int Instr)
 {
     int ybc;
     int xbc;
@@ -1246,7 +1260,6 @@ void Instrument_Semitone_Down_Block(int Position)
     int instrument;
     int max_columns = Get_Max_Nibble_All_Tracks();
 
-    SELECTION Sel = Get_Real_Selection(TRUE);
     for(ybc = Sel.y_start; ybc <= Sel.y_end; ybc++)
     {
         for(xbc = Sel.x_start; xbc <= Sel.x_end; xbc++)
@@ -1257,12 +1270,12 @@ void Instrument_Semitone_Down_Block(int Position)
                 {
                     instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
                     instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
-                    if(instrument == ped_patsam)
+                    if(instrument == Instr)
                     {
                         note = Read_Pattern_Column(Position, xbc, ybc);
                         if(note < 120)
                         {
-                            note--;
+                            note -= Amount;
                             if(note < 0) note = 0;
                         }
                         Write_Pattern_Column(Position, xbc, ybc, note);
@@ -1271,7 +1284,6 @@ void Instrument_Semitone_Down_Block(int Position)
             }
         }
     }
-    Actupated(0);
 }
 
 // ------------------------------------------------------
@@ -1295,7 +1307,7 @@ void Instrument_Octave_Up_Block(int Position)
                 {
                     instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
                     instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
-                    if(instrument == ped_patsam)
+                    if(instrument == Current_Sample)
                     {
                         note = Read_Pattern_Column(Position, xbc, ybc);
                         if(note < 120)
@@ -1333,7 +1345,7 @@ void Instrument_Octave_Down_Block(int Position)
                 {
                     instrument = Read_Pattern_Column(Position, xbc + 1, ybc);
                     instrument |= Read_Pattern_Column(Position, xbc + 2, ybc);
-                    if(instrument == ped_patsam)
+                    if(instrument == Current_Sample)
                     {
                         note = Read_Pattern_Column(Position, xbc, ybc);
                         if(note < 120)
@@ -1352,7 +1364,7 @@ void Instrument_Octave_Down_Block(int Position)
 
 // ------------------------------------------------------
 // Remap an instrument
-void Instrument_Remap_Block(int Position, SELECTION Sel, int From, int To)
+void Instrument_Remap_Sel(int Position, SELECTION Sel, int From, int To)
 {
     int ybc;
     int xbc;
@@ -1401,10 +1413,10 @@ void Select_Track_Block(void)
 
     if(!Songplaying)
     {
-        Mark_Block_Start(0, ped_track, 0);
-        nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1,
-                       ped_track,
+        Mark_Block_Start(0, Track_Under_Caret, 0);
+        nlines = patternLines[pSequence[Song_Position]];
+        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, Track_Under_Caret) - 1,
+                       Track_Under_Caret,
                        nlines,
                        BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
     }
@@ -1419,8 +1431,8 @@ void Select_Pattern_Block(void)
     if(!Songplaying)
     {
         Mark_Block_Start(0, 0, 0);
-        nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(Get_Track_Nibble_Start(Channels_MultiNotes, ped_track) - 1,
+        nlines = patternLines[pSequence[Song_Position]];
+        Mark_Block_End(Get_Track_Nibble_Start(Channels_MultiNotes, Track_Under_Caret) - 1,
                        Songtracks,
                        nlines,
                        BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
@@ -1457,15 +1469,15 @@ void Select_Note_Block(void)
 
     if(!Songplaying)
     {
-        for(i = 0; i < Channels_MultiNotes[ped_track] * 3; i++)
+        for(i = 0; i < Channels_MultiNotes[Track_Under_Caret] * 3; i++)
         {
-            if(ped_col == i)
+            if(Column_Under_Caret == i)
             {
                 column_to_select = Table_Select_Notes[i];
-                Mark_Block_Start(column_to_select, ped_track, 0);
-                nlines = patternLines[pSequence[cPosition]];
+                Mark_Block_Start(column_to_select, Track_Under_Caret, 0);
+                nlines = patternLines[pSequence[Song_Position]];
                 Mark_Block_End(column_to_select + 2,
-                               ped_track,
+                               Track_Under_Caret,
                                nlines,
                                BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
             }
@@ -1481,10 +1493,10 @@ void Select_All_Notes_Block(void)
 
     if(!Songplaying)
     {
-        Mark_Block_Start(0, ped_track, 0);
-        nlines = patternLines[pSequence[cPosition]];
-        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, ped_track) - 1 - EXTRA_NIBBLE_DAT,
-                       ped_track,
+        Mark_Block_Start(0, Track_Under_Caret, 0);
+        nlines = patternLines[pSequence[Song_Position]];
+        Mark_Block_End(Get_Max_Nibble_Track(Channels_MultiNotes, Track_Under_Caret) - 1 - EXTRA_NIBBLE_DAT,
+                       Track_Under_Caret,
                        nlines,
                        BLOCK_MARK_TRACKS | BLOCK_MARK_ROWS);
     }
@@ -1518,8 +1530,8 @@ void Select_Block_Keyboard(int Type)
     {
         if(Get_LShift())
         {
-            if(block_in_selection[Curr_Buff_Block] == FALSE) Mark_Block_Start(ped_col, ped_track, ped_line);
-            Mark_Block_End(ped_col, ped_track, ped_line, Type);
+            if(block_in_selection[Curr_Buff_Block] == FALSE) Mark_Block_Start(Column_Under_Caret, Track_Under_Caret, Pattern_Line);
+            Mark_Block_End(Column_Under_Caret, Track_Under_Caret, Pattern_Line, Type);
         }
         else
         {
@@ -1547,7 +1559,7 @@ void Insert_Track_Line(int track, int Position)
     int xoffseted;
     int i;
 
-    for(int interval = (MAX_ROWS - 2); interval > ped_line - 1; interval--)
+    for(int interval = (MAX_ROWS - 2); interval > Pattern_Line - 1; interval--)
     {
         xoffseted = Get_Pattern_Offset(pSequence[Position], track, interval);
 
@@ -1563,7 +1575,7 @@ void Insert_Track_Line(int track, int Position)
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FX2) = *(RawPatterns + xoffseted + PATTERN_FX2);
         *(RawPatterns + xoffseted + PATTERN_ROW_LEN + PATTERN_FXDATA2) = *(RawPatterns + xoffseted + PATTERN_FXDATA2);
     }
-    xoffseted = Get_Pattern_Offset(pSequence[Position], track, ped_line);
+    xoffseted = Get_Pattern_Offset(pSequence[Position], track, Pattern_Line);
  
     Clear_Track_Data(xoffseted);
     Actupated(0);
@@ -1589,7 +1601,7 @@ void Remove_Track_Line(int track, int Position)
     int xoffseted2;
     int i;
 
-    for(int interval = ped_line + 1; interval < MAX_ROWS; interval++)
+    for(int interval = Pattern_Line + 1; interval < MAX_ROWS; interval++)
     {
         xoffseted = Get_Pattern_Offset(pSequence[Position], track, interval);
         xoffseted2 = Get_Pattern_Offset(pSequence[Position], track, interval) - PATTERN_ROW_LEN;

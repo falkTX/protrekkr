@@ -50,6 +50,7 @@ typedef struct
 // Variables
 extern REQUESTER Overwrite_Requester;
 
+int transpose_semitones;
 int Cur_Seq_Buffer = 0;
 
 char Selection_Name[20];
@@ -122,14 +123,17 @@ void Draw_Sequencer_Ed(void)
     Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(745, 472, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(480, 501, 250, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(480, 501, 306, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(720, 501, 60, 18, "Transpose", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(720, 544, 60, 18, "Semitones", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+
     Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(600, 524, 60, 16, "Selection", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(600, 544, 60, 16, "Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(662, 524, 60, 16, "Pattern", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(662, 544, 60, 16, "Song", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(590, 524, 60, 16, "Selection", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(590, 544, 60, 16, "Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(652, 524, 60, 16, "Pattern", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(652, 544, 60, 16, "Song", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 void Actualize_Seq_Ed(char gode)
@@ -152,8 +156,8 @@ void Actualize_Seq_Ed(char gode)
         for(int lseq = -3; lseq < 4; lseq++)
         {
             int rel;
-            if(Songplaying) rel = lseq + cPosition_delay;
-            else rel = lseq + cPosition;
+            int Cur_Position = Get_Song_Position();
+            rel = lseq + Cur_Position;
             if(rel > -1 && rel < sLength)
             {
                 out_decchar(93, 505 + lseq * 12, rel, 0);
@@ -203,6 +207,14 @@ void Actualize_Seq_Ed(char gode)
                 Gui_Draw_Button_Box(579, 472, 164, 16, Selection_Name, BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
+
+        // Transpose
+        if(gode == 0 || gode == 4)
+        {
+            if(transpose_semitones < -100) transpose_semitones = -100;
+            if(transpose_semitones > 100) transpose_semitones = 100;
+            value_box_format(720, 524, transpose_semitones, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE, "%d");
+        }
     }
 }
 
@@ -210,39 +222,129 @@ void Mouse_Left_Sequencer_Ed(void)
 {
     int i;
     int j;
-    int Cur_Position = cPosition;
-
-    if(Songplaying) Cur_Position = cPosition_delay;
+    int k;
+    int Cur_Position = Get_Song_Position();
 
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
         // Remap Selection
-        if(zcheckMouse(600, 524, 60, 16))
+        if(zcheckMouse(590, 524, 60, 16))
         {
-            Instrument_Remap_Block(Cur_Position, Get_Real_Selection(FALSE), Remap_From, Remap_To);
+            if(transpose_semitones)
+            {
+                if(transpose_semitones > 0)
+                {
+                    for(k = 0; k < transpose_semitones; k++)
+                    {
+                        Instrument_Semitone_Up_Sel(Cur_Position, Get_Real_Selection(FALSE), 1, Remap_From);
+                    }
+                }
+                else
+                {
+                    for(k = 0; k < -transpose_semitones; k++)
+                    {
+                        Instrument_Semitone_Down_Sel(Cur_Position, Get_Real_Selection(FALSE), 1, Remap_From);
+                    }
+                }
+            }
+            Instrument_Remap_Sel(Cur_Position, Get_Real_Selection(FALSE), Remap_From, Remap_To);
         }
         // Remap Track
-        if(zcheckMouse(600, 544, 60, 16))
+        if(zcheckMouse(590, 544, 60, 16))
         {
-            Instrument_Remap_Block(Cur_Position, Select_Track(ped_track), Remap_From, Remap_To);
+            if(transpose_semitones)
+            {
+                if(transpose_semitones > 0)
+                {
+                    for(k = 0; k < transpose_semitones; k++)
+                    {
+                        Instrument_Semitone_Up_Sel(Cur_Position, Select_Track(Track_Under_Caret), 1, Remap_From);
+                    }
+                }
+                else
+                {
+                    for(k = 0; k < -transpose_semitones; k++)
+                    {
+                        Instrument_Semitone_Down_Sel(Cur_Position, Select_Track(Track_Under_Caret), 1, Remap_From);
+                    }
+                }
+            }
+            Instrument_Remap_Sel(Cur_Position, Select_Track(Track_Under_Caret), Remap_From, Remap_To);
         }
         // Remap Pattern
-        if(zcheckMouse(662, 524, 60, 16))
+        if(zcheckMouse(652, 524, 60, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
-                Instrument_Remap_Block(Cur_Position, Select_Track(i), Remap_From, Remap_To);
+                if(transpose_semitones)
+                {
+                    if(transpose_semitones > 0)
+                    {
+                        for(k = 0; k < transpose_semitones; k++)
+                        {
+                            Instrument_Semitone_Up_Sel(Cur_Position, Select_Track(i), 1, Remap_From);
+                        }
+                    }
+                    else
+                    {
+                        for(k = 0; k < -transpose_semitones; k++)
+                        {
+                            Instrument_Semitone_Down_Sel(Cur_Position, Select_Track(i), 1, Remap_From);
+                        }
+                    }
+                }
+                Instrument_Remap_Sel(Cur_Position, Select_Track(i), Remap_From, Remap_To);
             }
         }
         // Remap Song
-        if(zcheckMouse(662, 544, 60, 16))
+        if(zcheckMouse(652, 544, 60, 16))
         {
-            for(j = 0; j < sLength; j++)
+            char *Done_Pattern;
+            int nbr_patterns;
+
+            // We need an array to mark the patterns we already transposed
+            // otherwise we could transpose them several times and that's not what we want.
+            nbr_patterns = 0;
+            for(i = 0; i < sLength; i++)
             {
-                for(i = 0; i < Songtracks; i++)
+                if(pSequence[i] > nbr_patterns)
                 {
-                    Instrument_Remap_Block(j, Select_Track(i), Remap_From, Remap_To);
+                    nbr_patterns = pSequence[i];
                 }
+            }
+            Done_Pattern = (char *) malloc(nbr_patterns + 1);
+            memset(Done_Pattern, 0, nbr_patterns + 1);
+            if(Done_Pattern)
+            {
+                for(j = 0; j < sLength; j++)
+                {
+                    if(!Done_Pattern[pSequence[j]])
+                    {
+                        for(i = 0; i < Songtracks; i++)
+                        {
+                            if(transpose_semitones)
+                            {
+                                if(transpose_semitones > 0)
+                                {
+                                    for(k = 0; k < transpose_semitones; k++)
+                                    {
+                                        Instrument_Semitone_Up_Sel(j, Select_Track(i), 1, Remap_From);
+                                    }
+                                }
+                                else
+                                {
+                                    for(k = 0; k < -transpose_semitones; k++)
+                                    {
+                                        Instrument_Semitone_Down_Sel(j, Select_Track(i), 1, Remap_From);
+                                    }
+                                }
+                            }
+                            Instrument_Remap_Sel(j, Select_Track(i), Remap_From, Remap_To);
+                        }
+                        Done_Pattern[pSequence[j]] = TRUE;
+                    }
+                }
+                free(Done_Pattern);
             }
         }
 
@@ -277,6 +379,23 @@ void Mouse_Left_Sequencer_Ed(void)
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
             teac = 1;
         }
+
+        // Transpose
+        if(zcheckMouse(720, 524, 16, 16) == 1)
+        {
+            transpose_semitones--;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 4;
+        }
+
+        // Transpose
+        if(zcheckMouse(720 + 44, 524, 16, 16) == 1)
+        {
+            transpose_semitones++;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 4;
+        }
+
 
         // Clear all
         if(zcheckMouse(4, 466, 80, 16))
@@ -512,7 +631,7 @@ void Mouse_Left_Sequencer_Ed(void)
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < sLength && posindex != Cur_Position)
             {
-                cPosition = posindex;
+                Song_Position = posindex;
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
             }
         }
@@ -545,9 +664,8 @@ void Mouse_Left_Sequencer_Ed(void)
 
 void Mouse_Right_Sequencer_Ed(void)
 {
-    int Cur_Position = cPosition;
+    int Cur_Position = Get_Song_Position();
     int i;
-    if(Songplaying) Cur_Position = cPosition_delay;
 
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
@@ -674,38 +792,33 @@ void Actualize_Sequencer(void)
 
     if(Songplaying)
     {
-        if(cPosition_delay < 0) cPosition_delay = 0;
-        if(cPosition_delay > sLength - 1) cPosition_delay = sLength - 1;
-        Cur_Position = cPosition_delay;
-        if(cPosition < 0)
+        if(Song_Position < 0) Song_Position = 0;
+        if(Song_Position > sLength - 1)
         {
-            cPosition = 0;
-        }
-        if(cPosition > sLength - 1)
-        {
-            cPosition = sLength - 1;
+            Song_Position = sLength - 1;
             Bound_Patt_Pos();
             Actupated(0);
         }
         for(i = 0; i < MAX_TRACKS; i++)
         {
-            CHAN_HISTORY_STATE[cPosition][i] = FALSE;
+            CHAN_HISTORY_STATE[Song_Position][i] = FALSE;
         }
     }
     else
     {
-        if(cPosition < 0)
+        if(Song_Position < 0) Song_Position = 0;
+        if(Song_Position > sLength - 1)
         {
-            cPosition = 0;
-        }
-        if(cPosition > sLength - 1)
-        {
-            cPosition = sLength - 1;
+            Song_Position = sLength - 1;
             Bound_Patt_Pos();
             Actupated(0);
         }
-        Cur_Position = cPosition;
+        // Keep the coherency
+        Song_Position_Visual = Song_Position;
+        Pattern_Line_Visual = Pattern_Line;
     }
+    Cur_Position = Get_Song_Position();
+
     value = pSequence[Cur_Position];
     if(value > 127) pSequence[Cur_Position] = 127;
     if(value < 0) pSequence[Cur_Position] = 0;
@@ -716,7 +829,6 @@ void Actualize_Sequencer(void)
     if(Rows_Decimal) Gui_Draw_Arrows_Number_Box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     else value_box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Gui_Draw_Arrows_Number_Box(188, 64, sLength, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-
     if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 }
 

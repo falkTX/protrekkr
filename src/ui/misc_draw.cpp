@@ -61,7 +61,9 @@ char *Font_Ascii =
     "abcdefghijklmnopqrstuvwxyz"
     "0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014\015"
     //A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z   .   -   
-    "\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251\252"
+    "\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251"
+    // |>
+    "\253"
     " ";
 int Font_Pos[256];
 int Font_Size[256];
@@ -175,6 +177,26 @@ char *DecChar2[] =
 char *HexTab[] =
 {
     "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
+    "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
+    "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F",
+    "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F",
+    "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F",
+    "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F",
+    "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F",
+    "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F",
+    "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8A", "8B", "8C", "8D", "8E", "8F",
+    "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9A", "9B", "9C", "9D", "9E", "9F",
+    "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "AA", "AB", "AC", "AD", "AE", "AF",
+    "B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "BA", "BB", "BC", "BD", "BE", "BF",
+    "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CA", "CB", "CC", "CD", "CE", "CF",
+    "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DA", "DB", "DC", "DD", "DE", "DF",
+    "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "EA", "EB", "EC", "ED", "EE", "EF",
+    "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
+};
+
+char *HexTab_NoZero[] =
+{
+    " 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " A", " B", " C", " D", " E", " F",
     "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
     "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F",
     "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F",
@@ -517,7 +539,7 @@ SDL_Color Default_Palette4[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
 
-    { 0x44, 0x4a, 0x4c, 0x00 },
+    { 0x34, 0x2e, 0x4c, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
 	{ 0x56, 0x5e, 0x62, 0x00 },
@@ -600,6 +622,182 @@ SDL_Color Default_Palette4[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
 };
 
+int Default_Beveled5 = 1;
+SDL_Color Default_Palette5[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x00, 0x16, 0x44, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+    { 0x00, 0x28, 0x6a, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x00, 0x4e, 0x98, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x00, 0x4c, 0x7e, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x00, 0x30, 0x76, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0x66, 0xa0, 0xfa, 0x00 },
+    { 0x26, 0xb6, 0xff, 0x00 },
+    { 0x4e, 0x7e, 0xff, 0x00 },
+
+    { 0xb0, 0xce, 0xff, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+
+    { 0x08, 0x1e, 0x44, 0x00 },
+    { 0x46, 0x90, 0xee, 0x00 },
+
+    { 0x18, 0x3c, 0x7c, 0x00 },
+    { 0x94, 0xb4, 0xff, 0x00 },
+
+    { 0x0a, 0x32, 0xb0, 0x00 },
+    { 0x00, 0xa8, 0xff, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0x88, 0xc2, 0xee, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0x90, 0xb2, 0xff, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+    { 0xa0, 0xe8, 0xff, 0x00 },
+
+    { 0x00, 0x08, 0xa6, 0x00 },
+    { 0x42, 0x66, 0xd2, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled6 = 2;
+SDL_Color Default_Palette6[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x1c, 0x00, 0x00, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x24, 0x06, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0xc0, 0x2c, 0x0e, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x68, 0x14, 0x16, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x66, 0x18, 0x14, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0xff, 0x52, 0x32, 0x00 },
+    { 0xff, 0x40, 0x00, 0x00 },
+    { 0xff, 0xb6, 0x54, 0x00 },
+
+    { 0xff, 0xe0, 0x9a, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x10, 0x00, 0x00, 0x00 },
+    { 0xff, 0xc2, 0x36, 0x00 },
+
+    { 0x20, 0x00, 0x00, 0x00 },
+    { 0xee, 0x74, 0x3a, 0x00 },
+
+    { 0x18, 0x00, 0x00, 0x00 },
+    { 0xff, 0xff, 0x94, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0xff, 0xa6, 0x64, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0xff, 0x7a, 0x2a, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xff, 0xe8, 0x9a, 0x00 },
+
+    { 0xce, 0x00, 0x00, 0x00 },
+    { 0xff, 0x74, 0x00, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
 
 LONGRGB Phony_Palette[sizeof(Default_Palette2) / sizeof(SDL_Color)];
 
@@ -746,6 +944,9 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].r = ComponentR;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].g = ComponentG;
                 Ptk_Palette[i + (COL_PATTERN_LO_BACK_SHADOW - COL_PATTERN_LO_BACK)].b = ComponentB;
@@ -758,6 +959,9 @@ void Set_Phony_Palette(void)
                 ComponentR = Phony_Palette[i].r;
                 ComponentG = Phony_Palette[i].g;
                 ComponentB = Phony_Palette[i].b;
+                Ptk_Palette[i].r = ComponentR;
+                Ptk_Palette[i].g = ComponentG;
+                Ptk_Palette[i].b = ComponentB;
                 ComponentR2 = Phony_Palette[COL_PATTERN_LO_BACK].r;
                 ComponentG2 = Phony_Palette[COL_PATTERN_LO_BACK].g;
                 ComponentB2 = Phony_Palette[COL_PATTERN_LO_BACK].b;
@@ -950,8 +1154,17 @@ void Set_Phony_Palette(void)
 void value_box(int x, int y, int val, int flags)
 {
     Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
-    Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
     Gui_Draw_Button_Box(x + 18, y, 24, 16, HexTab[val], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
+}
+
+void value_box_format(int x, int y, int val, int flags, char *format)
+{
+    char String[64];
+    sprintf(String, format, val);
+    Gui_Draw_Button_Box(x, y, 16, 16, "\03", flags);
+    Gui_Draw_Button_Box(x + 18, y, 24, 16, String, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(x + 44, y, 16, 16, "\04", flags);
 }
 
 void Gui_Draw_Arrows_Number_Box(int x, int y, int val, int flags)
@@ -1625,7 +1838,7 @@ void Note_Letter(int x, int y, char ltr, int ys, int y2)
         }
         case 18: Copy(Note_Surface, x, y, 176, ys, 183, y2); break; // -
         case 19: Copy(Note_Surface, x, y, 152, ys, 175, y2); break; // Off
-        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Note_Surface, x, y, 56, ys, 63, y2); break; // Blank
         case 21: Copy(Note_Surface, x, y, 184, ys, 191, y2); break; // .
 
         case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
@@ -1672,7 +1885,7 @@ void Large_Letter(int x, int y, char ltr, int ys, int y2)
         case 17: Copy(Temp_LARGEPFONT, x, y, 88, ys, 88 + 11, y2); break; // #
         case 18: Copy(Temp_LARGEPFONT, x, y, 243, ys, 243 + 11, y2); break; // -
         case 19: Copy(Temp_LARGEPFONT, x, y, 210, ys, 210 + 34, y2); break; // Off
-        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Temp_LARGEPFONT, x, y, 77, ys, 77 + 11, y2); break; // Blank
         case 21: Copy(Temp_LARGEPFONT, x, y, 254, ys, 254 + 11, y2); break; // .
 
         case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
@@ -1730,7 +1943,7 @@ void Note_Large_Letter(int x, int y, char ltr, int ys, int y2)
         }
         case 18: Copy(Note_Surface, x, y, 243, ys, 243 + 11, y2); break; // -
         case 19: Copy(Note_Surface, x, y, 210, ys, 210 + 34, y2); break; // Off
-        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Note_Surface, x, y, 77, ys, 77 + 11, y2); break; // Blank
         case 21: Copy(Note_Surface, x, y, 254, ys, 254 + 11, y2); break; // .
 
         case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
@@ -1777,7 +1990,7 @@ void Small_Letter(int x, int y, char ltr, int ys, int y2)
         case 17: Copy(Temp_SMALLPFONT, x, y, 48, ys, 48 + 5, y2); break; // #
         case 18: Copy(Temp_SMALLPFONT, x, y, 132, ys, 132 + 5, y2); break; // -
         case 19: Copy(Temp_SMALLPFONT, x, y, 114, ys, 114 + 17, y2); break; // Off
-        case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Temp_SMALLPFONT, x, y, 42, ys, 42 + 5, y2); break; // Blank
         case 21: Copy(Temp_SMALLPFONT, x, y, 138, ys, 138 + 5, y2); break; // .
 
         case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
@@ -1835,7 +2048,7 @@ void Note_Small_Letter(int x, int y, char ltr, int ys, int y2)
         case 18: Copy(Note_Surface, x, y, 132, ys, 132 + 5, y2); break; // -
         case 19: Copy(Note_Surface, x, y, 114, ys, 114 + 17, y2); break; // Off
         
-        case 20: Copy(Temp_NOTEPFONT, x, y, 56, ys, 63, y2); break; // Blank
+        case 20: Copy(Note_Surface, x, y, 42, ys, 42 + 5, y2); break; // Blank
         case 21: Copy(Note_Surface, x, y, 138, ys, 138 + 5, y2); break; // .
 
         case 23: Copy(Temp_NOTEPFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON

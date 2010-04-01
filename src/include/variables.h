@@ -274,14 +274,16 @@ extern char cur_input_name[1024];
 extern char artist[20];
 extern char style[20];
 
-extern int ped_track;
+extern int Track_Under_Caret;
 
-extern int ped_patsam;
-extern int ped_col;
-extern int ped_line;
-extern int ped_line_delay;
-extern int cPosition;
-extern int cPosition_delay;
+extern int Current_Sample;
+extern int Column_Under_Caret;
+
+extern int Pattern_Line;
+extern int Pattern_Line_Visual;
+extern int Song_Position;
+extern int Song_Position_Visual;
+
 extern int gui_track;
 
 extern char userscreen;
@@ -306,7 +308,7 @@ extern int Pos_Tbl_Synth_ENV2;
 extern char draw_sampled_wave;
 extern char draw_sampled_wave2;
 extern char draw_sampled_wave3;
-extern char ped_split;
+extern char Current_Sample_Split;
 extern int resty;
 extern int rs_coef;
 
@@ -360,8 +362,8 @@ extern char sr_isrecording;
 
 extern int Songplaying;
 
-extern int ped_pattad;
-extern int ped_patoct;
+extern int Current_Edit_Steps;
+extern int Current_Octave;
 
 extern int restx;
 extern int resty;

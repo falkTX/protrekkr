@@ -125,10 +125,13 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(520, 455, 60, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(670, 455, 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, 475, 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16, "Theme #1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16, "Theme #2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16, "Theme #3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16, "Theme #4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16, "Themes", BUTTON_NO_BORDER | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 515, 29, 16, "1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 515, 29, 16, "2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 535, 29, 16, "3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 535, 29, 16, "4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 29, 16, "5", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 555, 29, 16, "6", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(194, 555, 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -661,40 +664,58 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // set default palette 1
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 495, 60, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 515, 29, 16))
         {
             Restore_Default_Palette(Default_Palette1, Default_Beveled1);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
-        }  
+        }
 
         // Set default palette 2
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 515, 60, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, 515, 29, 16))
         {
             Restore_Default_Palette(Default_Palette2, Default_Beveled2);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
-        }  
+        }
 
         // Set default palette 3
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 535, 60, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 535, 29, 16))
         {
             Restore_Default_Palette(Default_Palette3, Default_Beveled3);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
-        }  
+        }
 
         // Set default palette 4
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 555, 60, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, 535, 29, 16))
         {
             Restore_Default_Palette(Default_Palette4, Default_Beveled4);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;
-        }  
+        }
+
+        // Set default palette 5
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, 555, 29, 16))
+        {
+            Restore_Default_Palette(Default_Palette5, Default_Beveled5);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }
+
+        // Set default palette 6
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, 555, 29, 16))
+        {
+            Restore_Default_Palette(Default_Palette6, Default_Beveled6);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }
 
         // Turn beveling type 1 on/off
         if(zcheckMouse(520 + (18 + 108) + 2 + 20, 495, 14, 16))
@@ -737,11 +758,11 @@ void Mouse_Left_Master_Ed(void)
 #if !defined(__NO_MIDI__)
         if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
         {
-            Midi_NoteOff(ped_track, -1);
+            Midi_NoteOff(Track_Under_Caret, -1);
             int i;
             for(i = 0; i < MAX_POLYPHONY; i++)
             {
-                Midi_Current_Notes[CHAN_MIDI_PRG[ped_track]][i] = 0;
+                Midi_Current_Notes[CHAN_MIDI_PRG[Track_Under_Caret]][i] = 0;
             }
             gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
         }

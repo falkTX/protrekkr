@@ -4,9 +4,7 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
- - See to add a third filter to the synth (analog like).
- - Try to fix the speed dependant .mod effects.
- - Add functions to transpose patterns (as a sub option of remapping).
+ - Add 2 more color schemes.
 
 [UI]
  - Create a decent gadgets system (events based).
@@ -25,10 +23,8 @@ v2.0:
  - Drag'n'drop blocks in patterns.
  - Global synchro editor.
  - Add customization for the keys shortcuts in the xml file (may be ok without).
- - Copy/paste functions in the samples editor.
  - Undo functions for samples editor and patterns.
  - Chords editor done with intervals (see to use drag'n'drop and/or double clicks to place them on the patterns).
- - VSTs and VSTis support in the samples editor (for waveforms processing and generation).
 
 [ENGINE]
  - Adapt codecs packers & depackers to other Operating Systems (especially OSX).
@@ -49,3 +45,4 @@ v2.0:
  - Add support for soundfont 2 files loading.
  - Port to FreeBSD (done but there's a severe issue with SDL).
  - Port to Linux PPC (should be a matter of doing the appropriate makefile, hopefully).
+ - VSTs and VSTis support in the samples editor (for waveforms processing and generation).

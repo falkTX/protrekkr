@@ -241,10 +241,10 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_CHANGE_ASSOCIATED_SAMPLE ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            int synthprg_check = Synthprg[ped_patsam];
-            if(synthprg_check > 130) Synthprg[ped_patsam] = 130;
+            int synthprg_check = Synthprg[Current_Sample];
+            if(synthprg_check > 130) Synthprg[Current_Sample] = 130;
             
-            switch(Synthprg[ped_patsam])
+            switch(Synthprg[Current_Sample])
             {
                 case 0:
                     Allow_All = FALSE;
@@ -266,7 +266,7 @@ void Actualize_Synth_Ed(char gode)
                     Allow_All = TRUE;
                     Allow_Button = BUTTON_NORMAL;
                     Allow_Button_Pushed = BUTTON_PUSHED;
-                    value_box(228, 450, (Synthprg[ped_patsam] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    value_box(228, 450, (Synthprg[Current_Sample] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     break;
             }
             Gui_Draw_Button_Box(758, 450, 34, 16, "Save", Allow_Button | BUTTON_TEXT_CENTERED);
@@ -288,7 +288,7 @@ void Actualize_Synth_Ed(char gode)
             Gui_Draw_Button_Box(122, 505 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(174, 505 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
-            switch(PARASynth[ped_patsam].osc1_waveform)
+            switch(PARASynth[Current_Sample].osc1_waveform)
             {
                 case 0:Gui_Draw_Button_Box(18, 505 - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 1:Gui_Draw_Button_Box(44, 505 - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
@@ -311,7 +311,7 @@ void Actualize_Synth_Ed(char gode)
             Gui_Draw_Button_Box(122, 559 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(174, 559 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
-            switch(PARASynth[ped_patsam].osc2_waveform)
+            switch(PARASynth[Current_Sample].osc2_waveform)
             {
                 case 0: Gui_Draw_Button_Box(18, 559 - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
                 case 1: Gui_Draw_Button_Box(44, 559 - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
@@ -326,7 +326,7 @@ void Actualize_Synth_Ed(char gode)
         // Instrument number
         if(gode == UPDATE_SYNTH_ED_ALL || gode == UPDATE_SYNTH_ED_VALUES)
         {
-            value_box4(566, 450, ped_patsam);
+            value_box4(566, 450, Current_Sample);
             Actualize_SynthParSlider();
         }
 
@@ -335,7 +335,7 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_VALUES)
         {
             char tcp[30];
-            sprintf(tcp, "%s_", PARASynth[ped_patsam].presetname);
+            sprintf(tcp, "%s_", PARASynth[Current_Sample].presetname);
 
             if(snamesel == INPUT_SYNTH_NAME)
             {
@@ -343,7 +343,7 @@ void Actualize_Synth_Ed(char gode)
             }
             else
             {
-                Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[ped_patsam].presetname, Allow_Button | BUTTON_INPUT);
+                Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[Current_Sample].presetname, Allow_Button | BUTTON_INPUT);
             }
             Actualize_Instruments_Synths_List(1);
         }
@@ -549,7 +549,7 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_OSC3_SWITCH ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            if(PARASynth[ped_patsam].osc3_switch)
+            if(PARASynth[Current_Sample].osc3_switch)
             {
                 Gui_Draw_Button_Box(237, 505 - 1, 24, 16, "On", Allow_Button_Pushed | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(264, 505 - 1, 24, 16, "Off", Allow_Button | BUTTON_TEXT_CENTERED);
@@ -567,7 +567,7 @@ void Actualize_Synth_Ed(char gode)
         {
             Gui_Draw_Button_Box(349, 450, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(349 + 44, 450, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
-            switch(PARASynth[ped_patsam].vcf_type)
+            switch(PARASynth[Current_Sample].vcf_type)
             {
                 case 0:
                     Gui_Draw_Button_Box(349 + 18, 450, 24, 16, "Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
@@ -986,26 +986,26 @@ void Mouse_Right_Synth_Ed(void)
 
         if(zcheckMouse(228, 450, 17, 16))
         {
-            if(Synthprg[ped_patsam] >= 10)
+            if(Synthprg[Current_Sample] >= 10)
             {
-                Synthprg[ped_patsam] -= 10;
+                Synthprg[Current_Sample] -= 10;
             }
             else
             {
-                Synthprg[ped_patsam] = 0;
+                Synthprg[Current_Sample] = 0;
             }
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         }
         if(zcheckMouse(228 + 44, 450, 17, 16))
         {
-            if(Synthprg[ped_patsam] <= (129 - 10))
+            if(Synthprg[Current_Sample] <= (129 - 10))
             {
-                Synthprg[ped_patsam] += 10;
+                Synthprg[Current_Sample] += 10;
             }
             else
             {
-                Synthprg[ped_patsam] = 129;
+                Synthprg[Current_Sample] = 129;
             }
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -1025,18 +1025,18 @@ void Mouse_Left_Synth_Ed(void)
     {
         if(zcheckMouse(228, 450, 17, 16))
         {
-            if(Synthprg[ped_patsam])
+            if(Synthprg[Current_Sample])
             {
-                Synthprg[ped_patsam]--;
+                Synthprg[Current_Sample]--;
             }
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         }
         if(zcheckMouse(228 + 44, 450, 17, 16))
         {
-            if(Synthprg[ped_patsam] < 129)
+            if(Synthprg[Current_Sample] < 129)
             {
-                Synthprg[ped_patsam]++;
+                Synthprg[Current_Sample]++;
             }
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -1048,7 +1048,7 @@ void Mouse_Left_Synth_Ed(void)
             // Save the data
             if(zcheckMouse(758, 450, 34, 16))
             {
-                if(File_Exist("%s"SLASH"%s.pts", Dir_Presets, PARASynth[ped_patsam].presetname))
+                if(File_Exist("%s"SLASH"%s.pts", Dir_Presets, PARASynth[Current_Sample].presetname))
                 {
                     Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_SYNTH);
                 }
@@ -1062,9 +1062,9 @@ void Mouse_Left_Synth_Ed(void)
             if(zcheckMouse(592, 450, 164, 16) && snamesel == INPUT_NONE)
             {
                 snamesel = INPUT_SYNTH_NAME;
-                strcpy(cur_input_name, PARASynth[ped_patsam].presetname);
+                strcpy(cur_input_name, PARASynth[Current_Sample].presetname);
                 namesize = 0;
-                sprintf(PARASynth[ped_patsam].presetname, "");
+                sprintf(PARASynth[Current_Sample].presetname, "");
                 teac = UPDATE_SYNTH_CHANGE_NAME;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
@@ -1187,43 +1187,43 @@ void Mouse_Left_Synth_Ed(void)
             // OSC1 Waveform
             if(zcheckMouse(18, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 0;
+                PARASynth[Current_Sample].osc1_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(44, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 1;
+                PARASynth[Current_Sample].osc1_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(70, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 2;
+                PARASynth[Current_Sample].osc1_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(96, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 3;
+                PARASynth[Current_Sample].osc1_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(122, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 6;
+                PARASynth[Current_Sample].osc1_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(148, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 5;
+                PARASynth[Current_Sample].osc1_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(174, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc1_waveform = 4;
+                PARASynth[Current_Sample].osc1_waveform = 4;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
@@ -1231,43 +1231,43 @@ void Mouse_Left_Synth_Ed(void)
             // OSC2 Waveform
             if(zcheckMouse(18, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 0;
+                PARASynth[Current_Sample].osc2_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(44, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 1;
+                PARASynth[Current_Sample].osc2_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(70, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 2;
+                PARASynth[Current_Sample].osc2_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(96, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 3;
+                PARASynth[Current_Sample].osc2_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(122, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 6;
+                PARASynth[Current_Sample].osc2_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(148, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 5;
+                PARASynth[Current_Sample].osc2_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(174, 559 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc2_waveform = 4;
+                PARASynth[Current_Sample].osc2_waveform = 4;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
@@ -1275,27 +1275,27 @@ void Mouse_Left_Synth_Ed(void)
             // Sub oscillator switch
             if(zcheckMouse(237, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc3_switch = TRUE;
+                PARASynth[Current_Sample].osc3_switch = TRUE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
             if(zcheckMouse(264, 505 - 1, 24, 16))
             {
-                PARASynth[ped_patsam].osc3_switch = FALSE;
+                PARASynth[Current_Sample].osc3_switch = FALSE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
 
             // VCF Type
-            if(zcheckMouse(349, 450, 17, 16) && PARASynth[ped_patsam].vcf_type > 0)
+            if(zcheckMouse(349, 450, 17, 16) && PARASynth[Current_Sample].vcf_type > 0)
             {
-                PARASynth[ped_patsam].vcf_type--;
+                PARASynth[Current_Sample].vcf_type--;
                 teac = 7;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(349 + 44, 450, 17, 16) && PARASynth[ped_patsam].vcf_type < 2)
+            if(zcheckMouse(349 + 44, 450, 17, 16) && PARASynth[Current_Sample].vcf_type < 2)
             {
-                PARASynth[ped_patsam].vcf_type++;
+                PARASynth[Current_Sample].vcf_type++;
                 teac = 7;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
@@ -1305,7 +1305,7 @@ void Mouse_Left_Synth_Ed(void)
 void Actualize_SynthParSlider(void)
 {
 
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     // -----------------------------
     switch(Pos_Tbl_Synth_OSC1)
@@ -1837,7 +1837,7 @@ void Actualize_SynthParSlider(void)
 
 void Center_SynthParam_OSC1(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_OSC1)
     {
@@ -1875,7 +1875,7 @@ void Center_SynthParam_OSC1(void)
 
 void Center_SynthParam_OSC2(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_OSC2)
     {
@@ -1918,7 +1918,7 @@ void Center_SynthParam_OSC2(void)
 
 void Center_SynthParam_VCF(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_VCF)
     {
@@ -1936,7 +1936,7 @@ void Center_SynthParam_VCF(void)
 
 void Center_SynthParam_LFO1(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_LFO1)
     {
@@ -2009,7 +2009,7 @@ void Center_SynthParam_LFO1(void)
 
 void Center_SynthParam_LFO2(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_LFO2)
     {
@@ -2082,7 +2082,7 @@ void Center_SynthParam_LFO2(void)
 
 void Center_SynthParam_ENV1(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_ENV1)
     {
@@ -2130,7 +2130,7 @@ void Center_SynthParam_ENV1(void)
 
 void Center_SynthParam_ENV2(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_ENV2)
     {
@@ -2178,7 +2178,7 @@ void Center_SynthParam_ENV2(void)
 
 void Center_SynthParam_Misc(void)
 {
-    SynthParameters *Cur_SynthParam = &PARASynth[ped_patsam];
+    SynthParameters *Cur_SynthParam = &PARASynth[Current_Sample];
 
     switch(Pos_Tbl_Synth_Misc)
     {
@@ -2204,27 +2204,27 @@ void CParcha_OSC1(int cpar)
     switch(Pos_Tbl_Synth_OSC1)
     {
         case 0: /* Osc1_PD */
-            PARASynth[ped_patsam].osc1_pw = cpar * 4;
+            PARASynth[Current_Sample].osc1_pw = cpar * 4;
             break;
 
         case 1: /* ENV1_Attack */
-            PARASynth[ped_patsam].env1_attack = cpar * 512;
+            PARASynth[Current_Sample].env1_attack = cpar * 512;
             break;
 
         case 2: /* ENV1_Decay */
-            PARASynth[ped_patsam].env1_decay = cpar * 512;
+            PARASynth[Current_Sample].env1_decay = cpar * 512;
             break;
 
         case 3: /* ENV1_Sustain */
-            PARASynth[ped_patsam].env1_sustain = cpar;
+            PARASynth[Current_Sample].env1_sustain = cpar;
             break;
 
         case 4: /* ENV1_Release */
-            PARASynth[ped_patsam].env1_release = cpar * 512;
+            PARASynth[Current_Sample].env1_release = cpar * 512;
             break;
 
         case 5: /* OSC3 volume */
-            PARASynth[ped_patsam].osc3_volume = cpar;
+            PARASynth[Current_Sample].osc3_volume = cpar;
             break;
     }
 }
@@ -2234,31 +2234,31 @@ void CParcha_OSC2(int cpar)
     switch(Pos_Tbl_Synth_OSC2)
     {
         case 0: /* Osc2_PD */
-            PARASynth[ped_patsam].osc2_pw = cpar * 4;
+            PARASynth[Current_Sample].osc2_pw = cpar * 4;
             break;
 
         case 1: /* Osc2_Detune */
-            PARASynth[ped_patsam].osc2_detune = cpar;
+            PARASynth[Current_Sample].osc2_detune = cpar;
             break;
 
         case 2: /* Osc2_Finetune */
-            PARASynth[ped_patsam].osc2_finetune = cpar;
+            PARASynth[Current_Sample].osc2_finetune = cpar;
             break;
 
         case 3: /* ENV2_Attack */
-            PARASynth[ped_patsam].env2_attack = cpar * 512;
+            PARASynth[Current_Sample].env2_attack = cpar * 512;
             break;
 
         case 4: /* ENV2_Decay */
-            PARASynth[ped_patsam].env2_decay = cpar * 512;
+            PARASynth[Current_Sample].env2_decay = cpar * 512;
             break;
 
         case 5: /* ENV2_Sustain */
-            PARASynth[ped_patsam].env2_sustain = cpar;
+            PARASynth[Current_Sample].env2_sustain = cpar;
             break;
 
         case 6: /* ENV2_Release */
-            PARASynth[ped_patsam].env2_release = cpar * 512;
+            PARASynth[Current_Sample].env2_release = cpar * 512;
             break;
     }
 }
@@ -2268,11 +2268,11 @@ void CParcha_VCF(int cpar)
     switch(Pos_Tbl_Synth_VCF)
     {
         case 0: /* VCF Cutoff */
-            PARASynth[ped_patsam].vcf_cutoff = cpar;
+            PARASynth[Current_Sample].vcf_cutoff = cpar;
             break;
 
         case 1: /* VCF_Resonance */
-            PARASynth[ped_patsam].vcf_resonance = cpar;
+            PARASynth[Current_Sample].vcf_resonance = cpar;
             break;
     }
 }
@@ -2282,55 +2282,55 @@ void CParcha_LFO1(int cpar)
     switch(Pos_Tbl_Synth_LFO1)
     {
         case 0: /* Lfo1_Period */
-            PARASynth[ped_patsam].lfo1_period = cpar;
+            PARASynth[Current_Sample].lfo1_period = cpar;
             break;
 
         case 1: /* Lfo1->osc1 pd */
-            PARASynth[ped_patsam].lfo1_osc1_pw = cpar;
+            PARASynth[Current_Sample].lfo1_osc1_pw = cpar;
             break;
 
         case 2: /* Lfo1->osc2 pd */
-            PARASynth[ped_patsam].lfo1_osc2_pw = cpar;
+            PARASynth[Current_Sample].lfo1_osc2_pw = cpar;
             break;
 
         case 3: /* Lfo1->osc1 pitch */
-            PARASynth[ped_patsam].lfo1_osc1_pitch = cpar;
+            PARASynth[Current_Sample].lfo1_osc1_pitch = cpar;
             break;
 
         case 4: /* Lfo1->osc1 pitch */
-            PARASynth[ped_patsam].lfo1_osc2_pitch = cpar;
+            PARASynth[Current_Sample].lfo1_osc2_pitch = cpar;
             break;
 
         case 5: /* Lfo1->osc1 volume */
-            PARASynth[ped_patsam].lfo1_osc1_volume = cpar;
+            PARASynth[Current_Sample].lfo1_osc1_volume = cpar;
             break;
 
         case 6: /* Lfo1->osc2 volume */
-            PARASynth[ped_patsam].lfo1_osc2_volume = cpar;
+            PARASynth[Current_Sample].lfo1_osc2_volume = cpar;
             break;
 
         case 7: /* Lfo1->vcf cutoff */
-            PARASynth[ped_patsam].lfo1_vcf_cutoff = cpar;
+            PARASynth[Current_Sample].lfo1_vcf_cutoff = cpar;
             break;
 
         case 8: /* Lfo1->vcf resonance */
-            PARASynth[ped_patsam].lfo1_vcf_resonance = cpar;
+            PARASynth[Current_Sample].lfo1_vcf_resonance = cpar;
             break;
 
         case 9: /* LFO1_Attack */
-            PARASynth[ped_patsam].lfo1_attack = cpar * 512;
+            PARASynth[Current_Sample].lfo1_attack = cpar * 512;
             break;
 
         case 10: /* LFO1_Decay */
-            PARASynth[ped_patsam].lfo1_decay = cpar * 512;
+            PARASynth[Current_Sample].lfo1_decay = cpar * 512;
             break;
 
         case 11: /* LFO1_Sustain */
-            PARASynth[ped_patsam].lfo1_sustain = cpar;
+            PARASynth[Current_Sample].lfo1_sustain = cpar;
             break;
 
         case 12: /* LFO1_Release */
-            PARASynth[ped_patsam].lfo1_release = cpar * 512;
+            PARASynth[Current_Sample].lfo1_release = cpar * 512;
             break;
     }
 }
@@ -2340,55 +2340,55 @@ void CParcha_LFO2(int cpar)
     switch(Pos_Tbl_Synth_LFO2)
     {
         case 0: /* LFO2_Period */
-            PARASynth[ped_patsam].lfo2_period = cpar;
+            PARASynth[Current_Sample].lfo2_period = cpar;
             break;
 
         case 1: /* Lfo2->osc1 pd */
-            PARASynth[ped_patsam].lfo2_osc1_pw = cpar;
+            PARASynth[Current_Sample].lfo2_osc1_pw = cpar;
             break;
 
         case 2: /* Lfo2->osc2 pd */
-            PARASynth[ped_patsam].lfo2_osc2_pw = cpar;
+            PARASynth[Current_Sample].lfo2_osc2_pw = cpar;
             break;
 
         case 3: /* Lfo2->osc1 pitch */
-            PARASynth[ped_patsam].lfo2_osc1_pitch = cpar;
+            PARASynth[Current_Sample].lfo2_osc1_pitch = cpar;
             break;
 
         case 4: /* Lfo2->osc2 pitch */
-            PARASynth[ped_patsam].lfo2_osc2_pitch = cpar;
+            PARASynth[Current_Sample].lfo2_osc2_pitch = cpar;
             break;
 
         case 5: /* Lfo2->osc1 volume */
-            PARASynth[ped_patsam].lfo2_osc1_volume = cpar;
+            PARASynth[Current_Sample].lfo2_osc1_volume = cpar;
             break;
 
         case 6: /* Lfo2->osc2 volume */
-            PARASynth[ped_patsam].lfo2_osc2_volume = cpar;
+            PARASynth[Current_Sample].lfo2_osc2_volume = cpar;
             break;
 
         case 7: /* Lfo2->vcf cutoff */
-            PARASynth[ped_patsam].lfo2_vcf_cutoff = cpar;
+            PARASynth[Current_Sample].lfo2_vcf_cutoff = cpar;
             break;
 
         case 8: /* Lfo2->vcf resonance */
-            PARASynth[ped_patsam].lfo2_vcf_resonance = cpar;
+            PARASynth[Current_Sample].lfo2_vcf_resonance = cpar;
             break;
 
         case 9: /* LFO1_Attack */
-            PARASynth[ped_patsam].lfo2_attack = cpar * 512;
+            PARASynth[Current_Sample].lfo2_attack = cpar * 512;
             break;
 
         case 10: /* LFO1_Decay */
-            PARASynth[ped_patsam].lfo2_decay = cpar * 512;
+            PARASynth[Current_Sample].lfo2_decay = cpar * 512;
             break;
 
         case 11: /* LFO1_Sustain */
-            PARASynth[ped_patsam].lfo2_sustain = cpar;
+            PARASynth[Current_Sample].lfo2_sustain = cpar;
             break;
 
         case 12: /* LFO1_Release */
-            PARASynth[ped_patsam].lfo2_release = cpar * 512;
+            PARASynth[Current_Sample].lfo2_release = cpar * 512;
             break;
     }
 }
@@ -2398,35 +2398,35 @@ void CParcha_ENV1(int cpar)
     switch(Pos_Tbl_Synth_ENV1)
     {
         case 0: /* Env1->osc1 pd */
-            PARASynth[ped_patsam].env1_osc1_pw = cpar;
+            PARASynth[Current_Sample].env1_osc1_pw = cpar;
             break;
 
         case 1: /* Env1->osc2 pd */
-            PARASynth[ped_patsam].env1_osc2_pw = cpar;
+            PARASynth[Current_Sample].env1_osc2_pw = cpar;
             break;
 
         case 2: /* Env1->osc1 pitch */
-            PARASynth[ped_patsam].env1_osc1_pitch = cpar;
+            PARASynth[Current_Sample].env1_osc1_pitch = cpar;
             break;
 
         case 3: /* Env1->osc2 pitch */
-            PARASynth[ped_patsam].env1_osc2_pitch = cpar;
+            PARASynth[Current_Sample].env1_osc2_pitch = cpar;
             break;
 
         case 4: /* Env1->osc1 volume */
-            PARASynth[ped_patsam].env1_osc1_volume = cpar;
+            PARASynth[Current_Sample].env1_osc1_volume = cpar;
             break;
 
         case 5: /* Env1->osc2 volume */
-            PARASynth[ped_patsam].env1_osc2_volume = cpar;
+            PARASynth[Current_Sample].env1_osc2_volume = cpar;
             break;
 
         case 6: /* Env1->vcf cutoff */
-            PARASynth[ped_patsam].env1_vcf_cutoff = cpar;
+            PARASynth[Current_Sample].env1_vcf_cutoff = cpar;
             break;
 
         case 7: /* Env1->vcf resonance */
-            PARASynth[ped_patsam].env1_vcf_resonance = cpar;
+            PARASynth[Current_Sample].env1_vcf_resonance = cpar;
             break;
     }
 }
@@ -2436,35 +2436,35 @@ void CParcha_ENV2(int cpar)
     switch(Pos_Tbl_Synth_ENV2)
     {
         case 0: /* Env2->osc1 pd */
-            PARASynth[ped_patsam].env2_osc1_pw = cpar;
+            PARASynth[Current_Sample].env2_osc1_pw = cpar;
             break;
 
         case 1: /* Env2->osc2 pd */
-            PARASynth[ped_patsam].env2_osc2_pw = cpar;
+            PARASynth[Current_Sample].env2_osc2_pw = cpar;
             break;
 
         case 2: /* Env2->osc1 pitch */
-            PARASynth[ped_patsam].env2_osc1_pitch = cpar;
+            PARASynth[Current_Sample].env2_osc1_pitch = cpar;
             break;
 
         case 3: /* Env2->osc2 pitch */
-            PARASynth[ped_patsam].env2_osc2_pitch = cpar;
+            PARASynth[Current_Sample].env2_osc2_pitch = cpar;
             break;
 
         case 4: /* Env2->osc1 volume */
-            PARASynth[ped_patsam].env2_osc1_volume = cpar;
+            PARASynth[Current_Sample].env2_osc1_volume = cpar;
             break;
 
         case 5: /* Env2->osc2 volume */
-            PARASynth[ped_patsam].env2_osc2_volume = cpar;
+            PARASynth[Current_Sample].env2_osc2_volume = cpar;
             break;
 
         case 6: /* Env2->vcf cutoff */
-            PARASynth[ped_patsam].env2_vcf_cutoff = cpar;
+            PARASynth[Current_Sample].env2_vcf_cutoff = cpar;
             break;
 
         case 7: /* Env2->vcf resonance */
-            PARASynth[ped_patsam].env2_vcf_resonance = cpar;
+            PARASynth[Current_Sample].env2_vcf_resonance = cpar;
             break;
     }
 }
@@ -2474,106 +2474,106 @@ void CParcha_Misc(int cpar)
     switch(Pos_Tbl_Synth_Misc)
     {
         case 0: /* Misc. glide */
-            PARASynth[ped_patsam].ptc_glide = cpar;
+            PARASynth[Current_Sample].ptc_glide = cpar;
             break;
 
         case 1: /* Misc. Global volume */
-            PARASynth[ped_patsam].glb_volume = cpar;
+            PARASynth[Current_Sample].glb_volume = cpar;
             break;
 
         case 2: /* Misc. Distortion */
-            PARASynth[ped_patsam].disto = cpar;
+            PARASynth[Current_Sample].disto = cpar;
             break;
     }
 }
 
 void Rand_OSC1()
 {
-    PARASynth[ped_patsam].osc1_waveform = rand() % 7;
+    PARASynth[Current_Sample].osc1_waveform = rand() % 7;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].osc1_pw = rand() & 0x1ff;
+        PARASynth[Current_Sample].osc1_pw = rand() & 0x1ff;
     }
-    PARASynth[ped_patsam].env1_attack = rand();
-    PARASynth[ped_patsam].env1_decay = rand();
-    PARASynth[ped_patsam].env1_sustain = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_release = rand();
-    PARASynth[ped_patsam].osc3_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_attack = rand();
+    PARASynth[Current_Sample].env1_decay = rand();
+    PARASynth[Current_Sample].env1_sustain = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_release = rand();
+    PARASynth[Current_Sample].osc3_volume = rand() & 0x7f;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_OSC2()
 {
-    PARASynth[ped_patsam].osc2_waveform = rand() % 7;
+    PARASynth[Current_Sample].osc2_waveform = rand() % 7;
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].osc2_pw = rand() & 0x1ff;
+        PARASynth[Current_Sample].osc2_pw = rand() & 0x1ff;
     }
-    PARASynth[ped_patsam].osc2_finetune = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_attack = rand();
-    PARASynth[ped_patsam].env2_decay = rand();
-    PARASynth[ped_patsam].env2_sustain = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_release = rand();
-    PARASynth[ped_patsam].osc2_detune = rand() & 0x7f;
+    PARASynth[Current_Sample].osc2_finetune = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_attack = rand();
+    PARASynth[Current_Sample].env2_decay = rand();
+    PARASynth[Current_Sample].env2_sustain = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_release = rand();
+    PARASynth[Current_Sample].osc2_detune = rand() & 0x7f;
 
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_VCF()
 {
-    PARASynth[ped_patsam].vcf_type = rand() % 3;
-    PARASynth[ped_patsam].vcf_cutoff = rand() & 0x7f;
-    PARASynth[ped_patsam].vcf_resonance = rand() & 0x7f;
+    PARASynth[Current_Sample].vcf_type = rand() % 3;
+    PARASynth[Current_Sample].vcf_cutoff = rand() & 0x7f;
+    PARASynth[Current_Sample].vcf_resonance = rand() & 0x7f;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_LFO1()
 {
-    PARASynth[ped_patsam].lfo1_period = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_period = rand() & 0x7f;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].lfo1_osc1_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].lfo1_osc1_pw = rand() & 0x7f;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].lfo1_osc2_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].lfo1_osc2_pw = rand() & 0x7f;
     }
-    PARASynth[ped_patsam].lfo1_osc1_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_osc2_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_vcf_cutoff = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_vcf_resonance = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_osc1_pitch = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_osc2_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_osc1_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_osc2_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_vcf_cutoff = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_vcf_resonance = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_osc1_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_osc2_pitch = rand() & 0x7f;
 
-    PARASynth[ped_patsam].lfo1_attack = rand();
-    PARASynth[ped_patsam].lfo1_decay = rand();
-    PARASynth[ped_patsam].lfo1_sustain = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo1_release = rand();
+    PARASynth[Current_Sample].lfo1_attack = rand();
+    PARASynth[Current_Sample].lfo1_decay = rand();
+    PARASynth[Current_Sample].lfo1_sustain = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo1_release = rand();
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
 void Rand_LFO2()
 {
-    PARASynth[ped_patsam].lfo2_period = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_period = rand() & 0x7f;
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].lfo2_osc1_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].lfo2_osc1_pw = rand() & 0x7f;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].lfo2_osc2_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].lfo2_osc2_pw = rand() & 0x7f;
     }
-    PARASynth[ped_patsam].lfo2_osc1_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_osc2_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_vcf_cutoff = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_vcf_resonance = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_osc1_pitch = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_osc2_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_osc1_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_osc2_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_vcf_cutoff = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_vcf_resonance = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_osc1_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_osc2_pitch = rand() & 0x7f;
 
-    PARASynth[ped_patsam].lfo2_attack = rand();
-    PARASynth[ped_patsam].lfo2_decay = rand();
-    PARASynth[ped_patsam].lfo2_sustain = rand() & 0x7f;
-    PARASynth[ped_patsam].lfo2_release = rand();
+    PARASynth[Current_Sample].lfo2_attack = rand();
+    PARASynth[Current_Sample].lfo2_decay = rand();
+    PARASynth[Current_Sample].lfo2_sustain = rand() & 0x7f;
+    PARASynth[Current_Sample].lfo2_release = rand();
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 
@@ -2581,18 +2581,18 @@ void Rand_ENV1()
 {
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].env1_osc1_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].env1_osc1_pw = rand() & 0x7f;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].env1_osc2_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].env1_osc2_pw = rand() & 0x7f;
     }
-    PARASynth[ped_patsam].env1_osc1_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_osc2_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_vcf_cutoff = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_vcf_resonance = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_osc1_pitch = rand() & 0x7f;
-    PARASynth[ped_patsam].env1_osc2_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_osc1_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_osc2_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_vcf_cutoff = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_vcf_resonance = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_osc1_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].env1_osc2_pitch = rand() & 0x7f;
 
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
@@ -2601,18 +2601,18 @@ void Rand_ENV2()
 {
     if(Allow_Phase_Distortion_OSC1)
     {
-        PARASynth[ped_patsam].env2_osc1_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].env2_osc1_pw = rand() & 0x7f;
     }
     if(Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].env2_osc2_pw = rand() & 0x7f;
+        PARASynth[Current_Sample].env2_osc2_pw = rand() & 0x7f;
     }
-    PARASynth[ped_patsam].env2_osc1_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_osc2_volume = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_vcf_cutoff = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_vcf_resonance = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_osc1_pitch = rand() & 0x7f;
-    PARASynth[ped_patsam].env2_osc2_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_osc1_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_osc2_volume = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_vcf_cutoff = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_vcf_resonance = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_osc1_pitch = rand() & 0x7f;
+    PARASynth[Current_Sample].env2_osc2_pitch = rand() & 0x7f;
 
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
@@ -2621,10 +2621,10 @@ void Rand_Misc()
 {
     if(Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2)
     {
-        PARASynth[ped_patsam].ptc_glide = rand() & 0x7f;
+        PARASynth[Current_Sample].ptc_glide = rand() & 0x7f;
     }
-    PARASynth[ped_patsam].glb_volume = 100;
-    PARASynth[ped_patsam].disto = rand() & 0x7f;
+    PARASynth[Current_Sample].glb_volume = 100;
+    PARASynth[Current_Sample].disto = rand() & 0x7f;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);
 }
 

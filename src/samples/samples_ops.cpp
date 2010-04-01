@@ -58,24 +58,24 @@ int Sample_Rotate_Left(int32 range_start, int32 range_end, int amount)
  
     if(shiftsize)
     {
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         for(j = 0; j < amount; j++)
         {
-            sample1 = RawSamples[ped_patsam][0][ped_split][range_start];
-            if(nc == 2) sample2 = RawSamples[ped_patsam][1][ped_split][range_start];
+            sample1 = RawSamples[Current_Sample][0][Current_Sample_Split][range_start];
+            if(nc == 2) sample2 = RawSamples[Current_Sample][1][Current_Sample_Split][range_start];
  
             // Shift it
             for(i = range_start; i < range_end - 1; i++)
             {
-                RawSamples[ped_patsam][0][ped_split][i] = RawSamples[ped_patsam][0][ped_split][i + 1];
+                RawSamples[Current_Sample][0][Current_Sample_Split][i] = RawSamples[Current_Sample][0][Current_Sample_Split][i + 1];
                 if(nc == 2)
                 {
-                    RawSamples[ped_patsam][1][ped_split][i] = RawSamples[ped_patsam][1][ped_split][i + 1];
+                    RawSamples[Current_Sample][1][Current_Sample_Split][i] = RawSamples[Current_Sample][1][Current_Sample_Split][i + 1];
                 }
             }
-            RawSamples[ped_patsam][0][ped_split][i] = sample1;
-            if(nc == 2) RawSamples[ped_patsam][1][ped_split][i] = sample2;
+            RawSamples[Current_Sample][0][Current_Sample_Split][i] = sample1;
+            if(nc == 2) RawSamples[Current_Sample][1][Current_Sample_Split][i] = sample2;
         }
 
         Status_Box("Shift left done.");
@@ -97,24 +97,24 @@ int Sample_Rotate_Right(int32 range_start, int32 range_end, int amount)
  
     if(shiftsize)
     {
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         for(j = 0; j < amount; j++)
         {
-            sample1 = RawSamples[ped_patsam][0][ped_split][range_end - 1];
-            if(nc == 2) sample2 = RawSamples[ped_patsam][1][ped_split][range_end - 1];
+            sample1 = RawSamples[Current_Sample][0][Current_Sample_Split][range_end - 1];
+            if(nc == 2) sample2 = RawSamples[Current_Sample][1][Current_Sample_Split][range_end - 1];
  
             // Shift it
             for(i = range_end - 2; i >= range_start; i--)
             {
-                RawSamples[ped_patsam][0][ped_split][i + 1] = RawSamples[ped_patsam][0][ped_split][i];
+                RawSamples[Current_Sample][0][Current_Sample_Split][i + 1] = RawSamples[Current_Sample][0][Current_Sample_Split][i];
                 if(nc == 2)
                 {
-                    RawSamples[ped_patsam][1][ped_split][i + 1] = RawSamples[ped_patsam][1][ped_split][i];
+                    RawSamples[Current_Sample][1][Current_Sample_Split][i + 1] = RawSamples[Current_Sample][1][Current_Sample_Split][i];
                 }
             }
-            RawSamples[ped_patsam][0][ped_split][range_start] = sample1;
-            if(nc == 2) RawSamples[ped_patsam][1][ped_split][range_start] = sample2;
+            RawSamples[Current_Sample][0][Current_Sample_Split][range_start] = sample1;
+            if(nc == 2) RawSamples[Current_Sample][1][Current_Sample_Split][range_start] = sample2;
         }
 
         Status_Box("Shift right done.");
@@ -135,21 +135,21 @@ int Sample_Reverse(int32 range_start, int32 range_end)
  
     if(reversesize)
     {
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         p_s = range_end - 1;
 
         // Reverse it
         for(i = range_start; i < (range_start + reversesize); i++)
         {
-            sample = RawSamples[ped_patsam][0][ped_split][p_s];
-            RawSamples[ped_patsam][0][ped_split][p_s] = RawSamples[ped_patsam][0][ped_split][i];
-            RawSamples[ped_patsam][0][ped_split][i] = sample;
+            sample = RawSamples[Current_Sample][0][Current_Sample_Split][p_s];
+            RawSamples[Current_Sample][0][Current_Sample_Split][p_s] = RawSamples[Current_Sample][0][Current_Sample_Split][i];
+            RawSamples[Current_Sample][0][Current_Sample_Split][i] = sample;
             if(nc == 2)
             {
-                sample = RawSamples[ped_patsam][1][ped_split][p_s];
-                RawSamples[ped_patsam][1][ped_split][p_s] = RawSamples[ped_patsam][1][ped_split][i];
-                RawSamples[ped_patsam][1][ped_split][i] = sample;
+                sample = RawSamples[Current_Sample][1][Current_Sample_Split][p_s];
+                RawSamples[Current_Sample][1][Current_Sample_Split][p_s] = RawSamples[Current_Sample][1][Current_Sample_Split][i];
+                RawSamples[Current_Sample][1][Current_Sample_Split][i] = sample;
             }
             p_s--;
         }
@@ -174,7 +174,7 @@ int Sample_Crop(int32 range_start, int32 range_end)
         Stop_Current_Sample();
         AUDIO_Stop();
         SDL_Delay(10);
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         NewBuffer[0] = (short *) malloc(cropsize * 2 + 8);
         if(!NewBuffer[0]) return 0;
@@ -195,21 +195,21 @@ int Sample_Crop(int32 range_start, int32 range_end)
         // Copy the selection
         for(i = range_start; i < range_end; i++)
         {
-            *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-            if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+            *(NewBuffer[0] + p_s) = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+            if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             p_s++;
         }
 
         // Set the new buffer as current sample
-        if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
-        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
+        if(RawSamples[Current_Sample][0][Current_Sample_Split]) free(RawSamples[Current_Sample][0][Current_Sample_Split]);
+        RawSamples[Current_Sample][0][Current_Sample_Split] = NewBuffer[0];
         if(nc == 2)
         {
-            if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
-            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
+            if(RawSamples[Current_Sample][1][Current_Sample_Split]) free(RawSamples[Current_Sample][1][Current_Sample_Split]);
+            RawSamples[Current_Sample][1][Current_Sample_Split] = NewBuffer[1];
         }
 
-        SampleNumSamples[ped_patsam][ped_split] = cropsize;
+        SampleNumSamples[Current_Sample][Current_Sample_Split] = cropsize;
         Status_Box("Crop done.");
         AUDIO_Play();
         return 1;
@@ -225,7 +225,7 @@ int Sample_Copy(int32 range_start, int32 range_end)
     short *dest_mono;
     short *dest_stereo;
     long copysize = (range_end - range_start);
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
     if(copysize)
     {
@@ -257,8 +257,8 @@ int Sample_Copy(int32 range_start, int32 range_end)
         dest_stereo = Sample_Back[cur_sample_buffer][1];
         for(i = range_start; i < range_end; i++)
         {
-            *dest_mono++ = *(RawSamples[ped_patsam][0][ped_split] + i);
-            if(nc == 2) *dest_stereo++ = *(RawSamples[ped_patsam][1][ped_split] + i);
+            *dest_mono++ = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+            if(nc == 2) *dest_stereo++ = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
         }
         Status_Box("Copy done.");
         return 1;
@@ -275,11 +275,11 @@ int Sample_Paste(int32 range_start)
     char nc;
     long p_s;
     long cutsize = Sample_Back_Size[cur_sample_buffer];
-    long newsize = SampleNumSamples[ped_patsam][ped_split] + cutsize;
+    long newsize = SampleNumSamples[Current_Sample][Current_Sample_Split] + cutsize;
 
     if(cutsize)
     {
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         // Allocate the destination buffer(s)
         // (We need to clear the second one as the back buffer may not be stereo).
@@ -304,8 +304,8 @@ int Sample_Paste(int32 range_start)
             // Copy the original data into the new buffer
             for(i = 0; i < range_start; i++)
             {
-                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
                 p_s++;
             }
         }
@@ -318,27 +318,27 @@ int Sample_Paste(int32 range_start)
             p_s++;
         }
 
-        if((SampleNumSamples[ped_patsam][ped_split] - range_start) > 0)
+        if((SampleNumSamples[Current_Sample][Current_Sample_Split] - range_start) > 0)
         {
             // Add the rest of the original data
-            for(i = range_start; i < (int32) SampleNumSamples[ped_patsam][ped_split]; i++)
+            for(i = range_start; i < (int32) SampleNumSamples[Current_Sample][Current_Sample_Split]; i++)
             {
-                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
                 p_s++;
             }
         }
 
         // Set the new buffer as current sample
-        if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
-        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
+        if(RawSamples[Current_Sample][0][Current_Sample_Split]) free(RawSamples[Current_Sample][0][Current_Sample_Split]);
+        RawSamples[Current_Sample][0][Current_Sample_Split] = NewBuffer[0];
         if(nc == 2)
         {
-            if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
-            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
+            if(RawSamples[Current_Sample][1][Current_Sample_Split]) free(RawSamples[Current_Sample][1][Current_Sample_Split]);
+            RawSamples[Current_Sample][1][Current_Sample_Split] = NewBuffer[1];
         }
 
-        SampleNumSamples[ped_patsam][ped_split] = newsize;
+        SampleNumSamples[Current_Sample][Current_Sample_Split] = newsize;
         Status_Box("Paste done.");
         return 1;
     }
@@ -354,7 +354,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
     char nc;
     long p_s;
     long cutsize = (range_end - range_start);
-    long newsize = SampleNumSamples[ped_patsam][ped_split] - cutsize;
+    long newsize = SampleNumSamples[Current_Sample][Current_Sample_Split] - cutsize;
 
     if(newsize)
     {
@@ -362,7 +362,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
         AUDIO_Stop();
         SDL_Delay(10);
 
-        nc = SampleChannels[ped_patsam][ped_split];
+        nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         // Allocate the wav with the minus the block to cut
         NewBuffer[0] = (short *) malloc(newsize * 2 + 8);
@@ -395,33 +395,33 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
             // Copy the data located before the range start
             for(i = 0; i < range_start; i++)
             {
-                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
                 p_s++;
             }
         }
 
-        if((SampleNumSamples[ped_patsam][ped_split] - range_end) > 0)
+        if((SampleNumSamples[Current_Sample][Current_Sample_Split] - range_end) > 0)
         {
             // Add the data located after the range end
-            for(i = range_end; i < (int32) SampleNumSamples[ped_patsam][ped_split]; i++)
+            for(i = range_end; i < (int32) SampleNumSamples[Current_Sample][Current_Sample_Split]; i++)
             {
-                *(NewBuffer[0] + p_s) = *(RawSamples[ped_patsam][0][ped_split] + i);
-                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[ped_patsam][1][ped_split] + i);
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
                 p_s++;
             }
         }
 
         // Set the new buffer as current sample
-        if(RawSamples[ped_patsam][0][ped_split]) free(RawSamples[ped_patsam][0][ped_split]);
-        RawSamples[ped_patsam][0][ped_split] = NewBuffer[0];
+        if(RawSamples[Current_Sample][0][Current_Sample_Split]) free(RawSamples[Current_Sample][0][Current_Sample_Split]);
+        RawSamples[Current_Sample][0][Current_Sample_Split] = NewBuffer[0];
         if(nc == 2)
         {
-            if(RawSamples[ped_patsam][1][ped_split]) free(RawSamples[ped_patsam][1][ped_split]);
-            RawSamples[ped_patsam][1][ped_split] = NewBuffer[1];
+            if(RawSamples[Current_Sample][1][Current_Sample_Split]) free(RawSamples[Current_Sample][1][Current_Sample_Split]);
+            RawSamples[Current_Sample][1][Current_Sample_Split] = NewBuffer[1];
         }
 
-        SampleNumSamples[ped_patsam][ped_split] = newsize;
+        SampleNumSamples[Current_Sample][Current_Sample_Split] = newsize;
         Status_Box("Cut done.");
         AUDIO_Play();
         return 1;
@@ -445,14 +445,14 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
 void Sample_DC_Adjust(int32 range_start, int32 range_end)
 {
     int32 i;
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
     float l_shift = 0;
     float r_shift = 0;
 
      for(i = range_start; i < range_end + 1; i++)
     {
-        l_shift += *(RawSamples[ped_patsam][0][ped_split] + i);
-        if(nc == 2) r_shift += *(RawSamples[ped_patsam][1][ped_split] + i);
+        l_shift += *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
+        if(nc == 2) r_shift += *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
     }
 
     l_shift /= (range_end + 1) - range_start;
@@ -460,21 +460,21 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        float bleak = *(RawSamples[ped_patsam][0][ped_split] + i);
+        float bleak = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         bleak -= l_shift;
 
         if(bleak > 32767) bleak = 32767;
         if(bleak < -32767) bleak = -32767;
-        *(RawSamples[ped_patsam][0][ped_split] + i) = (short) bleak;
+        *(RawSamples[Current_Sample][0][Current_Sample_Split] + i) = (short) bleak;
 
         if(nc == 2)
         {
-            bleak = *(RawSamples[ped_patsam][1][ped_split] + i);
+            bleak = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             bleak -= r_shift;
 
             if(bleak > 32767) bleak = 32767;
             if(bleak < -32767) bleak = -32767;
-            *(RawSamples[ped_patsam][1][ped_split] + i) = (short) bleak;
+            *(RawSamples[Current_Sample][1][Current_Sample_Split] + i) = (short) bleak;
         }
     }
 
@@ -487,20 +487,20 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
 void Sample_Maximize(int32 range_start, int32 range_end)
 {
     int32 i;
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
     float l_shift = 0;
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        if(abs(*(RawSamples[ped_patsam][0][ped_split] + i)) > l_shift)
+        if(abs(*(RawSamples[Current_Sample][0][Current_Sample_Split] + i)) > l_shift)
         {
-            l_shift = *(RawSamples[ped_patsam][0][ped_split] + i);
+            l_shift = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         }
         if(nc == 2)
         {
-            if(abs(*(RawSamples[ped_patsam][1][ped_split] + i)) > l_shift)
+            if(abs(*(RawSamples[Current_Sample][1][Current_Sample_Split] + i)) > l_shift)
             {
-                l_shift = *(RawSamples[ped_patsam][1][ped_split] + i);
+                l_shift = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             }
         }
     }
@@ -509,21 +509,21 @@ void Sample_Maximize(int32 range_start, int32 range_end)
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        float bleak = *(RawSamples[ped_patsam][0][ped_split] + i);
+        float bleak = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         bleak *= l_shift;
 
         if(bleak > 32767) bleak = 32767;
         if(bleak < -32767) bleak = -32767;
-        *(RawSamples[ped_patsam][0][ped_split] + i) = (short) bleak;
+        *(RawSamples[Current_Sample][0][Current_Sample_Split] + i) = (short) bleak;
 
         if(nc == 2)
         {
-            bleak = *(RawSamples[ped_patsam][1][ped_split] + i);
+            bleak = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             bleak *= l_shift;
 
             if(bleak > 32767) bleak = 32767;
             if(bleak < -32767) bleak = -32767;
-            *(RawSamples[ped_patsam][1][ped_split] + i) = (short) bleak;
+            *(RawSamples[Current_Sample][1][Current_Sample_Split] + i) = (short) bleak;
         }
     }
 
@@ -536,27 +536,27 @@ void Sample_Maximize(int32 range_start, int32 range_end)
 void Sample_FadeIn(int32 range_start, int32 range_end)
 {
     int i;
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
     float c_vol = 0.0f;
     float const coef_vol = 1.0f / ((range_end + 1) - range_start);
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        float bleak = *(RawSamples[ped_patsam][0][ped_split] + i);
+        float bleak = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         bleak *= c_vol;
         if(bleak > 32767) bleak = 32767;
         if(bleak < -32767) bleak = -32767;
 
-        *(RawSamples[ped_patsam][0][ped_split] + i) = (short) bleak;
+        *(RawSamples[Current_Sample][0][Current_Sample_Split] + i) = (short) bleak;
 
         if(nc == 2)
         {
-            bleak = *(RawSamples[ped_patsam][1][ped_split] + i);
+            bleak = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             bleak *= c_vol;
 
             if(bleak > 32767) bleak = 32767;
             if(bleak < -32767) bleak = -32767;
-            *(RawSamples[ped_patsam][1][ped_split] + i) = (short) bleak;
+            *(RawSamples[Current_Sample][1][Current_Sample_Split] + i) = (short) bleak;
         }
         c_vol += coef_vol;
     }
@@ -573,28 +573,28 @@ void Sample_FadeOut(int32 range_start, int32 range_end)
     Status_Box("Fade Out Selection...");
     SDL_Delay(100);
 
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
     float c_vol = 1.0f;
     float const coef_vol = 1.0f / ((range_end + 1) - range_start);
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        float bleak = *(RawSamples[ped_patsam][0][ped_split] + i);
+        float bleak = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         bleak *= c_vol;
         if(bleak > 32767) bleak = 32767;
         if(bleak < -32767) bleak = -32767;
 
-        *(RawSamples[ped_patsam][0][ped_split] + i) = (short) bleak;
+        *(RawSamples[Current_Sample][0][Current_Sample_Split] + i) = (short) bleak;
 
         if(nc == 2)
         {
-            bleak = *(RawSamples[ped_patsam][1][ped_split] + i);
+            bleak = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             bleak *= c_vol;
 
             if(bleak > 32767) bleak = 32767;
             if(bleak < -32767) bleak = -32767;
-            *(RawSamples[ped_patsam][1][ped_split] + i) = (short) bleak;
+            *(RawSamples[Current_Sample][1][Current_Sample_Split] + i) = (short) bleak;
         }
         c_vol -= coef_vol;
     }
@@ -609,21 +609,21 @@ void Sample_Half(int32 range_start, int32 range_end)
 {
     int32 i;
 
-    char nc = SampleChannels[ped_patsam][ped_split];
+    char nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
     float c_vol = 0.5f;
 
     for(i = range_start; i < range_end + 1; i++)
     {
-        float bleak = *(RawSamples[ped_patsam][0][ped_split] + i);
+        float bleak = *(RawSamples[Current_Sample][0][Current_Sample_Split] + i);
         bleak *= c_vol;
 
-        *(RawSamples[ped_patsam][0][ped_split] + i) = (short) bleak;
+        *(RawSamples[Current_Sample][0][Current_Sample_Split] + i) = (short) bleak;
         if(nc == 2)
         {
-            bleak = *(RawSamples[ped_patsam][1][ped_split] + i);
+            bleak = *(RawSamples[Current_Sample][1][Current_Sample_Split] + i);
             bleak *= c_vol;
-            *(RawSamples[ped_patsam][1][ped_split] + i) = (short) bleak;
+            *(RawSamples[Current_Sample][1][Current_Sample_Split] + i) = (short) bleak;
         }
     }
 

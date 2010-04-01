@@ -377,6 +377,8 @@ void Kill_Requester(void)
     Current_Requester = NULL;
     Req_TimeOut = 0;
     Env_Change = TRUE;
+    Mouse.button = 0;
+    Mouse.button_oneshot = 0;
 }
 
 // ------------------------------------------------------
