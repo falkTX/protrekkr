@@ -72,7 +72,7 @@ extern char Dir_Samples[MAX_PATH];
 
 // ------------------------------------------------------
 // Functions
-void LoadAmigaMod(char *FileName, int channels);
+void LoadAmigaMod(char *Name, const char *FileName, int channels);
 int LoadMod(char *FileName);
 int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory);
 int Pack_Module(char *FileName);

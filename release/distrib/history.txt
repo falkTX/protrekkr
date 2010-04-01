@@ -11,7 +11,8 @@ v2.0:
 - Input zones are now displayed with altered colors.
 - 6 default color themes are now available.
 - Range selection in sample editor speeded up.
-- .mod import function is now much more accurate.
+- .mod import function is now much more accurate
+  (note: it can also import fasttracker 1 .ft modules).
 - Fixed a bug in samples looping (1 byte was always missing from the loop).
 - Improved shadow patterns rendering.
 - Patterns shading is also displayed for track which are turned off
@@ -36,7 +37,7 @@ v2.0:
   the waveform (like in the original protracker).
 - Filelists won't be redrawn after a loading process
   (so they won't jump back to the top).
-- Fixed a bug in Pattner loop command (6).
+- Fixed a bug in Pattern loop command (6).
 - Splitted the play button into 2, 1st one to play song,
   2nd one to play pattern, right mouse button on those to play song
   or pattern from current row (using left mouse button starts from top row).
@@ -46,7 +47,9 @@ v2.0:
     RALT: Play pattern from start of pattern.
     LSHIFT + RALT: Play pattern from current position.
 - Added transposing capability to the instruments remapping functions.
-- Changed LCTRL+H & LCTRL+LSHIFT+H to LCTRL+K & LCTRL+LSHIFT+K
+- Changed LCTRL+H & LCTRL+LSHIFT+H to LCTRL+K & LCTRL+LSHIFT+K.
+- Default patterns zoom selectable.
+- Effect 10 (Delay send) wasn't working when Track tab was selected.
 
 v1.99e:
 

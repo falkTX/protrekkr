@@ -2195,6 +2195,8 @@ void Sp_Player(void)
 
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
+                    //if(CHAN_ACTIVE_STATE[Song_Position][ct])
+                    //{
                     if(pl_note[i] < 120 || (pl_note[i] > 120 && pl_sample[i] != 255))
                     {
                         free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
@@ -2553,18 +2555,24 @@ ByPass_Wav:
                             sp_Stage[c][i] = PLAYING_NOSAMPLE;
                         }
                     }
-                    if(sp_Cvol[c][i] > sp_Tvol[c][i])
+                    // Volume ramping
+                    if(sp_Cvol[c][i] != sp_Tvol[c][i])
                     {
-                        sp_Cvol[c][i] -= 0.004f;
-                        Done_CVol[c][i] = TRUE;
+                        if(sp_Cvol[c][i] > sp_Tvol[c][i])
+                        {
+                            sp_Cvol[c][i] -= 0.05f;
+                            if(sp_Cvol[c][i] < sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                            Done_CVol[c][i] = TRUE;
+                        }
+                        else
+                        {
+                            sp_Cvol[c][i] += 0.05f;
+                            if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                            Done_CVol[c][i] = TRUE;
+                        }
+                        if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
+                        if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
                     }
-                    else
-                    {
-                        sp_Cvol[c][i] += 0.004f;
-                        Done_CVol[c][i] = TRUE;
-                    }
-                    if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
-                    if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
 
                     res_dec = sp_Position[c][i].half.last;
 
@@ -2759,10 +2767,24 @@ ByPass_Wav:
             {
                 if(!Done_CVol[c][i])
                 {
-                    if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] -= 0.004f;
-                    else sp_Cvol[c][i] += 0.004f;
-                    if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
-                    if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
+                    // Perform the volume ramping now if it hasn't been done before
+                    if(sp_Cvol[c][i] != sp_Tvol[c][i])
+                    {
+                        if(sp_Cvol[c][i] > sp_Tvol[c][i])
+                        {
+                            sp_Cvol[c][i] -= 0.05f;
+                            if(sp_Cvol[c][i] < sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                            Done_CVol[c][i] = TRUE;
+                        }
+                        else
+                        {
+                            sp_Cvol[c][i] += 0.05f;
+                            if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                            Done_CVol[c][i] = TRUE;
+                        }
+                        if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
+                        if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
+                    }
                 }
 
                 Curr_Signal_L[i] += Synthesizer[c][i].GetSample(Player_WL[c][i],
@@ -3460,11 +3482,11 @@ void Play_Instrument(int channel, int sub_channel,
             }
 #endif
 
-            if(!offset) 
-            {
+            //if(!offset) 
+            //{
                 //sp_Cvol[channel][sub_channel] = 0;
-            }
-            else sp_Cvol[channel][sub_channel] = vol;
+            //}
+            //else sp_Cvol[channel][sub_channel] = vol;
 
 #if defined(PTK_FX_ARPEGGIO)
             Arpeggio_BaseNote[channel][sub_channel] = note;
@@ -3938,7 +3960,10 @@ void DoEffects(void)
         {
 
 #if defined(PTK_FX_FINEVOLUMESLIDEUP) || defined(PTK_FX_FINEVOLUMESLIDEDOWN) || \
-    defined(PTK_FX_FINEPITCHUP) || defined(PTK_FX_FINEPITCHDOWN)
+    defined(PTK_FX_FINEPITCHUP) || defined(PTK_FX_FINEPITCHDOWN) || \
+    defined(PTK_FX_SENDTODELAYCOMMAND) || defined(PTK_FX_SENDTOREVERBCOMMAND) || \
+    defined(PTK_FX_SETDISTORTIONTHRESHOLD) || defined(PTK_FX_SETDISTORTIONCLAMP) || \
+    defined(PTK_FX_SETFILTERRESONANCE)
 
             // Only at tick 0 but after instruments data
             if(PosInTick == 0)
@@ -3991,6 +4016,41 @@ void DoEffects(void)
                             Vstep1[trackef][i] -= pltr_dat_row[k] << 21;
                             if(Vstep1[trackef][i] < 16) Vstep1[trackef][i] = 16;
                         }
+                        break;
+#endif
+
+#if defined(PTK_FX_SENDTODELAYCOMMAND)
+                    // $10 Send to delay Command
+                    case 0x10:
+                        CCoef[trackef] = (float) pltr_dat_row[k] / 255.0f;
+                        break;
+#endif
+
+#if defined(PTK_FX_SENDTOREVERBCOMMAND)
+                    // $11 Send to reverb Command
+                    case 0x11:
+                        DSend[trackef] = (float) pltr_dat_row[k] / 255.0f;
+                        break;
+#endif
+
+#if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
+                    // $12 Set distortion Threshold
+                    case 0x12:
+                        DThreshold[trackef] = (float) pltr_dat_row[k] * 128.0f;
+                        break;
+#endif
+
+#if defined(PTK_FX_SETDISTORTIONCLAMP)
+                    // $13 Set distortion clamp
+                    case 0x13: 
+                        DClamp[trackef] = (float) pltr_dat_row[k] * 128.0f;
+                        break;
+#endif
+
+#if defined(PTK_FX_SETFILTERRESONANCE)
+                    // $14 Set filter resonance
+                    case 0x14:
+                        FRez[trackef] = (int) (pltr_dat_row[k] / 2);
                         break;
 #endif
 
@@ -4179,7 +4239,8 @@ void DoEffects(void)
                             Reserved_Sub_Channels[trackef][i] = free_sub_channel;
 
                             // Retrigger all playing sub channels
-                            if(pltr_vol_row <= 64)
+                            // (Note: a 9 fx could be combined with a 3 one)
+                            if(pltr_vol_row <= 64 || pltr_eff_row[0] == 3 || pltr_eff_row[1] == 3)
                             {
                                 Play_Instrument(trackef,
                                                 free_sub_channel,
@@ -4246,41 +4307,6 @@ void DoEffects(void)
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
                     gui_bpm_action = TRUE;
 #endif
-                    break;
-#endif
-
-#if defined(PTK_FX_SENDTODELAYCOMMAND)
-                // $10 Send to delay Command
-                case 0x10:
-                    CCoef[trackef] = (float) pltr_dat_row[k] / 255.0f;
-                    break;
-#endif
-
-#if defined(PTK_FX_SENDTOREVERBCOMMAND)
-                // $11 Send to reverb Command
-                case 0x11:
-                    DSend[trackef] = (float) pltr_dat_row[k] / 255.0f;
-                    break;
-#endif
-
-#if defined(PTK_FX_SETDISTORTIONTHRESHOLD)
-                // $12 Set distortion Threshold
-                case 0x12:
-                    DThreshold[trackef] = (float) pltr_dat_row[k] * 128.0f;
-                    break;
-#endif
-
-#if defined(PTK_FX_SETDISTORTIONCLAMP)
-                // $13 Set distortion clamp
-                case 0x13: 
-                    DClamp[trackef] = (float) pltr_dat_row[k] * 128.0f;
-                    break;
-#endif
-
-#if defined(PTK_FX_SETFILTERRESONANCE)
-                // $14 Set filter resonance
-                case 0x14:
-                    FRez[trackef] = (int) (pltr_dat_row[k] / 2);
                     break;
 #endif
 
@@ -5547,51 +5573,63 @@ void Set_Spline_Boundaries(unsigned int Position,
     if(Boundaries[0]) Boundaries[3] = Boundaries[0] - 1;
     Boundaries[1] = Boundaries[0] + 1;
     Boundaries[2] = Boundaries[0] + 2;
+    Length--;
+    if(LoopEnd >= Length) LoopEnd = Length;
 
     switch(LoopType)
     {
         case SMP_LOOP_FORWARD:
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
-                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopStart;
+                if(Boundaries[0] >= LoopEnd) Boundaries[0] = LoopStart;
                 if(Boundaries[1] >= LoopEnd) Boundaries[1] = LoopStart;
                 if(Boundaries[2] >= LoopEnd) Boundaries[2] = LoopStart;
+                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopStart;
             }
             else
             {
-                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopEnd;
+                if((int) Boundaries[0] <= (int) LoopStart) Boundaries[0] = LoopEnd;
                 if((int) Boundaries[1] <= (int) LoopStart) Boundaries[1] = LoopEnd;
                 if((int) Boundaries[2] <= (int) LoopStart) Boundaries[2] = LoopEnd;
+                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopEnd;
             }
             break;
 
         case SMP_LOOP_PINGPONG:
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
-                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopEnd;
+                if(Boundaries[0] >= LoopEnd) Boundaries[0] = LoopEnd;
                 if(Boundaries[1] >= LoopEnd) Boundaries[1] = LoopEnd;
                 if(Boundaries[2] >= LoopEnd) Boundaries[2] = LoopEnd;
+                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopEnd;
             }
             else
             {
-                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopStart;
+                if(Boundaries[0] >= LoopEnd) Boundaries[0] = LoopEnd;
+                if(Boundaries[1] >= LoopEnd) Boundaries[1] = LoopEnd;
+                if(Boundaries[2] >= LoopEnd) Boundaries[2] = LoopEnd;
+                if(Boundaries[3] >= LoopEnd) Boundaries[3] = LoopEnd;
+                if((int) Boundaries[0] <= (int) LoopStart) Boundaries[0] = LoopStart;
                 if((int) Boundaries[1] <= (int) LoopStart) Boundaries[1] = LoopStart;
                 if((int) Boundaries[2] <= (int) LoopStart) Boundaries[2] = LoopStart;
+                if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopStart;
             }
             break;
 
         case SMP_LOOP_NONE:
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
-                if(Boundaries[3] >= Length) Boundaries[3] = Length;
+                if(Boundaries[0] >= Length) Boundaries[0] = Length;
                 if(Boundaries[1] >= Length) Boundaries[1] = Length;
                 if(Boundaries[2] >= Length) Boundaries[2] = Length;
+                if(Boundaries[3] >= Length) Boundaries[3] = Length;
             }
             else
             {
-                if((int) Boundaries[3] <= 0) Boundaries[3] = 0;
+                if((int) Boundaries[0] <= 0) Boundaries[0] = 0;
                 if((int) Boundaries[1] <= 0) Boundaries[1] = 0;
                 if((int) Boundaries[2] <= 0) Boundaries[2] = 0;
+                if((int) Boundaries[3] <= 0) Boundaries[3] = 0;
             }
             break;
     }

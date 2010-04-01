@@ -62,8 +62,8 @@ char *Font_Ascii =
     "0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014\015"
     //A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z   .   -   
     "\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251"
-    // |>
-    "\253"
+    // |> ||
+    "\253\254"
     " ";
 int Font_Pos[256];
 int Font_Size[256];
@@ -395,7 +395,7 @@ SDL_Color Default_Palette2[] =
     { 0x06, 0x1c, 0x28, 0x00 },      // 21 Pattern hi background
     { 0xa0, 0xbe, 0xe4, 0x00 },      // 22 Pattern hi foreground
 
-    { 0x36, 0x2e, 0x32, 0x00 },      // 23 Pattern sel background
+    { 0x30, 0x24, 0x34, 0x00 },      // 23 Pattern sel background
     { 0xdc, 0xf2, 0xff, 0x00 },      // 24 Pattern sel foreground
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
@@ -652,11 +652,10 @@ SDL_Color Default_Palette5[] =
     { 0xb0, 0xce, 0xff, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
 
-
     { 0x08, 0x1e, 0x44, 0x00 },
     { 0x46, 0x90, 0xee, 0x00 },
 
-    { 0x18, 0x3c, 0x7c, 0x00 },
+    { 0x18, 0x30, 0x5c, 0x00 },
     { 0x94, 0xb4, 0xff, 0x00 },
 
     { 0x0a, 0x32, 0xb0, 0x00 },

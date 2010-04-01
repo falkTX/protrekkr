@@ -100,6 +100,7 @@ extern char FullScreen;
 extern char AutoSave;
 extern int Beveled;
 extern char Use_Shadows;
+extern char Global_Patterns_Zoom;
 extern int Continuous_Scroll;
 extern char *cur_dir;
 extern char Scopish_LeftRight;
@@ -126,8 +127,55 @@ int mt_channels[13] =
     4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 };
 
+float mt_pannels[16] =
+{
+    0.35f, 0.65f, 0.65f, 0.35f,
+    0.35f, 0.65f, 0.65f, 0.35f,
+    0.35f, 0.65f, 0.65f, 0.35f,
+    0.35f, 0.65f, 0.65f, 0.35f
+};
+
 AMIGA_NOTE mt_period_conv[] =
 {
+    { 13696, 0 },
+    { 12928, 1 },
+    { 12192, 2 },
+    { 11520, 3 },
+    { 10848, 4 },
+    { 10240, 5 },
+    { 9664,  6 },
+    { 9120,  7 },
+    { 8608,  8 },
+    { 8128,  9 },
+    { 7680, 10 },
+    { 7248, 11 },
+
+    { 6848, 12 },
+    { 6464, 13 },
+    { 6096, 14 },
+    { 5760, 15 },
+    { 5424, 16 },
+    { 5120, 17 },
+    { 4832, 18 },
+    { 4560, 19 },
+    { 4304, 20 },
+    { 4064, 21 },
+    { 3840, 22 },
+    { 3624, 23 },
+
+    { 3424, 24 },
+    { 3232, 25 },
+    { 3048, 26 },
+    { 2880, 27 },
+    { 2712, 28 },
+    { 2560, 29 },
+    { 2416, 30 },
+    { 2280, 31 },
+    { 2152, 32 },
+    { 2032, 33 },
+    { 1920, 34 },
+    { 1812, 35 },
+
     { 1712, 36 },
     { 1616, 37 },
     { 1524, 38 },
@@ -153,6 +201,7 @@ AMIGA_NOTE mt_period_conv[] =
     {  508, 57 },
     {  480, 58 },
     {  453, 59 },
+    
     {  428, 60 },
     {  404, 61 },
     {  381, 62 },
@@ -165,6 +214,7 @@ AMIGA_NOTE mt_period_conv[] =
     {  254, 69 },
     {  240, 70 },
     {  226, 71 },
+    
     {  214, 72 },
     {  202, 73 },
     {  190, 74 },
@@ -183,12 +233,40 @@ AMIGA_NOTE mt_period_conv[] =
     {   95, 86 },
     {   90, 87 },
     {   85, 88 },
-    {   75, 89 },
-    {   71, 90 },
-    {   67, 91 },
-    {   63, 92 },
-    {   60, 93 },
-    {   56, 94 },
+    {   80, 89 },
+    {   75, 90 },
+    {   71, 91 },
+    {   67, 92 },
+    {   63, 93 },
+    {   60, 94 },
+    {   57, 95 },
+
+    {   53, 96 },
+    {   50, 97 },
+    {   47, 98 },
+    {   45, 99 },
+    {   42, 100 },
+    {   40, 101 },
+    {   38, 102 },
+    {   36, 103 },
+    {   34, 104 },
+    {   32, 105 },
+    {   30, 106 },
+    {   28, 107 },
+
+    {   26, 108 },
+    {   25, 109 },
+    {   23, 110 },
+    {   22, 111 },
+    {   21, 112 },
+    {   20, 113 },
+    {   18, 114 },
+    {   17, 115 },
+    {   16, 116 },
+    {   15, 117 },
+    {   15, 118 },
+    {   14, 119 },
+
 }; 
 
 INSTR_ORDER Used_Instr[MAX_INSTRS];
@@ -330,7 +408,7 @@ float Scale_AmigaMod_Value(int value, float scale1, float scale2)
 
 // ------------------------------------------------------
 // Load a .mod file
-void LoadAmigaMod(char *FileName, int channels)
+void LoadAmigaMod(char *Name, const char *FileName, int channels)
 {
     FILE *in;
     int t_hi;
@@ -356,6 +434,19 @@ void LoadAmigaMod(char *FileName, int channels)
     int found_speed;
     int last_speed;
     int last_tempo;
+    // -1 = -16
+    // -2 = -24
+    // -3 = -32
+    // -4 = -48
+    // -5 = -64
+    // -6 = -80
+    // -7 = -96
+    // -8 = -112
+    char FineTune_Table[] =
+    {
+        0,  16,  32,  48,  64,  80,  96,  112,
+       -112, -96, -80, -64, -48, -32, -24, -16
+    };
 
     for(i = 0; i < 16; i++)
     {
@@ -381,8 +472,29 @@ void LoadAmigaMod(char *FileName, int channels)
         init_sample_bank();
         Pre_Song_Init();
 
-        fread(FileName, sizeof(char), 20, in);
+        // Read the title
+        memset(Name, 0, 21);
+        sprintf(style, "Converted");
+        fread(Name, sizeof(char), 20, in);
 
+        if(!strlen(Name))
+        {
+            strcpy(Name, FileName);
+            i = strlen(Name) - 1;
+            while(i)
+            {
+                if(Name[i] == '.')
+                {
+                    for(j = i; Name[j]; j++)
+                    {
+                        Name[j] = 0;
+                    }
+                    break;
+                }
+                i--;
+            }
+        }
+        
         Songtracks = channels;
 
         for(swrite = 0; swrite < 31; swrite++)
@@ -399,7 +511,8 @@ void LoadAmigaMod(char *FileName, int channels)
             SampleNumSamples[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
             SampleNumSamples[swrite][0] *= 2;
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
-            Finetune[swrite][0] *= 16;
+
+            Finetune[swrite][0] = FineTune_Table[Finetune[swrite][0] & 0xf];
             CustomVol[swrite] = Scale_AmigaMod_Value(fgetc(in), 63.0f, 0.99f);
             SampleVol[swrite][0] = 0.5f;
             Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
@@ -713,13 +826,25 @@ void LoadAmigaMod(char *FileName, int channels)
 
                             // DEMOSYNCHRO SIGNAL ?
                             case 8:
-                                Cmd = 7;
+                                // Let's assume it's a fasttracker 1 module
+                                // Which could handle panning.
+                                if(channels > 4)
+                                {
+                                    Cmd_Dat >>= 1;
+                                    *(RawPatterns + tmo + PATTERN_PANNING) = Cmd_Dat;
+                                    Cmd = 0;
+                                    Cmd_Dat = 0;
+                                }
+                                else
+                                {
+                                    Cmd = 7;
+                                }
                                 break;
 
                             // SAMPLE OFFSET
                             case 9:
                                 // We use 256 bytes instead of 128
-                                Cmd_Dat <<= 1;
+                                //Cmd_Dat <<= 1;
                                 break;
 
                             // VOLSLIDE
@@ -835,14 +960,14 @@ void LoadAmigaMod(char *FileName, int channels)
                                 if(Cmd_Dat >= 0xa0 && Cmd_Dat < 0xb0)
                                 {
                                     Cmd = 0x20;
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xa0, 15.0f, 255.0f);
+                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xa0, 16.0f, 255.0f);
                                 }
 
                                 // FINEVOLUME SLIDEDOWN
                                 if(Cmd_Dat >= 0xb0 && Cmd_Dat < 0xc0)
                                 {
                                     Cmd = 0x21;
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xb0, 15.0f, 255.0f);
+                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xb0, 16.0f, 255.0f);
                                 }
 
                                 // NOTE CUT
@@ -935,14 +1060,11 @@ void LoadAmigaMod(char *FileName, int channels)
             }
         }
 
-        TPan[0] = 0.2f;
-        TPan[1] = 0.8f;
-        TPan[2] = 0.8f;
-        TPan[3] = 0.2f;
-        ComputeStereo(0);
-        ComputeStereo(1);
-        ComputeStereo(2);
-        ComputeStereo(3);
+        for(i = 0; i < channels; i++)
+        {
+            TPan[i] = mt_pannels[i];
+            ComputeStereo(i);
+        }
 
         Use_Cubic = NONE_INT;
         BeatsPerMin = 125;
@@ -4681,6 +4803,7 @@ void SaveConfig(void)
         Write_Data(&Accidental, sizeof(char), 1, out);
 
         Write_Data(&Use_Shadows, sizeof(char), 1, out);
+        Write_Data(&Global_Patterns_Zoom, sizeof(char), 1, out);
 
         fclose(out);
 
@@ -4769,6 +4892,7 @@ void LoadConfig(void)
             Read_Data(&Accidental, sizeof(char), 1, in);
 
             Read_Data(&Use_Shadows, sizeof(char), 1, in);
+            Read_Data(&Global_Patterns_Zoom, sizeof(char), 1, in);
 
             if(Patterns_Lines == DISPLAYED_LINES_LARGE)
             {

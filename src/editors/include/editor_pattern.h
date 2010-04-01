@@ -54,14 +54,14 @@
 #define DISPLAYED_LINES_SMALL 28
 #define DISPLAYED_LINES_LARGE 44
 
-#define MAX_PATT_SCREEN_X 771
+#define MAX_PATT_SCREEN_X 781
 
 // ------------------------------------------------------
 // Enumerations
 enum TRACK_TYPE
 {
     TRACK_SMALL,
-    TRACK_NORMAL,
+    TRACK_MEDIUM,
     TRACK_LARGE
 };
 

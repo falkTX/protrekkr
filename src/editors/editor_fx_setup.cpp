@@ -154,13 +154,19 @@ void Actualize_Fx_Ed(char gode)
         if(gode == 0 || gode == 10)
         {
             if(Ticks_Synchro_Left < 1) Ticks_Synchro_Left = 1;
-            if(Ticks_Synchro_Left > TicksPerBeat + 1) Ticks_Synchro_Left = TicksPerBeat + 1;
+            while((SamplesPerTick * Ticks_Synchro_Left) > 22100)
+            {
+                Ticks_Synchro_Left--;
+            }
             Gui_Draw_Arrows_Number_Box2(534, 480, Ticks_Synchro_Left, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
         if(gode == 0 || gode == 11)
         {
             if(Ticks_Synchro_Right < 1) Ticks_Synchro_Right = 1;
-            if(Ticks_Synchro_Right > TicksPerBeat + 1) Ticks_Synchro_Right = TicksPerBeat + 1;
+            while((SamplesPerTick * Ticks_Synchro_Right) > 22100)
+            {
+                Ticks_Synchro_Right--;
+            }
             Gui_Draw_Arrows_Number_Box2(534, 498, Ticks_Synchro_Right, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 

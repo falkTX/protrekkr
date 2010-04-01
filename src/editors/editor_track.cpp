@@ -73,7 +73,7 @@ void Actualize_Track_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-        if(gode == 0)
+        if(gode == 0 || gode == 15)
         {
             if(Track_Under_Caret > MAX_TRACKS - 1) Track_Under_Caret = 0;
             if(Track_Under_Caret < 0) Track_Under_Caret = MAX_TRACKS - 1;
@@ -83,28 +83,28 @@ void Actualize_Track_Ed(char gode)
             Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
         }
 
-        if(gode == 0 || gode == 1)
+        if(gode == 0 || gode == 1 || gode == 15)
         {
             if(TCut[Track_Under_Caret] < 0) TCut[Track_Under_Caret] = 0;
             if(TCut[Track_Under_Caret] > 127) TCut[Track_Under_Caret] = 127;
             Realslider(77, 484, (int) TCut[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
-        if(gode == 0 || gode == 2)
+        if(gode == 0 || gode == 2 || gode == 15)
         {
             if(FRez[Track_Under_Caret] < 0) FRez[Track_Under_Caret] = 0;
             if(FRez[Track_Under_Caret] > 127) FRez[Track_Under_Caret] = 127;
             Realslider(77, 502, FRez[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
-        if(gode == 0 || gode == 3)
+        if(gode == 0 || gode == 3 || gode == 15)
         {
             if(ICut[Track_Under_Caret] > 0.0078125f) ICut[Track_Under_Caret] = 0.0078125f;
             if(ICut[Track_Under_Caret] < 0.00006103515625f) ICut[Track_Under_Caret] = 0.00006103515625f;
             Realslider(77, 538, (int) (ICut[Track_Under_Caret] * 16384.0f), FType[Track_Under_Caret] != 4);
         }
 
-        if(gode == 0 || gode == 4)
+        if(gode == 0 || gode == 4 || gode == 15)
         {
             if(FType[Track_Under_Caret] < 0) FType[Track_Under_Caret] = 0;
             if(FType[Track_Under_Caret] >= MAX_FILTER) FType[Track_Under_Caret] = MAX_FILTER;
@@ -138,7 +138,7 @@ void Actualize_Track_Ed(char gode)
             value_box(77, 520, FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
-        if(gode == 0 || gode == 5)
+        if(gode == 0 || gode == 5 || gode == 15)
         {
             if(DSend[Track_Under_Caret] < 0) DSend[Track_Under_Caret] = 0;
             if(DSend[Track_Under_Caret] > 1.0f) DSend[Track_Under_Caret] = 1.0f;
@@ -153,21 +153,21 @@ void Actualize_Track_Ed(char gode)
             CCoef[Track_Under_Caret] = float((float) CSend[Track_Under_Caret] / 127.0f);
         }
 
-        if(gode == 0 || gode == 7)
+        if(gode == 0 || gode == 7 || gode == 15)
         {
             if(DThreshold[Track_Under_Caret] < 0) DThreshold[Track_Under_Caret] = 0;
             if(DThreshold[Track_Under_Caret] > 32767) DThreshold[Track_Under_Caret] = 32767;
             Realslider(308, 484, (int) DThreshold[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
-        if(gode == 0 || gode == 8)
+        if(gode == 0 || gode == 8 || gode == 15)
         {
             if(DClamp[Track_Under_Caret] < 0) DClamp[Track_Under_Caret] = 0;
             if(DClamp[Track_Under_Caret] > 32767) DClamp[Track_Under_Caret] = 32767;
             Realslider(308, 502, (int) DClamp[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
-        if(gode == 0 || gode == 9)
+        if(gode == 0 || gode == 9 || gode == 15)
         {
             if(TPan[Track_Under_Caret] < 0.0f) TPan[Track_Under_Caret] = 0.0f;
             if(TPan[Track_Under_Caret] > 1.0f) TPan[Track_Under_Caret] = 1.0f;
@@ -175,42 +175,42 @@ void Actualize_Track_Ed(char gode)
             Realslider(308, 538, (int) (TPan[Track_Under_Caret] * 127.0f), TRUE);
         }
 
-        if(gode == 0 || gode == 10)
+        if(gode == 0 || gode == 10 || gode == 15)
         {
             if(CHAN_MUTE_STATE[Track_Under_Caret]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
-        if(gode == 0 || gode == 11)
+        if(gode == 0 || gode == 11 || gode == 15)
         {
             if(CHAN_MIDI_PRG[Track_Under_Caret] > 15) CHAN_MIDI_PRG[Track_Under_Caret] = 0;
             if(CHAN_MIDI_PRG[Track_Under_Caret] < 0) CHAN_MIDI_PRG[Track_Under_Caret] = 15;
             Gui_Draw_Arrows_Number_Box2(570, 530, CHAN_MIDI_PRG[Track_Under_Caret] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
-        if(gode == 0 || gode == 12)
+        if(gode == 0 || gode == 12 || gode == 15)
         {
             if(Disclap[Track_Under_Caret]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
-        if(gode == 0 || gode == 13)
+        if(gode == 0 || gode == 13 || gode == 15)
         {
             if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
             if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
             Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
-        if(gode == 0 || gode == 14 || gode == 13)
+        if(gode == 0 || gode == 14 || gode == 13 || gode == 15)
         {
             if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
             if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
             if(Get_Track_Type(Track_Under_Caret) == TRACK_LARGE && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_LARGE)
             {
-                Set_Track_Zoom(Track_Under_Caret, TRACK_NORMAL);
+                Set_Track_Zoom(Track_Under_Caret, TRACK_MEDIUM);
             }
-            if(Get_Track_Type(Track_Under_Caret) == TRACK_NORMAL && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_NORMAL)
+            if(Get_Track_Type(Track_Under_Caret) == TRACK_MEDIUM && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_NORMAL)
             {
                 Set_Track_Zoom(Track_Under_Caret, TRACK_SMALL);
             }

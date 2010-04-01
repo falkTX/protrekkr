@@ -1535,7 +1535,7 @@ int Screen_Update(void)
         Gui_Draw_Button_Box(0, 24, 96, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
         Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
         Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(8, 46, 80, 16, "Stop", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 46, 80, 16, "\254", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         StartRec();
         StartEdit();
 
@@ -1610,7 +1610,7 @@ int Screen_Update(void)
 
     if(Songplaying && Pattern_Line_Visual != player_line)
     {
-        if(!sr_isrecording) Actualize_Track_Ed(0);
+        if(!sr_isrecording) Actualize_Track_Ed(15);
         Actupated(0);
         player_line = Pattern_Line_Visual;
     }
@@ -1839,7 +1839,7 @@ void LoadFile(int Freeindex, const char *str)
         {
             sprintf(name, "%s", FileName);
             // name / number of channels
-            LoadAmigaMod(name, found_mod);
+            LoadAmigaMod(name, FileName, found_mod);
             Renew_Sample_Ed();
             fclose(in);
             gui_action = GUI_CMD_NONE;
@@ -5114,7 +5114,7 @@ void Mouse_Handler(void)
         {
             for(i = 0; i < Songtracks; i++)
             {
-                Set_Track_Zoom(i, TRACK_NORMAL);
+                Set_Track_Zoom(i, TRACK_MEDIUM);
             }
             Actupated(0);
         }

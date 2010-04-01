@@ -438,7 +438,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber, char *Name  )
   portRef = MIDIGetDestination( portNumber );
 
   MIDIObjectGetStringProperty( portRef, kMIDIPropertyName, &nameRef );
-  CFStringGetCString( nameRef, name, sizeof(name), 0);
+  CFStringGetCString(nameRef, name, sizeof(name), 0);
   CFRelease( nameRef );
   std::string stringName = name;
   strcpy(Name, name);

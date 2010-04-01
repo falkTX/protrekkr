@@ -33,6 +33,7 @@
 // Includes
 #include "include/editor_setup.h"
 #include "include/editor_sequencer.h"
+#include "include/editor_pattern.h"
 #include "../midi/include/midi.h"
 
 // ------------------------------------------------------
@@ -45,6 +46,7 @@ extern int Beveled;
 extern char Use_Shadows;
 extern int Continuous_Scroll;
 extern int wait_AutoSave;
+extern char Global_Patterns_Zoom;
 
 extern int Nbr_Keyboards;
 extern int Keyboard_Idx;
@@ -57,6 +59,13 @@ int current_palette_idx;
 char Paste_Across;
 
 extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+
+char *Labels_PatSize[] =
+{
+    "Small",
+    "Medium",
+    "Large"
+};
 
 char *Labels_AutoSave[] =
 {
@@ -94,21 +103,28 @@ void Draw_Master_Ed(void)
 
     char middev[80];
 
-#if defined(__NO_MIDI__)
-    sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", 0, 0);
-#else
-    sprintf(middev, "Midi Setup. Found: %d Midi-In devices and %d Midi-Out devices.", n_midiindevices, n_midioutdevices);
-#endif
-    Gui_Draw_Button_Box(8, 466, 310, 78, middev, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(8, 467, 310, 64, "", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(12, 484, 56, 16, "Midi IN", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(12, 502, 56, 16, "Midi OUT", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(12, 522, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
+#if defined(__NO_MIDI__)
+    sprintf(middev, "In (%d)", 0);
+#else
+    sprintf(middev, "In (%d)", n_midiindevices);
+#endif
+    Gui_Draw_Button_Box(12, 471, 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
+
+#if defined(__NO_MIDI__)
+    sprintf(middev, "Out (%d)", 0);
+#else
+    sprintf(middev, "Out (%d)", n_midioutdevices);
+#endif
+
+    Gui_Draw_Button_Box(12, 490, 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(12, 510, 124, 16, "All Notes Off (Track)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
     );
-    Gui_Draw_Button_Box(138, 522, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
+    Gui_Draw_Button_Box(138, 510, 124, 16, "All Notes Off (Song)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
 #if defined(__NO_MIDI__)
     | BUTTON_DISABLED
 #endif
@@ -132,6 +148,8 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 535, 29, 16, "4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 29, 16, "5", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 555, 29, 16, "6", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+    Gui_Draw_Button_Box(8, 535, 110, 16, "Default Pattern Zoom", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(194, 555, 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -196,6 +214,7 @@ void Actualize_Master_Ed(char gode)
         }
         if(gode == 7) Actupated(0);
 
+        // Use decimal numbering for rows
         if(gode == 0 || gode == 8)
         {
             if(Rows_Decimal)
@@ -210,6 +229,7 @@ void Actualize_Master_Ed(char gode)
             }
         }
 
+        // Show Prev. next pattern
         if(gode == 0 || gode == 13)
         {
             if(See_Prev_Next_Pattern)
@@ -224,6 +244,7 @@ void Actualize_Master_Ed(char gode)
             }
         }
 
+        // Don't stop at the bottom of a pattern
         if(gode == 0 || gode == 14)
         {
             if(Continuous_Scroll)
@@ -338,43 +359,45 @@ void Actualize_Master_Ed(char gode)
         Midi_InitOut();
 #endif
 
+        // Select midi in device
         if(gode == 0 || gode == 11)
         {
 #if defined(__NO_MIDI__)
-            value_box(70, 484, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+            value_box(70, 471, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
 #else
-            value_box(70, 484, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(70, 471, c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
 #if !defined(__NO_MIDI__)
             if(c_midiin != -1)
             {
-                Gui_Draw_Button_Box(132, 484, 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 471, 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
 #endif
-                Gui_Draw_Button_Box(132, 484, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 471, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
 #if !defined(__NO_MIDI__)
             }
 #endif
         }
 
+        // Select midi out device
         if(gode == 0 || gode == 12)
         {
 #if defined(__NO_MIDI__)
-            value_box(70, 502, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+            value_box(70, 490, 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
 #else
-            value_box(70, 502, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(70, 490, c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
 #if !defined(__NO_MIDI__)
             if(c_midiout != -1)
             {
-                Gui_Draw_Button_Box(132, 502, 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 490, 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
 #endif
-                Gui_Draw_Button_Box(132, 502, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(132, 490, 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
 #if !defined(__NO_MIDI__)
             }
 #endif
@@ -439,6 +462,15 @@ void Actualize_Master_Ed(char gode)
             Actupated(0);
         }
 
+        // Set default size of patterns
+        if(gode == 0 || gode == 21)
+        {
+            if(AutoSave < TRACK_SMALL) AutoSave = TRACK_SMALL;
+            if(Global_Patterns_Zoom >= TRACK_LARGE) Global_Patterns_Zoom = TRACK_LARGE;
+            Gui_Draw_Button_Box(120, 535, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(120 + 18, 535, 46, 16, Labels_PatSize[Global_Patterns_Zoom], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(120 + 48 + 18, 535, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        }
     }
 }
 
@@ -734,6 +766,22 @@ void Mouse_Left_Master_Ed(void)
             teac = 20;
         }
 
+        // Default patterns zoom
+        if(zcheckMouse(120, 535, 16, 16) == 1)
+        {
+            Global_Patterns_Zoom--;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 21;
+        }
+
+        // Default patterns zoom
+        if(zcheckMouse(120 + 48 + 18, 535, 16, 16) == 1)
+        {
+            Global_Patterns_Zoom++;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 21;
+        }
+
         // Autosave
         if(zcheckMouse(520 + 62 + 2, 455, 16, 16) == 1)
         {
@@ -756,7 +804,7 @@ void Mouse_Left_Master_Ed(void)
 
         // Midi track notes off
 #if !defined(__NO_MIDI__)
-        if(zcheckMouse(12, 522, 124, 16) == 1 && c_midiout != -1)
+        if(zcheckMouse(12, 510, 124, 16) == 1 && c_midiout != -1)
         {
             Midi_NoteOff(Track_Under_Caret, -1);
             int i;
@@ -770,7 +818,7 @@ void Mouse_Left_Master_Ed(void)
 
         // All Midi notes off
 #if !defined(__NO_MIDI__)
-        if(zcheckMouse(138, 522, 124, 16) == 1 && c_midiout != -1)
+        if(zcheckMouse(138, 510, 124, 16) == 1 && c_midiout != -1)
         {
             Midi_AllNotesOff();
             gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
@@ -779,7 +827,7 @@ void Mouse_Left_Master_Ed(void)
 
 #if !defined(__NO_MIDI__)
         // Previous midi in device
-        if(zcheckMouse(70, 484, 16, 16))
+        if(zcheckMouse(70, 471, 16, 16))
         {
             c_midiin--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -787,7 +835,7 @@ void Mouse_Left_Master_Ed(void)
             teac = 11;
         }
         // Next midi in device
-        if(zcheckMouse(114, 484, 16, 16))
+        if(zcheckMouse(114, 471, 16, 16))
         {
             c_midiin++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -796,7 +844,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Previous midi out device
-        if(zcheckMouse(70, 502, 16, 16) == 1)
+        if(zcheckMouse(70, 490, 16, 16) == 1)
         {
             c_midiout--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -804,7 +852,7 @@ void Mouse_Left_Master_Ed(void)
             teac = 12;
         }
         // Next midi out device
-        if(zcheckMouse(114, 502, 16, 16) == 1)
+        if(zcheckMouse(114, 490, 16, 16) == 1)
         {
             c_midiout++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;

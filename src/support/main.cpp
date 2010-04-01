@@ -852,11 +852,17 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                             Env_Change = TRUE;
                             Init_UI();
                         }
+                        memset(Keys, 0, sizeof(Keys));
+                        memset(Keys_Sym, 0, sizeof(Keys_Sym));
+                        memset(Keys_Unicode, 0, sizeof(Keys_Raw));
+                        SDL_Event event;
+                        while(SDL_PollEvent(&event));
                     }
                     else
                     {
                         memset(Keys, 0, sizeof(Keys));
                         memset(Keys_Sym, 0, sizeof(Keys_Sym));
+                        memset(Keys_Unicode, 0, sizeof(Keys_Raw));
                     }
                     break;
 
