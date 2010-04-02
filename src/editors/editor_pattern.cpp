@@ -56,10 +56,12 @@ MARKER Patterns_Marker;
 
 extern char Use_Shadows;
 
-char Global_Patterns_Zoom = TRACK_MEDIUM;
+char Global_Patterns_Font = TRACK_MEDIUM;
 
 int Current_Edit_Steps = 1;
 int Current_Octave = 4;
+
+int Real_Displayed_Tracks;
 
 char sr_isrecording = 0;
 
@@ -308,6 +310,7 @@ void draw_pated(int track, int line, int petrack, int row)
     int rel2_size2;
     int dover;
     int cur_track;
+    int save_dover;
 
     Cur_Position = Get_Song_Position();
 
@@ -336,13 +339,11 @@ void draw_pated(int track, int line, int petrack, int row)
         if(Track_Under_Caret == cur_track) SetColor(COL_PUSHED_MED);
         else SetColor(COL_PATTERN_LO_BACK);
 
+        if(dover + 2 >= MAX_PATT_SCREEN_X) break;
         dover += 2;
-        if(dover >= MAX_PATT_SCREEN_X) break;
 
+        if(dover + 4 >= MAX_PATT_SCREEN_X) break;
         dover += 4;
-        if(dover >= MAX_PATT_SCREEN_X) break;
-
-        Cur_Char_Function[cur_track].Fnc(dover - 1, 187, cur_track, 71, 71 + 6);
 
         shadow_tracks[cur_track] = FALSE;
         if(!CHAN_ACTIVE_STATE[Cur_Position][cur_track])
@@ -350,28 +351,44 @@ void draw_pated(int track, int line, int petrack, int row)
             shadow_tracks[cur_track] = Use_Shadows;
         }
 
+        save_dover = dover;
+        if(dover + 1 >= MAX_PATT_SCREEN_X) break;
+        dover++;
+
+        // Draw the tracks headers
+
+        // Channel number
+        if((dover + (Cur_Char_size[cur_track] + 1)) >= MAX_PATT_SCREEN_X) break;
+        Cur_Char_Function[cur_track].Fnc(dover, 187, cur_track, 71, 71 + 6);
+        dover += Cur_Char_size[cur_track] + 1;
+
         // Mute on/off
-        if((dover + (Cur_Char_size[cur_track])) >= MAX_PATT_SCREEN_X) break;
-        if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track], 187, 25, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track], 187, 26, 0, 0);
+        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover, 187, 25, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover, 187, 26, 0, 0);
+        dover += 29;
 
         // Active on/off
-        if((dover + Cur_Char_size[cur_track] + 29) >= MAX_PATT_SCREEN_X) break;
-        if(CHAN_ACTIVE_STATE[Cur_Position][cur_track]) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29, 187, 23, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29, 187, 24, 0, 0);
+        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if(CHAN_ACTIVE_STATE[Cur_Position][cur_track]) Cur_Char_Function[cur_track].Fnc(dover, 187, 23, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover, 187, 24, 0, 0);
+        dover += 29;
 
         // Zoom on/off
-        if((dover + Cur_Char_size[cur_track] + 29 + 29) >= MAX_PATT_SCREEN_X) break;
-        if(Get_Track_Type(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 27, 0, 0);
-        else Cur_Char_Function[cur_track].Fnc(dover + Cur_Char_size[cur_track] + 29 + 29, 187, 28, 0, 0);
+        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if(Get_Track_Type(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover, 187, 27, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover, 187, 28, 0, 0);
+        dover += 29;
 
         // Caret track marker
-        if((dover + Cur_Char_size[cur_track] + 29 + 29 + 17) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 17) >= MAX_PATT_SCREEN_X) break;
         if(Track_Under_Caret == cur_track) SetColor(COL_VUMETERPEAK);
         else SetColor(COL_PATTERN_LO_BACK);
-        bjbox(dover + Cur_Char_size[cur_track] + 29 + 29 + 17, 187, 12, 7);
+        bjbox(dover, 187, 12, 7);
 
-        // On / off
+        dover = save_dover;
+
+        // Calculate the place holder for the tracks data
         for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
         {
             dover += Cur_Char_size[cur_track] * 3;
@@ -548,7 +565,6 @@ Disp:;
 void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
                        int y, int rel, int track, int tVisible_Columns, int pattern)
 {
-    int old_dover;
     int cur_column;
     int offset_t;
     int cur_color;
@@ -560,6 +576,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     int Fx_Color;
     int tracky;
     int cur_track;
+    int dover_break;
     int i;
 
     if(!In_Prev_Next) Shadow_Pattern = FALSE;
@@ -589,7 +606,6 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
     }
     
     dover = PAT_COL_NOTE;
-    old_dover = PAT_COL_NOTE;
 
     for(tracky = 0; tracky < tVisible_Columns; tracky++)
     {
@@ -615,16 +631,13 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         unsigned char p_f2 = *(RawPatterns + offset_t + PATTERN_FXDATA2);
         unsigned char p_f2h = p_f2 & 0xf;
 
-        // Row
+        // Don't draw the 2 gaps if the next char can't be drawn
+        if(dover + 6 + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
         cur_color = Get_Nibble_Color(In_Prev_Next, rel, cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
         Letter(dover, y, 20, cur_color, cur_color + 7);
-        old_dover = dover;
         dover += 2;
-        if(dover >= MAX_PATT_SCREEN_X) break;
         Letter(dover, y, 30, cur_color, cur_color + 7);
-        old_dover = dover;
         dover += 4;
-        if(dover >= MAX_PATT_SCREEN_X) break;
 
         // Notes/Instruments
         for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
@@ -633,70 +646,70 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
             p_b = *(RawPatterns + offset_t + PATTERN_INSTR1 + (i * 2));
             p_bh = p_b & 0xf;
 
-            if(dover + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
-     
+            dover_break = dover + (Cur_Char_size[cur_track] * 3);
+            if(dover_break >= MAX_PATT_SCREEN_X) break;
             Cur_Note_Function[cur_track].Fnc(dover, y, p_a, cur_color, cur_color + 7);
-
-            old_dover = dover;
             dover += Cur_Char_size[cur_track] * 3;
-            if(dover >= MAX_PATT_SCREEN_X) break;
 
-            old_dover = dover;
-            if((dover + PAT_COL_SHIFT - 2) >= MAX_PATT_SCREEN_X) break;
+            // Don't draw the gap if the next char can't be drawn
+            dover_break = (dover + PAT_COL_SHIFT - 2) + Cur_Char_size[cur_track];
+            if(dover_break >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
             dover += PAT_COL_SHIFT - 2;
 
             // Instrument
+            dover_break = dover + Cur_Char_size[cur_track];
+            if(dover_break >= MAX_PATT_SCREEN_X) break;
             if(p_b != 255)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_b >> 4) Cur_Char_Function[cur_track].Fnc(dover, y, p_b >> 4, cur_color, cur_color + 7);
                 else Cur_Char_Function[cur_track].Fnc(dover, y, 20, cur_color, cur_color + 7);
                 dover += Cur_Char_size[cur_track];
                 
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
+                dover_break = dover + Cur_Char_size[cur_track];
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
                 Cur_Char_Function[cur_track].Fnc(dover, y, p_bh, cur_color, cur_color + 7);
                 dover += Cur_Char_size[cur_track];
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
                 dover += Cur_Char_size[cur_track];
 
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
+                dover_break = dover + Cur_Char_size[cur_track];
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
                 Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
                 dover += Cur_Char_size[cur_track];
             }
+
+            // Don't draw the gap if the next char can't be drawn
+            dover_break = dover + 2;
+            // Is there at least 1 note after this ?
+            // Then check if it can be drawn properly
+            if(i < Channels_MultiNotes[cur_track] - 1) dover_break += (Cur_Char_size[cur_track] * 3);
+            if(dover_break >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
-            old_dover = dover;
             dover += 2;
         }
-        if(dover >= MAX_PATT_SCREEN_X) break;
+        if(dover_break >= MAX_PATT_SCREEN_X) break;
 
-        old_dover = dover;
-        if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+        // Don't draw the gap if the next char can't be drawn
+        if(dover + (PAT_COL_SHIFT + Cur_Char_size[cur_track]) >= MAX_PATT_SCREEN_X) break;
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         dover += PAT_COL_SHIFT;
 
         // Volume
+        if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
         if(p_c != 255)
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(p_c >> 4) Cur_Char_Function[cur_track].Fnc(dover, y, p_c >> 4, cur_color, cur_color + 7);
             else Cur_Char_Function[cur_track].Fnc(dover, y, 20, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
 
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_ch, cur_color, cur_color + 7);
@@ -704,34 +717,29 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
         else
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
 
-            old_dover = dover;
-            if(dover +Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         }
 
-        old_dover = dover;
-        if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+        // Don't draw the gap if the next char can't be drawn
+        if(dover + (PAT_COL_SHIFT + Cur_Char_size[cur_track]) >= MAX_PATT_SCREEN_X) break;
         cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         dover += PAT_COL_SHIFT;
 
         // Panning
+        if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
         if(p_d != 255)
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(p_d >> 4) Cur_Char_Function[cur_track].Fnc(dover, y, p_d >> 4, cur_color, cur_color + 7);
             else Cur_Char_Function[cur_track].Fnc(dover, y, 20, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
 
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_dh, cur_color, cur_color + 7);
@@ -739,45 +747,38 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
         else
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
 
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         }
 
-        old_dover = dover;
-        if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+        // Don't draw the gap if the next char can't be drawn
+        if(dover + (PAT_COL_SHIFT + Cur_Char_size[cur_track]) >= MAX_PATT_SCREEN_X) break;
         cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
-        // Effect
         Cur_Char_Function[cur_track].Fnc(dover, y, 29, cur_color, cur_color + 7);
         dover += PAT_COL_SHIFT;
 
+        // Effect 1
+        if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
         if(!p_e && !p_f)
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
             
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
@@ -785,51 +786,43 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
         else
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, y, p_e >> 4, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_eh, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f >> 4, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_fh, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         }
 
+        // Effect 2
+        if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
         if(!p_e2 && !p_f2)
         {
-            old_dover = dover;
+            cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
+            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
+            dover += Cur_Char_size[cur_track];
+        
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
-            cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
-            Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
-            dover += Cur_Char_size[cur_track];
-        
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, 21, cur_color, cur_color + 7);
@@ -837,25 +830,20 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
         else
         {
-            old_dover = dover;
-            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_e2 >> 4, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
 
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_e2h, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f2 >> 4, cur_color, cur_color + 7);
             dover += Cur_Char_size[cur_track];
         
-            old_dover = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color(In_Prev_Next, rel, ++cur_column, multip, Shadow_Pattern | shadow_tracks[cur_track]);
             Cur_Char_Function[cur_track].Fnc(dover, y, p_f2h, cur_color, cur_color + 7);
@@ -897,15 +885,6 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         }
     }
 
-    // Complete it if necessary
-    if(dover >= MAX_PATT_SCREEN_X)
-    {
-        if(old_dover < CONSOLE_WIDTH - 19)
-        {
-            Fillrect(old_dover, y, CONSOLE_WIDTH - 19, y + 7 + 1);
-        }
-    }
-
     ptr_table_decimal = table_decimal + (rel * 3);
 
     // Display the row index
@@ -934,7 +913,6 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
 void draw_pated_highlight(int track, int line, int petrack, int row)
 {
     int offset_t;
-    int old_dover;
     int dover;
     int cur_column;
     int cur_color;
@@ -946,6 +924,8 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
     int high_col;
     int i;
     int rec_to_fx2;
+    int dover_break;
+    int Real_visible;
 
     int tVisible_Columns = Visible_Columns;
 
@@ -985,14 +965,16 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         bjbox(1, YVIEW, CHANNELS_WIDTH - 1, 16);
 
         dover = PAT_COL_NOTE;
-        old_dover = PAT_COL_NOTE;
 
         cur_column = Get_Track_Nibble_Start(Channels_MultiNotes, track) + track;
 
+        Real_visible = 0;
+        
         for(tracky = 0; tracky < tVisible_Columns; tracky++)
         {
             int cur_track = track + tracky;
 
+            Real_visible++;
             offset_t = Get_Pattern_Offset(pattern, cur_track, line);
 
             unsigned char p_a;
@@ -1012,16 +994,15 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             unsigned char p_f2 = *(RawPatterns + offset_t + PATTERN_FXDATA2);
             unsigned char p_f2h = p_f2 & 0xf;
 
-            // Row
+            // Don't draw the gap if there's nothing to draw after that
+            if(dover + 2 + 4 + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, cur_column);
             Letter(dover, YVIEW, 20, cur_color, cur_color + 15);
-            old_dover = dover;
             dover += 2;
-            if(dover >= MAX_PATT_SCREEN_X) break;
+
+            if(dover + 4 >= MAX_PATT_SCREEN_X) break;
             Letter(dover, YVIEW, 30, cur_color, cur_color + 15);
-            old_dover = dover;
             dover += 4;
-            if(dover >= MAX_PATT_SCREEN_X) break;
 
             high_col = 0;
 
@@ -1033,88 +1014,79 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 p_bh = p_b & 0xf;
 
                 // Note
-                old_dover = dover;
-                if(dover + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
-                
+                dover_break = dover + (Cur_Char_size[cur_track] * 3);
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack) Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, 48, 48 + 15);
                 else Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track] * 3;
                 high_col++;
-                if(dover >= MAX_PATT_SCREEN_X) break;
 
                 // Instrument hi
-                old_dover = dover;
-                if((dover + PAT_COL_SHIFT - 2) >= MAX_PATT_SCREEN_X) break;
+                dover_break = (dover + PAT_COL_SHIFT - 2) + Cur_Char_size[cur_track];
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
-                // (gap)
                 Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
                 dover += PAT_COL_SHIFT - 2;
 
+                dover_break = dover + Cur_Char_size[cur_track];
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack)
                 {
-                    old_dover = dover;
-                    if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                     if(p_b != 255)
                     {
                         if(p_b >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_b >> 4, 48, 48 + 15);
                         else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 20, 48, 48 + 15);
                     }
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
-                    dover += Cur_Char_size[cur_track];
                 }
                 else
                 {
-                    old_dover = dover;
-                    if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                     if(p_b != 255)
                     {
                         if(p_b >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_b >> 4, cur_color, cur_color + 15);
                         else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 20, cur_color, cur_color + 15);
                     }
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
-                    dover += Cur_Char_size[cur_track];
                 }
+                dover += Cur_Char_size[cur_track];
                 high_col++;
 
                 // Instrument lo
+                dover_break = dover + Cur_Char_size[cur_track];
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack)
                 {
-                    old_dover = dover;
-                    if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                     if(p_b != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_bh, 48, 48 + 15);
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
-                    dover += Cur_Char_size[cur_track];
                 }
                 else
                 {
-                    old_dover = dover;
-                    if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                     if(p_b != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_bh, cur_color, cur_color + 15);
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
-                    dover += Cur_Char_size[cur_track];
                 }
+                dover += Cur_Char_size[cur_track];
 
-                // (gap)
+                // More notes to draw ?
+                dover_break = dover + 2;
+                if(i < Channels_MultiNotes[cur_track] - 1) dover_break += (Cur_Char_size[cur_track] * 3);
+                if(dover_break >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
-                old_dover = dover;
                 dover += 2;
 
                 high_col++;
             }
-            if(dover >= MAX_PATT_SCREEN_X) break;
+            if(dover_break >= MAX_PATT_SCREEN_X) break;
 
             // Volume hi
-            old_dover = dover;
-            if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+            if(dover + PAT_COL_SHIFT + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
 
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_c != 255)
                 {
                     if(p_c >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_c >> 4, 48, 48 + 15);
@@ -1125,8 +1097,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_c != 255)
                 {
                     if(p_c >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_c >> 4, cur_color, cur_color + 15);
@@ -1138,19 +1108,16 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             high_col++;
 
             // Volume lo
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             if(row == high_col && cur_track == petrack)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_c != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_ch, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 dover += Cur_Char_size[cur_track];
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_c != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_ch, cur_color, cur_color + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
@@ -1158,16 +1125,14 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             high_col++;
 
             // Panning hi
-            old_dover = dover;
-            if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+            if(dover + PAT_COL_SHIFT + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
 
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_d != 255)
                 {
                     if(p_d >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_d >> 4, 48, 48 + 15);
@@ -1178,8 +1143,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_d != 255)
                 {
                     if(p_d >> 4) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_d >> 4, cur_color, cur_color + 15);
@@ -1191,19 +1154,16 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             high_col++;
 
             // Panning lo
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             if(row == high_col && cur_track == petrack)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_d != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_dh, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 dover += Cur_Char_size[cur_track];
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(p_d != 255) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_dh, cur_color, cur_color + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
@@ -1211,23 +1171,20 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             high_col++;
 
             //  Effect hi
-            old_dover = dover;
-            if(dover + PAT_COL_SHIFT >= MAX_PATT_SCREEN_X) break;
+            if(dover + PAT_COL_SHIFT + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
 
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(!p_e && !p_f)
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
                 high_col++;
 
                 //  Effect lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
@@ -1236,7 +1193,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data hi
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
@@ -1246,7 +1202,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
@@ -1256,15 +1211,12 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             }
             else
             {
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
                 high_col++;
 
                 //  Effect lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, 48, 48 + 15);
@@ -1273,7 +1225,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data hi
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if((p_e >> 4) == 0) if(p_eh == 0x07) synchro_fx = TRUE;
@@ -1283,7 +1234,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, 48, 48 + 15);
@@ -1293,11 +1243,10 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             }
 
             // Fx 2
+            if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(!p_e2 && !p_f2)
             {
                 // Effect hi
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
@@ -1305,7 +1254,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
@@ -1314,7 +1262,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data hi
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if((p_e2 >> 4) == 0) if(p_e2h == 0x07) synchro_fx = TRUE;
@@ -1324,7 +1271,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
@@ -1335,8 +1281,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             else
             {
                 // Effect hi
-                old_dover = dover;
-                if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2 >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2 >> 4, cur_color, cur_color + 15);
@@ -1344,7 +1288,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2h, 48, 48 + 15);
@@ -1353,7 +1296,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data hi
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if((p_e2 >> 4) == 0) if(p_e2h == 0x07) synchro_fx = TRUE;
@@ -1363,7 +1305,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 high_col++;
 
                 //  Effect data lo
-                old_dover = dover;
                 if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2h, 48, 48 + 15);
@@ -1475,16 +1416,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 } // Close liveparam updated
             } // Close is recording
         }
-
-        // Complete it if necessary
-        if(dover >= MAX_PATT_SCREEN_X)
-        {
-            if(old_dover < CONSOLE_WIDTH - 19)
-            {
-                SetColor(COL_PATTERN_LO_BACK);
-                Fillrect(old_dover, YVIEW, CONSOLE_WIDTH - 19, YVIEW + 15 + 1);
-            }
-        }
+        Visible_Columns = Real_visible;
 
         // Row number
         ptr_table_decimal = table_decimal + (line * 3);
@@ -1676,8 +1608,8 @@ void Draw_Pattern_Right_Stuff()
 
     DrawVLine(0, 184, 349 + (16 * 5) + Patterns_Lines_Offset, COL_BLACK);
     // 196
-    Gui_Draw_Button_Box(782, 184, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(782, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(782, 184, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Button_Box(782, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
     High[Curr_Buff_Block] = BUTTON_PUSHED;
 
@@ -1750,11 +1682,15 @@ int Get_Nibble_Color_Highlight(int row, int column)
 
 // ------------------------------------------------------
 // Return the size in pixel of a given track
-int Get_Track_Size(int Track)
+int Get_Track_Size(int Track, int *Column)
 {
     int i;
     int dover = 0;
     int old_dover = 0;
+    int Phony;
+
+    if(Column == NULL) Column = &Phony;
+    *Column = 0;
 
     // Gap
     old_dover = dover;
@@ -1772,6 +1708,7 @@ int Get_Track_Size(int Track)
         old_dover = dover;
         dover += Cur_Char_size[Track] * 3;
         if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        *Column += 1;
 
         // Gap
         old_dover = dover;
@@ -1782,10 +1719,12 @@ int Get_Track_Size(int Track)
         old_dover = dover;
         dover += Cur_Char_size[Track];
         if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        *Column += 1;
 
         old_dover = dover;
         dover += Cur_Char_size[Track];
         if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+        *Column += 1;
 
         // Gap
         old_dover = dover;
@@ -1802,9 +1741,12 @@ int Get_Track_Size(int Track)
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
 
     // Gap
     old_dover = dover;
@@ -1815,9 +1757,12 @@ int Get_Track_Size(int Track)
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
 
     // Gap
     old_dover = dover;
@@ -1828,29 +1773,43 @@ int Get_Track_Size(int Track)
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
 
     // Effect 2
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
+
     old_dover = dover;
     dover += Cur_Char_size[Track];
     if(dover >= MAX_PATT_SCREEN_X) return(old_dover);
+    *Column += 1;
 
     return(dover);
 }
@@ -1861,23 +1820,25 @@ int Get_Visible_Tracks_Size(void)
 {
     int i;
     int size = 0;
+    int column = 0;
 
     for(i = gui_track; i < (gui_track + Visible_Columns); i++)
     {
-        size += Get_Track_Size(i);
+        size += Get_Track_Size(i, &column);
+        if(size >= MAX_PATT_SCREEN_X) break;
     }
     return(size);
 }
 
 // ------------------------------------------------------
 // Return the index of the track located under the mouse pointer
-int Get_Track_Over_Mouse(void)
+int Get_Track_Over_Mouse(int Mouse)
 {
     int i;
     int bound_left = 0;
     int bound_right = 0;
     int under_mouse = 0;
-    int mouse_coord = Mouse.x;
+    int mouse_coord = Mouse;
     int found_track;
     int track_size;
 
@@ -1935,7 +1896,7 @@ int Get_Track_Over_Mouse(void)
         }
         for(i = gui_track; i < (gui_track + tVisible_Columns); i++)
         {
-            track_size = Get_Track_Size(i);
+            track_size = Get_Track_Size(i, NULL);
             bound_right += track_size;
             if(mouse_coord >= bound_left && mouse_coord < bound_right)
             {
@@ -2112,26 +2073,196 @@ int Get_Column_Idx(int track, int mouse_coord)
 }
 
 // ------------------------------------------------------
-// Return the index of the column located under the mouse pointer
-int Get_Column_Over_Mouse(void)
+// Return the last visible column and track
+int Get_Last_Column_And_Track(int *track, int *pen_column)
 {
+    int i;
+    int dover = 0;
+    int old_dover = 0;
+    int column = 0;
+    int pixel_visible_tracks = PAT_COL_NOTE;
+    int channel_size;
+    int cur_track;
+
+    *track = gui_track;
+    *pen_column = 0;
+    for(i = gui_track; i < Songtracks; i++)
+    {
+        channel_size = Get_Track_Size(i, NULL);
+        if((pixel_visible_tracks + channel_size - 1) >= MAX_PATT_SCREEN_X)
+        {
+            break;
+        }
+        *track += 1;
+        pixel_visible_tracks += channel_size;
+    }
+
+    cur_track = *track;
+
+    // Start at last track
+    dover = pixel_visible_tracks;
+
+    // Gap
+    old_dover = dover;
+    dover += 2;
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+    old_dover = dover;
+    dover += 4;
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+    // On / off
+    for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
+    {
+        // Note
+        old_dover = dover;
+        dover += Cur_Char_size[cur_track] * 3;
+        if(dover >= MAX_PATT_SCREEN_X) return(column);
+        column++;
+
+        // Gap
+        old_dover = dover;
+        dover += PAT_COL_SHIFT - 2;
+        if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+        // Instrument
+        old_dover = dover;
+        dover += Cur_Char_size[cur_track];
+        if(dover >= MAX_PATT_SCREEN_X) return(column);
+        column++;
+
+        old_dover = dover;
+        dover += Cur_Char_size[cur_track];
+        if(dover >= MAX_PATT_SCREEN_X) return(column);
+        column++;
+
+        // Gap
+        old_dover = dover;
+        dover += 2;
+        if(dover >= MAX_PATT_SCREEN_X) return(column);
+    }
+
+    // Gap
+    old_dover = dover;
+    dover += PAT_COL_SHIFT;
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+    // Volume
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    // Gap
+    old_dover = dover;
+    dover += PAT_COL_SHIFT;
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+    // Panning
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    // Gap
+    old_dover = dover;
+    dover += PAT_COL_SHIFT;
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+
+    // Effect
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    // Effect 2
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    old_dover = dover;
+    dover += Cur_Char_size[cur_track];
+    if(dover >= MAX_PATT_SCREEN_X) return(column);
+    column++;
+
+    return(column);
+}
+
+// ------------------------------------------------------
+// Return the index of the column located under the mouse pointer
+void Get_Column_Over_Mouse(int *track, int *column)
+{
+
     int i;
     int max_tr = 6;
     int dover = 0;
     int old_dover = 0;
     int track_size;
+    int last_column;
+    int pen_column;
+    int last_track;
+    int mouse;
+    int tmp_track;
+    int mouse_coord;
+    int tmp_column;
 
-    int track = Get_Track_Over_Mouse();
-    int mouse_coord = Mouse.x - PAT_COL_NOTE;
-    int column = 0;
+    mouse = Mouse.x;
 
-    for(i = track - 1; i >= gui_track; i--)
+get_tracks_boundaries:
+    tmp_track = Get_Track_Over_Mouse(mouse);
+    mouse_coord = mouse - PAT_COL_NOTE;
+
+    for(i = tmp_track - 1; i >= gui_track; i--)
     {
-        track_size = Get_Track_Size(i);
+        track_size = Get_Track_Size(i, NULL);
         mouse_coord -= track_size;
     }
-    column = Get_Column_Idx(track, mouse_coord);
-    return(column);
+    tmp_column = Get_Column_Idx(tmp_track, mouse_coord);
+
+    last_column = Get_Last_Column_And_Track(&last_track, &pen_column);
+    if(tmp_track >= last_track && tmp_column >= last_column)
+    {
+        mouse--;
+        goto get_tracks_boundaries;
+    }
+    *track = tmp_track;
+    *column = tmp_column;
 }
 
 // ------------------------------------------------------
@@ -2167,8 +2298,8 @@ int Get_Visible_Complete_Tracks(void)
 
     for(i = gui_track; i < Songtracks; i++)
     {
-        channel_size = Get_Track_Size(i);
-        if((pixel_visible_tracks + channel_size - 1) > CHANNELS_WIDTH)
+        channel_size = Get_Track_Size(i, NULL);
+        if((pixel_visible_tracks + channel_size - 1) >= MAX_PATT_SCREEN_X)
         {
             break;
         }
@@ -2245,8 +2376,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     // Position the caret on the specified track/column with the mouse
     if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset))
     {
-        Track_Under_Caret = Get_Track_Over_Mouse();
-        Column_Under_Caret = Get_Column_Over_Mouse();
+        Get_Column_Over_Mouse(&Track_Under_Caret, &Column_Under_Caret);
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
@@ -2348,9 +2478,12 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // End of the marking stuff
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset) && !Songplaying)
+    if(zcheckMouse(1, 194, MAX_PATT_SCREEN_X, 234 + Patterns_Lines_Offset) && !Songplaying)
     {
-        Mark_Block_End(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse(), 3);
+        int track;
+        int column;
+        Get_Column_Over_Mouse(&track, &column);
+        Mark_Block_End(column, track, Get_Line_Over_Mouse(), 3);
     }
 }
 
@@ -2363,9 +2496,12 @@ void Mouse_Left_Pattern_Ed(void)
     int tracks;
 
     // Start of the marking block
-    if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset) && !Songplaying)
+    if(zcheckMouse(1, 194, MAX_PATT_SCREEN_X, 234 + Patterns_Lines_Offset) && !Songplaying)
     {
-        Mark_Block_Start(Get_Column_Over_Mouse(), Get_Track_Over_Mouse(), Get_Line_Over_Mouse());
+        int track;
+        int column;
+        Get_Column_Over_Mouse(&track, &column);
+        Mark_Block_Start(column, track, Get_Line_Over_Mouse());
     }
 
     // Next/Prev rows buttons
@@ -2377,8 +2513,6 @@ void Mouse_Left_Pattern_Ed(void)
     if(zcheckMouse(782, 349 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
     {
         Goto_Next_Row();
-        teac = 0;
-        gui_action = GUI_CMD_UPDATE_SEQUENCER;
     }
 
     // Set buffer 1
@@ -2419,7 +2553,7 @@ void Mouse_Left_Pattern_Ed(void)
     }
 
     // Track mute
-    start_mute_check_x = PAT_COL_NOTE + 1 + 4;
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + 1;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
@@ -2428,26 +2562,26 @@ void Mouse_Left_Pattern_Ed(void)
             gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
             break;
         }
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
 
     // Track on/off
-    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + 29;
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + 29 + 1;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
             int Cur_Position = Get_Song_Position();
-            int tmp_track = Get_Track_Over_Mouse();
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
             Toggle_Track_On_Off_Status(Cur_Position, tmp_track);
             break;
         }
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
 
     // Track zoom > large
-    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2);
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2) + 1;
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
@@ -2456,7 +2590,7 @@ void Mouse_Left_Pattern_Ed(void)
             gui_action = GUI_CMD_SWITCH_TRACK_LARGE_STATE;
             break;
         }
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
 }
 
@@ -2485,14 +2619,15 @@ void Mouse_Right_Pattern_Ed(void)
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
+        if(start_mute_check_x + Cur_Char_size[i] >= MAX_PATT_SCREEN_X) break;
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
-            int tmp_track = Get_Track_Over_Mouse();
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
             Solo_Track(tmp_track);
             // Will unmute the correct track
             gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
         }
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
 
     // All tracks off but the selected one
@@ -2500,14 +2635,15 @@ void Mouse_Right_Pattern_Ed(void)
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
+        if(start_mute_check_x + Cur_Char_size[i] >= MAX_PATT_SCREEN_X) break;
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
             int Cur_Position = Get_Song_Position();
-            int tmp_track = Get_Track_Over_Mouse();
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
             Solo_Track_On_Off(Cur_Position, tmp_track);
             break;
         }
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
 
     // Track zoom > small
@@ -2515,9 +2651,22 @@ void Mouse_Right_Pattern_Ed(void)
     tracks = Get_Visible_Partial_Tracks();
     for(i = gui_track; i < gui_track + tracks; i++)
     {
+        if(start_mute_check_x + Cur_Char_size[i] >= MAX_PATT_SCREEN_X) break;
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10)) gui_action = GUI_CMD_SWITCH_TRACK_SMALL_STATE;
-        start_mute_check_x += Get_Track_Size(i);
+        start_mute_check_x += Get_Track_Size(i, NULL);
     }
+
+    // Next/Prev page buttons
+    if(zcheckMouse(782, 184, 16 + 1, 14) & !Songplaying)
+    {
+        Goto_Previous_Page();
+    }
+
+    if(zcheckMouse(782, 349 + Patterns_Lines_Offset, 16 + 1, 14) & !Songplaying)
+    {
+        Goto_Next_Page();
+    }
+
 }
 
 // ------------------------------------------------------
@@ -2707,7 +2856,7 @@ void Reset_Patterns_Zoom(void)
 
     for(i = 0; i < MAX_TRACKS; i++)
     {
-        Set_Track_Zoom(i, (TRACK_TYPE) Global_Patterns_Zoom);
+        Set_Track_Zoom(i, (TRACK_TYPE) Global_Patterns_Font);
     }
 }
 

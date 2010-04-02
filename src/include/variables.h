@@ -470,9 +470,9 @@ void UpSynth(int peac,int number);
 void ComputeStereo(char channel);
 void Keyboard_Handler(void);
 void Mouse_Handler(void);
-int Get_Track_Over_Mouse(void);
+int Get_Track_Over_Mouse(int Mouse);
 int Get_Line_Over_Mouse(void);
-int Get_Column_Over_Mouse(void);
+void Get_Column_Over_Mouse(int *track, int *column);
 void Set_Track_Slider(int pos);
 #define BLOCK_MARK_TRACKS 1
 #define BLOCK_MARK_ROWS 2

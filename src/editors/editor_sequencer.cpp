@@ -211,8 +211,8 @@ void Actualize_Seq_Ed(char gode)
         // Transpose
         if(gode == 0 || gode == 4)
         {
-            if(transpose_semitones < -100) transpose_semitones = -100;
-            if(transpose_semitones > 100) transpose_semitones = 100;
+            if(transpose_semitones < -120) transpose_semitones = -120;
+            if(transpose_semitones > 120) transpose_semitones = 120;
             value_box_format(720, 524, transpose_semitones, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE, "%d");
         }
     }
@@ -395,7 +395,6 @@ void Mouse_Left_Sequencer_Ed(void)
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
             teac = 4;
         }
-
 
         // Clear all
         if(zcheckMouse(4, 466, 80, 16))
@@ -780,6 +779,22 @@ void Mouse_Right_Sequencer_Ed(void)
                 SeqDelete(Cur_Position);
             }
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
+        }
+
+        // Transpose
+        if(zcheckMouse(720, 524, 16, 16) == 1)
+        {
+            transpose_semitones -= 12;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 4;
+        }
+
+        // Transpose
+        if(zcheckMouse(720 + 44, 524, 16, 16) == 1)
+        {
+            transpose_semitones += 12;
+            gui_action = GUI_CMD_UPDATE_SEQUENCER;
+            teac = 4;
         }
     }
 }

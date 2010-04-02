@@ -18,7 +18,7 @@ v2.0:
 - Patterns shading is also displayed for track which are turned off
   in the sequencer (shading can be turned on/off globally).
 - Improved sample editor:
-  - Speeded up (especially the selection) and overall cleaner processing.
+  - Speeded up (especially the while selecting) and overall cleaner processing.
   - Middle mouse button can now be used to zoom in/out.
   - Added cut/copy/paste with 4 copy buffers.
   - Crop function (remove everything from a waveform but the selection).
@@ -30,8 +30,8 @@ v2.0:
 - Added fine volume slide up and down effects (20 & 21).
 - Added fine pitch up and down effects (22 & 23).
 - Speed can now go up to 32 ticks/beat.
-- BPM weren't refresh properly on screen when being changed inside patterns.
-- Multi notes channels of modules weren't re-initialized & that could lead
+- BPM weren't refreshed properly on screen when being changed inside patterns.
+- Multi notes channels of modules weren't re-initialized& that could lead
   to a potential crash.
 - Instruments used without notes won't retrig the note but only change
   the waveform (like in the original protracker).
@@ -46,10 +46,16 @@ v2.0:
     LSHIFT + RCTRL: Play song from current position.
     RALT: Play pattern from start of pattern.
     LSHIFT + RALT: Play pattern from current position.
-- Added transposing capability to the instruments remapping functions.
+- Added transposing capability to the instruments remapping function.
 - Changed LCTRL+H & LCTRL+LSHIFT+H to LCTRL+K & LCTRL+LSHIFT+K.
-- Default patterns zoom selectable.
-- Effect 10 (Delay send) wasn't working when Track tab was selected.
+- Default patterns zoom is now selectable.
+- Effect 10 (Delay send) was inneffective when Track tab was selected.
+- Overall better accuracy in replaying and volume ramping.
+- Global volume of instruments weren't saved in .pti files.
+- Using non existant instruments in patterns should now be handled properly.
+- Converted some tunes from FastTracker 1 for test purposes.
+- Instruments amplifications don't modulate synths volume anymore
+  because that was stupid.
 
 v1.99e:
 

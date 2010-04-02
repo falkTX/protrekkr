@@ -188,6 +188,19 @@ union s_access
     int64 absolu;
 };
 
+typedef struct
+{
+    int inote;
+    int sample;
+    float vol;
+    float vol_synth;
+    unsigned int offset;
+    int glide;
+    int Play_Selection;
+    int midi_sub_channel;
+    int start_backward;
+} INSTR_SCHEDULE, *LPINSTR_SCHEDULE;
+
 // ------------------------------------------------------
 // Variables
 extern float decays[MAX_COMB_FILTERS];
@@ -247,7 +260,7 @@ extern Uint32 LoopEnd[MAX_INSTRS][16];
 extern char LoopType[MAX_INSTRS][16];
 extern Uint32 SampleNumSamples[MAX_INSTRS][16];
 extern char Finetune[MAX_INSTRS][16];
-extern float SampleVol[MAX_INSTRS][16];
+extern float Sample_Amplify[MAX_INSTRS][16];
 extern float FDecay[MAX_INSTRS][16];
 extern short *RawSamples[MAX_INSTRS][2][16];
 extern char SampleChannels[MAX_INSTRS][16];         // Mono / Stereo
@@ -309,7 +322,7 @@ extern short beatlines[128];
 
 extern float REVERBFILTER;
 
-extern float CustomVol[128];
+extern float Sample_Vol[MAX_INSTRS];
 
 #if !defined(__STAND_ALONE__)
 extern unsigned int SubCounter;
@@ -318,6 +331,7 @@ extern int plx;
 extern int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int Locked_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
+extern int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH)
 extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
@@ -360,10 +374,11 @@ extern int DelayType;
 // Functions
 void Pre_Song_Init(void);
 void Sp_Player(void);
-void Play_Instrument(int channel, int sub_channel,
-                     int note, int sample,
-                     float vol, unsigned int offset,
-                     int glide, int Play_Selection, int midi_sub_channel);
+void Schedule_Instrument(int channel, int sub_channel,
+                         int note, int sample,
+                         float vol, float vol_synth, unsigned int offset,
+                         int glide, int Play_Selection, int midi_sub_channel);
+void Play_Instrument(int channel, int sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
 void GetPlayerValues(void);

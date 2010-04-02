@@ -902,7 +902,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_MUTE_STATE)
         {
-            int tmp_track = Get_Track_Over_Mouse();
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
 
             if(CHAN_MUTE_STATE[tmp_track] == 0) CHAN_MUTE_STATE[tmp_track] = 1;
             else CHAN_MUTE_STATE[tmp_track] = 0;
@@ -913,13 +913,13 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_LARGE_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(), TRUE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x), TRUE);
             Actupated(0);
         }
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_SMALL_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(), FALSE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x), FALSE);
             Actupated(0);
         }
 
@@ -1319,7 +1319,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_AMPLI)
         {
-            SampleVol[Current_Sample][Current_Sample_Split] = float((Mouse.x - 436) / 32.0f);
+            Sample_Amplify[Current_Sample][Current_Sample_Split] = float((Mouse.x - 436) / 32.0f);
             Actualize_Instrument_Ed(0, 1);
         }
 
@@ -1720,10 +1720,10 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
     LoopType[n_index][split] = SMP_LOOP_NONE;
     SampleNumSamples[n_index][split] = lenfir;
     Finetune[n_index][split] = 0;
-    SampleVol[n_index][split] = 1.0f;
+    Sample_Amplify[n_index][split] = 1.0f;
     FDecay[n_index][split] = 0.0f;
     Basenote[n_index][split] = DEFAULT_BASE_NOTE;
-    CustomVol[n_index] = 1.0f;
+    Sample_Vol[n_index] = 0.0f;
     Midiprg[n_index] = -1;
     Synthprg[n_index] = SYNTH_WAVE_OFF;
     beatsync[n_index] = FALSE;
@@ -1857,13 +1857,15 @@ void LoadFile(int Freeindex, const char *str)
            strcmp(extension, "TWNNINS4") == 0 ||
            strcmp(extension, "TWNNINS5") == 0 ||
            strcmp(extension, "TWNNINS6") == 0 ||
-           strcmp(extension, "TWNNINS7") == 0)
+           strcmp(extension, "TWNNINS7") == 0 ||
+           strcmp(extension, "TWNNINS8") == 0)
         {
             sprintf(instrname, "%s", FileName);
             LoadInst(instrname);
             Renew_Sample_Ed();
         }
-        else if(strcmp(extension, "TWNNSNG2") == 0 ||
+        else if(strcmp(extension, "TWNNSNG1") == 0 ||   // For salvage purpose
+                strcmp(extension, "TWNNSNG2") == 0 ||
                 strcmp(extension, "TWNNSNG3") == 0 ||
                 strcmp(extension, "TWNNSNG4") == 0 ||
                 strcmp(extension, "TWNNSNG5") == 0 ||
@@ -6290,11 +6292,12 @@ void Note_Jazz(int track, int note)
 
     if(Jazz_Edit || is_recording_2 || !is_editing)
     {
-        Play_Instrument(track, Sub_Channel,
-                        note,
-                        Current_Sample,
-                        CustomVol[Current_Sample],
-                        0, 0, !is_recording, -(Sub_Channel + 1));
+        Schedule_Instrument(track, Sub_Channel,
+                            note,
+                            Current_Sample,
+                            Sample_Vol[Current_Sample],
+                            PARASynth[Current_Sample].glb_volume * 0.0078125f,
+                            0, 0, !is_recording, -(Sub_Channel + 1));
     }
 }
 

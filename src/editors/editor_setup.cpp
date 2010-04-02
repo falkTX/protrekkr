@@ -46,7 +46,7 @@ extern int Beveled;
 extern char Use_Shadows;
 extern int Continuous_Scroll;
 extern int wait_AutoSave;
-extern char Global_Patterns_Zoom;
+extern char Global_Patterns_Font;
 
 extern int Nbr_Keyboards;
 extern int Keyboard_Idx;
@@ -149,7 +149,7 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, 555, 29, 16, "5", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, 555, 29, 16, "6", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(8, 535, 110, 16, "Default Pattern Zoom", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, 535, 110, 16, "Default Pattern Font", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(8, 555, 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(194, 555, 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -465,10 +465,10 @@ void Actualize_Master_Ed(char gode)
         // Set default size of patterns
         if(gode == 0 || gode == 21)
         {
-            if(AutoSave < TRACK_SMALL) AutoSave = TRACK_SMALL;
-            if(Global_Patterns_Zoom >= TRACK_LARGE) Global_Patterns_Zoom = TRACK_LARGE;
+            if(Global_Patterns_Font < TRACK_SMALL) Global_Patterns_Font = TRACK_SMALL;
+            if(Global_Patterns_Font >= TRACK_LARGE) Global_Patterns_Font = TRACK_LARGE;
             Gui_Draw_Button_Box(120, 535, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(120 + 18, 535, 46, 16, Labels_PatSize[Global_Patterns_Zoom], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(120 + 18, 535, 46, 16, Labels_PatSize[Global_Patterns_Font], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(120 + 48 + 18, 535, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
     }
@@ -769,7 +769,7 @@ void Mouse_Left_Master_Ed(void)
         // Default patterns zoom
         if(zcheckMouse(120, 535, 16, 16) == 1)
         {
-            Global_Patterns_Zoom--;
+            Global_Patterns_Font--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 21;
         }
@@ -777,7 +777,7 @@ void Mouse_Left_Master_Ed(void)
         // Default patterns zoom
         if(zcheckMouse(120 + 48 + 18, 535, 16, 16) == 1)
         {
-            Global_Patterns_Zoom++;
+            Global_Patterns_Font++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 21;
         }

@@ -100,7 +100,7 @@ extern char FullScreen;
 extern char AutoSave;
 extern int Beveled;
 extern char Use_Shadows;
-extern char Global_Patterns_Zoom;
+extern char Global_Patterns_Font;
 extern int Continuous_Scroll;
 extern char *cur_dir;
 extern char Scopish_LeftRight;
@@ -513,8 +513,8 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
 
             Finetune[swrite][0] = FineTune_Table[Finetune[swrite][0] & 0xf];
-            CustomVol[swrite] = Scale_AmigaMod_Value(fgetc(in), 63.0f, 0.99f);
-            SampleVol[swrite][0] = 0.5f;
+            Sample_Vol[swrite] = Scale_AmigaMod_Value(fgetc(in), 63.0f, 0.99f);
+            Sample_Amplify[swrite][0] = 0.5f;
             Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
 
             // Calculate/Adapt AMIGA loop points to ptk LoopPoints
@@ -1284,6 +1284,7 @@ int LoadMod(char *FileName)
     int j;
     int k;
     int Old_Ntk;
+    int Ntk_Beta;
     unsigned char *TmpPatterns;
     unsigned char *TmpPatterns_Tracks;
     unsigned char *TmpPatterns_Notes;
@@ -1307,6 +1308,7 @@ int LoadMod(char *FileName)
     FILE *in;
     in = fopen(FileName, "rb");
     Old_Ntk = FALSE;
+    Ntk_Beta = FALSE;
 
     if(in != NULL)
     {
@@ -1360,6 +1362,10 @@ int LoadMod(char *FileName)
             // Old noisetrekker
             case '2':
                 Old_Ntk = TRUE;
+
+            // Noisetrekker Beta (1.6)
+            case '1':
+                Ntk_Beta = TRUE;
         }
 
 Read_Mod_File:
@@ -1550,7 +1556,7 @@ Read_Mod_File:
 
                     Read_Mod_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                     Read_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
-                    Read_Mod_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
+                    Read_Mod_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                     Read_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
                     AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
@@ -1708,7 +1714,7 @@ Read_Mod_File:
 
         for(i = 0; i < MAX_INSTRS; i++)
         {
-            Read_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
+            Read_Mod_Data_Swap(&Sample_Vol[i], sizeof(float), 1, in);
         }
 
         if(!Portable) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
@@ -3430,7 +3436,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                     
                     Write_Mod_Data(&Calc_Len, sizeof(int), 1, in);
                     Write_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
-                    Write_Mod_Data(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
+                    Write_Mod_Data(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                     Write_Mod_Data(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
                     if(Apply_Interpolation)
@@ -3814,7 +3820,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
 
     if(Instrs)
     {
-        Write_Mod_Data(CustomVol, sizeof(float), MAX_INSTRS, in);
+        Write_Mod_Data(Sample_Vol, sizeof(float), MAX_INSTRS, in);
     }
 
     Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
@@ -4022,7 +4028,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                         
                         Write_Mod_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
-                        Write_Mod_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
+                        Write_Mod_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                         Write_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
                         // All samples are converted into 16 bits
@@ -4130,7 +4136,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             for(i = 0; i < 128; i++)
             {
-                Write_Mod_Data_Swap(&CustomVol[i], sizeof(float), 1, in);
+                Write_Mod_Data_Swap(&Sample_Vol[i], sizeof(float), 1, in);
             }
 
             // Include the patterns names
@@ -4306,6 +4312,7 @@ void LoadInst(char *FileName)
     int tight = FALSE;
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
+    int Glob_Vol = FALSE;
 
     Status_Box("Attempting to load an instrument file...");
     FILE *in;
@@ -4319,6 +4326,8 @@ void LoadInst(char *FileName)
 
         switch(extension[7])
         {
+            case '8':
+                Glob_Vol = TRUE;
             case '7':
                 New_Env = TRUE;
             case '6':
@@ -4389,6 +4398,12 @@ void LoadInst(char *FileName)
             }
         }
 
+        Sample_Vol[swrite] = 1.0f;
+        if(Glob_Vol)
+        {
+            Read_Data_Swap(&Sample_Vol[swrite], sizeof(float), 1, in);
+        }
+
         for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
         {
             Read_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
@@ -4404,7 +4419,7 @@ void LoadInst(char *FileName)
                 
                 Read_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                 Read_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
-                Read_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
+                Read_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                 Read_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
                 AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
@@ -4448,7 +4463,7 @@ void SaveInst(void)
     char synth_prg;
     int synth_save;
 
-    sprintf(extension, "TWNNINS7");
+    sprintf(extension, "TWNNINS8");
     sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Sample]);
     Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Sample]);
@@ -4494,6 +4509,8 @@ void SaveInst(void)
                 break;
         }
 
+        Write_Data_Swap(&Sample_Vol[swrite], sizeof(float), 1, in);
+
         swrite = synth_save;
         for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
         {
@@ -4510,7 +4527,7 @@ void SaveInst(void)
                 
                 Write_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
-                Write_Data_Swap(&SampleVol[swrite][slwrite], sizeof(float), 1, in);
+                Write_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                 Write_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
                 Write_Unpacked_Sample(Write_Data, in, swrite, slwrite);
@@ -4803,7 +4820,7 @@ void SaveConfig(void)
         Write_Data(&Accidental, sizeof(char), 1, out);
 
         Write_Data(&Use_Shadows, sizeof(char), 1, out);
-        Write_Data(&Global_Patterns_Zoom, sizeof(char), 1, out);
+        Write_Data(&Global_Patterns_Font, sizeof(char), 1, out);
 
         fclose(out);
 
@@ -4892,7 +4909,7 @@ void LoadConfig(void)
             Read_Data(&Accidental, sizeof(char), 1, in);
 
             Read_Data(&Use_Shadows, sizeof(char), 1, in);
-            Read_Data(&Global_Patterns_Zoom, sizeof(char), 1, in);
+            Read_Data(&Global_Patterns_Font, sizeof(char), 1, in);
 
             if(Patterns_Lines == DISPLAYED_LINES_LARGE)
             {

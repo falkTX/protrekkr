@@ -166,10 +166,10 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 // Instrument editor mode
                 if(gode == 0 || gode == 1)
                 {
-                    if(SampleVol[Current_Sample][Current_Sample_Split] > 4.0f) SampleVol[Current_Sample][Current_Sample_Split] = 4.0f;
-                    if(SampleVol[Current_Sample][Current_Sample_Split] < 0) SampleVol[Current_Sample][Current_Sample_Split] = 0;
-                    Realslider(426, 538, (int) (SampleVol[Current_Sample][Current_Sample_Split] * 32.0f), Allow_Sliders);
-                    outlong_small(575, 538, (int) (SampleVol[Current_Sample][Current_Sample_Split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
+                    if(Sample_Amplify[Current_Sample][Current_Sample_Split] > 4.0f) Sample_Amplify[Current_Sample][Current_Sample_Split] = 4.0f;
+                    if(Sample_Amplify[Current_Sample][Current_Sample_Split] < 0) Sample_Amplify[Current_Sample][Current_Sample_Split] = 0;
+                    Realslider(426, 538, (int) (Sample_Amplify[Current_Sample][Current_Sample_Split] * 32.0f), Allow_Sliders);
+                    outlong_small(575, 538, (int) (Sample_Amplify[Current_Sample][Current_Sample_Split] * 100.0f), 1, 56, BUTTON_NORMAL | BUTTON_DISABLED);
                 }
 
                 if(gode == 0 || gode == 2)
@@ -307,10 +307,10 @@ void Actualize_Instrument_Ed(int typex, char gode)
 
                 if(gode == 0 || gode == 15)
                 {
-                    if(CustomVol[Current_Sample] > 1.0f) CustomVol[Current_Sample] = 1.0f;
-                    if(CustomVol[Current_Sample] < 0.0f) CustomVol[Current_Sample] = 0.0f;
-                    Realslider(52, 546, (int) (CustomVol[Current_Sample] * 128.0f), Allow_Global_Sliders);
-                    outlong(201, 546, (int) (CustomVol[Current_Sample] * 100.0f), 1);
+                    if(Sample_Vol[Current_Sample] > 1.0f) Sample_Vol[Current_Sample] = 1.0f;
+                    if(Sample_Vol[Current_Sample] < 0.0f) Sample_Vol[Current_Sample] = 0.0f;
+                    Realslider(52, 546, (int) (Sample_Vol[Current_Sample] * 128.0f), Allow_Global_Sliders);
+                    outlong(201, 546, (int) (Sample_Vol[Current_Sample] * 100.0f), 1);
                 }
 
                 if(gode == 0 || gode == 16)
@@ -521,7 +521,7 @@ void Mouse_Sliders_Instrument_Ed(void)
         {
             if(zcheckMouse(52, 546, 148, 16))
             {
-                CustomVol[Current_Sample] = float(Mouse.x - 62) * 0.0078125f;
+                Sample_Vol[Current_Sample] = float(Mouse.x - 62) * 0.0078125f;
                 gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
                 teac = 15;
             }

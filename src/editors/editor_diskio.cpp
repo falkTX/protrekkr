@@ -134,7 +134,7 @@ void Draw_DiskIO_Ed(void)
 
     Gui_Draw_Button_Box(350, 532, 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(532, 513, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(532, 514, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(532, 534, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 }
 
@@ -180,9 +180,9 @@ void Actualize_DiskIO_Ed(int gode)
             if(rawrender_from > rawrender_to)
             {
                 rawrender_to = rawrender_from;
-                Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             }
-            Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
         }
 
         // To position
@@ -193,9 +193,9 @@ void Actualize_DiskIO_Ed(int gode)
             if(rawrender_to < rawrender_from)
             {
                 rawrender_from = rawrender_to;
-                Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Arrows_Number_Box(572, 514, rawrender_from, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             }
-            Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box(572, 534, rawrender_to, BUTTON_NORMAL | (rawrender_range ? 0 : BUTTON_DISABLED) | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
         }
 
         if(allow_save)
