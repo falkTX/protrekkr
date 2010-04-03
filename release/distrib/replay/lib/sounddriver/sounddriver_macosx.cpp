@@ -68,7 +68,6 @@ static OSStatus AUDIO_Callback(AudioDeviceID device,
                                const AudioTimeStamp *time_out,
                                void *client_data)
 {
-
     if(AUDIO_Play_Flag)
     {
         AUDIO_Mixer((Uint8 *) data_out->mBuffers[0].mData, data_out->mBuffers[0].mDataByteSize);
@@ -125,6 +124,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 {
     int num_fragments;
     int frag_size;
+    int found_pcmformat = TRUE;
 
     if(milliseconds < 10) milliseconds = 10;
     if(milliseconds > 250) milliseconds = 250;
@@ -144,26 +144,43 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     {
         Desc.mSampleRate = AUDIO_PCM_FREQ;
         Desc.mChannelsPerFrame = AUDIO_DBUF_CHANNELS;
-        Desc.mBitsPerChannel = 32;
+        Desc.mBitsPerChannel = sizeof(short) << 3;
+        Desc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kAudioFormatFlagIsSignedInteger;
         Desc.mFormatID = kAudioFormatLinearPCM;
 
         Desc.mFramesPerPacket = 1;
         Desc.mBytesPerFrame = (Desc.mBitsPerChannel * Desc.mChannelsPerFrame) >> 3;
         Desc.mBytesPerPacket = Desc.mBytesPerFrame * Desc.mFramesPerPacket;
 
-        Desc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kAudioFormatFlagIsFloat;
-
 #if defined(__BIG_ENDIAN__)
         Desc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
 #endif
 
+        // Try with floating points
         if(AudioDeviceSetProperty(AUDIO_Device,
                                   NULL,
                                   0,
                                   FALSE,
                                   kAudioDevicePropertyStreamFormat,
                                   sizeof(AudioStreamBasicDescription),
-                                  &Desc) == noErr)
+                                  &Desc) != noErr)
+        {
+            // Try with 32 bit floating points
+            Desc.mBitsPerChannel = sizeof(float) << 3;
+            Desc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kAudioFormatFlagIsFloat;
+            if(AudioDeviceSetProperty(AUDIO_Device,
+                                      NULL,
+                                      0,
+                                      FALSE,
+                                      kAudioDevicePropertyStreamFormat,
+                                      sizeof(AudioStreamBasicDescription),
+                                      &Desc) != noErr)
+            {
+                found_pcmformat = FALSE;
+            }
+        }
+
+        if(found_pcmformat)
         {
 	        Amount = sizeof(AudioValueRange);
 

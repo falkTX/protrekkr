@@ -907,7 +907,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_MUTE_STATE)
         {
-            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL);
 
             if(CHAN_MUTE_STATE[tmp_track] == 0) CHAN_MUTE_STATE[tmp_track] = 1;
             else CHAN_MUTE_STATE[tmp_track] = 0;
@@ -918,13 +918,13 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_LARGE_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x), TRUE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL), TRUE);
             Actupated(0);
         }
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_SMALL_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x), FALSE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL), FALSE);
             Actupated(0);
         }
 

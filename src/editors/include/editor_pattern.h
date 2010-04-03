@@ -109,6 +109,7 @@ void Goto_Next_Column(void);
 void Goto_Top_Left(void);
 void Goto_Bottom_Right(void);
 void Goto_Row(int row);
+int Get_Last_Track_Column(int track);
 int Get_Visible_Complete_Tracks(void);
 int Get_Pattern_Offset(int track, int row, int pattern);
 void Reset_Patterns_Zoom(void);

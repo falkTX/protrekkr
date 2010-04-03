@@ -51,6 +51,7 @@ char is_record_key = 0;
 // Min 1 Max 16
 int patt_highlight = 4;
 int Continuous_Scroll;
+int Last_Pixel;
 
 MARKER Patterns_Marker;
 
@@ -271,10 +272,14 @@ int Cur_Char_size[MAX_TRACKS];
 LETTER_FUNCTION Cur_Char_Function[MAX_TRACKS];
 NOTE_FUNCTION Cur_Note_Function[MAX_TRACKS];
 
-PtkTimer Pattern_Timer_Horiz;
-int Pattern_Scrolling_Horiz;
-float Pattern_First_Delay_Horiz;
-float Pattern_Delay_Horiz;
+PtkTimer Pattern_Timer_Horiz_Left;
+PtkTimer Pattern_Timer_Horiz_Right;
+int Pattern_Scrolling_Horiz_Left;
+int Pattern_Scrolling_Horiz_Right;
+float Pattern_First_Delay_Horiz_Left;
+float Pattern_First_Delay_Horiz_Right;
+float Pattern_Delay_Horiz_Left;
+float Pattern_Delay_Horiz_Right;
 
 PtkTimer Pattern_Timer_Vert;
 int Pattern_Scrolling_Vert;
@@ -375,10 +380,10 @@ void draw_pated(int track, int line, int petrack, int row)
         dover += 29;
 
         // Zoom on/off
-        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 17) >= MAX_PATT_SCREEN_X) break;
         if(Get_Track_Type(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover, 187, 27, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, 187, 28, 0, 0);
-        dover += 29;
+        dover += 17;
 
         // Caret track marker
         if((dover + 17) >= MAX_PATT_SCREEN_X) break;
@@ -965,7 +970,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
         bjbox(1, YVIEW, CHANNELS_WIDTH - 1, 16);
 
         dover = PAT_COL_NOTE;
-
+        Last_Pixel = dover;
         cur_column = Get_Track_Nibble_Start(Channels_MultiNotes, track) + track;
 
         Real_visible = 0;
@@ -995,14 +1000,17 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             unsigned char p_f2h = p_f2 & 0xf;
 
             // Don't draw the gap if there's nothing to draw after that
+            Last_Pixel = dover;
             if(dover + 2 + 4 + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, cur_column);
             Letter(dover, YVIEW, 20, cur_color, cur_color + 15);
             dover += 2;
+            Last_Pixel = dover;
 
             if(dover + 4 >= MAX_PATT_SCREEN_X) break;
             Letter(dover, YVIEW, 30, cur_color, cur_color + 15);
             dover += 4;
+            Last_Pixel = dover;
 
             high_col = 0;
 
@@ -1015,10 +1023,12 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
                 // Note
                 dover_break = dover + (Cur_Char_size[cur_track] * 3);
+                Last_Pixel = dover;
                 if(dover_break >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack) Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, 48, 48 + 15);
                 else Cur_Note_Function[cur_track].Fnc(dover, YVIEW, p_a, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track] * 3;
+                Last_Pixel = dover;
                 high_col++;
 
                 // Instrument hi
@@ -1027,7 +1037,8 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
                 dover += PAT_COL_SHIFT - 2;
-
+                Last_Pixel = dover;
+                
                 dover_break = dover + Cur_Char_size[cur_track];
                 if(dover_break >= MAX_PATT_SCREEN_X) break;
                 if(row == high_col && cur_track == petrack)
@@ -1049,6 +1060,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 }
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 // Instrument lo
@@ -1066,6 +1078,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                     else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 }
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
 
                 // More notes to draw ?
                 dover_break = dover + 2;
@@ -1074,16 +1087,19 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
                 Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
                 dover += 2;
+                Last_Pixel = dover;
 
                 high_col++;
             }
             if(dover_break >= MAX_PATT_SCREEN_X) break;
 
             // Volume hi
+            Last_Pixel = dover;
             if(dover + PAT_COL_SHIFT + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
 
+            Last_Pixel = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
@@ -1105,6 +1121,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
             }
+            Last_Pixel = dover;
             high_col++;
 
             // Volume lo
@@ -1122,6 +1139,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
             }
+            Last_Pixel = dover;
             high_col++;
 
             // Panning hi
@@ -1130,6 +1148,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
 
+            Last_Pixel = dover;
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
@@ -1151,6 +1170,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
             }
+            Last_Pixel = dover;
             high_col++;
 
             // Panning lo
@@ -1168,6 +1188,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
             }
+            Last_Pixel = dover;
             high_col++;
 
             //  Effect hi
@@ -1175,6 +1196,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
+            Last_Pixel = dover;
 
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(!p_e && !p_f)
@@ -1182,6 +1204,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect lo
@@ -1190,6 +1213,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data hi
@@ -1199,6 +1223,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data lo
@@ -1207,6 +1232,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
             }
             else
@@ -1214,6 +1240,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e >> 4, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect lo
@@ -1222,6 +1249,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_eh, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data hi
@@ -1231,6 +1259,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f >> 4, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data lo
@@ -1239,6 +1268,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_fh, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
             }
 
@@ -1251,6 +1281,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect lo
@@ -1259,6 +1290,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data hi
@@ -1268,6 +1300,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data lo
@@ -1276,6 +1309,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
             }
             else
@@ -1285,6 +1319,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2 >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2 >> 4, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect lo
@@ -1293,6 +1328,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2h, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_e2h, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data hi
@@ -1302,6 +1338,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2 >> 4, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2 >> 4, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
 
                 //  Effect data lo
@@ -1310,6 +1347,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2h, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2h, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
+                Last_Pixel = dover;
                 high_col++;
             }
 
@@ -1832,7 +1870,7 @@ int Get_Visible_Tracks_Size(void)
 
 // ------------------------------------------------------
 // Return the index of the track located under the mouse pointer
-int Get_Track_Over_Mouse(int Mouse)
+int Get_Track_Over_Mouse(int Mouse, int *Was_Scrolling)
 {
     int i;
     int bound_left = 0;
@@ -1842,50 +1880,44 @@ int Get_Track_Over_Mouse(int Mouse)
     int found_track;
     int track_size;
 
-    if(mouse_coord > CHANNELS_WIDTH)
-    {
-        under_mouse = (gui_track + 1) + Visible_Columns - 1;
+    if(Was_Scrolling) *Was_Scrolling = FALSE;
 
+    if(mouse_coord >= Last_Pixel)
+    {
         // Right scrolling
-        // It will scroll
-        if(under_mouse >= (gui_track + Visible_Columns - 1))
+        if(Pattern_Scrolling_Horiz_Right)
         {
-            if(Pattern_Scrolling_Horiz)
+            Pattern_Delay_Horiz_Right += Pattern_Timer_Horiz_Right.Get_Frames_Delay();
+            if(Pattern_Delay_Horiz_Right < Pattern_First_Delay_Horiz_Right)
             {
-                Pattern_Delay_Horiz += Pattern_Timer_Horiz.Get_Frames_Delay();
-                if(Pattern_Delay_Horiz < Pattern_First_Delay_Horiz)
-                {
-                    // Wait before scrolling
-                    under_mouse--;
-                }
-                else
-                {
-                    // Scroll it
-                    Pattern_Delay_Horiz = 0;
-                    Pattern_First_Delay_Horiz = 200.0f;
-                    if(under_mouse > (Songtracks - 1)) under_mouse = Songtracks - 1;
-                }
+                // Wait before scrolling
+                mouse_coord = Last_Pixel - 1;
             }
             else
             {
-                Pattern_Timer_Horiz.Set_Frames_Counter();
-                Pattern_Scrolling_Horiz = TRUE;
-                Pattern_Delay_Horiz = 0;
-                Pattern_First_Delay_Horiz = 200.0f;
-                under_mouse--;
+                under_mouse = gui_track + Visible_Columns - 1;
+                // Scroll it
+                Pattern_Delay_Horiz_Right = 0;
+                Pattern_First_Delay_Horiz_Right = 200.0f;
+                if(under_mouse > (Songtracks - 1)) under_mouse = Songtracks - 1;
+                Column_Under_Caret = Get_Last_Track_Column(under_mouse);
+                if(Was_Scrolling) *Was_Scrolling = TRUE;
             }
         }
         else
         {
-            Pattern_Delay_Horiz = 0;
-            Pattern_Scrolling_Horiz = FALSE;
+            Pattern_Timer_Horiz_Right.Set_Frames_Counter();
+            Pattern_Scrolling_Horiz_Right = TRUE;
+            Pattern_Delay_Horiz_Right = 0;
+            Pattern_First_Delay_Horiz_Right = 150.0f;
+            mouse_coord = Last_Pixel - 1;
         }
     }
-    else
+    if(mouse_coord < Last_Pixel)
     {
         mouse_coord -= PAT_COL_NOTE;
         found_track = FALSE;
-        int max_size = Get_Visible_Tracks_Size();    
+        int max_size = Get_Visible_Tracks_Size();
         int tVisible_Columns = Visible_Columns;
         if(max_size < MAX_PATT_SCREEN_X)
         {
@@ -1915,10 +1947,10 @@ int Get_Track_Over_Mouse(int Mouse)
     // Left scrolling
     if(under_mouse < gui_track)
     {
-        if(Pattern_Scrolling_Horiz)
+        if(Pattern_Scrolling_Horiz_Left)
         {
-            Pattern_Delay_Horiz += Pattern_Timer_Horiz.Get_Frames_Delay();
-            if(Pattern_Delay_Horiz < Pattern_First_Delay_Horiz)
+            Pattern_Delay_Horiz_Left += Pattern_Timer_Horiz_Left.Get_Frames_Delay();
+            if(Pattern_Delay_Horiz_Left < Pattern_First_Delay_Horiz_Left)
             {
                 // Wait before scrolling
                 under_mouse = gui_track;
@@ -1927,18 +1959,20 @@ int Get_Track_Over_Mouse(int Mouse)
             {
                 under_mouse = gui_track - 1;
                 // Scroll it
-                Pattern_Delay_Horiz = 0;
-                Pattern_First_Delay_Horiz = 150.0f;
+                Pattern_Delay_Horiz_Left = 0;
+                Pattern_First_Delay_Horiz_Left = 200.0f;
             }
         }
         else
         {
-            Pattern_Timer_Horiz.Set_Frames_Counter();
-            Pattern_Scrolling_Horiz = TRUE;
-            Pattern_Delay_Horiz = 0;
-            Pattern_First_Delay_Horiz = 150.0f;
+            Pattern_Timer_Horiz_Left.Set_Frames_Counter();
+            Pattern_Scrolling_Horiz_Left = TRUE;
+            Pattern_Delay_Horiz_Left = 0;
+            Pattern_First_Delay_Horiz_Left = 150.0f;
             under_mouse = gui_track;
         }
+        if(Was_Scrolling) *Was_Scrolling = TRUE;
+        Column_Under_Caret = 0;
     }
 
     if(under_mouse > Songtracks - 1) under_mouse = Songtracks - 1;
@@ -2073,8 +2107,16 @@ int Get_Column_Idx(int track, int mouse_coord)
 }
 
 // ------------------------------------------------------
+// Return the last column of a track
+int Get_Last_Track_Column(int track)
+{
+    // Notes + Volume + Panning + Fx1 + Fx2
+    return(((Channels_MultiNotes[track] * 3) + 12) - 1);
+}
+
+// ------------------------------------------------------
 // Return the last visible column and track
-int Get_Last_Column_And_Track(int *track, int *pen_column)
+int Get_Last_Column_And_Track(int *track)
 {
     int i;
     int dover = 0;
@@ -2085,7 +2127,6 @@ int Get_Last_Column_And_Track(int *track, int *pen_column)
     int cur_track;
 
     *track = gui_track;
-    *pen_column = 0;
     for(i = gui_track; i < Songtracks; i++)
     {
         channel_size = Get_Track_Size(i, NULL);
@@ -2226,7 +2267,8 @@ int Get_Last_Column_And_Track(int *track, int *pen_column)
 
 // ------------------------------------------------------
 // Return the index of the column located under the mouse pointer
-void Get_Column_Over_Mouse(int *track, int *column)
+void Get_Column_Over_Mouse(int *track, int *column,
+                           int check_boundaries, int *Was_Scrolling)
 {
 
     int i;
@@ -2235,7 +2277,6 @@ void Get_Column_Over_Mouse(int *track, int *column)
     int old_dover = 0;
     int track_size;
     int last_column;
-    int pen_column;
     int last_track;
     int mouse;
     int tmp_track;
@@ -2245,7 +2286,7 @@ void Get_Column_Over_Mouse(int *track, int *column)
     mouse = Mouse.x;
 
 get_tracks_boundaries:
-    tmp_track = Get_Track_Over_Mouse(mouse);
+    tmp_track = Get_Track_Over_Mouse(mouse, Was_Scrolling);
     mouse_coord = mouse - PAT_COL_NOTE;
 
     for(i = tmp_track - 1; i >= gui_track; i--)
@@ -2255,14 +2296,27 @@ get_tracks_boundaries:
     }
     tmp_column = Get_Column_Idx(tmp_track, mouse_coord);
 
-    last_column = Get_Last_Column_And_Track(&last_track, &pen_column);
-    if(tmp_track >= last_track && tmp_column >= last_column)
+    if(check_boundaries)
     {
-        mouse--;
-        goto get_tracks_boundaries;
+        last_column = Get_Last_Column_And_Track(&last_track);
+        if(tmp_track >= last_track && tmp_column >= last_column)
+        {
+            mouse--;
+            goto get_tracks_boundaries;
+        }
+    }
+    if(Was_Scrolling)
+    {
+        if(!*Was_Scrolling)
+        {
+            *column = tmp_column;
+        }
+    }
+    else
+    {
+        *column = tmp_column;
     }
     *track = tmp_track;
-    *column = tmp_column;
 }
 
 // ------------------------------------------------------
@@ -2337,10 +2391,13 @@ void Bound_Patt_Pos(void)
 
 // ------------------------------------------------------
 // Reset the mouse scrolling timing
+// Each time the right mouse button is pressed
 void Reset_Pattern_Scrolling_Horiz(void)
 {
-    Pattern_Delay_Horiz = 0;
-    Pattern_Scrolling_Horiz = FALSE;
+    Pattern_Delay_Horiz_Left = 0;
+    Pattern_Delay_Horiz_Right = 0;
+    Pattern_Scrolling_Horiz_Left = FALSE;
+    Pattern_Scrolling_Horiz_Right = FALSE;
     Pattern_Delay_Vert = 0;
     Pattern_Scrolling_Vert = FALSE;
 }
@@ -2376,7 +2433,8 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     // Position the caret on the specified track/column with the mouse
     if(zcheckMouse(1, 194, CHANNELS_WIDTH, 234 + Patterns_Lines_Offset))
     {
-        Get_Column_Over_Mouse(&Track_Under_Caret, &Column_Under_Caret);
+        int In_Scrolling = FALSE;
+        Get_Column_Over_Mouse(&Track_Under_Caret, &Column_Under_Caret, FALSE, &In_Scrolling);
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
@@ -2482,7 +2540,7 @@ void Mouse_Sliders_Pattern_Ed(void)
     {
         int track;
         int column;
-        Get_Column_Over_Mouse(&track, &column);
+        Get_Column_Over_Mouse(&track, &column, TRUE, NULL);
         Mark_Block_End(column, track, Get_Line_Over_Mouse(), 3);
     }
 }
@@ -2500,7 +2558,7 @@ void Mouse_Left_Pattern_Ed(void)
     {
         int track;
         int column;
-        Get_Column_Over_Mouse(&track, &column);
+        Get_Column_Over_Mouse(&track, &column, TRUE, NULL);
         Mark_Block_Start(column, track, Get_Line_Over_Mouse());
     }
 
@@ -2573,7 +2631,7 @@ void Mouse_Left_Pattern_Ed(void)
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
             int Cur_Position = Get_Song_Position();
-            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL);
             Toggle_Track_On_Off_Status(Cur_Position, tmp_track);
             break;
         }
@@ -2622,7 +2680,7 @@ void Mouse_Right_Pattern_Ed(void)
         if(start_mute_check_x + Cur_Char_size[i] >= MAX_PATT_SCREEN_X) break;
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
-            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL);
             Solo_Track(tmp_track);
             // Will unmute the correct track
             gui_action = GUI_CMD_SWITCH_TRACK_MUTE_STATE;
@@ -2639,7 +2697,7 @@ void Mouse_Right_Pattern_Ed(void)
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 28, 10))
         {
             int Cur_Position = Get_Song_Position();
-            int tmp_track = Get_Track_Over_Mouse(Mouse.x);
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL);
             Solo_Track_On_Off(Cur_Position, tmp_track);
             break;
         }
@@ -2666,7 +2724,6 @@ void Mouse_Right_Pattern_Ed(void)
     {
         Goto_Next_Page();
     }
-
 }
 
 // ------------------------------------------------------

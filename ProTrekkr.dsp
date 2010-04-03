@@ -484,6 +484,10 @@ SOURCE=.\src\samples\samples_ops.cpp
 # End Group
 # Begin Source File
 
+SOURCE=.\release\distrib\history.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Support\Project.ico
 # End Source File
 # Begin Source File

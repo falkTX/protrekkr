@@ -494,6 +494,14 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                 i--;
             }
         }
+
+        /// Remove suspicious chars
+        for(j = 0; Name[j]; j++)
+        {
+            if(Name[j] < 'A') Name[j] = '_';
+            if(Name[j] > 'z') Name[j] = '_';
+            if(Name[j] > 'Z' && Name[j] < 'a') Name[j] = '_';
+        }
         
         Songtracks = channels;
 
