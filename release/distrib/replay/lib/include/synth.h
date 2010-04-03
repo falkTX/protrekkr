@@ -274,7 +274,7 @@ typedef struct
         unsigned char OSC3_SWITCH;
         float PTC_GLIDE;
         int64 PTC_GLIDE64;
-        float GLB_VOLUME;
+        //float GLB_VOLUME;
         float DISTO;
         float LFO1_ATTACK;
         float LFO1_DECAY;
@@ -327,7 +327,8 @@ class CSynth
 #if defined(PTK_SYNTH_OSC3)
                         Uint64 *position_osc3,
 #endif
-                        int64 osc_speed);
+                        int64 osc_speed,
+                        float Ampli_Vol);
 
         void NoteOn(int noten, float speed, int Looping, unsigned int Length,
                     unsigned int Loop_Length

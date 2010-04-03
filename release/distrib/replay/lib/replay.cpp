@@ -49,6 +49,16 @@
 #endif
 
 // ------------------------------------------------------
+// Structures
+typedef struct
+{
+    int Line;
+    int Pos;
+    int SamplesPerTick;
+    int shufflestep;
+} VISUAL_DELAY_DAT, *LPVISUAL_DELAY_DAT;
+
+// ------------------------------------------------------
 // Variables
 int SamplesPerTick;
 
@@ -65,8 +75,8 @@ int SamplesPerTick;
 #endif
 
 #if defined(PTK_FX_AUTOFADEMODE)
-    char FADEMODE[MAX_TRACKS][MAX_POLYPHONY];    // 0 - Off, 1- In, 2 - Out;
-    float FADECOEF[MAX_TRACKS][MAX_POLYPHONY];
+    char FADEMODE[MAX_TRACKS];    // 0 - Off, 1- In, 2 - Out;
+    float FADECOEF[MAX_TRACKS];
 #endif
 
 #if defined(PTK_SYNTH)
@@ -85,9 +95,9 @@ char LFO_ON[MAX_TRACKS];
 
 int Delay_Sound_Buffer;
 int Cur_Delay_Sound_Buffer;
-int Max_Delay_Sound_Buffer;
-int Delays_Lines_Sound_Buffer[256];
-int Delays_Pos_Sound_Buffer[256];
+
+VISUAL_DELAY_DAT Delays_Pos_Sound_Buffer[256];
+int PosInTick_Delay;
 
 #if defined(PTK_LFO)
     float LFO_RATE[MAX_TRACKS];
@@ -116,6 +126,7 @@ float sp_Cvol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Cvol_Synth[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Tvol[MAX_TRACKS][MAX_POLYPHONY];
 float sp_Tvol_Synth[MAX_TRACKS][MAX_POLYPHONY];
+float sp_Tvol_Mod[MAX_TRACKS];
 float DSend[MAX_TRACKS];   
 int CSend[MAX_TRACKS];
 int64 Vstep1[MAX_TRACKS][MAX_POLYPHONY];
@@ -495,10 +506,10 @@ int delay_time;
     int L_MaxLevel;
     int R_MaxLevel;
     extern int CHAN_MIDI_PRG[MAX_TRACKS];
-    float Scope_Dats[MAX_TRACKS][128];
-    float Scope_Dats_LeftRight[2][128];
-    int Cscope[MAX_TRACKS];
+    float *Scope_Dats[MAX_TRACKS];
+    float *Scope_Dats_LeftRight[2];
     int pos_scope;
+    int pos_scope_latency;
     extern signed char c_midiin;
     extern signed char c_midiout;
     int plx;
@@ -542,6 +553,7 @@ void Clear_Midi_Channels_Pool(void);
 // Functions
 float ApplyLfo(float cy, int trcy);
 void ComputeCoefs(int freq, int r, int t);
+void Record_Delay_Event();
 
 #if defined(PTK_FX_TICK0)
     void DoEffects_tick0(void);
@@ -628,53 +640,51 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             *pSamples++ = right_float;
 
             // Prepare them for display now
-            left_float *= 32767.0f;
+/*            left_float *= 32767.0f;
             right_float *= 32767.0f;
 
             left_value = (int) (left_float);
-            right_value = (int) (right_float);
+            right_value = (int) (right_float);*/
 #else
-
             *pSamples++ = left_value;
             *pSamples++ = right_value;
-
 #endif
 
 #if !defined(__STAND_ALONE__)
             // Gather datas for the scopes and the vumeters
-
-#if !defined(__WINAMP__)
-            //if(Songplaying_Pattern)
-#endif
-            {
-                clamp_left_value = (float) left_value;
-                clamp_right_value = (float) right_value;
+            clamp_left_value = left_float;
+            clamp_right_value = right_float;
 
 #if defined(__LINUX__)
-                clamp_left_value /= 8192.0f;
-                clamp_right_value /= 8192.0f;
-                clamp_left_value *= 32767.0f;
-                clamp_right_value *= 32767.0f;
+            clamp_left_value /= 8192.0f;
+            clamp_right_value /= 8192.0f;
+            clamp_left_value *= 32767.0f;
+            clamp_right_value *= 32767.0f;
 #endif
 
-                if(clamp_left_value > L_MaxLevel) L_MaxLevel = (int) clamp_left_value;
-                if(clamp_right_value > R_MaxLevel) R_MaxLevel = (int) clamp_right_value;
+            // Pre-record
+            Scope_Dats_LeftRight[0][pos_scope] = ((float) clamp_left_value);
+            Scope_Dats_LeftRight[1][pos_scope] = ((float) clamp_right_value);
 
-                wait_level++;
-                if(wait_level > 127)
-                {
-                    wait_level = 0;
-                    L_MaxLevel -= 128;
-                    R_MaxLevel -= 128;
-                    if(L_MaxLevel < 0) L_MaxLevel = 0;
-                    if(R_MaxLevel < 0) R_MaxLevel = 0;
-                }
-
-                Scope_Dats_LeftRight[0][pos_scope] = ((float) clamp_left_value) * 0.25f;
-                Scope_Dats_LeftRight[1][pos_scope] = ((float) clamp_right_value) * 0.25f;
-                pos_scope++;
-                pos_scope &= 127;
+            clamp_left_value = (float) Scope_Dats_LeftRight[0][pos_scope_latency];
+            clamp_right_value = (float) Scope_Dats_LeftRight[1][pos_scope_latency];
+            if(clamp_left_value > L_MaxLevel) L_MaxLevel = (int) clamp_left_value;
+            if(clamp_right_value > R_MaxLevel) R_MaxLevel = (int) clamp_right_value;
+            wait_level++;
+            if(wait_level > 127)
+            {
+                wait_level = 0;
+                L_MaxLevel -= 128;
+                R_MaxLevel -= 128;
+                if(L_MaxLevel < 0) L_MaxLevel = 0;
+                if(R_MaxLevel < 0) R_MaxLevel = 0;
             }
+
+            pos_scope++;
+            if(pos_scope >= (AUDIO_Latency / 2)) pos_scope = 0;
+            pos_scope_latency = pos_scope - (AUDIO_Latency / 4);
+            if(pos_scope_latency < 0) pos_scope_latency = (AUDIO_Latency / 2) + pos_scope_latency;
+
 #endif
         }
 
@@ -818,6 +828,12 @@ int STDCALL Ptk_InitDriver(void)
     {
         return(FALSE);
     }
+
+
+#if !defined(__STAND_ALONE__)
+    if(!Init_Scopes_Buffers()) return(FALSE);
+#endif
+
     AUDIO_Play();
 
 #else  // __WINAMP__
@@ -1376,9 +1392,19 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 // Release the replayer driver
 void PTKEXPORT Ptk_ReleaseDriver(void)
 {
+    int i;
 
 #if !defined(__WINAMP__)
     AUDIO_Stop_Driver();
+#endif
+
+#if !defined(__STAND_ALONE__)
+    for(i = 0; i < MAX_TRACKS; i++)
+    {  
+        if(Scope_Dats[i]) free(Scope_Dats[i]);
+    }
+    if(Scope_Dats_LeftRight[0]) free(Scope_Dats_LeftRight[0]);
+    if(Scope_Dats_LeftRight[1]) free(Scope_Dats_LeftRight[1]);
 #endif
 
 }
@@ -1409,6 +1435,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     Pattern_Line = 0;
     //Song_Position_Visual = new_position;
     PosInTick = 0;
+    PosInTick_Delay = 0;
     SubCounter = 0;
     Subicounter = 0;
 
@@ -1566,6 +1593,8 @@ void PTKEXPORT Ptk_Play(void)
     Reset_Values();
     Done_Reset = FALSE;
 
+    L_MaxLevel = 0;
+    R_MaxLevel = 0;
     Songplaying = TRUE;
 
 #if defined(__PSP__)
@@ -1707,10 +1736,10 @@ void Pre_Song_Init(void)
             sp_channelnote[ini][i] = 120;
             sp_split[ini][i] = 0;
 
-           
             sp_Tvol[ini][i] = 0.0f;
             sp_Tvol_Synth[ini][i] = 0.0f;
         }
+        sp_Tvol_Mod[ini] = 1.0f;
 
         Channels_Polyphony[ini] = 1;
         Channels_MultiNotes[ini] = 1;
@@ -1899,11 +1928,6 @@ void Post_Song_Init(void)
             Vstep_vib[i][j] = 0;
 #endif
 
-#if defined(PTK_FX_AUTOFADEMODE)
-            FADEMODE[i][j] = 0;
-            FADECOEF[i][j] = 0.0f;
-#endif
-
 #if defined(PTK_INSTRUMENTS)
             Cut_Stage[i][j] = FALSE;
             sp_Tvol[i][j] = 0.0f;
@@ -1917,7 +1941,14 @@ void Post_Song_Init(void)
 
 
         }
+
+#if defined(PTK_FX_AUTOFADEMODE)
+        FADEMODE[i] = 0;
+        FADECOEF[i] = 0.0f;
+#endif
        
+        sp_Tvol_Mod[i] = 1.0f;
+
 #if defined(PTK_FX_REVERSE)
         Reverse_Switch[i] = 0;
         Reserve_Dat[i] = 0;
@@ -1931,7 +1962,10 @@ void Post_Song_Init(void)
     rchorus_counter2 = MIX_RATE - rchorus_delay;
     SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     PosInTick = 0;
+    PosInTick_Delay = 0;
     SamplesPerSub = SamplesPerTick / 6;
+    Cur_Delay_Sound_Buffer = 0;
+    Delay_Sound_Buffer = 0;
 
     Pattern_Line_Visual = Pattern_Line;
     Song_Position_Visual = Song_Position;
@@ -1954,36 +1988,46 @@ void Post_Song_Init(void)
         ComputeStereo(spl);
     }
 
-#if !defined(__WINAMP__)
     Songplaying_Pattern = 0;
     AUDIO_ResetTimer();
     Delay_Sound_Buffer = 0;
-    Max_Delay_Sound_Buffer = 0;
-    Cur_Delay_Sound_Buffer = 0;
-#endif
+}
 
+// ------------------------------------------------------
+// Record and set the visual patterns lines and song positions
+void Record_Delay_Event()
+{
+    // Record a complete sequence for latency calibration
+#if defined(PTK_SHUFFLE)
+    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].shufflestep = shufflestep;
+#endif
+    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].SamplesPerTick = SamplesPerTick;
+    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Line = Pattern_Line;
+    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Pos = Song_Position;
+    Cur_Delay_Sound_Buffer++;
+    if(Cur_Delay_Sound_Buffer >= 256) Cur_Delay_Sound_Buffer = 0;
 }
 
 // ------------------------------------------------------
 // Record and set the visual patterns lines and song positions
 void Proc_Next_Visual_Line()
 {
-    if(Max_Delay_Sound_Buffer == 0)
-    {
-        Pattern_Line_Visual = Pattern_Line;
-        Song_Position_Visual = Song_Position;
-    }
-    else
-    {
-        Pattern_Line_Visual = Delays_Lines_Sound_Buffer[Delay_Sound_Buffer];
-        Song_Position_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer];
-        Delay_Sound_Buffer++;
-        if(Delay_Sound_Buffer >= Max_Delay_Sound_Buffer) Delay_Sound_Buffer = 0;
+    PosInTick_Delay++;
 
-        if(Cur_Delay_Sound_Buffer >= Max_Delay_Sound_Buffer) Cur_Delay_Sound_Buffer = 0;
-        Delays_Lines_Sound_Buffer[Cur_Delay_Sound_Buffer] = Pattern_Line;
-        Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer] = Song_Position;
-        Cur_Delay_Sound_Buffer++;
+#if defined(PTK_SHUFFLE)
+    if(PosInTick_Delay > Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].SamplesPerTick +
+                         Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].shufflestep)
+    {
+#else
+    if(PosInTick_Delay > Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].SamplesPerTick)
+    {
+#endif
+        PosInTick_Delay = 0;
+
+        Delay_Sound_Buffer++;
+        if(Delay_Sound_Buffer >= 256) Delay_Sound_Buffer = 0;
+        Pattern_Line_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].Line;
+        Song_Position_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].Pos;
     }
 }
 
@@ -2004,7 +2048,8 @@ void Sp_Player(void)
     int i;
     int j;
     int trigger_note_off;
-
+    float dest_volume;
+    
     left_float = 0;
     right_float = 0;
 
@@ -2049,33 +2094,29 @@ void Sp_Player(void)
                 if(CHAN_ACTIVE_STATE[Song_Position][ct])
                 {
 
+#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
+                    if(pl_vol_row <= 64 ||  pl_eff_row[0] == 3 || pl_eff_row[1] == 3)
+#endif
+                    {
+                        sp_Tvol_Mod[ct] = 1.0f;
+                    }
+
 #if defined(PTK_VOLUME_COLUMN)
                     if(pl_vol_row <= 64)
                     {
-                        for(i = 0; i < Channels_Polyphony[ct]; i++)
-                        {
-                            sp_Tvol[ct][i] = (float) pl_vol_row * 0.015625f;
-                            sp_Tvol_Synth[ct][i] = (float) pl_vol_row * 0.015625f;
-                        }
+                        sp_Tvol_Mod[ct] *= (float) pl_vol_row * 0.015625f;
                     }
 #endif
 
 #if defined(PTK_FX_SETVOLUME)
+                    // Modulated be effect 3
                     if(pl_eff_row[0] == 3)
                     {
-                        for(i = 0; i < Channels_Polyphony[ct]; i++)
-                        {
-                            sp_Tvol[ct][i] = (float) pl_dat_row[0] * 0.0039062f;
-                            sp_Tvol_Synth[ct][i] = (float) pl_dat_row[0] * 0.0039062f;
-                        }
+                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[0] * 0.0039062f;
                     }
                     if(pl_eff_row[1] == 3)
                     {
-                        for(i = 0; i < Channels_Polyphony[ct]; i++)
-                        {
-                            sp_Tvol[ct][i] = (float) pl_dat_row[1] * 0.0039062f;
-                            sp_Tvol_Synth[ct][i] = (float) pl_dat_row[1] * 0.0039062f;
-                        }
+                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[1] * 0.0039062f;
                     }
 #endif
 
@@ -2219,45 +2260,36 @@ void Sp_Player(void)
                 {
                     if(CHAN_ACTIVE_STATE[Song_Position][ct])
                     {
-                    if(pl_note[i] < 120 || (pl_note[i] > 120 && pl_sample[i] != 255))
-                    {
-                        free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
-                        if(free_sub_channel == -1) free_sub_channel = i;
+                        // A note or no note with an instrument
+                        if(pl_note[i] < 120 || (pl_note[i] > 120 && pl_sample[i] != 255))
+                        {
+                            free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
+                            if(free_sub_channel == -1) free_sub_channel = i;
 
-                        // Mark it as playing
-                        Note_Sub_Channels[ct][i] = i;
-                        Reserved_Sub_Channels[ct][i] = free_sub_channel;
+                            // Mark it as playing
+                            Note_Sub_Channels[ct][i] = i;
+                            Reserved_Sub_Channels[ct][i] = free_sub_channel;
 
 #if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
-                        if(pl_vol_row <= 64 || pl_eff_row[0] == 3 || pl_eff_row[1] == 3)
-                        {
+                            // Need to set the instrument volume
+                            if(pl_vol_row > 64 && pl_eff_row[0] != 3 && pl_eff_row[1] != 3)
+#endif
+                            {
+                                if(pl_sample[i] != 255)
+                                {
+                                    sp_Tvol_Mod[ct] = 1.0f;
+                                }
+                            }
+
                             // Start to play it with the specified volume
                             Schedule_Instrument(ct,
                                                 free_sub_channel,           // From Channels_Polyphony not Channels_MultiNotes
                                                 pl_note[i],
                                                 pl_sample[i],
-                                                sp_Tvol[ct][free_sub_channel],
-                                                sp_Tvol_Synth[ct][free_sub_channel],
                                                 toffset,
                                                 glide,
                                                 FALSE, i + 1);
                         }
-                        else
-#endif
-                        {
-                            // Use the default sample volume if there's nothing
-                            // in the volume column of no 0x3 fx
-                            Schedule_Instrument(ct,
-                                                free_sub_channel,
-                                                pl_note[i],
-                                                pl_sample[i],
-                                                Sample_Vol[pl_sample[i]],
-                                                PARASynth[pl_sample[i]].glb_volume * 0.0078125f,
-                                                toffset,
-                                                glide,
-                                                FALSE, i + 1);
-                        }
-                    }
                     }
                 }
 
@@ -2317,10 +2349,21 @@ void Sp_Player(void)
 
         }// Pos in tick == 0
 
-
+        // ---------------------------------------
+        // ---------------------------------------
         // ---------------------------------------
 
-        if(!SubCounter) DoEffects();
+        if(!SubCounter)
+        {
+            DoEffects();
+        }
+
+        // Record at tick 0 but wait for the effects (like the speed)
+        // to be processed (SubCounter resetted at the same time as PosInTick)
+        if(PosInTick == 0)
+        {
+            Record_Delay_Event();
+        }
 
         SubCounter++;
 
@@ -2349,23 +2392,8 @@ void Sp_Player(void)
         if(PosInTick > SamplesPerTick)
         {
 #endif
-
             SubCounter = 0;
             PosInTick = 0;
-
-            // Record the lines & positions
-            switch(Songplaying_Pattern)
-            {
-                case 0:
-                    // Record the first lines/pos for calibration
-                    Delays_Lines_Sound_Buffer[Cur_Delay_Sound_Buffer] = Pattern_Line;
-                    Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer] = Song_Position;
-                    Cur_Delay_Sound_Buffer++;
-                    break;
-                case 1:
-                    Proc_Next_Visual_Line();
-                    break;
-            }
 
             // ------------------------------
             // Pattern movements
@@ -2409,7 +2437,7 @@ void Sp_Player(void)
 #if defined(PTK_FX_POSJUMP)
                             if(PosJump > 0)
                             {
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                                 if(PosJump <= Song_Position)
                                 {
                                     done = TRUE;
@@ -2438,7 +2466,7 @@ void Sp_Player(void)
                         if(Song_Position >= sLength)
                         {
                             Song_Position = 0;
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                             done = TRUE;
 #endif
                         }
@@ -2484,7 +2512,7 @@ void Sp_Player(void)
                             if(PosJump > 0)
                             {
 
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                                 if(PosJump <= Song_Position)
                                 {
                                     done = TRUE;
@@ -2512,7 +2540,7 @@ void Sp_Player(void)
                         if(Song_Position >= sLength)
                         {
                             Song_Position = 0;
-#if defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                             done = TRUE;
 #endif
                         }
@@ -2533,6 +2561,9 @@ void Sp_Player(void)
                 }
             }
         }
+
+        // Replay the song sequence with a delay
+        if(Songplaying_Pattern) Proc_Next_Visual_Line();
     }
 
     for(c = 0; c < Songtracks; c++)
@@ -2603,18 +2634,19 @@ ByPass_Wav:
                             sp_Tvol[c][i] = 0.0f;
                             if(sp_Cvol[c][i] <= 0.0f) sp_Stage[c][i] = PLAYING_NOSAMPLE;
                         }
+                        dest_volume = sp_Tvol[c][i] * sp_Tvol_Mod[c];
                         // Volume ramping
-                        if(sp_Cvol[c][i] != sp_Tvol[c][i])
+                        if(sp_Cvol[c][i] != dest_volume)
                         {
-                            if(sp_Cvol[c][i] > sp_Tvol[c][i])
+                            if(sp_Cvol[c][i] > dest_volume)
                             {
                                 sp_Cvol[c][i] -= 0.01f;
-                                if(sp_Cvol[c][i] < sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                                if(sp_Cvol[c][i] < dest_volume) sp_Cvol[c][i] = dest_volume;
                             }
                             else
                             {
                                 sp_Cvol[c][i] += 0.01f;
-                                if(sp_Cvol[c][i] > sp_Tvol[c][i]) sp_Cvol[c][i] = sp_Tvol[c][i];
+                                if(sp_Cvol[c][i] > dest_volume) sp_Cvol[c][i] = dest_volume;
                             }
                             if(sp_Cvol[c][i] > 1.0f) sp_Cvol[c][i] = 1.0f;
                             if(sp_Cvol[c][i] < 0.0f) sp_Cvol[c][i] = 0.0f;
@@ -2826,18 +2858,19 @@ ByPass_Wav:
                 }
                 else
                 {
+                    dest_volume = sp_Tvol_Synth[c][i] * sp_Tvol_Mod[c];
                     // Perform the volume ramping now if it hasn't been done before
-                    if(sp_Cvol_Synth[c][i] != sp_Tvol_Synth[c][i])
+                    if(sp_Cvol_Synth[c][i] != dest_volume)
                     {
-                        if(sp_Cvol_Synth[c][i] > sp_Tvol_Synth[c][i])
+                        if(sp_Cvol_Synth[c][i] > dest_volume)
                         {
                             sp_Cvol_Synth[c][i] -= 0.01f;
-                            if(sp_Cvol_Synth[c][i] < sp_Tvol_Synth[c][i]) sp_Cvol_Synth[c][i] = sp_Tvol_Synth[c][i];
+                            if(sp_Cvol_Synth[c][i] < dest_volume) sp_Cvol_Synth[c][i] = dest_volume;
                         }
                         else
                         {
                             sp_Cvol_Synth[c][i] += 0.01f;
-                            if(sp_Cvol_Synth[c][i] > sp_Tvol_Synth[c][i]) sp_Cvol_Synth[c][i] = sp_Tvol_Synth[c][i];
+                            if(sp_Cvol_Synth[c][i] > dest_volume) sp_Cvol_Synth[c][i] = dest_volume;
                         }
                         if(sp_Cvol_Synth[c][i] > 1.0f) sp_Cvol_Synth[c][i] = 1.0f;
                         if(sp_Cvol_Synth[c][i] < 0.0f) sp_Cvol_Synth[c][i] = 0.0f;
@@ -2859,7 +2892,8 @@ ByPass_Wav:
 #if defined(PTK_SYNTH_OSC3)
                                                                 (Uint64 *) &sp_Position_osc3[c][i],
 #endif
-                                                                Vstep1[c][i]
+                                                                Vstep1[c][i],
+                                                                Player_Ampli[c][i]
                                                                );
 
                 if((Synthesizer[c][i].Data.OSC1_WAVEFORM == WAVEFORM_WAV ||
@@ -2867,6 +2901,7 @@ ByPass_Wav:
                 {
                     if(Player_SC[c][i] == 2) grown = TRUE;
                 }
+
                 gotsome = TRUE;
             }
 #endif // PTK_SYNTH
@@ -3265,22 +3300,15 @@ ByPass_Wav:
             right_chorus += All_Signal_R * DC;
         }
 
-        // Store the data for the scopes
+        // Store the data for the tracks scopes
 #if !defined(__STAND_ALONE__)
-#if !defined(__WINAMP__)
-        //if(Songplaying_Pattern)
-#endif
+        if(!CHAN_MUTE_STATE[c])
         {
-            if(!CHAN_MUTE_STATE[c])
-            {
-                Scope_Dats[c][Cscope[c]] = (All_Signal_L + All_Signal_R) * 0.15f;
-            }
-            else
-            {
-                Scope_Dats[c][Cscope[c]] = 0.0f;
-            }
-            Cscope[c]++;
-            Cscope[c] &= 127;
+            Scope_Dats[c][pos_scope] = (All_Signal_L + All_Signal_R) * 0.15f;
+        }
+        else
+        {
+            Scope_Dats[c][pos_scope] = 0.0f;
         }
 #endif
     }
@@ -3341,7 +3369,7 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 //  during volume ramping as the previous one is still being played).
 void Schedule_Instrument(int channel, int sub_channel,
                          int inote, int sample,
-                         float vol, float vol_synth, unsigned int offset,
+                         unsigned int offset,
                          int glide, int Play_Selection,
                          int midi_sub_channel)
 {
@@ -3349,11 +3377,12 @@ void Schedule_Instrument(int channel, int sub_channel,
     if(CHAN_ACTIVE_STATE[Cur_Position][channel])
     {
         // Nothing is already playing so play it directly
+        old_note[channel][sub_channel] = inote;
         Instrument_Schedule_Dat[channel][sub_channel].start_backward = FALSE;
         Instrument_Schedule_Dat[channel][sub_channel].inote = inote;
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
-        Instrument_Schedule_Dat[channel][sub_channel].vol = vol;
-        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = vol_synth;
+        Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample];
+        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].glb_volume * 0.0078125f;
         Instrument_Schedule_Dat[channel][sub_channel].offset = offset;
         Instrument_Schedule_Dat[channel][sub_channel].glide = glide;
         Instrument_Schedule_Dat[channel][sub_channel].Play_Selection = Play_Selection;
@@ -3444,12 +3473,6 @@ void Play_Instrument(int channel, int sub_channel)
                 split = revo;
             }
         }
-        
-//        if(!SampleType[associated_sample][split] && Synthprg[sample] == SYNTH_WAVE_OFF)
-        {
-  //          return;
-        }
-
 #endif
 
 #if defined(PTK_SYNTH)
@@ -3732,13 +3755,9 @@ void Play_Instrument(int channel, int sub_channel)
 #endif // PTK_INSTRUMENTS
 
         {
-            if(Synthprg[sample] == SYNTH_WAVE_OFF)
-            {
-                // Nothing will be played anyway since there's no synth and no instrument
-                // so just do volume ramping
-                //sp_Tvol[channel][sub_channel] = 0.0f;
-                //sp_Tvol_Synth[channel][sub_channel] = 0.0f;
-            }
+
+            Player_WL[channel][sub_channel] = 0;
+            Player_WR[channel][sub_channel] = 0;
             Player_Ampli[channel][sub_channel] = 1.0f;
             if(!glide)
             {
@@ -4026,47 +4045,29 @@ void DoEffects(void)
         pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
         pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
 
-        // Sample only: only set the default volume
-        if(Subicounter == 0)
-        {
-            for(i = 0; i < Channels_MultiNotes[trackef]; i++)
-            {
-                if(pltr_note[i] == 121 && pltr_sample[i] != 255 && pltr_vol_row > 64)
-                {
-                    if(Reserved_Sub_Channels[trackef][i] != -1)
-                    {
-                        sp_Tvol[trackef][Reserved_Sub_Channels[trackef][i]] = Sample_Vol[pltr_sample[i]];
-                    }
-                }
-            }
-        }
-
 #if defined(PTK_FX_AUTOFADEMODE)
         // Autofade routine
-        for(i = 0; i < Channels_Polyphony[trackef]; i++)
+        switch(FADEMODE[trackef])
         {
-            switch(FADEMODE[trackef][i])
-            {
-                case 1:
-                    sp_Tvol[trackef][i] += FADECOEF[trackef][i];
+            case 1:
+                sp_Tvol_Mod[trackef] += FADECOEF[trackef];
 
-                    if(sp_Tvol[trackef][i] > 1.0f)
-                    {
-                        sp_Tvol[trackef][i] = 1.0f;
-                        FADEMODE[trackef][i] = 0;
-                    }
-                    break;
+                if(sp_Tvol_Mod[trackef] > 1.0f)
+                {
+                    sp_Tvol_Mod[trackef] = 1.0f;
+                    FADEMODE[trackef] = 0;
+                }
+                break;
 
-                case 2:
-                    sp_Tvol[trackef][i] -= FADECOEF[trackef][i];
+            case 2:
+                sp_Tvol_Mod[trackef] -= FADECOEF[trackef];
 
-                    if(sp_Tvol[trackef][i] < 0.0f)
-                    {   
-                        sp_Tvol[trackef][i] = 0.0f;
-                        FADEMODE[trackef][i] = 0;
-                    }
-                    break;
-            }
+                if(sp_Tvol_Mod[trackef] < 0.0f)
+                {   
+                    sp_Tvol_Mod[trackef] = 0.0f;
+                    FADEMODE[trackef] = 0;
+                }
+                break;
         }
 #endif
 
@@ -4083,7 +4084,7 @@ void DoEffects(void)
                         if(sp_Stage[trackef][i] == PLAYING_SAMPLE)
                         {
                             if(FType[trackef] == 4) sp_Stage[trackef][i] = PLAYING_SAMPLE_NOTEOFF;
-                            else sp_Tvol[trackef][i] = 0.001f;
+                            else sp_Tvol_Mod[trackef] = 0.001f;
                         }
 #endif
 
@@ -4124,22 +4125,16 @@ void DoEffects(void)
 #if defined(PTK_FX_FINEVOLUMESLIDEUP)
                     // $20 fine volume slide up
                     case 0x20:
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            sp_Tvol[trackef][i] += pltr_dat_row[k] * 0.0039062f;
-                            if(sp_Tvol[trackef][i] > 1.0f) sp_Tvol[trackef][i] = 1.0f;
-                        }
+                        sp_Tvol_Mod[trackef] += pltr_dat_row[k] * 0.0039062f;
+                        if(sp_Tvol_Mod[trackef] > 1.0f) sp_Tvol_Mod[trackef] = 1.0f;
                         break;
 #endif
 
 #if defined(PTK_FX_FINEVOLUMESLIDEDOWN)
                     // $20 fine volume slide down
                     case 0x21:
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            sp_Tvol[trackef][i] -= pltr_dat_row[k] * 0.0039062f;
-                            if(sp_Tvol[trackef][i] < 0.0f) sp_Tvol[trackef][i] = 0.0f;
-                        }
+                        sp_Tvol_Mod[trackef] -= pltr_dat_row[k] * 0.0039062f;
+                        if(sp_Tvol_Mod[trackef] < 0.0f) sp_Tvol_Mod[trackef] = 0.0f;
                         break;
 #endif
 
@@ -4244,10 +4239,7 @@ void DoEffects(void)
 #if defined(PTK_FX_TRANCESLICER)
                 // $04 Trance slicer
                 case 0x4:
-                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                    {
-                        if(Subicounter >= pltr_dat_row[k]) sp_Tvol[trackef][i] = 0;
-                    }
+                    if(Subicounter >= pltr_dat_row[k]) sp_Tvol_Mod[trackef] = 0;
                     break;
 #endif
 
@@ -4387,32 +4379,12 @@ void DoEffects(void)
                             // Mark it as playing
                             Note_Sub_Channels[trackef][i] = i;
                             Reserved_Sub_Channels[trackef][i] = free_sub_channel;
-
-                            // Retrigger all playing sub channels
-                            // (Note: a 9 fx could be combined with a 3 one)
-                            if(pltr_vol_row <= 64 || pltr_eff_row[0] == 3 || pltr_eff_row[1] == 3)
-                            {
-                                // Specified volume
-                                Schedule_Instrument(trackef,
-                                                    free_sub_channel,
-                                                    pltr_note[i],
-                                                    pltr_sample[i],
-                                                    pltr_vol_row * 0.015625f,
-                                                    pltr_vol_row * 0.015625f,
-                                                    0, 0,
-                                                    FALSE, i + 1);
-                            }
-                            else
-                            {
-                                Schedule_Instrument(trackef,
-                                                    free_sub_channel,
-                                                    pltr_note[i],
-                                                    pltr_sample[i],
-                                                    Sample_Vol[pltr_sample[i]],
-                                                    PARASynth[pltr_sample[i]].glb_volume * 0.0078125f,
-                                                    0, 0,
-                                                    FALSE, i + 1);
-                            }
+                            Schedule_Instrument(trackef,
+                                                free_sub_channel,
+                                                pltr_note[i],
+                                                pltr_sample[i],
+                                                0, 0,
+                                                FALSE, i + 1);
                         }
                     }
                     break;
@@ -4484,18 +4456,12 @@ void DoEffects(void)
                 case 0x17:
                     if(pltr_dat_row[k] > 0)
                     {
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            FADECOEF[trackef][i] = 0.1666667f / (float) pltr_dat_row[k];
-                            FADEMODE[trackef][i] = 1;
-                        }
+                        FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row[k];
+                        FADEMODE[trackef] = 1;
                     }
                     else
                     {
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            FADEMODE[trackef][i] = 0;
-                        }
+                        FADEMODE[trackef] = 0;
                     }
                     break;
 #endif
@@ -4505,18 +4471,11 @@ void DoEffects(void)
                 case 0x18:
                     if(pltr_dat_row[k] > 0)
                     {
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            FADECOEF[trackef][i] = 0.1666667f / (float) pltr_dat_row[k];
-                            FADEMODE[trackef][i] = 2;
-                        }
+                        FADECOEF[trackef] = 0.1666667f / (float) pltr_dat_row[k];
                     }
                     else
                     {
-                        for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                        {
-                            FADEMODE[trackef][i] = 0;
-                        }
+                        FADEMODE[trackef] = 0;
                     }
                     break;
 #endif
@@ -4524,22 +4483,16 @@ void DoEffects(void)
 #if defined(PTK_FX_VOLUMESLIDEUP)
                 // $19 Volume slide up
                 case 0x19:
-                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                    {
-                        sp_Tvol[trackef][i] += pltr_dat_row[k] * 0.0039062f;
-                        if(sp_Tvol[trackef][i] > 1.0f) sp_Tvol[trackef][i] = 1.0f;
-                    }
+                    sp_Tvol_Mod[trackef] += pltr_dat_row[k] * 0.0039062f;
+                    if(sp_Tvol_Mod[trackef] > 1.0f) sp_Tvol_Mod[trackef] = 1.0f;
                     break;
 #endif
 
 #if defined(PTK_FX_VOLUMESLIDEDOWN)
                 // $1a Volume slide down
                 case 0x1a: 
-                    for(i = 0; i < Channels_Polyphony[trackef]; i++)
-                    {
-                        sp_Tvol[trackef][i] -= pltr_dat_row[k] * 0.0039062f;
-                        if(sp_Tvol[trackef][i] < 0.0f) sp_Tvol[trackef][i] = 0.0f;
-                    }
+                    sp_Tvol_Mod[trackef] -= pltr_dat_row[k] * 0.0039062f;
+                    if(sp_Tvol_Mod[trackef] < 0.0f) sp_Tvol_Mod[trackef] = 0.0f;
                     break;
 #endif
 
@@ -4717,10 +4670,12 @@ void GetPlayerValues(void)
     {
         if(Songplaying_Pattern == 0)
         {
-            if(AUDIO_GetSamples() >= (int) (((float) AUDIO_Latency * ((AUDIO_DBUF_RESOLUTION * AUDIO_DBUF_CHANNELS) / 8.0f)) / 4.0f))
+            int Max_Latency = AUDIO_Latency;
+            if(AUDIO_GetSamples() >= Max_Latency)
             {
+                // Start from the top of the buffer
                 Delay_Sound_Buffer = 0;
-                Max_Delay_Sound_Buffer = Cur_Delay_Sound_Buffer;
+                PosInTick_Delay = 0;
                 Songplaying_Pattern = 1;
             }
         }

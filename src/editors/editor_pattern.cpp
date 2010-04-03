@@ -1453,7 +1453,7 @@ void Actupated(int modac)
     if(is_editing > 1)
     {
         is_editing = 0;
-        StartEdit();
+        Notify_Edit();
     }
     
     if(!Songplaying)

@@ -44,6 +44,8 @@
 extern int Nbr_Sub_NoteOff;
 extern int key_record_first_time;
 extern int old_key_Pattern_Line;
+extern int pos_scope;
+extern int pos_scope_latency;
 
 char Midi_In_Name[256];
 char Midi_Out_Name[256];
@@ -118,6 +120,8 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             Nbr_Sub_NoteOff = 0;
             is_record_key = FALSE;
             is_editing = TRUE;
+            L_MaxLevel = 0;
+            R_MaxLevel = 0;
             Songplaying = TRUE;
             Pattern_Line_Visual = Pattern_Line;
             key_record_first_time = FALSE;

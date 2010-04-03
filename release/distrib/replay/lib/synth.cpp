@@ -69,7 +69,7 @@ void CSynth::Reset(void)
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     // Synthesizer General Reset
-    Data.GLB_VOLUME = 1.0f;
+//    Data.GLB_VOLUME = 1.0f;
     Data.DISTO = 0.0f;
     Data.OSC1_WAVEFORM = WAVEFORM_SAW;      /* Sawtooth */
     Data.OSC2_WAVEFORM = WAVEFORM_PULSE;    /* Pulse */
@@ -712,7 +712,8 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_OSC3)
                         Uint64 *position_osc3,
 #endif
-                        int64 osc_speed)
+                        int64 osc_speed,
+                        float Ampi_Vol)
     {
 
     s_access *pos_osc1 = (s_access *) position_osc1;
@@ -761,6 +762,7 @@ float CSynth::GetSample(short *Left_Samples,
                             )
                             * ENV1_VOLUME
                            ;
+            if(Data.OSC1_WAVEFORM == WAVEFORM_NONE) T_OSC1_VOLUME *= Ampi_Vol;
 
             if(*track)
             {
@@ -1183,6 +1185,8 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                                     + 0) + ENV2_MIN)
                                     * ENV2_VOLUME;
+
+                    if(Data.OSC2_WAVEFORM == WAVEFORM_NONE) T_OSC2_VOLUME *= Ampi_Vol;
 
                     res_dec = pos_osc2->half.last;
 
@@ -1702,7 +1706,7 @@ float CSynth::GetSample(short *Left_Samples,
     }
 #endif
 
-    GS_VAL *= Data.GLB_VOLUME;
+//    GS_VAL *= Data.GLB_VOLUME;
 
     if(Stereo == 2)
     {
@@ -1721,7 +1725,7 @@ float CSynth::GetSample(short *Left_Samples,
         if(Data.VCF_TYPE < 2) GS_VAL2 = FilterR();
 #endif
 
-        GS_VAL2 *= Data.GLB_VOLUME;
+//        GS_VAL2 *= Data.GLB_VOLUME;
         *Right_Signal += GS_VAL2;
     }
 
@@ -1825,7 +1829,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     Data.PTC_GLIDE =          ((float) TSP.ptc_glide * (float) TSP.ptc_glide) * 0.0000015625f;
     Data.PTC_GLIDE64 =         (int64) ((double) Data.PTC_GLIDE * 4294967296.0);
 
-    Data.GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
+//    Data.GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
 
     Data.DISTO =              (((float) TSP.disto)) + 1.0f;
 

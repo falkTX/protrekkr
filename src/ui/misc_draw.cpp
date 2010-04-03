@@ -62,8 +62,8 @@ char *Font_Ascii =
     "0123456789&\351\"'(-\350_\347\340)=*+^$\371%\265,;:!?./<>@#[]|\\\001\002\003\004\005\006\007\010\011\012\013\014\015"
     //A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z   .   -   
     "\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251"
-    // |> ||
-    "\253\254"
+    // |> || Wave
+    "\253\254\255"
     " ";
 int Font_Pos[256];
 int Font_Size[256];
@@ -627,7 +627,7 @@ SDL_Color Default_Palette5[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
 
-    { 0x00, 0x16, 0x44, 0x00 },
+    { 0x00, 0x16, 0x32, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
     { 0x00, 0x28, 0x6a, 0x00 },
@@ -652,13 +652,13 @@ SDL_Color Default_Palette5[] =
     { 0xb0, 0xce, 0xff, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
 
-    { 0x08, 0x1e, 0x44, 0x00 },
+    { 0x00, 0x16, 0x32, 0x00 },
     { 0x46, 0x90, 0xee, 0x00 },
 
     { 0x18, 0x30, 0x5c, 0x00 },
     { 0x94, 0xb4, 0xff, 0x00 },
 
-    { 0x0a, 0x32, 0xb0, 0x00 },
+    { 0x0a, 0x32, 0x94, 0x00 },
     { 0x00, 0xa8, 0xff, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
@@ -1055,8 +1055,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_HI) + COL_HI].b;
-                ComponentR -= 0x10;
-                ComponentB += 0x10;
+                ComponentR -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
@@ -1078,8 +1078,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_DOUBLE_PUSHED_HI) + COL_PUSHED_HI].b;
-                ComponentR -= 0x10;
-                ComponentB += 0x10;
+                ComponentR -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentR < 0) ComponentR = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
@@ -1101,8 +1101,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_INPUT_HI) + COL_HI].b;
-                ComponentG -= 0x10;
-                ComponentB += 0x10;
+                ComponentG -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentG < 0) ComponentG = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 
@@ -1124,8 +1124,8 @@ void Set_Phony_Palette(void)
                 ComponentR = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].r;
                 ComponentG = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].g;
                 ComponentB = Ptk_Palette[(i - COL_INPUT_PUSHED_HI) + COL_PUSHED_HI].b;
-                ComponentG -= 0x10;
-                ComponentB += 0x10;
+                ComponentG -= 0x20;
+                ComponentB += 0x20;
                 if(ComponentG < 0) ComponentG = 0;
                 if(ComponentB > 0xff) ComponentB = 0xff;
 

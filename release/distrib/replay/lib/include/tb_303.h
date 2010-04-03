@@ -136,6 +136,7 @@ struct para303
 // Variables
 extern int SamplesPerTick;
 extern int PosInTick;
+extern int PosInTick_Delay;
 
 // ------------------------------------------------------
 // Classes

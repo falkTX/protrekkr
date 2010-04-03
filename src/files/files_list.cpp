@@ -59,11 +59,11 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
-int lt_ykar = 0;
-int lt_items = 0;
-int lt_index = 0;
-int lt_curr = 0;
-int list_counter;
+int lt_ykar[SCOPE_LAST_DIR];
+int lt_items[SCOPE_LAST_DIR];
+int lt_index[SCOPE_LAST_DIR];
+int lt_curr[SCOPE_LAST_DIR];
+int list_counter[SCOPE_LAST_DIR];
 int sort_files = TRUE;
 
 FILEENTRY SMPT_LIST[2048];
@@ -95,23 +95,23 @@ void Clear_Files_List(void)
 
 void Add_Entry(char *Name, int Type)
 {
-    sprintf(SMPT_LIST[list_counter].Name, Name);
-    SMPT_LIST[list_counter].Type = Type;
-    lt_items++;
-    list_counter++;
+    sprintf(SMPT_LIST[list_counter[Scopish]].Name, Name);
+    SMPT_LIST[list_counter[Scopish]].Type = Type;
+    lt_items[Scopish]++;
+    list_counter[Scopish]++;
 }
 
 void Insert_Entry(char *Name, int Type, int idx)
 {
     int i;
-    for(i = list_counter - 1; i >= idx; i--)
+    for(i = list_counter[Scopish] - 1; i >= idx; i--)
     {
         memcpy(&SMPT_LIST[i + 1], &SMPT_LIST[i], sizeof(FILEENTRY));
     }
     sprintf(SMPT_LIST[idx].Name, Name);
     SMPT_LIST[idx].Type = Type;
-    lt_items++;
-    list_counter++;
+    lt_items[Scopish]++;
+    list_counter[Scopish]++;
 }
 
 char *Get_FileName(int idx)
@@ -173,7 +173,7 @@ void Set_Current_Dir(void)
 
     if (tmp && *tmp == '/') *tmp = 0;
     if (strrchr(Dir_Act, '/') == Dir_Act &&
-        !strcmp(Get_FileName(lt_curr), ".."))
+        !strcmp(Get_FileName(lt_curr[Scopish]), ".."))
     {
         switch(Scopish)
         {
@@ -205,14 +205,14 @@ void Set_Current_Dir(void)
     if (!strcmp(Dir_Act, "/"))
     {
         strcpy(filename, "/");
-        strcat(filename, Get_FileName(lt_curr));
+        strcat(filename, Get_FileName(lt_curr[Scopish]));
     }
     else
     {
-        strcpy(filename, Get_FileName(lt_curr));
+        strcpy(filename, Get_FileName(lt_curr[Scopish]));
     }
 #else
-    strcpy(filename, Get_FileName(lt_curr));
+    strcpy(filename, Get_FileName(lt_curr[Scopish]));
 #endif
  
     switch(Scopish)
@@ -312,11 +312,11 @@ void CopyStringBSTRToC(BSTR in,
 // Fill the list with the content of the relevant directory
 void Read_SMPT(void)
 {
-    lt_ykar = 0;
-    lt_items = 0;  
-    list_counter = 0;
-    lt_curr = 0;
-    lt_index = 0;
+    //lt_ykar = 0;
+    //lt_curr = 0;
+    //lt_index = 0;
+    lt_items[Scopish] = 0;  
+    list_counter[Scopish] = 0;
 
 #if defined(__WIN32__)
     struct _finddata_t c_file;
@@ -401,7 +401,7 @@ void Read_SMPT(void)
             } // while      
             _findclose(hFile);
 
-            if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+            if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
 
             Insert_Entry("", _A_SEP, 0);
             Insert_Entry("..", _A_SUBDIR, 0);
@@ -480,7 +480,7 @@ void Read_SMPT(void)
             closedir(dirp);
         }
 
-        if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+        if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
 
         // Insert parent directory at the top
         Insert_Entry("", _A_SEP, 0);
@@ -492,7 +492,7 @@ void Read_SMPT(void)
     // Enum them
     nftw(Dir_Act, &list_file, FTW_PHYS, 0);
 
-    if(sort_files) qsort(&SMPT_LIST[0], list_counter, sizeof(FILEENTRY), &FileComp_Files);
+    if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
 
     // Always insert them at the top of the list
     Insert_Entry("", _A_SEP, 0);
@@ -502,7 +502,7 @@ void Read_SMPT(void)
 #endif
 
     // Insert a separator between files and directories
-    for(i = list_counter - 1; i >= 0; i--)
+    for(i = list_counter[Scopish] - 1; i >= 0; i--)
     {
         if(SMPT_LIST[i].Type == _A_FILE)
         {
@@ -516,7 +516,7 @@ void Read_SMPT(void)
 // Display the files list on screen
 void Dump_Files_List(int xr, int yr)
 {
-    int y = lt_index;
+    int y = lt_index[Scopish];
     FILE *File;
     char Size_String[64];
     int space = Font_Height + 1;
@@ -557,16 +557,16 @@ void Dump_Files_List(int xr, int yr)
                     break;
             }
 
-            if(lt_items)
+            if(lt_items[Scopish])
             {
                 for(int counter = 0; counter < 11; counter++)
                 {
                     int rel_val = y + counter;
 
-                    if(y + counter < lt_items)
+                    if(y + counter < lt_items[Scopish])
                     {
                         // Highlight bar in files requester.
-                        if(y + counter == lt_curr)
+                        if(y + counter == lt_curr[Scopish])
                         {
                             SetColor(COL_PUSHED_MED);
                             bjbox(xr - 1, yr + (counter * space) + 2, 387, space);
@@ -618,7 +618,7 @@ void Dump_Files_List(int xr, int yr)
 // Redraw the files list
 void Actualize_Files_List(int modeac)
 {
-    int const brolim = lt_items - 11;
+    int const brolim = lt_items[Scopish] - 11;
 
     switch(Scopish)
     {
@@ -631,31 +631,31 @@ void Actualize_Files_List(int modeac)
 
             if(modeac == 0)
             {
-                if(lt_ykar > 70) lt_ykar = 70;
-                if(lt_ykar < 0) lt_ykar = 0;
-                lt_index = (lt_ykar * brolim) / 70;
+                if(lt_ykar[Scopish] > 70) lt_ykar[Scopish] = 70;
+                if(lt_ykar[Scopish] < 0) lt_ykar[Scopish] = 0;
+                lt_index[Scopish] = (lt_ykar[Scopish] * brolim) / 70;
             }
 
-            if(lt_index > brolim) lt_index = brolim;
-            if(lt_index < 0) lt_index = 0;
+            if(lt_index[Scopish] > brolim) lt_index[Scopish] = brolim;
+            if(lt_index[Scopish] < 0) lt_index[Scopish] = 0;
             if(modeac != 0)
             {
                 if(brolim)
                 {
-                    lt_ykar = (lt_index * 70) / brolim;
+                    lt_ykar[Scopish] = (lt_index[Scopish] * 70) / brolim;
                 }
                 else
                 {
-                    lt_ykar = (lt_index * 70);
+                    lt_ykar[Scopish] = (lt_index[Scopish] * 70);
                 }
             }
 
             // Draw the files slider
-            Draw_Lists_Slider(lt_ykar);
-            if(last_index != lt_index)
+            Draw_Lists_Slider(lt_ykar[Scopish]);
+            if(last_index != lt_index[Scopish])
             {
                 Dump_Files_List(395, 41);
-                last_index = lt_index;
+                last_index = lt_index[Scopish];
             }
             break;
     }

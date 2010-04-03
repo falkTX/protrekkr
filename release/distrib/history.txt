@@ -12,7 +12,7 @@ v2.0:
 - 6 default color themes are now available.
 - Range selection in sample editor speeded up.
 - .mod import function is now much more accurate
-  (note: it can also import fasttracker 1 .ft modules).
+  (note: it can also import FastTracker 1 .ft modules).
 - Fixed a bug in samples looping (1 byte was always missing from the loop).
 - Improved shadow patterns rendering.
 - Patterns shading is also displayed for track which are turned off
@@ -31,12 +31,12 @@ v2.0:
 - Added fine pitch up and down effects (22 & 23).
 - Speed can now go up to 32 ticks/beat.
 - BPM weren't refreshed properly on screen when being changed inside patterns.
-- Multi notes channels of modules weren't re-initialized& that could lead
-  to a potential crash.
+- Multi-notes channels weren't re-initialized properly when loading new modules
+  which could lead to a crash.
 - Instruments used without notes won't retrig the note but only change
   the waveform (like in the original protracker).
 - Filelists won't be redrawn after a loading process
-  (so they won't jump back to the top).
+  and they won't jump back to the top after a saving one either.
 - Fixed a bug in Pattern loop command (6).
 - Splitted the play button into 2, 1st one to play song,
   2nd one to play pattern, right mouse button on those to play song
@@ -54,8 +54,29 @@ v2.0:
 - Global volume of instruments weren't saved in .pti files.
 - Using non existant instruments in patterns should now be handled properly.
 - Converted some tunes from FastTracker 1 for test purposes.
-- Instruments amplifications don't modulate synths volume anymore
-  because that was stupid.
+- Instruments amplifications are now modulating synths only when necessary
+  (meaning: only when the instruments are going through the synths).
+- Volumes columns and effect 3 are now calculated differently
+  and are cummulative:
+
+    c-3  0 .. .. ........
+  
+  will play instrument 0 at it's former volume.
+
+    c-3  0 20 .. ........
+  
+  will play instrument 0 at roughly 50% of it's volume.
+
+    c-3  0 .. .. 0380....
+  
+  will play instrument 0 at roughly 50% of it's volume.
+
+    c-3  0 20 .. 0380....
+  
+  will play instrument 0 at roughly 25% of it's volume.
+- Fixed a bug in note retrig effect if no note was specified
+  (now it takes the last played note as it should).
+- Rewrote the latency handling routines in a more robust & precise way.
 
 v1.99e:
 

@@ -176,9 +176,10 @@ void Actualize_Master_Ed(char gode)
         {
             AUDIO_Stop_Sound_Buffer();
             AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds);
+            Init_Scopes_Buffers();
             AUDIO_Play();
             SongStop();
-            Actupated(0);
+            //Actupated(0);
         }
 
         // Mouse wheel

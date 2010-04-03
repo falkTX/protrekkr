@@ -6,6 +6,9 @@ v2.0:
  - Complete the 303 (the env mod & accent stuff).
  - Import the 3 NTK 1 beta modules.
 
+ - Check fx 4.
+ - Descriptor format error in macosx (AudioDeviceSetProperty(kAudioDevicePropertyStreamFormat)).
+
 [UI]
  - Create a decent gadgets system (events based).
  - Click on numbers & move the mouse to modify them (or use the wheel).

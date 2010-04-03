@@ -376,7 +376,7 @@ void Pre_Song_Init(void);
 void Sp_Player(void);
 void Schedule_Instrument(int channel, int sub_channel,
                          int note, int sample,
-                         float vol, float vol_synth, unsigned int offset,
+                         unsigned int offset,
                          int glide, int Play_Selection, int midi_sub_channel);
 void Play_Instrument(int channel, int sub_channel);
 void ResetFilters(int tr);

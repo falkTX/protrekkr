@@ -61,6 +61,11 @@ extern char Paste_Across;
 
 unsigned char sl3 = 0;
 
+extern int pos_scope;
+extern int pos_scope_latency;
+
+extern float sp_Tvol_Mod[MAX_TRACKS];
+
 int Display_Pointer = FALSE;
 
 int CONSOLE_WIDTH = 800;
@@ -687,31 +692,31 @@ int Screen_Update(void)
         // Files list slider
         if(gui_action == GUI_CMD_SET_FILES_LIST_SLIDER)
         {
-            lt_ykar = Mouse.y - 72;
+            lt_ykar[Scopish] = Mouse.y - 72;
             Actualize_Files_List(0);
         }
 
         // File selection
         if(gui_action == GUI_CMD_SET_FILES_LIST_SELECT_FILE)
         {
-            if(lt_items)
+            if(lt_items[Scopish])
             {
-                int broadcast = lt_index + (Mouse.y - 43) / (Font_Height + 1);
+                int broadcast = lt_index[Scopish] + (Mouse.y - 43) / (Font_Height + 1);
                 if(Get_FileType(broadcast) != _A_SEP)
                 {
                     last_index = -1;
-                    if(broadcast != lt_curr)
+                    if(broadcast != lt_curr[Scopish])
                     {
-                        lt_curr = broadcast;
+                        lt_curr[Scopish] = broadcast;
                         Actualize_Files_List(1);
                     }
                     else
                     {
-                        switch(Get_FileType(lt_curr))
+                        switch(Get_FileType(lt_curr[Scopish]))
                         {
                             case _A_FILE:
                                 Stop_Current_Sample();
-                                LoadFile(Current_Sample, Get_FileName(lt_curr));
+                                LoadFile(Current_Sample, Get_FileName(lt_curr[Scopish]));
                                 AUDIO_Stop();
                                 AUDIO_Play();
                                 break;
@@ -729,20 +734,20 @@ int Screen_Update(void)
         // Play a .wav
         if(gui_action == GUI_CMD_SET_FILES_LIST_PLAY_WAV)
         {
-            if(lt_items)
+            if(lt_items[Scopish])
             {
-                int broadcast = lt_index + (Mouse.y - 43) / 12;
+                int broadcast = lt_index[Scopish] + (Mouse.y - 43) / 12;
                 last_index = -1;
-                lt_curr = broadcast;
-                switch(Get_FileType(lt_curr) )
+                lt_curr[Scopish] = broadcast;
+                switch(Get_FileType(lt_curr[Scopish]) )
                 {
                     case _A_FILE:
                         Actualize_Files_List(1);
 #if defined(__WIN32__)
-                        PlaySound(Get_FileName(lt_curr), NULL, SND_FILENAME | SND_ASYNC);
+                        PlaySound(Get_FileName(lt_curr[Scopish]), NULL, SND_FILENAME | SND_ASYNC);
 #endif
 #if defined(__MACOSX__)
-                        if(FSPathMakeRef((Uint8 *) Get_FileName(lt_curr), &soundFileRef, NULL) == noErr)
+                        if(FSPathMakeRef((Uint8 *) Get_FileName(lt_curr[Scopish]), &soundFileRef, NULL) == noErr)
                         {
                             SystemSoundGetActionID(&soundFileRef, &WavActionID);
                             SystemSoundSetCompletionRoutine(WavActionID,
@@ -757,7 +762,7 @@ int Screen_Update(void)
                         FILE *fptr;
                         char temp[1024];
 
-                        sprintf(temp, "aplay %s & > /dev/null", Get_FileName(lt_curr));
+                        sprintf(temp, "aplay %s & > /dev/null", Get_FileName(lt_curr[Scopish]));
                         fptr = popen(temp, "r");
                         pclose(fptr);
 #endif
@@ -934,7 +939,7 @@ int Screen_Update(void)
             is_recording_2 = 0;
             Nbr_Sub_NoteOff = 0;
             is_editing = 0;
-            StartEdit();
+            Notify_Edit();
             SongStop();
         }
 
@@ -950,7 +955,7 @@ int Screen_Update(void)
             Nbr_Sub_NoteOff = 0;
             SongStop();
             Actupated(0);
-            StartEdit();
+            Notify_Edit();
         }
 
         if(gui_action == GUI_CMD_RECORD_MODE)
@@ -963,7 +968,7 @@ int Screen_Update(void)
             key_record_first_time = TRUE;
             Clear_Midi_Channels_Pool();
             Actupated(0);
-            StartEdit();
+            Notify_Edit();
             Post_Song_Init();
         }
 
@@ -1533,11 +1538,11 @@ int Screen_Update(void)
         Gui_Draw_Button_Box(0, 180, fsize, 2, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
         Gui_Draw_Button_Box(0, 24, 96, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
-        Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        
         Gui_Draw_Button_Box(8, 46, 80, 16, "\254", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Notify_Play();
         StartRec();
-        StartEdit();
+        Notify_Edit();
 
         Gui_Draw_Button_Box(98, 24, 156, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
         Gui_Draw_Button_Box(106, 28, 80, 16, "Position", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -2159,22 +2164,11 @@ void SongPlay(void)
     Post_Song_Init();
     Ptk_Play();
 
-    if(plx == 0)
-    {
-        Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Status_Box("Playing song...");
-    }
-    else
-    {
-        Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-        Status_Box("Playing pattern...");
-    }
+    Notify_Play();
 }
 
 // ------------------------------------------------------
-// Turn live recording on/off
+// Display live recording status
 // "startrec" got it ? haha :(
 void StartRec(void)
 {
@@ -2185,8 +2179,8 @@ void StartRec(void)
 }
 
 // ------------------------------------------------------
-// Turn edit on/off
-void StartEdit(void)
+// Display editing status
+void Notify_Edit(void)
 {
     if(is_editing && !is_recording)
     {
@@ -2199,6 +2193,32 @@ void StartEdit(void)
     if(!is_editing && !is_recording)
     {
         Gui_Draw_Button_Box(8, 82, 80, 16, "Edit/Record", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+    }
+}
+
+// ------------------------------------------------------
+// Display playing status
+void Notify_Play(void)
+{
+    if(Songplaying)
+    {
+        if(plx == 0)
+        {
+            Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+            Status_Box("Playing song...");
+        }
+        else
+        {
+            Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+            Status_Box("Playing pattern...");
+        }
+    }
+    else
+    {
+        Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
 }
 
@@ -2361,6 +2381,7 @@ void Newmod(void)
 
     SubCounter = 0;
     PosInTick = 0;
+    PosInTick_Delay = 0;
 
     allow_save = TRUE;
 
@@ -3723,6 +3744,8 @@ void Keyboard_Handler(void)
                 Nbr_Sub_NoteOff = 0;
                 is_record_key = FALSE;
                 is_editing = TRUE;
+                L_MaxLevel = 0;
+                R_MaxLevel = 0;
                 Songplaying = TRUE;
                 Pattern_Line_Visual = Pattern_Line;
                 key_record_first_time = FALSE;
@@ -4698,7 +4721,7 @@ void Mouse_Handler(void)
                 // Scroll the files lists
                 if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
-                    lt_index--;
+                    lt_index[Scopish]--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
                 break;
@@ -4753,7 +4776,7 @@ void Mouse_Handler(void)
                 // Scroll the files lists
                 if(zcheckMouse(393, 41, 406, 136) == 1)
                 {
-                    lt_index++;
+                    lt_index[Scopish]++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
                 break;
@@ -4943,14 +4966,14 @@ void Mouse_Handler(void)
                 // Files list up
                 if(zcheckMouse(782, 42, 16, 14))
                 {
-                    lt_index--;
+                    lt_index[Scopish]--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
 
                 // Files list down
                 if(zcheckMouse(782, 164, 16, 14))
                 {
-                    lt_index++;
+                    lt_index[Scopish]++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
 
@@ -5330,12 +5353,12 @@ void Mouse_Handler(void)
 
                 if(zcheckMouse(394, 42, 16, 14) == 1)
                 {
-                    lt_index -= 10;
+                    lt_index[Scopish] -= 10;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
                 if(zcheckMouse(394, 162, 16, 14) == 1)
                 {
-                    lt_index += 10;
+                    lt_index[Scopish] += 10;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
                 break;
@@ -6020,7 +6043,11 @@ void Draw_Scope(void)
     int pixel_color = COL_SCOPESSAMPLES;
     float pos_in_line;
     float datas;
+    int offset_scope = pos_scope_latency;
     LPDAT_POS_SCOPE ptrTbl_Dat;
+
+    if(offset_scope < 0) offset_scope = 0;
+    if(offset_scope > (AUDIO_Latency / 2) - 1) offset_scope = (AUDIO_Latency / 2) - 1;
 
     if(Scopish == SCOPE_ZONE_SCOPE)
     {
@@ -6034,12 +6061,13 @@ void Draw_Scope(void)
             for(i = 0; i < Scope_Table[2].nbr; i++)
             {
                 x = ptrTbl_Dat->x_pos;
-                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large), USE_FONT_LOW, table_channels_scopes[i + 16]);
+                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                        USE_FONT_LOW, table_channels_scopes[i + 16]);
 
                 for(int s = 0; s < ptrTbl_Dat->x_max; s++)
                 {
-                    pos_in_line = ((float) s) / ptrTbl_Dat->x_max;
-                    datas = (Scope_Dats_LeftRight[i][(int) (pos_in_line * 128)] / 8192);
+                    pos_in_line = ((float) s) / (float) ptrTbl_Dat->x_max;
+                    datas = (Scope_Dats_LeftRight[i][offset_scope + (int) (pos_in_line * 128)] * 0.25f) / 8192;
                     if(datas < -1.0f) datas = -1.0f;
                     if(datas > 1.0f) datas = 1.0f;
                     int y = 42 + ptrTbl_Dat->y_pos + (int) (datas * ptrTbl_Dat->y_large);
@@ -6052,17 +6080,19 @@ void Draw_Scope(void)
         }
         else
         {
-            // Channels
+            // Tracks
             ptrTbl_Dat = &Scope_Table_Dats[Scope_Table[Songtracks].offset];
             for(i = 0; i < Scope_Table[Songtracks].nbr; i++)
             {
                 x = ptrTbl_Dat->x_pos;
-                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large), USE_FONT_LOW, table_channels_scopes[i]);
+                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                        USE_FONT_LOW, table_channels_scopes[i]);
 
                 for(int s = 0; s < ptrTbl_Dat->x_max; s++)
                 {
-                    pos_in_line = ((float) s) / ptrTbl_Dat->x_max;
-                    datas = (Scope_Dats[i][(int) (pos_in_line * 128)] / 8192) * mas_vol;
+                    // [0..1]
+                    pos_in_line = ((float) s) / (float) ptrTbl_Dat->x_max;
+                    datas = Scope_Dats[i][offset_scope + (int) (pos_in_line * 128)] / 8192;
                     if(datas < -1.0f) datas = -1.0f;
                     if(datas > 1.0f) datas = 1.0f;
                     int y = 42 + ptrTbl_Dat->y_pos + (int) (datas * ptrTbl_Dat->y_large);
@@ -6076,6 +6106,31 @@ void Draw_Scope(void)
     }
 }
 
+int Init_Scopes_Buffers(void)
+{
+    int i;
+
+    pos_scope = 0;
+    pos_scope_latency = 0;
+    for(i = 0; i < MAX_TRACKS; i++)
+    {  
+        if(Scope_Dats[i]) free(Scope_Dats[i]);
+        Scope_Dats[i] = (float *) malloc(((AUDIO_Latency + 1) + (512 * 4)) * 2);
+        if(!Scope_Dats[i]) return(FALSE);
+        memset(Scope_Dats[i], 0, ((AUDIO_Latency + 1) + (512 * 4)) * 2);
+    }
+
+    if(Scope_Dats_LeftRight[0]) free(Scope_Dats_LeftRight[0]);
+    if(Scope_Dats_LeftRight[1]) free(Scope_Dats_LeftRight[1]);
+    Scope_Dats_LeftRight[0] = (float *) malloc(((AUDIO_Latency + 1) + (512 * 4)) * 2);
+    if(!Scope_Dats_LeftRight[0]) return(FALSE);
+    Scope_Dats_LeftRight[1] = (float *) malloc(((AUDIO_Latency + 1) + (512 * 4)) * 2);
+    if(!Scope_Dats_LeftRight[1]) return(FALSE);
+    memset(Scope_Dats_LeftRight[0], 0, ((AUDIO_Latency + 1) + (512 * 4)) * 2);
+    memset(Scope_Dats_LeftRight[1], 0, ((AUDIO_Latency + 1) + (512 * 4)) * 2);
+    return(TRUE);
+}
+
 void Draw_Scope_Files_Button(void)
 {
     switch(Scopish)
@@ -6084,14 +6139,7 @@ void Draw_Scope_Files_Button(void)
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 137);
             Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            if(Scopish_LeftRight)
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
+            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6105,16 +6153,7 @@ void Draw_Scope_Files_Button(void)
 
         case SCOPE_ZONE_INSTR_LIST:
             Actualize_Instruments_Synths_List(0);
-
-            if(Scopish_LeftRight)
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
-
+            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6127,16 +6166,7 @@ void Draw_Scope_Files_Button(void)
 
         case SCOPE_ZONE_SYNTH_LIST:
             Actualize_Instruments_Synths_List(0);
-
-            if(Scopish_LeftRight)
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            }
-
+            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -6157,14 +6187,7 @@ void Draw_Scope_Files_Button(void)
             Read_SMPT();
             Dump_Files_List(395, 41);
             Actualize_Files_List(0);
-            if(Scopish_LeftRight)
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Sc", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
-            else
-            {
-                Gui_Draw_Button_Box(746, 6, 16, 16, "Tr", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            }
+            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
             switch(Scopish)
             {
@@ -6292,11 +6315,10 @@ void Note_Jazz(int track, int note)
 
     if(Jazz_Edit || is_recording_2 || !is_editing)
     {
+        sp_Tvol_Mod[track] = 1.0f;
         Schedule_Instrument(track, Sub_Channel,
                             note,
                             Current_Sample,
-                            Sample_Vol[Current_Sample],
-                            PARASynth[Current_Sample].glb_volume * 0.0078125f,
                             0, 0, !is_recording, -(Sub_Channel + 1));
     }
 }

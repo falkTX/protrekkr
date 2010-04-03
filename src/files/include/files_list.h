@@ -49,10 +49,10 @@
 
 // ------------------------------------------------------
 // Variables
-extern int lt_ykar;
-extern int lt_items;
-extern int lt_index;
-extern int lt_curr;
+extern int lt_ykar[SCOPE_LAST_DIR];
+extern int lt_items[SCOPE_LAST_DIR];
+extern int lt_index[SCOPE_LAST_DIR];
+extern int lt_curr[SCOPE_LAST_DIR];
 
 // ------------------------------------------------------
 // Functions

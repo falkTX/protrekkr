@@ -240,6 +240,7 @@
 #define SCOPE_ZONE_REVERB_DIR 6
 #define SCOPE_ZONE_PATTERN_DIR 7
 #define SCOPE_ZONE_SAMPLE_DIR 8
+#define SCOPE_LAST_DIR 9
 
 #define MIN_VUMETER 22
 #define MAX_VUMETER 155
@@ -380,8 +381,8 @@ extern int rawrender_to;
 
 extern char sas;
 
-extern float Scope_Dats[MAX_TRACKS][128];
-extern float Scope_Dats_LeftRight[2][128];
+extern float *Scope_Dats[MAX_TRACKS];
+extern float *Scope_Dats_LeftRight[2];
 
 extern SDL_Surface *SKIN303;
 extern SDL_Surface *LOGOPIC;
@@ -452,7 +453,8 @@ void Sp_Player(void);
 void Pre_Song_Init(void);
 void Compressor_work(void);
 void StartRec(void);
-void StartEdit(void);
+void Notify_Edit(void);
+void Notify_Play(void);
 void ComputeCoefs(int freq, int r, int t);
 void live303(int pltr_eff_row, int pltr_dat_row);
 float Filter(float x, char i);
@@ -504,6 +506,7 @@ void Display_Master_Volume(void);
 void Display_Shuffle(void);
 void Actualize_Input(void);
 void Draw_Scope(void);
+int Init_Scopes_Buffers(void);
 
 void Remove_Title(void);
 
