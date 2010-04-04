@@ -4,7 +4,6 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
- - Descriptor format error in macosx (AudioDeviceSetProperty(kAudioDevicePropertyStreamFormat)).
 
 [UI]
  - Create a decent gadgets system (events based).

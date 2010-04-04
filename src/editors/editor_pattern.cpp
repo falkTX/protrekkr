@@ -52,6 +52,7 @@ char is_record_key = 0;
 int patt_highlight = 4;
 int Continuous_Scroll;
 int Last_Pixel;
+int Last_Pixel_Complete;
 
 MARKER Patterns_Marker;
 
@@ -274,12 +275,16 @@ NOTE_FUNCTION Cur_Note_Function[MAX_TRACKS];
 
 PtkTimer Pattern_Timer_Horiz_Left;
 PtkTimer Pattern_Timer_Horiz_Right;
+PtkTimer Pattern_Timer_Horiz_Right_Slow;
 int Pattern_Scrolling_Horiz_Left;
 int Pattern_Scrolling_Horiz_Right;
+int Pattern_Scrolling_Horiz_Right_Slow;
 float Pattern_First_Delay_Horiz_Left;
 float Pattern_First_Delay_Horiz_Right;
+float Pattern_First_Delay_Horiz_Right_Slow;
 float Pattern_Delay_Horiz_Left;
 float Pattern_Delay_Horiz_Right;
+float Pattern_Delay_Horiz_Right_Slow;
 
 PtkTimer Pattern_Timer_Vert;
 int Pattern_Scrolling_Vert;
@@ -321,7 +326,7 @@ void draw_pated(int track, int line, int petrack, int row)
 
     int tVisible_Columns = Visible_Columns;
 
-    int max_size = Get_Visible_Tracks_Size();
+    int max_size = Get_Visible_Tracks_Size((gui_track + Visible_Columns));
     if(max_size < MAX_PATT_SCREEN_X)
     {
         if((gui_track + tVisible_Columns) < Songtracks)
@@ -934,7 +939,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
     int tVisible_Columns = Visible_Columns;
 
-    int max_size = Get_Visible_Tracks_Size();
+    int max_size = Get_Visible_Tracks_Size((gui_track + Visible_Columns));
     if(max_size < MAX_PATT_SCREEN_X)
     {
         if((gui_track + tVisible_Columns) < Songtracks)
@@ -971,6 +976,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 
         dover = PAT_COL_NOTE;
         Last_Pixel = dover;
+        Last_Pixel_Complete = dover;
         cur_column = Get_Track_Nibble_Start(Channels_MultiNotes, track) + track;
 
         Real_visible = 0;
@@ -1000,7 +1006,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             unsigned char p_f2h = p_f2 & 0xf;
 
             // Don't draw the gap if there's nothing to draw after that
-            Last_Pixel = dover;
             if(dover + 2 + 4 + (Cur_Char_size[cur_track] * 3) >= MAX_PATT_SCREEN_X) break;
             cur_color = Get_Nibble_Color_Highlight(line, cur_column);
             Letter(dover, YVIEW, 20, cur_color, cur_color + 15);
@@ -1094,12 +1099,11 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             if(dover_break >= MAX_PATT_SCREEN_X) break;
 
             // Volume hi
-            Last_Pixel = dover;
             if(dover + PAT_COL_SHIFT + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
-
             Last_Pixel = dover;
+
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
@@ -1147,8 +1151,8 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
             cur_color = Get_Nibble_Color_Highlight(line, ++cur_column);
             Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 29, cur_color, cur_color + 15);
             dover += PAT_COL_SHIFT;
-
             Last_Pixel = dover;
+
             if(dover + Cur_Char_size[cur_track] >= MAX_PATT_SCREEN_X) break;
             if(row == high_col && cur_track == petrack)
             {
@@ -1309,8 +1313,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, 21, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
-                Last_Pixel = dover;
-                high_col++;
             }
             else
             {
@@ -1347,10 +1349,10 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 if(row == high_col && cur_track == petrack) Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2h, 48, 48 + 15);
                 else Cur_Char_Function[cur_track].Fnc(dover, YVIEW, p_f2h, cur_color, cur_color + 15);
                 dover += Cur_Char_size[cur_track];
-                Last_Pixel = dover;
-                high_col++;
             }
-
+            Last_Pixel = dover;
+            Last_Pixel_Complete = dover;
+            high_col++;
             ++cur_column;
 
             // Record live events
@@ -1454,6 +1456,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
                 } // Close liveparam updated
             } // Close is recording
         }
+
         Visible_Columns = Real_visible;
 
         // Row number
@@ -1854,13 +1857,13 @@ int Get_Track_Size(int Track, int *Column)
 
 // ------------------------------------------------------
 // Return the size in pixel of all visible tracks
-int Get_Visible_Tracks_Size(void)
+int Get_Visible_Tracks_Size(int max_tracks)
 {
     int i;
     int size = 0;
     int column = 0;
 
-    for(i = gui_track; i < (gui_track + Visible_Columns); i++)
+    for(i = gui_track; i < max_tracks; i++)
     {
         size += Get_Track_Size(i, &column);
         if(size >= MAX_PATT_SCREEN_X) break;
@@ -1891,7 +1894,7 @@ int Get_Track_Over_Mouse(int Mouse, int *Was_Scrolling)
             if(Pattern_Delay_Horiz_Right < Pattern_First_Delay_Horiz_Right)
             {
                 // Wait before scrolling
-                mouse_coord = Last_Pixel - 1;
+                mouse_coord = Last_Pixel_Complete - 1;
             }
             else
             {
@@ -1910,16 +1913,52 @@ int Get_Track_Over_Mouse(int Mouse, int *Was_Scrolling)
             Pattern_Scrolling_Horiz_Right = TRUE;
             Pattern_Delay_Horiz_Right = 0;
             Pattern_First_Delay_Horiz_Right = 150.0f;
-            mouse_coord = Last_Pixel - 1;
+            mouse_coord = Last_Pixel_Complete - 1;
+        }
+    }
+    else
+    {
+        if(mouse_coord >= Last_Pixel_Complete)
+        {
+            // Right scrolling
+            if(Pattern_Scrolling_Horiz_Right_Slow)
+            {
+                Pattern_Delay_Horiz_Right_Slow += Pattern_Timer_Horiz_Right_Slow.Get_Frames_Delay();
+                if(Pattern_Delay_Horiz_Right_Slow < Pattern_First_Delay_Horiz_Right_Slow)
+                {
+                    // Wait before scrolling
+                    mouse_coord = Last_Pixel_Complete - 1;
+                }
+                else
+                {
+                    under_mouse = gui_track + Visible_Columns - 1;
+                    // Scroll it
+                    Pattern_Delay_Horiz_Right_Slow = 0;
+                    Pattern_First_Delay_Horiz_Right_Slow = 200.0f;
+                    if(under_mouse > (Songtracks - 1)) under_mouse = Songtracks - 1;
+                    Column_Under_Caret = Get_Last_Track_Column(under_mouse);
+                    if(Was_Scrolling) *Was_Scrolling = TRUE;
+                }
+            }
+            else
+            {
+                Pattern_Timer_Horiz_Right_Slow.Set_Frames_Counter();
+                Pattern_Scrolling_Horiz_Right_Slow = TRUE;
+                Pattern_Delay_Horiz_Right_Slow = 0;
+                Pattern_First_Delay_Horiz_Right_Slow = 150.0f;
+                mouse_coord = Last_Pixel_Complete - 1;
+            }
+
         }
     }
     if(mouse_coord < Last_Pixel)
     {
+        // From 0
         mouse_coord -= PAT_COL_NOTE;
         found_track = FALSE;
-        int max_size = Get_Visible_Tracks_Size();
+        int max_size = Get_Visible_Tracks_Size((gui_track + Visible_Columns));
         int tVisible_Columns = Visible_Columns;
-        if(max_size < MAX_PATT_SCREEN_X)
+        if(max_size < Last_Pixel)
         {
             if((gui_track + tVisible_Columns) < Songtracks)
             {
@@ -2368,7 +2407,7 @@ int Get_Visible_Complete_Tracks(void)
 int Get_Visible_Partial_Tracks(void)
 {
     int tracks = Visible_Columns;
-    int max_size = Get_Visible_Tracks_Size();
+    int max_size = Get_Visible_Tracks_Size((gui_track + Visible_Columns));
     if(max_size < MAX_PATT_SCREEN_X)
     {
         if((gui_track + tracks) < Songtracks)
@@ -2396,8 +2435,10 @@ void Reset_Pattern_Scrolling_Horiz(void)
 {
     Pattern_Delay_Horiz_Left = 0;
     Pattern_Delay_Horiz_Right = 0;
+    Pattern_Delay_Horiz_Right_Slow = 0;
     Pattern_Scrolling_Horiz_Left = FALSE;
     Pattern_Scrolling_Horiz_Right = FALSE;
+    Pattern_Scrolling_Horiz_Right_Slow = FALSE;
     Pattern_Delay_Vert = 0;
     Pattern_Scrolling_Vert = FALSE;
 }

@@ -96,7 +96,7 @@ void Mouse_Sliders_Pattern_Ed(void);
 void Mouse_Sliders_Right_Pattern_Ed(void);
 void Mouse_Left_Pattern_Ed(void);
 void Mouse_Right_Pattern_Ed(void);
-int Get_Visible_Tracks_Size(void);
+int Get_Visible_Tracks_Size(int max_tracks);
 int Get_Visible_Partial_Tracks(void);
 int Get_Song_Position(void);
 int Get_Pattern_Line(void);
