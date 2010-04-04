@@ -66,7 +66,7 @@ void Actualize_Track_Fx_Ed(char gode)
 {
     if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
     {
-        if(gode == 0 || gode == 1)
+        if(gode == 0 || gode == 1 || gode == 11)
         {
             if(FLANGER_AMOUNT[Track_Under_Caret] > 1.0f) FLANGER_AMOUNT[Track_Under_Caret] = 1.0f;
             if(FLANGER_AMOUNT[Track_Under_Caret] < -1.0f) FLANGER_AMOUNT[Track_Under_Caret] = -1.0f;
@@ -74,7 +74,7 @@ void Actualize_Track_Fx_Ed(char gode)
             outlong(448, 479, long(FLANGER_AMOUNT[Track_Under_Caret] * 100.0f), 1);
         }
 
-        if(gode == 0 || gode == 7)
+        if(gode == 0 || gode == 7 || gode == 11)
         {
             if(FLANGER_FEEDBACK[Track_Under_Caret] > 1.0f) FLANGER_FEEDBACK[Track_Under_Caret] = 1.0f;
             if(FLANGER_FEEDBACK[Track_Under_Caret] < -1.0f) FLANGER_FEEDBACK[Track_Under_Caret] = -1.0f;
@@ -82,7 +82,7 @@ void Actualize_Track_Fx_Ed(char gode)
             outlong(448, 533, long(FLANGER_FEEDBACK[Track_Under_Caret] * 100.0f), 1);
         }
 
-        if(gode == 0 || gode == 4)
+        if(gode == 0 || gode == 4 || gode == 11)
         {
             if(FLANGER_DEPHASE[Track_Under_Caret] > 3.1415927f) FLANGER_DEPHASE[Track_Under_Caret] = 3.1415927f;
             if(FLANGER_DEPHASE[Track_Under_Caret] < 0.0f) FLANGER_DEPHASE[Track_Under_Caret] = 0.0f;
@@ -90,7 +90,7 @@ void Actualize_Track_Fx_Ed(char gode)
             outlong(159, 544, (int) (FLANGER_DEPHASE[Track_Under_Caret] * 57.29578f), 6);
         }
 
-        if(gode == 0 || gode == 5)
+        if(gode == 0 || gode == 5 || gode == 11)
         {
             if(FLANGER_RATE[Track_Under_Caret] < 0.000001f) FLANGER_RATE[Track_Under_Caret] = 0.000001f;
             if(FLANGER_RATE[Track_Under_Caret] > 0.0001363f) FLANGER_RATE[Track_Under_Caret] = 0.0001363f;
@@ -98,7 +98,7 @@ void Actualize_Track_Fx_Ed(char gode)
             outlong(448, 497, long(0.1424758f / FLANGER_RATE[Track_Under_Caret]), 2);
         }
 
-        if(gode == 0 || gode == 6)
+        if(gode == 0 || gode == 6 || gode == 11)
         {
             if(FLANGER_AMPL[Track_Under_Caret] > 0.01f) FLANGER_AMPL[Track_Under_Caret] = 0.01f;
             if(FLANGER_AMPL[Track_Under_Caret] < 0.0f) FLANGER_AMPL[Track_Under_Caret] = 0.0f;
@@ -138,7 +138,7 @@ void Actualize_Track_Fx_Ed(char gode)
             }
         }
 
-        if(gode == 0 || gode == 10)
+        if(gode == 0 || gode == 10 || gode == 11)
         {
             if(FLANGER_ON[Track_Under_Caret])
             {
@@ -152,7 +152,7 @@ void Actualize_Track_Fx_Ed(char gode)
             }
         }
 
-        if(gode == 0 || gode == 8)
+        if(gode == 0 || gode == 8 || gode == 11)
         {
             if(FLANGER_DELAY[Track_Under_Caret] > 4096) FLANGER_DELAY[Track_Under_Caret] = 4096;
             if(FLANGER_DELAY[Track_Under_Caret] < 0) FLANGER_DELAY[Track_Under_Caret] = 0;

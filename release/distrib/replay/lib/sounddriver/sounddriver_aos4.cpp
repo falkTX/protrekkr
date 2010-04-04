@@ -74,14 +74,27 @@ void *AUDIO_Thread(void *arg)
     AHImp->mp_SigTask = IExec->FindTask(NULL);
     while(Thread_Running)
     {
-        if(AUDIO_Play_Flag && AHIbuf)
+        if(AHIbuf)
         {
             struct AHIRequest *io = AHIio;
             short *buf = AHIbuf;
     
             AUDIO_Acknowledge = FALSE;
-            AUDIO_Mixer((Uint8 *)buf, AUDIO_SoundBuffer_Size);
-    
+            if(AUDIO_Play_Flag)
+            {
+                AUDIO_Mixer((Uint8 *) buf, AUDIO_SoundBuffer_Size);
+            }
+            else
+            {
+                unsigned int i;
+                char *pSamples = (char *) buf;
+                for(i = 0; i < AUDIO_SoundBuffer_Size; i++)
+                {
+                    pSamples[i] = 0;
+                }
+                AUDIO_Acknowledge = TRUE;
+            }    
+
             io->ahir_Std.io_Message.mn_Node.ln_Pri = 0;
             io->ahir_Std.io_Command = CMD_WRITE;
             io->ahir_Std.io_Data = buf;
@@ -92,20 +105,16 @@ void *AUDIO_Thread(void *arg)
             io->ahir_Volume = 0x10000;
             io->ahir_Position = 0x8000;
             io->ahir_Link = join;
-            IExec->SendIO((struct IORequest *)io);
-            if (join) IExec->WaitIO((struct IORequest *)join);
+            IExec->SendIO((struct IORequest *) io);
+            if (join) IExec->WaitIO((struct IORequest *) join);
             join = io;
             AHIio = AHIio2; AHIio2 = io;
             AHIbuf = AHIbuf2; AHIbuf2 = buf;
-    
+
             AUDIO_Samples += AUDIO_SoundBuffer_Size;
             AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
         }
-        else
-        {
-            AUDIO_Acknowledge = TRUE;
-            usleep(10);
-        }
+        usleep(10);
     }
     if (join)
     {

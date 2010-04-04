@@ -86,7 +86,7 @@ DWORD WINAPI AUDIO_Thread(LPVOID lpParameter)
 
     for(;;)
     {
-        if(AUDIO_Play_Flag && AUDIO_Sound_Buffer)
+        if(AUDIO_Sound_Buffer)
         {
             AUDIO_Acknowledge = FALSE;
 
@@ -96,17 +96,31 @@ DWORD WINAPI AUDIO_Thread(LPVOID lpParameter)
             AUDIO_Sound_Buffer->Lock(AUDIO_Old_Buffer_Pos, Bytes_To_Lock, &AUDIO_Audio_Ptr1, &AUDIO_Audio_Bytes1, &AUDIO_Audio_Ptr2, &AUDIO_Audio_Bytes2, 0);
             AUDIO_Old_Buffer_Pos = AUDIO_Buffer_Pos;
 
-            AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr1, AUDIO_Audio_Bytes1);
-            AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr2, AUDIO_Audio_Bytes2);
+            if(AUDIO_Play_Flag)
+            {
+                AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr1, AUDIO_Audio_Bytes1);
+                AUDIO_Mixer((Uint8 *) AUDIO_Audio_Ptr2, AUDIO_Audio_Bytes2);
+            }
+            else
+            {
+                unsigned int i;
+                char *pSamples = (char *) AUDIO_Audio_Ptr1;
+                for(i = 0; i < AUDIO_Audio_Bytes1; i++)
+                {
+                    pSamples[i] = 0;
+                }
+                pSamples = (char *) AUDIO_Audio_Ptr2;
+                for(i = 0; i < AUDIO_Audio_Bytes2; i++)
+                {
+                    pSamples[i] = 0;
+                }
+                AUDIO_Acknowledge = TRUE;
+            }
 
             AUDIO_Sound_Buffer->Unlock(AUDIO_Audio_Ptr1, AUDIO_Audio_Bytes1, AUDIO_Audio_Ptr2, AUDIO_Audio_Bytes2);
 
             AUDIO_Samples += (AUDIO_Audio_Bytes1 + AUDIO_Audio_Bytes2);
             AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
-        }
-        else
-        {
-            AUDIO_Acknowledge = TRUE;
         }
         Sleep(10);
     }
@@ -178,6 +192,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
     {
         AUDIO_hReplayThread = CreateThread(NULL, 0, &AUDIO_Thread, 0, 0, &AUDIO_ThreadId);
         SetThreadPriority(AUDIO_hReplayThread, THREAD_PRIORITY_TIME_CRITICAL);
+        AUDIO_Sound_Buffer->Play(0, 0, DSBPLAY_LOOPING);
         return(TRUE);
     }
 
@@ -214,7 +229,6 @@ void AUDIO_Wait_For_Thread(void)
 // Desc: Play the sound buffer endlessly
 void AUDIO_Play(void)
 {
-    AUDIO_Sound_Buffer->Play(0, 0, DSBPLAY_LOOPING);
     AUDIO_ResetTimer();
     AUDIO_Play_Flag = TRUE;
     AUDIO_Wait_For_Thread();
@@ -260,7 +274,6 @@ void AUDIO_Stop(void)
 {
     AUDIO_Play_Flag = FALSE;
     AUDIO_Wait_For_Thread();
-    if(AUDIO_Sound_Buffer) AUDIO_Sound_Buffer->Stop();
 }
 
 // ------------------------------------------------------
@@ -269,6 +282,7 @@ void AUDIO_Stop(void)
 void AUDIO_Stop_Sound_Buffer(void)
 {
     AUDIO_Stop();
+    if(AUDIO_Sound_Buffer) AUDIO_Sound_Buffer->Stop();
     if(AUDIO_hReplayThread)
     {
         TerminateThread(AUDIO_hReplayThread, 0);

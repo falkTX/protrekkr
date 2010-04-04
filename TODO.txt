@@ -4,7 +4,6 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
-
  - Import the 3 NTK 1 beta modules.
  - Descriptor format error in macosx (AudioDeviceSetProperty(kAudioDevicePropertyStreamFormat)).
 
@@ -38,6 +37,7 @@ v2.0:
  - Possibility to associate effects to midi commands for live rec.
  - Add jackd support via libjack.
  - Possibility to select any soundcard as rendering device.
+ - Tracks filters envelopes (instead of just a sin).
 
 [MISC]
  - Function to wipe the current song
@@ -48,3 +48,4 @@ v2.0:
  - Port to FreeBSD (done but there's a severe issue with SDL).
  - Port to Linux PPC (should be a matter of doing the appropriate makefile, hopefully).
  - VSTs and VSTis support in the samples editor (for waveforms processing and generation).
+ - Record function in the samples editor (like recording instruments played on a keyboard).

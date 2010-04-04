@@ -71,10 +71,18 @@ static OSStatus AUDIO_Callback(AudioDeviceID device,
     if(AUDIO_Play_Flag)
     {
         AUDIO_Mixer((Uint8 *) data_out->mBuffers[0].mData, data_out->mBuffers[0].mDataByteSize);
-
-        AUDIO_Samples += data_out->mBuffers[0].mDataByteSize;
-        AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
     }
+    else
+    {
+        unsigned int i;
+        char *pSamples = (char *) data_out->mBuffers[0].mData;
+        for(i = 0; i < data_out->mBuffers[0].mDataByteSize; i++)
+        {
+            pSamples[i] = 0;
+        }
+    }
+    AUDIO_Samples += data_out->mBuffers[0].mDataByteSize;
+    AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
     return(kAudioHardwareNoError);
 }
 
@@ -209,6 +217,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
                                       sizeof(AUDIO_SoundBuffer_Size),
                                       &AUDIO_SoundBuffer_Size) == noErr)
             {
+                AudioDeviceStart(AUDIO_Device, AUDIO_Callback);
                 return(TRUE);
             }
 
@@ -253,7 +262,6 @@ void AUDIO_Wait_For_Thread(void)
 // Desc: Play the sound buffer endlessly
 void AUDIO_Play(void)
 {
-    AudioDeviceStart(AUDIO_Device, AUDIO_Callback);
     AUDIO_ResetTimer();
     AUDIO_Play_Flag = TRUE;
     AUDIO_Wait_For_Thread();
@@ -299,7 +307,6 @@ void AUDIO_Stop(void)
 {
     AUDIO_Play_Flag = FALSE;
     AUDIO_Wait_For_Thread();
-    AudioDeviceStop(AUDIO_Device, AUDIO_Callback);
 }
 
 // ------------------------------------------------------
@@ -308,6 +315,7 @@ void AUDIO_Stop(void)
 void AUDIO_Stop_Sound_Buffer(void)
 {
     AUDIO_Stop();
+    AudioDeviceStop(AUDIO_Device, AUDIO_Callback);
 }
 
 // ------------------------------------------------------

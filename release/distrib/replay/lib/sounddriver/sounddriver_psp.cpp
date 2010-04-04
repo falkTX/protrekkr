@@ -90,18 +90,42 @@ void Me_Handler(void)
         volatile short *ptrBuffer1 = (short *) (((int) ptrAudio_BufferPlay1) | 0x40000000);
         volatile short *ptrBuffer2 = (short *) (((int) ptrAudio_BufferPlay2) | 0x40000000);
         volatile int *ptrMutex = (int *) (((int) &Mutex) | 0x40000000);
+        volatile unsigned int i;
+        volatile char *pSamples;
 
-        if(*ptrAUDIO_Play_Flag && *ptrSongplaying)
+        if(*ptrSongplaying)
         {
             if(*ptrMutex == FALSE)
             {
                 if(*ptrAUDIO_FlipFlop)
                 {
-                    AUDIO_Mixer((Uint8 *) ptrBuffer1, *ptrAUDIO_SoundBuffer_Size);
+                    if(*ptrAUDIO_Play_Flag)
+                    {
+                        AUDIO_Mixer((Uint8 *) ptrBuffer1, *ptrAUDIO_SoundBuffer_Size);
+                    }
+                    else
+                    {
+                        pSamples = (Uint8 *) ptrBuffer1;
+                        for(i = 0; i < *ptrAUDIO_SoundBuffer_Size; i++)
+                        {
+                            pSamples[i] = 0;
+                        }
+                    }
                 }
                 else
                 {
-                    AUDIO_Mixer((Uint8 *) ptrBuffer2, *ptrAUDIO_SoundBuffer_Size);
+                    if(*ptrAUDIO_Play_Flag)
+                    {
+                        AUDIO_Mixer((Uint8 *) ptrBuffer2, *ptrAUDIO_SoundBuffer_Size);
+                    }
+                    else
+                    {
+                        pSamples = (Uint8 *) ptrBuffer2;
+                        for(i = 0; i < *ptrAUDIO_SoundBuffer_Size; i++)
+                        {
+                            pSamples[i] = 0;
+                        }
+                    }
                 }
 
                 *ptrAUDIO_Samples += *ptrAUDIO_SoundBuffer_Size;

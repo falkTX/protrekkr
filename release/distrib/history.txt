@@ -78,6 +78,7 @@ v2.0:
   (now it takes the last played note as it should).
 - Rewrote the latency handling routines in a more robust & precise way.
 - Fixed the right mouse button caret horizontal scrolling.
+- Added effect 24: turn flanger on/off.
 
 v1.99e:
 

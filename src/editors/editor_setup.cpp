@@ -174,11 +174,11 @@ void Actualize_Master_Ed(char gode)
         // Create a new sound buffer with the new latency amount
         if(gode == 5)
         {
+            SongStop();
             AUDIO_Stop_Sound_Buffer();
             AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds);
             Init_Scopes_Buffers();
             AUDIO_Play();
-            SongStop();
             //Actupated(0);
         }
 

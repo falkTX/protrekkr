@@ -299,7 +299,8 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int read_lfo_adsr,
                        int new_version,
                        int Env_Modulation,
-                       int New_Env);
+                       int New_Env,
+                       int Ntk_Beta);
 void Write_Synth_Params(int (*Write_Function)(void *, int ,int, FILE *),
                         int (*Write_Function_Swap)(void *, int ,int, FILE *),
                         FILE *in,
@@ -418,10 +419,10 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
     int pwrite;
     int li2;
     int pw2;
-    float volume;
+    //float volume;
     Uint32 x;
-    int ramp;
-    float ramp_vol;
+    //int ramp;
+    //float ramp_vol;
     int i;
     int j;
     int k;
@@ -458,8 +459,6 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
     in = fopen(FileName, "rb");
     if(in != NULL)
     {
-        SongStop();
-
         Songplaying = FALSE;
 
         Free_Samples();
@@ -495,12 +494,10 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
             }
         }
 
-        /// Remove suspicious chars
+        // Remove suspicious chars
         for(j = 0; Name[j]; j++)
         {
-            if(Name[j] < 'A') Name[j] = '_';
-            if(Name[j] > 'z') Name[j] = '_';
-            if(Name[j] > 'Z' && Name[j] < 'a') Name[j] = '_';
+            if(!isalnum(Name[j])) Name[j] = '_';
         }
         
         Songtracks = channels;
@@ -508,7 +505,15 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         for(swrite = 0; swrite < 31; swrite++)
         {
             SampleType[swrite][0] = 1;
+            memset(nameins[swrite], 0, 20);
             fread(&nameins[swrite], sizeof(char), 19, in);
+
+            // Remove suspicious chars
+            for(j = 0; nameins[swrite][j]; j++)
+            {
+                if(!isalnum(nameins[swrite][j])) nameins[swrite][j] = '_';
+            }
+        
             sprintf(SampleName[swrite][0], "Untitled.wav");
 
             // Jump over 3 unhandled bytes for PTK samplename.
@@ -1032,7 +1037,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                 }
                 *(RawSamples[swrite][0][0]) = 0;
 
-#define MOD_RAMP_SIZE 40
+/*#define MOD_RAMP_SIZE 40
 
                 // Ramp volume at the end of the sample (if there's no loop)
                 if(LoopType[swrite][0] == SMP_LOOP_NONE)
@@ -1059,7 +1064,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                         *(RawSamples[swrite][0][0] + ramp) = (short) (volume * 32767.0f);
                         ramp_vol += 1.0f / (float) (MOD_RAMP_SIZE - 1.0f);
                     }
-                }
+                }*/
             }
             else
             {
@@ -1307,6 +1312,7 @@ int LoadMod(char *FileName)
     int fake_value;
     int Packed_Size;
     int UnPacked_Size;
+    int Flanger_Bug = FALSE;
     unsigned char *Packed_Module = NULL;
 
     Mod_Simulate = LOAD_READ;
@@ -1322,7 +1328,6 @@ int LoadMod(char *FileName)
     {
 
 #if !defined(__WINAMP__)
-        SongStop();
         Status_Box("Attempting to load the song file...");
 #endif
 
@@ -1334,6 +1339,8 @@ int LoadMod(char *FileName)
 
         switch(extension[7])
         {
+            case 'J':
+                Flanger_Bug = TRUE;
             case 'I':
                 Fx2 = TRUE;
             case 'H':
@@ -1439,9 +1446,12 @@ Read_Mod_File:
         Clear_Patterns_Pool();
 
         // Load the patterns rows infos
-        for(i = 0; i < MAX_ROWS; i++)
+        if(!Ntk_Beta)
         {
-            Read_Mod_Data_Swap(&patternLines[i], sizeof(short), 1, in);
+            for(i = 0; i < MAX_ROWS; i++)
+            {
+                Read_Mod_Data_Swap(&patternLines[i], sizeof(short), 1, in);
+            }
         }
 
         // Multi notes
@@ -1461,7 +1471,10 @@ Read_Mod_File:
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
         {
             TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
-            for(j = 0; j < MAX_ROWS; j++)
+            int Rows_To_Read = MAX_ROWS;
+            if(Ntk_Beta) Rows_To_Read = 64;
+
+            for(j = 0; j < Rows_To_Read; j++)
             {
                 // Bytes / track
                 for(k = 0; k < Songtracks; k++)
@@ -1519,7 +1532,7 @@ Read_Mod_File:
             PARASynth[swrite].lfo2_release = 0x10000;
 
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
-                              new_disto, New_adsr, Portable, Env_Modulation, New_Env);
+                              new_disto, New_adsr, Portable, Env_Modulation, New_Env, Ntk_Beta);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo1_period > 128) PARASynth[swrite].lfo1_period = 128;
@@ -1548,7 +1561,6 @@ Read_Mod_File:
                     }
                 }
             }
-
             for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Read_Mod_Data(&SampleType[swrite][slwrite], sizeof(char), 1, in);
@@ -1599,7 +1611,6 @@ Read_Mod_File:
             Read_Mod_Data_Swap(&ICut[twrite], sizeof(float), 1, in);
             if(ICut[twrite] > 0.0078125f) ICut[twrite] = 0.0078125f;
             if(ICut[twrite] < 0.00006103515625f) ICut[twrite] = 0.00006103515625f;
-
             Read_Mod_Data_Swap(&TPan[twrite], sizeof(float), 1, in);
             ComputeStereo(twrite);
             Read_Mod_Data_Swap(&FType[twrite], sizeof(int), 1, in);
@@ -1652,7 +1663,6 @@ Read_Mod_File:
         }
 
         // Reading track part sequence
-
         for(tps_pos = 0; tps_pos < 256; tps_pos++)
         {
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
@@ -1693,80 +1703,88 @@ Read_Mod_File:
             foff1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
         }
 
-        Read_Mod_Data_Swap(&FLANGER_DEPHASE, sizeof(float), 1, in);
+        if(!Flanger_Bug)
+        {
+            Read_Mod_Data_Swap(&FLANGER_DEPHASE, sizeof(float), 1, in);
+        }
 
         for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
         {
             Read_Mod_Data_Swap(&CHAN_MUTE_STATE[tps_trk], sizeof(int), 1, in);
         }
+
         Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
+
         for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
         {
             Read_Mod_Data(&Disclap[tps_trk], sizeof(char), 1, in);
             if(!Portable) Read_Mod_Data(&fake_value, sizeof(char), 1, in);
         }
 
-        Read_Mod_Data(artist, sizeof(char), 20, in);
-        Read_Mod_Data(style, sizeof(char), 20, in);
-
-        if(!Portable) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-
-        Read_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
-
-        for(i = 0; i < MAX_INSTRS; i++)
+        if(!Ntk_Beta)       // Nothing like that in ntk beta
         {
-            Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
-        }
+            Read_Mod_Data(artist, sizeof(char), 20, in);
+            Read_Mod_Data(style, sizeof(char), 20, in);
 
-        Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
+            if(!Portable) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
 
-        for(i = 0; i < MAX_INSTRS; i++)
-        {
-            Read_Mod_Data_Swap(&Sample_Vol[i], sizeof(float), 1, in);
-        }
+            Read_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
 
-        if(!Portable) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-
-        // Read the 303 datas
-        for(j = 0; j < 2; j++)
-        {
-            Read_Mod_Data(&tb303[j].enabled, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].selectedpattern, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].tune, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].cutoff, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].resonance, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].envmod, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].decay, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].accent, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303[j].waveform, sizeof(char), 1, in);
-            if(Portable)
+            for(i = 0; i < MAX_INSTRS; i++)
             {
-                for(i = 0; i < 32; i++)
-                {
-                    Load_303_Data(Read_Mod_Data, Read_Mod_Data_Swap, in, j, i);
-                }
+                Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
             }
-            else
+
+            Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
+
+            for(i = 0; i < MAX_INSTRS; i++)
             {
-                Read_Mod_Data(&tb303[j].patternlength, sizeof(char), 32, in);
-                Read_Mod_Data(&tb303[j].tone, sizeof(char), 32 * 16, in);
-                Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-                Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-                Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
-                for(k = 0; k < 32; k++)
+                Read_Mod_Data_Swap(&Sample_Vol[i], sizeof(float), 1, in);
+            }
+
+            if(!Portable) Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+
+            // Read the 303 datas
+            for(j = 0; j < 2; j++)
+            {
+                Read_Mod_Data(&tb303[j].enabled, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].selectedpattern, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].tune, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].cutoff, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].resonance, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].envmod, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].decay, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].accent, sizeof(char), 1, in);
+                Read_Mod_Data(&tb303[j].waveform, sizeof(char), 1, in);
+                if(Portable)
                 {
-                    for(i = 0; i < 16; i++)
+                    for(i = 0; i < 32; i++)
                     {
-                        Read_Mod_Data_Swap(&tb303[j].flag[k][i], sizeof(struct flag303), 1, in);
-                    }                            
+                        Load_303_Data(Read_Mod_Data, Read_Mod_Data_Swap, in, j, i);
+                    }
                 }
-                Read_Mod_Data(&tb303[j].pattern_name, sizeof(char), 32 * 20, in);
+                else
+                {
+                    Read_Mod_Data(&tb303[j].patternlength, sizeof(char), 32, in);
+                    Read_Mod_Data(&tb303[j].tone, sizeof(char), 32 * 16, in);
+                    Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+                    Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+                    Read_Mod_Data(&Ye_Old_Phony_Value, sizeof(char), 1, in);
+                    for(k = 0; k < 32; k++)
+                    {
+                        for(i = 0; i < 16; i++)
+                        {
+                            Read_Mod_Data_Swap(&tb303[j].flag[k][i], sizeof(struct flag303), 1, in);
+                        }                            
+                    }
+                    Read_Mod_Data(&tb303[j].pattern_name, sizeof(char), 32 * 20, in);
+                }
             }
+            Read_Mod_Data_Swap(&tb303engine[0].tbVolume, sizeof(float), 1, in);
+            Read_Mod_Data_Swap(&tb303engine[1].tbVolume, sizeof(float), 1, in);
+            Read_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
+            Read_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
         }
-        Read_Mod_Data_Swap(&tb303engine[0].tbVolume, sizeof(float), 1, in);
-        Read_Mod_Data_Swap(&tb303engine[1].tbVolume, sizeof(float), 1, in);
-        Read_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
-        Read_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
 
         fclose(in);
 
@@ -2290,6 +2308,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_FX_FineVolumeSlideDown = FALSE;
     int Store_FX_FinePitchUp = FALSE;
     int Store_FX_FinePitchDown = FALSE;
+    int Store_FX_SwitchFlanger = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -2888,9 +2907,14 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_FinePitchUp = TRUE;
                                     break;
 
-                                // $22 Fine pitch down
+                                // $23 Fine pitch down
                                 case 0x23:
                                     Store_FX_FinePitchDown = TRUE;
+                                    break;
+
+                                // $24 Switch flanger
+                                case 0x24:
+                                    Store_FX_SwitchFlanger = TRUE;
                                     break;
 
                                 // $31 First TB303 control
@@ -3048,6 +3072,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_FINEVOLUMESLIDEDOWN", Store_FX_FineVolumeSlideDown);
     Save_Constant("PTK_FX_FINEPITCHUP", Store_FX_FinePitchUp);
     Save_Constant("PTK_FX_FINEPITCHDOWN", Store_FX_FinePitchDown);
+    Save_Constant("PTK_FX_SWITCHFLANGER", Store_FX_SwitchFlanger);
 
     // Special but only at tick 0
     Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio |
@@ -4116,7 +4141,7 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             }
 
             // Was a bug
-            Write_Mod_Data_Swap(&FLANGER_DEPHASE, sizeof(float), 1, in);
+            //Write_Mod_Data_Swap(&FLANGER_DEPHASE, sizeof(float), 1, in);
 
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
             {
@@ -4253,7 +4278,7 @@ void LoadSynth(char *FileName)
         PARASynth[Current_Sample].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, Current_Sample,
-                          TRUE, TRUE, new_version, Env_Modulation, New_Env);
+                          TRUE, TRUE, new_version, Env_Modulation, New_Env, FALSE);
 
         // Fix some old Ntk bugs
         if(PARASynth[Current_Sample].lfo1_period > 128) PARASynth[Current_Sample].lfo1_period = 128;
@@ -4380,7 +4405,7 @@ void LoadInst(char *FileName)
         PARASynth[swrite].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, swrite,
-                          !old_bug, new_adsr, tight, Env_Modulation, New_Env);
+                          !old_bug, new_adsr, tight, Env_Modulation, New_Env, FALSE);
 
         // Gsm by default
         if(Pack_Scheme)
@@ -4716,7 +4741,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGI");
+        sprintf(extension, "TWNNSNGJ");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
@@ -5101,7 +5126,8 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int read_lfo_adsr,
                        int new_version,
                        int Env_Modulation,
-                       int New_Env)
+                       int New_Env,
+                       int Ntk_Beta)
 {
     if(!new_version)
     {
@@ -5117,7 +5143,94 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
             }
             else
             {
-                Read_Function(&PARASynth[idx], sizeof(SynthParameters) - 4 - 32, 1, in);
+                if(Ntk_Beta)
+                {
+                    Read_Function(&PARASynth[idx].presetname, sizeof(char), 20, in);
+        
+                    Read_Function(&PARASynth[idx].osc1_waveform, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].osc2_waveform, sizeof(char), 1, in);
+        
+                    Read_Function_Swap(&PARASynth[idx].osc1_pw, sizeof(int), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].osc2_pw, sizeof(int), 1, in);
+        
+                    Read_Function(&PARASynth[idx].osc2_detune, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].osc2_finetune, sizeof(char), 1, in);
+        
+                    Read_Function(&PARASynth[idx].vcf_cutoff, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].vcf_resonance, sizeof(char), 1, in);
+                    char phony;
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].vcf_type, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+    
+                    Read_Function_Swap(&PARASynth[idx].env1_attack, sizeof(int), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].env1_decay, sizeof(int), 1, in);
+                    Read_Function(&PARASynth[idx].env1_sustain, sizeof(char), 1, in);   //44
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+    
+                    Read_Function_Swap(&PARASynth[idx].env1_release, sizeof(int), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].env2_attack, sizeof(int), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].env2_decay, sizeof(int), 1, in);
+                    Read_Function(&PARASynth[idx].env2_sustain, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].env2_release, sizeof(int), 1, in);//61
+    
+                    Read_Function_Swap(&PARASynth[idx].lfo1_period, sizeof(int), 1, in);
+                    Read_Function_Swap(&PARASynth[idx].lfo2_period, sizeof(int), 1, in);
+
+                    Read_Function(&PARASynth[idx].lfo1_osc1_pw, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo1_osc2_pw, sizeof(char), 1, in);
+                    PARASynth[idx].lfo1_osc1_pitch = 0x40;
+                    PARASynth[idx].lfo1_osc2_pitch = 0x40;
+                    Read_Function(&PARASynth[idx].lfo1_osc1_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo1_osc2_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo1_vcf_cutoff, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo1_vcf_resonance, sizeof(char), 1, in);
+
+                    Read_Function(&PARASynth[idx].lfo2_osc1_pw, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo2_osc2_pw, sizeof(char), 1, in);
+                    PARASynth[idx].lfo2_osc1_pitch = 0x40;
+                    PARASynth[idx].lfo2_osc2_pitch = 0x40;
+                    Read_Function(&PARASynth[idx].lfo2_osc1_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo2_osc2_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo2_vcf_cutoff, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].lfo2_vcf_resonance, sizeof(char), 1, in);//81
+                    Read_Function(&PARASynth[idx].env1_osc1_pw, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env1_osc2_pw, sizeof(char), 1, in);
+                    PARASynth[idx].env1_osc1_pitch = 0x40;
+                    PARASynth[idx].env1_osc2_pitch = 0x40;
+                    Read_Function(&PARASynth[idx].env1_osc1_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env1_osc2_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env1_vcf_cutoff, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env1_vcf_resonance, sizeof(char), 1, in);
+
+                    Read_Function(&PARASynth[idx].env2_osc1_pw, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env2_osc2_pw, sizeof(char), 1, in);
+                    PARASynth[idx].env2_osc1_pitch = 0x40;
+                    PARASynth[idx].env2_osc2_pitch = 0x40;
+                    Read_Function(&PARASynth[idx].env2_osc1_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env2_osc2_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env2_vcf_cutoff, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].env2_vcf_resonance, sizeof(char), 1, in);
+
+                    Read_Function(&PARASynth[idx].osc3_volume, sizeof(char), 1, in);
+                    Read_Function(&PARASynth[idx].osc3_switch, sizeof(char), 1, in);//96
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    Read_Function(&phony, sizeof(char), 1, in);
+                    PARASynth[idx].ptc_glide = 0;
+                    PARASynth[idx].glb_volume = 127;
+                }
+                else
+                {
+                    Read_Function(&PARASynth[idx], sizeof(SynthParameters) - 4 - 32, 1, in);
+                }
             }
         }
 

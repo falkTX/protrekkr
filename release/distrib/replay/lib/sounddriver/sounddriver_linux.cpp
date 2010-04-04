@@ -66,18 +66,27 @@ void *AUDIO_Thread(void *arg)
 {
     while(Thread_Running)
     {
-        if(AUDIO_Play_Flag && AUDIO_SoundBuffer)
+        if(AUDIO_SoundBuffer)
         {
             AUDIO_Acknowledge = FALSE;
-            AUDIO_Mixer((Uint8 *) AUDIO_SoundBuffer, AUDIO_SoundBuffer_Size);
+            if(AUDIO_Play_Flag)
+            {
+                AUDIO_Mixer((Uint8 *) AUDIO_SoundBuffer, AUDIO_SoundBuffer_Size);
+            }
+            else
+            {
+                unsigned int i;
+                char *pSamples = (char *) AUDIO_SoundBuffer;
+                for(i = 0; i < AUDIO_SoundBuffer_Size; i++)
+                {
+                    pSamples[i] = 0;
+                }
+                AUDIO_Acknowledge = TRUE;
+            }
             write(AUDIO_Device, AUDIO_SoundBuffer, AUDIO_SoundBuffer_Size);
 
             AUDIO_Samples += AUDIO_SoundBuffer_Size;
             AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
-        }
-        else
-        {
-            AUDIO_Acknowledge = TRUE;
         }
         usleep(10);
     }

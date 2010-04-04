@@ -173,7 +173,6 @@ int Sample_Crop(int32 range_start, int32 range_end)
     {
         Stop_Current_Sample();
         AUDIO_Stop();
-        SDL_Delay(10);
         nc = SampleChannels[Current_Sample][Current_Sample_Split];
 
         NewBuffer[0] = (short *) malloc(cropsize * 2 + 8);
@@ -360,7 +359,6 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
     {
         Stop_Current_Sample();
         AUDIO_Stop();
-        SDL_Delay(10);
 
         nc = SampleChannels[Current_Sample][Current_Sample_Split];
 

@@ -717,8 +717,6 @@ int Screen_Update(void)
                             case _A_FILE:
                                 Stop_Current_Sample();
                                 LoadFile(Current_Sample, Get_FileName(lt_curr[Scopish]));
-                                AUDIO_Stop();
-                                AUDIO_Play();
                                 break;
                             case _A_SUBDIR:
                                 Set_Current_Dir();
@@ -1615,7 +1613,11 @@ int Screen_Update(void)
 
     if(Songplaying && Pattern_Line_Visual != player_line)
     {
-        if(!sr_isrecording) Actualize_Track_Ed(15);
+        if(!sr_isrecording)
+        {
+            Actualize_Track_Ed(15);
+            Actualize_Track_Fx_Ed(11);
+        }
         Actupated(0);
         player_line = Pattern_Line_Visual;
     }
@@ -1844,11 +1846,14 @@ void LoadFile(int Freeindex, const char *str)
         {
             sprintf(name, "%s", FileName);
             // name / number of channels
+            SongStop();
+            AUDIO_Stop();
             LoadAmigaMod(name, FileName, found_mod);
             Renew_Sample_Ed();
             fclose(in);
             gui_action = GUI_CMD_NONE;
             Actualize_DiskIO_Ed(0);
+            AUDIO_Play();
             return;
         }
 
@@ -1886,12 +1891,15 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGF") == 0 ||
                 strcmp(extension, "TWNNSNGG") == 0 ||
                 strcmp(extension, "TWNNSNGH") == 0 ||
-                strcmp(extension, "TWNNSNGI") == 0)
+                strcmp(extension, "TWNNSNGI") == 0 ||
+                strcmp(extension, "TWNNSNGJ") == 0)
         {
             sprintf(name, "%s", FileName);
             SongStop();
+            AUDIO_Stop();
             LoadMod(name);
             Renew_Sample_Ed();
+            AUDIO_Play();
         }
         else if(strcmp(extension, "TWNNSYN0") == 0 ||
                 strcmp(extension, "TWNNSYN1") == 0 ||
