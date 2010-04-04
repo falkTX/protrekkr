@@ -1661,7 +1661,7 @@ void Clear_Track_Data(int offset)
 }
 
 // ------------------------------------------------------
-// Create a new pattern
+// Reset the patterns pool
 int Alloc_Patterns_Pool(void)
 {
     for(int api = 0; api < MAX_ROWS; api++)

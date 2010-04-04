@@ -159,8 +159,8 @@ void Actualize_Track_Fx_Ed(char gode)
             if(fld_chan == TRUE)
             {
                 FLANGER_OFFSET[Track_Under_Caret] = 8192;
-                foff2[Track_Under_Caret] = float(FLANGER_OFFSET[Track_Under_Caret] - FLANGER_DELAY[Track_Under_Caret]);
-                foff1[Track_Under_Caret] = float(FLANGER_OFFSET[Track_Under_Caret] - FLANGER_DELAY[Track_Under_Caret]);  
+                FLANGER_OFFSET2[Track_Under_Caret] = float(FLANGER_OFFSET[Track_Under_Caret] - FLANGER_DELAY[Track_Under_Caret]);
+                FLANGER_OFFSET1[Track_Under_Caret] = float(FLANGER_OFFSET[Track_Under_Caret] - FLANGER_DELAY[Track_Under_Caret]);  
                 fld_chan = FALSE;
             }
             Realslider(298, 551, FLANGER_DELAY[Track_Under_Caret] / 32, FLANGER_ON[Track_Under_Caret]);

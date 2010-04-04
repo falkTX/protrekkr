@@ -1528,7 +1528,7 @@ int Screen_Update(void)
         }
         else
         {
-            Status_Box("Ready.");
+            Status_Box("Feeling groovy.");
         }
 
         Gui_Draw_Button_Box(0, 6, 16, 16, "\011", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -2236,7 +2236,7 @@ void SongStop(void)
 {
     Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-    Status_Box("Ready...");
+    Status_Box("Feeling groovy.");
     Ptk_Stop();
     // Make sure the visuals stay
     Song_Position = Song_Position_Visual;
@@ -2751,7 +2751,8 @@ void ShowInfo(void)
          }
       }
    }
-   sprintf(tmp, "Sample bank size: %d bytes, pattern bank [%d patterns] size: %d bytes.", sampsize, nPatterns, pattsize);
+   sprintf(tmp, "Sample bank size: %d bytes, pattern bank [%d patterns] size: %d bytes.",
+                sampsize, nPatterns, pattsize);
    Status_Box(tmp);
 }
 

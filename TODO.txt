@@ -4,7 +4,6 @@ TODO (in no special order):
 v2.0:
 
  - Complete the 303 (the env mod & accent stuff).
- - Import the 3 NTK 1 beta modules.
  - Descriptor format error in macosx (AudioDeviceSetProperty(kAudioDevicePropertyStreamFormat)).
 
 [UI]

@@ -79,6 +79,9 @@ v2.0:
 - Rewrote the latency handling routines in a more robust & precise way.
 - Fixed the right mouse button caret horizontal scrolling.
 - Added effect 24: turn flanger on/off.
+- Salvaged 3 NoiseTrekker beta version modules,
+  they really don't sound like in the original one as i had to rework them, though.
+- Real numbers of used patterns are now counted when saving a .ptk.
 
 v1.99e:
 

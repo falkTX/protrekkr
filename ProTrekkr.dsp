@@ -494,6 +494,10 @@ SOURCE=.\src\Support\Project.ico
 
 SOURCE=.\src\ptk.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\TODO.txt
+# End Source File
 # End Group
 # End Target
 # End Project

@@ -408,9 +408,6 @@ extern char Channels_MultiNotes[MAX_TRACKS];
 // Functions
 void ResetFilters(int tr);
 void WavRenderizer(void);
-void DoEffects_tick0(void);
-void DoEffects_tick0_b(void);
-void DoEffects(void);
 void Newmod(void);
 void GetBackMouse(void);
 void SeqFill(int st, int en, char n);

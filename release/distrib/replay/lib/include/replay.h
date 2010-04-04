@@ -308,8 +308,8 @@ extern float FLANGER_FEEDBACK[MAX_TRACKS];
 extern int FLANGER_DELAY[MAX_TRACKS];
 extern int FLANGER_OFFSET[MAX_TRACKS];
 
-extern float foff2[MAX_TRACKS];
-extern float foff1[MAX_TRACKS];
+extern float FLANGER_OFFSET2[MAX_TRACKS];
+extern float FLANGER_OFFSET1[MAX_TRACKS];
 
 extern int CHAN_MUTE_STATE[MAX_TRACKS]; // 0->Normal 1->Muted
 extern char Disclap[MAX_TRACKS];
@@ -403,5 +403,6 @@ void Set_Spline_Boundaries(unsigned int Position,
                            unsigned int Length,
                            unsigned int LoopEnd,
                            unsigned int LoopStart);
+float Process_Sample(short *Data, int c, int i, unsigned int res_dec);
 
 #endif

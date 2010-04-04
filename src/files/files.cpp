@@ -1699,8 +1699,8 @@ Read_Mod_File:
             Read_Mod_Data_Swap(&FLANGER_FEEDBACK[twrite], sizeof(float), 1, in);
             Read_Mod_Data_Swap(&FLANGER_DELAY[twrite], sizeof(int), 1, in);
             FLANGER_OFFSET[twrite] = 8192;
-            foff2[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
-            foff1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
+            FLANGER_OFFSET2[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
+            FLANGER_OFFSET1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
         }
 
         if(!Flanger_Bug)
@@ -3974,6 +3974,16 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             // .ptk
             if(strlen(FileName)) rtrim_string(FileName, 20);
             Write_Mod_Data(FileName, sizeof(char), 20, in);
+
+            // Calc the real number of patterns
+            nPatterns = 0;
+            for(i = 0 ; i < sLength; i++)
+            {
+                if((pSequence[i] + 1) > nPatterns)
+                {
+                    nPatterns = pSequence[i] + 1;
+                }
+            }
 
             Write_Mod_Data(&nPatterns, sizeof(char), 1, in);
             Write_Mod_Data(&sLength, sizeof(char), 1, in);

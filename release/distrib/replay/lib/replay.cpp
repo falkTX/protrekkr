@@ -116,8 +116,8 @@ char FLANGER_ON[MAX_TRACKS];
     float FLANGER_FEEDBACK[MAX_TRACKS];
     int FLANGER_DELAY[MAX_TRACKS];
     int FLANGER_OFFSET[MAX_TRACKS];
-    float foff2[MAX_TRACKS];
-    float foff1[MAX_TRACKS];
+    float FLANGER_OFFSET2[MAX_TRACKS];
+    float FLANGER_OFFSET1[MAX_TRACKS];
     float FLANGE_LEFTBUFFER[MAX_TRACKS][16400];
     float FLANGE_RIGHTBUFFER[MAX_TRACKS][16400];
 #endif
@@ -556,13 +556,13 @@ void ComputeCoefs(int freq, int r, int t);
 void Record_Delay_Event();
 
 #if defined(PTK_FX_TICK0)
-    void DoEffects_tick0(void);
+    void Do_Effects_Tick_0(void);
 #endif
 #if defined(PTK_FX_PATTERNLOOP)
-    void DoEffects_tick0_b(void);
+    void Do_Pattern_Loop(int track);
 #endif
 
-void DoEffects(void);
+void Do_Effects_Ticks_X(void);
 float Filter(float x, char i);
 float filter2p(int ch, float input, float f, float q);
 float filter2px(int ch, float input, float f, float q);
@@ -1312,8 +1312,8 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                 Mod_Dat_Read(&FLANGER_FEEDBACK[twrite], sizeof(float));
                 Mod_Dat_Read(&FLANGER_DELAY[twrite], sizeof(int));
                 FLANGER_OFFSET[twrite] = 8192;
-                foff2[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
-                foff1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
+                FLANGER_OFFSET2[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
+                FLANGER_OFFSET1[twrite] = float(FLANGER_OFFSET[twrite] - FLANGER_DELAY[twrite]);
             }
 #endif
 
@@ -1469,20 +1469,7 @@ void Reset_Values(void)
 #if defined(PTK_TRACKFILTERS)
             CCut[i] = 0.0f;
 #endif
-
             ramper[i] = 0;
-
-#if defined(PTK_FLANGER)
-            foff2[i] = 0.0f;
-            foff1[i] = 0.0f;
-            for(int ini2 = 0; ini2 < 16400; ini2++)
-            {
-                FLANGE_LEFTBUFFER[i][ini2] = 0.0f;
-                FLANGE_RIGHTBUFFER[i][ini2] = 0.0f;
-            }
-
-#endif
-
             New_Instrument[i] = 0;
             Pos_Segue[i] = 0;
             Segue_Volume[i] = 0;
@@ -1782,8 +1769,8 @@ void Pre_Song_Init(void)
         ramper[ini] = 0;
 
 #if defined(PTK_FLANGER)
-        foff2[ini] = 0.0f;
-        foff1[ini] = 0.0f;
+        FLANGER_OFFSET2[ini] = 0.0f;
+        FLANGER_OFFSET1[ini] = 0.0f;
         for(int ini2 = 0; ini2 < 16400; ini2++)
         {
             FLANGE_LEFTBUFFER[ini][ini2] = 0.0f;
@@ -1890,6 +1877,8 @@ void Post_Song_Init(void)
 
     SubCounter = 0;
     Subicounter = 0;
+
+    Reset_Values();
 
 #if defined(PTK_FX_PATTERNLOOP)
     repeat_loop_pos = -1;
@@ -2042,6 +2031,8 @@ void Sp_Player(void)
     int j;
     int trigger_note_off;
     float dest_volume;
+    int toffset;
+    int free_sub_channel;
     
     left_float = 0;
     right_float = 0;
@@ -2057,7 +2048,7 @@ void Sp_Player(void)
         {
 
 #if defined(PTK_FX_TICK0)
-            DoEffects_tick0();
+            Do_Effects_Tick_0();
 #endif
 
             Subicounter = 0;
@@ -2070,12 +2061,13 @@ void Sp_Player(void)
             {
                 int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
                 
+                // Store the notes & instruments numbers
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
                     pl_note[i] = *(RawPatterns + efactor + PATTERN_NOTE1 + (i * 2));
                     pl_sample[i] = *(RawPatterns + efactor + PATTERN_INSTR1 + (i * 2));
                 }
-                
+
                 pl_vol_row = *(RawPatterns + efactor + PATTERN_VOLUME);
                 pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
                 pl_eff_row[0] = *(RawPatterns + efactor + PATTERN_FX);
@@ -2083,45 +2075,8 @@ void Sp_Player(void)
                 pl_eff_row[1] = *(RawPatterns + efactor + PATTERN_FX2);
                 pl_dat_row[1] = *(RawPatterns + efactor + PATTERN_FXDATA2);
 
-                // Don't check for potential volume change
-                if(CHAN_ACTIVE_STATE[Song_Position][ct])
-                {
-
-#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
-                    if(pl_vol_row <= 64 ||  pl_eff_row[0] == 3 || pl_eff_row[1] == 3)
-#endif
-                    {
-                        sp_Tvol_Mod[ct] = 1.0f;
-                    }
-
-#if defined(PTK_VOLUME_COLUMN)
-                    if(pl_vol_row <= 64)
-                    {
-                        sp_Tvol_Mod[ct] *= (float) pl_vol_row * 0.015625f;
-                    }
-#endif
-
-#if defined(PTK_FX_SETVOLUME)
-                    // Modulated be effect 3
-                    if(pl_eff_row[0] == 3)
-                    {
-                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[0] * 0.0039062f;
-                    }
-                    if(pl_eff_row[1] == 3)
-                    {
-                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[1] * 0.0039062f;
-                    }
-#endif
-
-                    if(pl_pan_row <= 128)
-                    {
-                        TPan[ct] = (float) pl_pan_row * 0.0078125f; 
-                        ComputeStereo(ct);
-                    }
-
-                }
-
                 // 303 are always available
+                // since they aren't "really" bounded to any track
 #if !defined(__STAND_ALONE__)
                 if(!sr_isrecording)
 #endif
@@ -2160,11 +2115,45 @@ void Sp_Player(void)
                 }
 #endif
 
+#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
+                    if(pl_vol_row <= 64 ||  pl_eff_row[0] == 3 || pl_eff_row[1] == 3)
+#endif
+                    {
+                        sp_Tvol_Mod[ct] = 1.0f;
+                    }
+
+#if defined(PTK_VOLUME_COLUMN)
+                    if(pl_vol_row <= 64)
+                    {
+                        sp_Tvol_Mod[ct] *= (float) pl_vol_row * 0.015625f;
+                    }
+#endif
+
+#if defined(PTK_FX_SETVOLUME)
+                    // Modulated be effect 3
+                    if(pl_eff_row[0] == 3)
+                    {
+                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[0] * 0.0039062f;
+                    }
+                    if(pl_eff_row[1] == 3)
+                    {
+                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[1] * 0.0039062f;
+                    }
+#endif
+
+                    if(pl_pan_row <= 128)
+                    {
+                        TPan[ct] = (float) pl_pan_row * 0.0078125f; 
+                        ComputeStereo(ct);
+                    }
+
+                // Don't check those fx if the channel isn't active
                 if(CHAN_ACTIVE_STATE[Song_Position][ct])
                 {
+
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-                    /* MidiController commands */
+                    // No controller command for inactive tracks
                     if((pl_pan_row == 0x90 && pl_eff_row[0] < 128) && c_midiout != -1)
                     {
                         Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row[0], pl_dat_row[0]);
@@ -2184,35 +2173,33 @@ void Sp_Player(void)
                     }
 #endif
 #endif
-                }
 
 #if defined(PTK_FX_PATTERNBREAK)
-                if(pl_eff_row[0] == 0xd && pl_dat_row[0] < MAX_ROWS)
-                {
-                    Patbreak_Line = pl_dat_row[0];
-                }
-                if(pl_eff_row[1] == 0xd && pl_dat_row[1] < MAX_ROWS)
-                {
-                    Patbreak_Line = pl_dat_row[1];
-                }
+                    if(pl_eff_row[0] == 0xd && pl_dat_row[0] < MAX_ROWS)
+                    {
+                        Patbreak_Line = pl_dat_row[0];
+                    }
+                    if(pl_eff_row[1] == 0xd && pl_dat_row[1] < MAX_ROWS)
+                    {
+                        Patbreak_Line = pl_dat_row[1];
+                    }
 #endif
 
 #if defined(PTK_FX_POSJUMP)
-                if(pl_eff_row[0] == 0x1f)
-                {
-                    if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
-                    PosJump = pl_dat_row[0];
-                }
-                if(pl_eff_row[1] == 0x1f)
-                {
-                    if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
-                    PosJump = pl_dat_row[1];
-                }
+                    if(pl_eff_row[0] == 0x1f)
+                    {
+                        if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
+                        PosJump = pl_dat_row[0];
+                    }
+                    if(pl_eff_row[1] == 0x1f)
+                    {
+                        if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
+                        PosJump = pl_dat_row[1];
+                    }
 #endif
+                }
 
-                int toffset;
-                int free_sub_channel;
-
+                // Those 2 will only be used when triggering new notes
                 toffset = 0;
                 glide = 0;
                 if(pl_eff_row[0] == 9) toffset = pl_dat_row[0];
@@ -2220,6 +2207,8 @@ void Sp_Player(void)
                 if(pl_eff_row[1] == 9) toffset = pl_dat_row[1];
                 else if(pl_eff_row[1] == 5) glide = 1;
 
+                // Send notes off to the synth & midi
+                // before triggering any new note
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
                     if(pl_note[i] < 120 && Note_Sub_Channels[ct][i] != -1)
@@ -2249,6 +2238,7 @@ void Sp_Player(void)
                     }
                 }
 
+                // New note
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
                     if(CHAN_ACTIVE_STATE[Song_Position][ct])
@@ -2286,7 +2276,7 @@ void Sp_Player(void)
                     }
                 }
 
-                // Trigger a note off
+                // Was a note off (always available even if channels are turned off)
                 trigger_note_off = FALSE;
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
@@ -2324,11 +2314,21 @@ void Sp_Player(void)
                 }
 
 #if defined(PTK_303)
+                // There was a note off on any notes slot,
+                // see if a 303 is running on that track
                 if(trigger_note_off)
                 {
-                    noteoff303(ct); // 303 Note Off...
+                    noteoff303(ct);
                 }
 #endif
+
+#if defined(PTK_FX_PATTERNLOOP)
+            if(CHAN_ACTIVE_STATE[Song_Position][ct])
+            {
+                Do_Pattern_Loop(ct);
+            }
+#endif
+
 
             } // Channels loop
 
@@ -2336,23 +2336,18 @@ void Sp_Player(void)
             Go303();
 #endif
 
-#if defined(PTK_FX_PATTERNLOOP)
-            DoEffects_tick0_b();
-#endif
-
-        }// Pos in tick == 0
+        } // Pos in tick == 0
 
         // ---------------------------------------
-        // ---------------------------------------
-        // ---------------------------------------
+
 
         if(!SubCounter)
         {
-            DoEffects();
+            Do_Effects_Ticks_X();
         }
 
-        // Record at tick 0 but wait for the effects (like the speed)
-        // to be processed (SubCounter resetted at the same time as PosInTick)
+        // Record at tick 0 but wait for some effects (like the speed change)
+        // to be processed (SubCounter is resetted at the same time as PosInTick)
         if(PosInTick == 0)
         {
             Record_Delay_Event();
@@ -2428,7 +2423,7 @@ void Sp_Player(void)
 
                             // Position jump and pattern break can be combined
 #if defined(PTK_FX_POSJUMP)
-                            if(PosJump > 0)
+                            if(PosJump >= 0)
                             {
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
                                 if(PosJump <= Song_Position)
@@ -2555,9 +2550,13 @@ void Sp_Player(void)
             }
         }
 
-        // Replay the song sequence with a delay
+        // Replay the recorded song sequence with the sound card latency delay
         if(Songplaying_Pattern) Proc_Next_Visual_Line();
     }
+
+    // -------------------------------------------
+    // Process the data, this is the huge loop
+    // -------------------------------------------
 
     for(c = 0; c < Songtracks; c++)
     {
@@ -2572,10 +2571,6 @@ void Sp_Player(void)
         All_Signal_L = 0;
         All_Signal_R = 0;
 
-        // -------------------------------------------
-        // Process the data
-        // -------------------------------------------
-
         for(i = 0; i < Channels_Polyphony[c]; i++)
         {
             Curr_Signal_L[i] = 0;
@@ -2583,6 +2578,7 @@ void Sp_Player(void)
 
 #if defined(PTK_INSTRUMENTS)
 
+            // A new note has been scheduled ?
             if(Cut_Stage[c][i])
             {
                 // Note Stop
@@ -2603,6 +2599,7 @@ void Sp_Player(void)
 
 #if defined(PTK_SYNTH)
 
+                // Synth bypassing
                 if(!Synth_Was[c][i]) goto ByPass_Wav;
 
                 if((Synthesizer[c][i].Data.OSC1_WAVEFORM != WAVEFORM_WAV &&
@@ -2661,97 +2658,14 @@ ByPass_Wav:
 
                     if(Player_WL[c][i])
                     {
-
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                        Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Current_Pointer[3]),
-                                                      *(Player_WL[c][i] + Current_Pointer[0]),
-                                                      *(Player_WL[c][i] + Current_Pointer[1]),
-                                                      *(Player_WL[c][i] + Current_Pointer[2]),
-                                                      res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-#elif defined(PTK_USE_SPLINE)
-                        Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Current_Pointer[3]),
-                                                       *(Player_WL[c][i] + Current_Pointer[0]),
-                                                       *(Player_WL[c][i] + Current_Pointer[1]),
-                                                       *(Player_WL[c][i] + Current_Pointer[2]),
-                                                       res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-
-#else
-                        Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer[0])
-                                            * sp_Cvol[c][i] * Player_Ampli[c][i]);
-#endif
-
-#else
-                        switch(Use_Cubic)
-                        {
-                            case CUBIC_INT:
-                                Curr_Signal_L[i] = Cubic_Work(*(Player_WL[c][i] + Current_Pointer[3]),
-                                                              *(Player_WL[c][i] + Current_Pointer[0]),
-                                                              *(Player_WL[c][i] + Current_Pointer[1]),
-                                                              *(Player_WL[c][i] + Current_Pointer[2]),
-                                                              res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-                                break;
-                            case SPLINE_INT:
-                                Curr_Signal_L[i] = Spline_Work(*(Player_WL[c][i] + Current_Pointer[3]),
-                                                               *(Player_WL[c][i] + Current_Pointer[0]),
-                                                               *(Player_WL[c][i] + Current_Pointer[1]),
-                                                               *(Player_WL[c][i] + Current_Pointer[2]),
-                                                               res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-                                break;
-                            default:
-                                Curr_Signal_L[i] = (*(Player_WL[c][i] + Current_Pointer[0])
-                                                    * sp_Cvol[c][i] * Player_Ampli[c][i]);
-                                break;
-                        }
-#endif
+                        Curr_Signal_L[i] = Process_Sample(Player_WL[c][i], c, i, res_dec);
                     }
 
-                    // Stereo sample
+                    // Is it stereo sample ?
                     if(Player_SC[c][i] == 2)
                     {
                         grown = TRUE;
-
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                        Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Current_Pointer[3]),
-                                                      *(Player_WR[c][i] + Current_Pointer[0]),
-                                                      *(Player_WR[c][i] + Current_Pointer[1]),
-                                                      *(Player_WR[c][i] + Current_Pointer[2]),
-                                                      res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-#elif defined(PTK_USE_SPLINE)
-                        Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Current_Pointer[3]),
-                                                       *(Player_WR[c][i] + Current_Pointer[0]),
-                                                       *(Player_WR[c][i] + Current_Pointer[1]),
-                                                       *(Player_WR[c][i] + Current_Pointer[2]),
-                                                       res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-#else
-                        Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer[0])
-                                            * sp_Cvol[c][i] * Player_Ampli[c][i]);
-#endif
-
-#else
-                        switch(Use_Cubic)
-                        {
-                            case CUBIC_INT:
-                                Curr_Signal_R[i] = Cubic_Work(*(Player_WR[c][i] + Current_Pointer[3]),
-                                                              *(Player_WR[c][i] + Current_Pointer[0]),
-                                                              *(Player_WR[c][i] + Current_Pointer[1]),
-                                                              *(Player_WR[c][i] + Current_Pointer[2]),
-                                                              res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-                                break;
-                            case SPLINE_INT:
-                                Curr_Signal_R[i] = Spline_Work(*(Player_WR[c][i] + Current_Pointer[3]),
-                                                               *(Player_WR[c][i] + Current_Pointer[0]),
-                                                               *(Player_WR[c][i] + Current_Pointer[1]),
-                                                               *(Player_WR[c][i] + Current_Pointer[2]),
-                                                               res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
-                                break;
-                            default:
-                                Curr_Signal_R[i] = (*(Player_WR[c][i] + Current_Pointer[0])
-                                                    * sp_Cvol[c][i] * Player_Ampli[c][i]);
-                                break;
-                        }
-#endif
+                        Curr_Signal_R[i] = Process_Sample(Player_WR[c][i], c, i, res_dec);
                     }
 
                     // End of Interpolation algo
@@ -3236,16 +3150,16 @@ ByPass_Wav:
             float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
 #endif
 
-            foff2[c] += fstep1;
-            foff1[c] += fstep2;  
+            FLANGER_OFFSET2[c] += fstep1;
+            FLANGER_OFFSET1[c] += fstep2;  
 
-            if(foff2[c] >= 16384.0f) foff2[c] = 0.0f;
-            if(foff1[c] >= 16384.0f) foff1[c] = 0.0f;
-            if(foff2[c] < 0.0f) foff2[c] = 0.0f;
-            if(foff1[c] < 0.0f) foff1[c] = 0.0f;
+            if(FLANGER_OFFSET2[c] >= 16384.0f) FLANGER_OFFSET2[c] = 0.0f;
+            if(FLANGER_OFFSET1[c] >= 16384.0f) FLANGER_OFFSET1[c] = 0.0f;
+            if(FLANGER_OFFSET2[c] < 0.0f) FLANGER_OFFSET2[c] = 0.0f;
+            if(FLANGER_OFFSET1[c] < 0.0f) FLANGER_OFFSET1[c] = 0.0f;
 
-            oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (foff2[c])];
-            roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (foff1[c])];
+            oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (FLANGER_OFFSET2[c])];
+            roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (FLANGER_OFFSET1[c])];
 
             All_Signal_L += Filter_FlangerL(oldspawn[c]);
             All_Signal_R += Filter_FlangerR(roldspawn[c]);
@@ -3256,8 +3170,8 @@ ByPass_Wav:
             if(FLANGER_GR[c] >= 6.283185f)
             {
                 FLANGER_GR[c] -= 6.283185f;
-                foff2[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
-                foff1[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
+                FLANGER_OFFSET2[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
+                FLANGER_OFFSET1[c] = float(FLANGER_OFFSET[c] - FLANGER_DELAY[c]);
             }
         }
 #endif
@@ -3870,7 +3784,7 @@ void Play_Instrument(int channel, int sub_channel)
 // ------------------------------------------------------
 // Handle patterns effects
 #if defined(PTK_FX_TICK0)
-void DoEffects_tick0(void)
+void Do_Effects_Tick_0(void)
 {
 
 #if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE)
@@ -3939,63 +3853,60 @@ void DoEffects_tick0(void)
 }
 
 #if defined(PTK_FX_PATTERNLOOP)
-void DoEffects_tick0_b(void)
+void Do_Pattern_Loop(int track)
 {
     int j;
     int pltr_eff_row[MAX_FX];
     int pltr_dat_row[MAX_FX];
 
-    for(int trackef = 0; trackef < Songtracks; trackef++)
-    {
-        int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
-        pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
-        pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
-        pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
-        pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
+    int tefactor = Get_Pattern_Offset(pSequence[Song_Position], track, Pattern_Line);
+    pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
+    pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
+    pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
+    pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
 
-        for(j = 0 ; j < MAX_FX; j++)
+    for(j = 0; j < MAX_FX; j++)
+    {
+        switch(pltr_eff_row[j])
         {
-            switch(pltr_eff_row[j])
-            {
-                // $06 Pattern loop
-                case 0x6:
-                    if(!pltr_dat_row[j])
+            // $06 Pattern loop
+            case 0x6:
+                if(!pltr_dat_row[j])
+                {
+                    if(repeat_loop_counter == 0)
+                    {
+                        repeat_loop_pos = Pattern_Line;
+                    }
+                }
+                else
+                {
+                    if(repeat_loop_pos != -1)
                     {
                         if(repeat_loop_counter == 0)
                         {
-                            repeat_loop_pos = Pattern_Line;
+                            repeat_loop_counter = ((int) pltr_dat_row[j]);
+                            repeat_loop_pos = (Pattern_Line - repeat_loop_pos);
+                            repeat_loop_counter_in = 1;
                         }
-                    }
-                    else
-                    {
-                        if(repeat_loop_pos != -1)
+                        else
                         {
-                            if(repeat_loop_counter == 0)
+                            // count down
+                            repeat_loop_counter--;
+                            if(!repeat_loop_counter)
                             {
-                                repeat_loop_counter = ((int) pltr_dat_row[j]);
-                                repeat_loop_pos = (Pattern_Line - repeat_loop_pos);
-                                repeat_loop_counter_in = 1;
+                                repeat_loop_pos = -1;
+                                repeat_loop_counter_in = 0;
                             }
                             else
                             {
-                                // count down
-                                repeat_loop_counter--;
-                                if(!repeat_loop_counter)
-                                {
-                                    repeat_loop_pos = -1;
-                                    repeat_loop_counter_in = 0;
-                                }
-                                else
-                                {
-                                    repeat_loop_counter_in = 1;
-                                }
+                                repeat_loop_counter_in = 1;
                             }
                         }
-                    } 
-                    break;
-            }
+                    }
+                } 
+                break;
         }
-    }      
+    }
 }
 #endif // PTK_FX_PATTERNLOOP
 
@@ -4003,7 +3914,7 @@ void DoEffects_tick0_b(void)
 
 // ------------------------------------------------------
 // Process ticks X effects
-void DoEffects(void)
+void Do_Effects_Ticks_X(void)
 {
     int i;
 
@@ -5718,4 +5629,49 @@ void Set_Spline_Boundaries(unsigned int Position,
             }
             break;
     }
+}
+
+// ------------------------------------------------------
+// Obtain the sample loocated at the current position
+float Process_Sample(short *Data, int c, int i, unsigned int res_dec)
+{
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+#if defined(PTK_USE_CUBIC)
+    return Cubic_Work(*(Data + Current_Pointer[3]),
+                      *(Data + Current_Pointer[0]),
+                      *(Data + Current_Pointer[1]),
+                      *(Data + Current_Pointer[2]),
+                      res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
+#elif defined(PTK_USE_SPLINE)
+    return Spline_Work(*(Data + Current_Pointer[3]),
+                       *(Data + Current_Pointer[0]),
+                       *(Data + Current_Pointer[1]),
+                       *(Data + Current_Pointer[2]),
+                       res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
+#else
+    return (*(Data + Current_Pointer[0]) * sp_Cvol[c][i] * Player_Ampli[c][i]);
+#endif
+
+#else
+    switch(Use_Cubic)
+    {
+        case CUBIC_INT:
+            return Cubic_Work(*(Data + Current_Pointer[3]),
+                              *(Data + Current_Pointer[0]),
+                              *(Data + Current_Pointer[1]),
+                              *(Data + Current_Pointer[2]),
+                              res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
+            break;
+        case SPLINE_INT:
+            return Spline_Work(*(Data + Current_Pointer[3]),
+                               *(Data + Current_Pointer[0]),
+                               *(Data + Current_Pointer[1]),
+                               *(Data + Current_Pointer[2]),
+                               res_dec) * sp_Cvol[c][i] * Player_Ampli[c][i];
+            break;
+        default:
+            return (*(Data + Current_Pointer[0]) * sp_Cvol[c][i] * Player_Ampli[c][i]);
+    }
+#endif
+
 }
