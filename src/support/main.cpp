@@ -91,7 +91,7 @@ REQUESTER Title_Requester =
     &LOGOPIC, 5
 };
 
-extern Display_Pointer;
+extern int Display_Pointer;
 int Burn_Title;
 SDL_Surface *Main_Screen;
 SDL_SysWMinfo WMInfo;

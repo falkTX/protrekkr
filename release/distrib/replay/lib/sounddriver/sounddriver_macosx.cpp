@@ -48,6 +48,7 @@ AudioStreamBasicDescription	Desc;
 int AUDIO_SoundBuffer_Size;
 int AUDIO_Latency;
 int AUDIO_Milliseconds = 20;
+int AUDIO_16Bits;
 
 // ------------------------------------------------------
 // Functions
@@ -142,6 +143,8 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 
     AudioValueRange Frame_Range;
 
+    AUDIO_16Bits = TRUE;
+
     Amount = sizeof(AudioStreamBasicDescription);
     if(AudioDeviceGetProperty(AUDIO_Device,
                               0,
@@ -155,7 +158,6 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
         Desc.mBitsPerChannel = sizeof(short) << 3;
         Desc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kAudioFormatFlagIsSignedInteger;
         Desc.mFormatID = kAudioFormatLinearPCM;
-
         Desc.mFramesPerPacket = 1;
         Desc.mBytesPerFrame = (Desc.mBitsPerChannel * Desc.mChannelsPerFrame) >> 3;
         Desc.mBytesPerPacket = Desc.mBytesPerFrame * Desc.mFramesPerPacket;
@@ -164,7 +166,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
         Desc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
 #endif
 
-        // Try with floating points
+        // Try with 16 bit integers
         if(AudioDeviceSetProperty(AUDIO_Device,
                                   NULL,
                                   0,
@@ -174,8 +176,20 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
                                   &Desc) != noErr)
         {
             // Try with 32 bit floating points
+            AUDIO_16Bits = FALSE;
+            Desc.mSampleRate = AUDIO_PCM_FREQ;
+            Desc.mChannelsPerFrame = AUDIO_DBUF_CHANNELS;
             Desc.mBitsPerChannel = sizeof(float) << 3;
             Desc.mFormatFlags = kLinearPCMFormatFlagIsPacked | kAudioFormatFlagIsFloat;
+            Desc.mFormatID = kAudioFormatLinearPCM;
+            Desc.mFramesPerPacket = 1;
+            Desc.mBytesPerFrame = (Desc.mBitsPerChannel * Desc.mChannelsPerFrame) >> 3;
+            Desc.mBytesPerPacket = Desc.mBytesPerFrame * Desc.mFramesPerPacket;
+
+#if defined(__BIG_ENDIAN__)
+            Desc.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
+#endif
+
             if(AudioDeviceSetProperty(AUDIO_Device,
                                       NULL,
                                       0,

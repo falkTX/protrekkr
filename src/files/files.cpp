@@ -714,7 +714,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                         // But no more
                         if(Cmd != 4 && Cmd != 6)
                         {
-                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1d00)
+                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1d)
                             {
                                 vib_chan[pw2] = FALSE;
                             }
@@ -737,7 +737,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                         // But no more
                         if(Cmd != 0 || (Cmd == 0 && Cmd_Dat == 0))
                         {
-                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1b00)
+                            if(*(RawPatterns + tmo + PATTERN_FX2) == 0x1b)
                             {
                                 arp_chan[pw2] = FALSE;
                             }

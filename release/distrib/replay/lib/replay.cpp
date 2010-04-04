@@ -610,7 +610,8 @@ void Reset_Values(void);
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 {
 #if defined(__MACOSX__)
-    float *pSamples = (float *) Buffer;
+    float *pSamples_flt = (float *) Buffer;
+    short *pSamples_int = (short *) Buffer;
 #else
     short *pSamples = (short *) Buffer;
 #endif
@@ -627,7 +628,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 
 #if defined(__MACOSX__)
-        for(i = Len - 1; i >= 0; i -= 8)
+        for(i = Len - 1; i >= 0; i -= AUDIO_16Bits ? 4 : 8)
 #else
         for(i = Len - 1; i >= 0; i -= 4)
 #endif
@@ -635,9 +636,16 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             GetPlayerValues();
 
 #if defined(__MACOSX__)
-            // Send them to the driver first
-            *pSamples++ = left_float;
-            *pSamples++ = right_float;
+            if(AUDIO_16Bits)
+            {
+                *pSamples_int++ = left_value;
+                *pSamples_int++ = right_value;
+            }
+            else
+            {
+                *pSamples_flt++ = left_float;
+                *pSamples_flt++ = right_float;
+            }
 #else
             *pSamples++ = left_value;
             *pSamples++ = right_value;
@@ -645,15 +653,8 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 
 #if !defined(__STAND_ALONE__)
             // Gather datas for the scopes and the vumeters
-            clamp_left_value = left_float;
-            clamp_right_value = right_float;
-
-#if defined(__LINUX__)
-            clamp_left_value /= 8192.0f;
-            clamp_right_value /= 8192.0f;
-            clamp_left_value *= 32767.0f;
-            clamp_right_value *= 32767.0f;
-#endif
+            clamp_left_value = left_float * 32767.0f;
+            clamp_right_value = right_float * 32767.0f;
 
             // Pre-record
             Scope_Dats_LeftRight[0][pos_scope] = ((float) clamp_left_value);
@@ -4669,23 +4670,16 @@ void GetPlayerValues(void)
     left_float_render = left_float;
     right_float_render = right_float;
 
-#if !defined(__MACOSX__) // Only float32 on mac
-
+    // It looks like the maximum range for OSS is -8192 +8192
+    // (higher than that will produce heavily satured signals
+    //  i don't know if it's a bug in drivers in Linux mixer or anything)
     #if defined(__LINUX__)
-        // It looks like the maximum range for OSS is -8192 +8192
-        // (higher than that will produce heavily satured signals
-        //  i don't know if it's a bug in drivers in Linux mixer or anything)
-        left_float *= 8192.0f;
-        right_float *= 8192.0f;
+        left_value = (int) (left_float * 8192.0f);
+        right_value = (int) (right_float * 8192.0f);
     #else
-        left_float *= 32767.0f;
-        right_float *= 32767.0f;
+        left_value = (int) (left_float * 32767.0f);
+        right_value = (int) (right_float * 32767.0f);
     #endif
-
-    left_value = (int) left_float;
-    right_value = (int) right_float;
-
-#endif // __MACOSX__
 }
 
 // ------------------------------------------------------
@@ -5325,9 +5319,7 @@ void Initreverb()
     for(i = 0; i < num_echoes; i++)
     {
         int mlrw = 99999 - (delays[i] * 4);
-
         if(mlrw < 0) mlrw = 0;
-
         counters[i] = mlrw;
     }
  

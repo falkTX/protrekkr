@@ -93,7 +93,7 @@ void Clear_Files_List(void)
     }
 }
 
-void Add_Entry(char *Name, int Type)
+void Add_Entry(const char *Name, int Type)
 {
     sprintf(SMPT_LIST[list_counter[Scopish]].Name, Name);
     SMPT_LIST[list_counter[Scopish]].Type = Type;
@@ -312,9 +312,8 @@ void CopyStringBSTRToC(BSTR in,
 // Fill the list with the content of the relevant directory
 void Read_SMPT(void)
 {
-    //lt_ykar = 0;
-    //lt_curr = 0;
-    //lt_index = 0;
+    int i;
+
     lt_items[Scopish] = 0;  
     list_counter[Scopish] = 0;
 
@@ -410,7 +409,6 @@ void Read_SMPT(void)
     }
 
     // Add the available drives to the end of the list
-    int i;
     char *Ptr_Drives;
     GetLogicalDriveStrings(1024, List_Drives);
 

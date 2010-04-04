@@ -60,6 +60,7 @@ typedef char int8;
 // Functions
 extern int AUDIO_Latency;
 extern int AUDIO_Milliseconds;
+extern int AUDIO_16Bits;
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
 void Message_Error(char *Message);

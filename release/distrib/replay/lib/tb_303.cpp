@@ -201,7 +201,7 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
     int tbLine2 = (tbLine - 1);
     if(tbLine2 < 0) tbLine2 = PARAT303->patternlength[tbPattern] - 1;
     if(tbLine2 < 0) tbLine2 = 0;
-    if(tbLine < 0) tbLine = PARAT303->patternlength[tbPattern] - 1;
+    if(tbLine == 255) tbLine = PARAT303->patternlength[tbPattern] - 1;
 
     if(PARAT303->flag[tbPattern][tbLine].slide_flag)
     {

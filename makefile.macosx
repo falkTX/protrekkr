@@ -63,219 +63,219 @@ protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 	-rm -f ./release/distrib/ptk_macosx_x86
 	
 ptk_ppc.o: src/ptk.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_303_ppc.o: src/editors/editor_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_pattern_ppc.o: src/editors/editor_pattern.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_sequencer_ppc.o: src/editors/editor_sequencer.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_track_ppc.o: src/editors/editor_track.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_track_fx_ppc.o: src/editors/editor_track_fx.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 patterns_blocks_ppc.o: src/editors/patterns_blocks.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_synth_ppc.o: src/editors/editor_synth.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_sample_ppc.o: src/editors/editor_sample.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_fx_setup_ppc.o: src/editors/editor_fx_setup.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_setup_ppc.o: src/editors/editor_setup.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_diskio_ppc.o: src/editors/editor_diskio.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_reverb_ppc.o: src/editors/editor_reverb.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_instrument_ppc.o: src/editors/editor_instrument.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 samples_pack_ppc.o: src/files/samples_pack.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 files_list_ppc.o: src/files/files_list.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 files_ppc.o: src/files/files.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 midi_ppc.o: src/midi/midi.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 RtMidi_ppc.o: src/midi/RtMidi.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 timer_ppc.o: src/support/timer.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 main_ppc.o: src/support/main.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 sdlmain_ppc.o: src/support/sdlmain.m
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/support/$(*).m
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 misc_draw_ppc.o: src/ui/misc_draw.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 draw_primitives_ppc.o: src/ui/draw_primitives.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 requesters_ppc.o: src/ui/requesters.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 xml_ppc.o: src/ui/xml.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 samples_ops_ppc.o: src/samples/samples_ops.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/samples/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 aiff_ppc.o: src/samples/aiff/aiff.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/samples/aiff/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 riff_ppc.o: src/samples/wav/riff.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) src/samples/wav/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 spline_ppc.o: release/distrib/replay/lib/spline.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 tb_303_ppc.o: release/distrib/replay/lib/tb_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 samples_unpack_ppc.o: release/distrib/replay/lib/samples_unpack.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 replay_ppc.o: release/distrib/replay/lib/replay.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 synth_ppc.o: release/distrib/replay/lib/synth.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 endianness_ppc.o: release/distrib/replay/lib/endianness.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 sounddriver_macosx_ppc.o: release/distrib/replay/lib/sounddriver/sounddriver_macosx.cpp
-	$(CXX) -c -o $(@) $(FLAGS_PPC) release/distrib/replay/lib/sounddriver/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 
 
 ptk_x86.o: src/ptk.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_303_x86.o: src/editors/editor_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_pattern_x86.o: src/editors/editor_pattern.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_sequencer_x86.o: src/editors/editor_sequencer.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_track_x86.o: src/editors/editor_track.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_track_fx_x86.o: src/editors/editor_track_fx.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 patterns_blocks_x86.o: src/editors/patterns_blocks.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_synth_x86.o: src/editors/editor_synth.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_sample_x86.o: src/editors/editor_sample.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_fx_setup_x86.o: src/editors/editor_fx_setup.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_setup_x86.o: src/editors/editor_setup.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_diskio_x86.o: src/editors/editor_diskio.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_reverb_x86.o: src/editors/editor_reverb.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_instrument_x86.o: src/editors/editor_instrument.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/editors/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 samples_pack_x86.o: src/files/samples_pack.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 files_list_x86.o: src/files/files_list.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 files_x86.o: src/files/files.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/files/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 midi_x86.o: src/midi/midi.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 RtMidi_x86.o: src/midi/RtMidi.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/midi/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 timer_x86.o: src/support/timer.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 main_x86.o: src/support/main.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 sdlmain_x86.o: src/support/sdlmain.m
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/support/$(*).m
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 misc_draw_x86.o: src/ui/misc_draw.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 draw_primitives_x86.o: src/ui/draw_primitives.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 requesters_x86.o: src/ui/requesters.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 xml_x86.o: src/ui/xml.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 samples_ops_x86.o: src/samples/samples_ops.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/samples/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 aiff_x86.o: src/samples/aiff/aiff.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/samples/aiff/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 riff_x86.o: src/samples/wav/riff.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) src/samples/wav/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 spline_x86.o: release/distrib/replay/lib/spline.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 tb_303_x86.o: release/distrib/replay/lib/tb_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 samples_unpack_x86.o: release/distrib/replay/lib/samples_unpack.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 replay_x86.o: release/distrib/replay/lib/replay.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 synth_x86.o: release/distrib/replay/lib/synth.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 endianness_x86.o: release/distrib/replay/lib/endianness.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 sounddriver_macosx_x86.o: release/distrib/replay/lib/sounddriver/sounddriver_macosx.cpp
-	$(CXX) -c -o $(@) $(FLAGS_X86) release/distrib/replay/lib/sounddriver/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
