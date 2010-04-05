@@ -49,7 +49,6 @@ short *AHIbuf;
 short *AHIbuf2;
 int volatile Thread_Running;
 
-#define USE_SDL_THREADS
 #include <string.h>
 #if defined(USE_SDL_THREADS)
 #include <SDL/SDL_thread.h>
@@ -100,7 +99,7 @@ void *AUDIO_Thread(void *arg)
             else
             {
                 unsigned int i;
-                char *pSamples = (Uint8 *) buf;
+                char *pSamples = (char *) buf;
                 for(i = 0; i < AUDIO_SoundBuffer_Size; i++)
                 {
                     pSamples[i] = 0;
