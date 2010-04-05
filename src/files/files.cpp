@@ -5788,6 +5788,77 @@ void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
 }
 
 // ------------------------------------------------------
+// Clear the data of a given instrument
+void Clear_Instrument_Dat(int n_index, int split, int lenfir)
+{
+    SampleType[n_index][split] = 0;
+    LoopStart[n_index][split] = 0;
+    LoopEnd[n_index][split] = lenfir;
+    LoopType[n_index][split] = SMP_LOOP_NONE;
+    SampleNumSamples[n_index][split] = lenfir;
+    Finetune[n_index][split] = 0;
+    Sample_Amplify[n_index][split] = 1.0f;
+    FDecay[n_index][split] = 0.0f;
+    Basenote[n_index][split] = DEFAULT_BASE_NOTE;
+    Sample_Vol[n_index] = 0.0f;
+    Midiprg[n_index] = -1;
+    Synthprg[n_index] = SYNTH_WAVE_OFF;
+    beatsync[n_index] = FALSE;
+
+    // Gsm is default compression
+#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+    SampleCompression[n_index] = SMP_PACK_GSM;
+    SamplesSwap[n_index] = FALSE;
+#else
+    SampleCompression[n_index] = SMP_PACK_NONE;
+#endif
+    Mp3_BitRate[n_index] = 0;
+    At3_BitRate[n_index] = 0;
+}
+
+// ------------------------------------------------------
+// Allocate space for a waveform
+void AllocateWave(int n_index, int split, long lenfir,
+                  int samplechans, int clear)
+{
+    // Freeing if memory was allocated before -----------------------
+    if(SampleType[n_index][split] != 0)
+    {
+        if(RawSamples[n_index][0][split]) free(RawSamples[n_index][0][split]);
+        RawSamples[n_index][0][split] = NULL;
+        if(SampleChannels[n_index][split] == 2)
+        {
+            if(RawSamples[n_index][1][split]) free(RawSamples[n_index][1][split]);
+            RawSamples[n_index][1][split] = NULL;
+        }
+
+#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+        if(RawSamples_Swap[n_index][0][split]) free(RawSamples_Swap[n_index][0][split]);
+        RawSamples_Swap[n_index][0][split] = NULL;
+        if(SampleChannels[n_index][split] == 2)
+        {
+            if(RawSamples_Swap[n_index][1][split]) free(RawSamples_Swap[n_index][1][split]);
+            RawSamples_Swap[n_index][1][split] = NULL;
+        }
+#endif
+
+    }
+
+    if(clear) Clear_Instrument_Dat(n_index, split, lenfir);
+
+    SampleType[n_index][split] = 1;
+
+    SampleChannels[n_index][split] = samplechans;
+    RawSamples[n_index][0][split] = (short *) malloc((lenfir * 2) + 8);
+    memset(RawSamples[n_index][0][split], 0, (lenfir * 2) + 8);
+    if(samplechans == 2)
+    {
+        RawSamples[n_index][1][split] = (short *) malloc((lenfir * 2) + 8);
+        memset(RawSamples[n_index][1][split], 0, (lenfir * 2) + 8);
+    }
+}
+
+// ------------------------------------------------------
 // Save the data to a reverb file (or a module)
 #if !defined(__WINAMP__)
 void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),

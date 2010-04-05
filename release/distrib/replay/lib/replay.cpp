@@ -208,9 +208,9 @@ volatile float local_ramp_vol;
 int left_value;
 int right_value;
 
-#if !defined(__WINAMP__)
-    int Songplaying_Pattern;
+int Songplaying_Pattern;
 
+#if !defined(__WINAMP__)
 #if !defined(__STAND_ALONE__) 
     int done;
 #endif
@@ -1345,8 +1345,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].tbVolume, sizeof(float));
         if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].tbVolume, sizeof(float));
-        if(tb303_1_enabled) Mod_Dat_Read(&tb303engine[0].hpf, sizeof(char));
-        if(tb303_2_enabled) Mod_Dat_Read(&tb303engine[1].hpf, sizeof(char));
 #endif
 
         Song_Position = start_position;
