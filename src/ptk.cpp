@@ -2154,16 +2154,16 @@ void Notify_Play(void)
         {
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Status_Box("Playing song...");
         }
         else
         {
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Status_Box("Playing pattern...");
         }
     }
@@ -2185,7 +2185,7 @@ void SongStop(void)
     // Make sure the visuals stay
     Song_Position = Song_Position_Visual;
     Pattern_Line = Pattern_Line_Visual;
-    Actualize_Master(0);
+    Actualize_Master(5);
 }
 
 // ------------------------------------------------------
@@ -3701,8 +3701,8 @@ void Keyboard_Handler(void)
                 L_MaxLevel = 0;
                 R_MaxLevel = 0;
                 Songplaying = TRUE;
-                Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Pattern_Line_Visual = Pattern_Line;
                 key_record_first_time = FALSE;
                 old_key_Pattern_Line = Pattern_Line;
@@ -5707,7 +5707,7 @@ void Actualize_Master(char gode)
     {
         if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
-        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0 || gode == 2)
@@ -5726,7 +5726,7 @@ void Actualize_Master(char gode)
             Actualize_Fx_Ed(10);
             Actualize_Fx_Ed(11);
         }
-        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0)
@@ -5745,6 +5745,12 @@ void Actualize_Master(char gode)
     SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
     float SamplesPerBeat = (float) MIX_RATE / (((float) BeatsPerMin * 4) / 60);
     SamplesPerSub = SamplesPerTick / 6;
+
+    if(gode == 5)
+    {
+        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    }
 
     if(userscreen == USER_SCREEN_SETUP_EDIT) Actualize_Master_Ed(3);
 }
