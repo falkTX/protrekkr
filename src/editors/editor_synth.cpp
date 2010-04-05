@@ -87,6 +87,17 @@ void CParcha_ENV1(int cpar);
 void CParcha_ENV2(int cpar);
 void CParcha_Misc(int cpar);
 
+// 2 = no filter by legacy
+int filter_vcf_type_plus[] =
+{
+    1, 3, 2, 4, 2
+};
+
+int filter_vcf_type_minus[] =
+{
+    0, 0, 4, 1, 3
+};
+
 int Tbl_Synth_OSC1[] =
 {
     1, /* Osc1_PD */
@@ -566,17 +577,23 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_VALUES)
         {
             Gui_Draw_Button_Box(349, 450, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(349 + 44, 450, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(349 + 84, 450, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Sample].vcf_type)
             {
                 case 0:
-                    Gui_Draw_Button_Box(349 + 18, 450, 24, 16, "Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 1:
-                    Gui_Draw_Button_Box(349 + 18, 450, 24, 16, "Hi", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Hi", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 2:
-                    Gui_Draw_Button_Box(349 + 18, 450, 24, 16, "N/A", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "N/A", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    break;
+                case 3:
+                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Moog Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    break;
+                case 4:
+                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Moog Band", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
             }
         }
@@ -1289,13 +1306,13 @@ void Mouse_Left_Synth_Ed(void)
             // VCF Type
             if(zcheckMouse(349, 450, 17, 16) && PARASynth[Current_Sample].vcf_type > 0)
             {
-                PARASynth[Current_Sample].vcf_type--;
+                PARASynth[Current_Sample].vcf_type = filter_vcf_type_minus[PARASynth[Current_Sample].vcf_type];
                 teac = 7;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(349 + 44, 450, 17, 16) && PARASynth[Current_Sample].vcf_type < 2)
+            if(zcheckMouse(349 + 84, 450, 17, 16) && PARASynth[Current_Sample].vcf_type <= 4)
             {
-                PARASynth[Current_Sample].vcf_type++;
+                PARASynth[Current_Sample].vcf_type = filter_vcf_type_plus[PARASynth[Current_Sample].vcf_type];
                 teac = 7;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
@@ -2521,7 +2538,7 @@ void Rand_OSC2()
 
 void Rand_VCF()
 {
-    PARASynth[Current_Sample].vcf_type = rand() % 3;
+    PARASynth[Current_Sample].vcf_type = rand() % 5;
     PARASynth[Current_Sample].vcf_cutoff = rand() & 0x7f;
     PARASynth[Current_Sample].vcf_resonance = rand() & 0x7f;
     Actualize_Synth_Ed(UPDATE_SYNTH_ED_VALUES);

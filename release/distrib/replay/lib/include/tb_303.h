@@ -57,10 +57,6 @@
 #define TB303_WAVEFORM_SAW 0
 #define TB303_WAVEFORM_SQUARE 1
 
-#define TB303_LOPASS 0
-#define TB303_HIPASS 1
-#define TB303_BANDPASS 2
-
 // ------------------------------------------------------
 // Structures
 
@@ -154,25 +150,27 @@ class gear303
         void tbNoteOn(int tbNote, para303 *PARAT303);
 
         float tbGetSample(void);
-        char hpf;
         float tbBuf[5];
         float tbVolume;
         float TickPos;
         int Note_Off;
 
         float RampVolume;
+        float tbTargetRealVolume;
 
     private:
 
         float tbFilter(void);
 
         // 303 Parameters
+        float tbTargetRealVolumeRamp;
         float tbCutoff;
         float tbResonance;
         float tbEnvmod;
         float tbDecay;
         float tbAccent;
         float tbSample;
+        float tbRealAccent;
         float tbRealCutoff;
         float tbRealCutoff2;
         float tbRealResonance;

@@ -1782,8 +1782,8 @@ Read_Mod_File:
             }
             Read_Mod_Data_Swap(&tb303engine[0].tbVolume, sizeof(float), 1, in);
             Read_Mod_Data_Swap(&tb303engine[1].tbVolume, sizeof(float), 1, in);
-            Read_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
-            Read_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
+            //Read_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
+            //Read_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
         }
 
         fclose(in);
@@ -2338,6 +2338,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     int Store_Synth_Filter = FALSE;
     int Store_Synth_Filter_Lo = FALSE;
     int Store_Synth_Filter_Hi = FALSE;
+    int Store_Synth_Filter_Moog_Lo = FALSE;
+    int Store_Synth_Filter_Moog_Band = FALSE;
     int Store_Synth_Sin = FALSE;
     int Store_Synth_Saw = FALSE;
     int Store_Synth_Pulse = FALSE;
@@ -3008,7 +3010,7 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_303", Store_303_1 | Store_303_2);
 
     Save_Constant("PTK_FX_0", Store_FX_PitchUp | Store_FX_PitchDown |
-                              Store_FX_SetVolume | Store_FX_TranceSlicer |
+                              Store_FX_TranceSlicer |
                               Store_FX_TranceGlider);
 
     Save_Constant("PTK_FX_X", Store_FX_SetCutOff |
@@ -3153,6 +3155,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 if(PARASynth[swrite].vcf_type != 2) Store_Synth_Filter = TRUE;
                 if(PARASynth[swrite].vcf_type == 0) Store_Synth_Filter_Lo = TRUE;
                 if(PARASynth[swrite].vcf_type == 1) Store_Synth_Filter_Hi = TRUE;
+                if(PARASynth[swrite].vcf_type == 3) Store_Synth_Filter_Moog_Lo = TRUE;
+                if(PARASynth[swrite].vcf_type == 4) Store_Synth_Filter_Moog_Band = TRUE;
 
                 fvalue = ((float) (PARASynth[swrite].env1_attack + 1)) / 512.0f;
                 if(fvalue < 0.1f) fvalue = 0.1f;
@@ -3372,6 +3376,10 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
             }
 
+            Write_Mod_Data(&beatsync[swrite], sizeof(char), 1, in);
+            Write_Mod_Data(&beatlines[swrite], sizeof(short), 1, in);
+            Write_Mod_Data(&Sample_Vol[swrite], sizeof(float), 1, in);
+
 #if defined(__NO_CODEC__)
             char No_Comp = SMP_PACK_NONE;
             Write_Mod_Data(&No_Comp, sizeof(char), 1, in);
@@ -3571,6 +3579,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_SYNTH_FILTER", Store_Synth_Filter);
     Save_Constant("PTK_SYNTH_FILTER_LO", Store_Synth_Filter_Lo);
     Save_Constant("PTK_SYNTH_FILTER_HI", Store_Synth_Filter_Hi);
+    Save_Constant("PTK_SYNTH_FILTER_MOOG_LO", Store_Synth_Filter_Moog_Lo);
+    Save_Constant("PTK_SYNTH_FILTER_MOOG_BAND", Store_Synth_Filter_Moog_Band);
 
     Save_Constant("PTK_SYNTH_SIN", Store_Synth_Sin);
     Save_Constant("PTK_SYNTH_SAW", Store_Synth_Saw);
@@ -3838,24 +3848,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-    char Instrs;
-    
-    Instrs = Store_Instruments;
-    
-    Write_Mod_Data(&Instrs, sizeof(char), 1, in);
-
-    if(Instrs)
-    {
-        Write_Mod_Data(beatsync, sizeof(char), MAX_INSTRS, in);
-        Write_Mod_Data(beatlines, sizeof(short), MAX_INSTRS, in);
-    }
     Write_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
-
-    if(Instrs)
-    {
-        Write_Mod_Data(Sample_Vol, sizeof(float), MAX_INSTRS, in);
-    }
-
+    
     Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
     if(Store_303_1)
     {
@@ -3890,8 +3884,8 @@ int SaveMod_Ptp(FILE *in, int Simulate, char *FileName)
     
     if(Store_303_1) Write_Mod_Data(&tb303engine[0].tbVolume, sizeof(float), 1, in);
     if(Store_303_2) Write_Mod_Data(&tb303engine[1].tbVolume, sizeof(float), 1, in);
-    if(Store_303_1) Write_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
-    if(Store_303_2) Write_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
+//    if(Store_303_1) Write_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
+    //if(Store_303_2) Write_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
 
     free(New_RawPatterns);
 
@@ -4208,8 +4202,8 @@ int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             Write_Mod_Data_Swap(&tb303engine[0].tbVolume, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&tb303engine[1].tbVolume, sizeof(float), 1, in);
-            Write_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
-            Write_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
+            //Write_Mod_Data(&tb303engine[0].hpf, sizeof(char), 1, in);
+            //Write_Mod_Data(&tb303engine[1].hpf, sizeof(char), 1, in);
         }
 
         if(!Simulate)

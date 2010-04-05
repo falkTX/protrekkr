@@ -201,6 +201,14 @@ typedef struct
     int start_backward;
 } INSTR_SCHEDULE, *LPINSTR_SCHEDULE;
 
+typedef struct
+{
+    int Line;
+    int Pos;
+    int SamplesPerTick;
+    int shufflestep;
+} VISUAL_DELAY_DAT, *LPVISUAL_DELAY_DAT;
+
 // ------------------------------------------------------
 // Variables
 extern float decays[MAX_COMB_FILTERS];

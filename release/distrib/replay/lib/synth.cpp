@@ -1704,9 +1704,49 @@ float CSynth::GetSample(short *Left_Samples,
         FILT_B = float(FILT_RESO * (1.0f + (1.0f / FILT_A)));
         GS_VAL = FilterL();
     }
-#endif
 
-//    GS_VAL *= Data.GLB_VOLUME;
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
+    else if(Data.VCF_TYPE > 2)
+    {
+            FILT_CUTO = Data.VCF_CUTOFF
+#if defined(PTK_SYNTH_LFO1)
+                        + LFO1_VALUE * Data.LFO1_VCF_CUTOFF
+#endif
+#if defined(PTK_SYNTH_LFO2)
+                        + LFO2_VALUE * Data.LFO2_VCF_CUTOFF
+#endif
+#if defined(PTK_SYNTH_ENV1)
+                        + ENV1_VALUE * Data.ENV1_VCF_CUTOFF
+#endif
+#if defined(PTK_SYNTH_ENV2)
+                        + ENV2_VALUE * Data.ENV2_VCF_CUTOFF
+#endif
+                       ;
+
+            FILT_RESO = Data.VCF_RESONANCE
+#if defined(PTK_SYNTH_LFO1)
+                        + LFO1_VALUE * Data.LFO1_VCF_RESONANCE
+#endif
+#if defined(PTK_SYNTH_LFO2)
+                        + LFO2_VALUE * Data.LFO2_VCF_RESONANCE
+#endif
+#if defined(PTK_SYNTH_ENV1)
+                        + ENV1_VALUE * Data.ENV1_VCF_RESONANCE
+#endif
+#if defined(PTK_SYNTH_ENV2)
+                        + ENV2_VALUE * Data.ENV2_VCF_RESONANCE
+#endif
+                    ;
+            if(FILT_CUTO < 0.0f) FILT_CUTO = 0.0f;
+            FILT_CUTO += 0.55f;
+            if(FILT_CUTO > 1.55f) FILT_CUTO = 1.55f;
+            if(FILT_RESO < 0.0f) FILT_RESO = 0.0f;
+            if(FILT_RESO > 1.0f) FILT_RESO = 1.0f;
+            GS_VAL = MoogFilterL();
+    }
+#endif      // defined(PTK_SYNTH_FILTER_MOOG)
+
+#endif      // defined(PTK_SYNTH_FILTER)
 
     if(Stereo == 2)
     {
@@ -1723,9 +1763,11 @@ float CSynth::GetSample(short *Left_Samples,
 
 #if defined(PTK_SYNTH_FILTER)
         if(Data.VCF_TYPE < 2) GS_VAL2 = FilterR();
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
+        else if(Data.VCF_TYPE > 2) GS_VAL2 = MoogFilterR();
+#endif
 #endif
 
-//        GS_VAL2 *= Data.GLB_VOLUME;
         *Right_Signal += GS_VAL2;
     }
 
@@ -1850,12 +1892,14 @@ void CSynth::ChangeParameters(SynthParameters TSP)
 #endif // defined(__STAND_ALONE__) && !defined(__WINAMP__)
 
 #if defined(PTK_SYNTH_FILTER)
+#if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
+
 float CSynth::FilterL(void)
 {
     GS_VAL++;
     sbuf0L = FILT_A * sbuf0L + FILT_CUTO * (GS_VAL + FILT_B * (sbuf0L - sbuf1L)); 
     sbuf1L = FILT_A * sbuf1L + FILT_CUTO * sbuf0L;
-#if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
+#if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)
     return(Data.VCF_TYPE == 0 ? sbuf1L : GS_VAL - sbuf1L);
 #else
     #if defined(PTK_SYNTH_FILTER_LO)
@@ -1872,7 +1916,7 @@ float CSynth::FilterR(void)
     GS_VAL2++;
     sbuf0R = FILT_A * sbuf0R + FILT_CUTO * (GS_VAL2 + FILT_B * (sbuf0R - sbuf1R));
     sbuf1R = FILT_A * sbuf1R + FILT_CUTO * sbuf0R;
-#if defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
+#if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)
     return(Data.VCF_TYPE == 0 ? sbuf1R : GS_VAL2 - sbuf1R);
 #else
     #if defined(PTK_SYNTH_FILTER_LO)
@@ -1883,6 +1927,87 @@ float CSynth::FilterR(void)
     #endif
 #endif
 }
+#endif      // defined(PTK_SYNTH_FILTER_LO) || defined(PTK_SYNTH_FILTER_HI)
+
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
+float CSynth::MoogFilterL(void)
+{
+    float f;
+    float p;
+    float q;
+    float t[4];
+    float cut = FILT_CUTO;
+    float res = FILT_RESO;
+
+    cut *= 0.50f;
+    q = (0.85f - cut);
+    p = ((cut * cut) * 0.45f);
+    f = (p + p) - 1.0f;
+    res *= 5.0f;
+    q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
+    if(q > 2.42f) q = 2.42f;
+    float in = (GS_VAL / 32767.0f) - (q * MoogBufferL[4]);
+    t[1] = MoogBufferL[1];
+    t[2] = MoogBufferL[2];
+    t[3] = MoogBufferL[3];
+    MoogBufferL[1] = ((in + MoogBufferL[0]) * p ) - (MoogBufferL[1] * f);
+    MoogBufferL[2] = ((MoogBufferL[1] + t[1]) * p ) - (MoogBufferL[2] * f);
+    MoogBufferL[3] = ((MoogBufferL[2] + t[2]) * p ) - (MoogBufferL[3] * f);
+    MoogBufferL[4] = ((MoogBufferL[3] + t[3]) * p ) - (MoogBufferL[4] * f);
+    MoogBufferL[0] = in;
+
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) && defined(PTK_SYNTH_FILTER_MOOG_BAND)
+    return((Data.VCF_TYPE == 3 ? MoogBufferL[4] : (3.0f * (MoogBufferL[3] - MoogBufferL[4]))) * 32767.0f);
+#else
+    #if defined(PTK_SYNTH_FILTER_MOOG_LO)
+        return(MoogBufferL[4] * 32767.0f);
+    #endif
+    #if defined(PTK_SYNTH_FILTER_MOOG_NAND)
+        return((3.0f * (MoogBufferL[3] - MoogBufferL[4])) * 32767.0f);
+    #endif
 #endif
+}
+
+float CSynth::MoogFilterR(void)
+{
+    float f;
+    float p;
+    float q;
+    float t[4];
+    float cut = FILT_CUTO;
+    float res = FILT_RESO;
+
+    cut *= 0.50f;
+    q = (0.85f - cut);
+    p = ((cut * cut) * 0.45f);
+    f = (p + p) - 1.0f;
+    res *= 5.0f;
+    q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
+    if(q > 2.42f) q = 2.42f;
+    float in = (GS_VAL / 32767.0f) - (q * MoogBufferR[4]);
+    t[1] = MoogBufferR[1];
+    t[2] = MoogBufferR[2];
+    t[3] = MoogBufferR[3];
+    MoogBufferR[1] = ((in + MoogBufferR[0]) * p ) - (MoogBufferR[1] * f);
+    MoogBufferR[2] = ((MoogBufferR[1] + t[1]) * p ) - (MoogBufferR[2] * f);
+    MoogBufferR[3] = ((MoogBufferR[2] + t[2]) * p ) - (MoogBufferR[3] * f);
+    MoogBufferR[4] = ((MoogBufferR[3] + t[3]) * p ) - (MoogBufferR[4] * f);
+    MoogBufferR[0] = in;
+
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) && defined(PTK_SYNTH_FILTER_MOOG_BAND)
+    return((Data.VCF_TYPE == 3 ? MoogBufferR[4] : (3.0f * (MoogBufferR[3] - MoogBufferR[4]))) * 32767.0f);
+#else
+    #if defined(PTK_SYNTH_FILTER_MOOG_LO)
+        return(MoogBufferR[4] * 32767.0f);
+    #endif
+    #if defined(PTK_SYNTH_FILTER_MOOG_NAND)
+        return((3.0f * (MoogBufferR[3] - MoogBufferR[4])) * 32767.0f);
+    #endif
+#endif
+
+}
+#endif
+
+#endif // defined(PTK_SYNTH_FILTER)
 
 #endif // PTK_SYNTH

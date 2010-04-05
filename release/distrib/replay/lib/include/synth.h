@@ -341,6 +341,9 @@ class CSynth
         float FilterL(void);
         float FilterR(void);
 
+        float MoogFilterL(void);
+        float MoogFilterR(void);
+
         char ENV1_LOOP_BACKWARD;
         char ENV2_LOOP_BACKWARD;
         char ENV3_LOOP_BACKWARD;
@@ -434,6 +437,8 @@ class CSynth
 #endif
 
         /* Internal rendering variables */
+        float MoogBufferL[5];
+        float MoogBufferR[5];
 
         float OSC1_STEP;
         float OSC2_STEP;

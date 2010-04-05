@@ -251,19 +251,6 @@ void Actualize_303_Ed(char gode)
             Skincopy(531, 558 - tb303v, 0, 116, 13, 11);
         }
 
-        // Light hpf led
-        if(gode == 0 || gode == 16)
-        {
-            if(tb303engine[sl3].hpf)
-            {
-                Skincopy(181, 528, 138, 119, 3, 3);
-            }
-            else
-            {
-                Skincopy(181, 528, 143, 119, 3, 3);
-            }
-        }
-
         if(gode == 0 || gode == 17)
         {
             Display_Cur_copy_Buffer();
@@ -800,15 +787,6 @@ void Mouse_Left_303_Ed(void)
             sl3 = 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
-        }
-
-        // hipass filter on/off
-        if(zcheckMouse(176, 536, 15, 10))
-        {
-            if(tb303engine[sl3].hpf) tb303engine[sl3].hpf = TB303_LOPASS;
-            else tb303engine[sl3].hpf = TB303_HIPASS;
-            teac = 16;
-            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
         // rand tones

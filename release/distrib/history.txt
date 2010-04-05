@@ -83,6 +83,8 @@ v2.0:
   they really don't sound like in the original one as i had to rework them, though.
 - Real numbers of used patterns are now counted when saving a .ptk.
 - Fixed a small issue with keyboard handling in message boxes.
+- Added Moog Lo & Moog band filters for synth instruments.
+- Fixed a bug in .ptp saving & replay: some instruments infos were scrambled.
 
 v1.99e:
 

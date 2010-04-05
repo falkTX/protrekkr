@@ -1,11 +1,6 @@
 TODO (in no special order):
 ----------------------------------------------------------
 
-v2.0:
-
- - Thorougly check the 303 units.
- - See to add moog filter like for synths.
-
 [UI]
  - Create a decent gadgets system (events based).
  - Click on numbers & move the mouse to modify them (or use the wheel).

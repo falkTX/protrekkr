@@ -123,6 +123,8 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             L_MaxLevel = 0;
             R_MaxLevel = 0;
             Songplaying = TRUE;
+            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Pattern_Line_Visual = Pattern_Line;
             key_record_first_time = FALSE;
             old_key_Pattern_Line = Pattern_Line_Visual;
