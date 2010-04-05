@@ -5707,7 +5707,7 @@ void Actualize_Master(char gode)
     {
         if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
-        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0 || gode == 2)
@@ -5726,7 +5726,7 @@ void Actualize_Master(char gode)
             Actualize_Fx_Ed(10);
             Actualize_Fx_Ed(11);
         }
-        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 
     if(gode == 0)
