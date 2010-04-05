@@ -57,7 +57,10 @@ void gear303::reset(void)
     tbTargetVolume = 0.0f;
     tbRealCutoff = 0.0f;
     tbRealEnvmod = 0.0f;
-    tbAutoSlide = 1;
+    tbRealResonance = 0.0f;
+    tbAutoSlidect = 1;
+    tbAutoSlideres = 1;
+    tbAutoSlideenv = 1;
     tbAutoMod = 1;
     tbFirstRow = 1;
 
@@ -66,6 +69,7 @@ void gear303::reset(void)
     tbEnvmod = 0.5f;
     tbDecay = 0.5f;
     tbAccent = 0.0f;
+    Note_Off = 0;
 
     for(i = 0 ; i < 5; i++)
     { 
@@ -115,64 +119,78 @@ float gear303::tbGetSample(void)
     // by the speed tbDecay.
     TickPos = tbDecay / (float) SamplesPerTick;
 
-    if(tbAutoSlide)
+    if(tbAutoSlidect)
     {
-        // Save it
         tbLastCutoff = tbRealCutoff;
-
-        tbRealCutoff -= TickPos * 0.8f;
+        tbRealCutoff -= TickPos;
         if(tbRealCutoff < tbCutoff - 0.35f)
         {
             tbRealCutoff = tbCutoff - 0.35f;
-            tbAutoSlide = 0;
+            tbAutoSlidect = 0;
         }
-
     }
-
-    if(tbAutoMod)
-    {
-        tbLastEnvmod = tbRealEnvmod;
-//        tbRealEnvmod -= TickPos;
-        if(tbRealEnvmod < 0.0f)
+     
+    if(tbAutoSlideres)
+    {   
+        tbLastResonance = tbRealResonance;
+        tbRealResonance -= TickPos;
+        if(tbRealResonance < tbResonance - 0.5f)
         {
-            tbRealEnvmod = 0.0f;
-            tbAutoMod = 0;
+            tbRealResonance = tbResonance - 0.5f;
+            tbAutoSlideres = 0;
         }
     }
 
-    tbRealResonance = tbResonance;
-    tbRealCutoff2 = tbRealCutoff + tbAccent;
+    if(tbAutoSlideenv)
+    {   
+        tbLastEnvmod = tbRealEnvmod;
+        tbRealEnvmod -= TickPos;
+        if(tbRealEnvmod < tbEnvmod - 1.0f)
+        {
+            tbRealEnvmod = tbEnvmod - 1.0f;
+            tbAutoSlideenv = 0;
+        }
+    }
 
-    tbTargetVolume = tbRealVolume + tbAccent;
+    tbRealCutoff2 = tbRealCutoff;
+    tbRealEnvmod2 = tbRealEnvmod;
+    tbRealResonance2 = tbRealResonance;
+    tbTargetVolume = tbRealVolume;
+
     if(tbRealCutoff2 > 1.0f) tbRealCutoff2 = 1.0f;
+    if(tbRealResonance2 > 1.0f) tbRealResonance2 = 1.0f;
+    if(tbRealEnvmod2 > 1.0f) tbRealEnvmod2 = 1.0f;
     if(tbTargetVolume > 1.0f) tbTargetVolume = 1.0f;
 
-    if(tbAccent > 0.0f)
-    {
-        tbAccent -= 0.002f;
-        if(tbAccent < 0.0f) tbAccent = 0.0f;
-    }
+    if(tbRealCutoff2 < 0.0f) tbRealCutoff2 = 0.0f;
+    if(tbRealEnvmod2 < -0.5f) tbRealEnvmod2 = -0.5f;
+    if(tbRealResonance2 < 0.0f) tbRealResonance2 = 0.0f;
 
     if(tbCurrentVolume < tbTargetVolume)
     {
-        tbCurrentVolume += 0.003f;
+        tbCurrentVolume += 0.001f;
         if(tbCurrentVolume > tbTargetVolume) tbCurrentVolume = tbTargetVolume;
     }
     else
     {
-        tbCurrentVolume -= 0.003f;
+        tbCurrentVolume -= 0.001f;
         if(tbCurrentVolume < tbTargetVolume) tbCurrentVolume = tbTargetVolume;
     }
 
-
-    if(tbSample < -32768.0f) tbSample = -32768.0f;
-    if(tbSample > 32767.0f) tbSample = 32767.0f;
-    float output = tbFilter();
-    if(output < -32768.0f) output = -32768.0f;
+    float output = tbFilter() * (1.0f + tbAccent);
+    if(output < -32767.0f) output = -32767.0f;
     if(output > 32767.0f) output = 32767.0f;
+
+    if(tbAccent > 0.0f)
+    {
+        tbAccent -= TickPos;
+        if(tbAccent < 0.0f) tbAccent = 0.0f;
+    }
+
     if(tbRampVolume > RampVolume)
     {
-        tbRampVolume -= 0.003f;
+        // That's for explicit note off
+        tbRampVolume -= 0.0003f;
         if(tbRampVolume < RampVolume) tbRampVolume = RampVolume;
     }
     else
@@ -187,116 +205,139 @@ float gear303::tbGetSample(void)
 // Do Note On
 void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
 {
-    if(PARAT303->flag[tbPattern][tbLine].transposeup_flag) tbNote += 12;
-    if(PARAT303->flag[tbPattern][tbLine].transposedown_flag) tbNote -= 12;
-
-    tbWaveform = PARAT303->waveform; 
-    tbOscSpeedFreak = 0;
-    float frune = float(tbNote) - 17;
-
-    // 0.1889763f seems to be about right
-    frune += (float) PARAT303->tune * 0.1889763f;
-    float tbOscSpeedTmp = powf(2.0f, frune / 12.0f) * 64.0f;
-
-    int tbLine2 = (tbLine - 1);
-    if(tbLine2 < 0) tbLine2 = PARAT303->patternlength[tbPattern] - 1;
-    if(tbLine2 < 0) tbLine2 = 0;
-    if(tbLine == 255) tbLine = PARAT303->patternlength[tbPattern] - 1;
-
-    if(PARAT303->flag[tbPattern][tbLine].slide_flag)
+    if(!Note_Off)
     {
-        // coming from a slide ?
-        if(PARAT303->flag[tbPattern][tbLine2].slide_flag && !tbFirstRow)
+        if(PARAT303->flag[tbPattern][tbLine].transposeup_flag) tbNote += 12;
+        if(PARAT303->flag[tbPattern][tbLine].transposedown_flag) tbNote -= 12;
+
+        RampVolume = 1.0f;
+
+        tbWaveform = PARAT303->waveform; 
+        tbOscSpeedFreak = 0;
+        float frune = float(tbNote) - 17;
+
+        // 0.1889763f seems to be about right
+        frune += (float) PARAT303->tune * 0.1889763f;
+        float tbOscSpeedTmp = powf(2.0f, frune / 12.0f) * 64.0f;
+
+        int tbLine2 = (tbLine - 1);
+        if(tbLine2 < 0) tbLine2 = PARAT303->patternlength[tbPattern] - 1;
+        if(tbLine2 < 0) tbLine2 = 0;
+        if(tbLine == 255) tbLine = PARAT303->patternlength[tbPattern] - 1;
+
+        if(PARAT303->flag[tbPattern][tbLine].slide_flag)
         {
-            tbRealCutoff = tbLastCutoff;
-            tbRealEnvmod = tbLastEnvmod;
-        }
-        else
-        {
-            // Re-init & prepare
-            tbFirstRow = 0;
-            tbAutoSlide = 1;
-            tbAutoMod = 1;
-            tbRealCutoff = float(PARAT303->cutoff) / 127.0f;
-            tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
-            
-        }
-    }
-    else
-    {
-        // coming from a slide ?
-        if(PARAT303->flag[tbPattern][tbLine2].slide_flag)
-        {
-            // First time played ?
-            if(tbFirstRow)
+            // Coming from a slide ?
+            if(PARAT303->flag[tbPattern][tbLine2].slide_flag && !tbFirstRow)
             {
-                // Re-init the sliding
-                tbAutoSlide = 1;
-                tbAutoMod = 1;
-                tbRealCutoff = float(PARAT303->cutoff) / 127.0f;;
-                tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
+                tbRealCutoff = tbLastCutoff;
+                tbRealEnvmod = tbLastEnvmod;
+                tbRealResonance = tbLastResonance;
             }
             else
             {
-                // Continue...
-                tbRealCutoff = tbLastCutoff;
-                tbRealEnvmod = tbLastEnvmod;
+                // Re-init & prepare
+                tbFirstRow = 0;
+                tbAutoSlidect = 1;
+                tbAutoSlideres = 1;
+                tbAutoSlideenv = 1;
+                tbAutoMod = 1;
+                tbRealCutoff = (float(PARAT303->cutoff) / 127.0f) * 0.5f;
+                tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
+                tbRealResonance = (((float) PARAT303->envmod) / 127.0f);
+            
             }
         }
         else
         {
-            // Re-init
-            tbAutoSlide = 1;
-            tbAutoMod = 1;
-            tbRealCutoff = float(PARAT303->cutoff) / 127.0f;;
-            tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
+            // coming from a slide ?
+            if(PARAT303->flag[tbPattern][tbLine2].slide_flag)
+            {
+                // First time played ?
+                if(tbFirstRow)
+                {
+                    // Re-init the sliding
+                    tbAutoSlidect = 1;
+                    tbAutoSlideres = 1;
+                    tbAutoSlideenv = 1;
+                    tbAutoMod = 1;
+                    tbRealCutoff = (float(PARAT303->cutoff) / 127.0f) * 0.5f;
+                    tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
+                }
+                else
+                {
+                    // Continue...
+                    tbRealCutoff = tbLastCutoff;
+                    tbRealEnvmod = tbLastEnvmod;
+                    tbRealResonance = tbLastResonance;
+                }
+            }
+            else
+            {
+                // Re-init
+                tbAutoSlidect = 1;
+                tbAutoSlideres = 1;
+                tbAutoSlideenv = 1;
+                tbAutoMod = 1;
+                tbRealCutoff = (float(PARAT303->cutoff) / 127.0f) * 0.5f;
+                tbRealEnvmod = (((float) PARAT303->envmod) / 127.0f);
+            }
         }
-    }
 
-    char forcefault = 1;
-    // Don't use slide when the pattern is starting
-    if(PARAT303->flag[tbPattern][tbLine2].slide_flag && !tbFirstRow)
-    {
-        tbOscSpeed = tbOscSpeedTmp;
-        forcefault = 0;
-        frune = float(PARAT303->tone[tbPattern][tbLine2]) - 17;
-        if(PARAT303->flag[tbPattern][tbLine2].transposeup_flag) frune += 12;
-        if(PARAT303->flag[tbPattern][tbLine2].transposedown_flag) frune -= 12;
-        frune += (float) PARAT303->tune * 0.1889763f;
-        tbInnertime = SamplesPerTick * 0.5f;
-        float tbDestiny = tbOscSpeed;                            // Dest
-        float tbSource = powf(2.0f, frune / 12.0f) * 64.0f;
-        tbOscSpeed = tbSource;
-        tbOscSpeedFreak = (tbDestiny - tbSource) / tbInnertime;  // Get glide coefficient
-    }
+        char forcefault = 1;
+        // Don't use slide when the pattern is starting
+        if(PARAT303->flag[tbPattern][tbLine2].slide_flag && !tbFirstRow)
+        {
+            tbOscSpeed = tbOscSpeedTmp;
+            forcefault = 0;
+            frune = float(PARAT303->tone[tbPattern][tbLine2]) - 17;
+            if(PARAT303->flag[tbPattern][tbLine2].transposeup_flag) frune += 12;
+            if(PARAT303->flag[tbPattern][tbLine2].transposedown_flag) frune -= 12;
+            frune += (float) PARAT303->tune * 0.1889763f;
+            tbInnertime = SamplesPerTick * 0.5f;
+            float tbDestiny = tbOscSpeed;                            // Dest
+            float tbSource = powf(2.0f, frune / 12.0f) * 64.0f;
+            tbOscSpeed = tbSource;
+            tbOscSpeedFreak = (tbDestiny - tbSource) / tbInnertime;  // Get glide coefficient
+        }
 
-    // Start volume rmaping if there's a pause and we're not sliding
-    if(!PARAT303->flag[tbPattern][tbLine].pause && forcefault)
-    {
-        tbRealVolume = 0;
-        tbAutoSlide = 1;
-        tbAutoMod = 1;
-        tbRealCutoff = tbLastCutoff;
-        tbRealEnvmod = tbLastEnvmod;
+        // Start volume rmaping if there's a pause and we're not sliding
+        if(!PARAT303->flag[tbPattern][tbLine].pause && forcefault)
+        {
+            tbRealVolume = 0;
+            tbAutoSlidect = 1;
+            tbAutoSlideres = 1;
+            tbAutoSlideenv = 1;
+            tbAutoMod = 1;
+            tbRealCutoff = tbLastCutoff;
+            tbRealEnvmod = tbLastEnvmod;
+            tbRealResonance = tbLastResonance;
+        }
+        else
+        {
+            tbOscSpeed = tbOscSpeedTmp;
+            tbCutoff = (float(PARAT303->cutoff) / 127.0f);
+            tbRealCutoff = tbCutoff;
+            tbEnvmod = (((float) PARAT303->envmod) / 127.0f);
+            tbRealEnvmod = tbEnvmod;
+            tbResonance = ((float) PARAT303->resonance) / 127.0f;
+            tbRealResonance = tbResonance;
+            tbDecay = (1.0f - (((float) PARAT303->decay) / 127.0f));
+            if(PARAT303->flag[tbPattern][tbLine].slide_flag) tbDecay += 0.05f;
+            tbRealVolume = tbVolume;
+
+            // Accent is only used if there's a note to play
+            if(PARAT303->flag[tbPattern][tbLine].accent_flag)
+            {
+                tbAccent = ((float) PARAT303->accent / 127.0f) * 1.8f;
+                // Decay is automatically turned on
+                tbDecay = 1.0f;
+            }
+        }
     }
     else
     {
-        tbOscSpeed = tbOscSpeedTmp;
-        tbCutoff = float(PARAT303->cutoff) / 127.0f;
-        tbEnvmod = (((float) PARAT303->envmod) / 127.0f);
-        tbEnvmodInv = 1.0f - tbEnvmod;
-        tbResonance = ((float) PARAT303->resonance) / 127.0f;
-        tbDecay = 1.0f - (((float) PARAT303->decay) / 127.0f);
-        if(PARAT303->flag[tbPattern][tbLine].slide_flag) tbDecay += 0.05f;
-        tbRealVolume = tbVolume;
-
-        // Accent is only used if there's a note to play
-        if(PARAT303->flag[tbPattern][tbLine].accent_flag)
-        {
-            tbAccent = ((float) PARAT303->accent / 127.0f) * 8.0f;
-            // Decay is automatically turned on
-            tbDecay = 1.0f;
-        }
+        Note_Off = 0;
     }
 }
 
@@ -310,42 +351,41 @@ float gear303::tbFilter(void)
     float p;
     float q;
     float t[4];
-    float cut = tbRealCutoff2;
-    float res = tbRealResonance;
-    float env = (1.0f + (tbRealEnvmod * 0.75f));
-    float envinv = (1.0f - (tbRealEnvmod * 0.75f));
-    float envres = (1.0f + (tbRealEnvmod * 1.25f));
+    float cut = tbRealCutoff2;                          // [0..1]
+    float res = tbRealResonance2;                       // [0..1]
+    float envcut;
+    float envcut2;
+
+    envcut = 1.0f + (tbRealEnvmod2 * 0.85f);
+    envcut2 = 1.0f - (tbRealEnvmod2 * 0.85f);
     cut += 0.55f;
-    // Lorsaue le cut est < 1.0f le signal decroit
-    if(cut < 0.28f) cut = 0.28f;
-    cut *= 0.5f;
-    q = (0.85f - cut);
-    p = ((cut * fabsf(cut)) * 0.45f);
-    f = (p + p) - 1.0f * envinv;
-    p *= env;
-    res *= 5.0f;
+    cut *= envcut;
+    cut *= 0.50f;                                       // [0.275..0.775]
+    q = (0.85f - cut);                                  // [0.075..0.575]
+    p = ((cut * cut) * 0.45f);                          // [0..0.45]
+    f = (p + p) - 1.0f;                                 // [-1.0..0]
+    res *= 5.0f;                                        // [0..5.0]
     q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
-    if(q > 2.4f) q = 2.4f;
-    if(envres > 1.9f) envres *= 1.0f - (envres - 1.9f);
-    float in = (tbSample / 16384.0f) - (q * tbBuf[4]) * (envres * tbRealResonance);
+    if(q > 2.42f) q = 2.42f;
+    float in = (tbSample / 16384.0f) - (q * tbBuf[4] * envcut2);
     t[1] = tbBuf[1];
     t[2] = tbBuf[2];
     t[3] = tbBuf[3];
-    tbBuf[1] = ((in + tbBuf[0]) * p) - (tbBuf[1] * f);
-    tbBuf[2] = ((tbBuf[1] + t[1]) * p) - (tbBuf[2] * f);
-    tbBuf[3] = ((tbBuf[2] + t[2]) * p) - (tbBuf[3] * f);
-    tbBuf[4] = ((tbBuf[3] + t[3]) * p) - (tbBuf[4] * f);
-    tbBuf[0] = in;
+    tbBuf[1] = ((in + tbBuf[0]) * p ) - (tbBuf[1] * f);
+    tbBuf[2] = ((tbBuf[1] + t[1]) * p ) - (tbBuf[2] * f);
+    tbBuf[3] = ((tbBuf[2] + t[2]) * p ) - (tbBuf[3] * f);
+    tbBuf[4] = ((tbBuf[3] + t[3]) * p ) - (tbBuf[4] * f);
+    tbBuf[0] = in ;
     // Selection of the output filter
     switch(hpf)
     {
         case TB303_HIPASS:
-            return(tbSample - (tbBuf[4] * env * 32767.0f));
+            return(tbSample - (tbBuf[4] * 16384.0f));
         case TB303_BANDPASS:
-            return((3.0f * (tbBuf[3] - tbBuf[4])) * env * 32767.0f);
+            return((3.0f * (tbBuf[3] - tbBuf[4])) * 16384.0f);
         case TB303_LOPASS:
         default:
-            return(tbBuf[4] * env * 32767.0f);
+            return(tbBuf[4] * 16384.0f);
     }
 }
 

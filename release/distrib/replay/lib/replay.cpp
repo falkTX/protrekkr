@@ -5045,8 +5045,16 @@ void Fire303(unsigned char number, int unit)
 
 void noteoff303(char strack)
 {
-    if(strack == track3031) tb303engine[0].RampVolume = 0.0f;
-    if(strack == track3032) tb303engine[1].RampVolume = 0.0f;
+    if(strack == track3031)
+    {
+        tb303engine[0].RampVolume = 0.0f;
+        tb303engine[0].Note_Off = TRUE;
+    }
+    if(strack == track3032)
+    { 
+        tb303engine[1].RampVolume = 0.0f;
+        tb303engine[1].Note_Off = TRUE;
+    }
 }
 
 void Go303(void)

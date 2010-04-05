@@ -63,10 +63,6 @@ const char *AMIGA_VERSION = "\0$VER: " TITLE " " VER_VER "." VER_REV "\0";
 #endif
 
 // ------------------------------------------------------
-// Constants
-#define MAX_EVENTS 16
-
-// ------------------------------------------------------
 // Types
 typedef struct
 {
@@ -122,7 +118,7 @@ extern SDL_Rect Update_Stack[2048];
 
 char *ExePath;
 
-static SDL_Event Events[MAX_EVENTS];
+SDL_Event Events[MAX_EVENTS];
 
 int Nbr_Keyboards;
 int Keyboard_Idx;
@@ -655,13 +651,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                 if(Current_Requester == NULL)
                 {
                     In_Requester = FALSE;
+                    memset(Keys, 0, sizeof(Keys));
+                    memset(Keys_Sym, 0, sizeof(Keys_Sym));
+                    memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
+                    memset(Keys_Raw, 0, sizeof(Keys_Raw));
+                    memset(Keys_Raw_Off, 0, sizeof(Keys_Raw_Off));
+                    memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw_Repeat));
                 }
-                memset(Keys, 0, sizeof(Keys));
-                memset(Keys_Sym, 0, sizeof(Keys_Sym));
-                memset(Keys_Unicode, 0, sizeof(Keys_Unicode));
-                memset(Keys_Raw, 0, sizeof(Keys_Raw));
-                memset(Keys_Raw_Off, 0, sizeof(Keys_Raw_Off));
-                memset(Keys_Raw_Repeat, 0, sizeof(Keys_Raw_Repeat));
             }
 
             switch(Events[i].type)

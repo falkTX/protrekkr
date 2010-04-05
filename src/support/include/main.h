@@ -53,6 +53,8 @@
 #define SDL_MOUSE_MIDDLE_BUTTON 2
 #define SDL_MOUSE_RIGHT_BUTTON 3
 
+#define MAX_EVENTS 16
+
 // ------------------------------------------------------
 // Structure
 typedef struct

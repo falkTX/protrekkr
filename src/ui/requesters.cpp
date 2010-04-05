@@ -62,6 +62,7 @@ SDL_Surface *Req_Picture;
 SDL_Surface *Req_Back;
 int Req_TimeOut;
 int Req_Timer;
+extern SDL_Event Events[MAX_EVENTS];
 
 // ------------------------------------------------------
 // Functions
@@ -379,6 +380,9 @@ void Kill_Requester(void)
     Env_Change = TRUE;
     Mouse.button = 0;
     Mouse.button_oneshot = 0;
+    SDL_Event event;
+    while(SDL_PollEvent(&event));
+    memset(Events, 0, sizeof(Events));
 }
 
 // ------------------------------------------------------

@@ -5,8 +5,8 @@ ProTrekkr releases history
 v2.0:
 
 - Tempo can now go down to 20 BPM.
-- Major overhaul of the 303 units, they now should behave and sound more like
-  the one found in Propellerhead's Rebirth.
+- 303 units entirely modified, now they should behave
+  and sound a bit more like the one found in Propellerhead's Rebirth.
 - Files & dirs entries are now sorted alphabetically.
 - Input zones are now displayed with altered colors.
 - 6 default color themes are now available.
@@ -82,6 +82,7 @@ v2.0:
 - Salvaged 3 NoiseTrekker beta version modules,
   they really don't sound like in the original one as i had to rework them, though.
 - Real numbers of used patterns are now counted when saving a .ptk.
+- Fixed a small issue with keyboard handling in message boxes.
 
 v1.99e:
 

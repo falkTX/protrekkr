@@ -158,6 +158,7 @@ class gear303
         float tbBuf[5];
         float tbVolume;
         float TickPos;
+        int Note_Off;
 
         float RampVolume;
 
@@ -169,16 +170,18 @@ class gear303
         float tbCutoff;
         float tbResonance;
         float tbEnvmod;
-        float tbEnvmodInv;
         float tbDecay;
         float tbAccent;
         float tbSample;
         float tbRealCutoff;
         float tbRealCutoff2;
         float tbRealResonance;
+        float tbRealResonance2;
         float tbLastCutoff;
         float tbLastEnvmod;
+        float tbLastResonance;
         float tbRealEnvmod;
+        float tbRealEnvmod2;
         float tbRealVolume;
         float tbOscSpeedFreak;
         float tbTargetVolume;
@@ -193,7 +196,9 @@ class gear303
         float tbRampVolume;
         float tbRampCutOff;
 
-        int tbAutoSlide;
+        int tbAutoSlidect;
+        int tbAutoSlideres;
+        int tbAutoSlideenv;
         int tbAutoMod;
         int tbFirstRow;
 
