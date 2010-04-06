@@ -46,6 +46,10 @@
 
 #include "../files/include/files.h"
 #include "../files/include/files_list.h"
+#include "../files/include/mods.h"
+#include "../files/include/303s.h"
+#include "../files/include/reverbs.h"
+#include "../files/include/patterns.h"
 
 #include "../editors/include/editor_setup.h"
 #include "../editors/include/editor_303.h"

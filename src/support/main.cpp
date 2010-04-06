@@ -48,6 +48,7 @@
 #include "include/resource.h"
 
 #include "../files/include/files.h"
+#include "../files/include/config.h"
 
 #if defined(__WIN32__)
 #include <windows.h>

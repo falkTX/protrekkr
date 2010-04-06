@@ -69,44 +69,45 @@ extern char Dir_Presets[MAX_PATH];
 extern char Dir_Reverbs[MAX_PATH];
 extern char Dir_Patterns[MAX_PATH];
 extern char Dir_Samples[MAX_PATH];
+extern char Use_Cubic;
+extern char Paste_Across;
+extern int wait_AutoSave;
+extern gear303 tb303engine[2];
+extern para303 tb303[2];
 
 // ------------------------------------------------------
 // Functions
-void LoadAmigaMod(char *Name, const char *FileName, int channels);
-int LoadMod(char *FileName);
-int SaveMod(char *FileName, int NewFormat, int Simulate, Uint8 *Memory);
+int LoadPtk(char *FileName);
+int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory);
 int Pack_Module(char *FileName);
 int TestMod(void);
 void LoadSynth(char *FileName);
 void LoadInst(char *FileName);
-void Load303(char *FileName);
-void LoadReverb(char *FileName);
-void LoadPattern(char *FileName);
 void SaveInst(void);
 void SaveSynth(void);
-void Save303(void);
-void SaveReverb(void);
-void SavePattern(void);
-void SaveConfig(void);
-void LoadConfig(void);
-
 void LoadSettings(void);
 void SaveSettings(void);
-
 void SongStop(void);
 void Free_Samples(void);
-
 Uint8 *Pack_Data(Uint8 *Memory, int *Len);
 Uint8 *Depack_Data(Uint8 *Memory, int Size, int size_out);
 int Get_File_Size(FILE *Handle);
-
 int Calc_Length(void);
 void Reset_Song_Length(void);
-
-void Load_Old_Reverb_Presets(int Type);
-
 void Clear_Input(void);
-
 int File_Exist(char *Format, char *Directory, char *FileName);
+void Init_Tracker_Context_After_ModLoad(void);
+int Read_Data(void *value, int size, int amount, FILE *handle);
+int Read_Data_Swap(void *value, int size, int amount, FILE *handle);
+int Write_Data(void *value, int size, int amount, FILE *handle);
+int Write_Data_Swap(void *value, int size, int amount, FILE *handle);
+void Swap_Sample(short *buffer, int sample, int bank);
+void rtrim_string(char *string, int maxlen);
+void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
+                           FILE *in, int sample, int bank);
+int Write_Mod_Data(void *Datas, int Unit, int Length, FILE *Handle);
+int Write_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle);
+short *Get_WaveForm(int Instr_Nbr, int Channel, int Split);
+void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int BitRate);
 
 #endif

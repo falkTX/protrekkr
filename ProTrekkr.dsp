@@ -382,6 +382,14 @@ SOURCE=.\src\UI\xml.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\src\files\include\303s.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\config.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Files\include\Files.h
 # End Source File
 # Begin Source File
@@ -390,9 +398,41 @@ SOURCE=.\src\Files\include\Files_List.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\files\include\insts.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\mods.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\patterns.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\ptps.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\reverbs.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Files\include\Samples_Pack.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\files\include\synths.h
+# End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\src\files\303s.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\config.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\Files\Files.cpp
@@ -403,7 +443,31 @@ SOURCE=.\src\Files\Files_List.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\files\insts.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\mods.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\patterns.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\ptps.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\reverbs.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Files\Samples_Pack.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\files\synths.cpp
 # End Source File
 # End Group
 # Begin Group "Midi"

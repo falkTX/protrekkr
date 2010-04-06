@@ -1317,13 +1317,13 @@ int Screen_Update(void)
             if(snamesel == INPUT_NONE) Pack_Module(name);
         }
 
-        // Save final mod
+        // Save a .ptp module
         if(gui_action == GUI_CMD_SAVE_FINAL)
         {
-            if(snamesel == INPUT_NONE) SaveMod(name, TRUE, SAVE_WRITE, NULL);
+            if(snamesel == INPUT_NONE) SavePtk(name, TRUE, SAVE_WRITE, NULL);
         }
 
-        // Calculate packed mod size
+        // Calculate the approximate size of a .ptp module
         if(gui_action == GUI_CMD_CALC_FINAL)
         {
             Final_Mod_Length = TestMod();
@@ -1837,7 +1837,7 @@ void LoadFile(int Freeindex, const char *str)
             sprintf(name, "%s", FileName);
             SongStop();
             AUDIO_Stop();
-            LoadMod(name);
+            LoadPtk(name);
             Renew_Sample_Ed();
             AUDIO_Play();
         }

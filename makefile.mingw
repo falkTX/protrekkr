@@ -13,7 +13,8 @@ EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_reverb.o editor_instrument.o \
-          samples_pack.o files_list.o files.o \
+          samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o \
+          config.o 303s.o synths.o insts.o ptps.o \
           midi.o RtMidi.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
@@ -85,6 +86,30 @@ files_list.o: src/files/files_list.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 files.o: src/files/files.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+mods.o: src/files/mods.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+patterns.o: src/files/patterns.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+reverbs.o: src/files/reverbs.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+config.o: src/files/config.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+303s.o: src/files/303s.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+synths.o: src/files/synths.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+insts.o: src/files/insts.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+ptps.o: src/files/ptps.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 midi.o: src/midi/midi.cpp

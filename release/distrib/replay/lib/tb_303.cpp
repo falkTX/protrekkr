@@ -376,7 +376,6 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
 // ------------------------------------------------------
 // Filter routine.
 // That's a custom moog like filter
-// (very empirical implementation but sounds similar to the one used in rebirth)
 float gear303::tbFilter(void)
 {
     float f;

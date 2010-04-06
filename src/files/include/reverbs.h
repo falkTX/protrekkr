@@ -29,32 +29,26 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _SAMPLES_OPS_H_
-#define _SAMPLES_OPS_H_
+#ifndef _REVERBS_H_
+#define _REVERBS_H_
 
 // ------------------------------------------------------
 // Includes
-#include "../../include/variables.h"
+#include "files.h"
+#include "files_list.h"
+#include "../../editors/include/editor_reverb.h"
 #include "../../ui/include/misc_draw.h"
 
 // ------------------------------------------------------
-// Variables
-extern int cur_sample_buffer;
-extern int Sample_Back_Size[4];
-
-// ------------------------------------------------------
 // Functions
-int Sample_Rotate_Left(int32 range_start, int32 range_end, int amount);
-int Sample_Rotate_Right(int32 range_start, int32 range_end, int amount);
-int Sample_Reverse(int32 range_start, int32 range_end);
-int Sample_Crop(int32 range_start, int32 range_end);
-int Sample_Copy(int32 range_start, int32 range_end);
-int Sample_Paste(int32 range_start);
-int Sample_Cut(int32 range_start, int32 range_end, int do_copy);
-void Sample_DC_Adjust(int32 range_start, int32 range_end);
-void Sample_Maximize(int32 range_start, int32 range_end);
-void Sample_FadeIn(int32 range_start, int32 range_end);
-void Sample_FadeOut(int32 range_start, int32 range_end);
-void Sample_Half(int32 range_start, int32 range_end);
+void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
+                      int (*Read_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
+void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
+                      int (*Write_Function_Swap)(void *, int ,int, FILE *),
+                      FILE *in);
+void LoadReverb(char *FileName);
+void SaveReverb(void);
+void Load_Old_Reverb_Presets(int Type);
 
 #endif

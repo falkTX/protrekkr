@@ -18,7 +18,7 @@ v2.0:
 - Patterns shading is also displayed for track which are turned off
   in the sequencer (shading can be turned on/off globally).
 - Improved sample editor:
-  - Speeded up (especially the while selecting) and overall cleaner processing.
+  - Speeded up (especially while selecting) and overall cleaner processing.
   - Middle mouse button can now be used to zoom in/out.
   - Added cut/copy/paste with 4 copy buffers.
   - Crop function (remove everything from a waveform but the selection).
@@ -69,7 +69,7 @@ v2.0:
 
     c-3  0 .. .. 0380....
   
-  will play instrument 0 at roughly 50% of it's volume.
+  will play instrument 0 at roughly 25% of it's volume.
 
     c-3  0 20 .. 0380....
   
