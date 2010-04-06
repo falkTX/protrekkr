@@ -36,7 +36,7 @@ EXEOBJS_X86 = ptk_x86.o \
               editor_303_x86.o editor_pattern_x86.o editor_sequencer_x86.o editor_track_x86.o editor_track_fx_x86.o \
               patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
               editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o \
-              samples_pack_x86.o files_list_x86.o files_x86.o mod_x86.o patterns_x86.o reverbs_x86.o \
+              samples_pack_x86.o files_list_x86.o files_x86.o mods_x86.o patterns_x86.o reverbs_x86.o \
               config_x86.o 303s_x86.o synths_x86.o insts_x86.o ptps_x86.o \
               midi_x86.o RtMidi_x86.o \
               timer_x86.o main_x86.o sdlmain_x86.o \
@@ -63,6 +63,7 @@ protrekkr: $(EXEOBJS_PPC) $(EXEOBJS_X86)
 	strip -x -X -S ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	-rm -f ./release/distrib/ptk_macosx_ppc
 	-rm -f ./release/distrib/ptk_macosx_x86
+	chmod +x ./release/distrib/protrekkr.app/Contents/MacOS/Protrekkr
 	
 ptk_ppc.o: src/ptk.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
