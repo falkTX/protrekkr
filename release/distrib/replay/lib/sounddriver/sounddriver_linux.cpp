@@ -182,7 +182,7 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 // Desc: Wait for a command acknowledgment from the thread
 void AUDIO_Wait_For_Thread(void)
 {
-    if(AUDIO_Sound_Buffer)
+    if(Thread_Running)
     {
         if(AUDIO_Play_Flag)
         {
