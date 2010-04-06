@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.0.1:
+
+- Big tracker & replay speed up.
+- Volume of instruments were left at 0 when loading waveforms.
+- Added the possibility to only delete the current instrument split.
+
 v2.0:
 
 - Tempo can now go down to 20 BPM.

@@ -3121,17 +3121,8 @@ ByPass_Wav:
             FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
             FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
 
-#if defined(__PSP__)
-            // May be a bit faster
-            float fstep1 = POWF(2.0f, SIN[(int) ((FLANGER_GR[c] / 6.283185f) * 360.0f)] * FLANGER_AMPL[c]);
-            float fstep2 = POWF(2.0f, SIN[(int) (((FLANGER_GR[c] / 6.283185f) +
-                                                 (FLANGER_DEPHASE[c] / 3.1415927f)
-                                                ) * 360.0f
-                                         )] * FLANGER_AMPL[c]);
-#else
             float fstep1 = POWF(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
             float fstep2 = POWF(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
-#endif
 
             FLANGER_OFFSET2[c] += fstep1;
             FLANGER_OFFSET1[c] += fstep2;  
@@ -4145,7 +4136,7 @@ void Do_Effects_Ticks_X(void)
 #if defined(PTK_FX_TRANCESLICER)
                 // $04 Trance slicer
                 case 0x4:
-                    if(Subicounter >= pltr_dat_row[k]) sp_Tvol_Mod[trackef] = 0;
+                    if(Subicounter >= pltr_dat_row[k])sp_Tvol_Mod[trackef] = 0;
                     break;
 #endif
 
@@ -4761,16 +4752,12 @@ float Kutoff(int v)
 
 float Resonance(float v)
 {
-    float tt;
-    tt = POWF(v / 127.0f, 4.0f) * 150.0f + 0.1f;
-    return tt;
+    return POWF(v / 127.0f, 4.0f) * 150.0f + 0.1f;
 }
 
 float Bandwidth(int v)
 {
-    float tt;
-    tt = POWF(v / 127.0f, 4.0f) * 4.0f + 0.1f;
-    return tt;
+    return POWF(v / 127.0f, 4.0f) * 4.0f + 0.1f;
 }
 
 #if defined(PTK_PROC_FILTER2P)
@@ -5171,65 +5158,73 @@ void init_sample_bank(void)
 
             ResetSynthParameters(&PARASynth[inico]);
 
-            KillInst(inico);
+            KillInst(inico, TRUE);
         }
     }
 }
 
-void KillInst(int inst_nbr)
+void KillInst(int inst_nbr, int all_splits)
 {
+    int first_split = 0;
+    int last_split = MAX_INSTRS_SPLITS;
+
+    if(all_splits)
+    {
 
 #if !defined(__NO_CODEC__)
-    // Gsm is the default packing scheme
-    SampleCompression[inst_nbr] = SMP_PACK_GSM;
+        // Gsm is the default packing scheme
+        SampleCompression[inst_nbr] = SMP_PACK_GSM;
 #else
-    SampleCompression[inst_nbr] = SMP_PACK_NONE;
+        SampleCompression[inst_nbr] = SMP_PACK_NONE;
 #endif
 
 #if defined(PTK_MP3)
-    Mp3_BitRate[inst_nbr] = 0;
+        Mp3_BitRate[inst_nbr] = 0;
 #endif
 
 #if defined(PTK_AT3)
-    At3_BitRate[inst_nbr] = 0;
+        At3_BitRate[inst_nbr] = 0;
 #endif
 
 #if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
-    SamplesSwap[inst_nbr] = FALSE;
+        SamplesSwap[inst_nbr] = FALSE;
 #endif
 
-    beatsync[inst_nbr] = FALSE;
-    beatlines[inst_nbr] = 16;
+        beatsync[inst_nbr] = FALSE;
+        beatlines[inst_nbr] = 16;
 
-    for(int z = 0; z < MAX_INSTRS_SPLITS; z++)
+#if defined(PTK_SYNTH)
+        Synthprg[inst_nbr] = SYNTH_WAVE_OFF;
+#endif
+
+#if !defined(__STAND_ALONE__)
+        Midiprg[inst_nbr] = -1;
+#endif
+
+        Sample_Vol[inst_nbr] = 0.0f;
+    }
+    else
     {
-        if(RawSamples[inst_nbr][0][z])
-        {
-            if(RawSamples[inst_nbr][0][z]) free(RawSamples[inst_nbr][0][z]);
-        }
+        first_split = Current_Sample_Split;
+        last_split = Current_Sample_Split + 1;
+    }
+    for(int z = first_split; z < last_split; z++)
+    {
+        if(RawSamples[inst_nbr][0][z]) free(RawSamples[inst_nbr][0][z]);
         RawSamples[inst_nbr][0][z] = NULL;
         if(SampleChannels[inst_nbr][z] == 2)
         {
-            if(RawSamples[inst_nbr][1][z])
-            {
-                if(RawSamples[inst_nbr][1][z]) free(RawSamples[inst_nbr][1][z]);
-            }
+            if(RawSamples[inst_nbr][1][z]) free(RawSamples[inst_nbr][1][z]);
             RawSamples[inst_nbr][1][z] = NULL;
         }
 
 #if !defined(__NO_CODEC__)
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-        if(RawSamples_Swap[inst_nbr][0][z])
-        {
-            if(RawSamples_Swap[inst_nbr][0][z]) free(RawSamples_Swap[inst_nbr][0][z]);
-        }
+        if(RawSamples_Swap[inst_nbr][0][z]) free(RawSamples_Swap[inst_nbr][0][z]);
         RawSamples_Swap[inst_nbr][0][z] = NULL;
         if(SampleChannels[inst_nbr][z] == 2)
         {
-            if(RawSamples_Swap[inst_nbr][1][z])
-            {
-                if(RawSamples_Swap[inst_nbr][1][z]) free(RawSamples_Swap[inst_nbr][1][z]);
-            }
+            if(RawSamples_Swap[inst_nbr][1][z]) free(RawSamples_Swap[inst_nbr][1][z]);
             RawSamples_Swap[inst_nbr][1][z] = NULL;
         }
 #endif
@@ -5248,14 +5243,8 @@ void KillInst(int inst_nbr)
 
 #if !defined(__STAND_ALONE__)
         sprintf(SampleName[inst_nbr][z], "Untitled");
-        Midiprg[inst_nbr] = -1;
 #endif
 
-#if defined(PTK_SYNTH)
-        Synthprg[inst_nbr] = SYNTH_WAVE_OFF;
-#endif
-
-        Sample_Vol[inst_nbr] = 0.0f;
     }
 }
 

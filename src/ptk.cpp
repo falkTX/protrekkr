@@ -352,9 +352,17 @@ REQUESTER_BUTTON Requester_Btn_Synth =
     SDLK_s
 };
 
-REQUESTER_BUTTON Requester_Btn_Instrument =
+REQUESTER_BUTTON Requester_Btn_Split =
 {
     &Requester_Btn_Synth,
+    "Split",
+    0,
+    SDLK_p
+};
+
+REQUESTER_BUTTON Requester_Btn_Instrument =
+{
+    &Requester_Btn_Split,
     "Instrument",
     0,
     SDLK_i
@@ -1707,11 +1715,16 @@ int Screen_Update(void)
             break;
 
         case 3:
+            // Split
+            ZzaappOMatic = ZZAAPP_SPLIT;
+            break;
+
+        case 4:
             // Synth
             ZzaappOMatic = ZZAAPP_SYNTHS;
             break;
 
-        case 4:
+        case 5:
             gui_action = GUI_CMD_NOP;
             break;
 
@@ -1740,6 +1753,7 @@ void LoadFile(int Freeindex, const char *str)
     FILE *in;
     WaveFile Wav_File;
     AIFFFile AIFF_File;
+    float save_sample_vol;
 
     int rate = 0;
     int bits = 0;
@@ -1895,6 +1909,8 @@ void LoadFile(int Freeindex, const char *str)
                         }
                         else
                         {
+                            save_sample_vol = 1.0f;
+                            if(Get_Number_Of_Splits(Freeindex)) save_sample_vol = Sample_Vol[Freeindex];
                             sp_Position[Freeindex][Current_Sample_Split].absolu = 0;
                             Stop_Current_Sample();
                             switch(channels)
@@ -1922,6 +1938,10 @@ void LoadFile(int Freeindex, const char *str)
                             LoopEnd[Freeindex][Current_Sample_Split] = 0;
                             LoopType[Freeindex][Current_Sample_Split] = SMP_LOOP_NONE;
                             Basenote[Freeindex][Current_Sample_Split] = DEFAULT_BASE_NOTE;
+                            if(Get_Number_Of_Splits(Freeindex) == 1)
+                            {
+                                Sample_Vol[Freeindex] = save_sample_vol;
+                            }
 
                             if(AIFF_File.BaseNote())
                             {
@@ -1997,6 +2017,8 @@ void LoadFile(int Freeindex, const char *str)
                         }
                         else
                         {
+                            save_sample_vol = 1.0f;
+                            if(Get_Number_Of_Splits(Freeindex)) save_sample_vol = Sample_Vol[Freeindex];
                             sp_Position[Freeindex][Current_Sample_Split].absolu = 0;
                             Stop_Current_Sample();
                             switch(channels)
@@ -2024,6 +2046,10 @@ void LoadFile(int Freeindex, const char *str)
                             LoopEnd[Freeindex][Current_Sample_Split] = 0;
                             LoopType[Freeindex][Current_Sample_Split] = SMP_LOOP_NONE;
                             Basenote[Freeindex][Current_Sample_Split] = DEFAULT_BASE_NOTE;
+                            if(Get_Number_Of_Splits(Freeindex) == 1)
+                            {
+                                Sample_Vol[Freeindex] = save_sample_vol;
+                            }
 
                             if(Wav_File.LoopType())
                             {
@@ -2213,7 +2239,7 @@ void Newmod(void)
         for(i = 0; i < MAX_INSTRS; i++)
         {
             Old_Prg = Synthprg[i];
-            KillInst(i);
+            KillInst(i, TRUE);
             Synthprg[i] = Old_Prg;
             sprintf(nameins[i], "Untitled");
             if((Synthprg[i] - 2) == i)
@@ -2609,13 +2635,32 @@ void DeleteInstrument(void)
         Status_Box("Synth deleted.");
     }
 
+    if(ZzaappOMatic == ZZAAPP_SPLIT)
+    {
+        seditor = 0;
+        Final_Mod_Length = 0;
+        Actualize_Master(0);
+        Old_Prg = Synthprg[Current_Sample];
+        KillInst(Current_Sample, FALSE);
+        Synthprg[Current_Sample] = Old_Prg;
+        sprintf(nameins[Current_Sample], "Untitled");
+        if((Synthprg[Current_Sample] - 2) == Current_Sample)
+        {
+            Synthprg[Current_Sample] = 1;
+        }
+        Renew_Sample_Ed();
+        Status_Box("Instrument deleted.");
+        RefreshSample();
+        Actualize_Master(0);
+    }
+
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_INSTRUMENTS)
     {
         seditor = 0;
         Final_Mod_Length = 0;
         Actualize_Master(0);
         Old_Prg = Synthprg[Current_Sample];
-        KillInst(Current_Sample);
+        KillInst(Current_Sample, TRUE);
         Synthprg[Current_Sample] = Old_Prg;
         sprintf(nameins[Current_Sample], "Untitled");
         if((Synthprg[Current_Sample] - 2) == Current_Sample)

@@ -250,26 +250,28 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 // Desc: Wait for a command acknowledgment from the thread
 void AUDIO_Wait_For_Thread(void)
 {
-
-    if(AUDIO_Play_Flag)
+    if(AUDIO_Sound_Buffer)
     {
-        while(AUDIO_Acknowledge)
+        if(AUDIO_Play_Flag)
         {
-            usleep(10);
-        };
-    }
-    else
-    {
-    #if defined(USE_SDL_THREADS)
-        if(hThread)     // sdl thread
-    #else
-        if(hThread.p)   // pthreads
-    #endif
-        {
-            while(!AUDIO_Acknowledge)
+            while(AUDIO_Acknowledge)
             {
                 usleep(10);
             };
+        }
+        else
+        {
+        #if defined(USE_SDL_THREADS)
+            if(hThread)     // sdl thread
+        #else
+            if(hThread.p)   // pthreads
+        #endif
+            {
+                while(!AUDIO_Acknowledge)
+                {
+                    usleep(10);
+                };
+            }
         }
     }
 }

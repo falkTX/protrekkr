@@ -79,7 +79,7 @@ void LoadInst(char *FileName)
                 break;
         }
 
-        KillInst(Current_Sample);
+        KillInst(Current_Sample, TRUE);
         Status_Box("Loading Instrument -> Header..."); 
         Read_Data(&nameins[Current_Sample], sizeof(char), 20, in);
 

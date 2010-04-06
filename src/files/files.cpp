@@ -1806,6 +1806,25 @@ short *Get_WaveForm(int Instr_Nbr, int Channel, int Split)
 }
 
 // ------------------------------------------------------
+// Return the number of splits used in an instrument
+int Get_Number_Of_Splits(int n_index)
+{
+    int i;
+
+    // If this is the first waveform of the instrument
+    // we set the global volume to max
+    int nbr_splits = 0;
+    for(i = 0; i < MAX_INSTRS_SPLITS; i++)
+    {
+        if(RawSamples[n_index][0][i])
+        {
+            nbr_splits++;
+        }
+    }
+    return nbr_splits;
+}
+
+// ------------------------------------------------------
 // Clear the data of a given instrument
 void Clear_Instrument_Dat(int n_index, int split, int lenfir)
 {
@@ -1818,20 +1837,24 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
     Sample_Amplify[n_index][split] = 1.0f;
     FDecay[n_index][split] = 0.0f;
     Basenote[n_index][split] = DEFAULT_BASE_NOTE;
-    Sample_Vol[n_index] = 0.0f;
-    Midiprg[n_index] = -1;
-    Synthprg[n_index] = SYNTH_WAVE_OFF;
-    beatsync[n_index] = FALSE;
+
+    if(Get_Number_Of_Splits(n_index) == 0)
+    {
+        Sample_Vol[n_index] = 0.0f;
+        Midiprg[n_index] = -1;
+        Synthprg[n_index] = SYNTH_WAVE_OFF;
+        beatsync[n_index] = FALSE;
 
     // Gsm is default compression
 #if !defined(__WINAMP__) && !defined(__NO_CODEC__)
-    SampleCompression[n_index] = SMP_PACK_GSM;
-    SamplesSwap[n_index] = FALSE;
+        SampleCompression[n_index] = SMP_PACK_GSM;
+        SamplesSwap[n_index] = FALSE;
 #else
-    SampleCompression[n_index] = SMP_PACK_NONE;
+        SampleCompression[n_index] = SMP_PACK_NONE;
 #endif
-    Mp3_BitRate[n_index] = 0;
-    At3_BitRate[n_index] = 0;
+        Mp3_BitRate[n_index] = 0;
+        At3_BitRate[n_index] = 0;
+    }
 }
 
 // ------------------------------------------------------

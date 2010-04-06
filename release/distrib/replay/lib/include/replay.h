@@ -401,7 +401,7 @@ void ComputeStereo(int channel);
 void GetPlayerValues(void);
 void noteoff303(char strack);
 void init_sample_bank(void);
-void KillInst(int inst_nbr);
+void KillInst(int inst_nbr, int all_splits);
 void Post_Song_Init(void);
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)

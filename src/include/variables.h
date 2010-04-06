@@ -252,8 +252,9 @@
 #define ZZAAPP_ALL 1
 #define ZZAAPP_PATTERNS 2
 #define ZZAAPP_INSTRUMENTS 3
-#define ZZAAPP_SYNTHS 4
-#define ZZAAPP_303 5
+#define ZZAAPP_SPLIT 4
+#define ZZAAPP_SYNTHS 5
+#define ZZAAPP_303 6
 
 // ------------------------------------------------------
 // Structures
@@ -415,6 +416,7 @@ void PutBackMouse(void);
 void Read_SMPT(void);
 void Initreverb();
 void init_sample_bank(void);
+int Get_Number_Of_Splits(int n_index);
 void Clear_Instrument_Dat(int n_index, int split, int lenfir);
 void AllocateWave(int n_index, int split, long lenfir, int samplechans, int clear);
 void LoadFile(int Freeindex, const char *str);
@@ -441,7 +443,7 @@ void Free_Samples(void);
 void draw_pated(int track, int line, int petrack, int row);
 void Actupated(int modac);
 
-void KillInst(int inst_nbr);
+void KillInst(int inst_nbr, int all_splits);
 void Stop_Current_Sample(void);
 void draw_lfoed(void);
 void draw_tracked(void);
