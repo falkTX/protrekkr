@@ -5203,11 +5203,13 @@ void KillInst(int inst_nbr, int all_splits)
 
         Sample_Vol[inst_nbr] = 0.0f;
     }
+#if !defined(__STAND_ALONE__)
     else
     {
         first_split = Current_Sample_Split;
         last_split = Current_Sample_Split + 1;
     }
+#endif
     for(int z = first_split; z < last_split; z++)
     {
         if(RawSamples[inst_nbr][0][z]) free(RawSamples[inst_nbr][0][z]);

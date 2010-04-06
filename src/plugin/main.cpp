@@ -33,7 +33,7 @@ BOOL WINAPI _DllMainCRTStartup(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lp
 #define PBLEN 1572864
 extern unsigned char *RawPatterns;
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len);
-int LoadMod(char *FileName);
+int LoadPtk(char *FileName);
 int Calc_Length(void);
 int Alloc_Patterns_Pool(void);
 extern float mas_vol;
@@ -130,7 +130,7 @@ int play(const char *fn)
 
     strcpy(modname, fn);
 
-    if(!LoadMod(modname))
+    if(!LoadPtk(modname))
     {
 		// we return error. 1 means to keep going in the playlist, -1
 		// means to stop the playlist.

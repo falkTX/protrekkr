@@ -380,6 +380,7 @@ void Write_Synth_Params(int (*Write_Function)(void *, int ,int, FILE *),
 
 // ------------------------------------------------------
 // Load a synth preset
+#if !defined(__WINAMP__)
 void LoadSynth(char *FileName)
 {
     FILE *in;
@@ -478,4 +479,4 @@ void SaveSynth(void)
 
     Clear_Input();
 }
-
+#endif

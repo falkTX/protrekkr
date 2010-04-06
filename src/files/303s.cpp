@@ -69,6 +69,7 @@ void Save_303_Data(int (*Write_Function)(void *, int ,int, FILE *),
 
 // ------------------------------------------------------
 // Load a 303 pattern
+#if !defined(__WINAMP__)
 void Load303(char *FileName)
 {
     FILE *in;
@@ -137,4 +138,4 @@ void Save303(void)
 
     Clear_Input();
 }
-
+#endif
