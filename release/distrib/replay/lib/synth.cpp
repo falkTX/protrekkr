@@ -345,8 +345,8 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     ENV1_COUNTER = 0; /* Envelope stage counter, in samples */
     ENV2_COUNTER = 0;
 
-    OSC1_STEP = powf(2.0f, note_1 / 12.0f);
-    OSC2_STEP = powf(2.0f, (note_2 + Data.OSC2_FINETUNE + Data.OSC2_DETUNE) / 12.0f);
+    OSC1_STEP = POWF(2.0f, note_1 / 12.0f);
+    OSC2_STEP = POWF(2.0f, (note_2 + Data.OSC2_FINETUNE + Data.OSC2_DETUNE) / 12.0f);
 
     ENV1_VALUE = 0;
     ENV2_VALUE = 0;

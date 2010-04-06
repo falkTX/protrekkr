@@ -2645,13 +2645,12 @@ ByPass_Wav:
                     if(Player_WL[c][i])
                     {
                         Curr_Signal_L[i] = Process_Sample(Player_WL[c][i], c, i, res_dec);
-                    }
-
-                    // Is it stereo sample ?
-                    if(Player_SC[c][i] == 2)
-                    {
-                        grown = TRUE;
-                        Curr_Signal_R[i] = Process_Sample(Player_WR[c][i], c, i, res_dec);
+                        // Is it stereo sample ?
+                        if(Player_SC[c][i] == 2)
+                        {
+                            grown = TRUE;
+                            Curr_Signal_R[i] = Process_Sample(Player_WR[c][i], c, i, res_dec);
+                        }
                     }
 
                     // End of Interpolation algo
@@ -3113,7 +3112,7 @@ ByPass_Wav:
                 All_Signal_R = 0;
             }
 #endif
-        }
+        }   // gotsome
 
 #if defined(PTK_FLANGER)
         // 32-Bit HQ Interpolated System Flanger
@@ -3124,16 +3123,14 @@ ByPass_Wav:
 
 #if defined(__PSP__)
             // May be a bit faster
-            float fstep1 = powf(2.0f,
-                                SIN[(int) ((FLANGER_GR[c] / 6.283185f) * 360.0f)] * FLANGER_AMPL[c]);
-            float fstep2 = powf(2.0f,
-                                SIN[(int) (((FLANGER_GR[c] / 6.283185f) +
-                                            (FLANGER_DEPHASE[c] / 3.1415927f)
-                                           ) * 360.0f
-                                          )] * FLANGER_AMPL[c]);
+            float fstep1 = POWF(2.0f, SIN[(int) ((FLANGER_GR[c] / 6.283185f) * 360.0f)] * FLANGER_AMPL[c]);
+            float fstep2 = POWF(2.0f, SIN[(int) (((FLANGER_GR[c] / 6.283185f) +
+                                                 (FLANGER_DEPHASE[c] / 3.1415927f)
+                                                ) * 360.0f
+                                         )] * FLANGER_AMPL[c]);
 #else
-            float fstep1 = powf(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
-            float fstep2 = powf(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
+            float fstep1 = POWF(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
+            float fstep2 = POWF(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
 #endif
 
             FLANGER_OFFSET2[c] += fstep1;
@@ -3204,7 +3201,7 @@ ByPass_Wav:
             Scope_Dats[c][pos_scope] = 0.0f;
         }
 #endif
-    }
+    } // Songtracks
 }
 
 // ------------------------------------------------------
@@ -3445,7 +3442,7 @@ void Play_Instrument(int channel, int sub_channel)
             sp_Tvol[channel][sub_channel] = vol;
             sp_Tvol_Synth[channel][sub_channel] = vol_synth;
 
-            double spreadnote = (double) powf(2.0f, note2 / 12.0f);
+            double spreadnote = (double) POWF(2.0f, note2 / 12.0f);
             spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
@@ -3550,7 +3547,7 @@ void Play_Instrument(int channel, int sub_channel)
                 }
                 else
                 {
-                    double spreadnote = (double) powf(2.0f, note / 12.0f);
+                    double spreadnote = (double) POWF(2.0f, note / 12.0f);
                     spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
@@ -4431,12 +4428,12 @@ void Do_Effects_Ticks_X(void)
                         Vstep1[trackef][i] = Vstep_arp[trackef][i];
                         break;
                     case 1:
-                        arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
+                        arpnote = (double) POWF(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
                         arpnote *= 4294967296.0f;
                         Vstep1[trackef][i] = (int64) arpnote;
                         break;
                     case 2:
-                        arpnote = (double) powf(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
+                        arpnote = (double) POWF(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
                         arpnote *= 4294967296.0f;
                         Vstep1[trackef][i] = (int64) arpnote;
                         break;
@@ -4460,7 +4457,7 @@ void Do_Effects_Ticks_X(void)
 
             for(i = 0; i < Channels_Polyphony[trackef]; i++)
             {
-                vibnote = (double) powf(2.0f, ((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
+                vibnote = (double) POWF(2.0f, ((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
                 vibnote *= 4294967296.0f;
                 Vstep1[trackef][i] = (int64) vibnote;
             }
@@ -4759,17 +4756,21 @@ float Filter(float x, char i)
 
 float Kutoff(int v)
 {
-    return powf((v + 5.0f) / (127.0f + 5.0f), 1.7f) * 13000.0f + 30.0f;
+    return POWF((v + 5.0f) / (127.0f + 5.0f), 1.7f) * 13000.0f + 30.0f;
 }
 
 float Resonance(float v)
 {
-    return powf(v / 127.0f, 4.0f) * 150.0f + 0.1f;
+    float tt;
+    tt = POWF(v / 127.0f, 4.0f) * 150.0f + 0.1f;
+    return tt;
 }
 
 float Bandwidth(int v)
 {
-    return powf(v / 127.0f, 4.0f) * 4.0f + 0.1f;
+    float tt;
+    tt = POWF(v / 127.0f, 4.0f) * 4.0f + 0.1f;
+    return tt;
 }
 
 #if defined(PTK_PROC_FILTER2P)
@@ -4945,7 +4946,7 @@ float int_filter2p(int ch, float input, float f, float q, float q2)
 {
     q *= 0.0787401f;
     input = filter2px(ch, input, f, q2);
-    return float(32767.0f * powf(fabsf(input) / 32767.0f, 1.0f - q / 11.0f));
+    return float(32767.0f * POWF(fabsf(input) / 32767.0f, 1.0f - q / 11.0f));
 }
 
 float filter2px(int ch, float input, float f, float q)
@@ -5741,3 +5742,32 @@ float Process_Sample(short *Data, int c, int i, unsigned int res_dec)
 #endif
 
 }
+
+#if defined(USE_FASTPOW)
+float FastLog2(float i)
+{
+	float x;
+	float y;
+	x = (float) (*(int *) &i);
+	x *= 1.0f / (1 << 23);;
+	x = x - 127;
+	y = x - floorf(x);
+	y = (y - y * y) * 0.346607f;
+	return x+y;
+}
+float FastPow2(float i)
+{
+    float PowBodge = 0.33971f;
+	float x;
+	float y = i - floorf(i);
+	y = (y - y * y) * PowBodge;
+	x =i + 127 - y;
+	x *= (1 << 23);
+	*(int*) &x = (int) x;
+	return x;
+}
+float FastPow(float a, float b)
+{
+    return FastPow2(b * FastLog2(a));
+}
+#endif

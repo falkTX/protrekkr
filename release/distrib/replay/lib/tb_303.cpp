@@ -32,6 +32,7 @@
 // ------------------------------------------------------
 // Includes
 #include "include/tb_303.h"
+#include "include/replay.h"
 
 #if defined(PTK_303)
 
@@ -234,7 +235,7 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
 
         // 0.1889763f seems to be about right
         frune += (float) PARAT303->tune * 0.1889763f;
-        float tbOscSpeedTmp = powf(2.0f, frune / 12.0f) * 64.0f;
+        float tbOscSpeedTmp = POWF(2.0f, frune / 12.0f) * 64.0f;
 
         int tbLine2 = (tbLine - 1);
         if(tbLine2 < 0) tbLine2 = PARAT303->patternlength[tbPattern] - 1;
@@ -319,7 +320,7 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
             frune += (float) PARAT303->tune * 0.1889763f;
             tbInnertime = SamplesPerTick * 0.5f;
             float tbDestiny = tbOscSpeed;                            // Dest
-            float tbSource = powf(2.0f, frune / 12.0f) * 64.0f;
+            float tbSource = POWF(2.0f, frune / 12.0f) * 64.0f;
             // Previous speed
             tbOscSpeed = tbSource;
             tbOscSpeedFreak = (tbDestiny - tbSource) / tbInnertime;  // Get glide coefficient

@@ -58,6 +58,8 @@
 
 // ------------------------------------------------------
 // Constants
+#define USE_FASTPOW
+
 #define MAX_TRACKS 16
 #define MAX_POLYPHONY 16
 #define DEFAULT_POLYPHONY 1
@@ -166,6 +168,13 @@
 #define SYNTH_DECAY 2
 #define SYNTH_SUSTAIN 3
 #define SYNTH_RELEASE 4
+
+#if defined(USE_FASTPOW)
+float FastPow(float a, float b);
+#define POWF(x, y) FastPow(x, y)
+#else
+#define POWF(x, y) powf(x, y)
+#endif
 
 // ------------------------------------------------------
 // Structures

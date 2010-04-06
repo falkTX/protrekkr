@@ -208,19 +208,22 @@ int AUDIO_Create_Sound_Buffer(int milliseconds)
 // Desc: Wait for a command acknowledgment from the thread
 void AUDIO_Wait_For_Thread(void)
 {
-    if(AUDIO_Play_Flag)
+    if(AUDIO_Sound_Buffer)
     {
-        while(AUDIO_Acknowledge)
+        if(AUDIO_Play_Flag)
         {
-            Sleep(10);
-        };
-    }
-    else
-    {
-        while(!AUDIO_Acknowledge)
+            while(AUDIO_Acknowledge)
+            {
+                Sleep(10);
+            };
+        }
+        else
         {
-            Sleep(10);
-        };
+            while(!AUDIO_Acknowledge)
+            {
+                Sleep(10);
+            };
+        }
     }
 }
 
@@ -302,5 +305,5 @@ void AUDIO_Stop_Sound_Buffer(void)
 void AUDIO_Stop_Driver(void)
 {
     AUDIO_Stop_Sound_Buffer();
-   if(AUDIO_DSound_Context) AUDIO_DSound_Context->Release();
+    if(AUDIO_DSound_Context) AUDIO_DSound_Context->Release();
 }
