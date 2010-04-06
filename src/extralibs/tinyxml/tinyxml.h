@@ -907,8 +907,8 @@ public:
 	TiXmlAttributeSet();
 	~TiXmlAttributeSet();
 
-	void Add( TiXmlAttribute* attribute );
-	void Remove( TiXmlAttribute* attribute );
+	void _Add( TiXmlAttribute* attribute );
+	void _Remove( TiXmlAttribute* attribute );
 
 	const TiXmlAttribute* First()	const	{ return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; }
 	TiXmlAttribute* First()					{ return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; }

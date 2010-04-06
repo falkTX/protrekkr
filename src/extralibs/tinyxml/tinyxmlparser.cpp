@@ -1167,7 +1167,7 @@ const char* TiXmlElement::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 				return 0;
 			}
 
-			attributeSet.Add( attrib );
+			attributeSet._Add( attrib );
 		}
 	}
 	return p;

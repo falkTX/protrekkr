@@ -423,7 +423,7 @@ void TiXmlElement::RemoveAttribute( const char * name )
 	#endif
 	if ( node )
 	{
-		attributeSet.Remove( node );
+		attributeSet._Remove( node );
 		delete node;
 	}
 }
@@ -546,7 +546,7 @@ void TiXmlElement::ClearThis()
 	while( attributeSet.First() )
 	{
 		TiXmlAttribute* node = attributeSet.First();
-		attributeSet.Remove( node );
+		attributeSet._Remove( node );
 		delete node;
 	}
 }
@@ -734,7 +734,7 @@ void TiXmlElement::SetAttribute( const char * cname, const char * cvalue )
 	TiXmlAttribute* attrib = new TiXmlAttribute( cname, cvalue );
 	if ( attrib )
 	{
-		attributeSet.Add( attrib );
+		attributeSet._Add( attrib );
 	}
 	else
 	{
@@ -1513,7 +1513,7 @@ TiXmlAttributeSet::~TiXmlAttributeSet()
 }
 
 
-void TiXmlAttributeSet::Add( TiXmlAttribute* addMe )
+void TiXmlAttributeSet::_Add( TiXmlAttribute* addMe )
 {
     #ifdef TIXML_USE_STL
 	assert( !Find( TIXML_STRING( addMe->Name() ) ) );	// Shouldn't be multiply adding to the set.
@@ -1528,7 +1528,7 @@ void TiXmlAttributeSet::Add( TiXmlAttribute* addMe )
 	sentinel.prev      = addMe;
 }
 
-void TiXmlAttributeSet::Remove( TiXmlAttribute* removeMe )
+void TiXmlAttributeSet::_Remove( TiXmlAttribute* removeMe )
 {
 	TiXmlAttribute* node;
 
