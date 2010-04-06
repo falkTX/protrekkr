@@ -86,7 +86,7 @@ char LFO_ON[MAX_TRACKS];
 int Delay_Sound_Buffer;
 int Cur_Delay_Sound_Buffer;
 
-VISUAL_DELAY_DAT Delays_Pos_Sound_Buffer[256];
+VISUAL_DELAY_DAT Delays_Pos_Sound_Buffer[512];
 int PosInTick_Delay;
 
 #if defined(PTK_LFO)
@@ -1973,7 +1973,7 @@ void Record_Delay_Event()
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Line = Pattern_Line;
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Pos = Song_Position;
     Cur_Delay_Sound_Buffer++;
-    if(Cur_Delay_Sound_Buffer >= 256) Cur_Delay_Sound_Buffer = 0;
+    if(Cur_Delay_Sound_Buffer >= 512) Cur_Delay_Sound_Buffer = 0;
 }
 
 // ------------------------------------------------------
@@ -1993,7 +1993,7 @@ void Proc_Next_Visual_Line()
         PosInTick_Delay = 0;
 
         Delay_Sound_Buffer++;
-        if(Delay_Sound_Buffer >= 256) Delay_Sound_Buffer = 0;
+        if(Delay_Sound_Buffer >= 512) Delay_Sound_Buffer = 0;
         Pattern_Line_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].Line;
         Song_Position_Visual = Delays_Pos_Sound_Buffer[Delay_Sound_Buffer].Pos;
     }

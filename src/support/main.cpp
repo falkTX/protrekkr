@@ -60,7 +60,7 @@
 #endif
 
 #if defined(__AMIGAOS4__) || defined(__AROS__)
-const char *AMIGA_VERSION = "\0$VER: " TITLE " " VER_VER "." VER_REV "\0";
+const char *AMIGA_VERSION = "\0$VER: " TITLE " " VER_VER "." VER_REV "." VER_REVSMALL "\0";
 #endif
 
 // ------------------------------------------------------
