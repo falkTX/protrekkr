@@ -237,7 +237,7 @@ int Type_At3_BitRate[] =
 };
 #endif
 
-#if defined(PTK_FX_PATTERNBREAK)
+#if defined(PTK_FX_PATTERNBREAK) || defined(PTK_FX_POSJUMP)
 // 255 when no jump or yes on patbreak < 128 = line to jump.
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int Patbreak_Line = 255;
@@ -3264,7 +3264,11 @@ void Schedule_Instrument(int channel, int sub_channel,
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
         Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample];
 #if defined(PTK_SYNTH)
+#if defined(__STAND_ALONE__)
+        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME;
+#else
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].glb_volume * 0.0078125f;
+#endif
 #endif
         Instrument_Schedule_Dat[channel][sub_channel].offset = offset;
         Instrument_Schedule_Dat[channel][sub_channel].glide = glide;
@@ -4654,7 +4658,7 @@ void GetPlayerValues(void)
     // It looks like the maximum range for OSS is -8192 +8192
     // (higher than that will produce heavily satured signals
     //  i don't know if it's a bug in drivers in Linux mixer or anything)
-    #if defined(__LINUX__)
+    #if defined(__LINUX__) && !defined(__FREEBSD__)
         left_value = (int) (left_float * 8192.0f);
         right_value = (int) (right_float * 8192.0f);
     #else

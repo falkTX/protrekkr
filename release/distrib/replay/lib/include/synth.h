@@ -274,7 +274,7 @@ typedef struct
         unsigned char OSC3_SWITCH;
         float PTC_GLIDE;
         int64 PTC_GLIDE64;
-        //float GLB_VOLUME;
+        float GLB_VOLUME;
         float DISTO;
         float LFO1_ATTACK;
         float LFO1_DECAY;
