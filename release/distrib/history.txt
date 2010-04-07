@@ -7,6 +7,7 @@ v2.0.1:
 - Big tracker & replay speed up.
 - Volume of instruments were left at 0 when loading waveforms.
 - Added the possibility to only delete the current instrument split.
+- Fixed an issue within .ptp saving function.
 
 v2.0:
 
