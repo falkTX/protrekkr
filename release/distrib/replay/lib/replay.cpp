@@ -3264,7 +3264,7 @@ void Schedule_Instrument(int channel, int sub_channel,
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
         Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample];
 #if defined(PTK_SYNTH)
-#if defined(__STAND_ALONE__)
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME;
 #else
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].glb_volume * 0.0078125f;
