@@ -727,8 +727,10 @@ float CSynth::GetSample(short *Left_Samples,
     short *Right_Samples1 = NULL;
     unsigned int res_dec;
 
+#if defined(PTK_SYNTH_PITCH)
     int64 osc_speed1;
     int64 osc_speed1b;
+#endif
     int64 osc_speed2;
     int64 osc_speed_tune;
     float mul_datL;

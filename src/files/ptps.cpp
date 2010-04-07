@@ -1015,6 +1015,10 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         {
             Write_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
+            Write_Mod_Data(&beatsync[swrite], sizeof(char), 1, in);
+            Write_Mod_Data(&beatlines[swrite], sizeof(short), 1, in);
+            Write_Mod_Data(&Sample_Vol[swrite], sizeof(float), 1, in);
+
             if(Synthprg[swrite])
             {
 
@@ -1284,10 +1288,6 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 if(fvalue < 0.15f) fvalue = 0.15f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
             }
-
-            Write_Mod_Data(&beatsync[swrite], sizeof(char), 1, in);
-            Write_Mod_Data(&beatlines[swrite], sizeof(short), 1, in);
-            Write_Mod_Data(&Sample_Vol[swrite], sizeof(float), 1, in);
 
 #if defined(__NO_CODEC__)
             char No_Comp = SMP_PACK_NONE;
