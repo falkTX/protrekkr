@@ -6,7 +6,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lmingw32 -lsdlmain -lSDL -ldsound -lmsacm32 -lwinmm -lsdldraw -lz
 
-FLAGS = -mwindows -O3 -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
+FLAGS = -mwindows -fno-strict-aliasing -O3 -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D G_OS_WIN32 -D __WIN32__ -D __GCC__ -D __WINDOWS_MM__ -D __MOT_SWAP__
 
 EXEOBJS = ptk.o \
