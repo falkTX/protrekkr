@@ -5739,6 +5739,10 @@ float Process_Sample(short *Data, int c, int i, unsigned int res_dec)
 }
 
 #if defined(USE_FASTPOW)
+void ToFloat(int *dest, int val)
+{
+    *dest = val;
+}
 float FastLog2(float i)
 {
 	float x;
@@ -5752,14 +5756,13 @@ float FastLog2(float i)
 }
 float FastPow2(float i)
 {
-    float PowBodge = 0.33971f;
 	float x;
 	float y = i - floorf(i);
-	y = (y - y * y) * PowBodge;
-	x =i + 127 - y;
+	y = (y - y * y) * 0.33971f;
+	x = i + 127 - y;
 	x *= (1 << 23);
-	*(int*) &x = (int) x;
-	return x;
+	ToFloat((int *) &x, (int) x);
+    return x;
 }
 float FastPow(float a, float b)
 {
