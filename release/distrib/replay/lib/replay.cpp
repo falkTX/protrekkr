@@ -1263,9 +1263,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 #endif
 
-#if defined(PTK_LIMITER_TRACKS)
         // Tracks compressors
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
+#if defined(PTK_LIMITER_TRACKS)
         if(Comp_Flag)
         {
             Mod_Dat_Read(&mas_threshold_Track, sizeof(float) * Songtracks);
