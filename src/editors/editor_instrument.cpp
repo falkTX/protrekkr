@@ -1606,7 +1606,17 @@ void Lock_Sample(int instr_nbr, int split)
                     Unpack8Bit((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
                     break;
             }
+        }
+        else
+        {
+            if(Pack_Type != SMP_PACK_NONE)
+            {
+                memcpy(Dest_Buffer, Sample, Size * 2);
+            }
+        }
 
+        if(Pack_Type != SMP_PACK_NONE)
+        {
             // Interpolate the sample
             Sample_Dest_Buffer = RawSamples[instr_nbr][i][split];
 
