@@ -886,8 +886,6 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         BeatsPerMin = 125;
         TicksPerBeat = 4;
         mas_vol = 0.75f;
-        mas_comp_threshold = 100.0f;
-        mas_comp_ratio = 0.0f;
 
         fclose(in);
 

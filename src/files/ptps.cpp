@@ -1611,9 +1611,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     if(mas_vol > 1.0f) mas_vol = 1.0f;
     Write_Mod_Data(&mas_vol, sizeof(float), 1, in);
 
-    float threshold = mas_comp_threshold;
-    float ratio = mas_comp_ratio;
-    char Comp_Flag;
+    float threshold = mas_comp_threshold_Master;
+    float ratio = mas_comp_ratio_Master;
+    char Comp_Flag = FALSE;
 
     if(threshold < 0.01f) threshold = 0.01f;
     if(threshold > 100.0f) threshold = 100.0f;
@@ -1626,17 +1626,55 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         ratio *= 0.01f;
         Comp_Flag = 1;
         Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
-
         Write_Mod_Data(&threshold, sizeof(float), 1, in);
         Write_Mod_Data(&ratio, sizeof(float), 1, in);
-        Save_Constant("PTK_LIMITER", TRUE);
+        Comp_Flag = TRUE;
     }
     else
     {
         Comp_Flag = 0;
         Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+    }
+
+    for(i = 0; i < Songtracks; i++)
+    {
+        // At least 1 track is compressed
+        if(Compress_Track[i])
+        {
+            Comp_Flag = TRUE;
+            break;
+        }
+    }
+    if(Comp_Flag)
+    {
+        Save_Constant("PTK_LIMITER", TRUE);
+    }
+    else
+    {
         Save_Constant("PTK_LIMITER", FALSE);
     }
+    Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+
+    if(Comp_Flag)
+    {
+        for(i = 0; i < Songtracks; i++)
+        {
+            threshold = mas_comp_threshold_Track[i];
+            if(threshold < 0.01f) threshold = 0.01f;
+            if(threshold > 100.0f) threshold = 100.0f;
+            threshold *= 0.001f;
+            Write_Mod_Data(&threshold, sizeof(float), 1, in);
+        }
+        for(i = 0; i < Songtracks; i++)
+        {
+            ratio = mas_comp_ratio_Track[i];
+            if(ratio < 0.01f) ratio = 0.01f;
+            if(ratio > 100.0f) ratio = 100.0f;
+            ratio *= 0.01f;
+            Write_Mod_Data(&ratio, sizeof(float), 1, in);
+        }
+        Write_Mod_Data(&Compress_Track, sizeof(char), Songtracks, in);
+   }
 
     Write_Mod_Data(&Feedback, sizeof(float), 1, in);
     

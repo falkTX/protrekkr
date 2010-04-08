@@ -340,17 +340,30 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
 #if defined(PTK_LIMITER)
     #define MAS_COMPRESSOR_SECONDS 0.1f
     #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * MIX_RATE)
-    float mas_comp_bufferL[MAS_COMPRESSOR_SIZE];
-    float mas_comp_bufferR[MAS_COMPRESSOR_SIZE];
     int mas_comp_pos_rms_buffer;
-    float rms_sumL;
-    float rms_sumR;
-    float mas_comp_ratio;
-    float mas_comp_threshold;
-    float mas_envL;
-    float mas_envR;
-    float mas_threshold;
-    float mas_ratio;
+    float mas_comp_bufferL_Track[MAX_TRACKS][MAS_COMPRESSOR_SIZE];
+    float mas_comp_bufferR_Track[MAX_TRACKS][MAS_COMPRESSOR_SIZE];
+    char Compress_Track[MAX_TRACKS];
+    float rms_sumL_Track[MAX_TRACKS];
+    float rms_sumR_Track[MAX_TRACKS];
+    float mas_envL_Track[MAX_TRACKS];
+    float mas_envR_Track[MAX_TRACKS];
+    float mas_comp_ratio_Track[MAX_TRACKS];
+    float mas_comp_threshold_Track[MAX_TRACKS];
+    float mas_threshold_Track[MAX_TRACKS];
+    float mas_ratio_Track[MAX_TRACKS];
+
+    float mas_comp_bufferL_Master[MAS_COMPRESSOR_SIZE];
+    float mas_comp_bufferR_Master[MAS_COMPRESSOR_SIZE];
+    char Compress_Master;
+    float rms_sumL_Master;
+    float rms_sumR_Master;
+    float mas_envL_Master;
+    float mas_envR_Master;
+    float mas_comp_ratio_Master;
+    float mas_comp_threshold_Master;
+    float mas_threshold_Master;
+    float mas_ratio_Master;
 #endif
 
 char CHAN_ACTIVE_STATE[256][MAX_TRACKS];
@@ -586,13 +599,6 @@ void Initreverb();
     float Filter_FlangerR(float input);
 #endif
 
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    void Mas_Compressor_Set_Variables(float treshold, float ratio);
-#endif
-
-float Mas_Compressor(float input, float *rms_sum, float *Buffer, float *Env);
-float Do_RMS(float input, float *rms_sum, float *buffer);
-
 volatile int Done_Reset;
 void Reset_Values(void);
 
@@ -737,8 +743,14 @@ int STDCALL Ptk_InitDriver(void)
     unsigned int total = 0;
 #endif
 
+#if defined(PTK_LIMITER)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    Mas_Compressor_Set_Variables(100.0f, 0.0f);
+    Mas_Compressor_Set_Variables_Master(100.0f, 0.0f);
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        Mas_Compressor_Set_Variables_Track(i, 100.0f, 0.0f);
+    }
+#endif
 #endif
 
     SIZE_WAVEFORMS = 0;
@@ -813,7 +825,6 @@ int STDCALL Ptk_InitDriver(void)
     {
         return(FALSE);
     }
-
 
 #if !defined(__STAND_ALONE__)
     if(!Init_Scopes_Buffers()) return(FALSE);
@@ -1236,10 +1247,20 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 
 #if defined(PTK_LIMITER)
+        // Master compressor
         if(Comp_Flag)
         {
-            Mod_Dat_Read(&mas_threshold, sizeof(float));
-            Mod_Dat_Read(&mas_ratio, sizeof(float));
+            Mod_Dat_Read(&mas_threshold_Master, sizeof(float));
+            Mod_Dat_Read(&mas_ratio_Master, sizeof(float));
+        }
+
+        // Tracks compressors
+        Mod_Dat_Read(&Comp_Flag, sizeof(char));
+        if(Comp_Flag)
+        {
+            Mod_Dat_Read(&mas_threshold_Track, sizeof(float) * Songtracks);
+            Mod_Dat_Read(&mas_ratio_Track, sizeof(float) * Songtracks);
+            Mod_Dat_Read(&Compress_Track, sizeof(char) * Songtracks);
         }
 #endif
 
@@ -1349,9 +1370,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
 
         Song_Position = start_position;
-
         Post_Song_Init();
-
         return(TRUE);
     }
     else
@@ -1801,17 +1820,33 @@ void Pre_Song_Init(void)
 
 #if defined(PTK_LIMITER)
     mas_comp_pos_rms_buffer = 0;
-    rms_sumL = 0;
-    rms_sumR = 0;
-    mas_comp_ratio = 0;
-    mas_comp_threshold = 0;
-    mas_envL = 0;
-    mas_envR = 0;
 
+    int j;
+    mas_comp_threshold_Master = 100.0f;
+    mas_comp_ratio_Master = 0;
+    rms_sumL_Master = 0;
+    rms_sumR_Master = 0;
+    mas_envL_Master = 0;
+    mas_envR_Master = 0;
     for(i = 0; i < MAS_COMPRESSOR_SIZE; i++)
     {
-        mas_comp_bufferL[i] = 0;
-        mas_comp_bufferR[i] = 0;
+        mas_comp_bufferL_Master[i] = 0;
+        mas_comp_bufferR_Master[i] = 0;
+    }
+
+    for(j = 0; j < MAX_TRACKS; j++)
+    {
+        mas_comp_threshold_Track[j] = 100.0f;
+        mas_comp_ratio_Track[j] = 0;
+        rms_sumL_Track[j] = 0;
+        rms_sumR_Track[j] = 0;
+        mas_envL_Track[j] = 0;
+        mas_envR_Track[j] = 0;
+        for(i = 0; i < MAS_COMPRESSOR_SIZE; i++)
+        {
+            mas_comp_bufferL_Track[j][i] = 0;
+            mas_comp_bufferR_Track[j][i] = 0;
+        }
     }
 #endif
 
@@ -3162,6 +3197,23 @@ ByPass_Wav:
             All_Signal_R = 0;
         }
 #endif
+
+#if defined(PTK_LIMITER)
+        // Compress the track signal
+        if(Compress_Track[c])
+        {
+            All_Signal_L = Mas_Compressor_Track(c,
+                                                All_Signal_L / 32767.0f,
+                                                &rms_sumL_Track[c],
+                                                mas_comp_bufferL_Track[c],
+                                                &mas_envL_Track[c]) * 32767.0f;
+            All_Signal_R = Mas_Compressor_Track(c,
+                                                All_Signal_R / 32767.0f,
+                                                &rms_sumR_Track[c],
+                                                mas_comp_bufferR_Track[c],
+                                                &mas_envR_Track[c]) * 32767.0f;
+        }
+#endif // PTK_LIMITER
 
         left_float += All_Signal_L;
         right_float += All_Signal_R;
@@ -4565,6 +4617,11 @@ void GetPlayerValues(void)
     left_chorus = 0.0f;
     right_chorus = 0.0f;
 
+#if defined(PTK_LIMITER)
+    mas_comp_pos_rms_buffer++;
+    if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
+#endif
+
     Sp_Player();
 
     // Wait for the audio latency before starting to play
@@ -4602,18 +4659,15 @@ void GetPlayerValues(void)
     right_float /= 32767.0f;
 
 #if defined(PTK_LIMITER)
-    mas_comp_pos_rms_buffer++;
-    if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
-
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    if(mas_comp_ratio > 0.01f)
+    if(mas_comp_ratio_Master > 0.01f)
     {
 #else
-    if(mas_ratio > 0.01f)
+    if(mas_ratio_Master > 0.01f)
     {
 #endif
-        left_float = Mas_Compressor(left_float, &rms_sumL, mas_comp_bufferL, &mas_envL);
-        right_float = Mas_Compressor(right_float, &rms_sumR, mas_comp_bufferR, &mas_envR);
+        left_float = Mas_Compressor_Master(left_float, &rms_sumL_Master, mas_comp_bufferL_Master, &mas_envL_Master);
+        right_float = Mas_Compressor_Master(right_float, &rms_sumR_Master, mas_comp_bufferR_Master, &mas_envR_Master);
     }
 #endif
 
@@ -5571,20 +5625,20 @@ float mas_attack = 0.977579f;
 float mas_release = 0.977579f;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-void Mas_Compressor_Set_Variables(float threshold, float ratio)
+void Mas_Compressor_Set_Variables_Track(int Track, float threshold, float ratio)
 {
     if(threshold < 0.01f) threshold = 0.01f;
     if(threshold > 100.0f) threshold = 100.0f;
     if(ratio < 0.01f) ratio = 0.01f;
     if(ratio > 100.0f) ratio = 100.0f;
-    mas_comp_threshold = threshold;
-    mas_comp_ratio = ratio;
-    mas_threshold = threshold * 0.001f;
-    mas_ratio = ratio * 0.01f;
+    mas_comp_threshold_Track[Track] = threshold;
+    mas_comp_ratio_Track[Track] = ratio;
+    mas_threshold_Track[Track] = threshold * 0.001f;
+    mas_ratio_Track[Track] = ratio * 0.01f;
 }
 #endif
 
-float Mas_Compressor(float input, float *rms_sum, float *buffer, float *env)
+float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *buffer, float *env)
 {
     float gain;
     float rmsf = Do_RMS(input, rms_sum, buffer);
@@ -5593,9 +5647,37 @@ float Mas_Compressor(float input, float *rms_sum, float *buffer, float *env)
     *env = (1.0f - theta) * rmsf + theta * *env;
 
     gain = 1.0f;
-    if(*env > mas_threshold)
+    if(*env > mas_threshold_Track[Track])
     {
-        gain = expf((logf(mas_threshold) - logf(*env)) * mas_ratio);
+        gain = expf((FastLog(mas_threshold_Track[Track]) - FastLog(*env)) * mas_ratio_Track[Track]);
+    }
+    return input * gain;
+}
+
+void Mas_Compressor_Set_Variables_Master(float threshold, float ratio)
+{
+    if(threshold < 0.01f) threshold = 0.01f;
+    if(threshold > 100.0f) threshold = 100.0f;
+    if(ratio < 0.01f) ratio = 0.01f;
+    if(ratio > 100.0f) ratio = 100.0f;
+    mas_comp_threshold_Master = threshold;
+    mas_comp_ratio_Master = ratio;
+    mas_threshold_Master = threshold * 0.001f;
+    mas_ratio_Master = ratio * 0.01f;
+}
+
+float Mas_Compressor_Master(float input, float *rms_sum, float *buffer, float *env)
+{
+    float gain;
+    float rmsf = Do_RMS(input, rms_sum, buffer);
+
+    float theta = rmsf > *env ? mas_attack : mas_release;
+    *env = (1.0f - theta) * rmsf + theta * *env;
+
+    gain = 1.0f;
+    if(*env > mas_threshold_Master)
+    {
+        gain = expf((FastLog(mas_threshold_Master) - FastLog(*env)) * mas_ratio_Master);
     }
     return input * gain;
 }
@@ -5608,7 +5690,7 @@ float Do_RMS(float input, float *rms_sum, float *buffer)
     if(*rms_sum < 0.0f) *rms_sum = 0.0f;
     return(sqrtf(*rms_sum / (float) MAS_COMPRESSOR_SIZE));
 }
-#endif
+#endif // PTK_LIMITER
 
 // ------------------------------------------------------
 // Return an index in a pattern's module
@@ -5744,7 +5826,7 @@ void ToFloat(int *dest, int val)
 {
     *dest = val;
 }
-float FastLog2(float i)
+float FastLog(float i)
 {
 	float x;
 	float y;
@@ -5767,6 +5849,6 @@ float FastPow2(float i)
 }
 float FastPow(float a, float b)
 {
-    return FastPow2(b * FastLog2(a));
+    return FastPow2(b * FastLog(a));
 }
 #endif

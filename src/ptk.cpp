@@ -1846,7 +1846,8 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGG") == 0 ||
                 strcmp(extension, "TWNNSNGH") == 0 ||
                 strcmp(extension, "TWNNSNGI") == 0 ||
-                strcmp(extension, "TWNNSNGJ") == 0)
+                strcmp(extension, "TWNNSNGJ") == 0 ||
+                strcmp(extension, "PROTREKK") == 0)
         {
             sprintf(name, "%s", FileName);
             SongStop();
@@ -2332,8 +2333,11 @@ void Newmod(void)
         TicksPerBeat = 4;
         DelayType = 1;
         mas_vol = 1.0f;
-        mas_comp_threshold = 100.0f;
-        mas_comp_ratio = 0.0f;
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            mas_comp_threshold_Track[i] = 100.0f;
+            mas_comp_ratio_Track[i] = 0.0f;
+        }
         lchorus_feedback = 0.6f;
         rchorus_feedback = 0.5f;
         lchorus_delay = 10584;
@@ -5659,26 +5663,26 @@ void Display_Master_Comp(void)
     char string[64];
 
     Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
-    Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold * 0.5f), TRUE);
-    if(mas_comp_ratio <= 0.01f)
+    Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold_Master * 0.5f), TRUE);
+    if(mas_comp_ratio_Master <= 0.01f)
     {
         sprintf(string, "Off");
     }
     else
     {
-        sprintf(string, "%d%%", (int) (mas_comp_threshold));
+        sprintf(string, "%d%%", (int) mas_comp_threshold_Master);
     }
     Print_String(string, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
-    Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio * 0.5f), TRUE);
-    if(mas_comp_ratio <= 0.01f)
+    Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio_Master * 0.5f), TRUE);
+    if(mas_comp_ratio_Master <= 0.01f)
     {
         sprintf(string, "Off");
     }
     else
     {
-        sprintf(string, "%d%%", (int) (mas_comp_ratio));
+        sprintf(string, "%d%%", (int) mas_comp_ratio_Master);
     }
     Print_String(string, 283 + 41, 8, 67, BUTTON_TEXT_CENTERED);
 }
@@ -5716,20 +5720,21 @@ void Display_Shuffle(void)
 // Handle the mouse event of the top bar
 void Mouse_Sliders_Master_Shuffle(void)
 {
+
     // Compressor threshold
     if(zcheckMouse(213, 6, 67, 18))
     {
-        Mas_Compressor_Set_Variables((Mouse.x - 223.0f) * 2.0f, mas_comp_ratio);
+        Mas_Compressor_Set_Variables_Master((Mouse.x - 223.0f) * 2.0f, mas_comp_ratio_Master);
         Display_Master_Comp();
     }
 
     // Compressor ratio
     if(zcheckMouse(324, 6, 67, 18))
     {
-        Mas_Compressor_Set_Variables(mas_comp_threshold, (Mouse.x - 334.0f) * 2.0f);
+        Mas_Compressor_Set_Variables_Master(mas_comp_threshold_Master, (Mouse.x - 334.0f) * 2.0f);
         Display_Master_Comp();
     }
-
+    
     // Master volume
     if(zcheckMouse(438, 6, 148, 18))
     {

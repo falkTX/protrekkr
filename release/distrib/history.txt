@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.0.2:
+
+- Moog Lo & Moog band filters buffers weren't resetted properly resulting
+  in some "scratchy" sound sometimes.
+- Added tracks compressors (can be CPU hungry).
+
 v2.0.1:
 
 - Big tracker & replay speed up.

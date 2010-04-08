@@ -171,6 +171,7 @@
 
 #if defined(USE_FASTPOW)
 float FastPow(float a, float b);
+float FastLog(float i);
 #define POWF(x, y) FastPow(x, y)
 #else
 #define POWF(x, y) powf(x, y)
@@ -247,8 +248,12 @@ extern unsigned int lchorus_counter2;
 extern unsigned int rchorus_counter2;
 extern int lchorus_delay;
 extern int rchorus_delay;
-extern float mas_comp_threshold;
-extern float mas_comp_ratio;
+extern float mas_comp_threshold_Track[MAX_TRACKS];
+extern float mas_comp_ratio_Track[MAX_TRACKS];
+extern char Compress_Track[MAX_TRACKS];
+extern float mas_comp_threshold_Master;
+extern float mas_comp_ratio_Master;
+extern char Compress_Master;
 extern unsigned char nPatterns;
 extern char Songtracks;
 extern unsigned char sLength;
@@ -409,7 +414,13 @@ void ResetSynthParameters(SynthParameters *TSP);
 #endif
 
 void Free_Samples(void);
-void Mas_Compressor_Set_Variables(float treshold, float ratio);
+#if defined(PTK_LIMITER)
+void Mas_Compressor_Set_Variables_Master(float treshold, float ratio);
+void Mas_Compressor_Set_Variables_Track(int Track, float treshold, float ratio);
+float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *Buffer, float *Env);
+float Mas_Compressor_Master(float input, float *rms_sum, float *Buffer, float *Env);
+float Do_RMS(float input, float *rms_sum, float *buffer);
+#endif
 int Get_Free_Sub_Channel(int channel, int polyphony);
 int Get_Pattern_Offset(int pattern, int track, int row);
 void InitRevervbFilter(void);

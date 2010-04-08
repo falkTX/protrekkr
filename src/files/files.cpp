@@ -113,7 +113,18 @@ void Init_Tracker_Context_After_ModLoad(void)
     rchorus_counter2 = MIX_RATE - rchorus_delay;
     Initreverb();
 
-    Mas_Compressor_Set_Variables(mas_comp_threshold, mas_comp_ratio);
+#if defined(PTK_LIMITER)
+    int i;
+    Mas_Compressor_Set_Variables_Master(mas_comp_threshold_Master,
+                                        mas_comp_ratio_Master);
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        Mas_Compressor_Set_Variables_Track(i,
+                                           mas_comp_threshold_Track[i],
+                                           mas_comp_ratio_Track[i]);
+    }
+#endif
+
     Reset_Song_Length();
 
 #if !defined(__WINAMP__)
@@ -144,9 +155,7 @@ int LoadPtk(char *FileName)
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
     int Fx2 = FALSE;
-
     char Comp_Flag;
-
     int i;
     int j;
     int k;
@@ -160,6 +169,7 @@ int LoadPtk(char *FileName)
     int new_disto = FALSE;
     int Pack_Scheme = FALSE;
     int Mp3_Scheme = FALSE;
+    int Compress_Tracks = FALSE;
     int tps_pos;
     int tps_trk;
     int twrite;
@@ -193,6 +203,9 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
+
+            case 'K':
+                Compress_Tracks = TRUE;
             case 'J':
                 Flanger_Bug = TRUE;
             case 'I':
@@ -244,8 +257,15 @@ Read_Mod_File:
 #endif
         Free_Samples();
 
-        mas_comp_threshold = 100.0f;
-        mas_comp_ratio = 0.0f;
+#if defined(PTK_LIMITER)
+        mas_comp_threshold_Master = 100.0f;
+        mas_comp_ratio_Master = 0.0f;
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            mas_comp_threshold_Track[i] = 100.0f;
+            mas_comp_ratio_Track[i] = 0.0f;
+        }
+#endif
 
 #if !defined(__WINAMP__)
         allow_save = TRUE;
@@ -491,13 +511,26 @@ Read_Mod_File:
             Read_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
             if(Comp_Flag)
             {
-                Read_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
-                if(mas_comp_threshold < 0.01f) mas_comp_threshold = 0.01f;
-                if(mas_comp_threshold > 100.0f) mas_comp_threshold = 100.0f;
+                Read_Mod_Data_Swap(&mas_comp_threshold_Master, sizeof(float), 1, in);
+                if(mas_comp_threshold_Master < 0.01f) mas_comp_threshold_Master = 0.01f;
+                if(mas_comp_threshold_Master > 100.0f) mas_comp_threshold_Master = 100.0f;
 
-                Read_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
-                if(mas_comp_ratio < 0.01f) mas_comp_ratio = 0.01f;
-                if(mas_comp_ratio > 100.0f) mas_comp_ratio = 100.0f;
+                Read_Mod_Data_Swap(&mas_comp_ratio_Master, sizeof(float), 1, in);
+                if(mas_comp_ratio_Master < 0.01f) mas_comp_ratio_Master = 0.01f;
+                if(mas_comp_ratio_Master > 100.0f) mas_comp_ratio_Master = 100.0f;
+            }
+            if(Compress_Tracks)
+            {
+                for(i = 0; i < MAX_TRACKS; i++)
+                {
+                    Read_Mod_Data_Swap(&mas_comp_threshold_Track[i], sizeof(float), 1, in);
+                }
+
+                for(i = 0; i < MAX_TRACKS; i++)
+                {
+                    Read_Mod_Data_Swap(&mas_comp_ratio_Track[i], sizeof(float), 1, in);
+                }
+                Read_Mod_Data(&Compress_Track, sizeof(char), MAX_TRACKS, in);
             }
         }
 
@@ -1206,8 +1239,22 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data_Swap(&mas_vol, sizeof(float), 1, in);
             
             Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
-            Write_Mod_Data_Swap(&mas_comp_threshold, sizeof(float), 1, in);
-            Write_Mod_Data_Swap(&mas_comp_ratio, sizeof(float), 1, in);
+            Write_Mod_Data_Swap(&mas_comp_threshold_Master, sizeof(float), 1, in);
+            Write_Mod_Data_Swap(&mas_comp_ratio_Master, sizeof(float), 1, in);
+
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                if(mas_comp_threshold_Track[i] < 0.01f) mas_comp_threshold_Track[i] = 0.01f;
+                if(mas_comp_threshold_Track[i] > 100.0f) mas_comp_threshold_Track[i] = 100.0f;
+                Write_Mod_Data_Swap(&mas_comp_threshold_Track[i], sizeof(float), 1, in);
+            }
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                if(mas_comp_ratio_Track[i] < 0.01f) mas_comp_ratio_Track[i] = 0.01f;
+                if(mas_comp_ratio_Track[i] > 100.0f) mas_comp_ratio_Track[i] = 100.0f;
+                Write_Mod_Data_Swap(&mas_comp_ratio_Track[i], sizeof(float), 1, in);
+            }
+            Write_Mod_Data(&Compress_Track, sizeof(char), MAX_TRACKS, in);
 
             Write_Mod_Data_Swap(&Feedback, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&lchorus_delay, sizeof(int), 1, in);
@@ -1429,7 +1476,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "TWNNSNGJ");
+        sprintf(extension, "PROTREKK");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
