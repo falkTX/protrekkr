@@ -65,7 +65,7 @@ void Draw_Track_Fx_Ed(void)
     Gui_Draw_Button_Box(248, 533, 56, 16, "Feedback", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(248, 551, 56, 16, "Delay", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(536, 462, 148, 80, "Compressor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(536, 462, 144, 76, "Compressor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(544, 479, 56, 16, "Active", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 

@@ -337,10 +337,14 @@ unsigned int Player_LE[MAX_TRACKS][MAX_POLYPHONY];
 unsigned int Player_LL[MAX_TRACKS][MAX_POLYPHONY];
 unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
 
-#if defined(PTK_LIMITER)
-    #define MAS_COMPRESSOR_SECONDS 0.1f
-    #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * MIX_RATE)
+
+#if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)
+#define MAS_COMPRESSOR_SECONDS 0.1f
+#define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * MIX_RATE)
     int mas_comp_pos_rms_buffer;
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
     float mas_comp_bufferL_Track[MAX_TRACKS][MAS_COMPRESSOR_SIZE];
     float mas_comp_bufferR_Track[MAX_TRACKS][MAS_COMPRESSOR_SIZE];
     char Compress_Track[MAX_TRACKS];
@@ -352,7 +356,9 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
     float mas_comp_threshold_Track[MAX_TRACKS];
     float mas_threshold_Track[MAX_TRACKS];
     float mas_ratio_Track[MAX_TRACKS];
+#endif
 
+#if defined(PTK_LIMITER_MASTER)
     float mas_comp_bufferL_Master[MAS_COMPRESSOR_SIZE];
     float mas_comp_bufferR_Master[MAS_COMPRESSOR_SIZE];
     char Compress_Master;
@@ -743,9 +749,11 @@ int STDCALL Ptk_InitDriver(void)
     unsigned int total = 0;
 #endif
 
-#if defined(PTK_LIMITER)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+#if defined(PTK_LIMITER_MASTER)
     Mas_Compressor_Set_Variables_Master(100.0f, 0.0f);
+#endif
+#if defined(PTK_LIMITER_TRACKS)
     for(i = 0; i < MAX_TRACKS; i++)
     {
         Mas_Compressor_Set_Variables_Track(i, 100.0f, 0.0f);
@@ -1246,14 +1254,16 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         char Comp_Flag;
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER)
         // Master compressor
         if(Comp_Flag)
         {
             Mod_Dat_Read(&mas_threshold_Master, sizeof(float));
             Mod_Dat_Read(&mas_ratio_Master, sizeof(float));
         }
+#endif
 
+#if defined(PTK_LIMITER_TRACKS)
         // Tracks compressors
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
         if(Comp_Flag)
@@ -1758,11 +1768,11 @@ void Pre_Song_Init(void)
         FLANGER_DEPHASE[ini] = 0.0174532f;
         FLANGER_ON[ini] = 0;
         FLANGER_RATE[ini] = 0.0068125f / 57.29578f;
-        FLANGER_AMPL[ini] = 0.0f;
+        FLANGER_AMPL[ini] = 0.001f;
         FLANGER_GR[ini] = 0;
         FLANGER_FEEDBACK[ini] = -0.51f;
         FLANGER_DELAY[ini] = 176;
-        FLANGER_OFFSET[ini] = 176;
+        FLANGER_OFFSET[ini] = 8192;
 
         TPan[ini] = 0.5f;
         TCut[ini] = 126.0f;
@@ -1777,8 +1787,8 @@ void Pre_Song_Init(void)
         ramper[ini] = 0;
 
 #if defined(PTK_FLANGER)
-        FLANGER_OFFSET2[ini] = 0.0f;
-        FLANGER_OFFSET1[ini] = 0.0f;
+        FLANGER_OFFSET2[ini] = float(FLANGER_OFFSET[ini] - FLANGER_DELAY[ini]);
+        FLANGER_OFFSET1[ini] = float(FLANGER_OFFSET[ini] - FLANGER_DELAY[ini]);  
         for(int ini2 = 0; ini2 < 16400; ini2++)
         {
             FLANGE_LEFTBUFFER[ini][ini2] = 0.0f;
@@ -1818,10 +1828,11 @@ void Pre_Song_Init(void)
         Sample_Vol[i] = 0.0f;
     }
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)
     mas_comp_pos_rms_buffer = 0;
+#endif
 
-    int j;
+#if defined(PTK_LIMITER_MASTER)
     mas_comp_threshold_Master = 100.0f;
     mas_comp_ratio_Master = 0;
     rms_sumL_Master = 0;
@@ -1833,7 +1844,10 @@ void Pre_Song_Init(void)
         mas_comp_bufferL_Master[i] = 0;
         mas_comp_bufferR_Master[i] = 0;
     }
+#endif
 
+#if defined(PTK_LIMITER_TRACKS)
+    int j;
     for(j = 0; j < MAX_TRACKS; j++)
     {
         mas_comp_threshold_Track[j] = 100.0f;
@@ -2602,7 +2616,7 @@ void Sp_Player(void)
             Curr_Signal_L[i] = 0;
             Curr_Signal_R[i] = 0;
 
-#if defined(PTK_INSTRUMENTS)
+#if defined(PTK_INSTRUMENTS) || defined(PTK_SYNTH)
 
             // A new note has been scheduled ?
             if(Cut_Stage[c][i])
@@ -2770,7 +2784,7 @@ ByPass_Wav:
 #endif
 
             }
-#endif
+#endif // defined(PTK_INSTRUMENTS) || defined(PTK_SYNTH)
 
 #if defined(PTK_SYNTH)
             // --------------------------------------
@@ -3167,10 +3181,10 @@ ByPass_Wav:
             FLANGER_OFFSET2[c] += fstep1;
             FLANGER_OFFSET1[c] += fstep2;  
 
-            if(FLANGER_OFFSET2[c] >= 16384.0f) FLANGER_OFFSET2[c] = 0.0f;
-            if(FLANGER_OFFSET1[c] >= 16384.0f) FLANGER_OFFSET1[c] = 0.0f;
-            if(FLANGER_OFFSET2[c] < 0.0f) FLANGER_OFFSET2[c] = 0.0f;
-            if(FLANGER_OFFSET1[c] < 0.0f) FLANGER_OFFSET1[c] = 0.0f;
+            if(FLANGER_OFFSET2[c] >= 16384.0f) FLANGER_OFFSET2[c] -= 16384.0f;
+            if(FLANGER_OFFSET1[c] >= 16384.0f) FLANGER_OFFSET1[c] -= 16384.0f;
+            if(FLANGER_OFFSET2[c] < 0.0f) FLANGER_OFFSET2[c] += 16384.0f;
+            if(FLANGER_OFFSET1[c] < 0.0f) FLANGER_OFFSET1[c] += 16384.0f;
 
             oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (FLANGER_OFFSET2[c])];
             roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (FLANGER_OFFSET1[c])];
@@ -3178,7 +3192,7 @@ ByPass_Wav:
             All_Signal_L += Filter_FlangerL(oldspawn[c]);
             All_Signal_R += Filter_FlangerR(roldspawn[c]);
 
-            if(++FLANGER_OFFSET[c] > 16383) FLANGER_OFFSET[c] = 0;
+            if(++FLANGER_OFFSET[c] >= 16384) FLANGER_OFFSET[c] -= 16384;
             FLANGER_GR[c] += FLANGER_RATE[c];
 
             if(FLANGER_GR[c] >= 6.283185f)
@@ -3198,7 +3212,7 @@ ByPass_Wav:
         }
 #endif
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_TRACKS)
         // Compress the track signal
         if(Compress_Track[c])
         {
@@ -3213,7 +3227,7 @@ ByPass_Wav:
                                                 mas_comp_bufferR_Track[c],
                                                 &mas_envR_Track[c]) * 32767.0f;
         }
-#endif // PTK_LIMITER
+#endif
 
         left_float += All_Signal_L;
         right_float += All_Signal_R;
@@ -3259,16 +3273,16 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
     int i;
 
     // Must be prioritary
-#if defined(PTK_INSTRUMENTS)
+/*#if defined(PTK_INSTRUMENTS)
     for(i = 0; i < polyphony; i++)
     {
-        if(!Cut_Stage[channel][i])
+        if()
         {
             return(i);
         }
     }
 #endif
-    
+  */  
     for(i = 0; i < polyphony; i++)
     {
         if(
@@ -3283,7 +3297,10 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 #endif
           )
         {
-            return(i);
+            if(!Cut_Stage[channel][i])
+            {
+                return(i);
+            }
         }
     }
 
@@ -4617,7 +4634,7 @@ void GetPlayerValues(void)
     left_chorus = 0.0f;
     right_chorus = 0.0f;
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)
     mas_comp_pos_rms_buffer++;
     if(mas_comp_pos_rms_buffer > MAS_COMPRESSOR_SIZE - 1) mas_comp_pos_rms_buffer = 0;
 #endif
@@ -4658,7 +4675,7 @@ void GetPlayerValues(void)
     left_float /= 32767.0f;
     right_float /= 32767.0f;
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     if(mas_comp_ratio_Master > 0.01f)
     {
@@ -5620,10 +5637,21 @@ float Filter_FlangerR(float input)
 
 // ------------------------------------------------------
 // Compressor / Limiter
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)
 float mas_attack = 0.977579f;
 float mas_release = 0.977579f;
 
+float Do_RMS(float input, float *rms_sum, float *buffer)
+{
+    *rms_sum -= buffer[mas_comp_pos_rms_buffer];
+    buffer[mas_comp_pos_rms_buffer] = input * input;
+    *rms_sum += buffer[mas_comp_pos_rms_buffer];
+    if(*rms_sum < 0.0f) *rms_sum = 0.0f;
+    return(sqrtf(*rms_sum / (float) MAS_COMPRESSOR_SIZE));
+}
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void Mas_Compressor_Set_Variables_Track(int Track, float threshold, float ratio)
 {
@@ -5653,7 +5681,10 @@ float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *buffer
     }
     return input * gain;
 }
+#endif // PTK_LIMITER_TRACKS
 
+#if defined(PTK_LIMITER_MASTER)
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void Mas_Compressor_Set_Variables_Master(float threshold, float ratio)
 {
     if(threshold < 0.01f) threshold = 0.01f;
@@ -5665,6 +5696,7 @@ void Mas_Compressor_Set_Variables_Master(float threshold, float ratio)
     mas_threshold_Master = threshold * 0.001f;
     mas_ratio_Master = ratio * 0.01f;
 }
+#endif
 
 float Mas_Compressor_Master(float input, float *rms_sum, float *buffer, float *env)
 {
@@ -5681,16 +5713,7 @@ float Mas_Compressor_Master(float input, float *rms_sum, float *buffer, float *e
     }
     return input * gain;
 }
-
-float Do_RMS(float input, float *rms_sum, float *buffer)
-{
-    *rms_sum -= buffer[mas_comp_pos_rms_buffer];
-    buffer[mas_comp_pos_rms_buffer] = input * input;
-    *rms_sum += buffer[mas_comp_pos_rms_buffer];
-    if(*rms_sum < 0.0f) *rms_sum = 0.0f;
-    return(sqrtf(*rms_sum / (float) MAS_COMPRESSOR_SIZE));
-}
-#endif // PTK_LIMITER
+#endif // PTK_LIMITER_MASTER
 
 // ------------------------------------------------------
 // Return an index in a pattern's module

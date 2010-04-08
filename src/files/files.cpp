@@ -113,10 +113,13 @@ void Init_Tracker_Context_After_ModLoad(void)
     rchorus_counter2 = MIX_RATE - rchorus_delay;
     Initreverb();
 
-#if defined(PTK_LIMITER)
-    int i;
+#if defined(PTK_LIMITER_MASTER)
     Mas_Compressor_Set_Variables_Master(mas_comp_threshold_Master,
                                         mas_comp_ratio_Master);
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
+    int i;
     for(i = 0; i < MAX_TRACKS; i++)
     {
         Mas_Compressor_Set_Variables_Track(i,
@@ -257,9 +260,12 @@ Read_Mod_File:
 #endif
         Free_Samples();
 
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER)
         mas_comp_threshold_Master = 100.0f;
         mas_comp_ratio_Master = 0.0f;
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
         for(i = 0; i < MAX_TRACKS; i++)
         {
             mas_comp_threshold_Track[i] = 100.0f;

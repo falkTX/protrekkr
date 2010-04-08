@@ -38,6 +38,8 @@
 int Ticks_Synchro_Left = 1;
 int Ticks_Synchro_Right = 1;
 extern char Use_Cubic;
+extern float mas_attack;
+extern float mas_release;
 
 int Table_Interpolation_Dec[] = { 0, SPLINE_INT, 0 };
 int Table_Interpolation_Inc[] = { SPLINE_INT, CUBIC_INT, CUBIC_INT };
@@ -67,6 +69,8 @@ void Draw_Fx_Ed(void)
     Gui_Draw_Button_Box(596, 498, 32, 16, "Set", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(640, 464, 64, 16, "Interpolation", BUTTON_NORMAL | BUTTON_DISABLED);
+
+//    Gui_Draw_Button_Box(640, 484, 144, 66, "Compressor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 }
 
 void Actualize_Fx_Ed(char gode)
@@ -187,6 +191,21 @@ void Actualize_Fx_Ed(char gode)
             }
             Gui_Draw_Button_Box(706 + (18 + 42) + 2, 464, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
+/*
+        if(gode == 0 || gode == 13)
+        {
+            char string[64];
+
+            Gui_Draw_Button_Box(648, 505, 56, 16, "Attack", BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider_Size(705, 505, 55, (int) (mas_attack * 55.0f), TRUE);
+            sprintf(string, "%d%%", (int) (mas_attack * 100.0f));
+            Print_String(string, 705, 507, 72, BUTTON_TEXT_CENTERED);
+
+            Gui_Draw_Button_Box(648, 523, 56, 16, "Release", BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider_Size(705, 523, 55, (int) (mas_release * 55.0f), TRUE);
+            sprintf(string, "%d%%", (int) (mas_release * 100.0f));
+            Print_String(string, 705, 525, 72, BUTTON_TEXT_CENTERED);
+        }*/
     }
 }
 
@@ -241,6 +260,27 @@ void Mouse_Sliders_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 6;
         }
+
+/*        // Compressor attack
+        if(zcheckMouse(706, 505, 72, 18))
+        {
+            mas_attack = float(Mouse.x - 716.0f) / 55;
+            if(mas_attack < 0.0f) mas_attack = 0.0f;
+            if(mas_attack > 0.99f) mas_attack = 0.99f;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 13;
+        }
+
+        // Compressor release
+        if(zcheckMouse(706, 523, 72, 18))
+        {
+            mas_release = float(Mouse.x - 716.0f) / 55;
+            if(mas_release < 0.0f) mas_release = 0.0f;
+            if(mas_release > 0.99f) mas_release = 0.99f;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 13;
+        }
+*/
     } // userscreen
 }
 

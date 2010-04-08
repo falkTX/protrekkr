@@ -1624,18 +1624,19 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     {
         threshold *= 0.001f;
         ratio *= 0.01f;
-        Comp_Flag = 1;
+        Comp_Flag = TRUE;
         Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
         Write_Mod_Data(&threshold, sizeof(float), 1, in);
         Write_Mod_Data(&ratio, sizeof(float), 1, in);
-        Comp_Flag = TRUE;
+        Save_Constant("PTK_LIMITER_MASTER", TRUE);
     }
     else
     {
-        Comp_Flag = 0;
         Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
+        Save_Constant("PTK_LIMITER_MASTER", FALSE);
     }
 
+    Comp_Flag = FALSE;
     for(i = 0; i < Songtracks; i++)
     {
         // At least 1 track is compressed
@@ -1647,11 +1648,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     }
     if(Comp_Flag)
     {
-        Save_Constant("PTK_LIMITER", TRUE);
+        Save_Constant("PTK_LIMITER_TRACKS", TRUE);
     }
     else
     {
-        Save_Constant("PTK_LIMITER", FALSE);
+        Save_Constant("PTK_LIMITER_TRACKS", FALSE);
     }
     Write_Mod_Data(&Comp_Flag, sizeof(char), 1, in);
 

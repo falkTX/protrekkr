@@ -69,7 +69,6 @@ void CSynth::Reset(void)
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     // Synthesizer General Reset
-//    Data.GLB_VOLUME = 1.0f;
     Data.DISTO = 0.0f;
     Data.OSC1_WAVEFORM = WAVEFORM_SAW;      /* Sawtooth */
     Data.OSC2_WAVEFORM = WAVEFORM_PULSE;    /* Pulse */
@@ -232,7 +231,7 @@ void CSynth::LfoAdvance(void)
 #if defined(PTK_SYNTH_LFO1)
     switch(LFO1_STAGE)
     {
-        case 1:
+        case SYNTH_ATTACK:
             LFO1_ADSR_VALUE += LFO1_A_COEF;
             LFO1_COUNTER++;
             if(LFO1_COUNTER >= LFO1b_ATTACK)
@@ -242,7 +241,7 @@ void CSynth::LfoAdvance(void)
                 LFO1_STAGE = 2;
             }
             break;
-        case 2:
+        case SYNTH_DECAY:
             LFO1_ADSR_VALUE -= LFO1_D_COEF;
             LFO1_COUNTER++;
             if(LFO1_COUNTER >= LFO1b_DECAY)
@@ -253,10 +252,10 @@ void CSynth::LfoAdvance(void)
                 LFO1_STAGE = 3;
             }
             break;
-        case 3:
+        case SYNTH_SUSTAIN:
             LFO1_ADSR_VALUE = Data.LFO1_SUSTAIN;
             break;
-        case 4:
+        case SYNTH_RELEASE:
             LFO1_ADSR_VALUE -= LFO1_R_COEF;
             LFO1_COUNTER++;
             if(LFO1_COUNTER > LFO1b_RELEASE)
@@ -281,7 +280,7 @@ void CSynth::LfoAdvance(void)
 #if defined(PTK_SYNTH_LFO2)
     switch(LFO2_STAGE)
     {
-        case 1:
+        case SYNTH_ATTACK:
             LFO2_ADSR_VALUE += LFO2_A_COEF;
             LFO2_COUNTER++;
             if(LFO2_COUNTER >= LFO2b_ATTACK)
@@ -291,7 +290,7 @@ void CSynth::LfoAdvance(void)
                 LFO2_STAGE = 2;
             }
             break;
-        case 2:
+        case SYNTH_DECAY:
             LFO2_ADSR_VALUE -= LFO2_D_COEF;
             LFO2_COUNTER++;
             if(LFO2_COUNTER >= LFO2b_DECAY)
@@ -302,10 +301,10 @@ void CSynth::LfoAdvance(void)
                 LFO2_STAGE = 3;
             }
             break;
-        case 3:
+        case SYNTH_SUSTAIN:
             LFO2_ADSR_VALUE = Data.LFO2_SUSTAIN;
             break;
-        case 4:
+        case SYNTH_RELEASE:
             LFO2_ADSR_VALUE -= LFO2_R_COEF;
             LFO2_COUNTER++;
             if(LFO2_COUNTER > LFO2b_RELEASE)
@@ -351,8 +350,8 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     float smp_freq;
     float adsr_ratio;
 
-    ENV1_STAGE = 1; /* '0' is off, '1' starts the attack */
-    ENV2_STAGE = 1;
+    ENV1_STAGE = SYNTH_ATTACK; /* '0' is off, '1' starts the attack */
+    ENV2_STAGE = SYNTH_ATTACK;
 
     ENV1_COUNTER = 0; /* Envelope stage counter, in samples */
     ENV2_COUNTER = 0;
@@ -368,6 +367,23 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
 
     ENV1_VOLUME = 0;
     ENV2_VOLUME = 0;
+
+    sbuf0L = 0.0f;
+    sbuf1L = 0.0f;
+    sbuf0R = 0.0f;
+    sbuf1R = 0.0f;
+
+    MoogBufferL[0] = 0.0f;
+    MoogBufferL[1] = 0.0f;
+    MoogBufferL[2] = 0.0f;
+    MoogBufferL[3] = 0.0f;
+    MoogBufferL[4] = 0.0f;
+
+    MoogBufferR[0] = 0.0f;
+    MoogBufferR[1] = 0.0f;
+    MoogBufferR[2] = 0.0f;
+    MoogBufferR[3] = 0.0f;
+    MoogBufferR[4] = 0.0f;
 
     if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
     {
@@ -444,7 +460,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     ENV3_LOOP_BACKWARD = FALSE;
 
 #if defined(PTK_SYNTH_LFO1)
-    LFO1_STAGE = 1;
+    LFO1_STAGE = SYNTH_ATTACK;
     LFO1_GR = 0;
     LFO1_VALUE = 0;
     LFO1_ADSR_VALUE = 0;
@@ -453,7 +469,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
 #endif
 
 #if defined(PTK_SYNTH_LFO2)
-    LFO2_STAGE = 1;
+    LFO2_STAGE = SYNTH_ATTACK;
     LFO2_GR = 0;
     LFO2_VALUE = 0;
     LFO2_ADSR_VALUE = 0;
@@ -603,25 +619,6 @@ void CSynth::EnvRun(int *track, int *track2)
 #if defined(PTK_SYNTH_ENV2)
     ENV2_VOLUME *= Data.ENV2_OSC2_VOLUME;
 #endif
-/*#if !defined(PTK_SYNTH_ENV1) && !defined(PTK_SYNTH_ENV2)
-    // Nullify
-    ENV1_VOLUME = 1.0f;
-    ENV2_VOLUME = 1.0f;
-#endif
-*/
-/*#if defined(PTK_SYNTH_ENV1) || defined(PTK_SYNTH_ENV2)
-    if(Data.ENV1_OSC1_VOLUME == 1.0f &&
-       Data.ENV2_OSC1_VOLUME == 1.0f)
-    {
-        ENV1_VOLUME = 1.0f;
-    }
-    if(Data.ENV1_OSC2_VOLUME == 1.0f &&
-       Data.ENV2_OSC2_VOLUME == 1.0f)
-    {
-        ENV2_VOLUME = 1.0f;
-    }
-#endif
-*/
 
 #if !defined(PTK_SYNTH_LFO1) && !defined(PTK_SYNTH_LFO2)
     ENV1_MIN = 1.0f;
@@ -919,17 +916,17 @@ float CSynth::GetSample(short *Left_Samples,
                                 (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                res_dec) * vol) * T_OSC1_VOLUME;
+                                res_dec)) * T_OSC1_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL = (Spline_Work(
                                 (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                 (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                res_dec) * vol) * T_OSC1_VOLUME;
+                                res_dec)) * T_OSC1_VOLUME;
 #else
                     GS_VAL = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                              * vol * T_OSC1_VOLUME;
+                              * T_OSC1_VOLUME;
 #endif
 
 #else
@@ -941,7 +938,7 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                        res_dec) * vol) * T_OSC1_VOLUME;
+                                        res_dec)) * T_OSC1_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL = (Spline_Work(
@@ -949,11 +946,11 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                         (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                        res_dec) * vol) * T_OSC1_VOLUME;
+                                        res_dec)) * T_OSC1_VOLUME;
                             break;
                         default:
                             GS_VAL = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                                      * vol * T_OSC1_VOLUME;
+                                      * T_OSC1_VOLUME;
                             break;
                     }
 #endif
@@ -969,17 +966,17 @@ float CSynth::GetSample(short *Left_Samples,
                                      (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                      (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                      (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                     res_dec) * vol) * T_OSC1_VOLUME;
+                                     res_dec)) * T_OSC1_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 = (Spline_Work(
                                      (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
                                      (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                      (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                      (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                     res_dec) * vol) * T_OSC1_VOLUME;
+                                     res_dec)) * T_OSC1_VOLUME;
 #else
                         GS_VAL2 = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                   * vol * T_OSC1_VOLUME;
+                                   * T_OSC1_VOLUME;
 #endif
 
 #else
@@ -991,7 +988,7 @@ float CSynth::GetSample(short *Left_Samples,
                                              (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                              (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                              (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                             res_dec) * vol) * T_OSC1_VOLUME;
+                                             res_dec)) * T_OSC1_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 = (Spline_Work(
@@ -999,11 +996,11 @@ float CSynth::GetSample(short *Left_Samples,
                                              (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                              (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                              (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                             res_dec) * vol) * T_OSC1_VOLUME;
+                                             res_dec)) * T_OSC1_VOLUME;
                                 break;
                             default:
                                 GS_VAL2 = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                           * vol * T_OSC1_VOLUME;
+                                           * T_OSC1_VOLUME;
                                 break;
                         }
 #endif
@@ -1245,17 +1242,17 @@ float CSynth::GetSample(short *Left_Samples,
                                 (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                res_dec) * vol) * T_OSC2_VOLUME;
+                                res_dec)) * T_OSC2_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL += (Spline_Work(
                                 (float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
                                 (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                res_dec) * vol) * T_OSC2_VOLUME;
+                                res_dec)) * T_OSC2_VOLUME;
 #else
                     GS_VAL += (*(Left_Samples + i_POSITION[0]) * mul_datL)
-                               * vol * T_OSC2_VOLUME;
+                               * T_OSC2_VOLUME;
 #endif
 
 #else
@@ -1267,7 +1264,7 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
                                         (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
                                         (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                        res_dec) * vol) * T_OSC2_VOLUME;
+                                        res_dec)) * T_OSC2_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL += (Spline_Work(
@@ -1275,11 +1272,11 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
                                         (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
                                         (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                        res_dec) * vol) * T_OSC2_VOLUME;
+                                        res_dec)) * T_OSC2_VOLUME;
                             break;
                         default:
                             GS_VAL += (*(Left_Samples + i_POSITION[0]) * mul_datL)
-                                       * vol * T_OSC2_VOLUME;
+                                       * T_OSC2_VOLUME;
                             break;
                     }
 #endif
@@ -1295,17 +1292,17 @@ float CSynth::GetSample(short *Left_Samples,
                                     (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                    res_dec) * vol) * T_OSC2_VOLUME;
+                                    res_dec)) * T_OSC2_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 += (Spline_Work(
                                     (float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
                                     (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                    res_dec) * vol) * T_OSC2_VOLUME;
+                                    res_dec)) * T_OSC2_VOLUME;
 #else
                         GS_VAL2 += (*(Right_Samples + i_POSITION[0]) * mul_datR)
-                                    * vol * T_OSC2_VOLUME;
+                                    * T_OSC2_VOLUME;
 #endif
 
 #else
@@ -1317,7 +1314,7 @@ float CSynth::GetSample(short *Left_Samples,
                                             (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
                                             (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
                                             (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                            res_dec) * vol) * T_OSC2_VOLUME;
+                                            res_dec)) * T_OSC2_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 += (Spline_Work(
@@ -1325,11 +1322,11 @@ float CSynth::GetSample(short *Left_Samples,
                                             (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
                                             (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
                                             (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                            res_dec) * vol) * T_OSC2_VOLUME;
+                                            res_dec)) * T_OSC2_VOLUME;
                                 break;
                             default:
                                 GS_VAL2 += (*(Right_Samples + i_POSITION[0]) * mul_datR)
-                                            * vol * T_OSC2_VOLUME;
+                                            * T_OSC2_VOLUME;
                                 break;
                         }
 #endif
@@ -1501,17 +1498,17 @@ float CSynth::GetSample(short *Left_Samples,
                                     (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                    res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                    res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                     GS_VAL += (Spline_Work(
                                     (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                     (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                    res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                    res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
                     GS_VAL += (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                               * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                               * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
 #else
@@ -1523,7 +1520,7 @@ float CSynth::GetSample(short *Left_Samples,
                                             (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                             (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                             (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                            res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                            res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                         case SPLINE_INT:
                             GS_VAL += (Spline_Work(
@@ -1531,11 +1528,11 @@ float CSynth::GetSample(short *Left_Samples,
                                             (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
                                             (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
                                             (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                            res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                            res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                         default:
                             GS_VAL += (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                                       * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                       * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                             break;
                     }
 #endif
@@ -1550,17 +1547,17 @@ float CSynth::GetSample(short *Left_Samples,
                                         (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                        res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                        res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #elif defined(PTK_USE_SPLINE)
                         GS_VAL2 += (Spline_Work(
                                         (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                         (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                        res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                        res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #else
                         GS_VAL2 += (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                    * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                    * T_OSC1_VOLUME * Data.OSC3_VOLUME;
 #endif
 
 #else
@@ -1572,7 +1569,7 @@ float CSynth::GetSample(short *Left_Samples,
                                                 (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                                 (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                                 (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                                res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                             case SPLINE_INT:
                                 GS_VAL2 += (Spline_Work(
@@ -1580,11 +1577,11 @@ float CSynth::GetSample(short *Left_Samples,
                                                 (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
                                                 (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
                                                 (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                res_dec) * vol) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                                res_dec)) * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                             default:
                                 GS_VAL2 += (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                            * vol * T_OSC1_VOLUME * Data.OSC3_VOLUME;
+                                            * T_OSC1_VOLUME * Data.OSC3_VOLUME;
                                 break;
                         }
 #endif
@@ -1782,7 +1779,7 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 #endif
 
-        *Right_Signal += GS_VAL2;
+        *Right_Signal += GS_VAL2 * vol;
     }
 
     // Advance all, oscillator, envelopes, and lfo's
@@ -1790,7 +1787,7 @@ float CSynth::GetSample(short *Left_Samples,
     LfoAdvance();
 
     // Return value
-    return GS_VAL;
+    return GS_VAL * vol;
 }
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
@@ -1910,7 +1907,7 @@ void CSynth::ChangeParameters(SynthParameters TSP)
 
 float CSynth::FilterL(void)
 {
-    GS_VAL++;
+//    GS_VAL++;
     sbuf0L = FILT_A * sbuf0L + FILT_CUTO * (GS_VAL + FILT_B * (sbuf0L - sbuf1L)); 
     sbuf1L = FILT_A * sbuf1L + FILT_CUTO * sbuf0L;
 #if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)
@@ -1927,7 +1924,7 @@ float CSynth::FilterL(void)
 
 float CSynth::FilterR(void)
 {
-    GS_VAL2++;
+  //  GS_VAL2++;
     sbuf0R = FILT_A * sbuf0R + FILT_CUTO * (GS_VAL2 + FILT_B * (sbuf0R - sbuf1R));
     sbuf1R = FILT_A * sbuf1R + FILT_CUTO * sbuf0R;
 #if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)

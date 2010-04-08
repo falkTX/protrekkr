@@ -414,11 +414,15 @@ void ResetSynthParameters(SynthParameters *TSP);
 #endif
 
 void Free_Samples(void);
-#if defined(PTK_LIMITER)
+#if defined(PTK_LIMITER_MASTER)
 void Mas_Compressor_Set_Variables_Master(float treshold, float ratio);
+float Mas_Compressor_Master(float input, float *rms_sum, float *Buffer, float *Env);
+#endif
+#if defined(PTK_LIMITER_TRACKS)
 void Mas_Compressor_Set_Variables_Track(int Track, float treshold, float ratio);
 float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *Buffer, float *Env);
-float Mas_Compressor_Master(float input, float *rms_sum, float *Buffer, float *Env);
+#endif
+#if defined(PTK_LIMITER_TRACKS) || defined(PTK_LIMITER_MASTER)
 float Do_RMS(float input, float *rms_sum, float *buffer);
 #endif
 int Get_Free_Sub_Channel(int channel, int polyphony);

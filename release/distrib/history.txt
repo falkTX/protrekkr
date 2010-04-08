@@ -4,9 +4,11 @@ ProTrekkr releases history
 
 v2.0.2:
 
-- Moog Lo & Moog band filters buffers weren't resetted properly resulting
-  in some "scratchy" sound sometimes.
-- Added tracks compressors (can be CPU hungry).
+- Moog Lo & Moog band filters buffers weren't resetted properly
+  resulting in some "scratchy" sound sometimes.
+- Added tracks compressors (can eat some CPU time).
+- Tracks polyphony was kinda broken.
+- Fixed a small issue with the flanger.
 
 v2.0.1:
 
