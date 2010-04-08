@@ -196,6 +196,7 @@ void SaveInst(void)
     int synth_save;
 
     sprintf(extension, "TWNNINS8");
+    if(!strlen(nameins[Current_Sample])) sprintf(nameins[Current_Sample], "Untitled");
     sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Sample]);
     Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Sample]);

@@ -470,8 +470,9 @@ int Note_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_INSTRUMENTS)
 int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
-int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
 #endif
+
+int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH)
 int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
@@ -1671,8 +1672,9 @@ void Pre_Song_Init(void)
 
 #if defined(PTK_INSTRUMENTS)
             sp_Stage[ini][i] = PLAYING_NOSAMPLE;
-            Cut_Stage[ini][i] = FALSE;
 #endif
+
+            Cut_Stage[ini][i] = FALSE;
 
 #if defined(PTK_SYNTH)
             sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
@@ -1897,8 +1899,9 @@ void Post_Song_Init(void)
             Vstep_vib[i][j] = 0;
 #endif
 
-#if defined(PTK_INSTRUMENTS)
             Cut_Stage[i][j] = FALSE;
+
+#if defined(PTK_INSTRUMENTS)
             sp_Tvol[i][j] = 0.0f;
             sp_Cvol[i][j] = 0.0f;
 #endif
@@ -2016,7 +2019,9 @@ void Sp_Player(void)
     int i;
     int j;
     int trigger_note_off;
+#if defined(PTK_SYNTH)
     float dest_volume;
+#endif
     int toffset;
     int free_sub_channel;
     
@@ -3351,9 +3356,9 @@ void Play_Instrument(int channel, int sub_channel)
 
         int split = 0;
 
-#if defined(PTK_INSTRUMENTS)
         if(associated_sample != 255)
         {
+#if defined(PTK_INSTRUMENTS)
             for(int revo = 0; revo < 16; revo++)
             {
                 if(inote >= Basenote[associated_sample][revo] &&
@@ -3758,10 +3763,6 @@ void Play_Instrument(int channel, int sub_channel)
             }
 #endif // __NO_MIDI
 #endif // __STAND_ALONE__
-
-        }
-        else
-        {
 
         }
     }
@@ -5617,7 +5618,7 @@ int Get_Pattern_Offset(int pattern, int track, int row)
 }
 
 // ------------------------------------------------------
-// Calculate the bondaries of a carrier for splines calculatation
+// Calculate the boundaries of a carrier for splines calculatation
 void Set_Spline_Boundaries(unsigned int Position,
                            unsigned int *Boundaries,
                            int LoopType,

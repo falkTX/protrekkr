@@ -6052,6 +6052,8 @@ void Draw_Scope(void)
     float datas;
     int offset_scope = pos_scope_latency;
     LPDAT_POS_SCOPE ptrTbl_Dat;
+    int scope_pos = Get_Song_Position();
+    int active_channel;
 
     if(offset_scope < 0) offset_scope = 0;
     if(offset_scope > (AUDIO_Latency / 2) - 1) offset_scope = (AUDIO_Latency / 2) - 1;
@@ -6069,7 +6071,7 @@ void Draw_Scope(void)
             {
                 x = ptrTbl_Dat->x_pos;
                 PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                        USE_FONT_LOW, table_channels_scopes[i + 16]);
+                        USE_FONT, table_channels_scopes[i + 16]);
 
                 for(int s = 0; s < ptrTbl_Dat->x_max; s++)
                 {
@@ -6092,8 +6094,19 @@ void Draw_Scope(void)
             for(i = 0; i < Scope_Table[Songtracks].nbr; i++)
             {
                 x = ptrTbl_Dat->x_pos;
-                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                        USE_FONT_LOW, table_channels_scopes[i]);
+                // Print the number of the track
+                if(CHAN_ACTIVE_STATE[scope_pos][i])
+                {
+                    PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                            USE_FONT, table_channels_scopes[i]);
+                    active_channel = TRUE;
+                }
+                else
+                {
+                    PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                            USE_FONT_LOW, table_channels_scopes[i]);
+                    active_channel = FALSE;
+                }
 
                 for(int s = 0; s < ptrTbl_Dat->x_max; s++)
                 {

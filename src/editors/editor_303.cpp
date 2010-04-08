@@ -153,24 +153,25 @@ void Actualize_303_Ed(char gode)
         // Restoring notes background
         if(gode == 0 || gode == 9)
         {
-            Skincopy(200, 515, 120, 55, 162, 34);
+            // Restore it
+            Skincopy(88 + 80, 66 + 460, 88, 66, 195, 40);
     
-            // Light Note
+            // Light a note
             switch(tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]])
             {
-                case 0: Skincopy(209, 543, 138, 119, 3, 3); break;
-                case 1: Skincopy(220, 518, 138, 119, 3, 3); break;
-                case 2: Skincopy(230, 543, 138, 119, 3, 3); break;
-                case 3: Skincopy(241, 518, 138, 119, 3, 3); break;
-                case 4: Skincopy(251, 543, 138, 119, 3, 3); break;
-                case 5: Skincopy(272, 543, 138, 119, 3, 3); break;
-                case 6: Skincopy(283, 518, 138, 119, 3, 3); break;
-                case 7: Skincopy(293, 543, 138, 119, 3, 3); break;
-                case 8: Skincopy(304, 518, 138, 119, 3, 3); break;
-                case 9: Skincopy(314, 543, 138, 119, 3, 3); break;
-                case 10: Skincopy(325, 518, 138, 119, 3, 3); break;
-                case 11: Skincopy(335, 543, 138, 119, 3, 3); break;
-                case 12: Skincopy(356, 543, 138, 119, 3, 3); break;
+                case 0: Skincopy(88 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 1: Skincopy(101 + 80, 66 + 460, 301, 119, 13, 13); break;
+                case 2: Skincopy(114 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 3: Skincopy(127 + 80, 66 + 460, 301, 119, 13, 13); break;
+                case 4: Skincopy(140 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 5: Skincopy(166 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 6: Skincopy(179 + 80, 66 + 460, 301, 119, 13, 13); break;
+                case 7: Skincopy(191 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 8: Skincopy(204 + 80, 66 + 460, 301, 119, 13, 13); break;
+                case 9: Skincopy(217 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 10: Skincopy(230 + 80, 66 + 460, 301, 119, 13, 13); break;
+                case 11: Skincopy(243 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 12: Skincopy(269 + 80, 91 + 460, 301, 119, 13, 13); break;
             }
         }
 
@@ -480,7 +481,6 @@ void Mouse_Wheel_303_Ed(int roll_amount)
 
 void Mouse_Left_303_Ed(void)
 {
-    // 303 handling gui source code
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         // Step Forward
@@ -610,80 +610,80 @@ void Mouse_Left_303_Ed(void)
         }
 
         // NoteOn/Off buttons
-        if(zcheckMouse(206, 550, 12, 15))
+        if(zcheckMouse(87 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(217, 524, 11, 15))
+        if(zcheckMouse(100 + 80, 524, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(227, 550, 12, 15))
+        if(zcheckMouse(113 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 2;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(238, 524, 11, 15))
+        if(zcheckMouse(126 + 80, 524, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 3;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(247, 550, 12, 15))
+        if(zcheckMouse(139 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 4;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(268, 550, 12, 15))
+        if(zcheckMouse(165 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 5;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(280, 524, 11, 15))
+        if(zcheckMouse(178 + 80, 524, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 6;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(289, 550, 12, 15))
+        if(zcheckMouse(190 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 7;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(301, 524, 11, 15))
+        if(zcheckMouse(203 + 80, 524, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 8;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(310, 550, 12, 15))
+        if(zcheckMouse(216 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 9;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
 
-        if(zcheckMouse(322, 524, 11, 15))
+        if(zcheckMouse(229 + 80, 524, 87, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 10;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(331, 550, 12, 15))
+        if(zcheckMouse(242 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 11;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(352, 550, 12, 15))
+        if(zcheckMouse(268 + 80, 550, 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 12;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;

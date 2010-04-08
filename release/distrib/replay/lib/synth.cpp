@@ -203,6 +203,18 @@ void CSynth::Reset(void)
     sbuf1L = 0.0f;
     sbuf0R = 0.0f;
     sbuf1R = 0.0f;
+
+    MoogBufferL[0] = 0.0f;
+    MoogBufferL[1] = 0.0f;
+    MoogBufferL[2] = 0.0f;
+    MoogBufferL[3] = 0.0f;
+    MoogBufferL[4] = 0.0f;
+
+    MoogBufferR[0] = 0.0f;
+    MoogBufferR[1] = 0.0f;
+    MoogBufferR[2] = 0.0f;
+    MoogBufferR[3] = 0.0f;
+    MoogBufferR[4] = 0.0f;
 }
 
 // ------------------------------------------------------
