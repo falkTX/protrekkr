@@ -29,8 +29,6 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#if !defined(__NO_CODEC__)
-
 // ------------------------------------------------------
 // Includes
 #if defined(__WIN32__)
@@ -49,7 +47,7 @@
 // ------------------------------------------------------
 // Variables
 #if defined(__STAND_ALONE__)
-WAVEFORMATEX Wave_Format;
+
 #if defined(PTK_GSM)
 GSM610WAVEFORMAT GSM_Format;
 #endif
@@ -65,16 +63,42 @@ TRUESPEECHWAVEFORMAT At3_Format;
 #if defined(PTK_MP3)
 MPEGLAYER3WAVEFORMAT MP3_Format;
 #endif
+
 #else
-extern WAVEFORMATEX Wave_Format;
-extern GSM610WAVEFORMAT GSM_Format;
-extern TRUESPEECHWAVEFORMAT TrueSpeech_Format;
-extern IMAADPCMWAVEFORMAT ADPCM_Format;
-extern TRUESPEECHWAVEFORMAT At3_Format;
+
+#if defined(__MP3_CODEC__)
 extern MPEGLAYER3WAVEFORMAT MP3_Format;
+#else
+#undef PTK_MP3
 #endif
+#if defined(__GSM_CODEC__)
+extern GSM610WAVEFORMAT GSM_Format;
+#else
+#undef PTK_GSM
+#endif
+#if defined(__TRUESPEECH_CODEC__)
+extern TRUESPEECHWAVEFORMAT TrueSpeech_Format;
+#else
+#undef PTK_TRUESPEECH
+#endif
+#if defined(__ADPCM_CODEC__)
+extern IMAADPCMWAVEFORMAT ADPCM_Format;
+#else
+#undef PTK_ADPCM
+#endif
+#if defined(__AT3_CODEC__)
+extern TRUESPEECHWAVEFORMAT At3_Format;
+#else
+#undef PTK_AT3
+#endif
+
+#endif
+
+#if defined(__WIN32__)
 ACMSTREAMHEADER Unpack_Stream_Head;
 HACMSTREAM Unpack_Stream;
+extern WAVEFORMATEX Wave_Format;
+#endif
 
 // ------------------------------------------------------
 // Unpack a GSM sample
@@ -330,6 +354,4 @@ void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
         Dest[i] = Source[i] << 8;
     }
 }
-#endif
-
 #endif

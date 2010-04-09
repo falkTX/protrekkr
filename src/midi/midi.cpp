@@ -161,7 +161,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             Instrument_Number = Midi_GetProgram((Param1 >> 8) & 0xff);
             if(Instrument_Number > -1)
             {
-                Current_Sample = Instrument_Number;
+                Current_Instrument = Instrument_Number;
                 Clear_Input();
                 Actualize_Patterned();
                 RefreshSample();

@@ -79,14 +79,14 @@ void LoadInst(char *FileName)
                 break;
         }
 
-        KillInst(Current_Sample, TRUE);
+        KillInst(Current_Instrument, TRUE);
         Status_Box("Loading Instrument -> Header..."); 
-        Read_Data(&nameins[Current_Sample], sizeof(char), 20, in);
+        Read_Data(&nameins[Current_Instrument], sizeof(char), 20, in);
 
         // Reading sample data
         Status_Box("Loading Instrument -> Sample data...");
 
-        int swrite = Current_Sample;
+        int swrite = Current_Instrument;
 
         Read_Data(&Midiprg[swrite], sizeof(char), 1, in);
         Read_Data(&Synthprg[swrite], sizeof(char), 1, in);
@@ -127,6 +127,10 @@ void LoadInst(char *FileName)
                 case SMP_PACK_AT3:
                     Read_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                     break;
+
+                case SMP_PACK_INTERNAL:
+                    Read_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
+                    break;
             }
         }
 
@@ -149,15 +153,15 @@ void LoadInst(char *FileName)
                 Read_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                 Read_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
                 
-                Read_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
+                Read_Data_Swap(&SampleLength[swrite][slwrite], sizeof(int), 1, in);
                 Read_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                 Read_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                 Read_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
-                AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
+                AllocateWave(swrite, slwrite, SampleLength[swrite][slwrite], 1, FALSE, NULL, NULL);
 
                 // Samples data
-                Read_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
+                Read_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleLength[swrite][slwrite], in);
                 Swap_Sample(RawSamples[swrite][0][slwrite], swrite, slwrite);
                 *RawSamples[swrite][0][slwrite] = 0;
 
@@ -165,9 +169,9 @@ void LoadInst(char *FileName)
                 Read_Data(&SampleChannels[swrite][slwrite], sizeof(char), 1, in);
                 if(SampleChannels[swrite][slwrite] == 2)
                 {
-                    RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
-                    memset(RawSamples[swrite][1][slwrite], 0, SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
-                    Read_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
+                    RawSamples[swrite][1][slwrite] = (short *) malloc(SampleLength[swrite][slwrite] * sizeof(short) + 8);
+                    memset(RawSamples[swrite][1][slwrite], 0, SampleLength[swrite][slwrite] * sizeof(short) + 8);
+                    Read_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleLength[swrite][slwrite], in);
                     Swap_Sample(RawSamples[swrite][1][slwrite], swrite, slwrite);
                     *RawSamples[swrite][1][slwrite] = 0;
                 }
@@ -196,21 +200,21 @@ void SaveInst(void)
     int synth_save;
 
     sprintf(extension, "TWNNINS8");
-    if(!strlen(nameins[Current_Sample])) sprintf(nameins[Current_Sample], "Untitled");
-    sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Sample]);
+    if(!strlen(nameins[Current_Instrument])) sprintf(nameins[Current_Instrument], "Untitled");
+    sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Instrument]);
     Status_Box(Temph);
-    sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Sample]);
+    sprintf(Temph, "%s"SLASH"%s.pti", Dir_Instrs, nameins[Current_Instrument]);
 
     in = fopen(Temph, "wb");
     if(in != NULL)
     {
         // Writing header & name...
         Write_Data(extension, sizeof(char), 9, in);
-        rtrim_string(nameins[Current_Sample], 20);
-        Write_Data(nameins[Current_Sample], sizeof(char), 20, in);
+        rtrim_string(nameins[Current_Instrument], 20);
+        Write_Data(nameins[Current_Instrument], sizeof(char), 20, in);
 
         // Writing sample data
-        int swrite = Current_Sample;
+        int swrite = Current_Instrument;
 
         Write_Data(&Midiprg[swrite], sizeof(char), 1, in);
         switch(Synthprg[swrite])
@@ -240,6 +244,10 @@ void SaveInst(void)
             case SMP_PACK_AT3:
                 Write_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                 break;
+
+            case SMP_PACK_INTERNAL:
+                Write_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
+                break;
         }
 
         Write_Data_Swap(&Sample_Vol[swrite], sizeof(float), 1, in);
@@ -258,7 +266,7 @@ void SaveInst(void)
                 Write_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
                 
-                Write_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
+                Write_Data_Swap(&SampleLength[swrite][slwrite], sizeof(int), 1, in);
                 Write_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                 Write_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                 Write_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);

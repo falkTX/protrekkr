@@ -194,6 +194,7 @@ int PosInTick;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char rawrender;
     char rawrender_32float;
+    char rawrender_target;
     int rawrender_range;
     int rawrender_from;
     int rawrender_to;
@@ -237,6 +238,10 @@ int Type_At3_BitRate[] =
 {
     66, 105, 132
 };
+#endif
+
+#if defined(PTK_INTERNAL)
+char Internal_Quality[MAX_INSTRS];
 #endif
 
 #if defined(PTK_FX_PATTERNBREAK) || defined(PTK_FX_POSJUMP)
@@ -386,11 +391,9 @@ char Basenote[MAX_INSTRS][16];
 char SampleType[MAX_INSTRS][16];
 char Finetune[MAX_INSTRS][16];
 
-#if !defined(__NO_CODEC__)
 #if !defined(__STAND_ALONE__) && !(__WINAMP__)
 char SamplesSwap[MAX_INSTRS];
 short *RawSamples_Swap[MAX_INSTRS][2][16];
-#endif
 #endif
 
 unsigned char Synthprg[128];
@@ -406,7 +409,8 @@ SYNTH_DATA PARASynth[128];
 char LoopType[MAX_INSTRS][MAX_INSTRS_SPLITS];
 Uint32 LoopStart[MAX_INSTRS][MAX_INSTRS_SPLITS];
 Uint32 LoopEnd[MAX_INSTRS][MAX_INSTRS_SPLITS];
-Uint32 SampleNumSamples[MAX_INSTRS][MAX_INSTRS_SPLITS];
+Uint32 SampleLength[MAX_INSTRS][MAX_INSTRS_SPLITS];
+Uint32 SampleLength_Packed[MAX_INSTRS][MAX_INSTRS_SPLITS];
 char beatsync[MAX_INSTRS];
 short beatlines[MAX_INSTRS];
 int64 sp_Step[MAX_TRACKS][MAX_POLYPHONY];
@@ -897,56 +901,44 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
 #if defined(__PSP__)
             case SMP_PACK_AT3:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_AT3)
                 UnpackAT3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
-#endif
 #endif
 #endif
                 break;
 
             case SMP_PACK_GSM:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_GSM)
                 UnpackGSM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
-#endif
 #endif
 
                 break;
 
             case SMP_PACK_MP3:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_MP3)
                 UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
-#endif
 #endif
                 break;
 
             case SMP_PACK_TRUESPEECH:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_TRUESPEECH)
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
-#endif
 #endif
                 break;
 
             case SMP_PACK_ADPCM:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_ADPCM)
                 UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
-#endif
 #endif
 
             case SMP_PACK_8BIT:
 
-#if !defined(__NO_CODEC__)
 #if defined(PTK_8BIT)
                 Unpack8Bit(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
-#endif
 #endif
                 break;
         }
@@ -1047,7 +1039,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
 
-#if defined(PTK_MP3) || defined(PTK_AT3)
+#if defined(PTK_MP3) || defined(PTK_AT3) || defined(PTK_INTERNAL)
             switch(SampleCompression[swrite])
             {
 
@@ -1060,6 +1052,12 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #if defined(PTK_AT3)
                 case SMP_PACK_AT3:
                     Mod_Dat_Read(&At3_BitRate[swrite], sizeof(char));
+                    break;
+#endif
+
+#if defined(PTK_INTERNAL)
+                case SMP_PACK_INTERNAL:
+                    Mod_Dat_Read(&Pack_Internal_Quality[swrite], sizeof(char));
                     break;
 #endif
 
@@ -1086,11 +1084,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
                     Mod_Dat_Read(&LoopStart[swrite][slwrite], sizeof(int));
                     Mod_Dat_Read(&LoopEnd[swrite][slwrite], sizeof(int));
                     Mod_Dat_Read(&LoopType[swrite][slwrite], sizeof(char));
-                    Mod_Dat_Read(&SampleNumSamples[swrite][slwrite], sizeof(int));
+                    Mod_Dat_Read(&SampleLength[swrite][slwrite], sizeof(int));
                     Mod_Dat_Read(&Finetune[swrite][slwrite], sizeof(char));
                     Mod_Dat_Read(&Sample_Amplify[swrite][slwrite], sizeof(float));
                     Mod_Dat_Read(&FDecay[swrite][slwrite], sizeof(float));
-                    Save_Len = SampleNumSamples[swrite][slwrite];
+                    Save_Len = SampleLength[swrite][slwrite];
 
                     Apply_Interpolation = SampleCompression[swrite] == SMP_PACK_NONE ? FALSE : TRUE;
 
@@ -1640,6 +1638,13 @@ void PTKEXPORT Ptk_Stop(void)
 #endif
 #if defined(__LINUX__) 
         usleep(10);
+#endif
+
+#if !defined(__STAND_ALONE__)
+        if(local_curr_ramp_vol == 1.0f && rawrender)
+        {
+            break;
+        }
 #endif
 
     }
@@ -3506,7 +3511,7 @@ void Play_Instrument(int channel, int sub_channel)
                     Synthesizer[channel][sub_channel].NoteOn(note2,
                                                              vol,
                                                              LoopType[associated_sample][split],
-                                                             LoopType[associated_sample][split] > SMP_LOOP_NONE ? LoopEnd[associated_sample][split]: (SampleNumSamples[associated_sample][split] - 2),
+                                                             LoopType[associated_sample][split] > SMP_LOOP_NONE ? LoopEnd[associated_sample][split]: (SampleLength[associated_sample][split] - 2),
                                                              LoopEnd[associated_sample][split] - LoopStart[associated_sample][split]
 #if defined(PTK_INSTRUMENTS)
                                                              ,note
@@ -3610,7 +3615,7 @@ void Play_Instrument(int channel, int sub_channel)
 
                 if(beatsync[associated_sample])
                 {
-                    double spreadnote = (double) (SampleNumSamples[associated_sample][split]) / ((double) beatlines[associated_sample] * (double) SamplesPerTick);
+                    double spreadnote = (double) (SampleLength[associated_sample][split]) / ((double) beatlines[associated_sample] * (double) SamplesPerTick);
                     spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
@@ -3687,13 +3692,13 @@ void Play_Instrument(int channel, int sub_channel)
                 {
                     Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
                     Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
-                    Player_NS[channel][sub_channel] = SampleNumSamples[associated_sample][split];
+                    Player_NS[channel][sub_channel] = SampleLength[associated_sample][split];
                     if(!glide) if(!no_retrig_note) sp_Position[channel][sub_channel].half.first = offset << 8;
                 }
 #else
                 Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
                 Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
-                Player_NS[channel][sub_channel] = SampleNumSamples[associated_sample][split];
+                Player_NS[channel][sub_channel] = SampleLength[associated_sample][split];
                 if(!glide) if(!no_retrig_note) sp_Position[channel][sub_channel].half.first = offset << 8;
 #endif
                 Player_LL[channel][sub_channel] = Player_LE[channel][sub_channel] - Player_LS[channel][sub_channel];
@@ -3741,10 +3746,10 @@ void Play_Instrument(int channel, int sub_channel)
             }
 
             // Sample is out of range
-            // (synths can have SampleNumSamples = 0)
-            if(SampleNumSamples[associated_sample][split])
+            // (synths can have SampleLength = 0)
+            if(SampleLength[associated_sample][split])
             {
-                if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleNumSamples[associated_sample][split])
+                if((int) sp_Position[channel][sub_channel].half.first >= (int) SampleLength[associated_sample][split])
                 {
                     if(LoopType[associated_sample][split])
                     {
@@ -5261,13 +5266,8 @@ void KillInst(int inst_nbr, int all_splits)
 
     if(all_splits)
     {
-
-#if !defined(__NO_CODEC__)
-        // Gsm is the default packing scheme
-        SampleCompression[inst_nbr] = SMP_PACK_GSM;
-#else
-        SampleCompression[inst_nbr] = SMP_PACK_NONE;
-#endif
+        // Internal is the default packing scheme
+        SampleCompression[inst_nbr] = SMP_PACK_INTERNAL;
 
 #if defined(PTK_MP3)
         Mp3_BitRate[inst_nbr] = 0;
@@ -5277,7 +5277,11 @@ void KillInst(int inst_nbr, int all_splits)
         At3_BitRate[inst_nbr] = 0;
 #endif
 
-#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+#if defined(PTK_INTERNAL)
+        Internal_Quality[inst_nbr] = 0;
+#endif
+
+#if !defined(__STAND_ALONE__)
         SamplesSwap[inst_nbr] = FALSE;
 #endif
 
@@ -5297,8 +5301,8 @@ void KillInst(int inst_nbr, int all_splits)
 #if !defined(__STAND_ALONE__)
     else
     {
-        first_split = Current_Sample_Split;
-        last_split = Current_Sample_Split + 1;
+        first_split = Current_Instrument_Split;
+        last_split = Current_Instrument_Split + 1;
     }
 #endif
     for(int z = first_split; z < last_split; z++)
@@ -5311,7 +5315,6 @@ void KillInst(int inst_nbr, int all_splits)
             RawSamples[inst_nbr][1][z] = NULL;
         }
 
-#if !defined(__NO_CODEC__)
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
         if(RawSamples_Swap[inst_nbr][0][z]) free(RawSamples_Swap[inst_nbr][0][z]);
         RawSamples_Swap[inst_nbr][0][z] = NULL;
@@ -5321,14 +5324,13 @@ void KillInst(int inst_nbr, int all_splits)
             RawSamples_Swap[inst_nbr][1][z] = NULL;
         }
 #endif
-#endif
 
         SampleChannels[inst_nbr][z] = 0;
         SampleType[inst_nbr][z] = 0;
         LoopStart[inst_nbr][z] = 0;
         LoopEnd[inst_nbr][z] = 0;
         LoopType[inst_nbr][z] = SMP_LOOP_NONE;
-        SampleNumSamples[inst_nbr][z] = 0;
+        SampleLength[inst_nbr][z] = 0;
         Finetune[inst_nbr][z] = 0;
         Sample_Amplify[inst_nbr][z] = 0.0f;
         FDecay[inst_nbr][z] = 0.0f;
@@ -5440,7 +5442,7 @@ void Free_Samples(void)
                 }
             }
 
-#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__)
             if(SampleType[freer][pedsplit] != 0)
             {
                 if(RawSamples_Swap[freer][0][pedsplit]) free(RawSamples_Swap[freer][0][pedsplit]);
@@ -5455,7 +5457,7 @@ void Free_Samples(void)
 
         }
 
-#if !defined(__NO_CODEC__) && !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__)
         SamplesSwap[freer] = FALSE;
 #endif
 

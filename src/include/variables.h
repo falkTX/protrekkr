@@ -278,7 +278,7 @@ extern char style[20];
 
 extern int Track_Under_Caret;
 
-extern int Current_Sample;
+extern int Current_Instrument;
 extern int Column_Under_Caret;
 
 extern int Pattern_Line;
@@ -310,7 +310,7 @@ extern int Pos_Tbl_Synth_ENV2;
 extern char draw_sampled_wave;
 extern char draw_sampled_wave2;
 extern char draw_sampled_wave3;
-extern char Current_Sample_Split;
+extern char Current_Instrument_Split;
 extern int resty;
 extern int rs_coef;
 
@@ -373,13 +373,6 @@ extern int fsize;
 
 extern unsigned int SamplesPerSub;
 
-// Render as .wav
-extern char rawrender;
-extern char rawrender_32float;
-extern int rawrender_range;
-extern int rawrender_from;
-extern int rawrender_to;
-
 extern char sas;
 
 extern float *Scope_Dats[MAX_TRACKS];
@@ -408,7 +401,7 @@ extern char Channels_MultiNotes[MAX_TRACKS];
 // ------------------------------------------------------
 // Functions
 void ResetFilters(int tr);
-void WavRenderizer(void);
+void WavRenderizer();
 void Newmod(void);
 void GetBackMouse(void);
 void SeqFill(int st, int en, char n);
@@ -418,7 +411,9 @@ void Initreverb();
 void init_sample_bank(void);
 int Get_Number_Of_Splits(int n_index);
 void Clear_Instrument_Dat(int n_index, int split, int lenfir);
-void AllocateWave(int n_index, int split, long lenfir, int samplechans, int clear);
+void AllocateWave(int n_index, int split, long lenfir,
+                  int samplechans, int clear,
+                  short *Waveform1, short *Waveform2);
 void LoadFile(int Freeindex, const char *str);
 void RefreshSample(void);
 void value_box(int x, int y, int val, int flags);
@@ -444,7 +439,7 @@ void draw_pated(int track, int line, int petrack, int row);
 void Actupated(int modac);
 
 void KillInst(int inst_nbr, int all_splits);
-void Stop_Current_Sample(void);
+void Stop_Current_Instrument(void);
 void draw_lfoed(void);
 void draw_tracked(void);
 void DeleteInstrument(void);

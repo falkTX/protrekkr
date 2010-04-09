@@ -36,7 +36,7 @@ typedef int INT32;
 typedef unsigned __int64 Uint64;
 #else
 #if defined(__LINUX__) && !defined(__FREEBSD__)
-typedef unsigned long uint64_t;
+typedef unsigned long long uint64_t;
 typedef uint64_t Uint64;
 #else
 typedef unsigned long long Uint64;

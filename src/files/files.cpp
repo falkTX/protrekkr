@@ -89,7 +89,7 @@ void Init_Tracker_Context_After_ModLoad(void)
 {
 #if !defined(__WINAMP__)
     Track_Under_Caret = 0;
-    Current_Sample = 0;
+    Current_Instrument = 0;
     Column_Under_Caret = 0;
 #endif
 
@@ -438,6 +438,10 @@ Read_Mod_File:
                         case SMP_PACK_AT3:
                             Read_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                             break;
+
+                        case SMP_PACK_INTERNAL:
+                            Read_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
+                            break;
                     }
                 }
             }
@@ -454,13 +458,13 @@ Read_Mod_File:
                     Read_Mod_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                     Read_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
 
-                    Read_Mod_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
+                    Read_Mod_Data_Swap(&SampleLength[swrite][slwrite], sizeof(int), 1, in);
                     Read_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                     Read_Mod_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                     Read_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
 
-                    AllocateWave(swrite, slwrite, SampleNumSamples[swrite][slwrite], 1, FALSE);
-                    Read_Mod_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
+                    AllocateWave(swrite, slwrite, SampleLength[swrite][slwrite], 1, FALSE, NULL, NULL);
+                    Read_Mod_Data(RawSamples[swrite][0][slwrite], sizeof(short), SampleLength[swrite][slwrite], in);
                     Swap_Sample(RawSamples[swrite][0][slwrite], swrite, slwrite);
                     *RawSamples[swrite][0][slwrite] = 0;
 
@@ -468,9 +472,9 @@ Read_Mod_File:
                     Read_Mod_Data(&SampleChannels[swrite][slwrite], sizeof(char), 1, in);
                     if(SampleChannels[swrite][slwrite] == 2)
                     {
-                        RawSamples[swrite][1][slwrite] = (short *) malloc(SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
-                        memset(RawSamples[swrite][1][slwrite], 0, SampleNumSamples[swrite][slwrite] * sizeof(short) + 8);
-                        Read_Mod_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleNumSamples[swrite][slwrite], in);
+                        RawSamples[swrite][1][slwrite] = (short *) malloc(SampleLength[swrite][slwrite] * sizeof(short) + 8);
+                        memset(RawSamples[swrite][1][slwrite], 0, SampleLength[swrite][slwrite] * sizeof(short) + 8);
+                        Read_Mod_Data(RawSamples[swrite][1][slwrite], sizeof(short), SampleLength[swrite][slwrite], in);
                         Swap_Sample(RawSamples[swrite][1][slwrite], swrite, slwrite);
                         *RawSamples[swrite][1][slwrite] = 0;
                     }
@@ -717,9 +721,7 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
 {
     int Packed_Length;
 
-#if !defined(__NO_CODEC__)
     short *Dest_Buffer;
-#endif
 
     Uint8 *Packed_Read_Buffer;
 
@@ -735,7 +737,6 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
     else
     {
 
-#if !defined(__NO_CODEC__)
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
         // Read the packer buffer
         Read_Mod_Data(Packed_Read_Buffer, sizeof(char), Packed_Length, FileHandle);
@@ -744,31 +745,37 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
 
         switch(Pack_Type)
         {
+#if defined(__AT3_CODEC__)
             case SMP_PACK_AT3:
                 UnpackAT3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
                 break;
+#endif
+#if defined(__GSM_CODEC__)
             case SMP_PACK_GSM:
                 UnpackGSM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
+#endif
+#if defined(__MP3_CODEC__)
             case SMP_PACK_MP3:
                 UnpackMP3(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length, BitRate);
                 break;
+#endif
+#if defined(__TRUESPEECH_CODEC__)
             case SMP_PACK_TRUESPEECH:
                 UnpackTrueSpeech(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
+#endif
+#if defined(__ADPCM_CODEC__)
             case SMP_PACK_ADPCM:
                 UnpackADPCM(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
+#endif
             case SMP_PACK_8BIT:
                 Unpack8Bit(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
         }
         free(Packed_Read_Buffer);
         return(Dest_Buffer);
-#else
-        // No codec support
-        return(NULL);
-#endif
 
     }
 }
@@ -781,30 +788,35 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
     int PackedLen = 0;
     short *PackedSample = NULL;
 
-#if !defined(__NO_CODEC__)
+#if defined(__ADPCM_CODEC__) || defined(__TRUESPEECH_CODEC__)
     short *AlignedSample;
     int Aligned_Size;
+#endif
 
     switch(Pack_Type)
     {
+#if defined(__AT3_CODEC__)
         case SMP_PACK_AT3:
             PackedSample = (short *) malloc(Size * 2 + 8);
             memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToAT3(Sample, PackedSample, Size * 2, BitRate);
             break;
-
+#endif
+#if defined(__GSM_CODEC__)
         case SMP_PACK_GSM:
             PackedSample = (short *) malloc(Size * 2 + 8);
             memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToGSM(Sample, PackedSample, Size * 2);
             break;
-
+#endif
+#if defined(__MP3_CODEC__)
         case SMP_PACK_MP3:
             PackedSample = (short *) malloc(Size * 2 + 8);
             memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = ToMP3(Sample, PackedSample, Size * 2, BitRate);
             break;
-
+#endif
+#if defined(__TRUESPEECH_CODEC__)
         case SMP_PACK_TRUESPEECH:
             Aligned_Size = (Size * 2) + 0x400;
             AlignedSample = (short *) malloc(Aligned_Size + 8);
@@ -822,7 +834,8 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
                 free(AlignedSample);
             }
             break;
-
+#endif
+#if defined(__ADPCM_CODEC__)
         case SMP_PACK_ADPCM:
             Aligned_Size = (Size * 2) + 0x1000;
             AlignedSample = (short *) malloc(Aligned_Size + 8);
@@ -840,7 +853,7 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
                 free(AlignedSample);
             }
             break;
-
+#endif
         case SMP_PACK_8BIT:
             PackedSample = (short *) malloc(Size * 2 + 8);
             memset(PackedSample, 0, Size * 2 + 8);
@@ -860,20 +873,12 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
     }
     else
     {
-#endif
         // Couldn't pack (too small or user do not want that to happen)
         PackedLen = -1;
         Write_Mod_Data(&PackedLen, sizeof(char), 4, FileHandle);
         Write_Mod_Data(Sample, sizeof(char), Size * 2, FileHandle);
-
-#if !defined(__NO_CODEC__)
     }
-#endif
-
-#if !defined(__NO_CODEC__)
     if(PackedSample) free(PackedSample);
-#endif
-
 }
 
 // ------------------------------------------------------
@@ -1193,6 +1198,10 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                     case SMP_PACK_AT3:
                         Write_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                         break;
+
+                    case SMP_PACK_INTERNAL:
+                        Write_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
+                        break;
                 }
 
                 // 16 splits / instrument
@@ -1209,7 +1218,7 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                         Write_Mod_Data_Swap(&LoopEnd[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
                         
-                        Write_Mod_Data_Swap(&SampleNumSamples[swrite][slwrite], sizeof(int), 1, in);
+                        Write_Mod_Data_Swap(&SampleLength[swrite][slwrite], sizeof(int), 1, in);
                         Write_Mod_Data(&Finetune[swrite][slwrite], sizeof(char), 1, in);
                         Write_Mod_Data_Swap(&Sample_Amplify[swrite][slwrite], sizeof(float), 1, in);
                         Write_Mod_Data_Swap(&FDecay[swrite][slwrite], sizeof(float), 1, in);
@@ -1542,7 +1551,7 @@ void Swap_Short_Buffer(short *buffer, int size)
 void Swap_Sample(short *buffer, int sample, int bank)
 {
 #if defined(__BIG_ENDIAN__)
-    Swap_Short_Buffer(buffer, SampleNumSamples[sample][bank]);
+    Swap_Short_Buffer(buffer, SampleLength[sample][bank]);
 #endif
 }
 
@@ -1551,9 +1560,9 @@ void Swap_Sample(short *buffer, int sample, int bank)
 short *Swap_New_Sample(short *buffer, int sample, int bank)
 {
 #if defined(__BIG_ENDIAN__)
-    short *new_buffer = (short *) malloc(SampleNumSamples[sample][bank] * sizeof(short) + 8);
-    memset(new_buffer, 0, SampleNumSamples[sample][bank] * sizeof(short) + 8);
-    memcpy(new_buffer, buffer, SampleNumSamples[sample][bank] * sizeof(short));
+    short *new_buffer = (short *) malloc(SampleLength[sample][bank] * sizeof(short) + 8);
+    memset(new_buffer, 0, SampleLength[sample][bank] * sizeof(short) + 8);
+    memcpy(new_buffer, buffer, SampleLength[sample][bank] * sizeof(short));
     Swap_Sample(new_buffer, sample, bank);
     return(new_buffer);
 #else
@@ -1571,12 +1580,12 @@ void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
     swap_buffer = Swap_New_Sample(Get_WaveForm(sample, 0, bank), sample, bank);
     if(swap_buffer)
     {
-        Write_Function(swap_buffer, sizeof(short), SampleNumSamples[sample][bank], in);
+        Write_Function(swap_buffer, sizeof(short), SampleLength[sample][bank], in);
         free(swap_buffer);
     }
     else
     {
-        Write_Function(Get_WaveForm(sample, 0, bank), sizeof(short), SampleNumSamples[sample][bank], in);
+        Write_Function(Get_WaveForm(sample, 0, bank), sizeof(short), SampleLength[sample][bank], in);
     }
 
     Write_Function(&SampleChannels[sample][bank], sizeof(char), 1, in);
@@ -1585,12 +1594,12 @@ void Write_Unpacked_Sample(int (*Write_Function)(void *, int ,int, FILE *),
         swap_buffer = Swap_New_Sample(Get_WaveForm(sample, 1, bank), sample, bank);
         if(swap_buffer)
         {
-            Write_Function(swap_buffer, sizeof(short), SampleNumSamples[sample][bank], in);
+            Write_Function(swap_buffer, sizeof(short), SampleLength[sample][bank], in);
             free(swap_buffer);
         }
         else
         {
-            Write_Function(Get_WaveForm(sample, 1, bank), sizeof(short), SampleNumSamples[sample][bank], in);
+            Write_Function(Get_WaveForm(sample, 1, bank), sizeof(short), SampleLength[sample][bank], in);
         }
     }
 }
@@ -1846,7 +1855,7 @@ void Reset_Song_Length(void)
 // Return the data of an unpacked sample
 short *Get_WaveForm(int Instr_Nbr, int Channel, int Split)
 {
-#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+#if !defined(__WINAMP__)
     if(SamplesSwap[Instr_Nbr])
     {
         return(RawSamples_Swap[Instr_Nbr][Channel][Split]); 
@@ -1885,7 +1894,7 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
     LoopStart[n_index][split] = 0;
     LoopEnd[n_index][split] = lenfir;
     LoopType[n_index][split] = SMP_LOOP_NONE;
-    SampleNumSamples[n_index][split] = lenfir;
+    SampleLength[n_index][split] = lenfir;
     Finetune[n_index][split] = 0;
     Sample_Amplify[n_index][split] = 1.0f;
     FDecay[n_index][split] = 0.0f;
@@ -1899,7 +1908,7 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
         beatsync[n_index] = FALSE;
 
     // Gsm is default compression
-#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+#if !defined(__WINAMP__)
         SampleCompression[n_index] = SMP_PACK_GSM;
         SamplesSwap[n_index] = FALSE;
 #else
@@ -1907,13 +1916,15 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
 #endif
         Mp3_BitRate[n_index] = 0;
         At3_BitRate[n_index] = 0;
+        Internal_Quality[n_index] = 0;
     }
 }
 
 // ------------------------------------------------------
 // Allocate space for a waveform
 void AllocateWave(int n_index, int split, long lenfir,
-                  int samplechans, int clear)
+                  int samplechans, int clear,
+                  short *Waveform1, short *Waveform2)
 {
     // Freeing if memory was allocated before -----------------------
     if(SampleType[n_index][split] != 0)
@@ -1926,7 +1937,7 @@ void AllocateWave(int n_index, int split, long lenfir,
             RawSamples[n_index][1][split] = NULL;
         }
 
-#if !defined(__WINAMP__) && !defined(__NO_CODEC__)
+#if !defined(__WINAMP__)
         if(RawSamples_Swap[n_index][0][split]) free(RawSamples_Swap[n_index][0][split]);
         RawSamples_Swap[n_index][0][split] = NULL;
         if(SampleChannels[n_index][split] == 2)
@@ -1943,12 +1954,27 @@ void AllocateWave(int n_index, int split, long lenfir,
     SampleType[n_index][split] = 1;
 
     SampleChannels[n_index][split] = samplechans;
-    RawSamples[n_index][0][split] = (short *) malloc((lenfir * 2) + 8);
-    memset(RawSamples[n_index][0][split], 0, (lenfir * 2) + 8);
+    // Was it already supplied ?
+    if(Waveform1)
+    {
+        RawSamples[n_index][0][split] = Waveform1;
+    }
+    else
+    {
+        RawSamples[n_index][0][split] = (short *) malloc((lenfir * 2) + 8);
+        memset(RawSamples[n_index][0][split], 0, (lenfir * 2) + 8);
+    }
     if(samplechans == 2)
     {
-        RawSamples[n_index][1][split] = (short *) malloc((lenfir * 2) + 8);
-        memset(RawSamples[n_index][1][split], 0, (lenfir * 2) + 8);
+        if(Waveform2)
+        {
+            RawSamples[n_index][1][split] = Waveform2;
+        }
+        else
+        {
+            RawSamples[n_index][1][split] = (short *) malloc((lenfir * 2) + 8);
+            memset(RawSamples[n_index][1][split], 0, (lenfir * 2) + 8);
+        }
     }
 }
 

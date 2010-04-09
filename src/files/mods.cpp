@@ -324,8 +324,8 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
 
             Clear_Instrument_Dat(swrite, 0, 0);
 
-            SampleNumSamples[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
-            SampleNumSamples[swrite][0] *= 2;
+            SampleLength[swrite][0] = (int) (fgetc(in) << 8) + (int) fgetc(in);
+            SampleLength[swrite][0] *= 2;
             fread(&Finetune[swrite][0], sizeof(char), 1, in);
 
             Finetune[swrite][0] = FineTune_Table[Finetune[swrite][0] & 0xf];
@@ -346,13 +346,13 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
             }
             else
             {
-                LoopEnd[swrite][0] = SampleNumSamples[swrite][0];
+                LoopEnd[swrite][0] = SampleLength[swrite][0];
                 LoopType[swrite][0] = SMP_LOOP_NONE;
             }
 
-            if(LoopEnd[swrite][0] > SampleNumSamples[swrite][0])
+            if(LoopEnd[swrite][0] > SampleLength[swrite][0])
             {
-                LoopEnd[swrite][0] = LoopEnd[swrite][0] - SampleNumSamples[swrite][0];
+                LoopEnd[swrite][0] = LoopEnd[swrite][0] - SampleLength[swrite][0];
             }
         } // FOR
 
@@ -830,11 +830,11 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         // Load the samples
         for(swrite = 0; swrite < 31; swrite++)
         {
-            if(SampleNumSamples[swrite][0] > 8)
+            if(SampleLength[swrite][0] > 8)
             {
                 // Reserving space for 16-Bit Signed Short Data.
-                AllocateWave(swrite, 0, SampleNumSamples[swrite][0], 1, FALSE);
-                for(x = 0; x < SampleNumSamples[swrite][0]; x++)
+                AllocateWave(swrite, 0, SampleLength[swrite][0], 1, FALSE, NULL, NULL);
+                for(x = 0; x < SampleLength[swrite][0]; x++)
                 {
                     *(RawSamples[swrite][0][0] + x) = (short) fgetc(in) << 8;
                 }

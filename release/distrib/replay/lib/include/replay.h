@@ -83,6 +83,7 @@
 #define SMP_PACK_AT3 4
 #define SMP_PACK_ADPCM 5
 #define SMP_PACK_8BIT 6
+#define SMP_PACK_INTERNAL 7
 
 #define MAX_ROWS 128
 #define MAX_SEQUENCES 256
@@ -177,6 +178,18 @@ float FastLog(float i);
 #define POWF(x, y) powf(x, y)
 #endif
 
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+#define RENDER_TO_FILE 0
+#define RENDER_TO_MONO 1
+#define RENDER_TO_STEREO 2
+extern char rawrender;
+extern char rawrender_32float;
+extern int rawrender_range;
+extern char rawrender_target;
+extern int rawrender_from;
+extern int rawrender_to;
+#endif
+
 // ------------------------------------------------------
 // Structures
 
@@ -225,11 +238,19 @@ extern float decays[MAX_COMB_FILTERS];
 extern int delays[MAX_COMB_FILTERS];       // delays for the comb filters
 extern int counters[MAX_COMB_FILTERS];
 
+#if defined(PTK_MP3)
 extern char Mp3_BitRate[MAX_INSTRS];
 extern int Type_Mp3_BitRate[];
+#endif
 
+#if defined(PTK_AT3)
 extern char At3_BitRate[MAX_INSTRS];
 extern int Type_At3_BitRate[];
+#endif
+
+#if defined(PTK_INTERNAL)
+extern char Internal_Quality[MAX_INSTRS];
+#endif
 
 #if defined(PTK_COMPRESSOR)
 extern char num_echoes;
@@ -266,26 +287,25 @@ extern char Midiprg[MAX_INSTRS];
 extern unsigned char Synthprg[MAX_INSTRS];
 #endif
 
-#if !defined(__NO_CODEC__)
 #if !defined(__STAND_ALONE__)
 extern char SamplesSwap[MAX_INSTRS];
-extern short *RawSamples_Swap[MAX_INSTRS][2][16];
-#endif
+extern short *RawSamples_Swap[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
+extern Uint32 SampleLength_Packed[MAX_INSTRS][MAX_INSTRS_SPLITS];
 #endif
 
-extern char SampleType[MAX_INSTRS][16];
+extern char SampleType[MAX_INSTRS][MAX_INSTRS_SPLITS];
 extern char SampleCompression[MAX_INSTRS];
-extern char SampleName[MAX_INSTRS][16][64];
-extern char Basenote[MAX_INSTRS][16];
-extern Uint32 LoopStart[MAX_INSTRS][16];
-extern Uint32 LoopEnd[MAX_INSTRS][16];
-extern char LoopType[MAX_INSTRS][16];
-extern Uint32 SampleNumSamples[MAX_INSTRS][16];
-extern char Finetune[MAX_INSTRS][16];
-extern float Sample_Amplify[MAX_INSTRS][16];
-extern float FDecay[MAX_INSTRS][16];
-extern short *RawSamples[MAX_INSTRS][2][16];
-extern char SampleChannels[MAX_INSTRS][16];         // Mono / Stereo
+extern char SampleName[MAX_INSTRS][MAX_INSTRS_SPLITS][64];
+extern char Basenote[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern Uint32 LoopStart[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern Uint32 LoopEnd[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern char LoopType[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern Uint32 SampleLength[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern char Finetune[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern float Sample_Amplify[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern float FDecay[MAX_INSTRS][MAX_INSTRS_SPLITS];
+extern short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
+extern char SampleChannels[MAX_INSTRS][MAX_INSTRS_SPLITS];         // Mono / Stereo
 extern float TCut[MAX_TRACKS];
 extern float ICut[MAX_TRACKS];
 extern float TPan[MAX_TRACKS];

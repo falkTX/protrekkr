@@ -150,12 +150,15 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int tps_trk;
     char Store_303_1 = FALSE;
     char Store_303_2 = FALSE;
+
     int Store_Gsm = FALSE;
     int Store_Mp3 = FALSE;
     int Store_TrueSpeech = FALSE;
     int Store_ADPCM = FALSE;
     int Store_At3 = FALSE;
     int Store_8Bit = FALSE;
+    int Store_Internal = FALSE;
+
     int Store_Flanger = FALSE;
     int Store_Disclap = FALSE;
     int Store_LFO = FALSE;
@@ -1293,10 +1296,6 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
             }
 
-#if defined(__NO_CODEC__)
-            char No_Comp = SMP_PACK_NONE;
-            Write_Mod_Data(&No_Comp, sizeof(char), 1, in);
-#else
             Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
             switch(SampleCompression[swrite])
             {
@@ -1307,8 +1306,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 case SMP_PACK_AT3:
                     Write_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                     break;
+
+                case SMP_PACK_INTERNAL:
+                    Write_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
+                    break;
             }
-#endif
 
             // Compression type
 
@@ -1321,44 +1323,52 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                     Store_Instruments = TRUE;
                     int Apply_Interpolation = FALSE;
 
-#if !defined(__NO_CODEC__)
                     // Check if any of the packing scheme has been used
                     switch(SampleCompression[swrite])
                     {
+#if defined(__AT3_CODEC__)
                         case SMP_PACK_AT3:
                             Store_At3 = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-
+#endif
+#if defined(__GSM_CODEC__)
                         case SMP_PACK_GSM:
                             Store_Gsm = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-
+#endif
+#if defined(__MP3_CODEC__)
                         case SMP_PACK_MP3:
                             Store_Mp3 = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-
+#endif
+#if defined(__TRUESPEECH_CODEC__)
                         case SMP_PACK_TRUESPEECH:
                             Store_TrueSpeech = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-
+#endif
+#if defined(__ADPCM_CODEC__)
                         case SMP_PACK_ADPCM:
                             Store_ADPCM = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-
+#endif
                         case SMP_PACK_8BIT:
                             Store_8Bit = TRUE;
                             Apply_Interpolation = TRUE;
                             break;
-                    }
-#endif
 
-                    Uint32 Real_Len = SampleNumSamples[swrite][slwrite];
-                    Uint32 Calc_Len = SampleNumSamples[swrite][slwrite];
+                        case SMP_PACK_INTERNAL:
+                            Store_Internal = TRUE;
+                            Apply_Interpolation = TRUE;
+                            break;
+                    }
+
+                    Uint32 Real_Len = SampleLength[swrite][slwrite];
+                    Uint32 Calc_Len = SampleLength[swrite][slwrite];
                     Uint32 Loop_Start = LoopStart[swrite][slwrite];
                     Uint32 Loop_End = LoopEnd[swrite][slwrite];
                     Uint32 iSmp;
@@ -1522,6 +1532,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_ADPCM", Store_ADPCM);
     Save_Constant("PTK_AT3", Store_At3);
     Save_Constant("PTK_8BIT", Store_8Bit);
+    Save_Constant("PTK_INTERNAL", Store_Internal);
 
     Write_Mod_Data(&compressor, sizeof(char), 1, in);
 

@@ -387,28 +387,15 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
     // Show the restrictions:
     char *NoMidi = "";
-    char *NoCodec = "";
 
+    NoMidi = "";
 #if defined(__NO_MIDI__)
     NoMidi = "no midi";
 #endif
 
-#if defined(__NO_CODEC__)
-
-#if defined(__NO_MIDI__)
-    NoCodec = " - ";
-#endif
-
-    NoCodec = "no codec";
-#endif
-
-#if !defined(__NO_MIDI__) && !defined(__NO_CODEC__)
-    NoMidi = "";
-#endif
-
-    if(strlen(NoMidi) || strlen(NoCodec))
+    if(strlen(NoMidi))
     {
-        sprintf(Window_Title, "%s - Build restrictions: %s%s", VERSION, NoMidi, NoCodec);
+        sprintf(Window_Title, "%s - Build restrictions: %s", VERSION, NoMidi);
     }
     else
     {

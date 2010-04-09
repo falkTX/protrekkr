@@ -29,8 +29,6 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#if !defined(__NO_CODEC__)
-
 // ------------------------------------------------------
 // Includes
 #if defined(__WIN32__)
@@ -49,17 +47,59 @@
 
 // ------------------------------------------------------
 // Variables
-WAVEFORMATEX Wave_Format;
+#if defined(STAND_ALONE)
+
+#if defined(PTK_MP3)
 MPEGLAYER3WAVEFORMAT MP3_Format;
+#endif
+#if defined(PTK_GSM)
 GSM610WAVEFORMAT GSM_Format;
+#endif
+#if defined(PTK_TRUESPEECH)
 TRUESPEECHWAVEFORMAT TrueSpeech_Format;
+#endif
+#if defined(PTK_ADPCM)
 IMAADPCMWAVEFORMAT ADPCM_Format;
+#endif
+#if defined(PTK_AT3)
 TRUESPEECHWAVEFORMAT At3_Format;
+#endif
+
+#if defined(__WIN32__)
+WAVEFORMATEX Wave_Format;
 ACMSTREAMHEADER Pack_Stream_Head;
 HACMSTREAM Pack_Stream;
+#endif
+
+#else
+
+#if defined(__MP3_CODEC__)
+MPEGLAYER3WAVEFORMAT MP3_Format;
+#endif
+#if defined(__GSM_CODEC__)
+GSM610WAVEFORMAT GSM_Format;
+#endif
+#if defined(__TRUESPEECH_CODEC__)
+TRUESPEECHWAVEFORMAT TrueSpeech_Format;
+#endif
+#if defined(__ADPCM_CODEC__)
+IMAADPCMWAVEFORMAT ADPCM_Format;
+#endif
+#if defined(__AT3_CODEC__)
+TRUESPEECHWAVEFORMAT At3_Format;
+#endif
+
+#if defined(__WIN32__)
+WAVEFORMATEX Wave_Format;
+ACMSTREAMHEADER Pack_Stream_Head;
+HACMSTREAM Pack_Stream;
+#endif
+
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to GSM
+#if defined(__GSM_CODEC__)
 int ToGSM(short *Source, short *Dest, int Size)
 {
     int Src_size;
@@ -114,9 +154,11 @@ int ToGSM(short *Source, short *Dest, int Size)
 
     return(Dest_Size);
 }
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to AT3
+#if defined(__AT3_CODEC__)
 int ToAT3(short *Source, short *Dest, int Size, int BitRate)
 {
     int Src_size;
@@ -207,9 +249,11 @@ int ToAT3(short *Source, short *Dest, int Size, int BitRate)
 
     return(Dest_Size);
 }
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to MP3
+#if defined(__MP3_CODEC__)
 int ToMP3(short *Source, short *Dest, int Size, int BitRate)
 {
     int Src_size;
@@ -276,9 +320,11 @@ int ToMP3(short *Source, short *Dest, int Size, int BitRate)
 
     return(Dest_Size);
 }
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to TrueSpeech
+#if defined(__TRUESPEECH_CODEC__)
 int ToTrueSpeech(short *Source, short *Dest, int Size)
 {
     int Src_size;
@@ -333,9 +379,11 @@ int ToTrueSpeech(short *Source, short *Dest, int Size)
 
     return(Dest_Size);
 }
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to ADPCM
+#if defined(__ADPCM_CODEC__)
 int ToADPCM(short *Source, short *Dest, int Size)
 {
     int Src_size;
@@ -390,6 +438,7 @@ int ToADPCM(short *Source, short *Dest, int Size)
 
     return(Dest_Size);
 }
+#endif
 
 // ------------------------------------------------------
 // Pack a sample to 8 Bit
@@ -405,5 +454,3 @@ int To8Bit(short *Source, short *Dest, int Size)
 
     return(Size);
 }
-
-#endif

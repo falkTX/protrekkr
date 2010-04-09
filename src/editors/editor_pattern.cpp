@@ -1672,18 +1672,18 @@ void Actualize_Patterned(void)
     if(Current_Edit_Steps > 16) Current_Edit_Steps = 0;
     if(Current_Octave < 0) Current_Octave = 0;
     if(Current_Octave > 8) Current_Octave = 8;
-    if(Current_Sample < 0) Current_Sample = 127;
-    if(Current_Sample > 127) Current_Sample = 0;
+    if(Current_Instrument < 0) Current_Instrument = 127;
+    if(Current_Instrument > 127) Current_Instrument = 0;
 
     char tcp[30];
-    sprintf(tcp, "%s_", nameins[Current_Sample]);
+    sprintf(tcp, "%s_", nameins[Current_Instrument]);
 
     if(snamesel == INPUT_INSTRUMENT_NAME) Gui_Draw_Button_Box(90, 108, 166, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
-    else Gui_Draw_Button_Box(90, 108, 166, 16, nameins[Current_Sample], BUTTON_NORMAL | BUTTON_INPUT);
+    else Gui_Draw_Button_Box(90, 108, 166, 16, nameins[Current_Instrument], BUTTON_NORMAL | BUTTON_INPUT);
 
     Gui_Draw_Arrows_Number_Box2(90, 126, Current_Edit_Steps, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     value_box(258, 126, Current_Octave, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    value_box(258, 108, Current_Sample, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    value_box(258, 108, Current_Instrument, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Actualize_Instruments_Synths_List(2);
 }
 

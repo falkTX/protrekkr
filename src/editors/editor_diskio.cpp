@@ -114,7 +114,7 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Disk Operations / Module Credits");
 
-    Gui_Draw_Button_Box(254, 488, 80, 16, "Calc .ptp size", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(254, 488, 80, 16, "Calc .ptp Size", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     outlong(254, 506, Final_Mod_Length, 7);
 
     Gui_Draw_Button_Box(254, 524, 80, 16, "Calc Length", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -127,10 +127,12 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(90, 488, 80, 16, "WAV Render", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(90, 470, 80, 16, "Show Info", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(342, 470, 304, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(342, 470, 404, 88, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    PrintXY(350, 472, USE_FONT, "Tracks To Render As WAV:");
+    PrintXY(350, 472, USE_FONT, "Tracks To Render :");
     Display_Tracks_To_Render();
+
+    PrintXY(654, 476, USE_FONT, "Render To :");
 
     Gui_Draw_Button_Box(350, 532, 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
 
@@ -138,23 +140,51 @@ void Draw_DiskIO_Ed(void)
     Gui_Draw_Button_Box(532, 534, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 }
 
+// ------------------------------------------------------
+// Refresh function
 void Actualize_DiskIO_Ed(int gode)
 {
+    int Allow_32bit = 0;
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
     {
         char tname[32];
+
+        if(gode == 0 || gode == 5)
+        {
+            switch(rawrender_target)
+            {
+                case RENDER_TO_FILE:
+                    Gui_Draw_Button_Box(654, 494, 80, 16, "Wav File", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 512, 80, 16, "Mono Sample", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 530, 80, 16, "Stereo Sample", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Allow_32bit = 0;
+                    break;
+                case RENDER_TO_MONO:
+                    Gui_Draw_Button_Box(654, 494, 80, 16, "Wav File", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 512, 80, 16, "Mono Sample", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 530, 80, 16, "Stereo Sample", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Allow_32bit = BUTTON_DISABLED;
+                    break;
+                case RENDER_TO_STEREO:
+                    Gui_Draw_Button_Box(654, 494, 80, 16, "Wav File", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 512, 80, 16, "Mono Sample", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(654, 530, 80, 16, "Stereo Sample", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Allow_32bit = BUTTON_DISABLED;
+                    break;
+            }
+        }
 
         if(gode == 0 || gode == 1)
         {
             if(rawrender_32float)
             {
-                Gui_Draw_Button_Box(458, 532, 29, 16, "32", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458, 532, 29, 16, "32", Allow_32bit | BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", Allow_32bit | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(458, 532, 29, 16, "32", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458, 532, 29, 16, "32", Allow_32bit | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(458 + 31, 532, 29, 16, "16", Allow_32bit | BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -244,6 +274,8 @@ void Actualize_DiskIO_Ed(int gode)
     }
 }
 
+// ------------------------------------------------------
+// Handle right mouse button
 void Mouse_Right_DiskIO_Ed(void)
 {
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
@@ -288,6 +320,8 @@ void Mouse_Right_DiskIO_Ed(void)
     }
 }
 
+// ------------------------------------------------------
+// Handle left mouse button
 void Mouse_Left_DiskIO_Ed(void)
 {
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
@@ -370,9 +404,16 @@ void Mouse_Left_DiskIO_Ed(void)
 
         if(zcheckMouse(90, 488, 80, 16))
         {
-            if(File_Exist("%s"SLASH"%s.wav", Dir_Mods, name))
+            if(rawrender_target == RENDER_TO_FILE)
             {
-                Display_Requester(&Overwrite_Requester, GUI_CMD_RENDER_WAV);
+                if(File_Exist("%s"SLASH"%s.wav", Dir_Mods, name))
+                {
+                    Display_Requester(&Overwrite_Requester, GUI_CMD_RENDER_WAV);
+                }
+                else
+                {
+                    gui_action = GUI_CMD_RENDER_WAV;
+                }
             }
             else
             {
@@ -447,6 +488,30 @@ void Mouse_Left_DiskIO_Ed(void)
             }
         }
 
+        // Render to wav file
+        if(zcheckMouse(654, 494, 80, 16))
+        {
+            rawrender_target = RENDER_TO_FILE;
+            teac = 0;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        // Render to mono sample
+        if(zcheckMouse(654, 512, 80, 16))
+        {
+            rawrender_target = RENDER_TO_MONO;
+            teac = 0;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
+        // Render to stereo sample
+        if(zcheckMouse(654, 530, 80, 16))
+        {
+            rawrender_target = RENDER_TO_STEREO;
+            teac = 0;
+            gui_action = GUI_CMD_UPDATE_DISKIO_ED;
+        }
+
         Check_Tracks_To_Render();
     }
 }
@@ -463,7 +528,8 @@ void Display_Song_Length(void)
     }
 }
 
-// Check if a track to render has been soloed already
+// ------------------------------------------------------
+// Check if a track to render has been solo'ed already
 int Is_Track_To_Render_Solo(int nbr)
 {
     int i;
@@ -482,6 +548,8 @@ int Is_Track_To_Render_Solo(int nbr)
     return(FALSE);
 }
 
+// ------------------------------------------------------
+// Display a track gadget with it's number
 void Display_1_Track_To_Render(int nbr)
 {
     if(Tracks_To_Render[nbr])
@@ -508,6 +576,8 @@ void Display_1_Track_To_Render(int nbr)
     }
 }
 
+// ------------------------------------------------------
+// Display the list of track to render
 void Display_Tracks_To_Render(void)
 {
     int i;
@@ -521,6 +591,8 @@ void Display_Tracks_To_Render(void)
     }
 }
 
+// ------------------------------------------------------
+// Clear tracks to render status
 void Reset_Tracks_To_Render(void)
 {
     int i;
@@ -531,6 +603,8 @@ void Reset_Tracks_To_Render(void)
     Display_Tracks_To_Render();
 }
 
+// ------------------------------------------------------
+// Check if a track can be solo'ed
 void Check_Tracks_To_Render_To_Solo(void)
 {
     int i;
@@ -560,6 +634,8 @@ void Check_Tracks_To_Render_To_Solo(void)
     Display_Tracks_To_Render();
 }
 
+// ------------------------------------------------------
+// Handle clicks on the tracks gadgets
 void Check_Tracks_To_Render(void)
 {
     int i;

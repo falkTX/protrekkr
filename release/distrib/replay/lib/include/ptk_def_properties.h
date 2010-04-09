@@ -113,6 +113,7 @@
 #define PTK_AT3
 #define PTK_ADPCM
 #define PTK_8BIT
+#define PTK_INTERNAL
 #define PTK_LIMITER_MASTER
 #define PTK_LIMITER_TRACKS
 #define PTK_TRACKFILTERS

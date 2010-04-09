@@ -104,7 +104,7 @@ char seditor = 0;
 int Done_Tip = FALSE;
 char tipoftheday[256];
 int ctipoftheday = 0;
-char Current_Sample_Split = 0;
+char Current_Instrument_Split = 0;
 
 int player_pos = -1;
 int xew = 0;
@@ -138,7 +138,7 @@ char artist[20];
 char style[20];
 char autosavename[MAX_PATH];
 
-int Current_Sample = 0;
+int Current_Instrument = 0;
 int restx = 0;
 int resty = 0;
 int fsize = 0;
@@ -166,8 +166,6 @@ int c_r_tvol = 32768;
 int c_l_cvol = 32768;
 int c_r_cvol = 32768;
 int mlimit = 0;
-
-int hd_isrecording = 0;
 
 int snamesel = INPUT_NONE;
 
@@ -645,7 +643,7 @@ int Screen_Update(void)
 
     for(i = 0; i < Channels_Polyphony[Track_Under_Caret]; i++)
     {
-        if(sp_Stage[Track_Under_Caret][i] == PLAYING_SAMPLE && Current_Sample == sp_channelsample[Track_Under_Caret][i] && Current_Sample_Split == sp_split[Track_Under_Caret][i])
+        if(sp_Stage[Track_Under_Caret][i] == PLAYING_SAMPLE && Current_Instrument == sp_channelsample[Track_Under_Caret][i] && Current_Instrument_Split == sp_split[Track_Under_Caret][i])
         {
             draw_sampled_wave2 = TRUE;
             boing = TRUE;
@@ -733,8 +731,8 @@ int Screen_Update(void)
                         switch(Get_FileType(lt_curr[Scopish]))
                         {
                             case _A_FILE:
-                                Stop_Current_Sample();
-                                LoadFile(Current_Sample, Get_FileName(lt_curr[Scopish]));
+                                Stop_Current_Instrument();
+                                LoadFile(Current_Instrument, Get_FileName(lt_curr[Scopish]));
                                 break;
                             case _A_SUBDIR:
                                 Set_Current_Dir();
@@ -800,7 +798,7 @@ int Screen_Update(void)
         // Select an instrument/synth
         if(gui_action == GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT)
         {
-            Current_Sample = Instrs_index + (Mouse.y - 43) / 12;
+            Current_Instrument = Instrs_index + (Mouse.y - 43) / 12;
             Actualize_Instruments_Synths_List(1);
             Actualize_Patterned();
             RefreshSample();
@@ -903,7 +901,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_PREV_INSTR)
         {
-            Current_Sample--;
+            Current_Instrument--;
             Clear_Input();
             Actualize_Patterned();
             RefreshSample();
@@ -913,7 +911,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_NEXT_INSTR)
         {
-            Current_Sample++;
+            Current_Instrument++;
             Clear_Input();
             Actualize_Patterned();
             RefreshSample();
@@ -1208,32 +1206,32 @@ int Screen_Update(void)
 
             WaveFile RF;
 
-            if(strlen(SampleName[Current_Sample][Current_Sample_Split]))
+            if(strlen(SampleName[Current_Instrument][Current_Instrument_Split]))
             {
-                RF.OpenForWrite(SampleName[Current_Sample][Current_Sample_Split],
+                RF.OpenForWrite(SampleName[Current_Instrument][Current_Instrument_Split],
                                 44100,
                                 16,
-                                SampleChannels[Current_Sample][Current_Sample_Split]);
+                                SampleChannels[Current_Instrument][Current_Instrument_Split]);
             }
             else
             {
                 RF.OpenForWrite("Untitled.wav",
                                 44100,
                                 16,
-                                SampleChannels[Current_Sample][Current_Sample_Split]);
+                                SampleChannels[Current_Instrument][Current_Instrument_Split]);
             }
 
             char t_stereo;
 
-            if(SampleChannels[Current_Sample][Current_Sample_Split] == 1) t_stereo = FALSE;
+            if(SampleChannels[Current_Instrument][Current_Instrument_Split] == 1) t_stereo = FALSE;
             else t_stereo = TRUE;
 
             Uint32 woff = 0;
 
-            short *eSamples = RawSamples[Current_Sample][0][Current_Sample_Split];
-            short *erSamples = RawSamples[Current_Sample][1][Current_Sample_Split];
+            short *eSamples = RawSamples[Current_Instrument][0][Current_Instrument_Split];
+            short *erSamples = RawSamples[Current_Instrument][1][Current_Instrument_Split];
 
-            while(woff < SampleNumSamples[Current_Sample][Current_Sample_Split])
+            while(woff < SampleLength[Current_Instrument][Current_Instrument_Split])
             {
                 if(t_stereo) RF.WriteStereoSample(*eSamples++, *erSamples++);
                 else RF.WriteMonoSample(*eSamples++);
@@ -1241,7 +1239,7 @@ int Screen_Update(void)
             }
 
             // Write the looping info
-            if(LoopType[Current_Sample][Current_Sample_Split])
+            if(LoopType[Current_Instrument][Current_Instrument_Split])
             {
                 RiffChunkHeader header;
                 WaveSmpl_ChunkData datas;
@@ -1251,8 +1249,8 @@ int Screen_Update(void)
 
                 memset(&datas, 0, sizeof(datas));
                 datas.Num_Sample_Loops = 1;
-                datas.Start = LoopStart[Current_Sample][Current_Sample_Split];
-                datas.End = LoopEnd[Current_Sample][Current_Sample_Split];
+                datas.Start = LoopStart[Current_Instrument][Current_Instrument_Split];
+                datas.End = LoopEnd[Current_Instrument][Current_Instrument_Split];
 
                 header.ckSize = Swap_32(header.ckSize);
 
@@ -1265,7 +1263,7 @@ int Screen_Update(void)
             }
 
             RF.Close();
-            if(strlen(SampleName[Current_Sample][Current_Sample_Split])) sprintf(buffer, "File '%s' saved.", SampleName[Current_Sample][Current_Sample_Split]);
+            if(strlen(SampleName[Current_Instrument][Current_Instrument_Split])) sprintf(buffer, "File '%s' saved.", SampleName[Current_Instrument][Current_Instrument_Split]);
             else sprintf(buffer, "File 'Untitled.wav' saved.");
             Status_Box(buffer);
 
@@ -1340,7 +1338,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_AMPLI)
         {
-            Sample_Amplify[Current_Sample][Current_Sample_Split] = float((Mouse.x - 436) / 32.0f);
+            Sample_Amplify[Current_Instrument][Current_Instrument_Split] = float((Mouse.x - 436) / 32.0f);
             Actualize_Instrument_Ed(0, 1);
         }
 
@@ -1349,13 +1347,13 @@ int Screen_Update(void)
             FineTune_Value = ((Mouse.x - 436) - 64) * 2;
             if(FineTune_Value > 127) FineTune_Value = 127;
             if(FineTune_Value < -127) FineTune_Value = -127;
-            Finetune[Current_Sample][Current_Sample_Split] = FineTune_Value;
+            Finetune[Current_Instrument][Current_Instrument_Split] = FineTune_Value;
             Actualize_Instrument_Ed(0, 2);
         }
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_DECAY)
         {
-            FDecay[Current_Sample][Current_Sample_Split] = float(Mouse.x - 62) / 8192.0f;
+            FDecay[Current_Instrument][Current_Instrument_Split] = float(Mouse.x - 62) / 8192.0f;
             Actualize_Instrument_Ed(0, 3);
         }
 
@@ -1422,7 +1420,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_PREVIOUS_16_INSTR)
         {
-            Current_Sample -= 16;
+            Current_Instrument -= 16;
             Actualize_Patterned();
             RefreshSample();
             Renew_Sample_Ed();
@@ -1431,7 +1429,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_NEXT_16_INSTR)
         {
-            Current_Sample += 16;
+            Current_Instrument += 16;
             Actualize_Patterned();
             RefreshSample();
             Renew_Sample_Ed();
@@ -1912,13 +1910,13 @@ void LoadFile(int Freeindex, const char *str)
                         {
                             save_sample_vol = 1.0f;
                             if(Get_Number_Of_Splits(Freeindex)) save_sample_vol = Sample_Vol[Freeindex];
-                            sp_Position[Freeindex][Current_Sample_Split].absolu = 0;
-                            Stop_Current_Sample();
+                            sp_Position[Freeindex][Current_Instrument_Split].absolu = 0;
+                            Stop_Current_Instrument();
                             switch(channels)
                             {
                                 case 1:
-                                    AllocateWave(Freeindex, Current_Sample_Split, AIFF_File.NumSamples(), 1, TRUE);
-                                    csamples = RawSamples[Freeindex][0][Current_Sample_Split];
+                                    AllocateWave(Freeindex, Current_Instrument_Split, AIFF_File.NumSamples(), 1, TRUE, NULL, NULL);
+                                    csamples = RawSamples[Freeindex][0][Current_Instrument_Split];
                                     for(i = 0; i < AIFF_File.NumSamples(); i++)
                                     {
                                         AIFF_File.ReadMonoSample(&csamples[i]);
@@ -1926,19 +1924,19 @@ void LoadFile(int Freeindex, const char *str)
                                     break;
 
                                 case 2:
-                                    AllocateWave(Freeindex, Current_Sample_Split, AIFF_File.NumSamples(), 2, TRUE);
-                                    csamples = RawSamples[Freeindex][0][Current_Sample_Split];
-                                    csamples2 = RawSamples[Freeindex][1][Current_Sample_Split];
+                                    AllocateWave(Freeindex, Current_Instrument_Split, AIFF_File.NumSamples(), 2, TRUE, NULL, NULL);
+                                    csamples = RawSamples[Freeindex][0][Current_Instrument_Split];
+                                    csamples2 = RawSamples[Freeindex][1][Current_Instrument_Split];
                                     for(i = 0; i < AIFF_File.NumSamples(); i++)
                                     {
                                         AIFF_File.ReadStereoSample(&csamples[i], &csamples2[i]);
                                     }
                                     break;
                             }
-                            LoopStart[Freeindex][Current_Sample_Split] = 0;
-                            LoopEnd[Freeindex][Current_Sample_Split] = 0;
-                            LoopType[Freeindex][Current_Sample_Split] = SMP_LOOP_NONE;
-                            Basenote[Freeindex][Current_Sample_Split] = DEFAULT_BASE_NOTE;
+                            LoopStart[Freeindex][Current_Instrument_Split] = 0;
+                            LoopEnd[Freeindex][Current_Instrument_Split] = 0;
+                            LoopType[Freeindex][Current_Instrument_Split] = SMP_LOOP_NONE;
+                            Basenote[Freeindex][Current_Instrument_Split] = DEFAULT_BASE_NOTE;
                             if(Get_Number_Of_Splits(Freeindex) == 1)
                             {
                                 Sample_Vol[Freeindex] = save_sample_vol;
@@ -1946,17 +1944,17 @@ void LoadFile(int Freeindex, const char *str)
 
                             if(AIFF_File.BaseNote())
                             {
-                                Basenote[Freeindex][Current_Sample_Split] = AIFF_File.BaseNote();
+                                Basenote[Freeindex][Current_Instrument_Split] = AIFF_File.BaseNote();
                             }
 
                             if(AIFF_File.LoopType())
                             {
-                                LoopType[Freeindex][Current_Sample_Split] = AIFF_File.LoopType();
-                                LoopStart[Freeindex][Current_Sample_Split] = AIFF_File.LoopStart();
-                                LoopEnd[Freeindex][Current_Sample_Split] = AIFF_File.LoopEnd();
+                                LoopType[Freeindex][Current_Instrument_Split] = AIFF_File.LoopType();
+                                LoopStart[Freeindex][Current_Instrument_Split] = AIFF_File.LoopStart();
+                                LoopEnd[Freeindex][Current_Instrument_Split] = AIFF_File.LoopEnd();
                             }
 
-                            sprintf(SampleName[Freeindex][Current_Sample_Split], "%s", FileName);
+                            sprintf(SampleName[Freeindex][Current_Instrument_Split], "%s", FileName);
                             Actualize_Patterned();
                             Actualize_Instrument_Ed(2, 0);
                             Renew_Sample_Ed();
@@ -2020,13 +2018,13 @@ void LoadFile(int Freeindex, const char *str)
                         {
                             save_sample_vol = 1.0f;
                             if(Get_Number_Of_Splits(Freeindex)) save_sample_vol = Sample_Vol[Freeindex];
-                            sp_Position[Freeindex][Current_Sample_Split].absolu = 0;
-                            Stop_Current_Sample();
+                            sp_Position[Freeindex][Current_Instrument_Split].absolu = 0;
+                            Stop_Current_Instrument();
                             switch(channels)
                             {
                                 case 1:
-                                    AllocateWave(Freeindex, Current_Sample_Split, Wav_File.NumSamples(), 1, TRUE);
-                                    csamples = RawSamples[Freeindex][0][Current_Sample_Split];
+                                    AllocateWave(Freeindex, Current_Instrument_Split, Wav_File.NumSamples(), 1, TRUE, NULL, NULL);
+                                    csamples = RawSamples[Freeindex][0][Current_Instrument_Split];
                                     for(i = 0; i < Wav_File.NumSamples(); i++)
                                     {
                                         Wav_File.ReadMonoSample(&csamples[i]);
@@ -2034,19 +2032,19 @@ void LoadFile(int Freeindex, const char *str)
                                     break;
 
                                 case 2:
-                                    AllocateWave(Freeindex, Current_Sample_Split, Wav_File.NumSamples(), 2, TRUE);
-                                    csamples = RawSamples[Freeindex][0][Current_Sample_Split];
-                                    csamples2 = RawSamples[Freeindex][1][Current_Sample_Split];
+                                    AllocateWave(Freeindex, Current_Instrument_Split, Wav_File.NumSamples(), 2, TRUE, NULL, NULL);
+                                    csamples = RawSamples[Freeindex][0][Current_Instrument_Split];
+                                    csamples2 = RawSamples[Freeindex][1][Current_Instrument_Split];
                                     for(i = 0; i < Wav_File.NumSamples(); i++)
                                     {
                                         Wav_File.ReadStereoSample(&csamples[i], &csamples2[i]);
                                     }
                                     break;
                             }
-                            LoopStart[Freeindex][Current_Sample_Split] = 0;
-                            LoopEnd[Freeindex][Current_Sample_Split] = 0;
-                            LoopType[Freeindex][Current_Sample_Split] = SMP_LOOP_NONE;
-                            Basenote[Freeindex][Current_Sample_Split] = DEFAULT_BASE_NOTE;
+                            LoopStart[Freeindex][Current_Instrument_Split] = 0;
+                            LoopEnd[Freeindex][Current_Instrument_Split] = 0;
+                            LoopType[Freeindex][Current_Instrument_Split] = SMP_LOOP_NONE;
+                            Basenote[Freeindex][Current_Instrument_Split] = DEFAULT_BASE_NOTE;
                             if(Get_Number_Of_Splits(Freeindex) == 1)
                             {
                                 Sample_Vol[Freeindex] = save_sample_vol;
@@ -2054,12 +2052,12 @@ void LoadFile(int Freeindex, const char *str)
 
                             if(Wav_File.LoopType())
                             {
-                                LoopType[Freeindex][Current_Sample_Split] = Wav_File.LoopType();
-                                LoopStart[Freeindex][Current_Sample_Split] = Wav_File.LoopStart();
-                                LoopEnd[Freeindex][Current_Sample_Split] = Wav_File.LoopEnd();
+                                LoopType[Freeindex][Current_Instrument_Split] = Wav_File.LoopType();
+                                LoopStart[Freeindex][Current_Instrument_Split] = Wav_File.LoopStart();
+                                LoopEnd[Freeindex][Current_Instrument_Split] = Wav_File.LoopEnd();
                             }
 
-                            sprintf(SampleName[Freeindex][Current_Sample_Split], "%s", FileName);
+                            sprintf(SampleName[Freeindex][Current_Instrument_Split], "%s", FileName);
                             Actualize_Patterned();
                             Actualize_Instrument_Ed(2, 0);
                             Renew_Sample_Ed();
@@ -2205,10 +2203,10 @@ void Notify_Play(void)
 // Stop replaying
 void SongStop(void)
 {
+    Ptk_Stop();
     Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     Status_Box("Feeling groovy.");
-    Ptk_Stop();
     // Make sure the visuals stay
     Song_Position = Song_Position_Visual;
     Pattern_Line = Pattern_Line_Visual;
@@ -2224,7 +2222,7 @@ void Newmod(void)
 
     Clear_Input();
     SongStop();
-    Stop_Current_Sample();
+    Stop_Current_Instrument();
 
 #if !defined(__NO_MIDI__)
     Midi_Reset();
@@ -2233,7 +2231,7 @@ void Newmod(void)
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_INSTRUMENTS)
     {
         Free_Samples();
-        Current_Sample = 0;
+        Current_Instrument = 0;
         seditor = 0;
         Final_Mod_Length = 0;
         Actualize_Master(0);
@@ -2268,7 +2266,7 @@ void Newmod(void)
         }
         Final_Mod_Length = 0;
         Actualize_Master(0);
-        Current_Sample = 0;
+        Current_Instrument = 0;
     }
 
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_PATTERNS)
@@ -2300,6 +2298,7 @@ void Newmod(void)
         Song_Position = 0;
         Song_Position_Visual = 0;
         rawrender_range = FALSE;
+        rawrender_target = RENDER_TO_FILE;
         rawrender_from = 0;
         rawrender_to = 0;
         Final_Mod_Length = 0;
@@ -2520,96 +2519,223 @@ void Actualize_Name(int *newletter, char *nam)
 
 // ------------------------------------------------------
 // Render the song as a .wav file
-void WavRenderizer(void)
+void WavRenderizer()
 {
     plx = 0;
     char buffer[80];
     int Save_CHAN_MUTE_STATE[MAX_TRACKS];
     int i;
     int Max_Position;
+    WaveFile RF;
+    short *Sample_Buffer[2];
+    int Pos_In_Memory;
+    int Mem_Buffer_Size;
+    int Stereo = 0;
+    float save_sample_vol;
 
     sprintf(buffer, "%s.wav", name);
 
-    if(!hd_isrecording)
+    SongStop();
+    switch(rawrender_target)
     {
-        WaveFile RF;
-        if(RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
-        {
-            sprintf(buffer, "Can't open '%s.wav' file.", name);
-            Status_Box(buffer);
-            return;
-        }
-        SongStop();
-        sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
-        Status_Box(buffer);
-        SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
-
-        rawrender = TRUE;
-
-        Pattern_Line = 0;
-        if(rawrender_range)
-        {
-            Song_Position = rawrender_from;
-            Max_Position = rawrender_to + 1;
-        }
-        else
-        {
-            Song_Position = 0;
-            Max_Position = sLength;
-        }
-
-        long filesize = 0;
-        done = FALSE;
-
-        for(i = 0; i < MAX_TRACKS; i++)
-        {
-            Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
-            CHAN_MUTE_STATE[i] = Tracks_To_Render[i];
-        }
-
-        SongPlay();
-
-        while(Song_Position < Max_Position && done == FALSE)
-        {
-            GetPlayerValues();
-            if(rawrender_32float)
+        case RENDER_TO_FILE:
+            if(RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
             {
-                RF.WriteStereoFloatSample(left_float_render, right_float_render);
+                sprintf(buffer, "Can't open '%s.wav' file.", name);
+                Status_Box(buffer);
+                return;
+            }
+            if(rawrender_range)
+            {
+                sprintf(buffer, "Rendering selection to '%s.wav' file. Please wait...", name);
             }
             else
             {
-                RF.WriteStereoSample(left_value, right_value);
+                sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
             }
-            filesize += 4;
-        }
+            break;
 
-        RF.Close();
-        rawrender = FALSE;
-        SongStop();
-
-        for(i = 0; i < MAX_TRACKS; i++)
-        {
-            CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
-        }
-
-        int minutes = filesize / 10584000;
-        int seconds = (filesize - minutes * 10584000) / 176400;
-
-        sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
-        Status_Box(buffer);
-
-        // Return to the start as all the values will be trashed anyway.
-        Pattern_Line = 0;
-        Song_Position = 0;
-        Actualize_DiskIO_Ed(0);
-
-        last_index = -1;
-        Read_SMPT();
-        Actualize_Files_List(0);
-
-        Status_Box(buffer);
-        Actupated(0);
+        case RENDER_TO_MONO:
+        case RENDER_TO_STEREO:
+            if(rawrender_range)
+            {
+                sprintf(buffer, "Rendering selection to instrument %d (split %d). Please wait...",
+                        Current_Instrument,
+                        Current_Instrument_Split);
+            }
+            else
+            {
+                sprintf(buffer, "Rendering module to instrument %d (split %d). Please wait...",
+                        Current_Instrument,
+                        Current_Instrument_Split);
+            }
+            break;
     }
+    Status_Box(buffer);
+    SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
+
+    rawrender = TRUE;
+
+    Pattern_Line = 0;
+    if(rawrender_range)
+    {
+        Song_Position = rawrender_from;
+        Max_Position = rawrender_to + 1;
+    }
+    else
+    {
+        Song_Position = 0;
+        Max_Position = sLength;
+    }
+
+    long filesize = 0;
+    done = FALSE;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
+        CHAN_MUTE_STATE[i] = Tracks_To_Render[i];
+    }
+
+    switch(rawrender_target)
+    {
+        case RENDER_TO_FILE:
+            SongPlay();
+            while(Song_Position < Max_Position && done == FALSE)
+            {
+                GetPlayerValues();
+                if(rawrender_32float)
+                {
+                    // [-1.0..1.0]
+                    RF.WriteStereoFloatSample(left_float_render, right_float_render);
+                    filesize += 8;
+                }
+                else
+                {
+                    RF.WriteStereoSample(left_value, right_value);
+                    filesize += 4;
+                }
+            }
+            RF.Close();
+            break;
+
+        case RENDER_TO_STEREO:
+            Stereo = 1;
+        case RENDER_TO_MONO:
+            Mem_Buffer_Size = AUDIO_Latency * 64;
+            Sample_Buffer[0] = (short *) malloc(Mem_Buffer_Size * 2);
+            memset(Sample_Buffer[0], 0, Mem_Buffer_Size * 2);
+            Sample_Buffer[1] = NULL;
+            if(Sample_Buffer[0])
+            {
+                if(Stereo)
+                {
+                    Sample_Buffer[1] = (short *) malloc(Mem_Buffer_Size * 2);
+                    if(!Sample_Buffer[1])
+                    {
+                        free(Sample_Buffer[0]);
+                        goto Stop_WavRender;
+                    }
+                    memset(Sample_Buffer[1], 0, Mem_Buffer_Size * 2);
+                }
+                Pos_In_Memory = 0;
+                SongPlay();
+                while(Song_Position < Max_Position && done == FALSE)
+                {
+                    if(!Mem_Buffer_Size)
+                    {
+                        // Increase the size of our buffer
+                        Mem_Buffer_Size = (AUDIO_Latency * 64);
+                        Sample_Buffer[0] = (short *) realloc(Sample_Buffer[0], (Pos_In_Memory + Mem_Buffer_Size) * 2);
+                        if(Stereo)
+                        {
+                            Sample_Buffer[1] = (short *) realloc(Sample_Buffer[1], (Pos_In_Memory + Mem_Buffer_Size) * 2);
+                        }
+                    }
+                    GetPlayerValues();
+                    if(Stereo)
+                    {
+                        Sample_Buffer[0][Pos_In_Memory] = left_float_render * 32767.0f;
+                        Sample_Buffer[1][Pos_In_Memory] = right_float_render * 32767.0f;
+                        filesize += 4;
+                    }
+                    else
+                    {
+                        // Mix both channels
+                        Sample_Buffer[0][Pos_In_Memory] = ((left_float_render * 0.5f) +
+                                                           (right_float_render * 0.5f)) * 32767.0f;
+                        filesize += 2;
+                    }
+                    Pos_In_Memory++;
+                    Mem_Buffer_Size--;
+                }
+                save_sample_vol = 1.0f;
+                if(Get_Number_Of_Splits(Current_Instrument)) save_sample_vol = Sample_Vol[Current_Instrument];
+
+                AllocateWave(Current_Instrument, Current_Instrument_Split,
+                             Pos_In_Memory, (Stereo + 1), TRUE,
+                             NULL, NULL);
+
+                // Fixup the buffer with it's real size
+                memcpy(RawSamples[Current_Instrument][0][Current_Instrument_Split], 
+                       Sample_Buffer[0], (Pos_In_Memory * 2));
+                if(Stereo)
+                {
+                    memcpy(RawSamples[Current_Instrument][1][Current_Instrument_Split], 
+                           Sample_Buffer[1], (Pos_In_Memory * 2));
+                    free(Sample_Buffer[1]);
+                }
+                free(Sample_Buffer[0]);
+                LoopStart[Current_Instrument][Current_Instrument_Split] = 0;
+                LoopEnd[Current_Instrument][Current_Instrument_Split] = 0;
+                LoopType[Current_Instrument][Current_Instrument_Split] = SMP_LOOP_NONE;
+                Basenote[Current_Instrument][Current_Instrument_Split] = DEFAULT_BASE_NOTE;
+                Renew_Sample_Ed();
+                if(Get_Number_Of_Splits(Current_Instrument) == 1)
+                {
+                    Sample_Vol[Current_Instrument] = save_sample_vol;
+                }
+            }
+            break;
+    }
+
+Stop_WavRender:
+    SongStop();
+    Post_Song_Init();
+    Songplaying = FALSE;
+
+    for(i = 0; i < MAX_TRACKS; i++)
+    {
+        CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
+    }
+
+    int minutes = filesize / 10584000;
+    int seconds = (filesize - minutes * 10584000) / 176400;
+
+    switch(rawrender_target)
+    {
+        case RENDER_TO_FILE:
+            sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
+            break;
+        default:
+            sprintf(buffer, "Wav rendering finished. Waveform size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
+    }
+    Status_Box(buffer);
+
+    // Return to the start as all the values will be trashed anyway.
+    Pattern_Line = 0;
+    Song_Position = 0;
+    Song_Position_Visual = 0;
+    Pattern_Line_Visual = 0;
+    Actualize_DiskIO_Ed(0);
+    rawrender = FALSE;
+
+    last_index = -1;
+    Read_SMPT();
+    Actualize_Files_List(0);
+
+    Status_Box(buffer);
+    Actupated(0);
 }
 
 // ------------------------------------------------------
@@ -2619,7 +2745,7 @@ void DeleteInstrument(void)
     int i;
     int Old_Prg;
 
-    Stop_Current_Sample();
+    Stop_Current_Instrument();
 
     if(ZzaappOMatic == ZZAAPP_ALL || ZzaappOMatic == ZZAAPP_SYNTHS)
     {
@@ -2631,8 +2757,8 @@ void DeleteInstrument(void)
             }
         }
 
-        ResetSynthParameters(&PARASynth[Current_Sample]);
-        Synthprg[Current_Sample] = 0;
+        ResetSynthParameters(&PARASynth[Current_Instrument]);
+        Synthprg[Current_Instrument] = 0;
         Actualize_Master(0);
         Final_Mod_Length = 0;
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
@@ -2644,13 +2770,13 @@ void DeleteInstrument(void)
         seditor = 0;
         Final_Mod_Length = 0;
         Actualize_Master(0);
-        Old_Prg = Synthprg[Current_Sample];
-        KillInst(Current_Sample, FALSE);
-        Synthprg[Current_Sample] = Old_Prg;
-        sprintf(nameins[Current_Sample], "Untitled");
-        if((Synthprg[Current_Sample] - 2) == Current_Sample)
+        Old_Prg = Synthprg[Current_Instrument];
+        KillInst(Current_Instrument, FALSE);
+        Synthprg[Current_Instrument] = Old_Prg;
+        sprintf(nameins[Current_Instrument], "Untitled");
+        if((Synthprg[Current_Instrument] - 2) == Current_Instrument)
         {
-            Synthprg[Current_Sample] = 1;
+            Synthprg[Current_Instrument] = 1;
         }
         Renew_Sample_Ed();
         Status_Box("Instrument deleted.");
@@ -2663,13 +2789,13 @@ void DeleteInstrument(void)
         seditor = 0;
         Final_Mod_Length = 0;
         Actualize_Master(0);
-        Old_Prg = Synthprg[Current_Sample];
-        KillInst(Current_Sample, TRUE);
-        Synthprg[Current_Sample] = Old_Prg;
-        sprintf(nameins[Current_Sample], "Untitled");
-        if((Synthprg[Current_Sample] - 2) == Current_Sample)
+        Old_Prg = Synthprg[Current_Instrument];
+        KillInst(Current_Instrument, TRUE);
+        Synthprg[Current_Instrument] = Old_Prg;
+        sprintf(nameins[Current_Instrument], "Untitled");
+        if((Synthprg[Current_Instrument] - 2) == Current_Instrument)
         {
-            Synthprg[Current_Sample] = 1;
+            Synthprg[Current_Instrument] = 1;
         }
         Renew_Sample_Ed();
         Status_Box("Instrument deleted.");
@@ -2679,7 +2805,7 @@ void DeleteInstrument(void)
     Actualize_Instruments_Synths_List(0);
 }
 
-void Stop_Current_Sample(void)
+void Stop_Current_Instrument(void)
 {
     int i;
 
@@ -2687,7 +2813,7 @@ void Stop_Current_Sample(void)
     {
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
-            if(sp_channelsample[u][i] == Current_Sample)
+            if(sp_channelsample[u][i] == Current_Instrument)
             {
                 if(sp_Stage[u][i] == PLAYING_SAMPLE)
                 {
@@ -2707,7 +2833,7 @@ void Stop_Current_Sample(void)
 void RefreshSample(void)
 {
     seditor = 0;
-    Current_Sample_Split = 0;
+    Current_Instrument_Split = 0;
     if(userscreen == USER_SCREEN_INSTRUMENT_EDIT)
     {
         Draw_Instrument_Ed();
@@ -2741,7 +2867,7 @@ void ShowInfo(void)
       {
          if(SampleType[pp][z] != 0)
          {
-            sampsize += SampleChannels[pp][z] * SampleNumSamples[pp][z];
+            sampsize += SampleChannels[pp][z] * SampleLength[pp][z];
          }
       }
    }
@@ -2790,13 +2916,13 @@ void Actualize_Input(void)
 
         // Instrument name
         case INPUT_INSTRUMENT_NAME:
-            Actualize_Name(retletter, nameins[Current_Sample]);
+            Actualize_Name(retletter, nameins[Current_Instrument]);
             gui_action = GUI_CMD_UPDATE_PATTERN_ED;
             break;
 
         // Synth name
         case INPUT_SYNTH_NAME:
-            Actualize_Name(retletter, PARASynth[Current_Sample].presetname);
+            Actualize_Name(retletter, PARASynth[Current_Instrument].presetname);
             teac = UPDATE_SYNTH_CHANGE_NAME;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             break;
@@ -4511,7 +4637,7 @@ void Keyboard_Handler(void)
                             if(is_editing)
                             {
                                 *(RawPatterns + xoffseted + PATTERN_NOTE1) = tmp_note;
-                                *(RawPatterns + xoffseted + PATTERN_INSTR1) = Current_Sample;
+                                *(RawPatterns + xoffseted + PATTERN_INSTR1) = Current_Instrument;
                             }
                         }
                         move_down = TRUE;
@@ -4932,8 +5058,8 @@ void Mouse_Handler(void)
         if(zcheckMouse(90, 108, 166, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_INSTRUMENT_NAME;
-            strcpy(cur_input_name, nameins[Current_Sample]);
-            sprintf(nameins[Current_Sample], "");
+            strcpy(cur_input_name, nameins[Current_Instrument]);
+            sprintf(nameins[Current_Instrument], "");
             namesize = 0;
             gui_action = GUI_CMD_UPDATE_PATTERN_ED;
         }
@@ -6343,7 +6469,7 @@ void Note_Jazz(int track, int note)
         sp_Tvol_Mod[track] = 1.0f;
         Schedule_Instrument(track, Sub_Channel,
                             note,
-                            Current_Sample,
+                            Current_Instrument,
                             0, 0, !is_recording, -(Sub_Channel + 1));
     }
 }

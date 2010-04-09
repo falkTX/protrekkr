@@ -2,6 +2,16 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.0:
+
+- Fixed 2 bugs in the replay (which can now be slightly smaller).
+- Lengths of individual packed waveforms are now displayed.
+- Songs can now be rendered to wav files (like before)
+  or directly used to create instruments waveforms.
+- Added primitive.ptk by Mice of Brainstorm.
+- Fixed a bug in the sample editor which prevented it to work properly
+  with waveforms of more than 2 megabytes.
+
 v2.0.2:
 
 - Moog Lo & Moog band filters buffers weren't resetted properly

@@ -32,21 +32,27 @@
 #ifndef _SAMPLES_PACK_H_
 #define _SAMPLES_PACK_H_
 
-#if !defined(__NO_CODEC__)
-
 // ------------------------------------------------------
 // Constants
 #define MP3_FRAMES_LAG 65536
 
 // ------------------------------------------------------
 // Functions
+#if defined(__GSM_CODEC__)
 int ToGSM(short *Source, short *Dest, int Size);
-int ToAT3(short *Source, short *Dest, int Size, int BitRate);
-int ToMP3(short *Source, short *Dest, int Size, int BitRate);
-int ToTrueSpeech(short *Source, short *Dest, int Size);
-int ToADPCM(short *Source, short *Dest, int Size);
-int To8Bit(short *Source, short *Dest, int Size);
-
 #endif
+#if defined(__AT3_CODEC__)
+int ToAT3(short *Source, short *Dest, int Size, int BitRate);
+#endif
+#if defined(__MP3_CODEC__)
+int ToMP3(short *Source, short *Dest, int Size, int BitRate);
+#endif
+#if defined(__TRUESPEECH_CODEC__)
+int ToTrueSpeech(short *Source, short *Dest, int Size);
+#endif
+#if defined(__ADPCM_CODEC__)
+int ToADPCM(short *Source, short *Dest, int Size);
+#endif
+int To8Bit(short *Source, short *Dest, int Size);
 
 #endif
