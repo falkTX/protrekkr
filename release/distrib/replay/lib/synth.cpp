@@ -203,6 +203,7 @@ void CSynth::Reset(void)
     sbuf0R = 0.0f;
     sbuf1R = 0.0f;
 
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
     MoogBufferL[0] = 0.0f;
     MoogBufferL[1] = 0.0f;
     MoogBufferL[2] = 0.0f;
@@ -214,6 +215,7 @@ void CSynth::Reset(void)
     MoogBufferR[2] = 0.0f;
     MoogBufferR[3] = 0.0f;
     MoogBufferR[4] = 0.0f;
+#endif
 }
 
 // ------------------------------------------------------
@@ -373,6 +375,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     sbuf0R = 0.0f;
     sbuf1R = 0.0f;
 
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
     MoogBufferL[0] = 0.0f;
     MoogBufferL[1] = 0.0f;
     MoogBufferL[2] = 0.0f;
@@ -384,6 +387,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     MoogBufferR[2] = 0.0f;
     MoogBufferR[3] = 0.0f;
     MoogBufferR[4] = 0.0f;
+#endif
 
     if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
     {
@@ -1021,9 +1025,11 @@ float CSynth::GetSample(short *Left_Samples,
                     }
                     else pos_osc1->absolu += osc_speed2;
 
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                     switch(Loop_Type1)
                     {
                         case SMP_LOOP_NONE:
+#endif
                             if(ENV1_LOOP_BACKWARD)
                             {
                                 if((int) pos_osc1->half.first <= 0)
@@ -1040,8 +1046,11 @@ float CSynth::GetSample(short *Left_Samples,
                                     *track = PLAYING_NOSAMPLE;
                                 }
                             }
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                             break;
+#endif
 
+#if defined(PTK_LOOP_FORWARD)
                         case SMP_LOOP_FORWARD:
                             if(ENV1_LOOP_BACKWARD)
                             {
@@ -1058,7 +1067,9 @@ float CSynth::GetSample(short *Left_Samples,
                                 }
                             }
                             break;
+#endif
 
+#if defined(PTK_LOOP_PINGPONG)
                         case SMP_LOOP_PINGPONG:
                             if(ENV1_LOOP_BACKWARD)
                             {
@@ -1077,7 +1088,11 @@ float CSynth::GetSample(short *Left_Samples,
                                 }
                             }
                             break;
+#endif
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                     }
+#endif
+
                }
             }
         }
@@ -1346,9 +1361,11 @@ float CSynth::GetSample(short *Left_Samples,
                     }
                     else pos_osc2->absolu += osc_speed2;
 
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                     switch(Loop_Type2)
                     {
                         case SMP_LOOP_NONE:
+#endif
                             if(ENV2_LOOP_BACKWARD)
                             {
                                 if((int) pos_osc2->half.first <= 0)
@@ -1365,8 +1382,11 @@ float CSynth::GetSample(short *Left_Samples,
                                     *track2 = PLAYING_NOSAMPLE;
                                 }
                             }
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                             break;
+#endif
 
+#if defined(PTK_LOOP_FORWARD)
                         case SMP_LOOP_FORWARD:
                             if(ENV2_LOOP_BACKWARD)
                             {
@@ -1383,7 +1403,9 @@ float CSynth::GetSample(short *Left_Samples,
                                 }
                             }
                             break;
+#endif
 
+#if defined(PTK_LOOP_PINGPONG)
                         case SMP_LOOP_PINGPONG:
                             if(ENV2_LOOP_BACKWARD)
                             {
@@ -1402,7 +1424,11 @@ float CSynth::GetSample(short *Left_Samples,
                                 }
                             }
                             break;
+#endif
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                     }
+#endif
+
                 }
             }
         }
@@ -1603,9 +1629,11 @@ float CSynth::GetSample(short *Left_Samples,
                 }
                 else pos_osc3->absolu += osc_speed2;
 
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                 switch(Loop_Type)
                 {
                     case SMP_LOOP_NONE:
+#endif
                         if(ENV3_LOOP_BACKWARD)
                         {
                             if((int) pos_osc3->half.first <= 0)
@@ -1622,8 +1650,11 @@ float CSynth::GetSample(short *Left_Samples,
                                 *track = PLAYING_NOSAMPLE;
                             }
                         }
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                         break;
+#endif
 
+#if defined(PTK_LOOP_FORWARD)
                     case SMP_LOOP_FORWARD:
                         if(ENV3_LOOP_BACKWARD)
                         {
@@ -1640,7 +1671,9 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                         }
                         break;
+#endif
 
+#if defined(PTK_LOOP_PINGPONG)
                     case SMP_LOOP_PINGPONG:
                         if(ENV3_LOOP_BACKWARD)
                         {
@@ -1659,7 +1692,10 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                         }
                         break;
+#endif
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                 }
+#endif
             }
         }
     }
@@ -1862,8 +1898,6 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     Data.ENV1_OSC2_VOLUME =   ((float) TSP.env1_osc2_volume - 64) * 0.015625f;
     Data.ENV1_VCF_CUTOFF =    ((float) TSP.env1_vcf_cutoff - 64) * 0.015625f;
     Data.ENV1_VCF_RESONANCE = ((float) TSP.env1_vcf_resonance - 64) * 0.015625f;
-    //if((TSP.env1_osc1_volume - 64) == 0) Data.ENV1_OSC1_VOLUME = 1.0f;
-    //if((TSP.env1_osc2_volume - 64) == 0) Data.ENV1_OSC2_VOLUME = 1.0f;
 
     Data.ENV2_OSC1_PW =       ((float) TSP.env2_osc1_pw - 64) * 0.015625f;
     Data.ENV2_OSC2_PW =       ((float) TSP.env2_osc2_pw - 64) * 0.015625f;
@@ -1873,16 +1907,12 @@ void CSynth::ChangeParameters(SynthParameters TSP)
     Data.ENV2_OSC2_VOLUME =   ((float) TSP.env2_osc2_volume - 64) * 0.015625f;
     Data.ENV2_VCF_CUTOFF =    ((float) TSP.env2_vcf_cutoff - 64) * 0.015625f;
     Data.ENV2_VCF_RESONANCE = ((float) TSP.env2_vcf_resonance - 64) * 0.015625f;
-    //if((TSP.env2_osc1_volume - 64) == 0) Data.ENV2_OSC1_VOLUME = 1.0f;
-    //if((TSP.env2_osc2_volume - 64) == 0) Data.ENV2_OSC2_VOLUME = 1.0f;
 
     Data.OSC3_VOLUME =        ((float) TSP.osc3_volume - 64) * 0.015625f;
     Data.OSC3_SWITCH =        TSP.osc3_switch;
 
     Data.PTC_GLIDE =          ((float) TSP.ptc_glide * (float) TSP.ptc_glide) * 0.0000015625f;
     Data.PTC_GLIDE64 =         (int64) ((double) Data.PTC_GLIDE * 4294967296.0);
-
-//    Data.GLB_VOLUME =         ((float) TSP.glb_volume) * 0.0078125f;
 
     Data.DISTO =              (((float) TSP.disto)) + 1.0f;
 

@@ -32,7 +32,9 @@
 // ------------------------------------------------------
 // Includes
 #include "include/spline.h"
+#include "include/ptk_def_properties.h"
 
+#if defined(PTK_USE_SPLINE)
 // ------------------------------------------------------
 // Variables
 float at[RESOLUTION];
@@ -71,3 +73,4 @@ float Spline_Work(float yo, float y0, float y1, float y2, unsigned int res)
     res = res >> 22;
     return (at[res] * yo + bt[res] * y0 + ct[res] * y1 + dt[res] * y2);
 }
+#endif

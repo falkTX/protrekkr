@@ -179,6 +179,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Store_Synth_Env2_Pitch = FALSE;
     
     int Store_Instruments = FALSE;
+    int Store_Loop_Forward = FALSE;
+    int Store_Loop_PingPong = FALSE;
 
     int Store_Volume_Column = FALSE;
     int Store_FX_NoteCut = FALSE;
@@ -1021,6 +1023,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
             if(Synthprg[swrite])
             {
+                // Forward as least for synths
+                Store_Loop_Forward = TRUE;
 
                 Write_Mod_Data(&PARASynth[swrite].osc1_waveform, sizeof(char), 1, in);
                 Write_Mod_Data(&PARASynth[swrite].osc2_waveform, sizeof(char), 1, in);
@@ -1382,6 +1386,15 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                     
                     Write_Mod_Data(&Loop_Start, sizeof(int), 1, in);
                     Write_Mod_Data(&Loop_End, sizeof(int), 1, in);
+                    switch(LoopType[swrite][slwrite])
+                    {
+                        case SMP_LOOP_FORWARD:
+                            Store_Loop_Forward = TRUE;
+                            break;
+                        case SMP_LOOP_PINGPONG:
+                            Store_Loop_PingPong = TRUE;
+                            break;
+                    }
                     Write_Mod_Data(&LoopType[swrite][slwrite], sizeof(char), 1, in);
                     
                     Write_Mod_Data(&Calc_Len, sizeof(int), 1, in);
@@ -1460,6 +1473,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     }
 
     Save_Constant("PTK_INSTRUMENTS", Store_Instruments);
+    Save_Constant("PTK_LOOP_FORWARD", Store_Loop_Forward);
+    Save_Constant("PTK_LOOP_PINGPONG", Store_Loop_PingPong);
 
     Save_Constant("PTK_SYNTH", Store_Synth);
 

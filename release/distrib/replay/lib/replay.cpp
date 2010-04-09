@@ -157,8 +157,10 @@ float DClamp[MAX_TRACKS];
 float CCoef[MAX_TRACKS];
 float lbuff_chorus[131072];
 float rbuff_chorus[131072];
+#if defined(PTK_FILTER_LOHIBAND)
 float coef[5];
 float coeftab[5][128][128][4];
+#endif
 
 #if defined(__PSP__)
 volatile int Songplaying;
@@ -435,7 +437,6 @@ short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
     char num_echoes;
     int delays[MAX_COMB_FILTERS];       // delays for the comb filters
     float decays[MAX_COMB_FILTERS];
-
 #endif // PTK_COMPRESSOR
 
 float buf024[MAX_TRACKS];
@@ -552,8 +553,12 @@ static unsigned long ctz[64] =
 };
 #endif
 
+#if !defined(__STAND_ALONE__)
+#if !defined(__NO_MIDI__)
 extern int Midi_Notes_History[MAX_TRACKS][256];
 extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+#endif
+#endif
 
 #if !defined(__STAND_ALONE__)
 void Clear_Midi_Channels_Pool(void);
@@ -854,6 +859,8 @@ int STDCALL Ptk_InitDriver(void)
 #if defined(__STAND_ALONE__)
 Uint8 *Cur_Module;
 
+// ------------------------------------------------------
+// Retrieve data from the ptp mod
 void Mod_Dat_Read(void *Dest, int size)
 {
     memcpy(Dest, Cur_Module, size);
@@ -1148,7 +1155,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                                       );
                     }
-                    *(RawSamples[swrite][0][slwrite]) = 0;
+                    //*(RawSamples[swrite][0][slwrite]) = 0;
 
                     // Stereo flag
                     Mod_Dat_Read(&SampleChannels[swrite][slwrite], sizeof(char));
@@ -1209,7 +1216,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                                           );
                         }
-                        *RawSamples[swrite][1][slwrite] = 0;
+                        //*RawSamples[swrite][1][slwrite] = 0;
                     }
                     if(Sample_Buffer) free(Sample_Buffer);
 
@@ -1438,10 +1445,10 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     Song_Position = new_position;
     Pattern_Line = 0;
     //Song_Position_Visual = new_position;
-    PosInTick = 0;
-    PosInTick_Delay = 0;
-    SubCounter = 0;
-    Subicounter = 0;
+    //PosInTick = 0;
+    //PosInTick_Delay = 0;
+    //SubCounter = 0;
+    //Subicounter = 0;
 
 #if defined(PTK_FX_PATTERNLOOP)
     // No repeat loop
@@ -1506,16 +1513,14 @@ void Reset_Values(void)
 
 #if defined(PTK_SYNTH)
                 Synthesizer[stopper][stopper_poly].Reset();
+                sp_Stage2[stopper][stopper_poly] = PLAYING_NOSAMPLE;
+                sp_Stage3[stopper][stopper_poly] = PLAYING_NOSAMPLE;
 #endif
 
 #if defined(PTK_INSTRUMENTS)
                 sp_Stage[stopper][stopper_poly] = PLAYING_NOSAMPLE;
 #endif
 
-#if defined(PTK_SYNTH)
-                sp_Stage2[stopper][stopper_poly] = PLAYING_NOSAMPLE;
-                sp_Stage3[stopper][stopper_poly] = PLAYING_NOSAMPLE;
-#endif
                 Reserved_Sub_Channels[stopper][stopper_poly] = -1;
                 Note_Sub_Channels[stopper][stopper_poly] = -1;
                 sp_channelsample[stopper][stopper_poly] = -1;
@@ -1764,6 +1769,7 @@ void Pre_Song_Init(void)
 #endif
 
 #if !defined(__STAND_ALONE__)
+        // Default parameters usde inside the tracker
         FLANGER_AMOUNT[ini] = -0.8f;
         FLANGER_DEPHASE[ini] = 0.0174532f;
         FLANGER_ON[ini] = 0;
@@ -1870,6 +1876,7 @@ void Pre_Song_Init(void)
         rbuff_chorus[dini] = 0.0f;
     }
 
+#if defined(PTK_FILTER_LOHIBAND)
     for(int cutt = 0; cutt < 128; cutt++)
     {
         for(int rezz = 0; rezz < 128; rezz++)
@@ -1885,6 +1892,7 @@ void Pre_Song_Init(void)
             }
         }
     }
+#endif
 
 #if defined(PTK_INSTRUMENTS)
     Free_Samples();
@@ -2721,8 +2729,10 @@ ByPass_Wav:
                         sp_Position[c][i].absolu += Vstep1[c][i];
                     }
 
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                     switch(Player_LT[c][i])
                     {
+#if defined(PTK_LOOP_FORWARD)
                         case SMP_LOOP_FORWARD:
                             if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                             {
@@ -2739,7 +2749,8 @@ ByPass_Wav:
                                 }
                             }
                             break;
-
+#endif
+#if defined(PTK_LOOP_PINGPONG)
                         case SMP_LOOP_PINGPONG:
                             if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                             {
@@ -2758,8 +2769,9 @@ ByPass_Wav:
                                 }
                             }
                             break;
-
+#endif
                         case SMP_LOOP_NONE:
+#endif // defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                             if(Player_LW[c][i] == SMP_LOOPING_FORWARD)
                             {
                                 if(sp_Position[c][i].half.first >= Player_NS[c][i])
@@ -2776,8 +2788,10 @@ ByPass_Wav:
                                     sp_Stage[c][i] = PLAYING_NOSAMPLE;
                                 }
                             }
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
                             break;
                     }
+#endif
 
 #if defined(PTK_SYNTH)
                 }
@@ -2943,15 +2957,15 @@ ByPass_Wav:
 
 #if defined(PTK_TRACKFILTERS)
             if(FType[c] != 4)
-            { // Track filter actived
+            {   // Track filter activated
                 float const dfi = TCut[c] - CCut[c];
 
                 if(dfi < -1.0f || dfi > 1.0f) CCut[c] += dfi * ICut[c];
 
+#if defined(PTK_FILTER_LOHIBAND)
                 if(FType[c] < 4)
                 {
 
-#if defined(PTK_FILTER_LOHIBAND)
                     gco = (int) (ApplyLfo(CCut[c] - ramper[c], c));
 
                     ramper[c] += Player_FD[c] * gco * 0.015625f;
@@ -2964,10 +2978,9 @@ ByPass_Wav:
 
                     All_Signal_L = Filter(All_Signal_L + 1.0f, c);
                     if(grown) All_Signal_R = Filter(All_Signal_R + 1.0f, c);
-#endif
-
                 }
                 else
+#endif
                 {
                     float const realcut = ApplyLfo(CCut[c] - ramper[c], c);
 
@@ -4741,6 +4754,7 @@ void GetPlayerValues(void)
 
 // ------------------------------------------------------
 // Precalc filters coefficients
+#if defined(PTK_FILTER_LOHIBAND)
 void ComputeCoefs(int freq, int r, int t)
 {
     float omega = float(2 * PI * Kutoff(freq) / fMIX_RATE);
@@ -4803,6 +4817,7 @@ void ComputeCoefs(int freq, int r, int t)
     coef[3] = -a1 / a0;
     coef[4] = -a2 / a0;
 }
+#endif
 
 // ------------------------------------------------------
 // Filters run
@@ -5740,8 +5755,10 @@ void Set_Spline_Boundaries(unsigned int Position,
     Length--;
     if(LoopEnd >= Length) LoopEnd = Length;
 
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
     switch(LoopType)
     {
+#if defined(PTK_LOOP_FORWARD)
         case SMP_LOOP_FORWARD:
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
@@ -5758,7 +5775,9 @@ void Set_Spline_Boundaries(unsigned int Position,
                 if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopEnd;
             }
             break;
+#endif
 
+#if defined(PTK_LOOP_PINGPONG)
         case SMP_LOOP_PINGPONG:
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
@@ -5779,8 +5798,10 @@ void Set_Spline_Boundaries(unsigned int Position,
                 if((int) Boundaries[3] <= (int) LoopStart) Boundaries[3] = LoopStart;
             }
             break;
+#endif
 
         case SMP_LOOP_NONE:
+#endif // defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
             if(LoopWay == SMP_LOOPING_FORWARD)
             {
                 if(Boundaries[0] >= Length) Boundaries[0] = Length;
@@ -5795,8 +5816,10 @@ void Set_Spline_Boundaries(unsigned int Position,
                 if((int) Boundaries[2] <= 0) Boundaries[2] = 0;
                 if((int) Boundaries[3] <= 0) Boundaries[3] = 0;
             }
+#if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
             break;
     }
+#endif
 }
 
 // ------------------------------------------------------

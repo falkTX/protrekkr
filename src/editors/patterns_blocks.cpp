@@ -762,7 +762,16 @@ Continue_Copy:
                     type_dst = Get_Column_Type(Channels_MultiNotes, xbc);
                     if(Buff_Full[Curr_Buff_Block])
                     {
-                        if(type_src == type_dst)
+                        if(type_src == type_dst ||
+                           (type_src == EFFECTLO && type_dst == EFFECT2LO) ||
+                           (type_src == EFFECTDATLO && type_dst == EFFECT2DATLO) ||
+                           (type_src == EFFECTHI && type_dst == EFFECT2HI) ||
+                           (type_src == EFFECTDATHI && type_dst == EFFECT2DATHI) ||
+                           (type_dst == EFFECTLO && type_src == EFFECT2LO) ||
+                           (type_dst == EFFECTDATLO && type_src == EFFECT2DATLO) ||
+                           (type_dst == EFFECTHI && type_src == EFFECT2HI) ||
+                           (type_dst == EFFECTDATHI && type_src == EFFECT2DATHI)
+                        )
                         {
                             // We need to check if we're on an odd byte for the instrument/volume or panning
                             // and see if the byte was 0xff if that's the case we need to put 0 in the upper nibble

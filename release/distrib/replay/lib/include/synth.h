@@ -437,8 +437,10 @@ class CSynth
 #endif
 
         /* Internal rendering variables */
+#if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
         float MoogBufferL[5];
         float MoogBufferR[5];
+#endif
 
         float OSC1_STEP;
         float OSC2_STEP;
