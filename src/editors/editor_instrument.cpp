@@ -106,7 +106,7 @@ void Draw_Instrument_Ed(void)
         case 0:
             Gui_Draw_Flat_Box("Instrument Editor [Sample]");
 
-            Gui_Draw_Button_Box(640, 466, 39, 16, "Pack", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(640, 466, 39, 16, "Pack:", BUTTON_NORMAL | BUTTON_DISABLED);
 
             Gui_Draw_Button_Box(8, 528, 44, 16, "F.Decay", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(8, 546, 44, 16, "Def.Vol", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -402,16 +402,6 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                             Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global | BUTTON_TEXT_CENTERED);
                             break;
-                        case SMP_PACK_NONE:
-                            Gui_Draw_Button_Box(681, 466, 39, 16, "Internal", Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_GSM | Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_MP3 | Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_ADPCM | Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_TRUESPEECH | Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_AT3 | Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global | BUTTON_TEXT_CENTERED);
-                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
-                            break;
                         case SMP_PACK_INTERNAL:
                             Gui_Draw_Button_Box(681, 466, 39, 16, "Internal", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                             Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_GSM | Allow_Global | BUTTON_TEXT_CENTERED);
@@ -421,6 +411,16 @@ void Actualize_Instrument_Ed(int typex, char gode)
                             Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_AT3 | Allow_Global | BUTTON_TEXT_CENTERED);
                             Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global | BUTTON_TEXT_CENTERED);
                             Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global | BUTTON_TEXT_CENTERED);
+                            break;
+                        case SMP_PACK_NONE:
+                            Gui_Draw_Button_Box(681, 466, 39, 16, "Internal", Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(640, 484, 39, 16, "Gsm", Allow_GSM | Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(681, 484, 39, 16, "Mp3", Allow_MP3 | Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 1), 80, 16, "ADPCM", Allow_ADPCM | Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 2), 80, 16, "True Speech", Allow_TRUESPEECH | Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 3), 80, 16, "At3 (PSP only)", Allow_AT3 | Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(640, 484 + (18 * 4), 39, 16, "8 Bit", Allow_Global | BUTTON_TEXT_CENTERED);
+                            Gui_Draw_Button_Box(681, 484 + (18 * 4), 39, 16, "None", Allow_Global_Pushed | BUTTON_TEXT_CENTERED);
                             break;
                     }
                     if(gode == 16) gode = 19;
@@ -1313,6 +1313,12 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
 #endif
+#if defined(__AT3_CODEC__)
+                                    case SMP_PACK_AT3:
+                                        sprintf(Line, "Pck: At3 (%d)", Type_At3_BitRate[At3_BitRate[rel_val]]);
+                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
+                                        break;
+#endif
                                     case SMP_PACK_8BIT:
                                         sprintf(Line, "Pck: 8 Bit");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
@@ -1321,12 +1327,6 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         sprintf(Line, "Pck: None");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
-#if defined(__AT3_CODEC__)
-                                    case SMP_PACK_AT3:
-                                        sprintf(Line, "Pck: At3 (%d)", Type_At3_BitRate[At3_BitRate[rel_val]]);
-                                        PrintXY(xr + 240, yr + (counter * 12), Font, Line);
-                                        break;
-#endif
                                     case SMP_PACK_INTERNAL:
                                         sprintf(Line, "Pck: Intern. (%s)", Type_Internal_Quality[Internal_Quality[rel_val]]);
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
@@ -1650,6 +1650,12 @@ void Lock_Sample(int instr_nbr, int split)
                 PackedLen = To8Bit(Sample, PackedSample, Size);
                 break;
 
+            case SMP_PACK_INTERNAL:
+                PackedSample = (short *) malloc(Size * 2 + 8);
+                memset(PackedSample, 0, Size * 2 + 8);
+                PackedLen = ToInternal(Sample, PackedSample, Size);
+                break;
+
             case SMP_PACK_NONE:
                 PackedLen = 0;
                 break;
@@ -1688,6 +1694,10 @@ void Lock_Sample(int instr_nbr, int split)
 #endif
                 case SMP_PACK_8BIT:
                     Unpack8Bit((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
+                    break;
+
+                case SMP_PACK_INTERNAL:
+                    UnpackInternal((Uint8 *) PackedSample, Dest_Buffer, PackedLen, Size);
                     break;
             }
         }

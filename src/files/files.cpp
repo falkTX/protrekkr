@@ -773,6 +773,10 @@ short *Unpack_Sample(FILE *FileHandle, int Dest_Length, char Pack_Type, int BitR
             case SMP_PACK_8BIT:
                 Unpack8Bit(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
                 break;
+
+            case SMP_PACK_INTERNAL:
+                UnpackInternal(Packed_Read_Buffer, Dest_Buffer, Packed_Length, Dest_Length);
+                break;
         }
         free(Packed_Read_Buffer);
         return(Dest_Buffer);
@@ -858,6 +862,12 @@ void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int 
             PackedSample = (short *) malloc(Size * 2 + 8);
             memset(PackedSample, 0, Size * 2 + 8);
             PackedLen = To8Bit(Sample, PackedSample, Size);
+            break;
+
+        case SMP_PACK_INTERNAL:
+            PackedSample = (short *) malloc(Size * 2 + 8);
+            memset(PackedSample, 0, Size * 2 + 8);
+            PackedLen = ToInternal(Sample, PackedSample, Size);
             break;
 
         case SMP_PACK_NONE:

@@ -54,5 +54,6 @@ int ToTrueSpeech(short *Source, short *Dest, int Size);
 int ToADPCM(short *Source, short *Dest, int Size);
 #endif
 int To8Bit(short *Source, short *Dest, int Size);
+int ToInternal(short *Source, short *Dest, int Size);
 
 #endif

@@ -355,3 +355,12 @@ void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     }
 }
 #endif
+
+// ------------------------------------------------------
+// Unpack an Internal format sample
+#if defined(PTK_INTERNAL)
+void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+{
+
+}
+#endif

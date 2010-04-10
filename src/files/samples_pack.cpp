@@ -454,3 +454,11 @@ int To8Bit(short *Source, short *Dest, int Size)
 
     return(Size);
 }
+
+// ------------------------------------------------------
+// Pack a sample to internal format
+int ToInternal(short *Source, short *Dest, int Size)
+{
+
+    return(Size);
+}
