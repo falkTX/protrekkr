@@ -292,6 +292,10 @@ SOURCE=.\Release\Distrib\Replay\lib\include\Synth.h
 
 SOURCE=.\Release\Distrib\Replay\lib\include\TB_303.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\release\distrib\replay\lib\include\wavpack.h
+# End Source File
 # End Group
 # Begin Group "SoundDriver"
 
@@ -332,6 +336,10 @@ SOURCE=.\Release\Distrib\Replay\lib\Synth.cpp
 # Begin Source File
 
 SOURCE=.\Release\Distrib\Replay\lib\TB_303.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\release\distrib\replay\lib\wavpack.cpp
 # End Source File
 # End Group
 # Begin Group "UI"
@@ -418,10 +426,6 @@ SOURCE=.\src\files\include\reverbs.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Files\include\Samples_Pack.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\files\include\synths.h
 # End Source File
 # End Group
@@ -460,10 +464,6 @@ SOURCE=.\src\files\ptps.cpp
 # Begin Source File
 
 SOURCE=.\src\files\reverbs.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\Files\Samples_Pack.cpp
 # End Source File
 # Begin Source File
 
@@ -540,10 +540,50 @@ SOURCE=.\src\samples\wav\riff.cpp
 
 SOURCE=.\src\samples\include\samples_ops.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\include\samples_pack.h
+# End Source File
+# End Group
+# Begin Group "Wavpack"
+
+# PROP Default_Filter ""
+# Begin Group "Wavpack Include"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\include\wplocal.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\bits.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\pack.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\tinypack.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\words.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\wavpack\wputils.cpp
+# End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\src\samples\samples_ops.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\samples\samples_pack.cpp
 # End Source File
 # End Group
 # Begin Source File

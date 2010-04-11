@@ -537,7 +537,7 @@ void draw_pated(int track, int line, int petrack, int row)
                     goto Go_Display;
                 } 
             }
-            if(Cur_Position2 < sLength - 1)
+            if(Cur_Position2 < Song_Length - 1)
             {
                 if(rel >= patternLines[pSequence[Cur_Position2]])
                 {
@@ -1487,10 +1487,12 @@ void draw_pated_highlight(int track, int line, int petrack, int row)
 void Actupated(int modac)
 {
     int nlines;
+    int i;
     int Cur_Position;
     int Cur_Line;
-    // Buffers blocks
+    int Max_Lines_Song;
 
+    // Buffers blocks
     if(is_editing > 1)
     {
         is_editing = 0;
@@ -1505,7 +1507,7 @@ void Actupated(int modac)
     Cur_Position = Get_Song_Position();
     nlines = patternLines[pSequence[Cur_Position]];
 
-    if(Cur_Position != 0 || Cur_Position < (sLength - 1))
+    if(Cur_Position != 0 || Cur_Position < (Song_Length - 1))
     {
         if(Continuous_Scroll)
         {
@@ -1623,10 +1625,29 @@ void Actupated(int modac)
     draw_pated(gui_track, Cur_Line, Track_Under_Caret, Column_Under_Caret);
     draw_pated_highlight(gui_track, Cur_Line, Track_Under_Caret, Column_Under_Caret);
 
-    Realslider_Vert(782, 200, Cur_Line,
-                    Patterns_Lines,
-                    patternLines[pSequence[Cur_Position]] + Patterns_Lines,
-                    148 + Patterns_Lines_Offset, TRUE);
+    if(Continuous_Scroll)
+    {
+        // Count the number of rows in the song
+        Max_Lines_Song = 0;
+        for(i = 0; i < Song_Length; i++)
+        {   
+            Max_Lines_Song += patternLines[pSequence[i]];
+        }
+        // Slider for the entire song
+        Realslider_Vert(782, 200, Get_Song_Line(),
+                        Patterns_Lines,
+                        Patterns_Lines + Max_Lines_Song,
+                        148 + Patterns_Lines_Offset,
+                        TRUE);
+    }
+    else
+    {
+        // Just for the pattern
+        Realslider_Vert(782, 200, Cur_Line,
+                        Patterns_Lines,
+                        patternLines[pSequence[Cur_Position]] + Patterns_Lines,
+                        148 + Patterns_Lines_Offset, TRUE);
+    }
 }
 
 // ------------------------------------------------------
@@ -1648,6 +1669,7 @@ void Draw_Pattern_Right_Stuff()
     Fillrect(781, 184, 782 + 19, 349 + (16 * 5) + Patterns_Lines_Offset);
 
     DrawVLine(0, 184, 349 + (16 * 5) + Patterns_Lines_Offset, COL_BLACK);
+
     // 196
     Gui_Draw_Button_Box(782, 184, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Gui_Draw_Button_Box(782, 349 + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
@@ -2454,7 +2476,7 @@ void Mouse_Wheel_Pattern_Ed(int roll_amount)
     {
         Pattern_Line += roll_amount;
         if(Continuous_Scroll && !Cur_Position) if(Pattern_Line < 0) Pattern_Line = 0;
-        if(Continuous_Scroll && (Cur_Position == sLength - 1))
+        if(Continuous_Scroll && (Cur_Position == Song_Length - 1))
         {
             if(Pattern_Line >= patternLines[pSequence[Cur_Position]])
             {
@@ -2514,7 +2536,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
 }
 
 // ------------------------------------------------------
-// Set the layout of the tracks slider and bound the caret
+// Set the layout of the horizontal tracks slider and bound the caret
 void Set_Track_Slider(int pos)
 {
     Visible_Columns = Get_Visible_Complete_Tracks();
@@ -2539,7 +2561,7 @@ void Set_Track_Slider(int pos)
 // Handle the sliders event (left mouse button)
 void Mouse_Sliders_Pattern_Ed(void)
 {
-    // Current track slider
+    // Current track slider (horizontal)
     if(zcheckMouse(726, 429 + Patterns_Lines_Offset,
                    72, 16))
     {
@@ -2555,25 +2577,72 @@ void Mouse_Sliders_Pattern_Ed(void)
         Actupated(1);
     }
 
-    // Rows slider
-    if(zcheckMouse(782, 200, 16 + 1, 148 + Patterns_Lines_Offset) & !Songplaying)
+    if(Continuous_Scroll)
     {
-        int final_row;
-        int Cur_Position = Get_Song_Position();
-        int max_length = patternLines[pSequence[Cur_Position]] + Patterns_Lines;
-        int Center = Slider_Get_Center(Patterns_Lines, max_length, 148 + Patterns_Lines_Offset);
-        float Pos_Mouse = ((float) ((Mouse.y - 200) - (Center / 2))) / (148.0f + (float) Patterns_Lines_Offset);
-        if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
-        float s_offset = (Pos_Mouse * max_length);
-        if(s_offset > (float) (max_length - Patterns_Lines))
+        // Rows slider (vertical) (whole song)
+        if(zcheckMouse(782, 200, 16 + 1, 148 + Patterns_Lines_Offset) & !Songplaying)
         {
-            s_offset = (float) (max_length - Patterns_Lines);
+            int max_length;
+            int Max_Lines_Song;
+            int final_row;
+            int i;
+
+            // Max rows
+            Max_Lines_Song = 0;
+            for(i = 0; i < Song_Length; i++)
+            {
+                Max_Lines_Song += patternLines[pSequence[i]];
+            }
+
+            // Use linear position
+            max_length = Max_Lines_Song + Patterns_Lines;
+        
+            int Center = Slider_Get_Center(Patterns_Lines, max_length, 148 + Patterns_Lines_Offset);
+            float Pos_Mouse = ((float) ((Mouse.y - 200) - (Center / 2))) / (148.0f + (float) Patterns_Lines_Offset);
+            if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
+            float s_offset = (Pos_Mouse * max_length);
+            if(s_offset > (float) (max_length - Patterns_Lines))
+            {
+                s_offset = (float) (max_length - Patterns_Lines);
+            }
+            final_row = (int32) s_offset;
+            if(final_row < 0) final_row = 0;
+            if(final_row > Max_Lines_Song - 1) final_row = Max_Lines_Song - 1;
+            // Convert it back to segmented pattern/position structure
+            i = 0;
+            while(final_row >= patternLines[pSequence[i]])
+            {
+                final_row -= patternLines[pSequence[i]];
+                i++;
+            }
+            Pattern_Line = final_row;
+            Goto_Song_Position(i);
+            Actupated(0);
         }
-        final_row = (int32) s_offset;
-        if(final_row < 0) final_row = 0;
-        if(final_row > patternLines[pSequence[Cur_Position]] - 1) final_row = patternLines[pSequence[Cur_Position]] - 1;
-        Pattern_Line = final_row;
-        Actupated(0);
+    }
+    else
+    {
+        // Rows slider (vertical) (pattern only)
+        if(zcheckMouse(782, 200 + (Continuous_Scroll * 80), 16 + 1, 148 - (Continuous_Scroll * 80) + Patterns_Lines_Offset) & !Songplaying)
+        {
+            int final_row;
+            int Cur_Position = Get_Song_Position();
+            int max_length = patternLines[pSequence[Cur_Position]] + Patterns_Lines;
+            int Center = Slider_Get_Center(Patterns_Lines, max_length, (148 - (Continuous_Scroll * 80)) + Patterns_Lines_Offset);
+            float Pos_Mouse = ((float) ((Mouse.y - (200 + (Continuous_Scroll * 80))) - 
+                              (Center / 2))) / ((148.0f - (Continuous_Scroll * 80)) + (float) Patterns_Lines_Offset);
+            if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
+            float s_offset = (Pos_Mouse * max_length);
+            if(s_offset > (float) (max_length - Patterns_Lines))
+            {
+                s_offset = (float) (max_length - Patterns_Lines);
+            }
+            final_row = (int32) s_offset;
+            if(final_row < 0) final_row = 0;
+            if(final_row > patternLines[pSequence[Cur_Position]] - 1) final_row = patternLines[pSequence[Cur_Position]] - 1;
+            Pattern_Line = final_row;
+            Actupated(0);
+        }
     }
 
     // End of the marking stuff
@@ -2833,7 +2902,7 @@ void Goto_Next_Row(void)
 
     Select_Block_Keyboard(BLOCK_MARK_ROWS);
     Pattern_Line++;
-    if(Continuous_Scroll && (Cur_Position == sLength - 1)) if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
+    if(Continuous_Scroll && (Cur_Position == Song_Length - 1)) if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
     Actupated(0);
     Select_Block_Keyboard(BLOCK_MARK_ROWS);
 }
@@ -2861,7 +2930,7 @@ void Goto_Next_Page(void)
     Select_Block_Keyboard(BLOCK_MARK_ROWS);
     Pattern_Line += 16;
     if(!is_recording && !Continuous_Scroll) if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
-    if(Continuous_Scroll && (Cur_Position == sLength - 1)) if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
+    if(Continuous_Scroll && (Cur_Position == Song_Length - 1)) if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
     Actupated(0);
     Select_Block_Keyboard(BLOCK_MARK_ROWS);
 }
@@ -2930,6 +2999,17 @@ void Goto_Row(int row)
     Select_Block_Keyboard(BLOCK_MARK_ROWS);
 }
 
+
+// ------------------------------------------------------
+// Go to a given song position
+void Goto_Song_Position(int Position)
+{
+    Song_Position = Position;
+    Bound_Patt_Pos();
+    Actualize_Sequencer();
+    Actupated(0);
+}
+
 // ------------------------------------------------------
 // Return the current sequence position
 int Get_Song_Position(void)
@@ -2944,6 +3024,23 @@ int Get_Pattern_Line(void)
 {
     if(Songplaying) return(Pattern_Line_Visual);
     else return(Pattern_Line);
+}
+
+// ------------------------------------------------------
+// Return the current row in the entire song
+int Get_Song_Line(void)
+{
+    int i;
+    int Cur_Lines_Song;
+
+    int Start_Pos = Get_Song_Position();
+    Cur_Lines_Song = 0;
+    for(i = 0; i < Start_Pos; i++)
+    {
+        Cur_Lines_Song += patternLines[pSequence[i]];
+    }
+    if(Songplaying) return(Cur_Lines_Song + Pattern_Line_Visual);
+    else return(Cur_Lines_Song + Pattern_Line);
 }
 
 // ------------------------------------------------------

@@ -240,10 +240,6 @@ int Type_At3_BitRate[] =
 };
 #endif
 
-#if defined(PTK_INTERNAL)
-char Internal_Quality[MAX_INSTRS];
-#endif
-
 #if defined(PTK_FX_PATTERNBREAK) || defined(PTK_FX_POSJUMP)
 // 255 when no jump or yes on patbreak < 128 = line to jump.
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -292,9 +288,9 @@ int shuffleswitch;
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    unsigned char sLength = 1;
+    unsigned char Song_Length = 1;
 #else
-    unsigned char sLength;
+    unsigned char Song_Length;
 #endif
 
 #if defined(PTK_FX_REVERSE)
@@ -896,7 +892,7 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
         memset(Dest_Buffer, 0, Dest_Length * 2 + 8);
 
 #if defined(PTK_AT3) || defined(PTK_GSM) || defined(PTK_MP3) || \
-    defined(PTK_TRUESPEECH) || defined(PTK_ADPCM) || defined(PTK_8BIT) \\
+    defined(PTK_TRUESPEECH) || defined(PTK_ADPCM) || defined(PTK_8BIT) || \
     defined(PTK_INTERNAL)
 
         switch(Pack_Type)
@@ -981,11 +977,11 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         Mod_Dat_Read(&nPatterns, sizeof(char));
         Mod_Dat_Read(&Songtracks, sizeof(char));
-        Mod_Dat_Read(&sLength, sizeof(char));
+        Mod_Dat_Read(&Song_Length, sizeof(char));
 
         Mod_Dat_Read(&Use_Cubic, sizeof(char));
 
-        Mod_Dat_Read(pSequence, sizeof(char) * sLength);
+        Mod_Dat_Read(pSequence, sizeof(char) * Song_Length);
 
         // Patterns lines
         for(i = 0; i < nPatterns; i++)
@@ -1045,7 +1041,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             // Compression type
             Mod_Dat_Read(&SampleCompression[swrite], sizeof(char));
 
-#if defined(PTK_MP3) || defined(PTK_AT3) || defined(PTK_INTERNAL)
+#if defined(PTK_MP3) || defined(PTK_AT3)
             switch(SampleCompression[swrite])
             {
 
@@ -1058,12 +1054,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #if defined(PTK_AT3)
                 case SMP_PACK_AT3:
                     Mod_Dat_Read(&At3_BitRate[swrite], sizeof(char));
-                    break;
-#endif
-
-#if defined(PTK_INTERNAL)
-                case SMP_PACK_INTERNAL:
-                    Mod_Dat_Read(&Pack_Internal_Quality[swrite], sizeof(char));
                     break;
 #endif
 
@@ -1310,7 +1300,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&shuffle, sizeof(int));
 
         // Reading track part sequence
-        for(int tps_pos = 0; tps_pos < sLength; tps_pos++)
+        for(int tps_pos = 0; tps_pos < Song_Length; tps_pos++)
         {
             for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
             {
@@ -1439,7 +1429,7 @@ int PTKEXPORT Ptk_GetPosition(void)
 // Set the current position in the song
 void PTKEXPORT Ptk_SetPosition(int new_position)
 {
-    if(new_position >= sLength) new_position = sLength - 1;
+    if(new_position >= Song_Length) new_position = Song_Length - 1;
     if(new_position < 0) new_position = 0;
 
 /*#if !defined(__WINAMP__)
@@ -2510,7 +2500,7 @@ void Sp_Player(void)
                     if(!is_recording_2)
 #endif
                     {
-                        if(Song_Position >= sLength)
+                        if(Song_Position >= Song_Length)
                         {
                             Song_Position = 0;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -2584,7 +2574,7 @@ void Sp_Player(void)
                     if(!is_recording_2)
 #endif
                     {
-                        if(Song_Position >= sLength)
+                        if(Song_Position >= Song_Length)
                         {
                             Song_Position = 0;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -5281,10 +5271,6 @@ void KillInst(int inst_nbr, int all_splits)
 
 #if defined(PTK_AT3)
         At3_BitRate[inst_nbr] = 0;
-#endif
-
-#if defined(PTK_INTERNAL)
-        Internal_Quality[inst_nbr] = 0;
 #endif
 
 #if !defined(__STAND_ALONE__)

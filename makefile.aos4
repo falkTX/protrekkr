@@ -16,6 +16,7 @@ EXEOBJS = ptk.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_reverb.o editor_instrument.o \
           samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o \
+          bits.o pack.o tinypack.o words.o wputils.o \
           config.o 303s.o synths.o insts.o ptps.o \
           midi.o \
           timer.o main.o \
@@ -86,7 +87,7 @@ editor_reverb.o: src/editors/editor_reverb.cpp
 editor_instrument.o: src/editors/editor_instrument.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
-samples_pack.o: src/files/samples_pack.cpp
+samples_pack.o: src/samples/samples_pack.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 files_list.o: src/files/files_list.cpp
@@ -172,3 +173,18 @@ endianness.o: release/distrib/replay/lib/endianness.cpp
 
 sounddriver_aos4.o: release/distrib/replay/lib/sounddriver/sounddriver_aos4.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp
+
+bits.o: src/samples/wavpack/bits.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+pack.o: src/samples/wavpack/pack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+words.o: src/samples/wavpack/words.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+wputils.o: src/samples/wavpack/wputils.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+tinypack.o: src/samples/wavpack/tinypack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<

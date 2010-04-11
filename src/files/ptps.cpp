@@ -271,7 +271,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Real_SongTracks;
     int pwrite;
     int swrite;
-    char Constant_Filename[96];
+    char Constant_Filename[MAX_PATH];
 
     Out_constants = NULL;
     Out_FX = NULL;
@@ -279,7 +279,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
     if(!Simulate)
     {
-        sprintf(Constant_Filename, "ptk_properties.h");
+        sprintf(Constant_Filename, "%s"SLASH"ptk_properties.h", Dir_Mods);
         Out_constants = fopen(Constant_Filename, "w");
         fprintf(Out_constants, "// Constants for %s.ptp module\n", FileName);
         fprintf(Out_constants, "// Generated for %s replay routine\n", VERSION);
@@ -297,7 +297,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     memset(done_pattern, 0, sizeof(done_pattern));
     memset(Old_pSequence, -1, sizeof(Old_pSequence));
 
-    for(i = 0; i < sLength; i++)
+    for(i = 0; i < Song_Length; i++)
     {
         if(!done_pattern[pSequence[i]])
         {
@@ -344,12 +344,12 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     char_value = (char) Real_SongTracks;
     Write_Mod_Data(&char_value, sizeof(char), 1, in);
     
-    Write_Mod_Data(&sLength, sizeof(char), 1, in);
+    Write_Mod_Data(&Song_Length, sizeof(char), 1, in);
 
     Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
 
     // Patterns sequence
-    Write_Mod_Data(New_pSequence, sizeof(char), sLength, in);
+    Write_Mod_Data(New_pSequence, sizeof(char), Song_Length, in);
 
     for(i = 0; i < int_pattern; i++)
     {
@@ -467,7 +467,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
             Out_FX = fopen(FileName_FX, "wb");
 
             // Save the FX data
-            for(l = 0; l < sLength; l++)
+            for(l = 0; l < Song_Length; l++)
             {
                 TmpPatterns_Rows = New_RawPatterns + (New_pSequence[l] * PATTERN_LEN);
                 for(i = 0; i < PATTERN_BYTES; i++)
@@ -503,7 +503,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 int real_fx_nbr = 0;
 
                 // Save the FX data
-                for(l = 0; l < sLength; l++)
+                for(l = 0; l < Song_Length; l++)
                 {
                     TmpPatterns_Rows = New_RawPatterns + (New_pSequence[l] * PATTERN_LEN);
                     for(i = 0; i < PATTERN_BYTES; i++)
@@ -1306,10 +1306,6 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 case SMP_PACK_AT3:
                     Write_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
                     break;
-
-                case SMP_PACK_INTERNAL:
-                    Write_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
-                    break;
             }
 
             // Compression type
@@ -1757,7 +1753,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
     Save_Constant("PTK_COMPRESSOR", compressor);
 
-    for(int tps_pos = 0; tps_pos < sLength; tps_pos++)
+    for(int tps_pos = 0; tps_pos < Song_Length; tps_pos++)
     {
         for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
         {

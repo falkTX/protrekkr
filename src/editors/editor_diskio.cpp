@@ -206,7 +206,7 @@ void Actualize_DiskIO_Ed(int gode)
         if(gode == 0 || gode == 3)
         {
             if(rawrender_from < 0) rawrender_from = 0;
-            if(rawrender_from > (sLength - 1)) rawrender_from = (sLength - 1);
+            if(rawrender_from > (Song_Length - 1)) rawrender_from = (Song_Length - 1);
             if(rawrender_from > rawrender_to)
             {
                 rawrender_to = rawrender_from;
@@ -219,7 +219,7 @@ void Actualize_DiskIO_Ed(int gode)
         if(gode == 0 || gode == 4)
         {
             if(rawrender_to < 0) rawrender_to = 0;
-            if(rawrender_to > (sLength - 1)) rawrender_to = (sLength - 1);
+            if(rawrender_to > (Song_Length - 1)) rawrender_to = (Song_Length - 1);
             if(rawrender_to < rawrender_from)
             {
                 rawrender_from = rawrender_to;

@@ -60,6 +60,23 @@ typedef unsigned int Uint32;
 
 // ------------------------------------------------------
 // Functions
+#if defined(__STAND_ALONE__)
+#if defined(PTK_AT3)
+void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
+#endif
+#if defined(PTK_GSM)
+void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
+#endif
+#if defined(PTK_TRUESPEECH)
+void UnpackTrueSpeech(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
+#endif
+#if defined(PTK_ADPCM)
+void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
+#endif
+#if defined(PTK_MP3)
+void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
+#endif
+#else
 #if defined(__AT3_CODEC__)
 void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
 #endif
@@ -74,6 +91,7 @@ void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
 #endif
 #if defined(__MP3_CODEC__)
 void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate);
+#endif
 #endif
 void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);
 void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size);

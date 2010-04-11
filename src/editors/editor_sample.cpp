@@ -172,7 +172,7 @@ void Draw_Wave_Data(void)
 
                 // Draw a selection rect if there's any
                 start_rect = 0;
-                end_rect = LARGE_SMP_VIEW - 1;
+                end_rect = LARGE_SMP_VIEW;
                 set_start_rect = 0;
                 for(s_ex = 0; s_ex < LARGE_SMP_VIEW; s_ex++)
                 {

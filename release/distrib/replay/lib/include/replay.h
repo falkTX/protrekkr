@@ -248,10 +248,6 @@ extern char At3_BitRate[MAX_INSTRS];
 extern int Type_At3_BitRate[];
 #endif
 
-#if defined(PTK_INTERNAL)
-extern char Internal_Quality[MAX_INSTRS];
-#endif
-
 #if defined(PTK_COMPRESSOR)
 extern char num_echoes;
 #endif
@@ -277,7 +273,7 @@ extern float mas_comp_ratio_Master;
 extern char Compress_Master;
 extern unsigned char nPatterns;
 extern char Songtracks;
-extern unsigned char sLength;
+extern unsigned char Song_Length;
 extern unsigned char pSequence[256];
 extern short patternLines[MAX_ROWS];
 extern char nameins[MAX_INSTRS][20];

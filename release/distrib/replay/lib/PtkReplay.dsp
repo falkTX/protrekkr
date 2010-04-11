@@ -108,6 +108,10 @@ SOURCE=.\Synth.cpp
 
 SOURCE=.\TB_303.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\wavpack.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -143,6 +147,10 @@ SOURCE=.\include\Synth.h
 # Begin Source File
 
 SOURCE=.\include\TB_303.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\wavpack.h
 # End Source File
 # End Group
 # End Target

@@ -113,7 +113,7 @@ void LoadInst(char *FileName)
         }
         else
         {
-            SampleCompression[swrite] = SMP_PACK_GSM;
+            SampleCompression[swrite] = SMP_PACK_INTERNAL;
         }
         // Load the bitrate
         if(Mp3_Scheme)
@@ -126,10 +126,6 @@ void LoadInst(char *FileName)
 
                 case SMP_PACK_AT3:
                     Read_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
-                    break;
-
-                case SMP_PACK_INTERNAL:
-                    Read_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
                     break;
             }
         }
@@ -243,10 +239,6 @@ void SaveInst(void)
 
             case SMP_PACK_AT3:
                 Write_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
-                break;
-
-            case SMP_PACK_INTERNAL:
-                Write_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
                 break;
         }
 

@@ -732,7 +732,7 @@ void Paste_Selection_From_Buffer(int Position, int Go_Across)
 
         if(Go_Across && ybc >= patternLines[pSequence[Position]])
         {
-            if(Position < (sLength - 1))
+            if(Position < (Song_Length - 1))
             {
                 if(pSequence[Position] == pSequence[Position + 1])
                 {

@@ -35,7 +35,6 @@
 
 #include "../include/ptk.h"
 #include "include/files.h"
-#include "include/samples_pack.h"
 #include "include/mods.h"
 #include "include/patterns.h"
 #include "include/reverbs.h"
@@ -43,6 +42,7 @@
 #include "include/synths.h"
 #include "include/ptps.h"
 #include "../ui/include/misc_draw.h"
+#include "../samples/include/samples_pack.h"
 #include "../editors/include/editor_synth.h"
 #include "../editors/include/editor_diskio.h"
 #include "../editors/include/editor_reverb.h"
@@ -312,7 +312,7 @@ Read_Mod_File:
         Read_Mod_Data(&nPatterns, sizeof(char), 1, in);
 
         Songtracks = MAX_TRACKS;
-        Read_Mod_Data(&sLength, sizeof(char), 1, in);
+        Read_Mod_Data(&Song_Length, sizeof(char), 1, in);
 
         Use_Cubic = CUBIC_INT;
 
@@ -437,10 +437,6 @@ Read_Mod_File:
 
                         case SMP_PACK_AT3:
                             Read_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
-                            break;
-
-                        case SMP_PACK_INTERNAL:
-                            Read_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
                             break;
                     }
                 }
@@ -1132,7 +1128,7 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             // Calc the real number of patterns
             nPatterns = 0;
-            for(i = 0 ; i < sLength; i++)
+            for(i = 0 ; i < Song_Length; i++)
             {
                 if((pSequence[i] + 1) > nPatterns)
                 {
@@ -1141,7 +1137,7 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             }
 
             Write_Mod_Data(&nPatterns, sizeof(char), 1, in);
-            Write_Mod_Data(&sLength, sizeof(char), 1, in);
+            Write_Mod_Data(&Song_Length, sizeof(char), 1, in);
             Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
 
             Write_Mod_Data(pSequence, sizeof(char), MAX_SEQUENCES, in);
@@ -1207,10 +1203,6 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
                     case SMP_PACK_AT3:
                         Write_Mod_Data(&At3_BitRate[swrite], sizeof(char), 1, in);
-                        break;
-
-                    case SMP_PACK_INTERNAL:
-                        Write_Mod_Data(&Internal_Quality[swrite], sizeof(char), 1, in);
                         break;
                 }
 
@@ -1723,7 +1715,7 @@ int Calc_Length(void)
     nbr_ticks = 0;
     len = 0;
     i = 0;
-    while(i < sLength)
+    while(i < Song_Length)
     {
         if(have_break < MAX_ROWS) pos_patt = have_break;
         else pos_patt = 0;
@@ -1782,7 +1774,7 @@ int Calc_Length(void)
                         
                             case 0x1f:
                                 // Avoid looping the song when jumping
-                                if(i == (sLength - 1) || patt_datas[l] <= i)
+                                if(i == (Song_Length - 1) || patt_datas[l] <= i)
                                 {
                                     early_exit = TRUE;
                                 }
@@ -1917,16 +1909,15 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
         Synthprg[n_index] = SYNTH_WAVE_OFF;
         beatsync[n_index] = FALSE;
 
-    // Gsm is default compression
+        // Internal is default compression
 #if !defined(__WINAMP__)
-        SampleCompression[n_index] = SMP_PACK_GSM;
+        SampleCompression[n_index] = SMP_PACK_INTERNAL;
         SamplesSwap[n_index] = FALSE;
 #else
         SampleCompression[n_index] = SMP_PACK_NONE;
 #endif
         Mp3_BitRate[n_index] = 0;
         At3_BitRate[n_index] = 0;
-        Internal_Quality[n_index] = 0;
     }
 }
 

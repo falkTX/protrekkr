@@ -33,10 +33,11 @@
 // Includes
 #include "include/editor_instrument.h"
 #include "include/editor_sample.h"
-#include "../files/include/samples_pack.h"
+#include "../samples/include/samples_pack.h"
 #include "../files/include/files_list.h"
 
 #include "../../release/distrib/replay/lib/include/samples_unpack.h"
+#include "../../release/distrib/replay/lib/include/wavpack.h"
 
 #include "../../release/distrib/replay/lib/include/endianness.h"
 
@@ -64,13 +65,6 @@ extern char Mp3_BitRate[MAX_INSTRS];
 extern int Type_Mp3_BitRate[];
 extern char At3_BitRate[MAX_INSTRS];
 extern int Type_At3_BitRate[];
-extern char Internal_Quality[MAX_INSTRS];
-
-char *Type_Internal_Quality[] =
-{
-    "Hi",
-    "Lo"
-};
 
 void Lock_Sample(int instr_nbr, int split);
 
@@ -1328,7 +1322,7 @@ void Dump_Instruments_Synths_List(int xr, int yr)
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
                                     case SMP_PACK_INTERNAL:
-                                        sprintf(Line, "Pck: Intern. (%s)", Type_Internal_Quality[Internal_Quality[rel_val]]);
+                                        sprintf(Line, "Pck: Internal");
                                         PrintXY(xr + 240, yr + (counter * 12), Font, Line);
                                         break;
                                 }

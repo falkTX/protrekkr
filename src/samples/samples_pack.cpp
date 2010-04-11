@@ -45,6 +45,8 @@
 #include "include/samples_pack.h"
 #include "../../Release/Distrib/Replay/Lib/include/Samples_Unpack.h"
 
+int pack_audio(short *Source, short *Dest, int Size);
+
 // ------------------------------------------------------
 // Variables
 #if defined(STAND_ALONE)
@@ -459,6 +461,5 @@ int To8Bit(short *Source, short *Dest, int Size)
 // Pack a sample to internal format
 int ToInternal(short *Source, short *Dest, int Size)
 {
-
-    return(Size);
+    return pack_audio(Source, Dest, Size);
 }

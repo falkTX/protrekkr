@@ -356,7 +356,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
             }
         } // FOR
 
-        fread(&sLength, sizeof(unsigned char), 1, in);
+        fread(&Song_Length, sizeof(unsigned char), 1, in);
         fgetc(in);
 
         last_speed = 4;
@@ -375,7 +375,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         // JUMP OVER THE HEADER
         fseek(in, 4, SEEK_CUR);
 
-        for(pwrite = 0; pwrite < sLength; pwrite++)
+        for(pwrite = 0; pwrite < Song_Length; pwrite++)
         {
             // All 64 rows of the .mod
             for(li2 = 0; li2 < 64; li2++)

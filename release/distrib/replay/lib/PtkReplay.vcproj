@@ -70,6 +70,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/QIfist"
 				Optimization="1"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="__WIN32__;NDEBUG;_LIB;__STAND_ALONE__"
@@ -195,6 +196,9 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\wavpack.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -222,6 +226,9 @@
 			</File>
 			<File
 				RelativePath="include\TB_303.h">
+			</File>
+			<File
+				RelativePath=".\include\wavpack.h">
 			</File>
 		</Filter>
 	</Files>

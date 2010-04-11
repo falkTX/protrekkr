@@ -158,7 +158,7 @@ void Actualize_Seq_Ed(char gode)
             int rel;
             int Cur_Position = Get_Song_Position();
             rel = lseq + Cur_Position;
-            if(rel > -1 && rel < sLength)
+            if(rel > -1 && rel < Song_Length)
             {
                 out_decchar(93, 505 + lseq * 12, rel, 0);
                 out_decchar(261, 505 + lseq * 12, pSequence[rel], 0);
@@ -305,7 +305,7 @@ void Mouse_Left_Sequencer_Ed(void)
             // We need an array to mark the patterns we already transposed
             // otherwise we could transpose them several times and that's not what we want.
             nbr_patterns = 0;
-            for(i = 0; i < sLength; i++)
+            for(i = 0; i < Song_Length; i++)
             {
                 if(pSequence[i] > nbr_patterns)
                 {
@@ -316,7 +316,7 @@ void Mouse_Left_Sequencer_Ed(void)
             memset(Done_Pattern, 0, nbr_patterns + 1);
             if(Done_Pattern)
             {
-                for(j = 0; j < sLength; j++)
+                for(j = 0; j < Song_Length; j++)
                 {
                     if(!Done_Pattern[pSequence[j]])
                     {
@@ -551,7 +551,7 @@ void Mouse_Left_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 if(pSequence[posindex] < 127)
                 {
@@ -575,7 +575,7 @@ void Mouse_Left_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 if(pSequence[posindex] < 127)
                 {
@@ -599,7 +599,7 @@ void Mouse_Left_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 if(pSequence[posindex] < 127)
                 {
@@ -628,7 +628,7 @@ void Mouse_Left_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength && posindex != Cur_Position)
+            if(posindex >= 0 && posindex < Song_Length && posindex != Cur_Position)
             {
                 Song_Position = posindex;
                 gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -705,7 +705,7 @@ void Mouse_Right_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 int reak = pSequence[posindex];
                 reak -= 100;
@@ -722,7 +722,7 @@ void Mouse_Right_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 int reak = pSequence[posindex];
                 reak -= 10;
@@ -740,7 +740,7 @@ void Mouse_Right_Sequencer_Ed(void)
         {
             int posindex = ((Mouse.y - 469) / 12) - 3;
             posindex += Cur_Position;
-            if(posindex >= 0 && posindex < sLength)
+            if(posindex >= 0 && posindex < Song_Length)
             {
                 if(pSequence[posindex] > 0)
                 {
@@ -808,9 +808,9 @@ void Actualize_Sequencer(void)
     if(Songplaying)
     {
         if(Song_Position < 0) Song_Position = 0;
-        if(Song_Position > sLength - 1)
+        if(Song_Position > Song_Length - 1)
         {
-            Song_Position = sLength - 1;
+            Song_Position = Song_Length - 1;
             Bound_Patt_Pos();
             Actupated(0);
         }
@@ -822,9 +822,9 @@ void Actualize_Sequencer(void)
     else
     {
         if(Song_Position < 0) Song_Position = 0;
-        if(Song_Position > sLength - 1)
+        if(Song_Position > Song_Length - 1)
         {
-            Song_Position = sLength - 1;
+            Song_Position = Song_Length - 1;
             Bound_Patt_Pos();
             Actupated(0);
         }
@@ -843,7 +843,7 @@ void Actualize_Sequencer(void)
     Anat(Cur_Position);
     if(Rows_Decimal) Gui_Draw_Arrows_Number_Box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     else value_box(188, 82, patternLines[pSequence[Cur_Position]], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-    Gui_Draw_Arrows_Number_Box(188, 64, sLength, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Arrows_Number_Box(188, 64, Song_Length, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     if(userscreen == USER_SCREEN_SEQUENCER) Actualize_Seq_Ed(0);
 }
 
@@ -865,9 +865,9 @@ void SeqDelete(int st)
 {
     int cl;
 
-    if(sLength > 1)
+    if(Song_Length > 1)
     {
-        for(cl = st; cl < sLength - 1; cl++)
+        for(cl = st; cl < Song_Length - 1; cl++)
         {
             pSequence[cl] = pSequence[cl + 1];
             for(char trk = 0; trk < Songtracks; trk++)
@@ -882,7 +882,7 @@ void SeqDelete(int st)
             CHAN_ACTIVE_STATE[cl][trk] = TRUE;
             CHAN_HISTORY_STATE[cl][trk] = FALSE;
         }
-        sLength--;
+        Song_Length--;
     }
 }     
 
@@ -892,9 +892,9 @@ void SeqInsert(int st)
 {
     int cl;
 
-    if(sLength < 255)
+    if(Song_Length < 255)
     {
-        for(cl = sLength - 1; cl >= st; cl--)
+        for(cl = Song_Length - 1; cl >= st; cl--)
         {
             pSequence[cl + 1] = pSequence[cl];
             for(char trk = 0; trk < Songtracks; trk++)
@@ -909,7 +909,7 @@ void SeqInsert(int st)
             CHAN_ACTIVE_STATE[st][trk] = TRUE;
             CHAN_HISTORY_STATE[st][trk] = FALSE;
         }
-    sLength++;
+    Song_Length++;
     }
 }     
 
@@ -960,7 +960,7 @@ void Display_Seq_Buffer(void)
 // Turn a channel active state on/off
 void Toggle_Track_On_Off_Status(int posindex, int seqindex)
 {
-    if(posindex >= 0 && posindex < sLength)
+    if(posindex >= 0 && posindex < Song_Length)
     {
         if(seqindex < 0) seqindex = 0;
         if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;
@@ -985,7 +985,7 @@ void Solo_Track_On_Off(int posindex, int seqindex)
 {
     int Already_Solo;
 
-    if(posindex >= 0 && posindex < sLength)
+    if(posindex >= 0 && posindex < Song_Length)
     {
         if(seqindex < 0) seqindex = 0;
         if(seqindex > Songtracks - 1) seqindex = Songtracks - 1;

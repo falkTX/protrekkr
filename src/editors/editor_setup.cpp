@@ -179,7 +179,6 @@ void Actualize_Master_Ed(char gode)
             AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds);
             Init_Scopes_Buffers();
             AUDIO_Play();
-            //Actupated(0);
         }
 
         // Mouse wheel
@@ -258,6 +257,8 @@ void Actualize_Master_Ed(char gode)
                 Gui_Draw_Button_Box(446, 555, 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(446 + 31, 555, 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
+            Draw_Pattern_Right_Stuff();
+            Actupated(0);
         }
 
         if(gode == 0 || gode == 9)
@@ -605,7 +606,7 @@ void Mouse_Left_Master_Ed(void)
         // Continuous scroll
         if(zcheckMouse(446, 555, 29, 16))
         {
-            Continuous_Scroll = TRUE;
+            Continuous_Scroll = 1;
             teac = 14;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
@@ -613,7 +614,7 @@ void Mouse_Left_Master_Ed(void)
         // Continuous scroll
         if(zcheckMouse(446 + 31, 555, 29, 16))
         {
-            Continuous_Scroll = FALSE;
+            Continuous_Scroll = 0;
             teac = 14;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }

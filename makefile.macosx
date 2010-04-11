@@ -24,6 +24,7 @@ EXEOBJS_PPC = ptk_ppc.o \
               patterns_blocks_ppc.o editor_synth_ppc.o editor_sample_ppc.o editor_fx_setup_ppc.o editor_setup_ppc.o \
               editor_diskio_ppc.o editor_reverb_ppc.o editor_instrument_ppc.o \
               samples_pack_ppc.o files_list_ppc.o files_ppc.o mods_ppc.o patterns_ppc.o reverbs_ppc.o \
+              bits_ppc.o pack_ppc.o tinypack_ppc.o words_ppc.o wputils_ppc.o \
               config_ppc.o 303s_ppc.o synths_ppc.o insts_ppc.o ptps_ppc.o \
               midi_ppc.o RtMidi_ppc.o \
               timer_ppc.o main_ppc.o sdlmain_ppc.o \
@@ -37,6 +38,7 @@ EXEOBJS_X86 = ptk_x86.o \
               patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
               editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o \
               samples_pack_x86.o files_list_x86.o files_x86.o mods_x86.o patterns_x86.o reverbs_x86.o \
+              bits_x86.o pack_x86.o tinypack_x86.o words_x86.o wputils_x86.o \
               config_x86.o 303s_x86.o synths_x86.o insts_x86.o ptps_x86.o \
               midi_x86.o RtMidi_x86.o \
               timer_x86.o main_x86.o sdlmain_x86.o \
@@ -107,7 +109,7 @@ editor_reverb_ppc.o: src/editors/editor_reverb.cpp
 editor_instrument_ppc.o: src/editors/editor_instrument.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
-samples_pack_ppc.o: src/files/samples_pack.cpp
+samples_pack_ppc.o: src/samples/samples_pack.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 files_list_ppc.o: src/files/files_list.cpp
@@ -197,6 +199,21 @@ endianness_ppc.o: release/distrib/replay/lib/endianness.cpp
 sounddriver_macosx_ppc.o: release/distrib/replay/lib/sounddriver/sounddriver_macosx.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
+bits_ppc.o: src/samples/wavpack/bits.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+pack_ppc.o: src/samples/wavpack/pack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+words_ppc.o: src/samples/wavpack/words.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+wputils_ppc.o: src/samples/wavpack/wputils.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+tinypack_ppc.o: src/samples/wavpack/tinypack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
 
 
 ptk_x86.o: src/ptk.cpp
@@ -241,7 +258,7 @@ editor_reverb_x86.o: src/editors/editor_reverb.cpp
 editor_instrument_x86.o: src/editors/editor_instrument.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
-samples_pack_x86.o: src/files/samples_pack.cpp
+samples_pack_x86.o: src/samples/samples_pack.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 files_list_x86.o: src/files/files_list.cpp
@@ -330,3 +347,18 @@ endianness_x86.o: release/distrib/replay/lib/endianness.cpp
 
 sounddriver_macosx_x86.o: release/distrib/replay/lib/sounddriver/sounddriver_macosx.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
+
+bits_x86.o: src/samples/wavpack/bits.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+pack_x86.o: src/samples/wavpack/pack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+words_x86.o: src/samples/wavpack/words.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+wputils_x86.o: src/samples/wavpack/wputils.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+tinypack_x86.o: src/samples/wavpack/tinypack.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<

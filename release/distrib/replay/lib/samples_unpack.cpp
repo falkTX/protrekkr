@@ -97,7 +97,7 @@ extern TRUESPEECHWAVEFORMAT At3_Format;
 #if defined(__WIN32__)
 ACMSTREAMHEADER Unpack_Stream_Head;
 HACMSTREAM Unpack_Stream;
-extern WAVEFORMATEX Wave_Format;
+WAVEFORMATEX Wave_Format;
 #endif
 
 // ------------------------------------------------------
@@ -353,14 +353,5 @@ void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     {
         Dest[i] = Source[i] << 8;
     }
-}
-#endif
-
-// ------------------------------------------------------
-// Unpack an Internal format sample
-#if defined(PTK_INTERNAL)
-void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
-{
-
 }
 #endif

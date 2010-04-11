@@ -11,6 +11,14 @@ v2.1.0:
 - Added primitive.ptk by Mice of Brainstorm.
 - Fixed a bug in the sample editor which prevented it to work properly
   with waveforms of more than 2 megabytes.
+- In continuous scroll mode, the patterns scrollbar (& the arrows) 
+  now reflect to length and can be used to browse through entire song
+  (and not just the current pattern like before).
+- Implemented an internal compression scheme (based on wavpack) so
+  samples packing is available on every platforms.
+  The compression is rather good but the depacker is bigger than when using
+  codecs (a few kb kkrunched).
+- Properties.h files weren't always saved at the right place.
 
 v2.0.2:
 

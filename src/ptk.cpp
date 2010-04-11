@@ -810,18 +810,12 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_PREVIOUS_POSITION)
         {
-            Song_Position--;
-            Bound_Patt_Pos();
-            Actualize_Sequencer();
-            Actupated(0);
+            Goto_Song_Position(Song_Position - 1);
         }
 
         if(gui_action == GUI_CMD_NEXT_POSITION)
         {
-            Song_Position++;
-            Bound_Patt_Pos();
-            Actualize_Sequencer();
-            Actupated(0);
+            Goto_Song_Position(Song_Position + 1);
         }
 
         if(gui_action == GUI_CMD_SET_PATTERN_LENGTH)
@@ -850,14 +844,14 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_REDUCE_SONG_LENGTH)
         {
-            sLength--;
+            Song_Length--;
             Actualize_Sequencer();
             Actupated(0);
         }
 
         if(gui_action == GUI_CMD_INCREASE_SONG_LENGTH)
         {
-            sLength++;
+            Song_Length++;
             Actualize_Sequencer();
             Actupated(0);
         }
@@ -2289,7 +2283,7 @@ void Newmod(void)
             }
         }
 
-        sLength = 1;
+        Song_Length = 1;
         Track_Under_Caret = 0;
         Column_Under_Caret = 0;
         Pattern_Line = 0;
@@ -2585,7 +2579,7 @@ void WavRenderizer()
     else
     {
         Song_Position = 0;
-        Max_Position = sLength;
+        Max_Position = Song_Length;
     }
 
     long filesize = 0;
@@ -5176,11 +5170,11 @@ void Mouse_Handler(void)
         {
             gui_action = GUI_CMD_NEXT_PATT;
         }
-        if(zcheckMouse(188, 64, 16, 16) && sLength > 1)
+        if(zcheckMouse(188, 64, 16, 16) && Song_Length > 1)
         {
             gui_action = GUI_CMD_REDUCE_SONG_LENGTH;
         }
-        if(zcheckMouse(232, 64, 16, 16) && sLength < 255)
+        if(zcheckMouse(232, 64, 16, 16) && Song_Length < 255)
         {
             gui_action = GUI_CMD_INCREASE_SONG_LENGTH;
         }
@@ -5543,21 +5537,24 @@ void Mouse_Handler(void)
             teac = 2;
         }
 
-        // Songlength + 10
-        if(zcheckMouse(188, 64, 16, 16) == 1 && sLength != 1)
+        // Songlength - 10
+        if(zcheckMouse(188, 64, 16, 16) == 1 && Song_Length != 1)
         {
-            int tLength = sLength;
+            int tLength = Song_Length;
             tLength -= 10;
             if(tLength < 1) tLength = 1;
-            sLength = tLength;
+            Song_Length = tLength;
+            Actupated(0);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
-        if(zcheckMouse(232, 64, 16, 16) == 1 && sLength != 255)
+        // Songlength + 10
+        if(zcheckMouse(232, 64, 16, 16) == 1 && Song_Length != 255)
         {
-            int tLength = sLength;
+            int tLength = Song_Length;
             tLength += 10;
             if(tLength > 255) tLength = 255;
-            sLength = tLength;
+            Song_Length = tLength;
+            Actupated(0);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
@@ -5683,7 +5680,7 @@ int Search_Free_Pattern(void)
     int j;
     int found;
 
-    for(i = 0; i < sLength; i++)
+    for(i = 0; i < Song_Length; i++)
     {
         found = FALSE;
         for(j = 0; j < 128; j++)
@@ -5711,13 +5708,13 @@ int Next_Line_Pattern_Auto(int *position, int lines, int *line)
         // Normal end of pattern
         *line = *line - lines;
         *position += 1;
-        if(*position >= sLength - 1)
+        if(*position >= Song_Length - 1)
         {
-            sLength++;
-            max_value = sLength;
+            Song_Length++;
+            max_value = Song_Length;
             if(max_value > 255)
             {
-                sLength = 255;
+                Song_Length = 255;
                 Song_Position = 0;
             }
             // Alloc a new pattern position
