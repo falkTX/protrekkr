@@ -43,7 +43,7 @@
 #endif
 
 #include "include/samples_pack.h"
-#include "../../Release/Distrib/Replay/Lib/include/Samples_Unpack.h"
+#include "../../release/distrib/replay/lib/include/samples_unpack.h"
 
 int pack_audio(short *Source, short *Dest, int Size);
 
@@ -447,7 +447,7 @@ int ToADPCM(short *Source, short *Dest, int Size)
 int To8Bit(short *Source, short *Dest, int Size)
 {
     int i;
-    Uint8 *bDest = (Uint8 *) Dest;
+    unsigned char *bDest = (unsigned char *) Dest;
 
     for(i = 0; i < Size; i++)
     {

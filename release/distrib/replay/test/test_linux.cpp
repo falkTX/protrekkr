@@ -27,7 +27,6 @@ extern "C"
 int main(void)
 {
     if(!Ptk_InitDriver(LATENCY)) return(0);
-
     // Load it
     if(!Ptk_InitModule((unsigned char *) &_PTK_MODULE, 0))
     {

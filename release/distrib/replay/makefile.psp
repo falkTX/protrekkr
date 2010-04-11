@@ -5,7 +5,7 @@ EXTRA_TARGETS = EBOOT.PBP
 OBJS = test/test_psp.o test/module.o lib/sounddriver/mestub.o
          
 INCDIR =
-CFLAGS = -n -ffast-math -fsingle-precision-constant -g -G0 -O2 -D __GCC__ -D __STAND_ALONE__ -D __NO_MIDI__ -D __PSP__
+CFLAGS = -n -ffast-math -fno-strict-aliasing -fsingle-precision-constant -g -G0 -O2 -D __GCC__ -D __STAND_ALONE__ -D __NO_MIDI__ -D __PSP__
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -ffast-math
 ASFLAGS = -c $(CFLAGS)
 

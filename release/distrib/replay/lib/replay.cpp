@@ -2606,7 +2606,6 @@ void Sp_Player(void)
     // -------------------------------------------
     // Process the data, this is the huge loop
     // -------------------------------------------
-
     for(c = 0; c < Songtracks; c++)
     {
 
@@ -4637,10 +4636,6 @@ void ComputeStereo(int channel)
     RVol[channel] = sqrtf(TPan[channel]);
 }
 
-int max_row;
-int delays_stuff;
-
-
 // ------------------------------------------------------
 // Main mixing routine
 void GetPlayerValues(void)
@@ -4738,8 +4733,10 @@ void GetPlayerValues(void)
     if(right_float > 1.0f) right_float = 1.0f;
     if(right_float < -1.0f) right_float = -1.0f;
 
+#if !defined(__STAND_ALONE__)
     left_float_render = left_float;
     right_float_render = right_float;
+#endif
 
     // It looks like the maximum range for OSS is -8192 +8192
     // (higher than that will produce heavily satured signals

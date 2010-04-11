@@ -3,6 +3,7 @@
 *.dll
 *install*
 *.mingw*
+*.freebsd*
 *.dsw*
 *.dsp*
 *.sln*
