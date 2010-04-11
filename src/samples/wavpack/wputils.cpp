@@ -268,7 +268,6 @@ static int finish_block (WavpackContext *wpc)
     }
 
     bcount = ((WavpackHeader *) wps->blockbuff)->ckSize + 8;
-    //WavpackNativeToLittleEndian((WavpackHeader *) wps->blockbuff, WavpackHeaderFormat);
     result = wpc->blockout(wpc, wps->blockbuff, bcount);
 
     if (!result)
@@ -306,9 +305,7 @@ uint32_t WavpackGetSampleIndex (WavpackContext *wpc)
 
 void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block)
 {
-//    WavpackLittleEndianToNative (first_block, WavpackHeaderFormat);
     ((WavpackHeader *) first_block)->total_samples = WavpackGetSampleIndex (wpc);
-    //WavpackNativeToLittleEndian (first_block, WavpackHeaderFormat);
 }
 
 // return TRUE if any uncorrected lossy blocks were actually written or read
@@ -322,7 +319,7 @@ int WavpackLossyBlocks (WavpackContext *wpc)
 
 uint32_t WavpackGetFileSize (WavpackContext *wpc)
 {
-    return wpc ? wpc->filelen /*+ wpc->file2len*/ : 0;
+    return wpc ? wpc->filelen : 0;
 }
 
 // Close the specified WavPack file and release all resources used by it.
