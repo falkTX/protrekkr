@@ -41,7 +41,7 @@ endianness_ppc.o: lib/endianness.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/endianness.cpp
 
 wavpack_ppc.o: lib/wavpack.cpp
-	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS) lib/wavpack.cpp
+	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS_PPC) lib/wavpack.cpp
 
 sounddriver_macosx_x86.o: lib/sounddriver/sounddriver_macosx.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/sounddriver/sounddriver_macosx.cpp
@@ -65,4 +65,4 @@ endianness_x86.o: lib/endianness.cpp
 	g++ -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/endianness.cpp
 
 wavpack_x86.o: lib/wavpack.cpp
-	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS) lib/wavpack.cpp
+	$(CC) -o $(@) $(LIBFLAGS) $(FLAGS_X86) lib/wavpack.cpp

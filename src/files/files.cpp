@@ -424,9 +424,12 @@ Read_Mod_File:
             }
 
             // Compression type
+            SampleCompression[swrite] = SMP_PACK_INTERNAL;
             if(Pack_Scheme)
             {
                 Read_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
+                SampleCompression[swrite] = Fix_Codec(SampleCompression[swrite]);
+
                 if(Mp3_Scheme)
                 {
                     switch(SampleCompression[swrite])
@@ -2023,3 +2026,30 @@ void Clear_Input(void)
     }
 }
 #endif
+
+// ------------------------------------------------------
+// Make sure an instrument isn't using a non existant codec
+int Fix_Codec(int Scheme)
+{
+#if !defined(__AT3_CODEC__)
+    if(Scheme == SMP_PACK_AT3) return SMP_PACK_INTERNAL;
+#endif
+
+#if !defined(__MP3_CODEC__)
+    if(Scheme == SMP_PACK_MP3) return SMP_PACK_INTERNAL;
+#endif
+
+#if !defined(__ADPCM_CODEC__)
+    if(Scheme == SMP_PACK_ADPCM) return SMP_PACK_INTERNAL;
+#endif
+
+#if !defined(__TRUESPEECH_CODEC__)
+    if(Scheme == SMP_PACK_TRUESPEECH) return SMP_PACK_INTERNAL;
+#endif
+
+#if !defined(__GSM_CODEC__)
+    if(Scheme == SMP_PACK_TRUESPEECH) return SMP_PACK_INTERNAL;
+#endif
+
+    return(Scheme);
+}

@@ -895,7 +895,7 @@ uint32_t WavpackUnpackSamples (WavpackContext *wpc,
     return samples_unpacked;
 }
 
-static uint32_t read_next_header (WavpackHeader *wphdr)
+uint32_t read_next_header (WavpackHeader *wphdr)
 {
     char buffer [sizeof (*wphdr)];
     char *sp = buffer + sizeof (*wphdr);

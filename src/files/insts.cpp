@@ -116,6 +116,7 @@ void LoadInst(char *FileName)
             SampleCompression[swrite] = SMP_PACK_INTERNAL;
         }
         // Load the bitrate
+        SampleCompression[swrite] = Fix_Codec(SampleCompression[swrite]);
         if(Mp3_Scheme)
         {
             switch(SampleCompression[swrite])

@@ -30,7 +30,7 @@ EXEOBJS_PPC = ptk_ppc.o \
               timer_ppc.o main_ppc.o sdlmain_ppc.o \
               misc_draw_ppc.o draw_primitives_ppc.o requesters_ppc.o xml_ppc.o \
               samples_ops_ppc.o aiff_ppc.o riff_ppc.o \
-              spline_ppc.o tb_303_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
+              spline_ppc.o tb_303_ppc.o wavpack_ppc.o samples_unpack_ppc.o replay_ppc.o synth_ppc.o endianness_ppc.o \
               sounddriver_macosx_ppc.o
 
 EXEOBJS_X86 = ptk_x86.o \
@@ -44,7 +44,7 @@ EXEOBJS_X86 = ptk_x86.o \
               timer_x86.o main_x86.o sdlmain_x86.o \
               misc_draw_x86.o draw_primitives_x86.o requesters_x86.o xml_x86.o \
               samples_ops_x86.o aiff_x86.o riff_x86.o \
-              spline_x86.o tb_303_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
+              spline_x86.o tb_303_x86.o wavpack_x86.o samples_unpack_x86.o replay_x86.o synth_x86.o endianness_x86.o \
               sounddriver_macosx_x86.o
 
 all: protrekkr
@@ -184,6 +184,9 @@ spline_ppc.o: release/distrib/replay/lib/spline.cpp
 tb_303_ppc.o: release/distrib/replay/lib/tb_303.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
+wavpack_ppc.o: release/distrib/replay/lib/wavpack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
+
 samples_unpack_ppc.o: release/distrib/replay/lib/samples_unpack.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
@@ -200,19 +203,19 @@ sounddriver_macosx_ppc.o: release/distrib/replay/lib/sounddriver/sounddriver_mac
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 bits_ppc.o: src/samples/wavpack/bits.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 pack_ppc.o: src/samples/wavpack/pack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 words_ppc.o: src/samples/wavpack/words.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 wputils_ppc.o: src/samples/wavpack/wputils.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 tinypack_ppc.o: src/samples/wavpack/tinypack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 
 
@@ -333,6 +336,9 @@ spline_x86.o: release/distrib/replay/lib/spline.cpp
 tb_303_x86.o: release/distrib/replay/lib/tb_303.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
+wavpack_x86.o: release/distrib/replay/lib/wavpack.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
+
 samples_unpack_x86.o: release/distrib/replay/lib/samples_unpack.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
@@ -349,16 +355,16 @@ sounddriver_macosx_x86.o: release/distrib/replay/lib/sounddriver/sounddriver_mac
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 bits_x86.o: src/samples/wavpack/bits.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 pack_x86.o: src/samples/wavpack/pack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 words_x86.o: src/samples/wavpack/words.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 wputils_x86.o: src/samples/wavpack/wputils.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 tinypack_x86.o: src/samples/wavpack/tinypack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) $<
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<

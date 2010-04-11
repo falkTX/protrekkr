@@ -109,5 +109,6 @@ int Write_Mod_Data(void *Datas, int Unit, int Length, FILE *Handle);
 int Write_Mod_Data_Swap(void *Datas, int Unit, int Length, FILE *Handle);
 short *Get_WaveForm(int Instr_Nbr, int Channel, int Split);
 void Pack_Sample(FILE *FileHandle, short *Sample, int Size, char Pack_Type, int BitRate);
+int Fix_Codec(int Scheme);
 
 #endif

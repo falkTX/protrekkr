@@ -5,10 +5,15 @@
 #include <stdio.h>
 #include <memory.h>
 
+#if defined(__GCC__)
+typedef unsigned long long uint64_t;
+typedef long long int64_t;
+#else
 typedef unsigned __int64 uint64_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
 typedef __int32 int32_t;
+#endif
 
 typedef unsigned char uchar;
 

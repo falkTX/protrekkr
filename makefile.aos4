@@ -22,10 +22,10 @@ EXEOBJS = ptk.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
           samples_ops.o aiff.o riff.o \
-          spline.o tb_303.o samples_unpack.o replay.o synth.o endianness.o \
+          spline.o tb_303.o wavpack.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver_aos4.o
 LIBOBJS = midi.o \
-          spline.o tb_303.o samples_unpack.o replay.o synth.o endianness.o \
+          spline.o tb_303.o wavpack.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver_aos4.o
 
 all: protrekkr
@@ -157,6 +157,9 @@ spline.o: release/distrib/replay/lib/spline.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
+	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+
+wavpack.o: release/distrib/replay/lib/wavpack.cpp
 	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
