@@ -50,7 +50,7 @@ typedef unsigned int uint32_t;
 #endif
 #if defined(__AROS__)
 typedef unsigned int uint32_t;
-typedef long int32_t;
+typedef int int32_t;
 #include <string.h>
 #endif
 #else
