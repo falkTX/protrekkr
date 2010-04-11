@@ -190,6 +190,14 @@ SOURCE=..\..\release\distrib\replay\lib\tb_303.cpp
 
 SOURCE=..\..\release\distrib\replay\lib\include\tb_303.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\release\distrib\replay\lib\wavpack.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\release\distrib\replay\lib\include\wavpack.h
+# End Source File
 # End Group
 # End Target
 # End Project
