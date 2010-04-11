@@ -41,6 +41,7 @@ module_ppc.o: module.cpp
 	g++ -c -o $(@) -arch ppc module.cpp
 
 module:
+	chmod +x ./bin2c_uni
 	./bin2c_uni $(MODULE) module.cpp _PTK_MODULE
 
 # the library itself #

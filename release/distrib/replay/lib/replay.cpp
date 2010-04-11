@@ -2077,7 +2077,7 @@ void Sp_Player(void)
     int i;
     int j;
     int trigger_note_off;
-#if defined(PTK_SYNTH)
+#if defined(PTK_SYNTH) || defined(PTK_INSTRUMENTS)
     float dest_volume;
 #endif
     int toffset;
