@@ -364,7 +364,5 @@ int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sa
 int WavpackFlushSamples (WavpackContext *wpc);
 void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block);
 void *WavpackGetWrapperLocation (void *first_block, uint32_t *size);
-//void WavpackNativeToLittleEndian (void *data, char *format);
-//void WavpackLittleEndianToNative (void *data, char *format);
 
 #endif
