@@ -123,7 +123,7 @@ int pack_audio(short *Source, short *Dest, int Size)
             }
             if (sample_count)
             {
-                uint cnt = sample_count;
+                uint32_t cnt = sample_count;
                 uchar *sptr = cSource;
                 int32_t *dptr = large_buffer;
 

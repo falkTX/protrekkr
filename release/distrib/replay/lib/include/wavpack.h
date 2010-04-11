@@ -8,6 +8,11 @@
 #if defined(__GCC__)
 typedef unsigned long long uint64_t;
 typedef long long int64_t;
+#if defined(__AROS__)
+typedef unsigned long uint32_t;
+typedef long int32_t;
+#include <string.h>
+#endif
 #else
 typedef unsigned __int64 uint64_t;
 typedef unsigned __int32 uint32_t;
