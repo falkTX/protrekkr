@@ -781,7 +781,7 @@ void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_count)
 
     int32_t min_value, max_value, min_shifted, max_shifted;
 
-    min_shifted = (min_value = -32768 >> shift) << shift;
+    min_shifted = (min_value = -32767 >> shift) << shift;
     max_shifted = (max_value = 32767 >> shift) << shift;
 
     while (sample_count--)

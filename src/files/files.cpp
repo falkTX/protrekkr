@@ -2048,7 +2048,7 @@ int Fix_Codec(int Scheme)
 #endif
 
 #if !defined(__GSM_CODEC__)
-    if(Scheme == SMP_PACK_TRUESPEECH) return SMP_PACK_INTERNAL;
+    if(Scheme == SMP_PACK_GSM) return SMP_PACK_INTERNAL;
 #endif
 
     return(Scheme);
