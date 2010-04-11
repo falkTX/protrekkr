@@ -92,7 +92,7 @@ TRUESPEECHWAVEFORMAT At3_Format;
 #endif
 
 #if defined(__WIN32__)
-WAVEFORMATEX Wave_Format;
+extern WAVEFORMATEX Wave_Format;
 ACMSTREAMHEADER Pack_Stream_Head;
 HACMSTREAM Pack_Stream;
 #endif
