@@ -959,8 +959,13 @@ void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
         {
             while (samples_unpacked--)
             {
+#if defined(__BIG_ENDIAN__)
+                *bDest++ = (uchar)((temp = *buf++) >> 8);
+                *bDest++ = (uchar)(temp & 0xff);
+#else
                 *bDest++ = (uchar)(temp = *buf++);
                 *bDest++ = (uchar)(temp >> 8);
+#endif
             }
         }
         if(!samples_unpacked) break;
