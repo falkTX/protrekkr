@@ -268,7 +268,7 @@ static int finish_block (WavpackContext *wpc)
     }
 
     bcount = ((WavpackHeader *) wps->blockbuff)->ckSize + 8;
-    WavpackNativeToLittleEndian((WavpackHeader *) wps->blockbuff, WavpackHeaderFormat);
+    //WavpackNativeToLittleEndian((WavpackHeader *) wps->blockbuff, WavpackHeaderFormat);
     result = wpc->blockout(wpc, wps->blockbuff, bcount);
 
     if (!result)
@@ -306,9 +306,9 @@ uint32_t WavpackGetSampleIndex (WavpackContext *wpc)
 
 void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block)
 {
-    WavpackLittleEndianToNative (first_block, WavpackHeaderFormat);
+//    WavpackLittleEndianToNative (first_block, WavpackHeaderFormat);
     ((WavpackHeader *) first_block)->total_samples = WavpackGetSampleIndex (wpc);
-    WavpackNativeToLittleEndian (first_block, WavpackHeaderFormat);
+    //WavpackNativeToLittleEndian (first_block, WavpackHeaderFormat);
 }
 
 // return TRUE if any uncorrected lossy blocks were actually written or read
@@ -371,7 +371,7 @@ int WavpackGetBytesPerSample (WavpackContext *wpc)
 
 /////////////////////// Endian Correction Routines ////////////////////////////
 
-void WavpackLittleEndianToNative (void *data, char *format)
+/*void WavpackLittleEndianToNative (void *data, char *format)
 {
     uchar *cp = (uchar *) data;
     int32_t temp;
@@ -433,3 +433,4 @@ void WavpackNativeToLittleEndian (void *data, char *format)
     }
 }
 
+*/

@@ -310,7 +310,6 @@ void write_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd);
 int32_t FASTCALL send_word (WavpackStream *wps, int32_t value, int chan);
-void FASTCALL send_word_lossless (WavpackStream *wps, int32_t value, int chan);
 int32_t FASTCALL get_word (WavpackStream *wps, int chan, int32_t *correction);
 int32_t FASTCALL get_word_lossless (WavpackStream *wps, int chan);
 void flush_word (WavpackStream *wps);
@@ -365,7 +364,7 @@ int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sa
 int WavpackFlushSamples (WavpackContext *wpc);
 void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block);
 void *WavpackGetWrapperLocation (void *first_block, uint32_t *size);
-void WavpackNativeToLittleEndian (void *data, char *format);
-void WavpackLittleEndianToNative (void *data, char *format);
+//void WavpackNativeToLittleEndian (void *data, char *format);
+//void WavpackLittleEndianToNative (void *data, char *format);
 
 #endif

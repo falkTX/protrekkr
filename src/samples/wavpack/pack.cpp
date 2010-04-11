@@ -262,7 +262,7 @@ uint32_t pack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_cou
     uint32_t flags = wps->wphdr.flags;
     int tcount, lossy = 0, m;
     struct decorr_pass *dpp;
-    uint32_t crc, crc2, i;
+    uint32_t crc, i;
     int32_t *bptr;
 
     if (!sample_count)
