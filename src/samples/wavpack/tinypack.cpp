@@ -45,8 +45,15 @@ static int write_block (void *wpc, void *data, int32_t length)
     WavpackContext *wpc_loc = (WavpackContext *) wpc;
     if (wpc_loc->Dest && data && length)
     {
-        memcpy(wpc_loc->Dest, data, length);
-        wpc_loc->Dest += length;
+        if(length / wpc_loc->config.bytes_per_sample <= wpc_loc->config.block_samples)
+        {
+            memcpy(wpc_loc->Dest, data, length);
+            wpc_loc->Dest += length;
+        }
+        else
+        {
+            return FALSE;
+        }
     }
     return TRUE;
 }

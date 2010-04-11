@@ -461,5 +461,6 @@ int To8Bit(short *Source, short *Dest, int Size)
 // Pack a sample to internal format
 int ToInternal(short *Source, short *Dest, int Size)
 {
-    return pack_audio(Source, Dest, Size);
+    int Dest_Size = pack_audio(Source, Dest, Size);
+    return Dest_Size >= Size ? 0 : Dest_Size;
 }

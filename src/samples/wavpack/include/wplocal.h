@@ -66,8 +66,6 @@ typedef struct {
 #define HYBRID_FLAG     8       // hybrid mode
 #define HYBRID_SHAPE    0x40    // noise shape (hybrid mode only)
 
-#define HYBRID_BITRATE  0x200   // bitrate noise (hybrid mode only)
-
 #define INITIAL_BLOCK   0x800   // initial block of multichannel segment
 #define FINAL_BLOCK     0x1000  // final block of multichannel segment
 

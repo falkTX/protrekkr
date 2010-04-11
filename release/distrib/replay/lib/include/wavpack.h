@@ -33,7 +33,6 @@ typedef struct
 } WavpackHeader;
 
 #define INT32_DATA      0x100   // special extended int handling
-#define HYBRID_BITRATE  0x200   // bitrate noise (hybrid mode only)
 
 #define INITIAL_BLOCK   0x800   // initial block of multichannel segment
 #define FINAL_BLOCK     0x1000  // final block of multichannel segment
@@ -147,7 +146,7 @@ typedef struct
 {
     WavpackConfig config;
     WavpackStream stream;
-    uchar read_buffer[1024];
+    uchar read_buffer[512];
     uint32_t total_samples;
     unsigned char *Source;
     int Pos_Source;

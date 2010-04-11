@@ -186,17 +186,10 @@ void init_words (WavpackStream *wps)
 
 void word_set_bitrate (WavpackStream *wps)
 {
-    int bitrate_0, bitrate_1;
+    int bitrate_0;
 
-    if (wps->wphdr.flags & HYBRID_BITRATE)
-    {
-        bitrate_0 = wps->bits < 568 ? 0 : wps->bits - 568;
-    }
-    else
-        bitrate_0 = bitrate_1 = 0;
-
+    bitrate_0 = wps->bits < 568 ? 0 : wps->bits - 568;
     wps->w.bitrate_acc [0] = (int32_t) bitrate_0 << 16;
-    wps->w.bitrate_acc [1] = (int32_t) bitrate_1 << 16;
 }
 
 // Allocates the correct space in the metadata structure and writes the
@@ -242,10 +235,8 @@ void write_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     wpmd->data = wpmd->temp_data;
     wpmd->id = ID_HYBRID_PROFILE;
 
-    if (wps->wphdr.flags & HYBRID_BITRATE) {
-        *byteptr++ = temp = log2s (wps->w.slow_level [0]);
-        *byteptr++ = temp >> 8;
-    }
+    *byteptr++ = temp = log2s (wps->w.slow_level [0]);
+    *byteptr++ = temp >> 8;
 
     *byteptr++ = temp = wps->w.bitrate_acc [0] >> 16;
     *byteptr++ = temp >> 8;
@@ -286,10 +277,8 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     uchar *byteptr = (uchar *) wpmd->data;
     uchar *endptr = byteptr + wpmd->byte_length;
 
-    if (wps->wphdr.flags & HYBRID_BITRATE) {
-        wps->w.slow_level [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
-        byteptr += 2;
-    }
+    wps->w.slow_level [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
+    byteptr += 2;
 
     wps->w.bitrate_acc [0] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
@@ -317,16 +306,12 @@ static void update_error_limit (WavpackStream *wps)
 {
     int bitrate_0 = (wps->w.bitrate_acc [0] += wps->w.bitrate_delta [0]) >> 16;
 
-    if (wps->wphdr.flags & HYBRID_BITRATE) {
-        int slow_log_0 = (wps->w.slow_level [0] + SLO) >> SLS;
+    int slow_log_0 = (wps->w.slow_level [0] + SLO) >> SLS;
 
-        if (slow_log_0 - bitrate_0 > -0x100)
-            wps->w.error_limit [0] = exp2s (slow_log_0 - bitrate_0 + 0x100);
-        else
-            wps->w.error_limit [0] = 0;
-    }
+    if (slow_log_0 - bitrate_0 > -0x100)
+        wps->w.error_limit [0] = exp2s (slow_log_0 - bitrate_0 + 0x100);
     else
-        wps->w.error_limit [0] = exp2s (bitrate_0);
+        wps->w.error_limit [0] = 0;
 }
 
 // This function writes the specified word to the open bitstream "wvbits" and,
@@ -473,10 +458,8 @@ int32_t FASTCALL send_word (WavpackStream *wps, int32_t value, int chan)
         }
     }
 
-    if (wps->wphdr.flags & HYBRID_BITRATE) {
-        wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
-        wps->w.slow_level [chan] += mylog2 (mid);
-    }
+    wps->w.slow_level [chan] -= (wps->w.slow_level [chan] + SLO) >> SLS;
+    wps->w.slow_level [chan] += mylog2 (mid);
 
     return sign ? ~mid : mid;
 }

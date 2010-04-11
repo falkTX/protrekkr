@@ -130,7 +130,7 @@ int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, uint32_
     flags |= (uint32_t) i << SRATE_LSB;
     flags |= (uint32_t) shift << SHIFT_LSB;
 
-    flags |= HYBRID_FLAG | HYBRID_BITRATE;
+    flags |= HYBRID_FLAG;
     bps = config->bitrate;
     config->bitrate = 0;
 

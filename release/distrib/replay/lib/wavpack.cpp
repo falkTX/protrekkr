@@ -97,11 +97,8 @@ int read_hybrid_profile_depack(WavpackStream *wps, WavpackMetadata *wpmd)
     uchar *byteptr = (uchar *) wpmd->data;
     uchar *endptr = byteptr + wpmd->byte_length;
 
-    if (wps->wphdr.flags & HYBRID_BITRATE)
-    {
-        wps->w.c [0].slow_level = exp2s_depack(byteptr [0] + (byteptr [1] << 8));
-        byteptr += 2;
-    }
+    wps->w.c [0].slow_level = exp2s_depack(byteptr [0] + (byteptr [1] << 8));
+    byteptr += 2;
 
     wps->w.bitrate_acc [0] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
@@ -126,22 +123,15 @@ void update_error_limit (struct words_data *w, uint32_t flags)
 {
     int bitrate_0 = (w->bitrate_acc [0] += w->bitrate_delta [0]) >> 16;
 
-    if (flags & HYBRID_BITRATE)
-    {
-        int slow_log_0 = (w->c [0].slow_level + SLO) >> SLS;
+    int slow_log_0 = (w->c [0].slow_level + SLO) >> SLS;
 
-        if (slow_log_0 - bitrate_0 > -0x100)
-        {
-            w->c [0].error_limit = exp2s_depack(slow_log_0 - bitrate_0 + 0x100);
-        }
-        else
-        {
-            w->c [0].error_limit = 0;
-        }
+    if (slow_log_0 - bitrate_0 > -0x100)
+    {
+        w->c [0].error_limit = exp2s_depack(slow_log_0 - bitrate_0 + 0x100);
     }
     else
     {
-        w->c [0].error_limit = exp2s_depack(bitrate_0);
+        w->c [0].error_limit = 0;
     }
 }
 
@@ -306,8 +296,7 @@ int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
 
         *buffer++ = getbit (bs) ? ~mid : mid;
 
-        if (flags & HYBRID_BITRATE)
-            c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
+        c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
     }
 
     return csamples;
@@ -954,6 +943,7 @@ void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
     while (1)
     {
         int32_t *buf = temp_buffer;
+        memset(buf, 0, 256 * sizeof(int32_t *));
         uint32_t samples_unpacked = WavpackUnpackSamples(wpc, buf, 256);
         if (samples_unpacked)
         {
@@ -968,7 +958,10 @@ void UnpackInternal(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 #endif
             }
         }
-        if(!samples_unpacked) break;
+        else
+        {
+            break;
+        }
     }
 }
 
