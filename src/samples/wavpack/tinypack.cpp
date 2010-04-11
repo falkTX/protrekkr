@@ -122,7 +122,11 @@ int pack_audio(short *Source, short *Dest, int Size)
 
                 while (cnt--)
                 {
-                    *dptr++ = sptr [0] | ((int32_t)(signed char) sptr [1] << 8);
+#if defined(__BIG_ENDIAN__)
+                    *dptr++ = sptr[1] | ((int32_t)(signed char) sptr[0] << 8);
+#else
+                    *dptr++ = sptr[0] | ((int32_t)(signed char) sptr[1] << 8);
+#endif
                     sptr += 2;
                 }
             }

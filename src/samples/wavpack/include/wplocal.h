@@ -60,8 +60,6 @@ typedef struct {
     uint32_t flags;
 } WavpackHeader;
 
-#define WavpackHeaderFormat "4LS2LLLLL"
-
 // or-values for "flags"
 
 #define BYTES_STORED    3       // 1-4 bytes/sample
