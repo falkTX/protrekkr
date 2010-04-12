@@ -38,17 +38,22 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#if !defined(__PSP__)
 #include <memory.h>
-
+#endif
 #if defined(__GCC__)
 #if !defined(__LINUX__)
 typedef unsigned long long uint64_t;
 typedef long long int64_t;
+#if defined(__WIN32__)
+typedef unsigned int uint32_t;
+typedef int int32_t;
+#endif
 #else
 #include <sys/types.h>
 typedef unsigned int uint32_t;
 #endif
-#if defined(__AROS__)
+#if defined(__AROS__) || defined(__PSP__)
 typedef unsigned int uint32_t;
 typedef int int32_t;
 #include <string.h>

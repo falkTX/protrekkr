@@ -105,7 +105,7 @@ void Me_Handler(void)
                     }
                     else
                     {
-                        pSamples = (Uint8 *) ptrBuffer1;
+                        pSamples = (volatile char *) ptrBuffer1;
                         for(i = 0; i < *ptrAUDIO_SoundBuffer_Size; i++)
                         {
                             pSamples[i] = 0;
@@ -120,7 +120,7 @@ void Me_Handler(void)
                     }
                     else
                     {
-                        pSamples = (Uint8 *) ptrBuffer2;
+                        pSamples = (volatile char *) ptrBuffer2;
                         for(i = 0; i < *ptrAUDIO_SoundBuffer_Size; i++)
                         {
                             pSamples[i] = 0;

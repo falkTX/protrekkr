@@ -76,6 +76,7 @@ void AUDIO_Stop_Sound_Buffer(void);
 void AUDIO_Stop_Driver(void);
 void AUDIO_Play(void);
 void AUDIO_Stop(void);
+void *AUDIO_malloc_64(int *size);
 int AUDIO_IsPlaying(void);
 float AUDIO_GetTime(void);
 int AUDIO_GetSamples(void);

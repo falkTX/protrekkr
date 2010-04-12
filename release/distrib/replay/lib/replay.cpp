@@ -942,8 +942,8 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
                 break;
 #endif
 
-#endif
         }
+#endif
 
         free(Packed_Read_Buffer);
         return(Dest_Buffer);
@@ -992,13 +992,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 
         // Allocated the necessary room for the patterns
-        int max_lines = (PATTERN_BYTES * Songtracks * PATTERN_ROW_LEN * nPatterns * MAX_ROWS);
+        int max_lines = (PATTERN_LEN * nPatterns);
 
         // Free the patterns block
         if(RawPatterns) free(RawPatterns);
 
+#if defined(__PSP__)
+        RawPatterns = (unsigned char *) AUDIO_malloc_64(&max_lines);
+        if(!RawPatterns) return(FALSE);
+#else
         RawPatterns = (unsigned char *) malloc(max_lines);
         if(!RawPatterns) return(FALSE);
+#endif
 
         // Multi notes
         Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
