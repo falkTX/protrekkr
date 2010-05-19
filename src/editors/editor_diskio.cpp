@@ -48,6 +48,7 @@ int allow_save = TRUE;
 extern int song_Seconds;
 extern int song_Minutes;
 extern int song_Hours;
+int Allow_32bit = 0;
 
 int Tracks_To_Render[MAX_TRACKS];
 char *Tracks_Labels[MAX_TRACKS] =
@@ -144,7 +145,6 @@ void Draw_DiskIO_Ed(void)
 // Refresh function
 void Actualize_DiskIO_Ed(int gode)
 {
-    int Allow_32bit = 0;
     if(userscreen == USER_SCREEN_DISKIO_EDIT)
     {
         char tname[32];
@@ -422,7 +422,7 @@ void Mouse_Left_DiskIO_Ed(void)
         }
 
         // Render as 32 bit on
-        if(zcheckMouse(458, 532, 29, 16))
+        if(zcheckMouse(458, 532, 29, 16) && !Allow_32bit)
         {
             rawrender_32float = TRUE;
             teac = 1;
@@ -430,7 +430,7 @@ void Mouse_Left_DiskIO_Ed(void)
         }
 
         // Render as 32 bit off
-        if(zcheckMouse(458 + 31, 532, 29, 16))
+        if(zcheckMouse(458 + 31, 532, 29, 16) && !Allow_32bit)
         {
             rawrender_32float = FALSE;
             teac = 1;
