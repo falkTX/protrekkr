@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.1:
+
+- Patterns slider wasn't always resized properly when switching from large
+  to small patterns view.
+- Some buttons weren't grayed properly in Disk IO tab.
+
 v2.1.0:
 
 - Fixed 2 bugs in the replay (which can now be slightly smaller).

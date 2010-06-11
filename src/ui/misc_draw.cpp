@@ -1301,6 +1301,7 @@ void Draw_Editors_Bar(int Highlight)
         bjbox(0, 428, 800, 19);
         Highlight = curr_tab_highlight;
     }
+    Draw_Pattern_Right_Stuff();
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
     {
         if(Patterns_Lines_Offset)
@@ -1323,9 +1324,8 @@ void Draw_Editors_Bar(int Highlight)
         bjbox(0, 428 + Patterns_Lines_Offset, 800, 19);
         Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
         Actupated(0);
-
     }
-
+    
     if(Patterns_Lines_Offset == 0) Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
     else Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20, 429 + Patterns_Lines_Offset, 62, 16, "Sequencer", Highlight_Tab[4]);
