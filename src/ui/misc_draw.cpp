@@ -1301,7 +1301,6 @@ void Draw_Editors_Bar(int Highlight)
         bjbox(0, 428, 800, 19);
         Highlight = curr_tab_highlight;
     }
-    Draw_Pattern_Right_Stuff();
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
     {
         if(Patterns_Lines_Offset)
@@ -1315,6 +1314,7 @@ void Draw_Editors_Bar(int Highlight)
         VIEWLINE2 = -13;
         YVIEW = 300;
         Patterns_Lines_Offset = 0;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
     }
     else
@@ -1323,6 +1323,7 @@ void Draw_Editors_Bar(int Highlight)
         SetColor(COL_BLACK);
         bjbox(0, 428 + Patterns_Lines_Offset, 800, 19);
         Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
+        Draw_Pattern_Right_Stuff();
         Actupated(0);
     }
     
