@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo /dll /machine:I386 /out:"Distrib\in_ptk.dll"
+# ADD LINK32 kernel32.lib user32.lib ../../zlib.lib msvcrt.lib msacm32.lib dsound.lib /nologo /dll /machine:I386 /out:"Distrib\in_ptk.dll"
 
 !ELSEIF  "$(CFG)" == "plugin - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib msacm32.lib ../../zlib.lib msvcrt.lib dsound.lib /nologo /dll /debug /machine:I386 /nodefaultlib /out:"C:\Program Files\XM Play\in_ptk.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib ../../zlib.lib msvcrt.lib msacm32.lib dsound.lib /nologo /dll /debug /machine:I386 /nodefaultlib /out:"C:\Program Files\XM Play\in_ptk.dll" /pdbtype:sept
 
 !ENDIF 
 
