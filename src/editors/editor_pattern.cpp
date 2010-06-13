@@ -390,8 +390,20 @@ void draw_pated(int track, int line, int petrack, int row)
         else Cur_Char_Function[cur_track].Fnc(dover, 187, 28, 0, 0);
         dover += 17;
 
+        // Reduce notes
+        if((dover + 9) >= MAX_PATT_SCREEN_X) break;
+        if(Channels_MultiNotes[cur_track] == 1) Cur_Char_Function[cur_track].Fnc(dover, 187, 37, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover, 187, 35, 0, 0);
+        dover += 9;
+
+        // Expand notes
+        if((dover + 9) >= MAX_PATT_SCREEN_X) break;
+        if(Channels_MultiNotes[cur_track] == MAX_POLYPHONY) Cur_Char_Function[cur_track].Fnc(dover, 187, 38, 0, 0);
+        else Cur_Char_Function[cur_track].Fnc(dover, 187, 36, 0, 0);
+        dover += 9;
+
         // Caret track marker
-        if((dover + 17) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 13) >= MAX_PATT_SCREEN_X) break;
         if(Track_Under_Caret == cur_track) SetColor(COL_VUMETERPEAK);
         else SetColor(COL_PATTERN_LO_BACK);
         bjbox(dover, 187, 12, 7);
@@ -2756,6 +2768,32 @@ void Mouse_Left_Pattern_Ed(void)
         if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 16, 10))
         {
             gui_action = GUI_CMD_SWITCH_TRACK_LARGE_STATE;
+            break;
+        }
+        start_mute_check_x += Get_Track_Size(i, NULL);
+    }
+
+    // Reduce notes
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2) + 1 + 17;
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
+    {
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 8, 10))
+        {
+            gui_action = GUI_CMD_REDUCE_TRACK_NOTES;
+            break;
+        }
+        start_mute_check_x += Get_Track_Size(i, NULL);
+    }
+
+    // Expand notes
+    start_mute_check_x = PAT_COL_NOTE + 1 + 4 + (29 * 2) + 1 + 17 + 9;
+    tracks = Get_Visible_Partial_Tracks();
+    for(i = gui_track; i < gui_track + tracks; i++)
+    {
+        if(zcheckMouse(start_mute_check_x + Cur_Char_size[i], 184, 8, 10))
+        {
+            gui_action = GUI_CMD_EXPAND_TRACK_NOTES;
             break;
         }
         start_mute_check_x += Get_Track_Size(i, NULL);

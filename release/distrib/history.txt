@@ -4,9 +4,11 @@ ProTrekkr releases history
 
 v2.1.1:
 
-- Patterns slider wasn't always resized properly when switching from large
-  to small patterns view.
+- Patterns slider wasn't always resized properly when switching from
+  large to small patterns view.
 - Some buttons weren't grayed properly in Disk IO tab.
+- Added buttons to reduce or expand the number of notes in each track header.
+- Max number of notes in a track is now 16.
 
 v2.1.0:
 

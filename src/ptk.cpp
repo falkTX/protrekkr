@@ -936,6 +936,20 @@ int Screen_Update(void)
             Actupated(0);
         }
 
+        if(gui_action == GUI_CMD_REDUCE_TRACK_NOTES)
+        {
+            Track_Sub_Note(Get_Track_Over_Mouse(Mouse.x, NULL), 1);
+            Actupated(0);
+            Actualize_Track_Ed(14);
+        }
+
+        if(gui_action == GUI_CMD_EXPAND_TRACK_NOTES)
+        {
+            Track_Add_Note(Get_Track_Over_Mouse(Mouse.x, NULL), 1);
+            Actupated(0);
+            Actualize_Track_Ed(14);
+        }
+
         if(gui_action == GUI_CMD_PLAY_SONG)
         {
             SongPlay();

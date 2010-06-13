@@ -1779,13 +1779,13 @@ void Letter(int x, int y, char ltr, int ys, int y2)
         case 20: Copy(Temp_PFONT, x, y, 56, ys, 63, y2); break; // Blank
         case 21: Copy(Temp_PFONT, x, y, 184, ys, 191, y2); break; // .
 
-        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y, 56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y, 84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,  0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y, 28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y, 193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y, 221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -1795,6 +1795,11 @@ void Letter(int x, int y, char ltr, int ys, int y2)
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
 
         case 34: Copy(Temp_PFONT, x, y, 56, ys, 56, y2); break; // Blank (1 pixels)
+
+        case 35: Copy(Temp_PFONT, x, y, 249, 64, 249 + 6, 64 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_PFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_PFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_PFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -1841,13 +1846,13 @@ void Note_Letter(int x, int y, char ltr, int ys, int y2)
         case 20: Copy(Note_Surface, x, y, 56, ys, 63, y2); break; // Blank
         case 21: Copy(Note_Surface, x, y, 184, ys, 191, y2); break; // .
 
-        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y, 56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y, 84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,  0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y, 28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y, 193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y, 221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -1855,6 +1860,11 @@ void Note_Letter(int x, int y, char ltr, int ys, int y2)
         case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
         case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
+        case 35: Copy(Temp_PFONT, x, y, 249, 64, 249 + 6, 64 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_PFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_PFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_PFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -1888,13 +1898,13 @@ void Large_Letter(int x, int y, char ltr, int ys, int y2)
         case 20: Copy(Temp_LARGEPFONT, x, y, 77, ys, 77 + 11, y2); break; // Blank
         case 21: Copy(Temp_LARGEPFONT, x, y, 254, ys, 254 + 11, y2); break; // .
 
-        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y, 56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y, 84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,  0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y, 28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y, 193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y, 221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -1903,6 +1913,10 @@ void Large_Letter(int x, int y, char ltr, int ys, int y2)
         case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
 
+        case 35: Copy(Temp_PFONT, x, y, 249, 64, 249 + 6, 64 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_PFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_PFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_PFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -1946,13 +1960,13 @@ void Note_Large_Letter(int x, int y, char ltr, int ys, int y2)
         case 20: Copy(Note_Surface, x, y, 77, ys, 77 + 11, y2); break; // Blank
         case 21: Copy(Note_Surface, x, y, 254, ys, 254 + 11, y2); break; // .
 
-        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y, 56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y, 84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,  0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y, 28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y, 193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y, 221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -1960,6 +1974,11 @@ void Note_Large_Letter(int x, int y, char ltr, int ys, int y2)
         case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
         case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
+        case 35: Copy(Temp_PFONT, x, y, 249, 56, 249 + 6, 56 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_PFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_PFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_PFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -1993,13 +2012,13 @@ void Small_Letter(int x, int y, char ltr, int ys, int y2)
         case 20: Copy(Temp_SMALLPFONT, x, y, 42, ys, 42 + 5, y2); break; // Blank
         case 21: Copy(Temp_SMALLPFONT, x, y, 138, ys, 138 + 5, y2); break; // .
 
-        case 23: Copy(Temp_PFONT, x, y,  56, 64, 56 + 26, 64 + 6); break; // ON
-        case 24: Copy(Temp_PFONT, x, y,  84, 64, 84 + 26, 64 + 6); break; // OFF
-        case 25: Copy(Temp_PFONT, x, y,   0, 64,  0 + 26, 64 + 6); break; // MUTE
-        case 26: Copy(Temp_PFONT, x, y,  28, 64, 28 + 26, 64 + 6); break; // PLAY
+        case 23: Copy(Temp_PFONT, x, y, 56, 64, 56 + 26, 64 + 6); break; // ON
+        case 24: Copy(Temp_PFONT, x, y, 84, 64, 84 + 26, 64 + 6); break; // OFF
+        case 25: Copy(Temp_PFONT, x, y,  0, 64,  0 + 26, 64 + 6); break; // MUTE
+        case 26: Copy(Temp_PFONT, x, y, 28, 64, 28 + 26, 64 + 6); break; // PLAY
 
-        case 27: Copy(Temp_PFONT, x, y,  193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
-        case 28: Copy(Temp_PFONT, x, y,  221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
+        case 27: Copy(Temp_PFONT, x, y, 193, 64, 193 + 14, 64 + 6); break; // ZOOM ON
+        case 28: Copy(Temp_PFONT, x, y, 221, 64, 221 + 14, 64 + 6); break; // ZOOM OFF
 
         case 29: Copy(Temp_PFONT, x, y, 56, ys, 59, y2); break; // Blank (4 pixels)
         case 30: Copy(Temp_PFONT, x, y, 56, ys, 57, y2); break; // Blank (2 pixels)
@@ -2007,6 +2026,11 @@ void Small_Letter(int x, int y, char ltr, int ys, int y2)
         case 31: Copy(Temp_PFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
         case 32: Copy(Temp_PFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_PFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
+        case 35: Copy(Temp_PFONT, x, y, 249, 64, 249 + 6, 64 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_PFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_PFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_PFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -2065,6 +2089,11 @@ void Note_Small_Letter(int x, int y, char ltr, int ys, int y2)
         case 31: Copy(Temp_NOTEPFONT, x, y, 111, 64, 111 + 4, 64 + 6); break; // FX ARROW LO BACK
         case 32: Copy(Temp_NOTEPFONT, x, y, 138, 64, 138 + 4, 64 + 6); break; // FX ARROW HI BACK
         case 33: Copy(Temp_NOTEPFONT, x, y, 165, 64, 165 + 4, 64 + 6); break; // FX ARROW SEL BACK
+
+        case 35: Copy(Temp_NOTEPFONT, x, y, 249, 64, 249 + 6, 64 + 6); break; // REDUCE NOTES ON
+        case 36: Copy(Temp_NOTEPFONT, x, y, 257, 64, 257 + 6, 64 + 6); break; // EXPAND NOTES ON
+        case 37: Copy(Temp_NOTEPFONT, x, y, 277, 64, 277 + 6, 64 + 6); break; // REDUCE NOTES OFF
+        case 38: Copy(Temp_NOTEPFONT, x, y, 285, 64, 285 + 6, 64 + 6); break; // EXPAND NOTES OFF
     }
 }
 
@@ -2367,7 +2396,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset,
     int j;
 
     // Create the pattern font
-    Copy_To_Surface(PFONT, Dest, 0, 0, 0, offset, 286, offset + 8);
+    Copy_To_Surface(PFONT, Dest, 0, 0, 0, offset, 316, offset + 8);
 
     // Set the base colors
     while(SDL_LockSurface(Dest) < 0);
@@ -2418,7 +2447,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset,
     SDL_UnlockSurface(Dest);
 
     // Blank line
-    Copy_To_Surface(PFONT, Dest, 0, 16, 0, 7, 286, 7 + 1);
+    Copy_To_Surface(PFONT, Dest, 0, 16, 0, 7, 316, 7 + 1);
 
     while(SDL_LockSurface(Dest) < 0);
 
@@ -2537,7 +2566,7 @@ void Create_Pattern_font(SDL_Surface *Dest, int offset,
     SDL_UnlockSurface(Dest);
 
     // Markers arrows
-    Copy_To_Surface(PFONT, Dest, 0, 64, 0, 8, 286, 8 + 7);
+    Copy_To_Surface(PFONT, Dest, 0, 64, 0, 8, 316, 8 + 7);
 }
 
 // ------------------------------------------------------
@@ -2634,12 +2663,12 @@ int Set_Pictures_Colors(void)
     }
     max_colors_Pointer++;
 
-    Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
-    Temp_LARGEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
-    Temp_SMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
-    Temp_NOTEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
-    Temp_NOTELARGEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
-    Temp_NOTESMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 286, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_PFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_LARGEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_SMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTELARGEPFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
+    Temp_NOTESMALLPFONT = SDL_AllocSurface(SDL_SWSURFACE, 316, 87 * 2, 8, 0, 0, 0, 0xff);
 
     Pointer_BackBuf = (unsigned char *) malloc(POINTER->pitch * POINTER->h * sizeof(unsigned char));
     memset(Pointer_BackBuf, 0, POINTER->pitch * POINTER->h * sizeof(unsigned char));
@@ -2669,6 +2698,8 @@ int Set_Pictures_Colors(void)
     Set_Channel_State_Pic(165, COL_MUTE, COL_PATTERN_SEL_BACK);
     Set_Channel_State_Pic(193, COL_PLAY, COL_MUTE_PLAY_INVERT);
     Set_Channel_State_Pic(221, COL_MUTE, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(249, COL_PLAY, COL_MUTE_PLAY_INVERT);
+    Set_Channel_State_Pic(277, COL_MUTE, COL_MUTE_PLAY_INVERT);
 
     return(TRUE);
 }

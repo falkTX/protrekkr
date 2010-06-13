@@ -194,7 +194,7 @@ void Actualize_Track_Ed(char gode)
             else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
-        if(gode == 0 || gode == 13 || gode == 15)
+        if(gode == 0 || gode == 13 || gode == 14 || gode == 15)
         {
             if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
             if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
@@ -205,15 +205,7 @@ void Actualize_Track_Ed(char gode)
         {
             if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
             if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
-            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
-            if(Get_Track_Type(Track_Under_Caret) == TRACK_LARGE && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_LARGE)
-            {
-                Set_Track_Zoom(Track_Under_Caret, TRACK_MEDIUM);
-            }
-            if(Get_Track_Type(Track_Under_Caret) == TRACK_MEDIUM && Channels_MultiNotes[Track_Under_Caret] > MAX_TRACKS_NORMAL)
-            {
-                Set_Track_Zoom(Track_Under_Caret, TRACK_SMALL);
-            }
+            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY;
             Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actupated(0);
         }
@@ -377,19 +369,13 @@ void Mouse_Left_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[Track_Under_Caret]--;
-            if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
+            Track_Sub_Note(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[Track_Under_Caret]++;
-            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret])
-            {
-                Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
-            }
-            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
+            Track_Add_Note(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -447,19 +433,13 @@ void Mouse_Right_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[Track_Under_Caret] -= 10;
-            if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
+            Track_Sub_Note(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
         {
-            Channels_MultiNotes[Track_Under_Caret] += 10;
-            if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret])
-            {
-                Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
-            }
-            if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY - 1) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY - 1;
+            Track_Add_Note(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -477,5 +457,41 @@ void Mouse_Sliders_Track_Ed(void)
         if(zcheckMouse(308, 502, 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
         if(compressor != 0) if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
         if(zcheckMouse(308, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
+    }
+}
+
+// ------------------------------------------------------
+// Add a given amount of note to a track
+void Track_Add_Note(int Track_Nbr, int Amount)
+{
+    Channels_MultiNotes[Track_Nbr] += Amount;
+    if(Channels_MultiNotes[Track_Nbr] > MAX_POLYPHONY) Channels_MultiNotes[Track_Nbr] = MAX_POLYPHONY;
+    if(Channels_MultiNotes[Track_Nbr] > Channels_Polyphony[Track_Nbr])
+    {
+        Channels_Polyphony[Track_Nbr] = Channels_MultiNotes[Track_Nbr];
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_LARGE)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_NORMAL)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
+    }
+}
+
+// ------------------------------------------------------
+// Remove a given amount of note from a track
+void Track_Sub_Note(int Track_Nbr, int Amount)
+{
+    Channels_MultiNotes[Track_Nbr] -= Amount;
+    if(Channels_MultiNotes[Track_Nbr] < 1) Channels_MultiNotes[Track_Nbr] = 1;
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_LARGE)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_NORMAL)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }
 }
