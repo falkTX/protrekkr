@@ -4,9 +4,10 @@ ProTrekkr releases history
 
 v2.1.2:
 
-- Fixed flanger filter (now 1 filter buffer / track).
-- Fixed 06xx command.
+- Fixed flanger filter (now using individual buffers / track).
+- Fixed 06xx command (was always jumping at patterns start).
 - Added loading support for 1, 2 & 3 channels FastTracker I modules.
+- Added flight.ptk & warlock.ptk.
 
 v2.1.1:
 
