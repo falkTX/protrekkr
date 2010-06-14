@@ -99,7 +99,7 @@ void Load303(char *FileName)
     }
     else
     {
-        Status_Box("303 pattern loading failed. (Probably: file not found)");
+        Status_Box("303 pattern loading failed. (Possible cause: file not found)");
     }
 }
 

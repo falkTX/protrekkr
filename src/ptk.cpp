@@ -2105,7 +2105,7 @@ void LoadFile(int Freeindex, const char *str)
     }
     else
     {
-        Status_Box("File loading error. (Probably: file not found)");
+        Status_Box("File loading error. (Possible cause: file not found)");
     }
     gui_action = GUI_CMD_NONE;
     Actualize_DiskIO_Ed(0);

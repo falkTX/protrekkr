@@ -895,7 +895,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
     }
     else
     {
-        Status_Box("Protracker module loading failed. (Probably: file not found)");
+        Status_Box("Protracker module loading failed. (Possible cause: file not found)");
     }
 
     Clear_Input();

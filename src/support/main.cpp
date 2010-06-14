@@ -449,7 +449,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
             }
         }
 
-        // There's a probably abetter way to do that but
+        // There's a probably a better way to do that but
         // it works fine and i want the app to be able 
         // to run from a console too.
         int Found_File = FALSE;

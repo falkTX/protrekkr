@@ -2,6 +2,12 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.2:
+
+- Fixed flanger filter (now 1 filter buffer / track).
+- Fixed 06xx command.
+- Added loading support for 1, 2 & 3 channels FastTracker I modules.
+
 v2.1.1:
 
 - Patterns slider wasn't always resized properly when switching

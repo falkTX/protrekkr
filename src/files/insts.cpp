@@ -180,7 +180,7 @@ void LoadInst(char *FileName)
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         Status_Box("Instrument loaded ok.");
     } else {
-        Status_Box("Instrument loading failed. (Probably: file not found)");
+        Status_Box("Instrument loading failed. (Possible cause: file not found)");
     }
     
     Clear_Input();

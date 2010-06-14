@@ -114,7 +114,7 @@ void LoadReverb(char *FileName)
     }
     else
     {
-        Status_Box("Reverb data loading failed. (Probably: file not found)");
+        Status_Box("Reverb data loading failed. (Possible cause: file not found)");
     }
 }
 

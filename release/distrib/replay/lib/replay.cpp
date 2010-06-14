@@ -503,10 +503,10 @@ char SampleCompression[MAX_INSTRS];
 int delay_time;
 
 #if defined(PTK_FLANGER)
-    float Flanger_sbuf0L;
-    float Flanger_sbuf1L;
-    float Flanger_sbuf0R;
-    float Flanger_sbuf1R;
+    float Flanger_sbuf0L[MAX_TRACKS];
+    float Flanger_sbuf1L[MAX_TRACKS];
+    float Flanger_sbuf0R[MAX_TRACKS];
+    float Flanger_sbuf1R[MAX_TRACKS];
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -606,8 +606,8 @@ void Compressor_work(void);
 void Initreverb();
 
 #if defined(PTK_FLANGER)
-    float Filter_FlangerL(float input);
-    float Filter_FlangerR(float input);
+    float Filter_FlangerL(int track, float input);
+    float Filter_FlangerR(int track, float input);
 #endif
 
 volatile int Done_Reset;
@@ -1492,14 +1492,15 @@ void Reset_Values(void)
             Segue_Volume[i] = 0;
             Segue_SamplesL[i] = 0;
             Segue_SamplesR[i] = 0;
-        }
 
 #if defined(PTK_FLANGER)
-        Flanger_sbuf0L = 0;
-        Flanger_sbuf1L = 0;
-        Flanger_sbuf0R = 0;
-        Flanger_sbuf1R = 0;
+            Flanger_sbuf0L[i] = 0;
+            Flanger_sbuf1L[i] = 0;
+            Flanger_sbuf0R[i] = 0;
+            Flanger_sbuf1R[i] = 0;
 #endif
+
+        }
 
 #if defined(PTK_COMPRESSOR)
         Initreverb();
@@ -1821,18 +1822,18 @@ void Pre_Song_Init(void)
         CCut[ini] = 0.0f;
 #endif
 
+#if defined(PTK_FLANGER)
+    Flanger_sbuf0L[ini] = 0;
+    Flanger_sbuf1L[ini] = 0;
+    Flanger_sbuf0R[ini] = 0;
+    Flanger_sbuf1R[ini] = 0;
+#endif
+
     }
 
 #if defined(PTK_303)
     tb303engine[0].reset();
     tb303engine[1].reset();
-#endif
-
-#if defined(PTK_FLANGER)
-    Flanger_sbuf0L = 0;
-    Flanger_sbuf1L = 0;
-    Flanger_sbuf0R = 0;
-    Flanger_sbuf1R = 0;
 #endif
 
     for(i = 0; i < MAX_INSTRS; i++)
@@ -2444,7 +2445,7 @@ void Sp_Player(void)
             // Check if we're in a loop
             if(repeat_loop_counter_in)
             {
-                Pattern_Line -= repeat_loop_pos + 1;
+                Pattern_Line -= repeat_loop_pos;
                 if(Pattern_Line < 0) Pattern_Line = 0;
                 repeat_loop_counter_in = 0;
             }
@@ -3207,8 +3208,8 @@ ByPass_Wav:
             oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (FLANGER_OFFSET2[c])];
             roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (FLANGER_OFFSET1[c])];
 
-            All_Signal_L += Filter_FlangerL(oldspawn[c]);
-            All_Signal_R += Filter_FlangerR(roldspawn[c]);
+            All_Signal_L += Filter_FlangerL(c, oldspawn[c]);
+            All_Signal_R += Filter_FlangerR(c, roldspawn[c]);
 
             if(++FLANGER_OFFSET[c] >= 16384) FLANGER_OFFSET[c] -= 16384;
             FLANGER_GR[c] += FLANGER_RATE[c];
@@ -5628,21 +5629,21 @@ void Reset_303_Parameters(para303 *tbpars)
 // ------------------------------------------------------
 // Filter flanger signal
 #if defined(PTK_FLANGER)
-float Filter_FlangerL(float input)
+float Filter_FlangerL(int track, float input)
 {
     float fa = 1.0f - FLANGER_LOPASS_CUTOFF; 
     float fb = float(FLANGER_LOPASS_RESONANCE * (1.0f + (1.0f / fa)));
-    Flanger_sbuf0L = fa * Flanger_sbuf0L + FLANGER_LOPASS_CUTOFF * (input + fb * (Flanger_sbuf0L - Flanger_sbuf1L));
-    Flanger_sbuf1L = fa * Flanger_sbuf1L + FLANGER_LOPASS_CUTOFF * Flanger_sbuf0L;
-    return(Flanger_sbuf1L);
+    Flanger_sbuf0L[track] = fa * Flanger_sbuf0L[track] + FLANGER_LOPASS_CUTOFF * (input + fb * (Flanger_sbuf0L[track] - Flanger_sbuf1L[track]));
+    Flanger_sbuf1L[track] = fa * Flanger_sbuf1L[track] + FLANGER_LOPASS_CUTOFF * Flanger_sbuf0L[track];
+    return(Flanger_sbuf1L[track]);
 }
-float Filter_FlangerR(float input)
+float Filter_FlangerR(int track, float input)
 {
     float fa = 1.0f - FLANGER_LOPASS_CUTOFF;
     float fb = float(FLANGER_LOPASS_RESONANCE * (1.0f + (1.0f / fa)));
-    Flanger_sbuf0R = fa * Flanger_sbuf0R + FLANGER_LOPASS_CUTOFF * (input + fb * (Flanger_sbuf0R - Flanger_sbuf1R));
-    Flanger_sbuf1R = fa * Flanger_sbuf1R + FLANGER_LOPASS_CUTOFF * Flanger_sbuf0R;
-    return(Flanger_sbuf1R);
+    Flanger_sbuf0R[track] = fa * Flanger_sbuf0R[track] + FLANGER_LOPASS_CUTOFF * (input + fb * (Flanger_sbuf0R[track] - Flanger_sbuf1R[track]));
+    Flanger_sbuf1R[track] = fa * Flanger_sbuf1R[track] + FLANGER_LOPASS_CUTOFF * Flanger_sbuf0R[track];
+    return(Flanger_sbuf1R[track]);
 }
 #endif
 

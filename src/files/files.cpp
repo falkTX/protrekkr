@@ -700,7 +700,7 @@ Read_Mod_File:
     {
 
 #if !defined(__WINAMP__)
-        Status_Box("Module loading failed. (Probably: file not found)");
+        Status_Box("Module loading failed. (Possible cause: file not found)");
 #endif
 
         return(FALSE);

@@ -442,7 +442,7 @@ void LoadSynth(char *FileName)
     }
     else
     {
-        Status_Box("Synthesizer program loading failed. (Probably: file not found)");
+        Status_Box("Synthesizer program loading failed. (Possible cause: file not found)");
     }
 }
 

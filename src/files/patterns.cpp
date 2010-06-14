@@ -143,7 +143,7 @@ void LoadPattern(char *FileName)
     }
     else
     {
-        Status_Box("Pattern data loading failed. (Probably: file not found)");
+        Status_Box("Pattern data loading failed. (Possible cause: file not found)");
     }
 }
 
