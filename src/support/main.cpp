@@ -924,7 +924,7 @@ int Switch_FullScreen(int Width, int Height)
     Env_Change = TRUE;
     if(Width < SCREEN_WIDTH) Width = SCREEN_WIDTH;
     if(Height < SCREEN_HEIGHT) Height = SCREEN_HEIGHT;
-
+    
     if(FullScreen)
     {
         Width = SCREEN_WIDTH;
@@ -961,6 +961,9 @@ int Switch_FullScreen(int Width, int Height)
     CONSOLE_HEIGHT2 = CONSOLE_HEIGHT - 42;
     fsize = 638 + restx;
     Visible_Columns = CONSOLE_WIDTH / 128;
+
+    // Flush any pending rects
+    Nbr_Update_Rects = 0;
 
     // Obtain SDL window
     SDL_GetWMInfo(&WMInfo);
