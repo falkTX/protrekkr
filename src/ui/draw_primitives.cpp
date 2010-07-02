@@ -291,6 +291,8 @@ void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
 // Display or clear the mouse pointer at given coordinates
 void Display_Mouse_Pointer(int x, int y, int clear)
 {
+    if(x >= Cur_Width) return;
+    if(y >= Cur_Height) return;
     while(SDL_LockSurface(POINTER) < 0);
 
     int i;
@@ -309,8 +311,8 @@ void Display_Mouse_Pointer(int x, int y, int clear)
             Dst_offset = ((j + y) * Main_Screen->pitch) + (i + x);
             if(Dst_offset >= 0)
             {
-                if(((i + x) < (Main_Screen->w - 1)) &&
-                   ((j + y) < (Main_Screen->h - 1)))
+                if(((i + x) < (Cur_Width - 1)) &&
+                   ((j + y) < (Cur_Height - 1)))
                 {
                     if(clear)
                     {
