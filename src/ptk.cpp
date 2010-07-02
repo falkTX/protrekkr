@@ -1520,7 +1520,7 @@ int Screen_Update(void)
     if(redraw_everything)
     {
         SetColor(COL_BLACK);
-        Fillrect(0, 4, CONSOLE_WIDTH, CONSOLE_HEIGHT);
+        Fillrect(0, 0, CONSOLE_WIDTH, CONSOLE_HEIGHT);
 
         last_index = -1;
         Gui_Draw_Button_Box(MIN_VUMETER - 4, 6, (MAX_VUMETER - MIN_VUMETER) + 6, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -5917,7 +5917,8 @@ void Actualize_Master(char gode)
             Actualize_Fx_Ed(10);
             Actualize_Fx_Ed(11);
         }
-        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
+                                                           BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
     }
 
     if(gode == 0)

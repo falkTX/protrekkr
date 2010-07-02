@@ -1538,7 +1538,7 @@ void Gui_Draw_Flat_Box(const char *str)
 {
     SetColor(COL_STATIC_MED);
 
-    Fillrect(2, (Cur_Height - 150), 800 - 6, (Cur_Height - 24));
+    Fillrect(2, (Cur_Height - 150), Cur_Width - 6, (Cur_Height - 24));
     PrintXY(4, (Cur_Height - 151), USE_FONT, (char *) str);
 }
 
