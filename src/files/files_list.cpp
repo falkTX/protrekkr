@@ -528,30 +528,30 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_PATTERN_DIR:
         case SCOPE_ZONE_SAMPLE_DIR:
             SetColor(COL_BACKGROUND);
-            bjbox(xr - 1, yr + 1, 387, 137);
+            bjbox(xr - 1, yr + 1, Cur_Width - 412, 137);
 
             // Current dir background
-            Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, Cur_Width - 504, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Mods, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Mods, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Instrs, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Instrs, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Presets, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Presets, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_REVERB_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_PATTERN_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Patterns, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_SAMPLE_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Samples, 296);
+                    PrintXY(398, 26, USE_FONT, Dir_Samples, (Cur_Width - 504));
                     break;
             }
 
@@ -567,17 +567,17 @@ void Dump_Files_List(int xr, int yr)
                         if(y + counter == lt_curr[Scopish])
                         {
                             SetColor(COL_PUSHED_MED);
-                            bjbox(xr - 1, yr + (counter * space) + 2, 387, space);
+                            bjbox(xr - 1, yr + (counter * space) + 2, (Cur_Width - 413), space);
                         }
 
                         switch(Get_FileType(rel_val))
                         {
                             case _A_SUBDIR:
-                                PrintXY(xr, yr + (counter * space), USE_FONT_LOW, Get_FileName(rel_val), 296);
-                                PrintXY(xr + 364, yr + (counter * space) + 1, USE_FONT_LOW, "<Dir>");
+                                PrintXY(xr, yr + (counter * space), USE_FONT_LOW, Get_FileName(rel_val), Cur_Width - 504);
+                                PrintXY(xr + (Cur_Width - 436), yr + (counter * space) + 1, USE_FONT_LOW, "<Dir>");
                                 break;
                             case _A_FILE:
-                                PrintXY(xr, yr + (counter * space) + 1, USE_FONT, Get_FileName(rel_val), 296);
+                                PrintXY(xr, yr + (counter * space) + 1, USE_FONT, Get_FileName(rel_val), Cur_Width - 504);
                                 File = fopen(Get_FileName(rel_val), "rb");
                                 if(File)
                                 {
@@ -587,18 +587,18 @@ void Dump_Files_List(int xr, int yr)
                                         sprintf(Size_String, "0");
                                     }
                                     else sprintf(Size_String, "%9.d", Size);
-                                    int pos = (xr + 385) - Get_Size_Text(Size_String);
+                                    int pos = (xr + (Cur_Width - 415)) - Get_Size_Text(Size_String);
                                     PrintXY(pos, yr + (counter * space) + 1, USE_FONT, Size_String);
                                     fclose(File);
                                 }
                                 else
                                 {
-                                    PrintXY(xr + 340, yr + (counter * space) + 1, USE_FONT_LOW, "<Locked>");
+                                    PrintXY(xr + (Cur_Width - 460), yr + (counter * space) + 1, USE_FONT_LOW, "<Locked>");
                                 }
                                 break;
                             case _A_SEP:
                                 SetColor(COL_PUSHED_HI);
-                                bjbox(xr - 1, yr + (counter * space) + (space / 2) + 1, 387, 1);
+                                bjbox(xr - 1, yr + (counter * space) + (space / 2) + 1, Cur_Width - 413, 1);
                                 break;
                         }
                     }
@@ -664,14 +664,14 @@ void Actualize_Files_List(int modeac)
 void Draw_Lists_Slider(int idx)
 {
     SetColor(COL_BLACK);
-    bjbox(781, 42, 18, 136);
+    bjbox(Cur_Width - 1, 42, 18, 136);
     SetColor(COL_SLIDER_LO);
-    bjbox(783 - 1, 59 - 1, 15 + 2, 103 + 2);
+    bjbox(Cur_Width - 18, 59 - 1, 15 + 2, 103 + 2);
     SetColor(COL_SLIDER_HI);
-    bjbox(783, 59, 15 + 1, 103 + 1);
+    bjbox(Cur_Width - 17, 59, 15 + 1, 103 + 1);
     SetColor(COL_SLIDER_MED);
-    bjbox(783, 59, 15, 103);
-    Gui_Draw_Button_Box(783, 58 + idx + 1, 16 - 2, 32, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(782, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(782, 164, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    bjbox(Cur_Width - 17, 59, 15, 103);
+    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 2, 58 + idx + 1, 16 - 2, 32, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 164, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }

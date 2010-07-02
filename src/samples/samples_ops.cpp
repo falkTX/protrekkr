@@ -535,6 +535,26 @@ void Sample_Maximize(int32 range_start, int32 range_end)
 }
 
 // ------------------------------------------------------
+// Zeroize a sample
+void Sample_Zeroize(int32 range_start, int32 range_end)
+{
+    int32 i;
+    char nc = SampleChannels[Current_Instrument][Current_Instrument_Split];
+
+    for(i = range_start; i < range_end + 1; i++)
+    {
+        *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i) = 0;
+        if(nc == 2)
+        {
+            *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i) = 0;
+        }
+    }
+
+    draw_sampled_wave = TRUE;
+    Status_Box("Zero done.");
+}
+
+// ------------------------------------------------------
 // Fade a sample in
 void Sample_FadeIn(int32 range_start, int32 range_end)
 {

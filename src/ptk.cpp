@@ -78,10 +78,10 @@ extern float sp_Tvol_Mod[MAX_TRACKS];
 
 int Display_Pointer = FALSE;
 
-int CONSOLE_WIDTH = 800;
-int CHANNELS_WIDTH = 800 - 20;
-int CONSOLE_HEIGHT = 600;
-int CONSOLE_HEIGHT2 = 600;
+int CONSOLE_WIDTH;
+int CHANNELS_WIDTH;
+int CONSOLE_HEIGHT;
+int CONSOLE_HEIGHT2;
 int fluzy = -1;
 int Scopish = SCOPE_ZONE_MOD_DIR;
 char Scopish_LeftRight = FALSE;
@@ -165,7 +165,6 @@ int c_l_tvol = 32768;
 int c_r_tvol = 32768;
 int c_l_cvol = 32768;
 int c_r_cvol = 32768;
-int mlimit = 0;
 
 int snamesel = INPUT_NONE;
 
@@ -474,13 +473,6 @@ int Load_Font_Datas(char *name)
 // Load the necessary datas and initialize the interface
 int Init_Context(void)
 {
-    restx = CONSOLE_WIDTH - 640;
-    resty = CONSOLE_HEIGHT - 492;
-    CONSOLE_HEIGHT2 = CONSOLE_HEIGHT - 42;
-    mlimit = 619 + restx;
-    fsize = 638 + restx;
-    Visible_Columns = CONSOLE_WIDTH / 128;
-
 #if defined(__WIN32__)
     srand(GetTickCount());
 #else
@@ -702,7 +694,7 @@ int Screen_Update(void)
 
     if(actuloop) Afloop();
 
-    if(gui_action != 0)
+    if(gui_action != GUI_CMD_NONE)
     { // There are some for me today.....:)
 
         // Files list slider
@@ -753,7 +745,7 @@ int Screen_Update(void)
                 int broadcast = lt_index[Scopish] + (Mouse.y - 43) / 12;
                 last_index = -1;
                 lt_curr[Scopish] = broadcast;
-                switch(Get_FileType(lt_curr[Scopish]) )
+                switch(Get_FileType(lt_curr[Scopish]))
                 {
                     case _A_FILE:
                         Actualize_Files_List(1);
@@ -788,6 +780,7 @@ int Screen_Update(void)
                 }
             }
         }
+
         // Instruments/synths list slider
         if(gui_action == GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER)
         {
@@ -915,7 +908,7 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_MUTE_STATE)
         {
-            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL);
+            int tmp_track = Get_Track_Over_Mouse(Mouse.x, NULL, FALSE);
 
             if(CHAN_MUTE_STATE[tmp_track] == 0) CHAN_MUTE_STATE[tmp_track] = 1;
             else CHAN_MUTE_STATE[tmp_track] = 0;
@@ -926,26 +919,26 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_LARGE_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL), TRUE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), TRUE);
             Actupated(0);
         }
 
         if(gui_action == GUI_CMD_SWITCH_TRACK_SMALL_STATE)
         {
-            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL), FALSE);
+            Toggle_Track_Zoom(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), FALSE);
             Actupated(0);
         }
 
         if(gui_action == GUI_CMD_REDUCE_TRACK_NOTES)
         {
-            Track_Sub_Note(Get_Track_Over_Mouse(Mouse.x, NULL), 1);
+            Track_Sub_Note(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
             Actupated(0);
             Actualize_Track_Ed(14);
         }
 
         if(gui_action == GUI_CMD_EXPAND_TRACK_NOTES)
         {
-            Track_Add_Note(Get_Track_Over_Mouse(Mouse.x, NULL), 1);
+            Track_Add_Note(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
             Actupated(0);
             Actualize_Track_Ed(14);
         }
@@ -1003,7 +996,6 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_CHANGE_TRACKS_NBR)
         {
             Actualize_Master(teac);
-            //Set_Track_Slider(gui_track);
             Actupated(0);
             Draw_Scope();
             Display_Tracks_To_Render();
@@ -1071,25 +1063,19 @@ int Screen_Update(void)
         // Tabs select
         if(gui_action == GUI_CMD_SELECT_LARGE_PATTERNS)
         {
-            if(Patterns_Lines == DISPLAYED_LINES_SMALL)
+            if(!Large_Patterns)
             {
-                Patterns_Lines = DISPLAYED_LINES_LARGE;
-                Patterns_Lines_Offset = 132;
-                VIEWLINE = 22;
-                VIEWLINE2 = -22;
-                YVIEW = 372;
+                Large_Patterns = TRUE;
+                Set_Pattern_Size();
                 Draw_Pattern_Right_Stuff();
                 Actupated(0);
                 Draw_Editors_Bar(USER_SCREEN_LARGE_PATTERN);
-             }
+            }
             else
             {
                 userscreen = curr_tab_highlight;
-                Patterns_Lines = DISPLAYED_LINES_SMALL;
-                Patterns_Lines_Offset = 0;
-                VIEWLINE = 15;
-                VIEWLINE2 = -13;
-                YVIEW = 300;
+                Large_Patterns = FALSE;
+                Set_Pattern_Size();
                 Draw_Pattern_Right_Stuff();
                 Actupated(0);
                 Draw_Editors_Bar(-1);
@@ -1341,7 +1327,7 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_CALC_FINAL)
         {
             Final_Mod_Length = TestMod();
-            outlong(254, 506, Final_Mod_Length, 7);
+            outlong(254, (Cur_Height - 94), Final_Mod_Length, 7);
         }
 
         if(gui_action == GUI_CMD_SET_INSTRUMENT_AMPLI)
@@ -2187,16 +2173,16 @@ void Notify_Play(void)
         {
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Status_Box("Playing song...");
         }
         else
         {
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Status_Box("Playing pattern...");
         }
     }
@@ -2865,23 +2851,39 @@ void Set_Default_Channels_Polyphony(void)
 // Show song informations (summing instruments and patterns)
 void ShowInfo(void)
 {
-   char tmp[256];
-   int pattsize = nPatterns * PATTERN_LEN;
-   int sampsize = 0;
+    char tmp[256];
+    int pattsize = nPatterns * PATTERN_LEN;
+    int sampsize = 0;
+    int nbr_samp = 0;
+    int nbr_synth = 0;
+    int i;
 
-   for(int pp = 0; pp < 128; pp++)
-   {
-      for(int z = 0; z < 16; z++)
-      {
-         if(SampleType[pp][z] != 0)
-         {
-            sampsize += SampleChannels[pp][z] * SampleLength[pp][z];
-         }
-      }
-   }
-   sprintf(tmp, "Sample bank size: %d bytes, pattern bank [%d patterns] size: %d bytes.",
-                sampsize, nPatterns, pattsize);
-   Status_Box(tmp);
+    for(i = 0; i < MAX_INSTRS; i++)
+    {
+        if(Synthprg[i])
+        {
+            nbr_synth++;
+        }
+    }
+
+    for(int pp = 0; pp < MAX_INSTRS; pp++)
+    {
+        for(int z = 0; z < MAX_INSTRS_SPLITS; z++)
+        {
+            if(SampleType[pp][z] != 0)
+            {
+                sampsize += SampleChannels[pp][z] * SampleLength[pp][z];
+                nbr_samp++;
+            }
+        }
+    }
+    sprintf(tmp, "%d instruments (%d bytes), "
+                 "%d synths, "
+                 "%d patterns (%d bytes).",
+                 nbr_samp, sampsize,
+                 nbr_synth, 
+                 nPatterns, pattsize);
+    Status_Box(tmp);
 }
 
 // ------------------------------------------------------
@@ -3884,8 +3886,8 @@ void Keyboard_Handler(void)
                 L_MaxLevel = 0;
                 R_MaxLevel = 0;
                 Songplaying = TRUE;
-                Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                 Pattern_Line_Visual = Pattern_Line;
                 key_record_first_time = FALSE;
                 old_key_Pattern_Line = Pattern_Line;
@@ -4843,7 +4845,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SYNTH_LIST:
 
                 // Scroll the instruments/synths lists
-                if(zcheckMouse(393, 41, 406, 136) == 1)
+                if(zcheckMouse(393, 41, (Cur_Width - 394), 136) == 1)
                 {
                     Instrs_index--;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
@@ -4858,7 +4860,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Scroll the files lists
-                if(zcheckMouse(393, 41, 406, 136) == 1)
+                if(zcheckMouse(393, 41, (Cur_Width - 394), 136) == 1)
                 {
                     lt_index[Scopish]--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
@@ -4869,9 +4871,9 @@ void Mouse_Handler(void)
         // Scroll the sequences
         if(userscreen == USER_SCREEN_SEQUENCER)
         {
-            if(zcheckMouse(257, 466, 26, 90) ||
-               zcheckMouse(89, 466, 26, 90) ||
-               zcheckMouse(120, 466, 132, 90))
+            if(zcheckMouse(257, (Cur_Height - 134), 26, 90) ||
+               zcheckMouse(89, (Cur_Height - 134), 26, 90) ||
+               zcheckMouse(120, (Cur_Height - 134), 132, 90))
             {
                 gui_action = GUI_CMD_PREVIOUS_POSITION;
             }
@@ -4898,7 +4900,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SYNTH_LIST:
 
                 // Scroll the instruments/synths lists
-                if(zcheckMouse(393, 41, 406, 136) == 1)
+                if(zcheckMouse(393, 41, (Cur_Width - 394), 136) == 1)
                 {
                     Instrs_index++;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
@@ -4913,7 +4915,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Scroll the files lists
-                if(zcheckMouse(393, 41, 406, 136) == 1)
+                if(zcheckMouse(393, 41, (Cur_Width - 394), 136) == 1)
                 {
                     lt_index[Scopish]++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
@@ -4924,9 +4926,9 @@ void Mouse_Handler(void)
         // Scroll the sequences
         if(userscreen == USER_SCREEN_SEQUENCER)
         {
-            if(zcheckMouse(257, 466, 26, 90) ||
-               zcheckMouse(89, 466, 26, 90) ||
-               zcheckMouse(120, 466, 132, 90))
+            if(zcheckMouse(257, (Cur_Height - 134), 26, 90) ||
+               zcheckMouse(89, (Cur_Height - 134), 26, 90) ||
+               zcheckMouse(120, (Cur_Height - 134), 132, 90))
             {
                 gui_action = GUI_CMD_NEXT_POSITION;
             }
@@ -4937,20 +4939,13 @@ void Mouse_Handler(void)
         Mouse_Wheel_Sample_Ed(-MouseWheel_Multiplier);
     }
 
-    if(Mouse.button & MOUSE_RIGHT_BUTTON)
-    {
-        Mouse_Sliders_Right_Pattern_Ed();
-        Mouse_Sliders_Right_Instrument_Ed();
-        Mouse_Sliders_Right_Reverb_Ed();
-    }
-
     if(Mouse.button & MOUSE_LEFT_BUTTON)
     {
         switch(Scopish)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(783, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
+                if(zcheckMouse(Cur_Width - 17, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SLIDER;
                 break;
 
             case SCOPE_ZONE_MOD_DIR:
@@ -4959,7 +4954,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
             case SCOPE_ZONE_SAMPLE_DIR:
-                if(zcheckMouse(783, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
+                if(zcheckMouse(Cur_Width - 17, 59, 16, 103 + 1)) gui_action = GUI_CMD_SET_FILES_LIST_SLIDER;
                 break;
         }
 
@@ -4987,49 +4982,49 @@ void Mouse_Handler(void)
     if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
     {
         // Modules dir.
-        if(zcheckMouse(692, 24, 18, 16))
+        if(zcheckMouse(Cur_Width - 108, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_MOD_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Instruments dir.
-        if(zcheckMouse(710, 24, 18, 16))
+        if(zcheckMouse(Cur_Width - 90, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_INSTR_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Samples dir.
-        if(zcheckMouse(728, 24, 18, 16))
+        if(zcheckMouse(Cur_Width - 72, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_SAMPLE_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Presets dir.
-        if(zcheckMouse(746, 24, 18, 16))
+        if(zcheckMouse(Cur_Width - 54, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_PRESET_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Reverbs dir.
-        if(zcheckMouse(764, 24, 18, 16))
+        if(zcheckMouse(Cur_Width - 36, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_REVERB_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Patterns dir.
-        if(zcheckMouse(782, 24, 18, 16))
+        if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 24, 18, 16))
         {
             Scopish = SCOPE_ZONE_PATTERN_DIR;
             Draw_Scope_Files_Button();
         }
 
         // Tracks scopes.
-        if(zcheckMouse(746, 6, 18, 16))
+        if(zcheckMouse(Cur_Width - 54, 6, 18, 16))
         {
             if(Scopish != SCOPE_ZONE_SCOPE)
             {
@@ -5045,15 +5040,15 @@ void Mouse_Handler(void)
             }
         }
 
-        // Instrument list
-        if(zcheckMouse(764, 6, 18, 16))
+        // Instruments list
+        if(zcheckMouse(Cur_Width - 36, 6, 18, 16))
         {
             Scopish = SCOPE_ZONE_INSTR_LIST;
             Draw_Scope_Files_Button();
         }
 
-        // Synth list
-        if(zcheckMouse(782, 6, 18, 16))
+        // Synths list
+        if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 6, 18, 16))
         {
             Scopish = SCOPE_ZONE_SYNTH_LIST;
             Draw_Scope_Files_Button();
@@ -5076,20 +5071,20 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(782, 42, 16, 14))
+                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
                 {
                     Instrs_index--;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
-                if(zcheckMouse(782, 164, 16, 14))
+                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
                 {
                     Instrs_index++;
                     gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
                 }
 
                 // Select
-                if(zcheckMouse(393, 43, 388, 133))
+                if(zcheckMouse(393, 43, Cur_Width - 412, 133))
                 {
                     gui_action = GUI_CMD_SET_INSTR_SYNTH_LIST_SELECT;
                 }
@@ -5103,21 +5098,21 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Files list up
-                if(zcheckMouse(782, 42, 16, 14))
+                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
                 {
                     lt_index[Scopish]--;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
 
                 // Files list down
-                if(zcheckMouse(782, 164, 16, 14))
+                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
                 {
                     lt_index[Scopish]++;
                     gui_action = GUI_CMD_FILELIST_SCROLL;
                 }
 
                 // Select a file
-                if(zcheckMouse(393, 43, 388, 133))
+                if(zcheckMouse(393, 43, Cur_Width - 412, 133))
                 {
                     gui_action = GUI_CMD_SET_FILES_LIST_SELECT_FILE;
                 }
@@ -5371,8 +5366,8 @@ void Mouse_Handler(void)
         }
 
         // Switch small / large patterns
-        int Add_Offset = (Patterns_Lines == DISPLAYED_LINES_LARGE ? 133 : 0);
-        if(zcheckMouse(0, 429 + Add_Offset, 18, 16))
+        int Add_Offset = Patterns_Lines_Offset;
+        if(zcheckMouse(0, (Cur_Height - 171) + Add_Offset, 18, 16))
         {
             gui_action = GUI_CMD_SELECT_LARGE_PATTERNS;
         }
@@ -5383,25 +5378,25 @@ void Mouse_Handler(void)
             gui_action = GUI_CMD_EXIT;
         }
 
-        if(zcheckMouse(20, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SEQUENCER || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SEQUENCER;
-        if(zcheckMouse(84, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
+        if(zcheckMouse(20, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SEQUENCER || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SEQUENCER;
+        if(zcheckMouse(84, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_INSTRUMENT_EDIT;
             seditor = 0;
         }
-        if(zcheckMouse(148, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SYNTH_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
-        if(zcheckMouse(212, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SAMPLE_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
-        if(zcheckMouse(276, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TB303_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TB303_EDIT;
-        if(zcheckMouse(340, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
-        if(zcheckMouse(404, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_FX_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
-        if(zcheckMouse(468, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_FX_SETUP_EDIT || Patterns_Lines_Offset))
+        if(zcheckMouse(148, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SYNTH_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
+        if(zcheckMouse(212, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SAMPLE_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
+        if(zcheckMouse(276, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TB303_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TB303_EDIT;
+        if(zcheckMouse(340, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
+        if(zcheckMouse(404, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_FX_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
+        if(zcheckMouse(468, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_FX_SETUP_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_FX_EDIT;
             teac = 0;
         }
-        if(zcheckMouse(532, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
-        if(zcheckMouse(596, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
-        if(zcheckMouse(660, 429 + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
+        if(zcheckMouse(532, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
+        if(zcheckMouse(596, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
+        if(zcheckMouse(660, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
 
         Mouse_Left_Track_Fx_Ed();
         Mouse_Left_Sequencer_Ed();
@@ -5424,6 +5419,7 @@ void Mouse_Handler(void)
     // Right mouse button
     if(Mouse.button_oneshot & MOUSE_RIGHT_BUTTON)
     {
+        Reset_Pattern_Scrolling_Horiz();
         Mouse_Right_Pattern_Ed();
 
         if(zcheckMouse(188, 82, 16, 16))
@@ -5632,7 +5628,7 @@ void Mouse_Handler(void)
         }
 
         // Stereo scopes.
-        if(zcheckMouse(746, 6, 18, 16))
+        if(zcheckMouse(Cur_Width - 54, 6, 18, 16))
         {
             if(Scopish != SCOPE_ZONE_SCOPE)
             {
@@ -5658,7 +5654,6 @@ void Mouse_Handler(void)
         Mouse_Right_Sequencer_Ed();
         Mouse_Right_Synth_Ed();
         Mouse_Right_Master_Ed();
-        Reset_Pattern_Scrolling_Horiz();
 
         // Play a .wav
         switch(Scopish)
@@ -5675,7 +5670,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SAMPLE_DIR:
 
                 // Play the file
-                if(zcheckMouse(393, 43, 388, 133))
+                if(zcheckMouse(393, 43, Cur_Width - 412, 133))
                 {
                     gui_action = GUI_CMD_SET_FILES_LIST_PLAY_WAV;
                 }
@@ -5684,6 +5679,14 @@ void Mouse_Handler(void)
 
 
     } // RIGHT MOUSE
+
+    if(Mouse.button & MOUSE_RIGHT_BUTTON)
+    {
+        Mouse_Sliders_Right_Pattern_Ed();
+        Mouse_Sliders_Right_Instrument_Ed();
+        Mouse_Sliders_Right_Reverb_Ed();
+    }
+
 }
 
 // ------------------------------------------------------
@@ -5799,7 +5802,7 @@ void Display_Master_Comp(void)
 {
     char string[64];
 
-    Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(159, 6, 54, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
     Realslider_Size(159 + 54, 6, 50, (int) (mas_comp_threshold_Master * 0.5f), TRUE);
     if(mas_comp_ratio_Master <= 0.01f)
     {
@@ -5811,7 +5814,7 @@ void Display_Master_Comp(void)
     }
     Print_String(string, 159 + 54, 8, 67, BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(283, 6, 41, 16, "Ratio", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
     Realslider_Size(283 + 41, 6, 50, (int) (mas_comp_ratio_Master * 0.5f), TRUE);
     if(mas_comp_ratio_Master <= 0.01f)
     {
@@ -5832,7 +5835,7 @@ void Display_Master_Volume(void)
 
     if(mas_vol < 0.01f) mas_vol = 0.01f;
     if(mas_vol > 1.0f) mas_vol = 1.0f;
-    Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(394, 6, 44, 16, "Mst Vol.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
     Realslider(394 + 44, 6, (int) (mas_vol * 128.0f), TRUE);
     sprintf(String, "%d%%", (int) (mas_vol * 100.0f));
     Print_String(String, 394 + 44, 8, 145, BUTTON_TEXT_CENTERED);
@@ -5846,18 +5849,18 @@ void Display_Shuffle(void)
 
     if(shuffle > 100) shuffle = 100;
     if(shuffle < 0) shuffle = 0;
-    Gui_Draw_Button_Box(586, 6, 40, 16, "Shuffle", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(586, 6, 40, 16, "Shuffle", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
     Realslider_Size(586 + 40, 6, 100, shuffle, TRUE);
     sprintf(string, "%d%%", shuffle);
     Print_String(string, 586 + 40, 8, 116, BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(746, 6, Cur_Width - 802, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 }
 
 // ------------------------------------------------------
 // Handle the mouse event of the top bar
 void Mouse_Sliders_Master_Shuffle(void)
 {
-
     // Compressor threshold
     if(zcheckMouse(213, 6, 67, 18))
     {
@@ -5894,7 +5897,8 @@ void Actualize_Master(char gode)
     {
         if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
-        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_DISABLED : BUTTON_NORMAL) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
+                                                         BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
     }
 
     if(gode == 0 || gode == 2)
@@ -5953,6 +5957,8 @@ typedef struct
 typedef struct
 {
     int x_pos;
+    int x_div;
+    int x_mul;
     int y_pos;
     int y_large;
     int x_max;
@@ -5982,185 +5988,185 @@ POS_SCOPE Scope_Table[] =
 DAT_POS_SCOPE Scope_Table_Dats[] =
 {
     // ---
-    {          394, 135 / 2, 135 / 2, 405 },                  // 0
+    { 394, 0, 0, 135 / 2, 135 / 2, 1 },                     // 0
 
     // ---
-    {                   394, 135 / 2, 135 / 2, 405 / 2},      // 1
-    { 394 + ((405 / 2) * 1), 135 / 2, 135 / 2, 405 / 2},      // 2
+    { 394, 0, 0, 135 / 2, 135 / 2, 2 },                     // 1
+    { 394, 2, 1, 135 / 2, 135 / 2, 2 },                     // 2
 
     // ---
-    {                   394, 135 / 2, 135 / 2, 405 / 3},      // 3
-    { 394 + ((405 / 3) * 1), 135 / 2, 135 / 2, 405 / 3},      // 4
-    { 394 + ((405 / 3) * 2), 135 / 2, 135 / 2, 405 / 3},      // 5
+    { 394, 0, 0, 135 / 2, 135 / 2, 3 },                     // 3
+    { 394, 3, 1, 135 / 2, 135 / 2, 3 },                     // 4
+    { 394, 3, 2, 135 / 2, 135 / 2, 3 },                     // 5
 
     // ---
-    {                   394, 135 / 2, 135 / 2, 405 / 4},      // 6
-    { 394 + ((405 / 4) * 1), 135 / 2, 135 / 2, 405 / 4},      // 7
-    { 394 + ((405 / 4) * 2), 135 / 2, 135 / 2, 405 / 4},      // 8
-    { 394 + ((405 / 4) * 3), 135 / 2, 135 / 2, 405 / 4},      // 9
+    { 394, 0, 0, 135 / 2, 135 / 2, 4 },                     // 6
+    { 394, 4, 1, 135 / 2, 135 / 2, 4 },                     // 7
+    { 394, 4, 2, 135 / 2, 135 / 2, 4 },                     // 8
+    { 394, 4, 3, 135 / 2, 135 / 2, 4 },                     // 9
 
     // ---
-    {             394, 135 / 2, 135 / 2, 405 / 5},            // 10
-    { 394 + ((405 / 5) * 1), 135 / 2, 135 / 2, 405 / 5},      // 11
-    { 394 + ((405 / 5) * 2), 135 / 2, 135 / 2, 405 / 5},      // 12
-    { 394 + ((405 / 5) * 3), 135 / 2, 135 / 2, 405 / 5},      // 13
-    { 394 + ((405 / 5) * 4), 135 / 2, 135 / 2, 405 / 5},      // 14
+    { 394, 0, 0, 135 / 2, 135 / 2, 5 },                     // 10
+    { 394, 5, 1, 135 / 2, 135 / 2, 5 },                     // 11
+    { 394, 5, 2, 135 / 2, 135 / 2, 5 },                     // 12
+    { 394, 5, 3, 135 / 2, 135 / 2, 5 },                     // 13
+    { 394, 5, 4, 135 / 2, 135 / 2, 5 },                     // 14
 
     // ---
-    {                   394, 135 / 4, 135 / 4, 405 / 3},      // 15
-    { 394 + ((405 / 3) * 1), 135 / 4, 135 / 4, 405 / 3},      // 16
-    { 394 + ((405 / 3) * 2), 135 / 4, 135 / 4, 405 / 3},      // 17
-    {                   394, (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 18
-    { 394 + ((405 / 3) * 1), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 19
-    { 394 + ((405 / 3) * 2), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 20
+    { 394, 0, 0, 135 / 4, 135 / 4, 3 },                     // 15
+    { 394, 3, 1, 135 / 4, 135 / 4, 3 },                     // 16
+    { 394, 3, 2, 135 / 4, 135 / 4, 3 },                     // 17
+    { 394, 0, 0, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 18
+    { 394, 3, 1, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 19
+    { 394, 3, 2, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 20
 
     // ---
-    {                   394, 135 / 4, 135 / 4, 405 / 4},      // 21
-    { 394 + ((405 / 4) * 1), 135 / 4, 135 / 4, 405 / 4},      // 22
-    { 394 + ((405 / 4) * 2), 135 / 4, 135 / 4, 405 / 4},      // 23
-    { 394 + ((405 / 4) * 3), 135 / 4, 135 / 4, 405 / 4},      // 24
-    {                   394, (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 25
-    { 394 + ((405 / 3) * 1), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 26
-    { 394 + ((405 / 3) * 2), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 3},      // 27
+    { 394, 0, 0, 135 / 4, 135 / 4, 4 },                     // 21
+    { 394, 4, 1, 135 / 4, 135 / 4, 4 },                     // 22
+    { 394, 4, 2, 135 / 4, 135 / 4, 4 },                     // 23
+    { 394, 4, 3, 135 / 4, 135 / 4, 4 },                     // 24
+    { 394, 0, 0, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 25
+    { 394, 3, 1, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 26
+    { 394, 3, 2, (135 / 2) + (135 / 4) + 1, 135 / 4, 3 },   // 27
 
     // ---
-    {                   394, 135 / 4, 135 / 4, 405 / 4},      // 28
-    { 394 + ((405 / 4) * 1), 135 / 4, 135 / 4, 405 / 4},      // 29
-    { 394 + ((405 / 4) * 2), 135 / 4, 135 / 4, 405 / 4},      // 30
-    { 394 + ((405 / 4) * 3), 135 / 4, 135 / 4, 405 / 4},      // 31
-    {                   394, (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 32
-    { 394 + ((405 / 4) * 1), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 33
-    { 394 + ((405 / 4) * 2), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 34
-    { 394 + ((405 / 4) * 3), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 35
+    { 394, 0, 0, 135 / 4, 135 / 4, 4 },                     // 28
+    { 394, 4, 1, 135 / 4, 135 / 4, 4 },                     // 29
+    { 394, 4, 2, 135 / 4, 135 / 4, 4 },                     // 30
+    { 394, 4, 3, 135 / 4, 135 / 4, 4 },                     // 31
+    { 394, 0, 0, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 32
+    { 394, 4, 1, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 33
+    { 394, 4, 2, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 34
+    { 394, 4, 3, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 35
 
     // ---
-    {                   394, 135 / 4, 135 / 4, 405 / 5},      // 36
-    { 394 + ((405 / 5) * 1), 135 / 4, 135 / 4, 405 / 5},      // 37
-    { 394 + ((405 / 5) * 2), 135 / 4, 135 / 4, 405 / 5},      // 38
-    { 394 + ((405 / 5) * 3), 135 / 4, 135 / 4, 405 / 5},      // 39
-    { 394 + ((405 / 5) * 4), 135 / 4, 135 / 4, 405 / 5},      // 40
-    {                   394, (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 41
-    { 394 + ((405 / 4) * 1), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 42
-    { 394 + ((405 / 4) * 2), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 43
-    { 394 + ((405 / 4) * 3), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 4},      // 44
+    { 394, 0, 0, 135 / 4, 135 / 4, 5 },                     // 36
+    { 394, 5, 1, 135 / 4, 135 / 4, 5 },                     // 37
+    { 394, 5, 2, 135 / 4, 135 / 4, 5 },                     // 38
+    { 394, 5, 3, 135 / 4, 135 / 4, 5 },                     // 39
+    { 394, 5, 4, 135 / 4, 135 / 4, 5 },                     // 40
+    { 394, 0, 0, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 41
+    { 394, 4, 1, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 42
+    { 394, 4, 2, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 43
+    { 394, 4, 3, (135 / 2) + (135 / 4) + 1, 135 / 4, 4 },   // 44
 
     // ---
-    {                   394, 135 / 4, 135 / 4, 405 / 5},      // 45
-    { 394 + ((405 / 5) * 1), 135 / 4, 135 / 4, 405 / 5},      // 46
-    { 394 + ((405 / 5) * 2), 135 / 4, 135 / 4, 405 / 5},      // 47
-    { 394 + ((405 / 5) * 3), 135 / 4, 135 / 4, 405 / 5},      // 48
-    { 394 + ((405 / 5) * 4), 135 / 4, 135 / 4, 405 / 5},      // 49
-    {                   394, (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 5},      // 50
-    { 394 + ((405 / 5) * 1), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 5},      // 51
-    { 394 + ((405 / 5) * 2), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 5},      // 52
-    { 394 + ((405 / 5) * 3), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 5},      // 53
-    { 394 + ((405 / 5) * 4), (135 / 2) + (135 / 4) + 1, 135 / 4, 405 / 5},      // 54
+    { 394, 0, 0, 135 / 4, 135 / 4, 5 },                     // 45
+    { 394, 5, 1, 135 / 4, 135 / 4, 5 },                     // 46
+    { 394, 5, 2, 135 / 4, 135 / 4, 5 },                     // 47
+    { 394, 5, 3, 135 / 4, 135 / 4, 5 },                     // 48
+    { 394, 5, 4, 135 / 4, 135 / 4, 5 },                     // 49
+    { 394, 0, 0, (135 / 2) + (135 / 4) + 1, 135 / 4, 5 },   // 50
+    { 394, 5, 1, (135 / 2) + (135 / 4) + 1, 135 / 4, 5 },   // 51
+    { 394, 5, 2, (135 / 2) + (135 / 4) + 1, 135 / 4, 5 },   // 52
+    { 394, 5, 3, (135 / 2) + (135 / 4) + 1, 135 / 4, 5 },   // 53
+    { 394, 5, 4, (135 / 2) + (135 / 4) + 1, 135 / 4, 5 },   // 54
 
     // ---
-    {                   394, 135 / 6, 135 / 6, 405 / 4},      // 55
-    { 394 + ((405 / 4) * 1), 135 / 6, 135 / 6, 405 / 4},      // 56
-    { 394 + ((405 / 4) * 2), 135 / 6, 135 / 6, 405 / 4},      // 57
-    { 394 + ((405 / 4) * 3), 135 / 6, 135 / 6, 405 / 4},      // 58
+    { 394, 0, 0, 135 / 6, 135 / 6, 4 },                     // 55
+    { 394, 4, 1, 135 / 6, 135 / 6, 4 },                     // 56
+    { 394, 4, 2, 135 / 6, 135 / 6, 4 },                     // 57
+    { 394, 4, 3, 135 / 6, 135 / 6, 4 },                     // 58
 
-    {                   394, (135 / 2) + 1, 135 / 6, 405 / 4},      // 59
-    { 394 + ((405 / 4) * 1), (135 / 2) + 1, 135 / 6, 405 / 4},      // 60
-    { 394 + ((405 / 4) * 2), (135 / 2) + 1, 135 / 6, 405 / 4},      // 61
-    { 394 + ((405 / 4) * 3), (135 / 2) + 1, 135 / 6, 405 / 4},      // 62
+    { 394, 0, 0, (135 / 2) + 1, 135 / 6, 4 },               // 59
+    { 394, 4, 1, (135 / 2) + 1, 135 / 6, 4 },               // 60
+    { 394, 4, 2, (135 / 2) + 1, 135 / 6, 4 },               // 61
+    { 394, 4, 3, (135 / 2) + 1, 135 / 6, 4 },               // 62
 
-    {                   394, (135 / 2) + (135 / 3), 135 / 6, 405 / 3},      // 63
-    { 394 + ((405 / 3) * 1), (135 / 2) + (135 / 3), 135 / 6, 405 / 3},      // 64
-    { 394 + ((405 / 3) * 2), (135 / 2) + (135 / 3), 135 / 6, 405 / 3},      // 65
-
-    // ---
-    {                   394, 135 / 6, 135 / 6, 405 / 4},      // 66
-    { 394 + ((405 / 4) * 1), 135 / 6, 135 / 6, 405 / 4},      // 67
-    { 394 + ((405 / 4) * 2), 135 / 6, 135 / 6, 405 / 4},      // 68
-    { 394 + ((405 / 4) * 3), 135 / 6, 135 / 6, 405 / 4},      // 69
-
-    {                   394, (135 / 2) + 1, 135 / 6, 405 / 4},      // 70
-    { 394 + ((405 / 4) * 1), (135 / 2) + 1, 135 / 6, 405 / 4},      // 71
-    { 394 + ((405 / 4) * 2), (135 / 2) + 1, 135 / 6, 405 / 4},      // 72
-    { 394 + ((405 / 4) * 3), (135 / 2) + 1, 135 / 6, 405 / 4},      // 73
-
-    {                   394, (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 74
-    { 394 + ((405 / 4) * 1), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 75
-    { 394 + ((405 / 4) * 2), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 76
-    { 394 + ((405 / 4) * 3), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 77
+    { 394, 0, 0, (135 / 2) + (135 / 3), 135 / 6, 3 },       // 63
+    { 394, 3, 1, (135 / 2) + (135 / 3), 135 / 6, 3 },       // 64
+    { 394, 3, 2, (135 / 2) + (135 / 3), 135 / 6, 3 },       // 65
 
     // ---
-    {                   394, 135 / 6, 135 / 6, 405 / 5},      // 78
-    { 394 + ((405 / 5) * 1), 135 / 6, 135 / 6, 405 / 5},      // 79
-    { 394 + ((405 / 5) * 2), 135 / 6, 135 / 6, 405 / 5},      // 80
-    { 394 + ((405 / 5) * 3), 135 / 6, 135 / 6, 405 / 5},      // 81
-    { 394 + ((405 / 5) * 4), 135 / 6, 135 / 6, 405 / 5},      // 82
+    { 394, 0, 0, 135 / 6, 135 / 6, 4 },                     // 66
+    { 394, 4, 1, 135 / 6, 135 / 6, 4 },                     // 67
+    { 394, 4, 2, 135 / 6, 135 / 6, 4 },                     // 68
+    { 394, 4, 3, 135 / 6, 135 / 6, 4 },                     // 69
 
-    {                   394, (135 / 2) + 1, 135 / 6, 405 / 4},      // 83
-    { 394 + ((405 / 4) * 1), (135 / 2) + 1, 135 / 6, 405 / 4},      // 84
-    { 394 + ((405 / 4) * 2), (135 / 2) + 1, 135 / 6, 405 / 4},      // 85
-    { 394 + ((405 / 4) * 3), (135 / 2) + 1, 135 / 6, 405 / 4},      // 86
+    { 394, 0, 0, (135 / 2) + 1, 135 / 6, 4 },               // 70
+    { 394, 4, 1, (135 / 2) + 1, 135 / 6, 4 },               // 71
+    { 394, 4, 2, (135 / 2) + 1, 135 / 6, 4 },               // 72
+    { 394, 4, 3, (135 / 2) + 1, 135 / 6, 4 },               // 73
 
-    {                   394, (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 87
-    { 394 + ((405 / 4) * 1), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 88
-    { 394 + ((405 / 4) * 2), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 89
-    { 394 + ((405 / 4) * 3), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 90
-
-    // ---
-    {                   394, 135 / 6, 135 / 6, 405 / 5},      // 91
-    { 394 + ((405 / 5) * 1), 135 / 6, 135 / 6, 405 / 5},      // 92
-    { 394 + ((405 / 5) * 2), 135 / 6, 135 / 6, 405 / 5},      // 93
-    { 394 + ((405 / 5) * 3), 135 / 6, 135 / 6, 405 / 5},      // 94
-    { 394 + ((405 / 5) * 4), 135 / 6, 135 / 6, 405 / 5},      // 95
-
-    {                   394, (135 / 2) + 1, 135 / 6, 405 / 5},      // 96
-    { 394 + ((405 / 5) * 1), (135 / 2) + 1, 135 / 6, 405 / 5},      // 97
-    { 394 + ((405 / 5) * 2), (135 / 2) + 1, 135 / 6, 405 / 5},      // 98
-    { 394 + ((405 / 5) * 3), (135 / 2) + 1, 135 / 6, 405 / 5},      // 99
-    { 394 + ((405 / 5) * 4), (135 / 2) + 1, 135 / 6, 405 / 5},      // 100
-
-    {                   394, (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 101
-    { 394 + ((405 / 4) * 1), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 102
-    { 394 + ((405 / 4) * 2), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 103
-    { 394 + ((405 / 4) * 3), (135 / 2) + (135 / 3), 135 / 6, 405 / 4},      // 104
+    { 394, 0, 0, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 74
+    { 394, 4, 1, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 75
+    { 394, 4, 2, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 76
+    { 394, 4, 3, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 77
 
     // ---
-    {                   394, 135 / 6, 135 / 6, 405 / 5},      // 105
-    { 394 + ((405 / 5) * 1), 135 / 6, 135 / 6, 405 / 5},      // 106
-    { 394 + ((405 / 5) * 2), 135 / 6, 135 / 6, 405 / 5},      // 107
-    { 394 + ((405 / 5) * 3), 135 / 6, 135 / 6, 405 / 5},      // 108
-    { 394 + ((405 / 5) * 4), 135 / 6, 135 / 6, 405 / 5},      // 109
+    { 394, 0, 0, 135 / 6, 135 / 6, 5 },                     // 78
+    { 394, 5, 1, 135 / 6, 135 / 6, 5 },                     // 79
+    { 394, 5, 2, 135 / 6, 135 / 6, 5 },                     // 80
+    { 394, 5, 3, 135 / 6, 135 / 6, 5 },                     // 81
+    { 394, 5, 4, 135 / 6, 135 / 6, 5 },                     // 82
 
-    {                   394, (135 / 2) + 1, 135 / 6, 405 / 5},      // 110
-    { 394 + ((405 / 5) * 1), (135 / 2) + 1, 135 / 6, 405 / 5},      // 111
-    { 394 + ((405 / 5) * 2), (135 / 2) + 1, 135 / 6, 405 / 5},      // 112
-    { 394 + ((405 / 5) * 3), (135 / 2) + 1, 135 / 6, 405 / 5},      // 113
-    { 394 + ((405 / 5) * 4), (135 / 2) + 1, 135 / 6, 405 / 5},      // 114
+    { 394, 0, 0, (135 / 2) + 1, 135 / 6, 4 },               // 83
+    { 394, 4, 1, (135 / 2) + 1, 135 / 6, 4 },               // 84
+    { 394, 4, 2, (135 / 2) + 1, 135 / 6, 4 },               // 85
+    { 394, 4, 3, (135 / 2) + 1, 135 / 6, 4 },               // 86
 
-    {                   394, (135 / 2) + (135 / 3), 135 / 6, 405 / 5},      // 115
-    { 394 + ((405 / 5) * 1), (135 / 2) + (135 / 3), 135 / 6, 405 / 5},      // 116
-    { 394 + ((405 / 5) * 2), (135 / 2) + (135 / 3), 135 / 6, 405 / 5},      // 117
-    { 394 + ((405 / 5) * 3), (135 / 2) + (135 / 3), 135 / 6, 405 / 5},      // 118
-    { 394 + ((405 / 5) * 4), (135 / 2) + (135 / 3), 135 / 6, 405 / 5},      // 119
+    { 394, 0, 0, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 87
+    { 394, 4, 1, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 88
+    { 394, 4, 2, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 89
+    { 394, 4, 3, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 90
 
     // ---
-    {                   394, 135 / 8, 135 / 8, 405 / 4},      // 120
-    { 394 + ((405 / 4) * 1), 135 / 8, 135 / 8, 405 / 4},      // 121
-    { 394 + ((405 / 4) * 2), 135 / 8, 135 / 8, 405 / 4},      // 122
-    { 394 + ((405 / 4) * 3), 135 / 8, 135 / 8, 405 / 4},      // 123
+    { 394, 0, 0, 135 / 6, 135 / 6, 5 },                     // 91
+    { 394, 5, 1, 135 / 6, 135 / 6, 5 },                     // 92
+    { 394, 5, 2, 135 / 6, 135 / 6, 5 },                     // 93
+    { 394, 5, 3, 135 / 6, 135 / 6, 5 },                     // 94
+    { 394, 5, 4, 135 / 6, 135 / 6, 5 },                     // 95
 
-    {                   394, (135 / 3) + 4, 135 / 8, 405 / 4},      // 125
-    { 394 + ((405 / 4) * 1), (135 / 3) + 4, 135 / 8, 405 / 4},      // 126
-    { 394 + ((405 / 4) * 2), (135 / 3) + 4, 135 / 8, 405 / 4},      // 127
-    { 394 + ((405 / 4) * 3), (135 / 3) + 4, 135 / 8, 405 / 4},      // 128
+    { 394, 0, 0, (135 / 2) + 1, 135 / 6, 5 },               // 96
+    { 394, 5, 1, (135 / 2) + 1, 135 / 6, 5 },               // 97
+    { 394, 5, 2, (135 / 2) + 1, 135 / 6, 5 },               // 98
+    { 394, 5, 3, (135 / 2) + 1, 135 / 6, 5 },               // 99
+    { 394, 5, 4, (135 / 2) + 1, 135 / 6, 5 },               // 100
 
-    {                   394, (135 / 3) + (135 / 4) + 3, 135 / 8, 405 / 4},      // 130
-    { 394 + ((405 / 4) * 1), (135 / 3) + (135 / 4) + 3, 135 / 8, 405 / 4},      // 131
-    { 394 + ((405 / 4) * 2), (135 / 3) + (135 / 4) + 3, 135 / 8, 405 / 4},      // 132
-    { 394 + ((405 / 4) * 3), (135 / 3) + (135 / 4) + 3, 135 / 8, 405 / 4},      // 133
+    { 394, 0, 0, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 101
+    { 394, 4, 1, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 102
+    { 394, 4, 2, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 103
+    { 394, 4, 3, (135 / 2) + (135 / 3), 135 / 6, 4 },       // 104
 
-    {                   394, (135 / 3) + (135 / 2) + 2, 135 / 8, 405 / 4},      // 134
-    { 394 + ((405 / 4) * 1), (135 / 3) + (135 / 2) + 2, 135 / 8, 405 / 4},      // 135
-    { 394 + ((405 / 4) * 2), (135 / 3) + (135 / 2) + 2, 135 / 8, 405 / 4},      // 136
-    { 394 + ((405 / 4) * 3), (135 / 3) + (135 / 2) + 2, 135 / 8, 405 / 4},      // 137
+    // ---
+    { 394, 0, 0, 135 / 6, 135 / 6, 5 },                     // 105
+    { 394, 5, 1, 135 / 6, 135 / 6, 5 },                     // 106
+    { 394, 5, 2, 135 / 6, 135 / 6, 5 },                     // 107
+    { 394, 5, 3, 135 / 6, 135 / 6, 5 },                     // 108
+    { 394, 5, 4, 135 / 6, 135 / 6, 5 },                     // 109
+
+    { 394, 0, 0, (135 / 2) + 1, 135 / 6, 5 },               // 110
+    { 394, 5, 1, (135 / 2) + 1, 135 / 6, 5 },               // 111
+    { 394, 5, 2, (135 / 2) + 1, 135 / 6, 5 },               // 112
+    { 394, 5, 3, (135 / 2) + 1, 135 / 6, 5 },               // 113
+    { 394, 5, 4, (135 / 2) + 1, 135 / 6, 5 },               // 114
+
+    { 394, 0, 0, (135 / 2) + (135 / 3), 135 / 6, 5 },       // 115
+    { 394, 5, 1, (135 / 2) + (135 / 3), 135 / 6, 5 },       // 116
+    { 394, 5, 2, (135 / 2) + (135 / 3), 135 / 6, 5 },       // 117
+    { 394, 5, 3, (135 / 2) + (135 / 3), 135 / 6, 5 },       // 118
+    { 394, 5, 4, (135 / 2) + (135 / 3), 135 / 6, 5 },       // 119
+
+    // ---
+    { 394, 0, 0, 135 / 8, 135 / 8, 4 },                     // 120
+    { 394, 4, 1, 135 / 8, 135 / 8, 4 },                     // 121
+    { 394, 4, 2, 135 / 8, 135 / 8, 4 },                     // 122
+    { 394, 4, 3, 135 / 8, 135 / 8, 4 },                     // 123
+
+    { 394, 0, 0, (135 / 3) + 4, 135 / 8, 4 },               // 125
+    { 394, 4, 1, (135 / 3) + 4, 135 / 8, 4 },               // 126
+    { 394, 4, 2, (135 / 3) + 4, 135 / 8, 4 },               // 127
+    { 394, 4, 3, (135 / 3) + 4, 135 / 8, 4 },               // 128
+
+    { 394, 0, 0, (135 / 3) + (135 / 4) + 3, 135 / 8, 4 },   // 130
+    { 394, 4, 1, (135 / 3) + (135 / 4) + 3, 135 / 8, 4 },   // 131
+    { 394, 4, 2, (135 / 3) + (135 / 4) + 3, 135 / 8, 4 },   // 132
+    { 394, 4, 3, (135 / 3) + (135 / 4) + 3, 135 / 8, 4 },   // 133
+
+    { 394, 0, 0, (135 / 3) + (135 / 2) + 2, 135 / 8, 4 },   // 134
+    { 394, 4, 1, (135 / 3) + (135 / 2) + 2, 135 / 8, 4 },   // 135
+    { 394, 4, 2, (135 / 3) + (135 / 2) + 2, 135 / 8, 4 },   // 136
+    { 394, 4, 3, (135 / 3) + (135 / 2) + 2, 135 / 8, 4 },   // 137
 };
 
 char *table_channels_scopes[] =
@@ -6187,15 +6193,18 @@ char *table_channels_scopes[] =
 
 void Draw_Scope(void)
 {
-    int x;
     int i;
     int pixel_color = COL_SCOPESSAMPLES;
     float pos_in_line;
     float datas;
+    int x_max;
+    int nibble_pos;
     int offset_scope = pos_scope_latency;
     LPDAT_POS_SCOPE ptrTbl_Dat;
     int scope_pos = Get_Song_Position();
     int active_channel;
+    int cur_pos_x = 394;
+    int max_right = Cur_Width - 395;
 
     if(offset_scope < 0) offset_scope = 0;
     if(offset_scope > (AUDIO_Latency / 2) - 1) offset_scope = (AUDIO_Latency / 2) - 1;
@@ -6203,27 +6212,39 @@ void Draw_Scope(void)
     if(Scopish == SCOPE_ZONE_SCOPE)
     {
         SetColor(COL_BACKGROUND);
-        Fillrect(394, 42, 394 + 405, 42 + 135);
+        Fillrect(394, 42, Cur_Width, 178);
 
+        cur_pos_x = 0;
         if(Scopish_LeftRight)
         {
             // Left / Right
             ptrTbl_Dat = &Scope_Table_Dats[Scope_Table[2].offset];
             for(i = 0; i < Scope_Table[2].nbr; i++)
             {
-                x = ptrTbl_Dat->x_pos;
-                PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                        USE_FONT, table_channels_scopes[i + 16]);
-
-                for(int s = 0; s < ptrTbl_Dat->x_max; s++)
+                if(ptrTbl_Dat->x_div) nibble_pos = ((max_right / ptrTbl_Dat->x_div) * ptrTbl_Dat->x_mul);
+                else
                 {
-                    pos_in_line = ((float) s) / (float) ptrTbl_Dat->x_max;
+                    nibble_pos = 0;
+                    cur_pos_x = 394;
+                }
+                PrintXY(cur_pos_x + 4,
+                        44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                        USE_FONT,
+                        table_channels_scopes[i + MAX_TRACKS]);
+                x_max = max_right / ptrTbl_Dat->x_max;
+                if(nibble_pos)
+                {
+                    x_max += max_right % ptrTbl_Dat->x_max;
+                }
+                for(int s = 0; s < x_max; s++)
+                {
+                    pos_in_line = ((float) s) / (float) x_max;
                     datas = (Scope_Dats_LeftRight[i][offset_scope + (int) (pos_in_line * 128)] * 0.25f) / 8192;
                     if(datas < -1.0f) datas = -1.0f;
                     if(datas > 1.0f) datas = 1.0f;
                     int y = 42 + ptrTbl_Dat->y_pos + (int) (datas * ptrTbl_Dat->y_large);
-                    DrawPixel(x, y, pixel_color);
-                    x++;
+                    DrawPixel(cur_pos_x, y, pixel_color);
+                    cur_pos_x++;
                 }
                 ptrTbl_Dat++;
                 pixel_color = COL_SCOPESSAMPLES;
@@ -6235,31 +6256,42 @@ void Draw_Scope(void)
             ptrTbl_Dat = &Scope_Table_Dats[Scope_Table[Songtracks].offset];
             for(i = 0; i < Scope_Table[Songtracks].nbr; i++)
             {
-                x = ptrTbl_Dat->x_pos;
+                if(ptrTbl_Dat->x_div) nibble_pos = ((max_right / ptrTbl_Dat->x_div) * ptrTbl_Dat->x_mul);
+                else
+                {
+                    nibble_pos = 0;
+                    cur_pos_x = 394;
+                }
                 // Print the number of the track
                 if(CHAN_ACTIVE_STATE[scope_pos][i])
                 {
-                    PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                    PrintXY(cur_pos_x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
                             USE_FONT, table_channels_scopes[i]);
                     active_channel = TRUE;
                 }
                 else
                 {
-                    PrintXY(x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                            USE_FONT_LOW, table_channels_scopes[i]);
+                    PrintXY(cur_pos_x + 4,
+                            44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                            USE_FONT_LOW,
+                            table_channels_scopes[i]);
                     active_channel = FALSE;
                 }
-
-                for(int s = 0; s < ptrTbl_Dat->x_max; s++)
+                x_max = max_right / ptrTbl_Dat->x_max;
+                if(!nibble_pos)
+                {
+                    x_max += max_right % ptrTbl_Dat->x_max;
+                }
+                for(int s = 0; s < x_max; s++)
                 {
                     // [0..1]
-                    pos_in_line = ((float) s) / (float) ptrTbl_Dat->x_max;
+                    pos_in_line = ((float) s) / (float) x_max;
                     datas = Scope_Dats[i][offset_scope + (int) (pos_in_line * 128)] / 8192;
                     if(datas < -1.0f) datas = -1.0f;
                     if(datas > 1.0f) datas = 1.0f;
                     int y = 42 + ptrTbl_Dat->y_pos + (int) (datas * ptrTbl_Dat->y_large);
-                    DrawPixel(x, y, pixel_color);
-                    x++;
+                    DrawPixel(cur_pos_x, y, pixel_color);
+                    cur_pos_x++;
                 }
                 ptrTbl_Dat++;
                 pixel_color = COL_SCOPESSAMPLES;
@@ -6300,43 +6332,43 @@ void Draw_Scope_Files_Button(void)
         case SCOPE_ZONE_SCOPE:
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 137);
-            Gui_Draw_Button_Box(394, 24, 296, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(394, 24, Cur_Width - 504, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 6, 16, 16, "\255", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
             break;
 
         case SCOPE_ZONE_INSTR_LIST:
             Actualize_Instruments_Synths_List(0);
-            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             break;
 
         case SCOPE_ZONE_SYNTH_LIST:
             Actualize_Instruments_Synths_List(0);
-            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             break;
 
         case SCOPE_ZONE_MOD_DIR:
@@ -6349,80 +6381,80 @@ void Draw_Scope_Files_Button(void)
             Read_SMPT();
             Dump_Files_List(395, 41);
             Actualize_Files_List(0);
-            Gui_Draw_Button_Box(746, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(Cur_Width - 54, 6, 16, 16, "\255", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
 
                 case SCOPE_ZONE_INSTR_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
 
                 case SCOPE_ZONE_SAMPLE_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
 
                 case SCOPE_ZONE_PRESET_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
 
                 case SCOPE_ZONE_REVERB_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
 
                 case SCOPE_ZONE_PATTERN_DIR:
-                    Gui_Draw_Button_Box(692, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(710, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(728, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(746, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(764, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 24, 16, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 108, 24, 16, 16, "M", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 90, 24, 16, 16, "I", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 72, 24, 16, 16, "S", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 54, 24, 16, 16, "P", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 24, 16, 16, "R", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 24, 16, 16, "B", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
 
-                    Gui_Draw_Button_Box(764, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                    Gui_Draw_Button_Box(782, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 36, 6, 16, 16, "In", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(Cur_Width - 18, 6, 16, 16, "Sy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
             }
             break;

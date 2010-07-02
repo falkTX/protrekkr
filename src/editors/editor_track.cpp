@@ -40,33 +40,33 @@ void Draw_Track_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_TRACK_EDIT);
 
-    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Track: Properties & Fx Send");
 
-    Gui_Draw_Button_Box(508, 468, 60, 16, "Track", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(570, 468, 60, 16, "Delay Send", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(508, 530, 60, 16, "Solo Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(508, 548, 60, 16, "Un-mute All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, (Cur_Height - 132), 60, 16, "Track", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(570, (Cur_Height - 132), 60, 16, "Delay Send", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, (Cur_Height - 70), 60, 16, "Solo Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, (Cur_Height - 52), 60, 16, "Un-mute All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(8, 468, 224, 96, "Analog Filter Emulation", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(18, 484, 56, 16, "CutOff Frq.", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 502, 56, 16, "Reso.", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 520, 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(18, 538, 56, 16, "Inertia", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 132), 224, 96, "Analog Filter Emulation", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(18, (Cur_Height - 116), 56, 16, "CutOff Frq.", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, (Cur_Height - 98), 56, 16, "Reso.", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, (Cur_Height - 80), 56, 16, "Type", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, (Cur_Height - 62), 56, 16, "Inertia", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(240, 468, 260, 96, "Distorsion / Reverb / Pan", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(248, 484, 56, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(248, 502, 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(248, 520, 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(248, 538, 56, 16, "Pan", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(456, 538, 40, 16, "Center", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(570, 512, 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(240, (Cur_Height - 132), 260, 96, "Distorsion / Reverb / Pan", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(248, (Cur_Height - 116), 56, 16, "Threshold", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, (Cur_Height - 98), 56, 16, "Clamp", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, (Cur_Height - 80), 56, 16, "Reverb", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(248, (Cur_Height - 62), 56, 16, "Pan", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(456, (Cur_Height - 62), 40, 16, "Center", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(570, (Cur_Height - 88), 60, 16, "Midi Chnl.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(640, 468, 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(714, 489, 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(640, (Cur_Height - 132), 130, 46, "Polyphony", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(714, (Cur_Height - 111), 60, 16, "Channels", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 
-    Gui_Draw_Button_Box(640, 518, 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(714, 539, 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
+    Gui_Draw_Button_Box(640, (Cur_Height - 82), 130, 46, "Multi notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(714, (Cur_Height - 61), 60, 16, "Notes", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER);
 }
    
 void Actualize_Track_Ed(char gode)
@@ -77,31 +77,31 @@ void Actualize_Track_Ed(char gode)
         {
             if(Track_Under_Caret > MAX_TRACKS - 1) Track_Under_Caret = 0;
             if(Track_Under_Caret < 0) Track_Under_Caret = MAX_TRACKS - 1;
-            value_box(508, 486, Track_Under_Caret, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            value_box(508, (Cur_Height - 114), Track_Under_Caret, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-            Gui_Draw_Button_Box(456, 484, 40, 16, "Flat2C", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
-            Gui_Draw_Button_Box(456, 502, 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, (Cur_Height - 116), 40, 16, "Flat2C", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
+            Gui_Draw_Button_Box(456, (Cur_Height - 98), 40, 16, "Flat2T", BUTTON_TEXT_CENTERED | BUTTON_NORMAL | (Disclap[Track_Under_Caret] ? 0 : BUTTON_DISABLED));
         }
 
         if(gode == 0 || gode == 1 || gode == 15)
         {
             if(TCut[Track_Under_Caret] < 0) TCut[Track_Under_Caret] = 0;
             if(TCut[Track_Under_Caret] > 127) TCut[Track_Under_Caret] = 127;
-            Realslider(77, 484, (int) TCut[Track_Under_Caret], FType[Track_Under_Caret] != 4);
+            Realslider(77, (Cur_Height - 116), (int) TCut[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 2 || gode == 15)
         {
             if(FRez[Track_Under_Caret] < 0) FRez[Track_Under_Caret] = 0;
             if(FRez[Track_Under_Caret] > 127) FRez[Track_Under_Caret] = 127;
-            Realslider(77, 502, FRez[Track_Under_Caret], FType[Track_Under_Caret] != 4);
+            Realslider(77, (Cur_Height - 98), FRez[Track_Under_Caret], FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 3 || gode == 15)
         {
             if(ICut[Track_Under_Caret] > 0.0078125f) ICut[Track_Under_Caret] = 0.0078125f;
             if(ICut[Track_Under_Caret] < 0.00006103515625f) ICut[Track_Under_Caret] = 0.00006103515625f;
-            Realslider(77, 538, (int) (ICut[Track_Under_Caret] * 16384.0f), FType[Track_Under_Caret] != 4);
+            Realslider(77, (Cur_Height - 62), (int) (ICut[Track_Under_Caret] * 16384.0f), FType[Track_Under_Caret] != 4);
         }
 
         if(gode == 0 || gode == 4 || gode == 15)
@@ -110,46 +110,46 @@ void Actualize_Track_Ed(char gode)
             if(FType[Track_Under_Caret] >= MAX_FILTER) FType[Track_Under_Caret] = MAX_FILTER;
             switch(FType[Track_Under_Caret])
             {
-                case 0: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 1: Gui_Draw_Button_Box(139, 520, 84, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 2: Gui_Draw_Button_Box(139, 520, 84, 16, "BandPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 3: Gui_Draw_Button_Box(139, 520, 84, 16, "BandReject", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 4: Gui_Draw_Button_Box(139, 520, 84, 16, "Filter Off", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 5: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -24db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 6: Gui_Draw_Button_Box(139, 520, 84, 16, "LoPass -48db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 7: Gui_Draw_Button_Box(139, 520, 84, 16, "LP-24 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 8: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 9: Gui_Draw_Button_Box(139, 520, 84, 16, "A. Mod. [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 10: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 11: Gui_Draw_Button_Box(139, 520, 84, 16, "Single [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 12: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 13: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq -6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 14: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 15: Gui_Draw_Button_Box(139, 520, 84, 16, "ParaEq +15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 16: Gui_Draw_Button_Box(139, 520, 84, 16, "Custom Delta", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 17: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort L", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 18: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort M", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 19: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort H", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 20: Gui_Draw_Button_Box(139, 520, 84, 16, "Comp. Distort", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 21: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 22: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 23: Gui_Draw_Button_Box(139, 520, 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 0: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 1: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 2: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "BandPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 3: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "BandReject", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 4: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Filter Off", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 5: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -24db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 6: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -48db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 7: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LP-24 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 8: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "A. Mod. [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 9: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "A. Mod. [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 10: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Single [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 11: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Single [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 12: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq -15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 13: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq -6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 14: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq +6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 15: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq +15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 16: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Custom Delta", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 17: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort L", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 18: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort M", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 19: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort H", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 20: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 21: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP12 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 22: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 23: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
             }
-            value_box(77, 520, FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(77, (Cur_Height - 80), FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 5 || gode == 15)
         {
             if(DSend[Track_Under_Caret] < 0) DSend[Track_Under_Caret] = 0;
             if(DSend[Track_Under_Caret] > 1.0f) DSend[Track_Under_Caret] = 1.0f;
-            Realslider(308, 520, int(DSend[Track_Under_Caret] * 128.0f), compressor != 0);
+            Realslider(308, (Cur_Height - 80), int(DSend[Track_Under_Caret] * 128.0f), compressor != 0);
         }
 
         if(gode == 0 || gode == 6)
         {
             if(CSend[Track_Under_Caret] < 0) CSend[Track_Under_Caret] = 0;
             if(CSend[Track_Under_Caret] > 127) CSend[Track_Under_Caret] = 127;
-            value_box(570, 486, CSend[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(570, (Cur_Height - 114), CSend[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             CCoef[Track_Under_Caret] = float((float) CSend[Track_Under_Caret] / 127.0f);
         }
 
@@ -157,14 +157,14 @@ void Actualize_Track_Ed(char gode)
         {
             if(DThreshold[Track_Under_Caret] < 0) DThreshold[Track_Under_Caret] = 0;
             if(DThreshold[Track_Under_Caret] > 32767) DThreshold[Track_Under_Caret] = 32767;
-            Realslider(308, 484, (int) DThreshold[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
+            Realslider(308, (Cur_Height - 116), (int) DThreshold[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
         if(gode == 0 || gode == 8 || gode == 15)
         {
             if(DClamp[Track_Under_Caret] < 0) DClamp[Track_Under_Caret] = 0;
             if(DClamp[Track_Under_Caret] > 32767) DClamp[Track_Under_Caret] = 32767;
-            Realslider(308, 502, (int) DClamp[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
+            Realslider(308, (Cur_Height - 98), (int) DClamp[Track_Under_Caret] / 256, Disclap[Track_Under_Caret]);
         }
 
         if(gode == 0 || gode == 9 || gode == 15)
@@ -172,33 +172,33 @@ void Actualize_Track_Ed(char gode)
             if(TPan[Track_Under_Caret] < 0.0f) TPan[Track_Under_Caret] = 0.0f;
             if(TPan[Track_Under_Caret] > 1.0f) TPan[Track_Under_Caret] = 1.0f;
             ComputeStereo(Track_Under_Caret);
-            Realslider(308, 538, (int) (TPan[Track_Under_Caret] * 127.0f), TRUE);
+            Realslider(308, (Cur_Height - 62), (int) (TPan[Track_Under_Caret] * 127.0f), TRUE);
         }
 
         if(gode == 0 || gode == 10 || gode == 15)
         {
-            if(CHAN_MUTE_STATE[Track_Under_Caret]) Gui_Draw_Button_Box(508, 512, 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            else Gui_Draw_Button_Box(508, 512, 60, 16, "Mute Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(CHAN_MUTE_STATE[Track_Under_Caret]) Gui_Draw_Button_Box(508, (Cur_Height - 88), 60, 16, "Un-Mute", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            else Gui_Draw_Button_Box(508, (Cur_Height - 88), 60, 16, "Mute Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 11 || gode == 15)
         {
             if(CHAN_MIDI_PRG[Track_Under_Caret] > 15) CHAN_MIDI_PRG[Track_Under_Caret] = 0;
             if(CHAN_MIDI_PRG[Track_Under_Caret] < 0) CHAN_MIDI_PRG[Track_Under_Caret] = 15;
-            Gui_Draw_Arrows_Number_Box2(570, 530, CHAN_MIDI_PRG[Track_Under_Caret] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box2(570, (Cur_Height - 70), CHAN_MIDI_PRG[Track_Under_Caret] + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 12 || gode == 15)
         {
-            if(Disclap[Track_Under_Caret]) Gui_Draw_Button_Box(570, 548, 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-            else Gui_Draw_Button_Box(570, 548, 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            if(Disclap[Track_Under_Caret]) Gui_Draw_Button_Box(570, (Cur_Height - 52), 60, 16, "Distort On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+            else Gui_Draw_Button_Box(570, (Cur_Height - 52), 60, 16, "Distort Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         if(gode == 0 || gode == 13 || gode == 14 || gode == 15)
         {
             if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
             if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 489, Channels_Polyphony[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(650, (Cur_Height - 111), Channels_Polyphony[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 14 || gode == 13 || gode == 15)
@@ -206,7 +206,7 @@ void Actualize_Track_Ed(char gode)
             if(Channels_MultiNotes[Track_Under_Caret] < 1) Channels_MultiNotes[Track_Under_Caret] = 1;
             if(Channels_MultiNotes[Track_Under_Caret] > Channels_Polyphony[Track_Under_Caret]) Channels_MultiNotes[Track_Under_Caret] = Channels_Polyphony[Track_Under_Caret];
             if(Channels_MultiNotes[Track_Under_Caret] > MAX_POLYPHONY) Channels_MultiNotes[Track_Under_Caret] = MAX_POLYPHONY;
-            Gui_Draw_Arrows_Number_Box2(650, 539, Channels_MultiNotes[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(650, (Cur_Height - 61), Channels_MultiNotes[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actupated(0);
         }
 
@@ -224,14 +224,14 @@ void Mouse_Left_Track_Ed(void)
     {
 
         // Filter type
-        if(zcheckMouse(77, 520, 16, 16) && FType[Track_Under_Caret] > 0)
+        if(zcheckMouse(77, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret]--;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, 520, 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
+        if(zcheckMouse(121, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret]++;
@@ -240,7 +240,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Previous track
-        if(zcheckMouse(508, 486, 16, 16))
+        if(zcheckMouse(508, (Cur_Height - 114), 16, 16))
         {
             Track_Under_Caret--;
             teac = 0;
@@ -249,7 +249,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Next track
-        if(zcheckMouse(552, 486, 16, 16))
+        if(zcheckMouse(552, (Cur_Height - 114), 16, 16))
         {
             Track_Under_Caret++;
             teac = 0;
@@ -258,26 +258,26 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Delay send
-        if(zcheckMouse(570, 486, 16, 16))
+        if(zcheckMouse(570, (Cur_Height - 114), 16, 16))
         {
             CSend[Track_Under_Caret]--;
             teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(614, 486, 16, 16))
+        if(zcheckMouse(614, (Cur_Height - 114), 16, 16))
         {
             CSend[Track_Under_Caret]++;
             teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(456, 484, 40, 16) && Disclap[Track_Under_Caret])
+        if(zcheckMouse(456, (Cur_Height - 116), 40, 16) && Disclap[Track_Under_Caret])
         {
             DThreshold[Track_Under_Caret] = DClamp[Track_Under_Caret];
             teac = 7;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(456, 502, 40, 16) && Disclap[Track_Under_Caret])
+        if(zcheckMouse(456, (Cur_Height - 98), 40, 16) && Disclap[Track_Under_Caret])
         {
             DClamp[Track_Under_Caret] = DThreshold[Track_Under_Caret];
             teac = 8;
@@ -285,7 +285,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Channel panning
-        if(zcheckMouse(456, 538, 40, 16))
+        if(zcheckMouse(456, (Cur_Height - 62), 40, 16))
         {
             TPan[Track_Under_Caret] = 0.5f;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
@@ -293,13 +293,13 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Midi channel
-        if(zcheckMouse(570, 530, 16, 16))
+        if(zcheckMouse(570, (Cur_Height - 70), 16, 16))
         {
             CHAN_MIDI_PRG[Track_Under_Caret]--;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 11;
         }
-        if(zcheckMouse(614, 530, 16, 16))
+        if(zcheckMouse(614, (Cur_Height - 70), 16, 16))
         {
             CHAN_MIDI_PRG[Track_Under_Caret]++;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
@@ -307,7 +307,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Distortion
-        if(zcheckMouse(570, 548, 60, 16))
+        if(zcheckMouse(570, (Cur_Height - 52), 60, 16))
         {
             Disclap[Track_Under_Caret] = !Disclap[Track_Under_Caret];
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
@@ -315,7 +315,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Mute track
-        if(zcheckMouse(508, 512, 64, 16))
+        if(zcheckMouse(508, (Cur_Height - 88), 64, 16))
         {
             if(CHAN_MUTE_STATE[Track_Under_Caret] == 0) CHAN_MUTE_STATE[Track_Under_Caret] = 1;
             else CHAN_MUTE_STATE[Track_Under_Caret] = 0;
@@ -325,7 +325,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Solo track
-        if(zcheckMouse(508, 530, 64, 16))
+        if(zcheckMouse(508, (Cur_Height - 70), 64, 16))
         {
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
@@ -338,7 +338,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Unmute all tracks
-        if(zcheckMouse(508, 548, 88, 16))
+        if(zcheckMouse(508, (Cur_Height - 52), 88, 16))
         {
             for(int solify = 0; solify < MAX_TRACKS; solify++)
             {
@@ -350,7 +350,7 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Channels polyphony
-        if(zcheckMouse(650, 489, 16, 16) == 1)
+        if(zcheckMouse(650, (Cur_Height - 111), 16, 16) == 1)
         {
             Channels_Polyphony[Track_Under_Caret]--;
             if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
@@ -358,7 +358,7 @@ void Mouse_Left_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
-        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, (Cur_Height - 111), 16, 16) == 1)
         {
             Channels_Polyphony[Track_Under_Caret]++;
             if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
@@ -367,13 +367,13 @@ void Mouse_Left_Track_Ed(void)
         }
 
         // Multi notes
-        if(zcheckMouse(650, 539, 16, 16) == 1)
+        if(zcheckMouse(650, (Cur_Height - 61), 16, 16) == 1)
         {
             Track_Sub_Note(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
-        if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, (Cur_Height - 61), 16, 16) == 1)
         {
             Track_Add_Note(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
@@ -387,25 +387,25 @@ void Mouse_Right_Track_Ed(void)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-        if(zcheckMouse(570, 486, 16, 16) == 1)
+        if(zcheckMouse(570, (Cur_Height - 114), 16, 16) == 1)
         {
             CSend[Track_Under_Caret] -= 16;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(614, 486, 16, 16) == 1)
+        if(zcheckMouse(614, (Cur_Height - 114), 16, 16) == 1)
         {
             CSend[Track_Under_Caret] += 16;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(77, 520, 16, 16) && FType[Track_Under_Caret] > 0)
+        if(zcheckMouse(77, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret] -= 16;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, 520, 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
+        if(zcheckMouse(121, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret] += 16;
@@ -414,7 +414,7 @@ void Mouse_Right_Track_Ed(void)
         }
 
         // Channels polyphony
-        if(zcheckMouse(650, 489, 16, 16) == 1)
+        if(zcheckMouse(650, (Cur_Height - 111), 16, 16) == 1)
         {
             Channels_Polyphony[Track_Under_Caret] -= 10;
             if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
@@ -422,7 +422,7 @@ void Mouse_Right_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 13;
         }
-        if(zcheckMouse(650 + 44, 489, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, (Cur_Height - 111), 16, 16) == 1)
         {
             Channels_Polyphony[Track_Under_Caret] += 10;
             if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
@@ -431,13 +431,13 @@ void Mouse_Right_Track_Ed(void)
         }
 
         // Multi notes
-        if(zcheckMouse(650, 539, 16, 16) == 1)
+        if(zcheckMouse(650, (Cur_Height - 61), 16, 16) == 1)
         {
             Track_Sub_Note(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
-        if(zcheckMouse(650 + 44, 539, 16, 16) == 1)
+        if(zcheckMouse(650 + 44, (Cur_Height - 61), 16, 16) == 1)
         {
             Track_Add_Note(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
@@ -450,13 +450,13 @@ void Mouse_Sliders_Track_Ed(void)
 {
     if(userscreen == USER_SCREEN_TRACK_EDIT)
     {
-        if(zcheckMouse(77, 484, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
-        if(zcheckMouse(77, 502, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
-        if(zcheckMouse(77, 538, 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
-        if(zcheckMouse(308, 484, 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
-        if(zcheckMouse(308, 502, 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
-        if(compressor != 0) if(zcheckMouse(308, 520, 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
-        if(zcheckMouse(308, 538, 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
+        if(zcheckMouse(77, (Cur_Height - 116), 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_CUTOFF_FREQ;
+        if(zcheckMouse(77, (Cur_Height - 98), 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_RESONANCE;
+        if(zcheckMouse(77, (Cur_Height - 62), 148, 16) && FType[Track_Under_Caret] != 4) gui_action = GUI_CMD_SET_TRACK_INERTIA;
+        if(zcheckMouse(308, (Cur_Height - 116), 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_THRESHOLD;
+        if(zcheckMouse(308, (Cur_Height - 98), 148, 16) && Disclap[Track_Under_Caret]) gui_action = GUI_CMD_SET_TRACK_CLAMP;
+        if(compressor != 0) if(zcheckMouse(308, (Cur_Height - 80), 148, 16)) gui_action = GUI_CMD_SET_TRACK_REVERB_SEND;
+        if(zcheckMouse(308, (Cur_Height - 62), 148, 16)) gui_action = GUI_CMD_SET_TRACK_PANNING;
     }
 }
 

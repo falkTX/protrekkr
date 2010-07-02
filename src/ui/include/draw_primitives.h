@@ -41,6 +41,11 @@
 #define UPDATE_STACK_SIZE 2048
 
 // ------------------------------------------------------
+// Variables
+extern int Cur_Width;
+extern int Cur_Height;
+
+// ------------------------------------------------------
 // Functions
 void DrawLine(int x1, int y1, int x2, int y2);
 void DrawPixel(int x, int y, int Color);

@@ -276,14 +276,14 @@ SDL_Color Default_Palette1[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
 
-    { 0xff, 0xfc, 0xf2, 0x00 },
+    { 0xff, 0xf4, 0xde, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
-	{ 0xbc, 0xd6, 0xe2, 0x00 },
+	{ 0xff, 0xce, 0x9c, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
 
     { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
-    { 0xc2, 0xe0, 0xc6, 0x00 },
+    { 0xff, 0xde, 0xb8, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
 
     { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
@@ -301,20 +301,20 @@ SDL_Color Default_Palette1[] =
     { 0x06, 0x0e, 0x28, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
 
-    { 0xff, 0xfc, 0xf2, 0x00 },
-    { 0x3a, 0x60, 0x9e, 0x00 },
+    { 0xff, 0xf4, 0xde, 0x00 },
+    { 0x00, 0x28, 0x54, 0x00 },
 
-    { 0xff, 0xf0, 0xd4, 0x00 },
-    { 0x16, 0x46, 0x60, 0x00 },
+    { 0xff, 0xe0, 0xbe, 0x00 },
+    { 0x00, 0x28, 0x54, 0x00 },
 
-    { 0xdc, 0xf0, 0xff, 0x00 },
-    { 0x20, 0x22, 0x36, 0x00 },
+    { 0xff, 0xff, 0xff, 0x00 },      // Pattern sel foreground
+    { 0x00, 0x28, 0x54, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
-    { 0x34, 0x62, 0x90, 0x00 },
+    { 0x7e, 0x2e, 0x56, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
-    { 0x0e, 0x56, 0x76, 0x00 },
+    { 0x7e, 0x2e, 0x56, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
 	{ 0x00, 0x1c, 0x40, 0x00 },
@@ -574,10 +574,10 @@ SDL_Color Default_Palette4[] =
     { 0xff, 0x8c, 0x5e, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
-    { 0xd8, 0xe6, 0xee, 0x00 },
+    { 0xa6, 0xe6, 0xff, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
-    { 0xb0, 0xbc, 0xc4, 0x00 },
+    { 0xff, 0xe6, 0xa6, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
 	{ 0xff, 0x8c, 0x5e, 0x00 },
@@ -1298,7 +1298,7 @@ void Draw_Editors_Bar(int Highlight)
     if(Highlight == -1)
     {
         SetColor(COL_BLACK);
-        bjbox(0, 428, 800, 19);
+        bjbox(0, Cur_Height - 172, Cur_Width, 19);
         Highlight = curr_tab_highlight;
     }
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
@@ -1306,14 +1306,11 @@ void Draw_Editors_Bar(int Highlight)
         if(Patterns_Lines_Offset)
         {
             SetColor(COL_BLACK);
-            bjbox(0, 428, 800, 19);
+            bjbox(0, Cur_Height - 172, Cur_Width, 19);
         }
         Highlight_Tab[Highlight] = BUTTON_PUSHED;
-        Patterns_Lines = DISPLAYED_LINES_SMALL;
-        VIEWLINE = 15;
-        VIEWLINE2 = -13;
-        YVIEW = 300;
-        Patterns_Lines_Offset = 0;
+        Large_Patterns = FALSE;
+        Set_Pattern_Size();
         Draw_Pattern_Right_Stuff();
         Actupated(0);
     }
@@ -1321,25 +1318,25 @@ void Draw_Editors_Bar(int Highlight)
     {
         userscreen = USER_SCREEN_LARGE_PATTERN;
         SetColor(COL_BLACK);
-        bjbox(0, 428 + Patterns_Lines_Offset, 800, 19);
+        bjbox(0, (Cur_Height - 172) + Patterns_Lines_Offset, Cur_Width, 19);
         Highlight_Tab[USER_SCREEN_LARGE_PATTERN] = BUTTON_PUSHED;
         Draw_Pattern_Right_Stuff();
         Actupated(0);
     }
     
-    if(Patterns_Lines_Offset == 0) Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
-    else Gui_Draw_Button_Box(0, 429 + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(20, 429 + Patterns_Lines_Offset, 62, 16, "Sequencer", Highlight_Tab[4]);
-    Gui_Draw_Button_Box(84, 429 + Patterns_Lines_Offset, 62, 16, "Instrument", Highlight_Tab[2]);
-    Gui_Draw_Button_Box(148, 429 + Patterns_Lines_Offset, 62, 16, "Synth", Highlight_Tab[6]);
-    Gui_Draw_Button_Box(212, 429 + Patterns_Lines_Offset, 62, 16, "Sample Ed.", Highlight_Tab[8]);
-    Gui_Draw_Button_Box(276, 429 + Patterns_Lines_Offset, 62, 16, "303", Highlight_Tab[9]);
-    Gui_Draw_Button_Box(340, 429 + Patterns_Lines_Offset, 62, 16, "Track", Highlight_Tab[1]);
-    Gui_Draw_Button_Box(404, 429 + Patterns_Lines_Offset, 62, 16, "Track FX", Highlight_Tab[7]);
-    Gui_Draw_Button_Box(468, 429 + Patterns_Lines_Offset, 62, 16, "FX Setup", Highlight_Tab[3]);
-    Gui_Draw_Button_Box(532, 429 + Patterns_Lines_Offset, 62, 16, "Reverb", Highlight_Tab[10]);
-    Gui_Draw_Button_Box(596, 429 + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
-    Gui_Draw_Button_Box(660, 429 + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
+    if(Patterns_Lines_Offset == 0) Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    else Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Sequencer", Highlight_Tab[4]);
+    Gui_Draw_Button_Box(84, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Instrument", Highlight_Tab[2]);
+    Gui_Draw_Button_Box(148, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Synth", Highlight_Tab[6]);
+    Gui_Draw_Button_Box(212, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Sample Ed.", Highlight_Tab[8]);
+    Gui_Draw_Button_Box(276, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "303", Highlight_Tab[9]);
+    Gui_Draw_Button_Box(340, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Track", Highlight_Tab[1]);
+    Gui_Draw_Button_Box(404, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Track FX", Highlight_Tab[7]);
+    Gui_Draw_Button_Box(468, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "FX Setup", Highlight_Tab[3]);
+    Gui_Draw_Button_Box(532, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Reverb", Highlight_Tab[10]);
+    Gui_Draw_Button_Box(596, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
+    Gui_Draw_Button_Box(660, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
 
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
     {
@@ -1435,6 +1432,9 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int flag
     int y_center;
     int Col_Idx = (flags & BUTTON_RIGHT_MOUSE) ? 4: 0;
     Col_Idx |= (flags & BUTTON_INPUT) ? 8: 0;
+
+    if(sx <= 0) return;
+    if(sy <= 0) return;
     
     int Colors_Norm[] =
     {
@@ -1538,8 +1538,8 @@ void Gui_Draw_Flat_Box(const char *str)
 {
     SetColor(COL_STATIC_MED);
 
-    Fillrect(2, 450, 800 - 6, 576);
-    PrintXY(4, 449, USE_FONT, (char *) str);
+    Fillrect(2, (Cur_Height - 150), 800 - 6, (Cur_Height - 24));
+    PrintXY(4, (Cur_Height - 151), USE_FONT, (char *) str);
 }
 
 // ------------------------------------------------------

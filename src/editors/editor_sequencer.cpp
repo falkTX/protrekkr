@@ -90,50 +90,50 @@ void Draw_Sequencer_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_SEQUENCER);
 
-    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Sequencer");
 
-    Gui_Draw_Button_Box(4, 466, 80, 16, "Clear All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(4, 484, 80, 16, "Clear Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(4, 522, 80, 16, "Reset All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(4, 540, 80, 16, "Reset Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, (Cur_Height - 134), 80, 16, "Clear All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, (Cur_Height - 116), 80, 16, "Clear Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, (Cur_Height - 78), 80, 16, "Reset All", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(4, (Cur_Height - 60), 80, 16, "Reset Position", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(396, 466, 32, 16, "Cut", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(396 + 34, 466, 32, 16, "Copy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(396, 484, 66, 16, "Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(396, 502, 66, 16, "Insert/Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396, (Cur_Height - 134), 32, 16, "Cut", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396 + 34, (Cur_Height - 134), 32, 16, "Copy", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396, (Cur_Height - 116), 66, 16, "Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(396, (Cur_Height - 98), 66, 16, "Insert/Paste", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Display_Seq_Buffer();
 
-    Gui_Draw_Button_Box(308, 466, 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(308, 484, 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(308, 522, 80, 16, "Insert Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(308, 540, 80, 16, "Delete Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, (Cur_Height - 134), 80, 16, "Ptn->Pos [Cur]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, (Cur_Height - 116), 80, 16, "Ptn->Pos [Sng]", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, (Cur_Height - 78), 80, 16, "Insert Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(308, (Cur_Height - 60), 80, 16, "Delete Position", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(288, 466, 16, 16, "\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 484, 16, 16, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 522, 16, 16, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(288, 540, 16, 16, "\10", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, (Cur_Height - 134), 16, 16, "\07", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, (Cur_Height - 116), 16, 16, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, (Cur_Height - 78), 16, 16, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(288, (Cur_Height - 60), 16, 16, "\10", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(89, 466, 24, 90, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(257, 466, 24, 90, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(120, 466, 132, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(89, (Cur_Height - 134), 24, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(257, (Cur_Height - 134), 24, 90, "", BUTTON_NORMAL);
+    Gui_Draw_Button_Box(120, (Cur_Height - 134), 132, 90, "", BUTTON_NORMAL);
 
-    Gui_Draw_Button_Box(480, 466, 306, 28, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(480, 472, 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(745, 472, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(480, (Cur_Height - 134), 306, 28, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(480, (Cur_Height - 128), 190, 26, "Save selection :", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(745, (Cur_Height - 128), 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(480, 501, 306, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(720, 501, 60, 18, "Transpose", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(720, 544, 60, 18, "Semitones", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(480, (Cur_Height - 99), 306, 64, "Remap Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(720, (Cur_Height - 99), 60, 18, "Transpose", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(720, (Cur_Height - 56), 60, 18, "Semitones", BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(480, 523, 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
-    Gui_Draw_Button_Box(480, 544, 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(480, (Cur_Height - 77), 60, 26, "From", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(480, (Cur_Height - 56), 60, 26, "To", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_VTOP);
 
-    Gui_Draw_Button_Box(590, 524, 60, 16, "Selection", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(590, 544, 60, 16, "Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(652, 524, 60, 16, "Pattern", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(652, 544, 60, 16, "Song", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(590, (Cur_Height - 76), 60, 16, "Selection", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(590, (Cur_Height - 56), 60, 16, "Track", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(652, (Cur_Height - 76), 60, 16, "Pattern", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(652, (Cur_Height - 56), 60, 16, "Song", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 void Actualize_Seq_Ed(char gode)
@@ -141,17 +141,17 @@ void Actualize_Seq_Ed(char gode)
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
         SetColor(COL_BLACK);
-        bjbox(91, 468, 21, 87);
-        bjbox(122, 468, 129, 87);
-        bjbox(259, 468, 21, 87);
+        bjbox(91, (Cur_Height - 132), 21, 87);
+        bjbox(122, (Cur_Height - 132), 129, 87);
+        bjbox(259, (Cur_Height - 132), 21, 87);
         SetColor(COL_BACKGROUND);
-        bjbox(91 + 1, 468 + 1, 21 - 2, 87 - 2);
-        bjbox(122 + 1, 468 + 1, 129 - 2, 87 - 2);
-        bjbox(259 + 1, 468 + 1, 21 - 2, 87 - 2);
+        bjbox(91 + 1, (Cur_Height - 132) + 1, 21 - 2, 87 - 2);
+        bjbox(122 + 1, (Cur_Height - 132) + 1, 129 - 2, 87 - 2);
+        bjbox(259 + 1, (Cur_Height - 132) + 1, 21 - 2, 87 - 2);
 
         // Current pos bar
         SetColor(COL_PUSHED_MED);
-        bjbox(123, 505, 127, 12);
+        bjbox(123, (Cur_Height - 95), 127, 12);
 
         for(int lseq = -3; lseq < 4; lseq++)
         {
@@ -160,19 +160,19 @@ void Actualize_Seq_Ed(char gode)
             rel = lseq + Cur_Position;
             if(rel > -1 && rel < Song_Length)
             {
-                out_decchar(93, 505 + lseq * 12, rel, 0);
-                out_decchar(261, 505 + lseq * 12, pSequence[rel], 0);
+                out_decchar(93, (Cur_Height - 95) + lseq * 12, rel, 0);
+                out_decchar(261, (Cur_Height - 95) + lseq * 12, pSequence[rel], 0);
 
                 for(int rel2 = 0; rel2 < Songtracks; rel2++)
                 {
-                    if(CHAN_ACTIVE_STATE[rel][rel2]) out_nibble(124 + rel2 * 8, 505 + lseq * 12, USE_FONT, rel2);
-                    else out_nibble(124 + rel2 * 8, 505 + lseq * 12, USE_FONT_LOW, rel2);
+                    if(CHAN_ACTIVE_STATE[rel][rel2]) out_nibble(124 + rel2 * 8, (Cur_Height - 95) + lseq * 12, USE_FONT, rel2);
+                    else out_nibble(124 + rel2 * 8, (Cur_Height - 95) + lseq * 12, USE_FONT_LOW, rel2);
                 } // sub for
             }
             else
             { // rel range OK
-                PrintXY(93, 505 + lseq * 12, USE_FONT, "000");
-                PrintXY(261, 505 + lseq * 12, USE_FONT, "000");
+                PrintXY(93, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
+                PrintXY(261, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
             }
         } // for end
         Actupated(0);
@@ -182,7 +182,7 @@ void Actualize_Seq_Ed(char gode)
         {
             if(Remap_From < 0) Remap_From = 0;
             if(Remap_From > 0x7f) Remap_From = 0x7f;
-            value_box(520, 524, Remap_From, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(520, (Cur_Height - 76), Remap_From, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         // To instrument
@@ -190,7 +190,7 @@ void Actualize_Seq_Ed(char gode)
         {
             if(Remap_To < 0) Remap_To = 0;
             if(Remap_To > 0x7f) Remap_To = 0x7f;
-            value_box(520, 544, Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(520, (Cur_Height - 56), Remap_To, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 3)
@@ -200,11 +200,11 @@ void Actualize_Seq_Ed(char gode)
 
             if(snamesel == INPUT_SELECTION_NAME)
             {
-                Gui_Draw_Button_Box(579, 472, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+                Gui_Draw_Button_Box(579, (Cur_Height - 128), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(579, 472, 164, 16, Selection_Name, BUTTON_NORMAL | BUTTON_INPUT);
+                Gui_Draw_Button_Box(579, (Cur_Height - 128), 164, 16, Selection_Name, BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
 
@@ -213,7 +213,7 @@ void Actualize_Seq_Ed(char gode)
         {
             if(transpose_semitones < -120) transpose_semitones = -120;
             if(transpose_semitones > 120) transpose_semitones = 120;
-            value_box_format(720, 524, transpose_semitones, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE, "%d");
+            value_box_format(720, (Cur_Height - 76), transpose_semitones, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE, "%d");
         }
     }
 }
@@ -228,7 +228,7 @@ void Mouse_Left_Sequencer_Ed(void)
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
         // Remap Selection
-        if(zcheckMouse(590, 524, 60, 16))
+        if(zcheckMouse(590, (Cur_Height - 76), 60, 16))
         {
             if(transpose_semitones)
             {
@@ -250,7 +250,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Instrument_Remap_Sel(Cur_Position, Get_Real_Selection(FALSE), Remap_From, Remap_To);
         }
         // Remap Track
-        if(zcheckMouse(590, 544, 60, 16))
+        if(zcheckMouse(590, (Cur_Height - 56), 60, 16))
         {
             if(transpose_semitones)
             {
@@ -272,7 +272,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Instrument_Remap_Sel(Cur_Position, Select_Track(Track_Under_Caret), Remap_From, Remap_To);
         }
         // Remap Pattern
-        if(zcheckMouse(652, 524, 60, 16))
+        if(zcheckMouse(652, (Cur_Height - 76), 60, 16))
         {
             for(i = 0; i < Songtracks; i++)
             {
@@ -297,7 +297,7 @@ void Mouse_Left_Sequencer_Ed(void)
             }
         }
         // Remap Song
-        if(zcheckMouse(652, 544, 60, 16))
+        if(zcheckMouse(652, (Cur_Height - 56), 60, 16))
         {
             char *Done_Pattern;
             int nbr_patterns;
@@ -349,7 +349,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // From Instrument
-        if(zcheckMouse(520, 524, 16, 16) == 1)
+        if(zcheckMouse(520, (Cur_Height - 76), 16, 16) == 1)
         {
             Remap_From--;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -357,7 +357,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // From Instrument
-        if(zcheckMouse(520 + 44, 524, 16, 16) == 1)
+        if(zcheckMouse(520 + 44, (Cur_Height - 76), 16, 16) == 1)
         {
             Remap_From++;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -365,7 +365,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // To Instrument
-        if(zcheckMouse(520, 544, 16, 16) == 1)
+        if(zcheckMouse(520, (Cur_Height - 56), 16, 16) == 1)
         {
             Remap_To--;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -373,7 +373,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // To Instrument
-        if(zcheckMouse(520 + 44, 544, 16, 16) == 1)
+        if(zcheckMouse(520 + 44, (Cur_Height - 56), 16, 16) == 1)
         {
             Remap_To++;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -381,7 +381,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Transpose
-        if(zcheckMouse(720, 524, 16, 16) == 1)
+        if(zcheckMouse(720, (Cur_Height - 76), 16, 16) == 1)
         {
             transpose_semitones--;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -389,7 +389,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Transpose
-        if(zcheckMouse(720 + 44, 524, 16, 16) == 1)
+        if(zcheckMouse(720 + 44, (Cur_Height - 76), 16, 16) == 1)
         {
             transpose_semitones++;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -397,49 +397,49 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Clear all
-        if(zcheckMouse(4, 466, 80, 16))
+        if(zcheckMouse(4, (Cur_Height - 134), 80, 16))
         {
             SeqFill(0, 256, FALSE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Clear position
-        if(zcheckMouse(4, 484, 80, 16))
+        if(zcheckMouse(4, (Cur_Height - 116), 80, 16))
         {
             SeqFill(Cur_Position, Cur_Position + 1, FALSE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Reset all
-        if(zcheckMouse(4, 522, 80, 16))
+        if(zcheckMouse(4, (Cur_Height - 78), 80, 16))
         {
             SeqFill(0, 256, TRUE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Reset position
-        if(zcheckMouse(4, 540, 80, 16))
+        if(zcheckMouse(4, (Cur_Height - 60), 80, 16))
         {
             SeqFill(Cur_Position, Cur_Position + 1, TRUE);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Insert position
-        if(zcheckMouse(308, 522, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 78), 80, 16))
         {
             SeqInsert(Cur_Position);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Delete position
-        if(zcheckMouse(308, 540, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 60), 80, 16))
         {
             SeqDelete(Cur_Position);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Select the copy buffers
-        if(zcheckMouse(396, 522, 15, 16))
+        if(zcheckMouse(396, (Cur_Height - 78), 15, 16))
         {
             cur_seq_buffer[0] = BUTTON_PUSHED;
             cur_seq_buffer[1] = BUTTON_NORMAL;
@@ -448,7 +448,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Display_Seq_Buffer();
             Cur_Seq_Buffer = 0;
         }
-        if(zcheckMouse(396 + 17, 522, 15, 16))
+        if(zcheckMouse(396 + 17, (Cur_Height - 78), 15, 16))
         {
             cur_seq_buffer[0] = BUTTON_NORMAL;
             cur_seq_buffer[1] = BUTTON_PUSHED;
@@ -457,7 +457,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Display_Seq_Buffer();
             Cur_Seq_Buffer = 1;
         }
-        if(zcheckMouse(396 + (17 * 2), 522, 15, 16))
+        if(zcheckMouse(396 + (17 * 2), (Cur_Height - 78), 15, 16))
         {
             cur_seq_buffer[0] = BUTTON_NORMAL;
             cur_seq_buffer[1] = BUTTON_NORMAL;
@@ -466,7 +466,7 @@ void Mouse_Left_Sequencer_Ed(void)
             Display_Seq_Buffer();
             Cur_Seq_Buffer = 2;
         }
-        if(zcheckMouse(396 + (17 * 3), 522, 15, 16))
+        if(zcheckMouse(396 + (17 * 3), (Cur_Height - 78), 15, 16))
         {
             cur_seq_buffer[0] = BUTTON_NORMAL;
             cur_seq_buffer[1] = BUTTON_NORMAL;
@@ -477,7 +477,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Cut
-        if(zcheckMouse(396, 466, 32, 16))
+        if(zcheckMouse(396, (Cur_Height - 134), 32, 16))
         {
             SeqCopy(Cur_Position);
             SeqDelete(Cur_Position);
@@ -485,20 +485,20 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Copy
-        if(zcheckMouse(396 + 34, 466, 32, 16))
+        if(zcheckMouse(396 + 34, (Cur_Height - 134), 32, 16))
         {
             SeqCopy(Cur_Position);
         }
 
         // Paste
-        if(zcheckMouse(396, 484, 66, 16))
+        if(zcheckMouse(396, (Cur_Height - 116), 66, 16))
         {
             SeqPaste(Cur_Position);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
 
         // Insert/Paste
-        if(zcheckMouse(396, 502, 66, 16))
+        if(zcheckMouse(396, (Cur_Height - 98), 66, 16))
         {
             SeqInsert(Cur_Position);
             SeqPaste(Cur_Position);
@@ -506,7 +506,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Ptn->Pos[Cur]
-        if(zcheckMouse(308, 466, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 134), 80, 16))
         {
             if(Cur_Position < 128)
             {
@@ -517,7 +517,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Ptn->Pos[Sng]
-        if(zcheckMouse(308, 484, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 116), 80, 16))
         {
             for(int xpos = 0; xpos < 128; xpos++)
             {
@@ -527,29 +527,29 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Up 10 pos
-        if(zcheckMouse(288, 466, 16, 16))
+        if(zcheckMouse(288, (Cur_Height - 134), 16, 16))
         {
             gui_action = GUI_CMD_REDUCE_POSITIONS_10;
         }
         // Up 1 pos
-        if(zcheckMouse(288, 484, 16, 16))
+        if(zcheckMouse(288, (Cur_Height - 116), 16, 16))
         {
             gui_action = GUI_CMD_PREVIOUS_POSITION;
         }
         // Down 1 pos
-        if(zcheckMouse(288, 522, 16, 16)){
+        if(zcheckMouse(288, (Cur_Height - 78), 16, 16)){
             gui_action = GUI_CMD_NEXT_POSITION;
         }
         // Down 10 pos
-        if(zcheckMouse(288, 540, 16, 16))
+        if(zcheckMouse(288, (Cur_Height - 60), 16, 16))
         {
             gui_action = GUI_CMD_INCREASE_POSITIONS_10;
         }
 
         // Add 100 to the selected pattern
-        if(zcheckMouse(260, 468, 7, 84))
+        if(zcheckMouse(260, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -571,9 +571,9 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Add 10 to the selected pattern
-        if(zcheckMouse(266, 468, 7, 84))
+        if(zcheckMouse(266, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -595,9 +595,9 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Add 1 to the selected pattern
-        if(zcheckMouse(272, 468, 7, 84))
+        if(zcheckMouse(272, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -616,17 +616,17 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Enable/Disable channels
-        if(zcheckMouse(123, 469, 129, 84) == 1)
+        if(zcheckMouse(123, (Cur_Height - 131), 129, 84) == 1)
         {
-            int posindex = ((Mouse.y - 470) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 131) + 1)) / 12) - 3;
             posindex += Cur_Position;
             Toggle_Track_On_Off_Status(posindex, (Mouse.x - 123) / 8);
         }
 
         // Scroll the positions
-        if(zcheckMouse(89, 469, 24, 84))
+        if(zcheckMouse(89, (Cur_Height - 131), 24, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - (Cur_Height - 131)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length && posindex != Cur_Position)
             {
@@ -636,7 +636,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
 
         // Start selection name input
-        if(zcheckMouse(579, 472, 164, 16) && snamesel == INPUT_NONE)
+        if(zcheckMouse(579, (Cur_Height - 128), 164, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_SELECTION_NAME;
             strcpy(cur_input_name, Selection_Name);
@@ -647,7 +647,7 @@ void Mouse_Left_Sequencer_Ed(void)
         }
         
         // Save the data
-        if(zcheckMouse(745, 472, 34, 16))
+        if(zcheckMouse(745, (Cur_Height - 128), 34, 16))
         {
             if(File_Exist("%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name))
             {
@@ -669,7 +669,7 @@ void Mouse_Right_Sequencer_Ed(void)
     if(userscreen == USER_SCREEN_SEQUENCER)
     {
         // From Instrument
-        if(zcheckMouse(520, 524, 16, 16) == 1)
+        if(zcheckMouse(520, (Cur_Height - 76), 16, 16) == 1)
         {
             Remap_From -= 10;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -677,7 +677,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // From Instrument
-        if(zcheckMouse(520 + 44, 524, 16, 16) == 1)
+        if(zcheckMouse(520 + 44, (Cur_Height - 76), 16, 16) == 1)
         {
             Remap_From += 10;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -685,7 +685,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // To Instrument
-        if(zcheckMouse(520, 544, 16, 16) == 1)
+        if(zcheckMouse(520, (Cur_Height - 56), 16, 16) == 1)
         {
             Remap_To -= 10;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -693,7 +693,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // To Instrument
-        if(zcheckMouse(520 + 44, 544, 16, 16) == 1)
+        if(zcheckMouse(520 + 44, (Cur_Height - 56), 16, 16) == 1)
         {
             Remap_To += 10;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -701,9 +701,9 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Sub 100 to the selected pattern
-        if(zcheckMouse(260, 468, 7, 84))
+        if(zcheckMouse(260, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -718,9 +718,9 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Sub 10 to the selected pattern
-        if(zcheckMouse(266, 468, 7, 84))
+        if(zcheckMouse(266, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -736,9 +736,9 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Sub 1 to the selected pattern
-        if(zcheckMouse(272, 468, 7, 84))
+        if(zcheckMouse(272, (Cur_Height - 132), 7, 84))
         {
-            int posindex = ((Mouse.y - 469) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 132) + 1)) / 12) - 3;
             posindex += Cur_Position;
             if(posindex >= 0 && posindex < Song_Length)
             {
@@ -754,15 +754,15 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Solo a track
-        if(zcheckMouse(123, 469, 129, 84) == 1)
+        if(zcheckMouse(123, (Cur_Height - 131), 129, 84) == 1)
         {
-            int posindex = ((Mouse.y - 470) / 12) - 3;
+            int posindex = ((Mouse.y - ((Cur_Height - 131) + 1)) / 12) - 3;
             posindex += Cur_Position;
             Solo_Track_On_Off(posindex, (Mouse.x - 123) / 8);
         }
 
         // Insert 10 positions
-        if(zcheckMouse(308, 522, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 78), 80, 16))
         {
             for(i = 0; i < 10; i++)
             {
@@ -772,7 +772,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Delete 10 positions
-        if(zcheckMouse(308, 540, 80, 16))
+        if(zcheckMouse(308, (Cur_Height - 60), 80, 16))
         {
             for(i = 0; i < 10; i++)
             {
@@ -782,7 +782,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Transpose
-        if(zcheckMouse(720, 524, 16, 16) == 1)
+        if(zcheckMouse(720, (Cur_Height - 76), 16, 16) == 1)
         {
             transpose_semitones -= 12;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -790,7 +790,7 @@ void Mouse_Right_Sequencer_Ed(void)
         }
 
         // Transpose
-        if(zcheckMouse(720 + 44, 524, 16, 16) == 1)
+        if(zcheckMouse(720 + 44, (Cur_Height - 76), 16, 16) == 1)
         {
             transpose_semitones += 12;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
@@ -950,10 +950,10 @@ void SeqPaste(int st)
 // Notify the user selected buffer visually
 void Display_Seq_Buffer(void)
 {
-    Gui_Draw_Button_Box(396, 522, 15, 16, "1", cur_seq_buffer[0] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[0] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(396 + 17, 522, 15, 16, "2", cur_seq_buffer[1] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[1] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(396 + (17 * 2), 522, 15, 16, "3", cur_seq_buffer[2] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[2] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(396 + (17 * 3), 522, 15, 16, "4", cur_seq_buffer[3] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[3] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396, (Cur_Height - 78), 15, 16, "1", cur_seq_buffer[0] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[0] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + 17, (Cur_Height - 78), 15, 16, "2", cur_seq_buffer[1] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[1] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + (17 * 2), (Cur_Height - 78), 15, 16, "3", cur_seq_buffer[2] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[2] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(396 + (17 * 3), (Cur_Height - 78), 15, 16, "4", cur_seq_buffer[3] | BUTTON_TEXT_CENTERED | (Seq_Buffers_Full[3] ? 0 : BUTTON_LOW_FONT));
 }
 
 // ------------------------------------------------------

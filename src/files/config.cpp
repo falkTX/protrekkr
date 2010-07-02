@@ -37,6 +37,10 @@
 // Variables
 extern int patt_highlight;
 extern char FullScreen;
+extern int Cur_Left;
+extern int Cur_Top;
+extern int Cur_Width;
+extern int Cur_Height;
 extern int Continuous_Scroll;
 extern char AutoSave;
 extern char Scopish_LeftRight;
@@ -58,7 +62,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "PROTCFGA");
+    sprintf(extension, "PROTCFGC");
     Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -112,7 +116,7 @@ void SaveConfig(void)
 
         Write_Data(&rawrender_32float, sizeof(char), 1, out);
         Write_Data(&rawrender_target, sizeof(char), 1, out);
-        Write_Data(&Patterns_Lines, sizeof(char), 1, out);
+        Write_Data(&Large_Patterns, sizeof(char), 1, out);
         Write_Data(&Scopish_LeftRight, sizeof(char), 1, out);
  
         Write_Data(&Paste_Across, sizeof(char), 1, out);
@@ -121,6 +125,14 @@ void SaveConfig(void)
 
         Write_Data(&Use_Shadows, sizeof(char), 1, out);
         Write_Data(&Global_Patterns_Font, sizeof(char), 1, out);
+
+        Write_Data_Swap(&Cur_Width, sizeof(int), 1, out);
+        Write_Data_Swap(&Cur_Height, sizeof(int), 1, out);
+
+        Cur_Left = -1;
+        Cur_Top = -1;
+        Write_Data_Swap(&Cur_Left, sizeof(int), 1, out);
+        Write_Data_Swap(&Cur_Top, sizeof(int), 1, out);
 
         fclose(out);
 
@@ -145,6 +157,8 @@ void LoadConfig(void)
     char FileName[MAX_PATH];
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
+    char Win_Coords[64];
+    SDL_Surface *Desktop = NULL;
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
 
@@ -157,7 +171,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "PROTCFGA") == 0)
+        if(strcmp(extension, "PROTCFGC") == 0)
         {
             Read_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -201,7 +215,7 @@ void LoadConfig(void)
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
             Read_Data(&rawrender_target, sizeof(char), 1, in);
-            Read_Data(&Patterns_Lines, sizeof(char), 1, in);
+            Read_Data(&Large_Patterns, sizeof(char), 1, in);
             Read_Data(&Scopish_LeftRight, sizeof(char), 1, in);
 
             Read_Data(&Paste_Across, sizeof(char), 1, in);
@@ -211,24 +225,51 @@ void LoadConfig(void)
             Read_Data(&Use_Shadows, sizeof(char), 1, in);
             Read_Data(&Global_Patterns_Font, sizeof(char), 1, in);
 
-            if(Patterns_Lines == DISPLAYED_LINES_LARGE)
+            if(Large_Patterns)
             {
-                VIEWLINE = 22;
-                VIEWLINE2 = -22;
-                YVIEW = 372;
-                Patterns_Lines_Offset = 132;
+                Set_Pattern_Size();
                 userscreen = USER_SCREEN_LARGE_PATTERN;
                 curr_tab_highlight = USER_SCREEN_DISKIO_EDIT;
             }
             else
             {
-                VIEWLINE = 15;
-                VIEWLINE2 = -13;
-                YVIEW = 300;
-                Patterns_Lines_Offset = 0;
+                Set_Pattern_Size();
                 userscreen = USER_SCREEN_DISKIO_EDIT;
                 curr_tab_highlight = USER_SCREEN_DISKIO_EDIT;
             }
+
+            Read_Data_Swap(&Cur_Width, sizeof(int), 1, in);
+            Read_Data_Swap(&Cur_Height, sizeof(int), 1, in);
+
+            Read_Data_Swap(&Cur_Left, sizeof(int), 1, in);
+            Read_Data_Swap(&Cur_Top, sizeof(int), 1, in);
+            Desktop = SDL_SetVideoMode(0, 0, 0, 0);
+            // Check if the coords are too big
+            if(Cur_Width > SDL_GetVideoSurface()->w)
+            {
+                Cur_Left = 0;
+                Cur_Width = SDL_GetVideoSurface()->w;
+            }
+            if(Cur_Height > SDL_GetVideoSurface()->h)
+            {
+                Cur_Top = 0;
+                Cur_Height = SDL_GetVideoSurface()->h;
+            }
+            if(Cur_Left == -1 ||
+               Cur_Top == -1)
+            {
+                Cur_Left = SDL_GetVideoSurface()->w;
+                Cur_Top = SDL_GetVideoSurface()->h;
+                Cur_Left = (Cur_Left - Cur_Width) / 2;
+                Cur_Top = (Cur_Top - Cur_Height) / 2;
+            }
+            SDL_FreeSurface(Desktop);
+
+            sprintf(Win_Coords,
+                    "SDL_VIDEO_WINDOW_POS=%d,%d",
+                    Cur_Left,
+                    Cur_Top);
+            SDL_putenv(Win_Coords);
         }
         fclose(in);
     }

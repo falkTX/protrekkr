@@ -51,10 +51,9 @@
 #define PAT_COL_CHAR_LARGE 11
 #define PAT_COL_CHAR_SMALL 6
 
-#define DISPLAYED_LINES_SMALL 28
-#define DISPLAYED_LINES_LARGE 44
+extern int DISPLAYED_LINES;
 
-#define MAX_PATT_SCREEN_X 781
+extern int MAX_PATT_SCREEN_X;
 
 // ------------------------------------------------------
 // Enumerations
@@ -80,14 +79,14 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
-extern char Patterns_Lines;
+extern char Large_Patterns;
 extern int Patterns_Lines_Offset;
 
 // ------------------------------------------------------
 // Functions
 void draw_pated(int track, int line, int petrack, int row);
 void Actupated(int modac);
-void draw_pated_highlight(int track, int line, int petrack, int row);
+void draw_pated_highlight(int track, int line, int petrack, int row, int ypos);
 void Actualize_Patterned(void);
 void Bound_Patt_Pos(void);
 void Reset_Pattern_Scrolling_Horiz(void);
@@ -121,5 +120,6 @@ void Clear_Track_Zoom(int track);
 TRACK_TYPE Get_Track_Type(int track);
 void Set_Track_Zoom(int track, TRACK_TYPE type);
 void Draw_Pattern_Right_Stuff();
+void Set_Pattern_Size();
 
 #endif

@@ -191,14 +191,14 @@ char Names_Tbl_Synth_ENV1[(sizeof(Tbl_Synth_ENV1) / sizeof(int))][24];
 
 int Tbl_Synth_ENV2[] =
 {
-41, /* Env2->osc1 pd */
-42, /* Env2->osc2 pd */
-43, /* Env2->osc1 pitch */
-44, /* Env2->osc2 pitch */
-45, /* Env2->osc1 volume */
-46, /* Env2->osc2 volume */
-47, /* Env2->vcf cutoff */
-48, /* Env2->vcf resonance */
+    41, /* Env2->osc1 pd */
+    42, /* Env2->osc2 pd */
+    43, /* Env2->osc1 pitch */
+    44, /* Env2->osc2 pitch */
+    45, /* Env2->osc1 volume */
+    46, /* Env2->osc2 volume */
+    47, /* Env2->vcf cutoff */
+    48, /* Env2->vcf resonance */
 };
 int Pos_Tbl_Synth_ENV2;
 int Size_Tbl_Synth_ENV2 = (sizeof(Tbl_Synth_ENV2) / sizeof(int)) - 1;
@@ -218,30 +218,30 @@ void Draw_Synth_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_SYNTH_EDIT);
 
-    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Instrument Editor [Synth]");
 
-    Gui_Draw_Button_Box(508, 450, 56, 16, "Program", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(508, (Cur_Height - 150), 56, 16, "Program", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(294, 450, 53, 16, "VCF Type", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(170, 450, 56, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(294, (Cur_Height - 150), 53, 16, "VCF Type", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(170, (Cur_Height - 150), 56, 16, "Instrument", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box( 24, 469 - 1, 36, 16, "OSC 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(200, 505 - 1, 35, 16, "Sub O.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box( 24, (Cur_Height - 131) - 1, 36, 16, "OSC 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(200, (Cur_Height - 95) - 1, 35, 16, "Sub O.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box( 24, 523 - 1, 36, 16, "OSC 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box( 24, (Cur_Height - 77) - 1, 36, 16, "OSC 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(294, 469 - 1, 35, 16, "VCF", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(294, (Cur_Height - 131) - 1, 35, 16, "VCF", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(294, 505 - 1, 35, 16, "LFO 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(294, (Cur_Height - 95) - 1, 35, 16, "LFO 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(294, 541 - 1, 35, 16, "LFO 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(294, (Cur_Height - 59) - 1, 35, 16, "LFO 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(546, 469 - 1, 35, 16, "ENV 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(546, (Cur_Height - 131) - 1, 35, 16, "ENV 1", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(546, 505 - 1, 35, 16, "ENV 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(546, (Cur_Height - 95) - 1, 35, 16, "ENV 2", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(546, 541 - 1, 35, 16, "Misc.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(546, (Cur_Height - 59) - 1, 35, 16, "Misc.", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
 }
 
 void Actualize_Synth_Ed(char gode)
@@ -261,30 +261,30 @@ void Actualize_Synth_Ed(char gode)
                     Allow_All = FALSE;
                     Allow_Button = BUTTON_NORMAL | BUTTON_DISABLED;
                     Allow_Button_Pushed = BUTTON_PUSHED | BUTTON_DISABLED;
-                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                    Gui_Draw_Button_Box(228 + 18, 450, 24, 16, "Off", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(228, (Cur_Height - 150), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 44, (Cur_Height - 150), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 18, (Cur_Height - 150), 24, 16, "Off", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 1:
                     Allow_All = TRUE;
                     Allow_Button = BUTTON_NORMAL;
                     Allow_Button_Pushed = BUTTON_PUSHED;
-                    Gui_Draw_Button_Box(228, 450, 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                    Gui_Draw_Button_Box(228 + 44, 450, 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                    Gui_Draw_Button_Box(228 + 18, 450, 24, 16, "Curr", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(228, (Cur_Height - 150), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 44, (Cur_Height - 150), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    Gui_Draw_Button_Box(228 + 18, (Cur_Height - 150), 24, 16, "Curr", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 default:
                     Allow_All = TRUE;
                     Allow_Button = BUTTON_NORMAL;
                     Allow_Button_Pushed = BUTTON_PUSHED;
-                    value_box(228, 450, (Synthprg[Current_Instrument] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                    value_box(228, (Cur_Height - 150), (Synthprg[Current_Instrument] - 2), BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
                     break;
             }
-            Gui_Draw_Button_Box(758, 450, 34, 16, "Save", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(506, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(524, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(294, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(460, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(758, (Cur_Height - 150), 34, 16, "Save", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(506, (Cur_Height - 131) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(524, (Cur_Height - 113) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(294, (Cur_Height - 113) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(460, (Cur_Height - 113) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             Actualize_Instruments_Synths_List(1);
         }
 
@@ -292,22 +292,22 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_OSC1_WAVEFORM ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            Gui_Draw_Button_Box(18, 505 - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(44, 505 - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(70, 505 - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(96, 505 - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(122, 505 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(174, 505 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(18, (Cur_Height - 95) - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(44, (Cur_Height - 95) - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(70, (Cur_Height - 95) - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(96, (Cur_Height - 95) - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(122, (Cur_Height - 95) - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(148, (Cur_Height - 95) - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Instrument].osc1_waveform)
             {
-                case 0:Gui_Draw_Button_Box(18, 505 - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 1:Gui_Draw_Button_Box(44, 505 - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 2:Gui_Draw_Button_Box(70, 505 - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 3:Gui_Draw_Button_Box(96, 505 - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 6:Gui_Draw_Button_Box(122, 505 - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5:Gui_Draw_Button_Box(148, 505 - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 4:Gui_Draw_Button_Box(174, 505 - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 0:Gui_Draw_Button_Box(18, (Cur_Height - 95) - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 1:Gui_Draw_Button_Box(44, (Cur_Height - 95) - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 2:Gui_Draw_Button_Box(70, (Cur_Height - 95) - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 3:Gui_Draw_Button_Box(96, (Cur_Height - 95) - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 6:Gui_Draw_Button_Box(122, (Cur_Height - 95) - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5:Gui_Draw_Button_Box(148, (Cur_Height - 95) - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 4:Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }
 
@@ -315,29 +315,29 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_OSC2_WAVEFORM ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            Gui_Draw_Button_Box(18, 559 - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(44, 559 - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(70, 559 - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(96, 559 - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(122, 559 - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(174, 559 - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(18, (Cur_Height - 41) - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(44, (Cur_Height - 41) - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(70, (Cur_Height - 41) - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(96, (Cur_Height - 41) - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(122, (Cur_Height - 41) - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(148, (Cur_Height - 41) - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Instrument].osc2_waveform)
             {
-                case 0: Gui_Draw_Button_Box(18, 559 - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 1: Gui_Draw_Button_Box(44, 559 - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 2: Gui_Draw_Button_Box(70, 559 - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 3: Gui_Draw_Button_Box(96, 559 - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 6: Gui_Draw_Button_Box(122, 559 - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5: Gui_Draw_Button_Box(148, 559 - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 4: Gui_Draw_Button_Box(174, 559 - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 0: Gui_Draw_Button_Box(18, (Cur_Height - 41) - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 1: Gui_Draw_Button_Box(44, (Cur_Height - 41) - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 2: Gui_Draw_Button_Box(70, (Cur_Height - 41) - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 3: Gui_Draw_Button_Box(96, (Cur_Height - 41) - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 6: Gui_Draw_Button_Box(122, (Cur_Height - 41) - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5: Gui_Draw_Button_Box(148, (Cur_Height - 41) - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 4: Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }
 
         // Instrument number
         if(gode == UPDATE_SYNTH_ED_ALL || gode == UPDATE_SYNTH_ED_VALUES)
         {
-            value_box4(566, 450, Current_Instrument);
+            value_box4(566, (Cur_Height - 150), Current_Instrument);
             Actualize_SynthParSlider();
         }
 
@@ -350,11 +350,11 @@ void Actualize_Synth_Ed(char gode)
 
             if(snamesel == INPUT_SYNTH_NAME)
             {
-                Gui_Draw_Button_Box(592, 450, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+                Gui_Draw_Button_Box(592, (Cur_Height - 150), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(592, 450, 164, 16, PARASynth[Current_Instrument].presetname, Allow_Button | BUTTON_INPUT);
+                Gui_Draw_Button_Box(592, (Cur_Height - 150), 164, 16, PARASynth[Current_Instrument].presetname, Allow_Button | BUTTON_INPUT);
             }
             Actualize_Instruments_Synths_List(1);
         }
@@ -377,22 +377,22 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_OSC1 < 0) Pos_Tbl_Synth_OSC1 = 0;
             if(Pos_Tbl_Synth_OSC1 > Size_Tbl_Synth_OSC1) Pos_Tbl_Synth_OSC1 = Size_Tbl_Synth_OSC1;
-            Gui_Draw_Arrows_Number_Box2(62, 469 - 1, Pos_Tbl_Synth_OSC1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(62 + 62, 469  - 1, 128, 16, Names_Tbl_Synth_OSC1[Pos_Tbl_Synth_OSC1], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(62, (Cur_Height - 131) - 1, Pos_Tbl_Synth_OSC1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(62 + 62, (Cur_Height - 131) - 1, 128, 16, Names_Tbl_Synth_OSC1[Pos_Tbl_Synth_OSC1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
             {
-                Gui_Draw_Button_Box(272, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(254, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(272, (Cur_Height - 113) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(254, (Cur_Height - 131) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, (Cur_Height - 113) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, (Cur_Height - 113) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(272, 487 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(254, 469 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(190, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(272, (Cur_Height - 113) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(254, (Cur_Height - 131) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, (Cur_Height - 113) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, (Cur_Height - 113) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -401,22 +401,22 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_OSC2 < 0) Pos_Tbl_Synth_OSC2 = 0;
             if(Pos_Tbl_Synth_OSC2 > Size_Tbl_Synth_OSC2) Pos_Tbl_Synth_OSC2 = Size_Tbl_Synth_OSC2;
-            Gui_Draw_Arrows_Number_Box2(62, 523 - 1, Pos_Tbl_Synth_OSC2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(62 + 62, 523 - 1, 128, 16, Names_Tbl_Synth_OSC2[Pos_Tbl_Synth_OSC2], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(62, (Cur_Height - 77) - 1, Pos_Tbl_Synth_OSC2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(62 + 62, (Cur_Height - 77) - 1, 128, 16, Names_Tbl_Synth_OSC2[Pos_Tbl_Synth_OSC2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
             {
-                Gui_Draw_Button_Box(272, 541 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(254, 523 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(272, (Cur_Height - 59) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(254, (Cur_Height - 77) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box( 24, (Cur_Height - 59) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, (Cur_Height - 59) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(272, 541 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED);
-                Gui_Draw_Button_Box(254, 523 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED);
-                Gui_Draw_Button_Box( 24, 541 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(190, 541 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(272, (Cur_Height - 59) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box(254, (Cur_Height - 77) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED);
+                Gui_Draw_Button_Box( 24, (Cur_Height - 59) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(190, (Cur_Height - 59) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
 
             Actualize_SynthParSlider();
@@ -426,8 +426,8 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_VCF < 0) Pos_Tbl_Synth_VCF = 0;
             if(Pos_Tbl_Synth_VCF > Size_Tbl_Synth_VCF) Pos_Tbl_Synth_VCF = Size_Tbl_Synth_VCF;
-            Gui_Draw_Arrows_Number_Box2(331, 469 - 1, Pos_Tbl_Synth_VCF + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(331 + 62, 469 - 1, 111, 16, Names_Tbl_Synth_VCF[Pos_Tbl_Synth_VCF], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(331, (Cur_Height - 131) - 1, Pos_Tbl_Synth_VCF + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(331 + 62, (Cur_Height - 131) - 1, 111, 16, Names_Tbl_Synth_VCF[Pos_Tbl_Synth_VCF], BUTTON_NORMAL | BUTTON_DISABLED);
             Actualize_SynthParSlider();
         }
 
@@ -435,23 +435,23 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_LFO1 < 0) Pos_Tbl_Synth_LFO1 = 0;
             if(Pos_Tbl_Synth_LFO1 > Size_Tbl_Synth_LFO1) Pos_Tbl_Synth_LFO1 = Size_Tbl_Synth_LFO1;
-            Gui_Draw_Arrows_Number_Box2(331, 505 - 1, Pos_Tbl_Synth_LFO1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(331 + 62, 505 - 1, 111, 16, Names_Tbl_Synth_LFO1[Pos_Tbl_Synth_LFO1], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(331, (Cur_Height - 95) - 1, Pos_Tbl_Synth_LFO1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(331 + 62, (Cur_Height - 95) - 1, 111, 16, Names_Tbl_Synth_LFO1[Pos_Tbl_Synth_LFO1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
                !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO1 == 2))
             {
-                Gui_Draw_Button_Box(506, 505 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(524, 523 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(506, (Cur_Height - 95) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(524, (Cur_Height - 77) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, (Cur_Height - 77) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, (Cur_Height - 77) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(506, 505 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(524, 523 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(460, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(506, (Cur_Height - 95) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(524, (Cur_Height - 77) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, (Cur_Height - 77) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, (Cur_Height - 77) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -460,23 +460,23 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_LFO2 < 0) Pos_Tbl_Synth_LFO2 = 0;
             if(Pos_Tbl_Synth_LFO2 > Size_Tbl_Synth_LFO2) Pos_Tbl_Synth_LFO2 = Size_Tbl_Synth_LFO2;
-            Gui_Draw_Arrows_Number_Box2(331, 541 - 1, Pos_Tbl_Synth_LFO2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(331 + 62, 541 - 1, 111, 16, Names_Tbl_Synth_LFO2[Pos_Tbl_Synth_LFO2], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(331, (Cur_Height - 59) - 1, Pos_Tbl_Synth_LFO2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(331 + 62, (Cur_Height - 59) - 1, 111, 16, Names_Tbl_Synth_LFO2[Pos_Tbl_Synth_LFO2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
                !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO2 == 2))
             {
-                Gui_Draw_Button_Box(506, 541 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(524, 559 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(506, (Cur_Height - 59) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(524, (Cur_Height - 41) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, (Cur_Height - 41) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, (Cur_Height - 41) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(506, 541 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(524, 559 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(294, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(460, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(506, (Cur_Height - 59) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(524, (Cur_Height - 41) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(294, (Cur_Height - 41) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(460, (Cur_Height - 41) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -485,23 +485,23 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_ENV1 < 0) Pos_Tbl_Synth_ENV1 = 0;
             if(Pos_Tbl_Synth_ENV1 > Size_Tbl_Synth_ENV1) Pos_Tbl_Synth_ENV1 = Size_Tbl_Synth_ENV1;
-            Gui_Draw_Arrows_Number_Box2(583, 469 - 1, Pos_Tbl_Synth_ENV1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(583 + 62, 469 - 1, 111, 16, Names_Tbl_Synth_ENV1[Pos_Tbl_Synth_ENV1], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(583, (Cur_Height - 131) - 1, Pos_Tbl_Synth_ENV1 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(583 + 62, (Cur_Height - 131) - 1, 111, 16, Names_Tbl_Synth_ENV1[Pos_Tbl_Synth_ENV1], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
                !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV1 == 1))
             {
-                Gui_Draw_Button_Box(758, 469 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 487 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 131) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 113) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 113) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 113) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(758, 469 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 487 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 487 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 487 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 131) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 113) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 113) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 113) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -510,23 +510,23 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_ENV2 < 0) Pos_Tbl_Synth_ENV2 = 0;
             if(Pos_Tbl_Synth_ENV2 > Size_Tbl_Synth_ENV2) Pos_Tbl_Synth_ENV2 = Size_Tbl_Synth_ENV2;
-            Gui_Draw_Arrows_Number_Box2(583, 505 - 1, Pos_Tbl_Synth_ENV2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(583 + 62, 505 - 1, 111, 16, Names_Tbl_Synth_ENV2[Pos_Tbl_Synth_ENV2], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(583, (Cur_Height - 95) - 1, Pos_Tbl_Synth_ENV2 + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(583 + 62, (Cur_Height - 95) - 1, 111, 16, Names_Tbl_Synth_ENV2[Pos_Tbl_Synth_ENV2], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
                !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV2 == 1))
             {
-                Gui_Draw_Button_Box(758, 505 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 523 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 95) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 77) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 77) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 77) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(758, 505 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 523 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 523 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 523 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 95) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 77) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 77) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 77) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -535,23 +535,23 @@ void Actualize_Synth_Ed(char gode)
         {
             if(Pos_Tbl_Synth_Misc < 0) Pos_Tbl_Synth_Misc = 0;
             if(Pos_Tbl_Synth_Misc > Size_Tbl_Synth_Misc) Pos_Tbl_Synth_Misc = Size_Tbl_Synth_Misc;
-            Gui_Draw_Arrows_Number_Box2(583, 541 - 1, Pos_Tbl_Synth_Misc + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Button_Box(583 + 62, 541 - 1, 111, 16, Names_Tbl_Synth_Misc[Pos_Tbl_Synth_Misc], BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Arrows_Number_Box2(583, (Cur_Height - 59) - 1, Pos_Tbl_Synth_Misc + 1, Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Button_Box(583 + 62, (Cur_Height - 59) - 1, 111, 16, Names_Tbl_Synth_Misc[Pos_Tbl_Synth_Misc], BUTTON_NORMAL | BUTTON_DISABLED);
 
             if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
                 Pos_Tbl_Synth_Misc > 0)
             {
-                Gui_Draw_Button_Box(758, 541 - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 559 - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 59) - 1, 34, 16, "Rand", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 41) - 1, 16, 16, "C", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 41) - 1, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 41) - 1, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             else
             {
-                Gui_Draw_Button_Box(758, 541 - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(776, 559 - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(546, 559 - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Button_Box(712, 559 - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(758, (Cur_Height - 59) - 1, 34, 16, "Rand", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(776, (Cur_Height - 41) - 1, 16, 16, "C", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(546, (Cur_Height - 41) - 1, 16, 16, "\03", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Gui_Draw_Button_Box(712, (Cur_Height - 41) - 1, 16, 16, "\04", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
             }
             Actualize_SynthParSlider();
         }
@@ -562,13 +562,13 @@ void Actualize_Synth_Ed(char gode)
         {
             if(PARASynth[Current_Instrument].osc3_switch)
             {
-                Gui_Draw_Button_Box(237, 505 - 1, 24, 16, "On", Allow_Button_Pushed | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(264, 505 - 1, 24, 16, "Off", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(237, (Cur_Height - 95) - 1, 24, 16, "On", Allow_Button_Pushed | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(264, (Cur_Height - 95) - 1, 24, 16, "Off", Allow_Button | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(237, 505 - 1, 24, 16, "On", Allow_Button | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(264, 505 - 1, 24, 16, "Off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(237, (Cur_Height - 95) - 1, 24, 16, "On", Allow_Button | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(264, (Cur_Height - 95) - 1, 24, 16, "Off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -576,24 +576,24 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_VCF_TYPE ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            Gui_Draw_Button_Box(349, 450, 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(349 + 84, 450, 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(349, (Cur_Height - 150), 16, 16, "\03", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(349 + 84, (Cur_Height - 150), 16, 16, "\04", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Instrument].vcf_type)
             {
                 case 0:
-                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, (Cur_Height - 150), 64, 16, "Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 1:
-                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Hi", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, (Cur_Height - 150), 64, 16, "Hi", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 2:
-                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "N/A", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, (Cur_Height - 150), 64, 16, "N/A", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 3:
-                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Moog Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, (Cur_Height - 150), 64, 16, "Moog Lo", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
                 case 4:
-                    Gui_Draw_Button_Box(349 + 18, 450, 64, 16, "Moog Band", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(349 + 18, (Cur_Height - 150), 64, 16, "Moog Band", Allow_Button | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
                     break;
             }
         }
@@ -618,14 +618,14 @@ void Mouse_Sliders_Synth_Ed(void)
     {
         if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
         {
-            Check_Slider(&csynth_slv_OSC1, 43, 487 - 1);
+            Check_Slider(&csynth_slv_OSC1, 43, (Cur_Height - 113) - 1);
         }
         if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
         {
-            Check_Slider(&csynth_slv_OSC2, 43, 541 - 1);
+            Check_Slider(&csynth_slv_OSC2, 43, (Cur_Height - 59) - 1);
         }
 
-        Check_Slider(&csynth_slv_VCF, 313, 487 - 1);
+        Check_Slider(&csynth_slv_VCF, 313, (Cur_Height - 113) - 1);
 
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO1 == 2))
@@ -633,7 +633,7 @@ void Mouse_Sliders_Synth_Ed(void)
         }
         else
         {
-            Check_Slider(&csynth_slv_LFO1, 313, 523 - 1);
+            Check_Slider(&csynth_slv_LFO1, 313, (Cur_Height - 77) - 1);
         }
 
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
@@ -642,7 +642,7 @@ void Mouse_Sliders_Synth_Ed(void)
         }
         else
         {
-            Check_Slider(&csynth_slv_LFO2, 313, 559 - 1);
+            Check_Slider(&csynth_slv_LFO2, 313, (Cur_Height - 41) - 1);
         }
 
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
@@ -650,7 +650,7 @@ void Mouse_Sliders_Synth_Ed(void)
         }
         else
         {
-            Check_Slider(&csynth_slv_ENV1, 565, 487 - 1);
+            Check_Slider(&csynth_slv_ENV1, 565, (Cur_Height - 113) - 1);
         }
 
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
@@ -659,13 +659,13 @@ void Mouse_Sliders_Synth_Ed(void)
         }
         else
         {
-            Check_Slider(&csynth_slv_ENV2, 565, 523 - 1);
+            Check_Slider(&csynth_slv_ENV2, 565, (Cur_Height - 77) - 1);
         }
 
         if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
             Pos_Tbl_Synth_Misc > 0)
         {
-            Check_Slider(&csynth_slv_Misc, 565, 559 - 1);
+            Check_Slider(&csynth_slv_Misc, 565, (Cur_Height - 41) - 1);
         }
     }
 }
@@ -673,7 +673,7 @@ void Mouse_Sliders_Synth_Ed(void)
 void Check_Sliders_Arrows(int value_step)
 {
     // OSC1 Sliders Arrows
-    if(zcheckMouse(24, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(24, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
         {
@@ -683,7 +683,7 @@ void Check_Sliders_Arrows(int value_step)
             teac = UPDATE_SYNTH_ED_VALIDATE_PARAMS;
         }
     }
-    if(zcheckMouse(190, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(190, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
         {
@@ -695,7 +695,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // OSC2 Sliders Arrows
-    if(zcheckMouse(24, 541 - 1, 16, 16) == 1)
+    if(zcheckMouse(24, (Cur_Height - 59) - 1, 16, 16) == 1)
     {
         if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
         {
@@ -705,7 +705,7 @@ void Check_Sliders_Arrows(int value_step)
             teac = UPDATE_SYNTH_ED_VALIDATE_PARAMS;
         }
     }
-    if(zcheckMouse(190, 541 - 1, 16, 16) == 1)
+    if(zcheckMouse(190, (Cur_Height - 59) - 1, 16, 16) == 1)
     {
         if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
         {
@@ -717,14 +717,14 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // VCF Sliders Arrows
-    if(zcheckMouse(294, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(294, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         csynth_slv_VCF -= value_step;
         if(csynth_slv_VCF < 0) csynth_slv_VCF = 0;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_VALIDATE_PARAMS;
     }
-    if(zcheckMouse(460, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(460, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         csynth_slv_VCF += value_step;
         if(csynth_slv_VCF > 128) csynth_slv_VCF = 128;
@@ -733,7 +733,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // LFO1 Sliders Arrows
-    if(zcheckMouse(294, 523 - 1, 16, 16) == 1)
+    if(zcheckMouse(294, (Cur_Height - 77) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO1 == 2))
@@ -747,7 +747,7 @@ void Check_Sliders_Arrows(int value_step)
             teac = UPDATE_SYNTH_ED_VALIDATE_PARAMS;
         }
     }
-    if(zcheckMouse(460, 523 - 1, 16, 16) == 1)
+    if(zcheckMouse(460, (Cur_Height - 77) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO1 == 2))
@@ -763,7 +763,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // LFO2 Sliders Arrows
-    if(zcheckMouse(294, 559 - 1, 16, 16) == 1)
+    if(zcheckMouse(294, (Cur_Height - 41) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO2 == 2))
@@ -778,7 +778,7 @@ void Check_Sliders_Arrows(int value_step)
         }
     }
     
-    if(zcheckMouse(460, 559 - 1, 16, 16) == 1)
+    if(zcheckMouse(460, (Cur_Height - 41) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO2 == 2))
@@ -794,7 +794,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // ENV1 Sliders Arrows
-    if(zcheckMouse(546, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(546, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV1 == 1))
@@ -809,7 +809,7 @@ void Check_Sliders_Arrows(int value_step)
         }
     }
 
-    if(zcheckMouse(712, 487 - 1, 16, 16) == 1)
+    if(zcheckMouse(712, (Cur_Height - 113) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV1 == 1))
@@ -825,7 +825,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // ENV2 Sliders Arrows
-    if(zcheckMouse(546, 523 - 1, 16, 16) == 1)
+    if(zcheckMouse(546, (Cur_Height - 77) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV2 == 1))
@@ -840,7 +840,7 @@ void Check_Sliders_Arrows(int value_step)
         }
     }
     
-    if(zcheckMouse(712, 523 - 1, 16, 16) == 1)
+    if(zcheckMouse(712, (Cur_Height - 77) - 1, 16, 16) == 1)
     {
         if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
            !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV2 == 1))
@@ -856,7 +856,7 @@ void Check_Sliders_Arrows(int value_step)
     }
 
     // Misc. Sliders Arrows
-    if(zcheckMouse(546, 559 - 1, 16, 16) == 1)
+    if(zcheckMouse(546, (Cur_Height - 41) - 1, 16, 16) == 1)
     {
         if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
             Pos_Tbl_Synth_Misc > 0)
@@ -868,7 +868,7 @@ void Check_Sliders_Arrows(int value_step)
         }
     }
     
-    if(zcheckMouse(712, 559 - 1, 16, 16) == 1)
+    if(zcheckMouse(712, (Cur_Height - 41) - 1, 16, 16) == 1)
     {
         if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
             Pos_Tbl_Synth_Misc > 0)
@@ -884,13 +884,13 @@ void Check_Sliders_Arrows(int value_step)
 void Check_Parameters_Arrows(int Value_Step)
 {
     // Select OSC1 parameter
-    if(zcheckMouse(62, 469 - 1, 16, 16) && Pos_Tbl_Synth_OSC1 > 0)
+    if(zcheckMouse(62, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_OSC1 > 0)
     {
         Pos_Tbl_Synth_OSC1 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_OSC1_PARAMS;
     }
-    if(zcheckMouse(62 + 44, 469 - 1, 16, 16) && Pos_Tbl_Synth_OSC1 < Size_Tbl_Synth_OSC1)
+    if(zcheckMouse(62 + 44, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_OSC1 < Size_Tbl_Synth_OSC1)
     {
         Pos_Tbl_Synth_OSC1 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -898,13 +898,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select OSC2 parameter
-    if(zcheckMouse(62, 523 - 1, 16, 16) && Pos_Tbl_Synth_OSC2 > 0)
+    if(zcheckMouse(62, (Cur_Height - 77) - 1, 16, 16) && Pos_Tbl_Synth_OSC2 > 0)
     {
         Pos_Tbl_Synth_OSC2 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_OSC2_PARAMS;
     }
-    if(zcheckMouse(62 + 44, 523 - 1, 16, 16) && Pos_Tbl_Synth_OSC2 < Size_Tbl_Synth_OSC2)
+    if(zcheckMouse(62 + 44, (Cur_Height - 77) - 1, 16, 16) && Pos_Tbl_Synth_OSC2 < Size_Tbl_Synth_OSC2)
     {
         Pos_Tbl_Synth_OSC2 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -912,13 +912,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select VCF parameter
-    if(zcheckMouse(331, 469 - 1, 16, 16) && Pos_Tbl_Synth_VCF > 0)
+    if(zcheckMouse(331, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_VCF > 0)
     {
         Pos_Tbl_Synth_VCF -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_VCF_PARAMS;
     }
-    if(zcheckMouse(331 + 44, 469 - 1, 16, 16) && Pos_Tbl_Synth_VCF < Size_Tbl_Synth_VCF)
+    if(zcheckMouse(331 + 44, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_VCF < Size_Tbl_Synth_VCF)
     {
         Pos_Tbl_Synth_VCF += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -926,13 +926,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select LFO1 parameter
-    if(zcheckMouse(331, 505 - 1, 16, 16) && Pos_Tbl_Synth_LFO1 > 0)
+    if(zcheckMouse(331, (Cur_Height - 95) - 1, 16, 16) && Pos_Tbl_Synth_LFO1 > 0)
     {
         Pos_Tbl_Synth_LFO1 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_LFO1_PARAMS;
     }
-    if(zcheckMouse(331 + 44, 505 - 1, 16, 16) && Pos_Tbl_Synth_LFO1 < Size_Tbl_Synth_LFO1)
+    if(zcheckMouse(331 + 44, (Cur_Height - 95) - 1, 16, 16) && Pos_Tbl_Synth_LFO1 < Size_Tbl_Synth_LFO1)
     {
         Pos_Tbl_Synth_LFO1 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -940,13 +940,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select LFO2 parameter
-    if(zcheckMouse(331, 541 - 1, 16, 16) && Pos_Tbl_Synth_LFO2 > 0)
+    if(zcheckMouse(331, (Cur_Height - 59) - 1, 16, 16) && Pos_Tbl_Synth_LFO2 > 0)
     {
         Pos_Tbl_Synth_LFO2 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_LFO2_PARAMS;
     }
-    if(zcheckMouse(331 + 44, 541 - 1, 16, 16) && Pos_Tbl_Synth_LFO2 < Size_Tbl_Synth_LFO2)
+    if(zcheckMouse(331 + 44, (Cur_Height - 59) - 1, 16, 16) && Pos_Tbl_Synth_LFO2 < Size_Tbl_Synth_LFO2)
     {
         Pos_Tbl_Synth_LFO2 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -954,13 +954,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }
 
     // Select ENV1 parameter
-    if(zcheckMouse(583, 469 - 1, 16, 16) && Pos_Tbl_Synth_ENV1 > 0)
+    if(zcheckMouse(583, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_ENV1 > 0)
     {
         Pos_Tbl_Synth_ENV1 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_ENV1_PARAMS;
     }
-    if(zcheckMouse(583 + 44, 469 - 1, 16, 16) && Pos_Tbl_Synth_ENV1 < Size_Tbl_Synth_ENV1)
+    if(zcheckMouse(583 + 44, (Cur_Height - 131) - 1, 16, 16) && Pos_Tbl_Synth_ENV1 < Size_Tbl_Synth_ENV1)
     {
         Pos_Tbl_Synth_ENV1 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -968,13 +968,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select ENV2 parameter
-    if(zcheckMouse(583, 505 - 1, 16, 16) && Pos_Tbl_Synth_ENV2 > 0)
+    if(zcheckMouse(583, (Cur_Height - 95) - 1, 16, 16) && Pos_Tbl_Synth_ENV2 > 0)
     {
         Pos_Tbl_Synth_ENV2 -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_ENV2_PARAMS;
     }
-    if(zcheckMouse(583 + 44, 505 - 1, 16, 16) && Pos_Tbl_Synth_ENV2 < Size_Tbl_Synth_ENV2)
+    if(zcheckMouse(583 + 44, (Cur_Height - 95) - 1, 16, 16) && Pos_Tbl_Synth_ENV2 < Size_Tbl_Synth_ENV2)
     {
         Pos_Tbl_Synth_ENV2 += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -982,13 +982,13 @@ void Check_Parameters_Arrows(int Value_Step)
     }  
 
     // Select Misc parameter
-    if(zcheckMouse(583, 541 - 1, 16, 16) && Pos_Tbl_Synth_Misc > 0)
+    if(zcheckMouse(583, (Cur_Height - 59) - 1, 16, 16) && Pos_Tbl_Synth_Misc > 0)
     {
         Pos_Tbl_Synth_Misc -= Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         teac = UPDATE_SYNTH_ED_Misc_PARAMS;
     }
-    if(zcheckMouse(583 + 44, 541 - 1, 16, 16) && Pos_Tbl_Synth_Misc < Size_Tbl_Synth_Misc)
+    if(zcheckMouse(583 + 44, (Cur_Height - 59) - 1, 16, 16) && Pos_Tbl_Synth_Misc < Size_Tbl_Synth_Misc)
     {
         Pos_Tbl_Synth_Misc += Value_Step;
         gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -1001,7 +1001,7 @@ void Mouse_Right_Synth_Ed(void)
     if(userscreen == USER_SCREEN_SYNTH_EDIT)
     {
 
-        if(zcheckMouse(228, 450, 17, 16))
+        if(zcheckMouse(228, (Cur_Height - 150), 17, 16))
         {
             if(Synthprg[Current_Instrument] >= 10)
             {
@@ -1014,7 +1014,7 @@ void Mouse_Right_Synth_Ed(void)
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         }
-        if(zcheckMouse(228 + 44, 450, 17, 16))
+        if(zcheckMouse(228 + 44, (Cur_Height - 150), 17, 16))
         {
             if(Synthprg[Current_Instrument] <= (129 - 10))
             {
@@ -1040,7 +1040,7 @@ void Mouse_Left_Synth_Ed(void)
 {
     if(userscreen == USER_SCREEN_SYNTH_EDIT)
     {
-        if(zcheckMouse(228, 450, 17, 16))
+        if(zcheckMouse(228, (Cur_Height - 150), 17, 16))
         {
             if(Synthprg[Current_Instrument])
             {
@@ -1049,7 +1049,7 @@ void Mouse_Left_Synth_Ed(void)
             teac = UPDATE_SYNTH_ED_ALL;
             gui_action = GUI_CMD_UPDATE_SYNTH_ED;
         }
-        if(zcheckMouse(228 + 44, 450, 17, 16))
+        if(zcheckMouse(228 + 44, (Cur_Height - 150), 17, 16))
         {
             if(Synthprg[Current_Instrument] < 129)
             {
@@ -1063,7 +1063,7 @@ void Mouse_Left_Synth_Ed(void)
         if(userscreen == USER_SCREEN_SYNTH_EDIT && Allow_All)
         {
             // Save the data
-            if(zcheckMouse(758, 450, 34, 16))
+            if(zcheckMouse(758, (Cur_Height - 150), 34, 16))
             {
                 if(File_Exist("%s"SLASH"%s.pts", Dir_Presets, PARASynth[Current_Instrument].presetname))
                 {
@@ -1076,7 +1076,7 @@ void Mouse_Left_Synth_Ed(void)
             }
 
             // Start synth name input
-            if(zcheckMouse(592, 450, 164, 16) && snamesel == INPUT_NONE)
+            if(zcheckMouse(592, (Cur_Height - 150), 164, 16) && snamesel == INPUT_NONE)
             {
                 snamesel = INPUT_SYNTH_NAME;
                 strcpy(cur_input_name, PARASynth[Current_Instrument].presetname);
@@ -1086,21 +1086,21 @@ void Mouse_Left_Synth_Ed(void)
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
 
-            if(zcheckMouse(254, 469 - 1, 34, 16)) Rand_OSC1();
-            if(zcheckMouse(254, 523 - 1, 34, 16)) Rand_OSC2();
-            if(zcheckMouse(506, 469 - 1, 34, 16)) Rand_VCF();
-            if(zcheckMouse(506, 505 - 1, 34, 16)) Rand_LFO1();
-            if(zcheckMouse(506, 541 - 1, 34, 16)) Rand_LFO2();
-            if(zcheckMouse(755, 469 - 1, 34, 16)) Rand_ENV1();
-            if(zcheckMouse(755, 505 - 1, 34, 16)) Rand_ENV2();
-            if(zcheckMouse(755, 541 - 1, 34, 16)) Rand_Misc();
+            if(zcheckMouse(254, (Cur_Height - 131) - 1, 34, 16)) Rand_OSC1();
+            if(zcheckMouse(254, (Cur_Height - 77) - 1, 34, 16)) Rand_OSC2();
+            if(zcheckMouse(506, (Cur_Height - 131) - 1, 34, 16)) Rand_VCF();
+            if(zcheckMouse(506, (Cur_Height - 95) - 1, 34, 16)) Rand_LFO1();
+            if(zcheckMouse(506, (Cur_Height - 59) - 1, 34, 16)) Rand_LFO2();
+            if(zcheckMouse(755, (Cur_Height - 131) - 1, 34, 16)) Rand_ENV1();
+            if(zcheckMouse(755, (Cur_Height - 95) - 1, 34, 16)) Rand_ENV2();
+            if(zcheckMouse(755, (Cur_Height - 59) - 1, 34, 16)) Rand_Misc();
 
             Check_Sliders_Arrows(1);
 
             Check_Parameters_Arrows(1);
 
             // Center OSC1
-            if(zcheckMouse(272, 487 - 1, 16, 16))
+            if(zcheckMouse(272, (Cur_Height - 113) - 1, 16, 16))
             {
                 if(Allow_Phase_Distortion_OSC1 || Pos_Tbl_Synth_OSC1 != 0)
                 {
@@ -1111,7 +1111,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center OSC2
-            if(zcheckMouse(272, 541 - 1, 16, 16))
+            if(zcheckMouse(272, (Cur_Height - 59) - 1, 16, 16))
             {
                 if(Allow_Phase_Distortion_OSC2 || Pos_Tbl_Synth_OSC2 != 0)
                 {
@@ -1122,7 +1122,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center VCF
-            if(zcheckMouse(524, 487 - 1, 16, 16))
+            if(zcheckMouse(524, (Cur_Height - 113) - 1, 16, 16))
             {
                 Center_SynthParam_VCF();
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
@@ -1130,7 +1130,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center LFO1
-            if(zcheckMouse(524, 523 - 1, 16, 16))
+            if(zcheckMouse(524, (Cur_Height - 77) - 1, 16, 16))
             {
                 if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO1 == 1) ||
                    !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO1 == 2))
@@ -1145,7 +1145,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center LFO2
-            if(zcheckMouse(524, 559 - 1, 16, 16))
+            if(zcheckMouse(524, (Cur_Height - 41) - 1, 16, 16))
             {
                 if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_LFO2 == 1) ||
                    !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_LFO2 == 2))
@@ -1160,7 +1160,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center ENV1
-            if(zcheckMouse(776, 487 - 1, 16, 16))
+            if(zcheckMouse(776, (Cur_Height - 113) - 1, 16, 16))
             {
                 if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV1 == 0) ||
                    !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV1 == 1))
@@ -1175,7 +1175,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center ENV2
-            if(zcheckMouse(776, 523 - 1, 16, 16))
+            if(zcheckMouse(776, (Cur_Height - 77) - 1, 16, 16))
             {
                 if(!Allow_Phase_Distortion_OSC1 && (Pos_Tbl_Synth_ENV2 == 0) ||
                    !Allow_Phase_Distortion_OSC2 && (Pos_Tbl_Synth_ENV2 == 1))
@@ -1190,7 +1190,7 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // Center Misc
-            if(zcheckMouse(776, 559 - 1, 16, 16))
+            if(zcheckMouse(776, (Cur_Height - 41) - 1, 16, 16))
             {
                 if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
                    Pos_Tbl_Synth_Misc > 0)
@@ -1202,43 +1202,43 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // OSC1 Waveform
-            if(zcheckMouse(18, 505 - 1, 24, 16))
+            if(zcheckMouse(18, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(44, 505 - 1, 24, 16))
+            if(zcheckMouse(44, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(70, 505 - 1, 24, 16))
+            if(zcheckMouse(70, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(96, 505 - 1, 24, 16))
+            if(zcheckMouse(96, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(122, 505 - 1, 24, 16))
+            if(zcheckMouse(122, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(148, 505 - 1, 24, 16))
+            if(zcheckMouse(148, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(174, 505 - 1, 24, 16))
+            if(zcheckMouse(174, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 4;
                 teac = UPDATE_SYNTH_ED_ALL;
@@ -1246,43 +1246,43 @@ void Mouse_Left_Synth_Ed(void)
             }
 
             // OSC2 Waveform
-            if(zcheckMouse(18, 559 - 1, 24, 16))
+            if(zcheckMouse(18, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(44, 559 - 1, 24, 16))
+            if(zcheckMouse(44, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(70, 559 - 1, 24, 16))
+            if(zcheckMouse(70, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(96, 559 - 1, 24, 16))
+            if(zcheckMouse(96, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(122, 559 - 1, 24, 16))
+            if(zcheckMouse(122, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(148, 559 - 1, 24, 16))
+            if(zcheckMouse(148, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(174, 559 - 1, 24, 16))
+            if(zcheckMouse(174, (Cur_Height - 41) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 4;
                 teac = UPDATE_SYNTH_ED_ALL;
@@ -1290,13 +1290,13 @@ void Mouse_Left_Synth_Ed(void)
             }
 
             // Sub oscillator switch
-            if(zcheckMouse(237, 505 - 1, 24, 16))
+            if(zcheckMouse(237, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc3_switch = TRUE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(264, 505 - 1, 24, 16))
+            if(zcheckMouse(264, (Cur_Height - 95) - 1, 24, 16))
             {
                 PARASynth[Current_Instrument].osc3_switch = FALSE;
                 teac = UPDATE_SYNTH_ED_OSC3_SWITCH;
@@ -1304,13 +1304,13 @@ void Mouse_Left_Synth_Ed(void)
             }
 
             // VCF Type
-            if(zcheckMouse(349, 450, 17, 16) && PARASynth[Current_Instrument].vcf_type > 0)
+            if(zcheckMouse(349, (Cur_Height - 150), 17, 16) && PARASynth[Current_Instrument].vcf_type > 0)
             {
                 PARASynth[Current_Instrument].vcf_type = filter_vcf_type_minus[PARASynth[Current_Instrument].vcf_type];
                 teac = 7;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(349 + 84, 450, 17, 16) && PARASynth[Current_Instrument].vcf_type <= 4)
+            if(zcheckMouse(349 + 84, (Cur_Height - 150), 17, 16) && PARASynth[Current_Instrument].vcf_type <= 4)
             {
                 PARASynth[Current_Instrument].vcf_type = filter_vcf_type_plus[PARASynth[Current_Instrument].vcf_type];
                 teac = 7;
@@ -1330,50 +1330,50 @@ void Actualize_SynthParSlider(void)
         case 0: /* Osc1_PD */
             if(Allow_Phase_Distortion_OSC1)
             {
-                Realslider(41, 487 - 1, Cur_SynthParam->osc1_pw / 4, Allow_All);
+                Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->osc1_pw / 4, Allow_All);
             }
             else
             {
-                Realslider(41, 487 - 1, Cur_SynthParam->osc1_pw / 4, FALSE);
+                Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->osc1_pw / 4, FALSE);
             }
             if(Cur_SynthParam->osc1_pw - 256)
             {
-                outfloat_small(208, 487 - 1, (((float) Cur_SynthParam->osc1_pw - 256) / 256.0f) * 100.0f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(208, (Cur_Height - 113) - 1, (((float) Cur_SynthParam->osc1_pw - 256) / 256.0f) * 100.0f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(208, 487 - 1, 62, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(208, (Cur_Height - 113) - 1, 62, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_OSC1 = Cur_SynthParam->osc1_pw / 4;
             break;
 
         case 1: /* ENV1_Attack */
-            Realslider(41, 487 - 1, Cur_SynthParam->env1_attack / 512, Allow_All);
-            outlong_small(208, 487 - 1, (Cur_SynthParam->env1_attack * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->env1_attack / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 113) - 1, (Cur_SynthParam->env1_attack * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC1 = Cur_SynthParam->env1_attack / 512;
             break;
 
         case 2: /* ENV1_Decay */
-            Realslider(41, 487 - 1, Cur_SynthParam->env1_decay / 512, Allow_All);
-            outlong_small(208, 487 - 1, (Cur_SynthParam->env1_decay * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->env1_decay / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 113) - 1, (Cur_SynthParam->env1_decay * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC1 = Cur_SynthParam->env1_decay / 512;
             break;
 
         case 3: /* ENV1_Sustain */
-            Realslider(41, 487 - 1, Cur_SynthParam->env1_sustain, Allow_All);
-            outlong_small(208, 487 - 1, (Cur_SynthParam->env1_sustain * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->env1_sustain, Allow_All);
+            outlong_small(208, (Cur_Height - 113) - 1, (Cur_SynthParam->env1_sustain * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC1 = Cur_SynthParam->env1_sustain;
             break;
 
         case 4: /* ENV1_Release */
-            Realslider(41, 487 - 1, Cur_SynthParam->env1_release / 512, Allow_All);
-            outlong_small(208, 487 - 1, (Cur_SynthParam->env1_release * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->env1_release / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 113) - 1, (Cur_SynthParam->env1_release * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC1 = Cur_SynthParam->env1_release / 512;
             break;
 
         case 5: /* OSC3 volume */
-            Realslider(41, 487 - 1, Cur_SynthParam->osc3_volume, Allow_All);
-            outfloat_small(208, 487 - 1, ((float) Cur_SynthParam->osc3_volume - 64.0f) * 1.5625f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 113) - 1, Cur_SynthParam->osc3_volume, Allow_All);
+            outfloat_small(208, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->osc3_volume - 64.0f) * 1.5625f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC1 = Cur_SynthParam->osc3_volume;
             break;
     }
@@ -1385,56 +1385,56 @@ void Actualize_SynthParSlider(void)
         case 0: /* Osc2_PD */
             if(Allow_Phase_Distortion_OSC2)
             {
-                Realslider(41, 541 - 1, Cur_SynthParam->osc2_pw / 4, Allow_All);
+                Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->osc2_pw / 4, Allow_All);
             }
             else
             {
-                Realslider(41, 541 - 1, Cur_SynthParam->osc2_pw / 4, FALSE);
+                Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->osc2_pw / 4, FALSE);
             }
             if(Cur_SynthParam->osc2_pw - 256)
             {
-                outfloat_small(208, 541 - 1, (((float) Cur_SynthParam->osc2_pw - 256) / 256.0f) * 100.0f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(208, (Cur_Height - 59) - 1, (((float) Cur_SynthParam->osc2_pw - 256) / 256.0f) * 100.0f, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(208, 541 - 1, 62, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(208, (Cur_Height - 59) - 1, 62, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_OSC2 = Cur_SynthParam->osc2_pw / 4;
             break;
 
         case 1: /* Osc2_Detune */
-            Realslider(41, 541 - 1, Cur_SynthParam->osc2_detune, Allow_All);
-            outlong_small(208, 541 - 1, Cur_SynthParam->osc2_detune - 64, 0, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->osc2_detune, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, Cur_SynthParam->osc2_detune - 64, 0, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->osc2_detune;
             break;
 
         case 2: /* Osc2_Finetune */
-            Realslider(41, 541 - 1, Cur_SynthParam->osc2_finetune, Allow_All);
-            outlong_small(208, 541 - 1, (Cur_SynthParam->osc2_finetune * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->osc2_finetune, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, (Cur_SynthParam->osc2_finetune * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->osc2_finetune;
             break;
 
         case 3: /* ENV2_Attack */
-            Realslider(41, 541 - 1, Cur_SynthParam->env2_attack / 512, Allow_All);
-            outlong_small(208, 541 - 1, (Cur_SynthParam->env2_attack * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->env2_attack / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, (Cur_SynthParam->env2_attack * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->env2_attack / 512;
             break;
 
         case 4: /* ENV2_Decay */
-            Realslider(41, 541 - 1, Cur_SynthParam->env2_decay / 512, Allow_All);
-            outlong_small(208, 541 - 1, (Cur_SynthParam->env2_decay * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->env2_decay / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, (Cur_SynthParam->env2_decay * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->env2_decay / 512;
             break;
 
         case 5: /* ENV2_Sustain */
-            Realslider(41, 541 - 1, Cur_SynthParam->env2_sustain, Allow_All);
-            outlong_small(208, 541 - 1, (Cur_SynthParam->env2_sustain * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->env2_sustain, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, (Cur_SynthParam->env2_sustain * 100) / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->env2_sustain;
             break;
 
         case 6: /* ENV2_Release */
-            Realslider(41, 541 - 1, Cur_SynthParam->env2_release / 512, Allow_All);
-            outlong_small(208, 541 - 1, (Cur_SynthParam->env2_release * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(41, (Cur_Height - 59) - 1, Cur_SynthParam->env2_release / 512, Allow_All);
+            outlong_small(208, (Cur_Height - 59) - 1, (Cur_SynthParam->env2_release * 100) / 512 / 128, 1, 63, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_OSC2 = Cur_SynthParam->env2_release / 512;
             break;
     // -----------------------------
@@ -1444,14 +1444,14 @@ void Actualize_SynthParSlider(void)
     switch(Pos_Tbl_Synth_VCF)
     {
         case 0: /* VCF Cutoff */
-            Realslider(311, 487 - 1, Cur_SynthParam->vcf_cutoff, Allow_All);
-            outlong_small(311 + 167, 487 - 1, Cur_SynthParam->vcf_cutoff * 172, 3, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 113) - 1, Cur_SynthParam->vcf_cutoff, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 113) - 1, Cur_SynthParam->vcf_cutoff * 172, 3, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_VCF = Cur_SynthParam->vcf_cutoff;
             break;
 
         case 1: /* VCF_Resonance */
-            Realslider(311, 487 - 1, Cur_SynthParam->vcf_resonance, Allow_All);
-            outlong_small(311 + 167, 487 - 1, (Cur_SynthParam->vcf_resonance * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 113) - 1, Cur_SynthParam->vcf_resonance, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 113) - 1, (Cur_SynthParam->vcf_resonance * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_VCF = Cur_SynthParam->vcf_resonance;
             break;
     }
@@ -1461,94 +1461,94 @@ void Actualize_SynthParSlider(void)
     switch(Pos_Tbl_Synth_LFO1)
     {
         case 0: /* LFO1_Period */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_period, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, (float) Cur_SynthParam->lfo1_period * 2, 8, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_period, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, (float) Cur_SynthParam->lfo1_period * 2, 8, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_period;
             break;
 
         case 1: /* Lfo1->osc1 pd */
             if(Allow_Phase_Distortion_OSC1)
             {
-                Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc1_pw, Allow_All);
+                Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc1_pw, Allow_All);
             }
             else
             {
-                Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc1_pw, FALSE);
+                Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc1_pw, FALSE);
             }
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc1_pw;
             break;
 
         case 2: /* Lfo1->osc2 pd */
             if(Allow_Phase_Distortion_OSC2)
             {
-                Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc2_pw, Allow_All);
+                Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc2_pw, Allow_All);
             }
             else
             {
-                Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc2_pw, FALSE);
+                Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc2_pw, FALSE);
             }
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc2_pw;
             break;
 
         case 3: /* Lfo1->osc1 pitch */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc1_pitch, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc1_pitch, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc1_pitch;
             break;
 
         case 4: /* Lfo1->osc1 pitch */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc2_pitch, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc2_pitch, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc2_pitch;
             break;
 
         case 5: /* Lfo1->osc1 volume */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc1_volume, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc1_volume, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc1_volume;
             break;
 
         case 6: /* Lfo1->osc2 volume */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_osc2_volume, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_osc2_volume, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_osc2_volume;
             break;
 
         case 7: /* Lfo1->vcf cutoff */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_vcf_cutoff, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_vcf_cutoff, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_vcf_cutoff;
             break;
 
         case 8: /* Lfo1->vcf resonance */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_vcf_resonance, Allow_All);
-            outfloat_small(311 + 167, 523 - 1, ((float) Cur_SynthParam->lfo1_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_vcf_resonance, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->lfo1_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_vcf_resonance;
             break;
 
         case 9: /* LFO1_Attack */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_attack / 512, Allow_All);
-            outlong_small(311 + 167, 523 - 1, (Cur_SynthParam->lfo1_attack * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_attack / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 77) - 1, (Cur_SynthParam->lfo1_attack * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_attack / 512;
             break;
 
         case 10: /* LFO1_Decay */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_decay / 512, Allow_All);
-            outlong_small(311 + 167, 523 - 1, (Cur_SynthParam->lfo1_decay * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_decay / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 77) - 1, (Cur_SynthParam->lfo1_decay * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_decay / 512;
             break;
 
         case 11: /* LFO1_Sustain */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_sustain, Allow_All);
-            outlong_small(311 + 167, 523 - 1, (Cur_SynthParam->lfo1_sustain * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_sustain, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 77) - 1, (Cur_SynthParam->lfo1_sustain * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_sustain;
             break;
 
         case 12: /* LFO1_Release */
-            Realslider(311, 523 - 1, Cur_SynthParam->lfo1_release / 512, Allow_All);
-            outlong_small(311 + 167, 523 - 1, (Cur_SynthParam->lfo1_release * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 77) - 1, Cur_SynthParam->lfo1_release / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 77) - 1, (Cur_SynthParam->lfo1_release * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO1 = Cur_SynthParam->lfo1_release / 512;
             break;
     }
@@ -1558,94 +1558,94 @@ void Actualize_SynthParSlider(void)
     switch(Pos_Tbl_Synth_LFO2)
     {
         case 0: /* LFO2_Period */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_period, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, (float) Cur_SynthParam->lfo2_period * 2, 8, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_period, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, (float) Cur_SynthParam->lfo2_period * 2, 8, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_period;
             break;
 
         case 1: /* Lfo2->osc1 pd */
             if(Allow_Phase_Distortion_OSC1)
             {
-                Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc1_pw, Allow_All);
+                Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc1_pw, Allow_All);
             }
             else
             {
-                Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc1_pw, FALSE);
+                Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc1_pw, FALSE);
             }
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc1_pw;
             break;
 
         case 2: /* Lfo2->osc2 pd */
             if(Allow_Phase_Distortion_OSC2)
             {
-                Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc2_pw, Allow_All);
+                Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc2_pw, Allow_All);
             }
             else
             {
-                Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc2_pw, FALSE);
+                Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc2_pw, FALSE);
             }
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc2_pw;
             break;
 
         case 3: /* Lfo2->osc1 pitch */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc1_pitch, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc1_pitch, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc1_pitch;
             break;
 
         case 4: /* Lfo2->osc2 pitch */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc2_pitch, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc2_pitch, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc2_pitch;
             break;
 
         case 5: /* Lfo2->osc1 volume */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc1_volume, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc1_volume, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc1_volume;
             break;
 
         case 6: /* Lfo2->osc2 volume */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_osc2_volume, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_osc2_volume, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_osc2_volume;
             break;
 
         case 7: /* Lfo2->vcf cutoff */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_vcf_cutoff, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_vcf_cutoff, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_vcf_cutoff;
             break;
 
         case 8: /* Lfo2->vcf resonance */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_vcf_resonance, Allow_All);
-            outfloat_small(311 + 167, 559 - 1, ((float) Cur_SynthParam->lfo2_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_vcf_resonance, Allow_All);
+            outfloat_small(311 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->lfo2_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_vcf_resonance;
             break;
 
         case 9: /* LFO2_Attack */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_attack / 512, Allow_All);
-            outlong_small(311 + 167, 559 - 1, (Cur_SynthParam->lfo2_attack * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_attack / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 41) - 1, (Cur_SynthParam->lfo2_attack * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_attack / 512;
             break;
 
         case 10: /* LFO2_Decay */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_decay / 512, Allow_All);
-            outlong_small(311 + 167, 559 - 1, (Cur_SynthParam->lfo2_decay * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_decay / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 41) - 1, (Cur_SynthParam->lfo2_decay * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_decay / 512;
             break;
 
         case 11: /* LFO2_Sustain */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_sustain, Allow_All);
-            outlong_small(311 + 167, 559 - 1, (Cur_SynthParam->lfo2_sustain * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_sustain, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 41) - 1, (Cur_SynthParam->lfo2_sustain * 100) / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_sustain;
             break;
 
         case 12: /* LFO2_Release */
-            Realslider(311, 559 - 1, Cur_SynthParam->lfo2_release / 512, Allow_All);
-            outlong_small(311 + 167, 559 - 1, (Cur_SynthParam->lfo2_release * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(311, (Cur_Height - 41) - 1, Cur_SynthParam->lfo2_release / 512, Allow_All);
+            outlong_small(311 + 167, (Cur_Height - 41) - 1, (Cur_SynthParam->lfo2_release * 100) / 512 / 128, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_LFO2 = Cur_SynthParam->lfo2_release / 512;
             break;
     }
@@ -1657,76 +1657,76 @@ void Actualize_SynthParSlider(void)
         case 0: /* Env1->osc1 pd */
             if(Allow_Phase_Distortion_OSC1)
             {
-                Realslider(563, 487 - 1, Cur_SynthParam->env1_osc1_pw, Allow_All);
+                Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc1_pw, Allow_All);
             }
             else
             {
-                Realslider(563, 487 - 1, Cur_SynthParam->env1_osc1_pw, FALSE);
+                Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc1_pw, FALSE);
             }
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc1_pw;
             break;
 
         case 1: /* Env1->osc2 pd */
             if(Allow_Phase_Distortion_OSC2)
             {
-                Realslider(563, 487 - 1, Cur_SynthParam->env1_osc2_pw, Allow_All);
+                Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc2_pw, Allow_All);
             }
             else
             {
-                Realslider(563, 487 - 1, Cur_SynthParam->env1_osc2_pw, FALSE);
+                Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc2_pw, FALSE);
             }
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc2_pw;
             break;
 
         case 2: /* Env1->osc1 pitch */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_osc1_pitch, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc1_pitch, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc1_pitch;
             break;
 
         case 3: /* Env1->osc2 pitch */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_osc2_pitch, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc2_pitch, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc2_pitch;
             break;
 
         case 4: /* Env1->osc1 volume */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_osc1_volume, Allow_All);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc1_volume, Allow_All);
             if(Cur_SynthParam->env1_osc1_volume != 64)
             {
-                outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(563 + 167, 487 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(563 + 167, (Cur_Height - 113) - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc1_volume;
             break;
 
         case 5: /* Env1->osc2 volume */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_osc2_volume, Allow_All);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_osc2_volume, Allow_All);
             if(Cur_SynthParam->env1_osc2_volume != 64)
             {
-                outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(563 + 167, 487 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(563 + 167, (Cur_Height - 113) - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_ENV1 = Cur_SynthParam->env1_osc2_volume;
             break;
 
         case 6: /* Env1->vcf cutoff */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_vcf_cutoff, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_vcf_cutoff, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_vcf_cutoff;
             break;
 
         case 7: /* Env1->vcf resonance */
-            Realslider(563, 487 - 1, Cur_SynthParam->env1_vcf_resonance, Allow_All);
-            outfloat_small(563 + 167, 487 - 1, ((float) Cur_SynthParam->env1_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 113) - 1, Cur_SynthParam->env1_vcf_resonance, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 113) - 1, ((float) Cur_SynthParam->env1_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV1 = Cur_SynthParam->env1_vcf_resonance;
             break;
     }
@@ -1738,76 +1738,76 @@ void Actualize_SynthParSlider(void)
         case 0: /* Env2->osc1 pw */
             if(Allow_Phase_Distortion_OSC1)
             {
-                Realslider(563, 523 - 1, Cur_SynthParam->env2_osc1_pw, Allow_All);
+                Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc1_pw, Allow_All);
             }
             else
             {
-                Realslider(563, 523 - 1, Cur_SynthParam->env2_osc1_pw, FALSE);
+                Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc1_pw, FALSE);
             }
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc1_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc1_pw;
             break;
 
         case 1: /* Env2->osc2 pw */
             if(Allow_Phase_Distortion_OSC2)
             {
-                Realslider(563, 523 - 1, Cur_SynthParam->env2_osc2_pw, Allow_All);
+                Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc2_pw, Allow_All);
             }
             else
             {
-                Realslider(563, 523 - 1, Cur_SynthParam->env2_osc2_pw, FALSE);
+                Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc2_pw, FALSE);
             }
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc2_pw - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc2_pw;
             break;
 
         case 2: /* Env2->osc1 pitch */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_osc1_pitch, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc1_pitch, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc1_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc1_pitch;
             break;
 
         case 3: /* Env2->osc2 pitch */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_osc2_pitch, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc2_pitch, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc2_pitch - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc2_pitch;
             break;
 
         case 4: /* Env2->osc1 volume */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_osc1_volume, Allow_All);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc1_volume, Allow_All);
             if(Cur_SynthParam->env2_osc1_volume != 64)
             {
-                outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc1_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(563 + 167, 523 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(563 + 167, (Cur_Height - 77) - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc1_volume;
             break;
 
         case 5: /* Env2->osc2 volume */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_osc2_volume, Allow_All);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_osc2_volume, Allow_All);
             if(Cur_SynthParam->env2_osc2_volume != 64)
             {
-                outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_osc2_volume - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(563 + 167, 523 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(563 + 167, (Cur_Height - 77) - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_ENV2 = Cur_SynthParam->env2_osc2_volume;
             break;
 
         case 6: /* Env2->vcf cutoff */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_vcf_cutoff, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_vcf_cutoff, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_vcf_cutoff - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_vcf_cutoff;
             break;
 
         case 7: /* Env2->vcf resonance */
-            Realslider(563, 523 - 1, Cur_SynthParam->env2_vcf_resonance, Allow_All);
-            outfloat_small(563 + 167, 523 - 1, ((float) Cur_SynthParam->env2_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 77) - 1, Cur_SynthParam->env2_vcf_resonance, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 77) - 1, ((float) Cur_SynthParam->env2_vcf_resonance - 64.0f) * 1.5625f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_ENV2 = Cur_SynthParam->env2_vcf_resonance;
             break;
     }
@@ -1820,32 +1820,32 @@ void Actualize_SynthParSlider(void)
             if((Allow_Phase_Distortion_OSC1 || Allow_Phase_Distortion_OSC2) ||
                Pos_Tbl_Synth_Misc > 0)
             {
-                Realslider(563, 559 - 1, Cur_SynthParam->ptc_glide, Allow_All);
+                Realslider(563, (Cur_Height - 41) - 1, Cur_SynthParam->ptc_glide, Allow_All);
             }
             else
             {
-                Realslider(563, 559 - 1, Cur_SynthParam->ptc_glide, FALSE);
+                Realslider(563, (Cur_Height - 41) - 1, Cur_SynthParam->ptc_glide, FALSE);
             }
             if(Cur_SynthParam->ptc_glide)
             {
-                outfloat_small(563 + 167, 559 - 1, ((float) Cur_SynthParam->ptc_glide) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+                outfloat_small(563 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->ptc_glide) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             }
             else
             {
-                Gui_Draw_Button_Box(563 + 167, 559 - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
+                Gui_Draw_Button_Box(563 + 167, (Cur_Height - 41) - 1, 44, 16, "off", BUTTON_NORMAL | BUTTON_DISABLED);           
             }
             csynth_slv_Misc = Cur_SynthParam->ptc_glide;
             break;
 
         case 1: /* Misc. Global volume */
-            Realslider(563, 559 - 1, Cur_SynthParam->glb_volume, Allow_All);
-            outfloat_small(563 + 167, 559 - 1, ((float) Cur_SynthParam->glb_volume) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 41) - 1, Cur_SynthParam->glb_volume, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 41) - 1, ((float) Cur_SynthParam->glb_volume) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_Misc = Cur_SynthParam->glb_volume;
             break;
 
         case 2: /* Misc. Distortion */
-            Realslider(563, 559 - 1, Cur_SynthParam->disto, Allow_All);
-            outfloat_small(563 + 167, 559 - 1, (((float) Cur_SynthParam->disto)) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
+            Realslider(563, (Cur_Height - 41) - 1, Cur_SynthParam->disto, Allow_All);
+            outfloat_small(563 + 167, (Cur_Height - 41) - 1, (((float) Cur_SynthParam->disto)) * 0.78125f, 1, 45, BUTTON_NORMAL | BUTTON_DISABLED);
             csynth_slv_Misc = Cur_SynthParam->disto;
             break;
     }

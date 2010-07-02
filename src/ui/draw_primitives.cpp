@@ -374,8 +374,8 @@ void Push_Update_Rect(int x, int y, int width, int height)
         {
             if(x < 0) x = 0;
             if(y < 0) y = 0;
-            if((x + width) > SCREEN_WIDTH - 1) width = (SCREEN_WIDTH - 1) - x;
-            if((y + height) > SCREEN_HEIGHT - 1) height = (SCREEN_HEIGHT - 1) - y;
+            if((x + width) > Cur_Width - 1) width = (Cur_Width - 1) - x;
+            if((y + height) > Cur_Height - 1) height = (Cur_Height - 1) - y;
             Update_Stack[Nbr_Update_Rects].x = x;
             Update_Stack[Nbr_Update_Rects].y = y;
             Update_Stack[Nbr_Update_Rects].w = width + 1;

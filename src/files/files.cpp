@@ -139,6 +139,8 @@ void Init_Tracker_Context_After_ModLoad(void)
     Reset_Tracks_To_Render();
 
     Refresh_UI_Context();
+    Unselect_Selection();
+
 #endif
 
 }

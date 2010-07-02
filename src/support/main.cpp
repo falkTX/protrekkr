@@ -106,6 +106,10 @@ int Keyboard_Notes_Type[256];
 int Keyboard_Notes_Bound[256];
 int Key_Unicode;
 char FullScreen = FALSE;
+int Cur_Left = -1;
+int Cur_Top = -1;
+int Cur_Width = SCREEN_WIDTH;
+int Cur_Height = SCREEN_HEIGHT;
 char AutoSave;
 char Window_Title[256];
 extern int gui_pushed;
@@ -369,14 +373,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     int Uni_Trans;
     FILE *KbFile;
     int in_note;
+    char Win_Coords[64];
     Uint32 ExePath_Size = MAX_PATH;
 
 #if defined(__MACOSX__)
     Uint32 Path_Length;
 #endif
-
-    SDL_putenv("SDL_VIDEO_WINDOW_POS=center");
-    SDL_putenv("SDL_VIDEO_CENTERED=1");
 
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0)
     {
@@ -388,9 +390,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     // Show the restrictions:
     char *NoMidi = "";
 
-    NoMidi = "";
 #if defined(__NO_MIDI__)
-    NoMidi = "no midi";
+    NoMidi = "No midi";
 #endif
 
     if(strlen(NoMidi))
@@ -491,6 +492,9 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         exit(0);
     }
 
+//    SDL_putenv("SDL_VIDEO_WINDOW_POS=default");
+ //   SDL_putenv("SDL_VIDEO_CENTERED=0");
+
     if((Keyboards = XML_get_string("files", "file", "keyboards", "value")) != NULL)
     {
         memset(KbFileNameToLoad, 0, sizeof(KbFileNameToLoad));
@@ -566,7 +570,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Ptk_Palette[0].g = 0;
     Ptk_Palette[0].b = 0;
 
-    if(!Switch_FullScreen())
+    if(!Switch_FullScreen(Cur_Width, Cur_Height))
     {
         Message_Error("Can't open screen.");
         SDL_Quit();
@@ -601,7 +605,7 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     int delay_ms = 0;
 
     env_var = getenv("PROTREKKR_MAIN_LOOP_DELAY");
-    if (env_var)
+    if(env_var)
     {
         delay_ms = atol(env_var);
     }
@@ -609,8 +613,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     {
         delay_ms = 40;
     }
-    if (delay_ms < 10) delay_ms = 10;
-    if (delay_ms > 1000) delay_ms = 1000;
+    if(delay_ms < 10) delay_ms = 10;
+    if(delay_ms > 1000) delay_ms = 1000;
 #endif
 
     Set_Phony_Palette();
@@ -651,7 +655,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
             switch(Events[i].type)
             {
                 case SDL_KEYDOWN:
-
                     Key_Unicode = Events[i].key.keysym.unicode;
 
                     Symbol = Events[i].key.keysym.sym;
@@ -713,13 +716,12 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         if(Keys[SDLK_RETURN])
                         {
                             FullScreen ^= TRUE;
-                            Switch_FullScreen();
+                            Switch_FullScreen(Cur_Width, Cur_Height);
                         }
                     }
                     break;
 
                 case SDL_KEYUP:
-
                     kb_evnt = (SDL_KeyboardEvent *) &Events[i];
                     if(kb_evnt->state == SDL_RELEASED)
                     {
@@ -828,6 +830,13 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                     }
                     break;
 
+                case SDL_VIDEORESIZE:
+                    // Nullify it
+                    sprintf(Win_Coords, "SDL_VIDEO_WINDOW_POS=");
+                    SDL_putenv(Win_Coords);
+                    Switch_FullScreen(Events[i].resize.w, Events[i].resize.h);
+                    break;
+
                 case SDL_ACTIVEEVENT:
                     if(Events[i].active.gain)
                     {
@@ -910,22 +919,62 @@ void Message_Error(char *Message)
 
 // ------------------------------------------------------
 // Swap window/fullscreen mode
-int Switch_FullScreen(void)
+int Switch_FullScreen(int Width, int Height)
 {
     Env_Change = TRUE;
-    if((Main_Screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                       SCREEN_BPP, SDL_SWSURFACE | (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+    if(Width < SCREEN_WIDTH) Width = SCREEN_WIDTH;
+    if(Height < SCREEN_HEIGHT) Height = SCREEN_HEIGHT;
+
+    if(FullScreen)
     {
-        return(FALSE);
+        Width = SCREEN_WIDTH;
+        Height = SCREEN_HEIGHT;
+        if((Main_Screen = SDL_SetVideoMode(Width, Height,
+                                           SCREEN_BPP,
+                                           SDL_SWSURFACE |
+                                           (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+        {
+            return(FALSE);
+        }
     }
+    else
+    {
+        if((Main_Screen = SDL_SetVideoMode(Width, Height,
+                                           SCREEN_BPP,
+                                           SDL_RESIZABLE |
+                                           SDL_SWSURFACE |
+                                           (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
+        {
+            return(FALSE);
+        }
+    }
+    Cur_Width = Width;
+    Cur_Height = Height;
+    CONSOLE_WIDTH = Cur_Width;
+    CHANNELS_WIDTH = Cur_Width - 20;
+    CONSOLE_HEIGHT = Cur_Height;
+    CONSOLE_HEIGHT2 = Cur_Height;
+    MAX_PATT_SCREEN_X = Cur_Width - 19;
+    Set_Pattern_Size();
+    restx = CONSOLE_WIDTH - 640;
+    resty = CONSOLE_HEIGHT - 492;
+    CONSOLE_HEIGHT2 = CONSOLE_HEIGHT - 42;
+    fsize = 638 + restx;
+    Visible_Columns = CONSOLE_WIDTH / 128;
+
     // Obtain SDL window
     SDL_GetWMInfo(&WMInfo);
 
 #if defined(__WIN32__)
+    HICON hIcon;
     Main_Window = WMInfo.window;
+    HINSTANCE ApphInstance = GetModuleHandle(0);
+    hIcon = LoadIcon(ApphInstance, MAKEINTRESOURCE(IDI_ICON1));
     // Set the icon of the window
-    SetClassLong(Main_Window, GCL_HICON,
-                 (LONG) LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)));
+    SetClassLong(Main_Window, GCL_HICON, (LONG) hIcon);
+    SetClassLong(Main_Window, GCL_HICONSM, (LONG) hIcon);
+    SendMessage(Main_Window, WM_SETICON, ICON_SMALL, (LONG) hIcon);
+    SendMessage(Main_Window, WM_SETICON, ICON_BIG, (LONG) hIcon);
 #endif
 
     Init_UI();

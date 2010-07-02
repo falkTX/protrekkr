@@ -62,24 +62,24 @@ void Draw_303_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_TB303_EDIT);
 
-    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("303s Gear");
 
-    Gui_Draw_Button_Box(8, 466, 64, 16, "Reset Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(8, 484, 64, 16, "Clear Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(8, 502, 64, 16, "Rnd.NoteOn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(8, 520, 64, 16, "Rand.Tones", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(8, 538, 64, 16, "Rand.Flags", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 134), 64, 16, "Reset Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 116), 64, 16, "Clear Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 98), 64, 16, "Rnd.NoteOn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 80), 64, 16, "Rand.Tones", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 62), 64, 16, "Rand.Flags", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(600, 502, 64, 16, "All Notes Up", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(668, 502, 64, 16, "All Notes Dn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(600, 522, 64, 16, "Copy Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(600, 540, 64, 16, "Paste Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, (Cur_Height - 98), 64, 16, "All Notes Up", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(668, (Cur_Height - 98), 64, 16, "All Notes Dn", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, (Cur_Height - 78), 64, 16, "Copy Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, (Cur_Height - 60), 64, 16, "Paste Patt.", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Gui_Draw_Button_Box(600, 462, 56, 16, "Patt. Name", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(658, 462, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(600, (Cur_Height - 138), 56, 16, "Patt. Name", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(658, (Cur_Height - 138), 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
-    Skincopy(80, 460, 0, 0, 510, 114);
+    Skincopy(80, (Cur_Height - 140), 0, 0, 510, 114);
 
     Actualize_303_Ed(0);
 }
@@ -90,88 +90,88 @@ void Actualize_303_Ed(char gode)
     
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
-        if(gode == 0 || gode == 1) number303(tb303[sl3].patternlength[tb303[sl3].selectedpattern], 118, 556);
+        if(gode == 0 || gode == 1) number303(tb303[sl3].patternlength[tb303[sl3].selectedpattern], 118, (Cur_Height - 44));
 
         // Selected bassline
         if(gode == 0)
         {
             if(sl3)
             {
-                Skincopy(577, 542, 138, 119, 3, 3);
-                Skincopy(558, 542, 143, 119, 3, 3);
+                Skincopy(577, (Cur_Height - 58), 138, 119, 3, 3);
+                Skincopy(558, (Cur_Height - 58), 143, 119, 3, 3);
             }
             else
             {
-                Skincopy(558, 542, 138, 119, 3, 3);
-                Skincopy(577, 542, 143, 119, 3, 3);
+                Skincopy(558, (Cur_Height - 58), 138, 119, 3, 3);
+                Skincopy(577, (Cur_Height - 58), 143, 119, 3, 3);
             }
 
             // Make sure we display the right boundaries
             if(editsteps[sl3][tb303[sl3].selectedpattern] > tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1) editsteps[sl3][tb303[sl3].selectedpattern] = tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1;
 
-            number303(editsteps[sl3][tb303[sl3].selectedpattern] + 1, 486, 486);
+            number303(editsteps[sl3][tb303[sl3].selectedpattern] + 1, 486, (Cur_Height - 114));
             // Displaying pattern selection leds
             // Bank [A-D]
             int tbank303 = tb303[sl3].selectedpattern / 8;
             tbank303 *= 15;
             // Restoring background
-            Skincopy(86, 526, 6, 66, 59, 14);
+            Skincopy(86, (Cur_Height - 74), 6, 66, 59, 14);
             // Light the bank
-            Skincopy(86 + tbank303, 526, 15 + tbank303, 117, 14, 14);
+            Skincopy(86 + tbank303, (Cur_Height - 74), 15 + tbank303, 117, 14, 14);
             // Displaying pattern selection leds
             // Pattern [1-8]
             int tpat303 = tb303[sl3].selectedpattern - (tb303[sl3].selectedpattern / 8) * 8;
             // Restoring background
-            Skincopy(86, 484, 6, 24, 59, 30);
+            Skincopy(86, (Cur_Height - 116), 6, 24, 59, 30);
             // Light the bank
             if(tpat303 < 4)
             {
-                Skincopy(86 + tpat303 * 15, 484, 75 + tpat303 * 15, 117, 14, 14);
+                Skincopy(86 + tpat303 * 15, (Cur_Height - 116), 75 + tpat303 * 15, 117, 14, 14);
             }
             else
             {
                 tpat303 -= 4;
-                Skincopy(86 + tpat303 * 15, 499, 75 + tpat303 * 15, 132, 14, 14);
+                Skincopy(86 + tpat303 * 15, (Cur_Height - 101), 75 + tpat303 * 15, 132, 14, 14);
             }
         }
 
         // Displaying waveform switch
         if(gode == 0 || gode == 2)
         {
-            if(tb303[sl3].waveform) Skincopy(180, 472, 137, 135, 13, 8);
-            else Skincopy(180, 472, 137, 125, 13, 8);
+            if(tb303[sl3].waveform) Skincopy(180, (Cur_Height - 128), 137, 135, 13, 8);
+            else Skincopy(180, (Cur_Height - 128), 137, 125, 13, 8);
         }
 
         // Draw 303 Knobs
-        if(gode == 0 || gode == 3) knob(229, 476, tb303[sl3].tune / 2);
-        if(gode == 0 || gode == 4) knob(262, 476, tb303[sl3].cutoff / 2);
-        if(gode == 0 || gode == 5) knob(295, 476, tb303[sl3].resonance / 2);
-        if(gode == 0 || gode == 6) knob(328, 476, tb303[sl3].envmod / 2);
-        if(gode == 0 || gode == 7) knob(361, 476, tb303[sl3].decay / 2);
-        if(gode == 0 || gode == 8) knob(394, 476, tb303[sl3].accent / 2);
+        if(gode == 0 || gode == 3) knob(229, (Cur_Height - 124), tb303[sl3].tune / 2);
+        if(gode == 0 || gode == 4) knob(262, (Cur_Height - 124), tb303[sl3].cutoff / 2);
+        if(gode == 0 || gode == 5) knob(295, (Cur_Height - 124), tb303[sl3].resonance / 2);
+        if(gode == 0 || gode == 6) knob(328, (Cur_Height - 124), tb303[sl3].envmod / 2);
+        if(gode == 0 || gode == 7) knob(361, (Cur_Height - 124), tb303[sl3].decay / 2);
+        if(gode == 0 || gode == 8) knob(394, (Cur_Height - 124), tb303[sl3].accent / 2);
 
         // Restoring notes background
         if(gode == 0 || gode == 9)
         {
             // Restore it
-            Skincopy(88 + 80, 66 + 460, 88, 66, 195, 40);
+            Skincopy(88 + 80, 66 + (Cur_Height - 140), 88, 66, 195, 40);
     
             // Light a note
             switch(tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]])
             {
-                case 0: Skincopy(88 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 1: Skincopy(101 + 80, 66 + 460, 301, 119, 13, 13); break;
-                case 2: Skincopy(114 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 3: Skincopy(127 + 80, 66 + 460, 301, 119, 13, 13); break;
-                case 4: Skincopy(140 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 5: Skincopy(166 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 6: Skincopy(179 + 80, 66 + 460, 301, 119, 13, 13); break;
-                case 7: Skincopy(191 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 8: Skincopy(204 + 80, 66 + 460, 301, 119, 13, 13); break;
-                case 9: Skincopy(217 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 10: Skincopy(230 + 80, 66 + 460, 301, 119, 13, 13); break;
-                case 11: Skincopy(243 + 80, 91 + 460, 301, 119, 13, 13); break;
-                case 12: Skincopy(269 + 80, 91 + 460, 301, 119, 13, 13); break;
+                case 0: Skincopy(88 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 1: Skincopy(101 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 2: Skincopy(114 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 3: Skincopy(127 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 4: Skincopy(140 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 5: Skincopy(166 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 6: Skincopy(179 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 7: Skincopy(191 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 8: Skincopy(204 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 9: Skincopy(217 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 10: Skincopy(230 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 11: Skincopy(243 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 12: Skincopy(269 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
             }
         }
 
@@ -180,13 +180,13 @@ void Actualize_303_Ed(char gode)
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause)
             {
-                Skincopy(402, 521, 138, 119, 3, 3);
-                Skincopy(439, 521, 143, 119, 3, 3);
+                Skincopy(402, (Cur_Height - 79), 138, 119, 3, 3);
+                Skincopy(439, (Cur_Height - 79), 143, 119, 3, 3);
             }
             else
             {
-                Skincopy(402, 521, 143, 119, 3, 3);
-                Skincopy(439, 521, 138, 119, 3, 3);
+                Skincopy(402, (Cur_Height - 79), 143, 119, 3, 3);
+                Skincopy(439, (Cur_Height - 79), 138, 119, 3, 3);
             }
         }
 
@@ -195,11 +195,11 @@ void Actualize_303_Ed(char gode)
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag)
             {
-                Skincopy(456, 543, 138, 119, 3, 3);
+                Skincopy(456, (Cur_Height - 57), 138, 119, 3, 3);
             }
             else
             {
-                Skincopy(456, 543, 143, 119, 3, 3);
+                Skincopy(456, (Cur_Height - 57), 143, 119, 3, 3);
             }
         }
 
@@ -208,11 +208,11 @@ void Actualize_303_Ed(char gode)
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag)
             {
-                Skincopy(431, 543, 138, 119, 3, 3);
+                Skincopy(431, (Cur_Height - 57), 138, 119, 3, 3);
             }
             else
             {
-                Skincopy(431, 543, 143, 119, 3, 3);
+                Skincopy(431, (Cur_Height - 57), 143, 119, 3, 3);
             }
         }
 
@@ -221,11 +221,11 @@ void Actualize_303_Ed(char gode)
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag)
             {
-                Skincopy(406, 543, 138, 119, 3, 3);
+                Skincopy(406, (Cur_Height - 57), 138, 119, 3, 3);
             }
             else
             {
-                Skincopy(406, 543, 143, 119, 3, 3);
+                Skincopy(406, (Cur_Height - 57), 143, 119, 3, 3);
             }
         }
 
@@ -234,11 +234,11 @@ void Actualize_303_Ed(char gode)
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag)
             {
-                Skincopy(381, 543, 138, 119, 3, 3);
+                Skincopy(381, (Cur_Height - 57), 138, 119, 3, 3);
             }
             else
             {
-                Skincopy(381, 543, 143, 119, 3, 3);
+                Skincopy(381, (Cur_Height - 57), 143, 119, 3, 3);
             }
         }
 
@@ -246,10 +246,10 @@ void Actualize_303_Ed(char gode)
         if(gode == 0 || gode == 15)
         {
             // volume background
-            Skincopy(529, 485, 449, 25, 19, 88);
+            Skincopy(529, (Cur_Height - 115), 449, 25, 19, 88);
             int tb303v = (int) (tb303engine[sl3].tbVolume * 72.0f);
             // Volume slider
-            Skincopy(531, 558 - tb303v, 0, 116, 13, 11);
+            Skincopy(531, (Cur_Height - 42) - tb303v, 0, 116, 13, 11);
         }
 
         if(gode == 0 || gode == 17)
@@ -263,11 +263,11 @@ void Actualize_303_Ed(char gode)
 
             if(snamesel == INPUT_303_PATTERN)
             {
-                Gui_Draw_Button_Box(600, 480, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+                Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(600, 480, 164, 16, tb303[sl3].pattern_name[tb303[sl3].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
+                Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tb303[sl3].pattern_name[tb303[sl3].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
     }
@@ -308,7 +308,7 @@ void Mouse_Right_303_Ed(void )
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         // Volume Slider
-        if(zcheckMouse(529, 485, 19, 88))
+        if(zcheckMouse(529, (Cur_Height - 115), 19, 88))
         {
             tb303engine[sl3].tbVolume = 0.5f;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -316,7 +316,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // Tune Knob
-        if(zcheckMouse(229, 476, 24, 24))
+        if(zcheckMouse(229, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].tune = tempz;
@@ -327,7 +327,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // CutOff Knob
-        if(zcheckMouse(262, 476, 24, 24))
+        if(zcheckMouse(262, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].cutoff = tempz;
@@ -338,7 +338,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // Reso knob
-        if(zcheckMouse(295, 476, 24, 24))
+        if(zcheckMouse(295, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].resonance = tempz;
@@ -349,7 +349,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // Envmod knob
-        if(zcheckMouse(328, 476, 24, 24))
+        if(zcheckMouse(328, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].envmod = tempz;
@@ -360,7 +360,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // Decay knob
-        if(zcheckMouse(361, 476, 24, 24))
+        if(zcheckMouse(361, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].decay = tempz;
@@ -371,7 +371,7 @@ void Mouse_Right_303_Ed(void )
         }
 
         // Accent knob
-        if(zcheckMouse(394, 476, 24, 24))
+        if(zcheckMouse(394, (Cur_Height - 124), 24, 24))
         {
             int tempz = 64;
             tb303[sl3].accent = tempz;
@@ -388,7 +388,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         // Volume Knob
-        if(zcheckMouse(529, 485, 19, 88))
+        if(zcheckMouse(529, (Cur_Height - 115), 19, 88))
         {
             float froll = roll_amount / 86.0f;
             float breakvol = tb303engine[sl3].tbVolume + froll;
@@ -400,7 +400,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // Tune Knob
-        if(zcheckMouse(229, 476, 24, 24))
+        if(zcheckMouse(229, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].tune + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -413,7 +413,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // CutOff Knob
-        if(zcheckMouse(262, 476, 24, 24))
+        if(zcheckMouse(262, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].cutoff + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -426,7 +426,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // Reso knob
-        if(zcheckMouse(295, 476, 24, 24))
+        if(zcheckMouse(295, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].resonance + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -439,7 +439,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // Envmod knob
-        if(zcheckMouse(328, 476, 24, 24))
+        if(zcheckMouse(328, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].envmod + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -452,7 +452,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // Decay knob
-        if(zcheckMouse(361, 476, 24, 24))
+        if(zcheckMouse(361, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].decay + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -465,7 +465,7 @@ void Mouse_Wheel_303_Ed(int roll_amount)
         }
 
         // Accent knob
-        if(zcheckMouse(394, 476, 24, 24))
+        if(zcheckMouse(394, (Cur_Height - 124), 24, 24))
         {
             int tempz = tb303[sl3].accent + roll_amount;
             if(tempz < 0) tempz = 0;
@@ -484,7 +484,7 @@ void Mouse_Left_303_Ed(void)
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         // Step Forward
-        if(zcheckMouse(479, 550, 25, 16))
+        if(zcheckMouse(479, (Cur_Height - 50), 25, 16))
         {
             editsteps[sl3][tb303[sl3].selectedpattern]++;
             if(editsteps[sl3][tb303[sl3].selectedpattern] > tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1)
@@ -496,7 +496,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Step Back
-        if(zcheckMouse(484, 522, 15, 10))
+        if(zcheckMouse(484, (Cur_Height - 78), 15, 10))
         {
             if(editsteps[sl3][tb303[sl3].selectedpattern] == 0) editsteps[sl3][tb303[sl3].selectedpattern] = tb303[sl3].patternlength[tb303[sl3].selectedpattern] - 1;
             else editsteps[sl3][tb303[sl3].selectedpattern]--;
@@ -505,7 +505,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Pattern Steps +1
-        if(zcheckMouse(135, 555, 11, 9) &&
+        if(zcheckMouse(135, (Cur_Height - 45), 11, 9) &&
            tb303[sl3].patternlength[tb303[sl3].selectedpattern] < 16)
         {
             tb303[sl3].patternlength[tb303[sl3].selectedpattern]++;
@@ -514,7 +514,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Pattern Steps -1
-        if(zcheckMouse(135, 564, 11, 9) &&
+        if(zcheckMouse(135, (Cur_Height - 36), 11, 9) &&
            tb303[sl3].patternlength[tb303[sl3].selectedpattern] > 1)
         {
             tb303[sl3].patternlength[tb303[sl3].selectedpattern]--;
@@ -527,7 +527,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Pause/Note button
-        if(zcheckMouse(450, 518, 15, 10))
+        if(zcheckMouse(450, (Cur_Height - 82), 15, 10))
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].pause)
             {
@@ -542,7 +542,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Glide button
-        if(zcheckMouse(454, 550, 10, 15))
+        if(zcheckMouse(454, (Cur_Height - 50), 10, 15))
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].slide_flag)
             {
@@ -557,7 +557,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Accent button
-        if(zcheckMouse(428, 550, 10, 15))
+        if(zcheckMouse(428, (Cur_Height - 50), 10, 15))
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].accent_flag)
             {
@@ -572,7 +572,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Transpose up button
-        if(zcheckMouse(403, 550, 10, 15))
+        if(zcheckMouse(403, (Cur_Height - 50), 10, 15))
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposeup_flag)
             {
@@ -587,7 +587,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Transpose down button
-        if(zcheckMouse(378, 550, 10, 15))
+        if(zcheckMouse(378, (Cur_Height - 50), 10, 15))
         {
             if(tb303[sl3].flag[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]].transposedown_flag)
             {
@@ -602,7 +602,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Sawtooth/Square switching
-        if(zcheckMouse(177, 471, 19, 10))
+        if(zcheckMouse(177, (Cur_Height - 129), 19, 10))
         {
             tb303[sl3].waveform ^= 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -610,80 +610,80 @@ void Mouse_Left_303_Ed(void)
         }
 
         // NoteOn/Off buttons
-        if(zcheckMouse(87 + 80, 550, 17, 15))
+        if(zcheckMouse(87 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(100 + 80, 524, 17, 15))
+        if(zcheckMouse(100 + 80, (Cur_Height - 76), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(113 + 80, 550, 17, 15))
+        if(zcheckMouse(113 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 2;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(126 + 80, 524, 17, 15))
+        if(zcheckMouse(126 + 80, (Cur_Height - 76), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 3;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(139 + 80, 550, 17, 15))
+        if(zcheckMouse(139 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 4;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(165 + 80, 550, 17, 15))
+        if(zcheckMouse(165 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 5;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(178 + 80, 524, 17, 15))
+        if(zcheckMouse(178 + 80, (Cur_Height - 76), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 6;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(190 + 80, 550, 17, 15))
+        if(zcheckMouse(190 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 7;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(203 + 80, 524, 17, 15))
+        if(zcheckMouse(203 + 80, (Cur_Height - 76), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 8;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(216 + 80, 550, 17, 15))
+        if(zcheckMouse(216 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 9;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
 
-        if(zcheckMouse(229 + 80, 524, 87, 15))
+        if(zcheckMouse(229 + 80, (Cur_Height - 76), 87, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 10;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(242 + 80, 550, 17, 15))
+        if(zcheckMouse(242 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 11;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 9;
         }
-        if(zcheckMouse(268 + 80, 550, 17, 15))
+        if(zcheckMouse(268 + 80, (Cur_Height - 50), 17, 15))
         {
             tb303[sl3].tone[tb303[sl3].selectedpattern][editsteps[sl3][tb303[sl3].selectedpattern]] = 12;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -691,56 +691,56 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Pattern selection buttons
-        if(zcheckMouse(86, 483, 16, 16))
+        if(zcheckMouse(86, (Cur_Height - 117), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(100, 483, 16, 16))
+        if(zcheckMouse(100, (Cur_Height - 117), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(114, 483, 16, 16))
+        if(zcheckMouse(114, (Cur_Height - 117), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 2;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(130, 483, 16, 16))
+        if(zcheckMouse(130, (Cur_Height - 117), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 3;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(86, 498, 16, 16))
+        if(zcheckMouse(86, (Cur_Height - 102), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 4;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(100, 498, 16, 16))
+        if(zcheckMouse(100, (Cur_Height - 102), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 5;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(114, 498, 16, 16))
+        if(zcheckMouse(114, (Cur_Height - 102), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 6;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(130, 498, 16, 16))
+        if(zcheckMouse(130, (Cur_Height - 102), 16, 16))
         {
             char gcp = (tb303[sl3].selectedpattern / 8) * 8;
             tb303[sl3].selectedpattern = gcp + 7;
@@ -749,25 +749,25 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Bank selection buttons
-        if(zcheckMouse(86, 525, 16, 16))
+        if(zcheckMouse(86, (Cur_Height - 75), 16, 16))
         {
             tb303[sl3].selectedpattern = (tb303[sl3].selectedpattern - (tb303[sl3].selectedpattern / 8) * 8);
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(100, 525, 16, 16))
+        if(zcheckMouse(100, (Cur_Height - 75), 16, 16))
         {
             tb303[sl3].selectedpattern = ((tb303[sl3].selectedpattern - (tb303[sl3].selectedpattern / 8) * 8)) + 8;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(114, 525, 16, 16))
+        if(zcheckMouse(114, (Cur_Height - 75), 16, 16))
         {
             tb303[sl3].selectedpattern = ((tb303[sl3].selectedpattern - (tb303[sl3].selectedpattern / 8) * 8)) + 16;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
-        if(zcheckMouse(130, 525, 16, 16))
+        if(zcheckMouse(130, (Cur_Height - 75), 16, 16))
         {
             tb303[sl3].selectedpattern = ((tb303[sl3].selectedpattern - (tb303[sl3].selectedpattern / 8) * 8)) + 24;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -775,14 +775,14 @@ void Mouse_Left_303_Ed(void)
         }
 
         // 303 #1
-        if(zcheckMouse(553, 529, 15, 12))
+        if(zcheckMouse(553, (Cur_Height - 71), 15, 12))
         {
             sl3 = 0;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 0;
         }
         // 303 #2
-        if(zcheckMouse(573, 529, 15, 12))
+        if(zcheckMouse(573, (Cur_Height - 71), 15, 12))
         {
             sl3 = 1;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
@@ -790,7 +790,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // rand tones
-        if(zcheckMouse(8, 520, 64, 16))
+        if(zcheckMouse(8, (Cur_Height - 80), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
             {
@@ -801,7 +801,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // rand flags
-        if(zcheckMouse(8, 538, 64, 16))
+        if(zcheckMouse(8, (Cur_Height - 62), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
             {
@@ -815,7 +815,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // rand noteon
-        if(zcheckMouse(8, 502, 64, 16))
+        if(zcheckMouse(8, (Cur_Height - 98), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
             {
@@ -826,7 +826,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // clear pat...
-        if(zcheckMouse(8, 484, 64, 16))
+        if(zcheckMouse(8, (Cur_Height - 116), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
             {
@@ -842,7 +842,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // reset pat...
-        if(zcheckMouse(8, 466, 64, 16))
+        if(zcheckMouse(8, (Cur_Height - 134), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
             {
@@ -858,7 +858,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // all notes up
-        if(zcheckMouse(600, 502, 64, 16))
+        if(zcheckMouse(600, (Cur_Height - 98), 64, 16))
         {
             tb303_notes_up();
             teac = 0;
@@ -866,7 +866,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // all notes down
-        if(zcheckMouse(668, 502, 64, 16))
+        if(zcheckMouse(668, (Cur_Height - 98), 64, 16))
         {
             tb303_notes_down();
             teac = 0;
@@ -874,7 +874,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // copy pattern
-        if(zcheckMouse(600, 522, 64, 16))
+        if(zcheckMouse(600, (Cur_Height - 78), 64, 16))
         {
             tb303_copy_pattern();
             teac = 0;
@@ -882,7 +882,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // paste pattern
-        if(zcheckMouse(600, 540, 64, 16))
+        if(zcheckMouse(600, (Cur_Height - 60), 64, 16))
         {
             tb303_paste_pattern();
             teac = 0;
@@ -890,25 +890,25 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Select the copy buffers
-        if(zcheckMouse(600, 558, 15, 16))
+        if(zcheckMouse(600, (Cur_Height - 42), 15, 16))
         {
             Current_copy_buffer = 0;
             teac = 17;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
-        if(zcheckMouse(616, 558, 15, 16))
+        if(zcheckMouse(616, (Cur_Height - 42), 15, 16))
         {
             Current_copy_buffer = 1;
             teac = 17;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
-        if(zcheckMouse(633, 558, 15, 16))
+        if(zcheckMouse(633, (Cur_Height - 42), 15, 16))
         {
             Current_copy_buffer = 2;
             teac = 17;
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
-        if(zcheckMouse(649, 558, 15, 16))
+        if(zcheckMouse(649, (Cur_Height - 42), 15, 16))
         {
             Current_copy_buffer = 3;
             teac = 17;
@@ -916,7 +916,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Start name input
-        if(zcheckMouse(600, 480, 164, 16) && snamesel == INPUT_NONE)
+        if(zcheckMouse(600, (Cur_Height - 120), 164, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_303_PATTERN;
             strcpy(cur_input_name, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
@@ -927,7 +927,7 @@ void Mouse_Left_303_Ed(void)
         }
 
         // Save the data
-        if(zcheckMouse(658, 462, 34, 16))
+        if(zcheckMouse(658, (Cur_Height - 138), 34, 16))
         {
             if(File_Exist("%s"SLASH"%s.303", Dir_Patterns, tb303[sl3].pattern_name[tb303[sl3].selectedpattern]))
             {
@@ -946,9 +946,9 @@ void Mouse_Sliders_303_Ed(void)
     if(userscreen == USER_SCREEN_TB303_EDIT)
     {
         // Volume Knob
-        if(zcheckMouse(529, 485, 19, 88))
+        if(zcheckMouse(529, (Cur_Height - 115), 19, 88))
         {
-            float breakvol = (float) (80 - (Mouse.y - 485));
+            float breakvol = (float) (80 - (Mouse.y - (Cur_Height - 115)));
             breakvol /= 72.0f;
             if(breakvol < 0.0f) breakvol = 0.0f;
             if(breakvol > 1.0f) breakvol = 1.0f;
@@ -958,7 +958,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // Tune Knob
-        if(zcheckMouse(229, 476, 24, 24))
+        if(zcheckMouse(229, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].tune;
 
@@ -973,7 +973,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // CutOff Knob
-        if(zcheckMouse(262, 476, 24, 24))
+        if(zcheckMouse(262, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].cutoff;
 
@@ -988,7 +988,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // Reso knob
-        if(zcheckMouse(295, 476, 24, 24))
+        if(zcheckMouse(295, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].resonance;
 
@@ -1003,7 +1003,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // Envmod knob
-        if(zcheckMouse(328, 476, 24, 24))
+        if(zcheckMouse(328, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].envmod;
 
@@ -1018,7 +1018,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // Decay knob
-        if(zcheckMouse(361, 476, 24, 24))
+        if(zcheckMouse(361, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].decay;
 
@@ -1033,7 +1033,7 @@ void Mouse_Sliders_303_Ed(void)
         }
 
         // Accent knob
-        if(zcheckMouse(394, 476, 24, 24))
+        if(zcheckMouse(394, (Cur_Height - 124), 24, 24))
         {
             if(fluzy == -1) fluzy = (Mouse.y * 3) + tb303[sl3].accent;
 
@@ -1118,8 +1118,8 @@ void Display_Cur_copy_Buffer(void)
         BUTTON_NORMAL
     };
     highlight[Current_copy_buffer] = BUTTON_PUSHED;
-    Gui_Draw_Button_Box(600, 558, 15, 16, "1", highlight[0] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[0] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(616, 558, 15, 16, "2", highlight[1] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[1] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(633, 558, 15, 16, "3", highlight[2] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[2] ? 0 : BUTTON_LOW_FONT));
-    Gui_Draw_Button_Box(649, 558, 15, 16, "4", highlight[3] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[3] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(600, (Cur_Height - 42), 15, 16, "1", highlight[0] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[0] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(616, (Cur_Height - 42), 15, 16, "2", highlight[1] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[1] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(633, (Cur_Height - 42), 15, 16, "3", highlight[2] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[2] ? 0 : BUTTON_LOW_FONT));
+    Gui_Draw_Button_Box(649, (Cur_Height - 42), 15, 16, "4", highlight[3] | BUTTON_TEXT_CENTERED | (tb303_pattern_buffer_full[3] ? 0 : BUTTON_LOW_FONT));
 }

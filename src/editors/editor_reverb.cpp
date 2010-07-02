@@ -42,30 +42,30 @@ extern REQUESTER Overwrite_Requester;
 char Reverb_Name[20];
 SCREEN_COORD Table_Sliders[10] = 
 {
-    { 442, 485 },
-    { 442, 503 },
-    { 442, 521 },
-    { 442, 539 },
-    { 442, 557 },
-    { 442 + 205, 485 },
-    { 442 + 205, 503 },
-    { 442 + 205, 521 },
-    { 442 + 205, 539 },
-    { 442 + 205, 557 }
+    { 442, 0 },
+    { 442, 18 },
+    { 442, 18 * 2 },
+    { 442, 18 * 3 },
+    { 442, 18 * 4 },
+    { 442 + 205, 0 },
+    { 442 + 205, 18 },
+    { 442 + 205, 18 * 2 },
+    { 442 + 205, 18 * 3 },
+    { 442 + 205, 18 * 4 }
 };
 
 SCREEN_COORD Table_Arrows[10] = 
 {
-    { 72, 485 },
-    { 72, 503 },
-    { 72, 521 },
-    { 72, 539 },
-    { 72, 557 },
-    { 72 + 185, 485 },
-    { 72 + 185, 503 },
-    { 72 + 185, 521 },
-    { 72 + 185, 539 },
-    { 72 + 185, 557 }
+    { 72, 0 },
+    { 72, 18 },
+    { 72, 18 * 2 },
+    { 72, 18 * 3 },
+    { 72, 18 * 4 },
+    { 72 + 185, 0 },
+    { 72 + 185, 18 },
+    { 72 + 185, 18 * 2 },
+    { 72 + 185, 18 * 3 },
+    { 72 + 185, 18 * 4 }
 };
 
 int Update_Slider[] = 
@@ -93,36 +93,36 @@ void Draw_Reverb_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_REVERB_EDIT);
 
-    Gui_Draw_Button_Box(0, 447, fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Flat_Box("Reverb Super Customiz'o'lazer 5000");
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Flat_Box("Reverb customizer");
 
-    Gui_Draw_Button_Box(10, 465, 60, 16, "Echoes", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 135), 60, 16, "Echoes", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(10, 485, 60, 16, "Delay 1", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10, 503, 60, 16, "Delay 2", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10, 521, 60, 16, "Delay 3", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10, 539, 60, 16, "Delay 4", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10, 557, 60, 16, "Delay 5", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 115), 60, 16, "Delay 1", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 97), 60, 16, "Delay 2", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 79), 60, 16, "Delay 3", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 61), 60, 16, "Delay 4", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10, (Cur_Height - 43), 60, 16, "Delay 5", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(10 + 185, 485, 60, 16, "Delay 6", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10 + 185, 503, 60, 16, "Delay 7", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10 + 185, 521, 60, 16, "Delay 8", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10 + 185, 539, 60, 16, "Delay 9", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(10 + 185, 557, 60, 16, "Delay 10", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10 + 185, (Cur_Height - 115), 60, 16, "Delay 6", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10 + 185, (Cur_Height - 97), 60, 16, "Delay 7", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10 + 185, (Cur_Height - 79), 60, 16, "Delay 8", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10 + 185, (Cur_Height - 61), 60, 16, "Delay 9", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(10 + 185, (Cur_Height - 43), 60, 16, "Delay 10", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(380, 485, 60, 16, "Decay 1", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(380, 503, 60, 16, "Decay 2", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(380, 521, 60, 16, "Decay 3", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(380, 539, 60, 16, "Decay 4", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(380, 557, 60, 16, "Decay 5", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(380, (Cur_Height - 115), 60, 16, "Decay 1", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(380, (Cur_Height - 97), 60, 16, "Decay 2", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(380, (Cur_Height - 79), 60, 16, "Decay 3", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(380, (Cur_Height - 61), 60, 16, "Decay 4", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(380, (Cur_Height - 43), 60, 16, "Decay 5", BUTTON_NORMAL | BUTTON_DISABLED);
     
-    Gui_Draw_Button_Box(585, 485, 60, 16, "Decay 6", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(585, 503, 60, 16, "Decay 7", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(585, 521, 60, 16, "Decay 8", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(585, 539, 60, 16, "Decay 9", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(585, 557, 60, 16, "Decay 10", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(585, (Cur_Height - 115), 60, 16, "Decay 6", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(585, (Cur_Height - 97), 60, 16, "Decay 7", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(585, (Cur_Height - 79), 60, 16, "Decay 8", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(585, (Cur_Height - 61), 60, 16, "Decay 9", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(585, (Cur_Height - 43), 60, 16, "Decay 10", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(749, 458, 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(749, (Cur_Height - 142), 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
 
 // ------------------------------------------------------
@@ -134,7 +134,7 @@ void Actualize_Reverb_Ed(int gode)
         // Echoes
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_ECHOES)
         {
-            Gui_Draw_Arrows_Number_Box2(72, 465, num_echoes, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Gui_Draw_Arrows_Number_Box2(72, (Cur_Height - 135), num_echoes, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DECAY1)
@@ -188,52 +188,52 @@ void Actualize_Reverb_Ed(int gode)
 
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY1)
         {
-            outlong_small(108, 485, delays[0], 0, 45,
+            outlong_small(108, (Cur_Height - 115), delays[0], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY2)
         {
-            outlong_small(108, 503, delays[1], 0, 45,
+            outlong_small(108, (Cur_Height - 97), delays[1], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY3)
         {
-            outlong_small(108, 521, delays[2], 0, 45,
+            outlong_small(108, (Cur_Height - 79), delays[2], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY4)
         {
-            outlong_small(108, 539, delays[3], 0, 45,
+            outlong_small(108, (Cur_Height - 61), delays[3], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY5)
         {
-            outlong_small(108, 557, delays[4], 0, 45,
+            outlong_small(108, (Cur_Height - 43), delays[4], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY6)
         {
-            outlong_small(108 + 185, 485, delays[5], 0, 45,
+            outlong_small(108 + 185, (Cur_Height - 115), delays[5], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY7)
         {
-            outlong_small(108 + 185, 503, delays[6], 0, 45,
+            outlong_small(108 + 185, (Cur_Height - 97), delays[6], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY8)
         {
-            outlong_small(108 + 185, 521, delays[7], 0, 45,
+            outlong_small(108 + 185, (Cur_Height - 79), delays[7], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY9)
         {
-            outlong_small(108 + 185, 539, delays[8], 0, 45,
+            outlong_small(108 + 185, (Cur_Height - 61), delays[8], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_DELAY10)
         {
-            outlong_small(108 + 185, 557, delays[9], 0, 45,
+            outlong_small(108 + 185, (Cur_Height - 43), delays[9], 0, 45,
                           BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
         }
 
@@ -244,11 +244,11 @@ void Actualize_Reverb_Ed(int gode)
 
             if(snamesel == INPUT_REVERB_NAME)
             {
-                Gui_Draw_Button_Box(583, 458, 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+                Gui_Draw_Button_Box(583, (Cur_Height - 142), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
             }
             else
             {
-                Gui_Draw_Button_Box(583, 458, 164, 16, Reverb_Name, BUTTON_NORMAL | BUTTON_INPUT);
+                Gui_Draw_Button_Box(583, (Cur_Height - 142), 164, 16, Reverb_Name, BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
     }
@@ -260,7 +260,7 @@ void Mouse_Right_Reverb_Ed(void)
 {
     if(userscreen == USER_SCREEN_REVERB_EDIT)
     {
-        if(zcheckMouse(72, 465, 16, 16))
+        if(zcheckMouse(72, (Cur_Height - 135), 16, 16))
         {
             num_echoes -= 2;
             if(num_echoes < 1) num_echoes = 1;
@@ -270,7 +270,7 @@ void Mouse_Right_Reverb_Ed(void)
         }
 
         // Number of echoes
-        if(zcheckMouse(72 + 44, 465, 16, 16))
+        if(zcheckMouse(72 + 44, (Cur_Height - 135), 16, 16))
         {
             num_echoes += 2;
             if(num_echoes > 10) num_echoes = 10;
@@ -284,7 +284,7 @@ void Mouse_Right_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Arrows left
-            if(zcheckMouse(Table_Arrows[i].x + 18, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] -= 50;
                 if(delays[i] < 167) delays[i] = 167;
@@ -295,7 +295,7 @@ void Mouse_Right_Reverb_Ed(void)
             }
 
             // Arrows right
-            if(zcheckMouse(Table_Arrows[i].x + 82, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 82, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] += 50;
                 if(delays[i] > 15000) delays[i] = 15000;
@@ -316,7 +316,7 @@ void Mouse_Left_Reverb_Ed(void)
     if(userscreen == USER_SCREEN_REVERB_EDIT)
     {
         // Number of echoes
-        if(zcheckMouse(72, 465, 16, 16))
+        if(zcheckMouse(72, (Cur_Height - 135), 16, 16))
         {
             num_echoes--;
             if(num_echoes < 1) num_echoes = 1;
@@ -326,7 +326,7 @@ void Mouse_Left_Reverb_Ed(void)
         }
 
         // Number of echoes
-        if(zcheckMouse(72 + 44, 465, 16, 16))
+        if(zcheckMouse(72 + 44, (Cur_Height - 135), 16, 16))
         {
             num_echoes++;
             if(num_echoes > 10) num_echoes = 10;
@@ -336,7 +336,7 @@ void Mouse_Left_Reverb_Ed(void)
         }
 
         // Save the data
-        if(zcheckMouse(749, 458, 34, 16))
+        if(zcheckMouse(749, (Cur_Height - 142), 34, 16))
         {
             if(File_Exist("%s"SLASH"%s.prv", Dir_Reverbs, Reverb_Name))
             {
@@ -349,7 +349,7 @@ void Mouse_Left_Reverb_Ed(void)
         }
 
         // Start reverb name input
-        if(zcheckMouse(583, 458, 164, 16) && snamesel == INPUT_NONE)
+        if(zcheckMouse(583, (Cur_Height - 142), 164, 16) && snamesel == INPUT_NONE)
         {
             snamesel = INPUT_REVERB_NAME;
             strcpy(cur_input_name, Reverb_Name);
@@ -364,7 +364,7 @@ void Mouse_Left_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Center buttons
-            if(zcheckMouse(Table_Sliders[i].x + 120, Table_Sliders[i].y, 16, 16))
+            if(zcheckMouse(Table_Sliders[i].x + 120, (Cur_Height - 115) + Table_Sliders[i].y, 16, 16))
             {
                 decays[i] = 0.0f;
                 teac = 0;
@@ -377,7 +377,7 @@ void Mouse_Left_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Arrows left
-            if(zcheckMouse(Table_Arrows[i].x + 18, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]--;
                 if(delays[i] < 167) delays[i] = 167;
@@ -388,7 +388,7 @@ void Mouse_Left_Reverb_Ed(void)
             }
 
             // Arrows right
-            if(zcheckMouse(Table_Arrows[i].x + 82, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 82, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]++;
                 if(delays[i] > 15000) delays[i] = 15000;
@@ -412,7 +412,7 @@ void Mouse_Sliders_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Rows slider
-            if(zcheckMouse(Table_Sliders[i].x, Table_Sliders[i].y, 119, 16))
+            if(zcheckMouse(Table_Sliders[i].x, (Cur_Height - 115) + Table_Sliders[i].y, 119, 16))
             {
                 int max_length = 128 + 16;
                 int Center = Slider_Get_Center(16, max_length, 119);
@@ -433,7 +433,7 @@ void Mouse_Sliders_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Arrows left
-            if(zcheckMouse(Table_Arrows[i].x, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]--;
                 if(delays[i] < 167) delays[i] = 167;
@@ -444,7 +444,7 @@ void Mouse_Sliders_Reverb_Ed(void)
             }
 
             // Arrows right
-            if(zcheckMouse(Table_Arrows[i].x + 82 + 18, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 82 + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]++;
                 if(delays[i] > 15000) delays[i] = 15000;
@@ -468,7 +468,7 @@ void Mouse_Sliders_Right_Reverb_Ed(void)
         for(i = 0; i < num_echoes; i++)
         {
             // Arrows left
-            if(zcheckMouse(Table_Arrows[i].x, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] -= 50;
                 if(delays[i] < 167) delays[i] = 167;
@@ -479,7 +479,7 @@ void Mouse_Sliders_Right_Reverb_Ed(void)
             }
 
             // Arrows right
-            if(zcheckMouse(Table_Arrows[i].x + 82 + 18, Table_Arrows[i].y, 16, 16))
+            if(zcheckMouse(Table_Arrows[i].x + 82 + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] += 50;
                 if(delays[i] > 15000) delays[i] = 15000;
@@ -518,10 +518,10 @@ void Display_Delays_Arrows(void)
 
     for(i = 0; i < 10; i++)
     {
-        Gui_Draw_Button_Box(Table_Arrows[i].x, Table_Arrows[i].y, 16, 16, "\05", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 18, Table_Arrows[i].y, 16, 16, "\03", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 82, Table_Arrows[i].y, 16, 16, "\04", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(Table_Arrows[i].x + 82 + 18, Table_Arrows[i].y, 16, 16, "\06", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16, "\05", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16, "\03", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 82, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16, "\04", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(Table_Arrows[i].x + 82 + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16, "\06", BUTTON_NORMAL | Enabled[i] | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     }
 }
 
@@ -529,7 +529,7 @@ void Display_Delays_Arrows(void)
 // Display a decay slider
 void Display_Decay_Slider(int Index)
 {
-    Realslider_Horiz(Table_Sliders[Index].x, Table_Sliders[Index].y,
+    Realslider_Horiz(Table_Sliders[Index].x, (Cur_Height - 115) + Table_Sliders[Index].y,
                      (int) ((decays[Index] * 64.0f) + 64.0f), 16, 128 + 16, 119, num_echoes > Index);
-    Gui_Draw_Button_Box(Table_Sliders[Index].x + 120, Table_Sliders[Index].y, 16, 16, "C", BUTTON_NORMAL | (num_echoes > Index ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(Table_Sliders[Index].x + 120, (Cur_Height - 115) + Table_Sliders[Index].y, 16, 16, "C", BUTTON_NORMAL | (num_echoes > Index ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED);
 }

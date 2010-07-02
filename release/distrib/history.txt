@@ -2,10 +2,17 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.3:
+
+- Window can now be resized.
+- Zero command added to sample editor
+  (used to clear selections without removing them from samples).
+- Fixed a small issue with patterns blocks selection.
+
 v2.1.2:
 
 - Fixed flanger filter (now using individual buffers / track).
-- Fixed 06xx command (was always jumping at patterns start).
+- Fixed 06xx command (was always jumping jumping 1 line too far).
 - Added loading support for 1, 2 & 3 channels FastTracker I modules.
 - Added flight.ptk & warlock.ptk.
 

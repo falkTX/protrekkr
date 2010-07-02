@@ -53,6 +53,7 @@ int Sample_Paste(int32 range_start);
 int Sample_Cut(int32 range_start, int32 range_end, int do_copy);
 void Sample_DC_Adjust(int32 range_start, int32 range_end);
 void Sample_Maximize(int32 range_start, int32 range_end);
+void Sample_Zeroize(int32 range_start, int32 range_end);
 void Sample_FadeIn(int32 range_start, int32 range_end);
 void Sample_FadeOut(int32 range_start, int32 range_end);
 void Sample_Half(int32 range_start, int32 range_end);
