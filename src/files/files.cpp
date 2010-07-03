@@ -208,7 +208,6 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
-
             case 'K':
                 Compress_Tracks = TRUE;
             case 'J':
@@ -414,7 +413,8 @@ Read_Mod_File:
             PARASynth[swrite].lfo2_release = 0x10000;
 
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
-                              new_disto, New_adsr, Portable, Env_Modulation, New_Env, Ntk_Beta);
+                              new_disto, New_adsr, Portable, Env_Modulation,
+                              New_Env, Ntk_Beta);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo1_period > 128) PARASynth[swrite].lfo1_period = 128;
@@ -430,8 +430,6 @@ Read_Mod_File:
             if(Pack_Scheme)
             {
                 Read_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);
-                SampleCompression[swrite] = Fix_Codec(SampleCompression[swrite]);
-
                 if(Mp3_Scheme)
                 {
                     switch(SampleCompression[swrite])
@@ -445,6 +443,7 @@ Read_Mod_File:
                             break;
                     }
                 }
+                SampleCompression[swrite] = Fix_Codec(SampleCompression[swrite]);
             }
             for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
@@ -673,7 +672,7 @@ Read_Mod_File:
                         for(i = 0; i < 16; i++)
                         {
                             Read_Mod_Data_Swap(&tb303[j].flag[k][i], sizeof(struct flag303), 1, in);
-                        }                            
+                        }
                     }
                     Read_Mod_Data(&tb303[j].pattern_name, sizeof(char), 32 * 20, in);
                 }
