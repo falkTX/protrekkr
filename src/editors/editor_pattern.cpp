@@ -1669,13 +1669,6 @@ void Actupated(int modac)
 void Draw_Pattern_Right_Stuff()
 {
     int cur_line;
-    int High[] =
-    {
-        BUTTON_NORMAL,
-        BUTTON_NORMAL,
-        BUTTON_NORMAL,
-        BUTTON_NORMAL
-    };
 
     cur_line = Get_Pattern_Line();
 
@@ -1687,6 +1680,21 @@ void Draw_Pattern_Right_Stuff()
     // 195
     Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 184, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
     Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, (Cur_Height - 251) + Patterns_Lines_Offset, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+
+    Draw_Blocks_Buffers_Status();
+}
+
+// ------------------------------------------------------
+// Display the status of the selection buffers
+void Draw_Blocks_Buffers_Status()
+{
+    int High[] =
+    {
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL,
+        BUTTON_NORMAL
+    };
 
     High[Curr_Buff_Block] = BUTTON_PUSHED;
 

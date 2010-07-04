@@ -852,6 +852,7 @@ void Cut_Selection(int Position)
     Calc_selection();
     Unselect_Selection();
     Actupated(0);
+    Draw_Blocks_Buffers_Status();
 }
 
 // ------------------------------------------------------
@@ -861,6 +862,7 @@ void Copy_Selection(int Position)
     Copy_Selection_To_Buffer(Position);
     Calc_selection();
     Actupated(0);
+    Draw_Blocks_Buffers_Status();
 }
 
 // ------------------------------------------------------

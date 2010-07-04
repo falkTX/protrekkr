@@ -121,5 +121,6 @@ TRACK_TYPE Get_Track_Type(int track);
 void Set_Track_Zoom(int track, TRACK_TYPE type);
 void Draw_Pattern_Right_Stuff();
 void Set_Pattern_Size();
+void Draw_Blocks_Buffers_Status();
 
 #endif
