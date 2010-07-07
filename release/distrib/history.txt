@@ -2,6 +2,13 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.4:
+
+- Added duplicate function to samples editor: increase sample by selection length
+  and copy it's content into the newly created space.
+- Added Insert function to samples editor: increase sample by selection length
+  and insert zeroes into the newly created space.
+
 v2.1.3:
 
 - Window can now be resized.

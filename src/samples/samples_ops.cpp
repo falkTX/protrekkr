@@ -212,6 +212,7 @@ int Sample_Crop(int32 range_start, int32 range_end)
             Player_WR[Current_Instrument][Current_Instrument_Split] = NewBuffer[1];
         }
         SampleLength[Current_Instrument][Current_Instrument_Split] = cropsize;
+
         Status_Box("Crop done.");
         AUDIO_Play();
         return 1;
@@ -281,6 +282,9 @@ int Sample_Paste(int32 range_start)
 
     if(cutsize)
     {
+        Stop_Current_Instrument();
+        AUDIO_Stop();
+
         nc = SampleChannels[Current_Instrument][Current_Instrument_Split];
 
         // Allocate the destination buffer(s)
@@ -342,7 +346,9 @@ int Sample_Paste(int32 range_start)
             Player_WR[Current_Instrument][Current_Instrument_Split] = NewBuffer[1];
         }
         SampleLength[Current_Instrument][Current_Instrument_Split] = newsize;
+
         Status_Box("Paste done.");
+        AUDIO_Play();
         return 1;
     }
     return 0;
@@ -425,6 +431,7 @@ int Sample_Cut(int32 range_start, int32 range_end, int do_copy)
             Player_WR[Current_Instrument][Current_Instrument_Split] = NewBuffer[1];
         }
         SampleLength[Current_Instrument][Current_Instrument_Split] = newsize;
+
         Status_Box("Cut done.");
         AUDIO_Play();
         return 1;
@@ -452,7 +459,7 @@ void Sample_DC_Adjust(int32 range_start, int32 range_end)
     float l_shift = 0;
     float r_shift = 0;
 
-     for(i = range_start; i < range_end + 1; i++)
+    for(i = range_start; i < range_end + 1; i++)
     {
         l_shift += *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
         if(nc == 2) r_shift += *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
@@ -652,4 +659,169 @@ void Sample_Half(int32 range_start, int32 range_end)
 
     draw_sampled_wave = TRUE;
     Status_Box("Half done.");
+}
+
+// ------------------------------------------------------
+// Duplicate the current selection
+int Sample_Duplicate(int32 range_start, int32 range_end)
+{
+    int32 i;
+    short *NewBuffer[2];
+    char nc;
+    long p_s;
+    long cutsize = range_end - range_start;
+    long newsize = SampleLength[Current_Instrument][Current_Instrument_Split] + cutsize;
+
+    if(cutsize)
+    {
+        Stop_Current_Instrument();
+        AUDIO_Stop();
+
+        nc = SampleChannels[Current_Instrument][Current_Instrument_Split];
+
+        // Allocate the destination buffer(s)
+        // (We need to clear the second one as the back buffer may not be stereo).
+        NewBuffer[0] = (short *) malloc(newsize * 2 + 8);
+        if(!NewBuffer[0]) return 0;
+        memset(NewBuffer[0], 0, newsize * 2 + 8);
+
+        if(nc == 2)
+        {
+            NewBuffer[1] = (short *) malloc(newsize * 2 + 8);
+            if(!NewBuffer[1])
+            {
+                free(NewBuffer[0]);
+                return 0;
+            }
+            memset(NewBuffer[1], 0, newsize * 2 + 8);
+        }
+
+        p_s = 0;
+        if(range_start > 0)
+        {
+            // Copy the original data into the new buffer
+            for(i = 0; i < range_start; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
+                p_s++;
+            }
+        }
+
+        // Copy the selection
+        for(i = range_start; i < range_end; i++)
+        {
+            *(NewBuffer[0] + p_s) = *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
+            if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
+            p_s++;
+        }
+
+        if((SampleLength[Current_Instrument][Current_Instrument_Split] - range_start) > 0)
+        {
+            // Add the rest of the original data
+            for(i = range_start; i < (int32) SampleLength[Current_Instrument][Current_Instrument_Split]; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
+                p_s++;
+            }
+        }
+
+        // Set the new buffer as current sample
+        if(RawSamples[Current_Instrument][0][Current_Instrument_Split]) free(RawSamples[Current_Instrument][0][Current_Instrument_Split]);
+        RawSamples[Current_Instrument][0][Current_Instrument_Split] = NewBuffer[0];
+        Player_WL[Current_Instrument][Current_Instrument_Split] = NewBuffer[0];
+        if(nc == 2)
+        {
+            if(RawSamples[Current_Instrument][1][Current_Instrument_Split]) free(RawSamples[Current_Instrument][1][Current_Instrument_Split]);
+            RawSamples[Current_Instrument][1][Current_Instrument_Split] = NewBuffer[1];
+            Player_WR[Current_Instrument][Current_Instrument_Split] = NewBuffer[1];
+        }
+        SampleLength[Current_Instrument][Current_Instrument_Split] = newsize;
+
+        Status_Box("Insert zeroes done.");
+        AUDIO_Play();
+        return 1;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
+// Insert zeroes into a sample the length of the selection buffer
+int Sample_InsertZero(int32 range_start, int32 range_end)
+{
+    int32 i;
+    short *NewBuffer[2];
+    char nc;
+    long p_s;
+    long cutsize = range_end - range_start;
+    long newsize = SampleLength[Current_Instrument][Current_Instrument_Split] + cutsize;
+
+    if(cutsize)
+    {
+        Stop_Current_Instrument();
+        AUDIO_Stop();
+
+        nc = SampleChannels[Current_Instrument][Current_Instrument_Split];
+
+        // Allocate the destination buffer(s)
+        // (We need to clear the second one as the back buffer may not be stereo).
+        NewBuffer[0] = (short *) malloc(newsize * 2 + 8);
+        if(!NewBuffer[0]) return 0;
+        memset(NewBuffer[0], 0, newsize * 2 + 8);
+
+        if(nc == 2)
+        {
+            NewBuffer[1] = (short *) malloc(newsize * 2 + 8);
+            if(!NewBuffer[1])
+            {
+                free(NewBuffer[0]);
+                return 0;
+            }
+            memset(NewBuffer[1], 0, newsize * 2 + 8);
+        }
+
+        p_s = 0;
+        if(range_start > 0)
+        {
+            // Copy the original data into the new buffer
+            for(i = 0; i < range_start; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
+                p_s++;
+            }
+        }
+
+        // Skip a buffer of the selection's size
+        p_s += cutsize;
+
+        if((SampleLength[Current_Instrument][Current_Instrument_Split] - range_start) > 0)
+        {
+            // Add the rest of the original data
+            for(i = range_start; i < (int32) SampleLength[Current_Instrument][Current_Instrument_Split]; i++)
+            {
+                *(NewBuffer[0] + p_s) = *(RawSamples[Current_Instrument][0][Current_Instrument_Split] + i);
+                if(nc == 2) *(NewBuffer[1] + p_s) = *(RawSamples[Current_Instrument][1][Current_Instrument_Split] + i);
+                p_s++;
+            }
+        }
+
+        // Set the new buffer as current sample
+        if(RawSamples[Current_Instrument][0][Current_Instrument_Split]) free(RawSamples[Current_Instrument][0][Current_Instrument_Split]);
+        RawSamples[Current_Instrument][0][Current_Instrument_Split] = NewBuffer[0];
+        Player_WL[Current_Instrument][Current_Instrument_Split] = NewBuffer[0];
+        if(nc == 2)
+        {
+            if(RawSamples[Current_Instrument][1][Current_Instrument_Split]) free(RawSamples[Current_Instrument][1][Current_Instrument_Split]);
+            RawSamples[Current_Instrument][1][Current_Instrument_Split] = NewBuffer[1];
+            Player_WR[Current_Instrument][Current_Instrument_Split] = NewBuffer[1];
+        }
+        SampleLength[Current_Instrument][Current_Instrument_Split] = newsize;
+
+        Status_Box("Duplicate done.");
+        AUDIO_Play();
+        return 1;
+    }
+    return 0;
 }

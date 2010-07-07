@@ -457,7 +457,7 @@ void Actualize_Master_Ed(char gode)
             switch(Use_Shadows)
             {
                 case 0:
-                    Gui_Draw_Button_Box(520 + 18 + (18 + 108) + 2 + 20, (Cur_Height - 105), 40, 16, "Shades", BUTTON_NORMAL| BUTTON_TEXT_CENTERED);
+                    Gui_Draw_Button_Box(520 + 18 + (18 + 108) + 2 + 20, (Cur_Height - 105), 40, 16, "Shades", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                     break;
                 case 1:
                     Gui_Draw_Button_Box(520 + 18 + (18 + 108) + 2 + 20, (Cur_Height - 105), 40, 16, "Shades", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
