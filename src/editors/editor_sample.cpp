@@ -488,11 +488,11 @@ void Actualize_Sample_Ed(char gode)
 
             Gui_Draw_Button_Box(520, (Cur_Height - 114), 29, 16, "Max.", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(551, (Cur_Height - 114), 29, 16, "Zero", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520, (Cur_Height - 96), 60, 16, "DC Adjust", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520, (Cur_Height - 78), 29, 16, "F. In", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(551, (Cur_Height - 78), 29, 16, "F. Out", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520, (Cur_Height - 60), 29, 16, "Dup.", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(551, (Cur_Height - 60), 29, 16, "Ins.", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, (Cur_Height - 96), 29, 16, "Dup.", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(551, (Cur_Height - 96), 29, 16, "Ins.", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, (Cur_Height - 78), 60, 16, "DC Adjust", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(520, (Cur_Height - 60), 29, 16, "F. In", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(551, (Cur_Height - 60), 29, 16, "F. Out", BUTTON_NORMAL | Allow | ReadOnly | BUTTON_TEXT_CENTERED);
 
             // Non-modifying operations are allowed
             Gui_Draw_Button_Box(582, (Cur_Height - 132), 60, 16, "Sel. View", BUTTON_NORMAL | Allow | BUTTON_TEXT_CENTERED);
@@ -1008,10 +1008,10 @@ void Mouse_Left_Sample_Ed(void)
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
-            // DC Adjust
-            if(zcheckMouse(520, (Cur_Height - 96), 60, 16) && sed_range_mode && Allow)
+            // Half
+            if(zcheckMouse(551, (Cur_Height - 132), 29, 16) && sed_range_mode && Allow)
             {
-                teac = SMPED_DC_ADJUST;
+                teac = SMPED_HALF;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
@@ -1029,38 +1029,38 @@ void Mouse_Left_Sample_Ed(void)
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
+            // Duplicate
+            if(zcheckMouse(520, (Cur_Height - 96), 29, 16) && sed_range_mode && Allow)
+            {
+                teac = SMPED_DUPLICATE;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
+            }
+
+            // Insert zeroes
+            if(zcheckMouse(551, (Cur_Height - 96), 29, 16) && sed_range_mode && Allow)
+            {
+                teac = SMPED_INSERTZERO;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
+            }
+
+            // DC Adjust
+            if(zcheckMouse(520, (Cur_Height - 78), 60, 16) && sed_range_mode && Allow)
+            {
+                teac = SMPED_DC_ADJUST;
+                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
+            }
+
             // Fade in
-            if(zcheckMouse(520, (Cur_Height - 78), 29, 16) && sed_range_mode && Allow)
+            if(zcheckMouse(520, (Cur_Height - 60), 29, 16) && sed_range_mode && Allow)
             {
                 teac = SMPED_FADEIN;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
             // Fade out
-            if(zcheckMouse(551, (Cur_Height - 78), 29, 16) && sed_range_mode && Allow)
-            {
-                teac = SMPED_FADEOUT;
-                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
-            }
-
-            // Duplicate
-            if(zcheckMouse(520, (Cur_Height - 60), 29, 16) && sed_range_mode && Allow)
-            {
-                teac = SMPED_DUPLICATE;
-                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
-            }
-
-            // Insert zero
             if(zcheckMouse(551, (Cur_Height - 60), 29, 16) && sed_range_mode && Allow)
             {
-                teac = SMPED_INSERTZERO;
-                gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
-            }
-
-            // Half
-            if(zcheckMouse(551, (Cur_Height - 132), 29, 16) && sed_range_mode && Allow)
-            {
-                teac = SMPED_HALF;
+                teac = SMPED_FADEOUT;
                 gui_action = GUI_CMD_REFRESH_SAMPLE_ED;
             }
 
