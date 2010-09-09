@@ -8,6 +8,8 @@ v2.1.4:
   and copy it's content into the newly created space.
 - Added Insert function to samples editor: increase sample by selection length
   and insert zeroes into the newly created space.
+- Looks like the signal reduction hack is no longer necessary on Linux.
+- Linux 32 bit executable now available.
 
 v2.1.3:
 
