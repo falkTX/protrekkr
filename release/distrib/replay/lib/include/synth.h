@@ -70,8 +70,7 @@ typedef unsigned __int64 Uint64;
 #else
 typedef long long int64;
 #if defined(__LINUX__) && !defined(__FREEBSD__)
-typedef long unsigned int uint64_t;
-#include <sys/types.h>
+typedef unsigned long long uint64_t;
 typedef uint64_t Uint64;
 #else
 typedef unsigned long long Uint64;

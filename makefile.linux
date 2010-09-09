@@ -6,7 +6,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lasound -lSDL -lsdldraw -lz
 
-FLAGS = -O2 -fno-strict-aliasing -ffast-math -fno-rtti -fno-exceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
+FLAGS = -O2 -fno-strict-aliasing -ffast-math -fno-rtti -fexceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D __LINUX__ -D __GCC__ -D __LINUX_ALSASEQ__ -D __MOT_SWAP__
 
 EXEOBJS = ptk.o \

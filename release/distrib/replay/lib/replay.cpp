@@ -1327,6 +1327,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             {
                 Mod_Dat_Read(&LFO_RATE[twrite], sizeof(float));
                 Mod_Dat_Read(&LFO_AMPL[twrite], sizeof(float));
+
             }
 #endif
         }
@@ -4744,13 +4745,15 @@ void GetPlayerValues(void)
     // It looks like the maximum range for OSS is -8192 +8192
     // (higher than that will produce heavily satured signals
     //  i don't know if it's a bug in drivers in Linux mixer or anything)
-    #if defined(__LINUX__) && !defined(__FREEBSD__)
+
+    // It looks like they (hopefully) fixed their shit so this nasty hack is no longer required.
+/*    #if defined(__LINUX__) && !defined(__FREEBSD__)
         left_value = (int) (left_float * 8192.0f);
         right_value = (int) (right_float * 8192.0f);
-    #else
+    #else*/
         left_value = (int) (left_float * 32767.0f);
         right_value = (int) (right_float * 32767.0f);
-    #endif
+//    #endif
 }
 
 // ------------------------------------------------------
