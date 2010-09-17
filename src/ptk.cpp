@@ -3927,7 +3927,7 @@ void Keyboard_Handler(void)
                             }
 
                             // Play it
-                            Note_Jazz(Track_Under_Caret, tmp_note);
+                            Note_Jazz(Track_Under_Caret, tmp_note, 1.0f);
                         }
                     }
                     else
@@ -6492,7 +6492,7 @@ void Send_Note(int Note, int Raw_Note, int One_Channel)
 
 // ------------------------------------------------------
 // Jazz a note man
-void Note_Jazz(int track, int note)
+void Note_Jazz(int track, int note, float volume)
 {
     // Play the note
     int Sub_Channel = Get_Free_Sub_Channel(track, Channels_Polyphony[track]);
@@ -6514,7 +6514,11 @@ void Note_Jazz(int track, int note)
         Schedule_Instrument(track, Sub_Channel,
                             note,
                             Current_Instrument,
-                            0, 0, !is_recording, -(Sub_Channel + 1));
+                            0,
+                            0,
+                            !is_recording,
+                            -(Sub_Channel + 1),
+                            volume);
     }
 }
 
@@ -6543,7 +6547,7 @@ void Note_Jazz_Off(int note)
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-    if(Jazz_Edit || is_recording_2)
+    if(Jazz_Edit || is_recording_2 || !is_editing)
     {
         Midi_NoteOff(Track_Under_Caret, note);
     }

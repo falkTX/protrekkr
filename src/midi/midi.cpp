@@ -191,7 +191,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
                 }
                 if(is_recording_2 || !is_editing)
                 { 
-                    Note_Jazz(Track_Under_Caret, tmp_note);
+                    Note_Jazz(Track_Under_Caret, tmp_note, ((float) Midi_Velocity) / 127.0f);
                 }
             }
             else

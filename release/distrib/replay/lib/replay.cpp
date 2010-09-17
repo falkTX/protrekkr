@@ -2325,7 +2325,8 @@ void Sp_Player(void)
                                                 pl_sample[i],
                                                 toffset,
                                                 glide,
-                                                FALSE, i + 1);
+                                                FALSE, i + 1,
+                                                Sample_Vol[pl_sample[i]]);
                         }
                     }
                 }
@@ -3339,11 +3340,15 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 // Record an instrument for playing it later
 // (We use this to avoid immediately chaning the instrument
 //  during volume ramping as the previous one is still being played).
-void Schedule_Instrument(int channel, int sub_channel,
-                         int inote, int sample,
+void Schedule_Instrument(int channel,
+                         int sub_channel,
+                         int inote,
+                         int sample,
                          unsigned int offset,
-                         int glide, int Play_Selection,
-                         int midi_sub_channel)
+                         int glide,
+                         int Play_Selection,
+                         int midi_sub_channel,
+                         float vol)
 {
     int Cur_Position = Song_Position;
     if(CHAN_ACTIVE_STATE[Cur_Position][channel])
@@ -3353,7 +3358,7 @@ void Schedule_Instrument(int channel, int sub_channel,
         Instrument_Schedule_Dat[channel][sub_channel].start_backward = FALSE;
         Instrument_Schedule_Dat[channel][sub_channel].inote = inote;
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
-        Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample];
+        Instrument_Schedule_Dat[channel][sub_channel].vol = vol;
 #if defined(PTK_SYNTH)
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME;
@@ -4372,7 +4377,9 @@ void Do_Effects_Ticks_X(void)
                                                 pltr_note[i],
                                                 pltr_sample[i],
                                                 0, 0,
-                                                FALSE, i + 1);
+                                                FALSE,
+                                                i + 1,
+                                                Sample_Vol[pltr_sample[i]]);
                         }
                     }
                     break;

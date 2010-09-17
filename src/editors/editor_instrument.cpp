@@ -328,7 +328,7 @@ void Actualize_Instrument_Ed(int typex, char gode)
                 {
                     if(Sample_Vol[Current_Instrument] > 1.0f) Sample_Vol[Current_Instrument] = 1.0f;
                     if(Sample_Vol[Current_Instrument] < 0.0f) Sample_Vol[Current_Instrument] = 0.0f;
-                    Realslider(52, (Cur_Height - 54), (int) (Sample_Vol[Current_Instrument] * 128.0f), Allow_Global_Sliders);
+                    Realslider(52, (Cur_Height - 54), (int) (Sample_Vol[Current_Instrument] * 128.0f), TRUE);
                     outlong(201, (Cur_Height - 54), (int) (Sample_Vol[Current_Instrument] * 100.0f), 1);
                 }
 
@@ -555,14 +555,11 @@ void Mouse_Sliders_Instrument_Ed(void)
                 gui_action = GUI_CMD_SET_INSTRUMENT_DECAY;
             }
         }
-        if(Allow_Global_Sliders)
+        if(zcheckMouse(52, (Cur_Height - 54), 148, 16))
         {
-            if(zcheckMouse(52, (Cur_Height - 54), 148, 16))
-            {
-                Sample_Vol[Current_Instrument] = float(Mouse.x - 62) * 0.0078125f;
-                gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
-                teac = 15;
-            }
+            Sample_Vol[Current_Instrument] = float(Mouse.x - 62) * 0.0078125f;
+            gui_action = GUI_CMD_UPDATE_INSTRUMENT_ED;
+            teac = 15;
         }
     }
 }

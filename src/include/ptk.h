@@ -138,7 +138,7 @@ int Discard_Key_Note_Off(JAZZ_KEY Pool[MAX_TRACKS][MAX_POLYPHONY], int Channel, 
 void Set_Default_Channels_Polyphony(void);
 void Clear_Midi_Channels_Pool(void);
 void Send_Note(int Note, int Raw_Note, int One_Channel);
-void Note_Jazz(int track, int note);
+void Note_Jazz(int track, int note, float volume);
 void Note_Jazz_Off(int note);
 void Display_Beat_Time(void);
 

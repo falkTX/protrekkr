@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.1.5:
+
+- Improved midi in/out support.
+
 v2.1.4:
 
 - Added duplicate function to samples editor: increase sample by selection length

@@ -415,7 +415,10 @@ void Sp_Player(void);
 void Schedule_Instrument(int channel, int sub_channel,
                          int note, int sample,
                          unsigned int offset,
-                         int glide, int Play_Selection, int midi_sub_channel);
+                         int glide,
+                         int Play_Selection,
+                         int midi_sub_channel,
+                         float volume);
 void Play_Instrument(int channel, int sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
