@@ -49,6 +49,7 @@
 #include "../editors/include/editor_instrument.h"
 #include "../editors/include/editor_sequencer.h"
 #include "../editors/include/editor_setup.h"
+#include "../editors/include/editor_midi.h"
 #include "../editors/include/editor_303.h"
 #include "../editors/include/editor_sample.h"
 #include "../editors/include/editor_fx_setup.h"

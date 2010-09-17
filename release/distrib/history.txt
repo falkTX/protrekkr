@@ -8,6 +8,8 @@ v2.2.0:
 - Default instruments volumes are always turned on now
   as they're used for midi output.
 - Added 3 new themes.
+- Tracker sometimes crashed at exit when using midi.
+- Mouse wheel activated for horizontal patterns slider.
 
 TODO:
 
@@ -33,6 +35,7 @@ TODO:
   - 303 volume.
   - Channel filter cutoff.
   - Channel filter frequency.
+  - Track on/off.
 
 v2.1.4:
 

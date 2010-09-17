@@ -1836,7 +1836,7 @@ void Pre_Song_Init(void)
 
     for(i = 0; i < MAX_INSTRS; i++)
     {
-        Sample_Vol[i] = 0.0f;
+        Sample_Vol[i] = 1.0f;
     }
 
 #if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)

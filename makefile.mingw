@@ -13,7 +13,7 @@ FLAGS = -mwindows -fno-strict-aliasing -O3 -fno-rtti -fno-exceptions -Lsrc/extra
 EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
-          editor_diskio.o editor_reverb.o editor_instrument.o \
+          editor_diskio.o editor_reverb.o editor_instrument.o editor_midi.o \
           samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o \
           bits.o pack.o tinypack.o words.o wputils.o \
           config.o 303s.o synths.o insts.o ptps.o \
@@ -79,6 +79,9 @@ editor_reverb.o: src/editors/editor_reverb.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 editor_instrument.o: src/editors/editor_instrument.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+editor_midi.o: src/editors/editor_midi.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 samples_pack.o: src/samples/samples_pack.cpp

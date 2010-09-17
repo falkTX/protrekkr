@@ -594,7 +594,19 @@ void Destroy_Context(void)
 {
     if(Timer) SDL_RemoveTimer(Timer);
     AUDIO_Acknowledge = TRUE;
+
     Ptk_ReleaseDriver();
+
+#if !defined(__NO_MIDI__)
+    // Close any opened midi devices on any exit
+    Midi_CloseIn();
+    Midi_CloseOut();
+#endif
+
+#if !defined(__NO_MIDI__)
+    // Free the devices enumeration
+    Midi_FreeAll();
+#endif
 
     Free_Samples();
 
@@ -1151,6 +1163,16 @@ int Screen_Update(void)
             userscreen = USER_SCREEN_SETUP_EDIT;
             Draw_Master_Ed();
             Actualize_Master_Ed(0);
+        }
+
+        if(gui_action == GUI_CMD_SELECT_SCREEN_SETUP_MIDI)
+        {
+            retletter[71] = TRUE;
+            Actualize_Input();
+            retletter[71] = FALSE;
+            userscreen = USER_SCREEN_SETUP_MIDI;
+            Draw_Midi_Ed();
+            //Actualize_Master_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SELECT_SYNTH_EDIT)
@@ -4837,10 +4859,7 @@ void Mouse_Handler(void)
     if(Mouse.wheel == 1)
     {
         // Scroll the pattern
-        if(!Songplaying && !is_recording)
-        {
-            Mouse_Wheel_Pattern_Ed(-MouseWheel_Multiplier);
-        }
+        Mouse_Wheel_Pattern_Ed(-MouseWheel_Multiplier, !Songplaying && !is_recording);
 
         // Scroll the files list
         switch(Scopish)
@@ -4893,10 +4912,7 @@ void Mouse_Handler(void)
     if(Mouse.wheel == -1)
     {
         // Scroll the pattern
-        if(!Songplaying && !is_recording)
-        {
-            Mouse_Wheel_Pattern_Ed(MouseWheel_Multiplier);
-        }
+        Mouse_Wheel_Pattern_Ed(MouseWheel_Multiplier, !Songplaying && !is_recording);
 
         switch(Scopish)
         {
@@ -5401,7 +5417,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(20 + (TAB_LARG * 8), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
         if(zcheckMouse(20 + (TAB_LARG * 9), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
         if(zcheckMouse(20 + (TAB_LARG * 10), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
-        if(zcheckMouse(20 + (TAB_LARG * 11), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
+        if(zcheckMouse(20 + (TAB_LARG * 11), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_MIDI || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
 
         Mouse_Left_Track_Fx_Ed();
         Mouse_Left_Sequencer_Ed();

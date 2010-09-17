@@ -29,26 +29,56 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _EDITOR_SETUP_H_
-#define _EDITOR_SETUP_H_
-
 // ------------------------------------------------------
 // Includes
-#if defined(__GCC__)
-#include "../../include/variables.h"
-#include "../../ui/include/misc_draw.h"
-#else
-#include "../include/variables.h"
-#include "../ui/include/misc_draw.h"
-#endif
+#include "include/editor_setup.h"
+#include "include/editor_sequencer.h"
+#include "include/editor_pattern.h"
+#include "../midi/include/midi.h"
+
+// ------------------------------------------------------
+// Variables
 
 // ------------------------------------------------------
 // Functions
-void Draw_Master_Ed(void);
-void Actualize_Master_Ed(char gode);
-void Mouse_Left_Master_Ed(void);
-void Mouse_Right_Master_Ed(void);
-void Mouse_Sliders_Master_Ed(void);
-void Actualize_Fx_Ed(char gode);
 
-#endif
+void Draw_Midi_Ed(void)
+{
+    Draw_Editors_Bar(USER_SCREEN_SETUP_MIDI);
+
+    Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Flat_Box("Midi Setup");
+
+}
+
+void Actualize_Midi_Ed(char gode)
+{
+    if(userscreen == USER_SCREEN_SETUP_MIDI)
+    {
+
+    }
+}
+
+void Mouse_Right_Midi_Ed(void)
+{
+    if(userscreen == USER_SCREEN_SETUP_MIDI)
+    {
+
+    }
+}
+
+void Mouse_Left_Midi_Ed(void)
+{
+    if(userscreen == USER_SCREEN_SETUP_MIDI)
+    {
+
+    }
+}
+
+void Mouse_Sliders_Midi_Ed(void)
+{
+    if(userscreen == USER_SCREEN_SETUP_MIDI)
+    {
+
+    }
+}

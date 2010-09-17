@@ -29,8 +29,8 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _EDITOR_SETUP_H_
-#define _EDITOR_SETUP_H_
+#ifndef _EDITOR_MIDI_H_
+#define _EDITOR_MIDI_H_
 
 // ------------------------------------------------------
 // Includes
@@ -44,11 +44,10 @@
 
 // ------------------------------------------------------
 // Functions
-void Draw_Master_Ed(void);
-void Actualize_Master_Ed(char gode);
-void Mouse_Left_Master_Ed(void);
-void Mouse_Right_Master_Ed(void);
-void Mouse_Sliders_Master_Ed(void);
-void Actualize_Fx_Ed(char gode);
+void Draw_Midi_Ed(void);
+void Actualize_Midi_Ed(char gode);
+void Mouse_Left_Midi_Ed(void);
+void Mouse_Right_Midi_Ed(void);
+void Mouse_Sliders_Midi_Ed(void);
 
 #endif

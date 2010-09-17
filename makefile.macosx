@@ -22,7 +22,7 @@ FLAGS_X86 = $(DEBUG) -O3 -ffast-math --prefetch-loop-arrays -fomit-frame-pointer
 EXEOBJS_PPC = ptk_ppc.o \
               editor_303_ppc.o editor_pattern_ppc.o editor_sequencer_ppc.o editor_track_ppc.o editor_track_fx_ppc.o \
               patterns_blocks_ppc.o editor_synth_ppc.o editor_sample_ppc.o editor_fx_setup_ppc.o editor_setup_ppc.o \
-              editor_diskio_ppc.o editor_reverb_ppc.o editor_instrument_ppc.o \
+              editor_diskio_ppc.o editor_reverb_ppc.o editor_instrument_ppc.o editor_midi_ppc.o \
               samples_pack_ppc.o files_list_ppc.o files_ppc.o mods_ppc.o patterns_ppc.o reverbs_ppc.o \
               bits_ppc.o pack_ppc.o tinypack_ppc.o words_ppc.o wputils_ppc.o \
               config_ppc.o 303s_ppc.o synths_ppc.o insts_ppc.o ptps_ppc.o \
@@ -36,7 +36,7 @@ EXEOBJS_PPC = ptk_ppc.o \
 EXEOBJS_X86 = ptk_x86.o \
               editor_303_x86.o editor_pattern_x86.o editor_sequencer_x86.o editor_track_x86.o editor_track_fx_x86.o \
               patterns_blocks_x86.o editor_synth_x86.o editor_sample_x86.o editor_fx_setup_x86.o editor_setup_x86.o \
-              editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o \
+              editor_diskio_x86.o editor_reverb_x86.o editor_instrument_x86.o editor_midi_x86.o \
               samples_pack_x86.o files_list_x86.o files_x86.o mods_x86.o patterns_x86.o reverbs_x86.o \
               bits_x86.o pack_x86.o tinypack_x86.o words_x86.o wputils_x86.o \
               config_x86.o 303s_x86.o synths_x86.o insts_x86.o ptps_x86.o \
@@ -107,6 +107,9 @@ editor_reverb_ppc.o: src/editors/editor_reverb.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 editor_instrument_ppc.o: src/editors/editor_instrument.cpp
+	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
+
+editor_midi_ppc.o: src/editors/editor_midi.cpp
 	$(CXX) -c -o $(@) $(FLAGS_PPC) $<
 
 samples_pack_ppc.o: src/samples/samples_pack.cpp
@@ -259,6 +262,9 @@ editor_reverb_x86.o: src/editors/editor_reverb.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 editor_instrument_x86.o: src/editors/editor_instrument.cpp
+	$(CXX) -c -o $(@) $(FLAGS_X86) $<
+
+editor_midi_x86.o: src/editors/editor_midi.cpp
 	$(CXX) -c -o $(@) $(FLAGS_X86) $<
 
 samples_pack_x86.o: src/samples/samples_pack.cpp

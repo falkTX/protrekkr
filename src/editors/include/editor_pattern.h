@@ -90,7 +90,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos);
 void Actualize_Patterned(void);
 void Bound_Patt_Pos(void);
 void Reset_Pattern_Scrolling_Horiz(void);
-void Mouse_Wheel_Pattern_Ed(int roll_amount);
+void Mouse_Wheel_Pattern_Ed(int roll_amount, int allow);
 void Mouse_Sliders_Pattern_Ed(void);
 void Mouse_Sliders_Right_Pattern_Ed(void);
 void Mouse_Left_Pattern_Ed(void);

@@ -162,6 +162,10 @@ SOURCE=.\src\Editors\include\Editor_Instrument.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\editors\include\editor_midi.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Editors\include\Editor_Pattern.h
 # End Source File
 # Begin Source File
@@ -212,6 +216,10 @@ SOURCE=.\src\Editors\Editor_Fx_Setup.cpp
 # Begin Source File
 
 SOURCE=.\src\Editors\Editor_Instrument.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\editors\editor_midi.cpp
 # End Source File
 # Begin Source File
 

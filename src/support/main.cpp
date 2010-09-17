@@ -408,7 +408,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     if(ExePath == NULL)
     {
         Message_Error("Can't open alloc memory.");
-        SDL_Quit();
         exit(0);
     }
     memset(ExePath, 0, ExePath_Size + 1);
@@ -895,18 +894,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 
 	if(ExePath) free(ExePath);
 
-#if !defined(__NO_MIDI__)
-    // Close any opened midi devices on any exit
-    Midi_CloseIn();
-    Midi_CloseOut();
-#endif
-
-#if !defined(__NO_MIDI__)
-    // Free the devices enumeration
-    Midi_FreeAll();
-#endif
-
-    SDL_Quit();
     exit(0);
 }
 

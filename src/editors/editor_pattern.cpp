@@ -39,6 +39,10 @@
 #include "include/editor_sequencer.h"
 
 // ------------------------------------------------------
+// Constants
+#define POS_HORIZ_SLIDER 716
+
+// ------------------------------------------------------
 // Variables
 int VIEWLINE;
 char is_editing = 0;
@@ -2499,23 +2503,44 @@ void Reset_Pattern_Scrolling_Horiz(void)
 
 // ------------------------------------------------------
 // Handle the mouse wheel event
-void Mouse_Wheel_Pattern_Ed(int roll_amount)
+void Mouse_Wheel_Pattern_Ed(int roll_amount, int allow)
 {
     int Cur_Position = Get_Song_Position();
 
-    // Scroll the patterns
-    if(zcheckMouse_nobutton(0, 182, CONSOLE_WIDTH, (Cur_Height - 354) + Patterns_Lines_Offset) == 1)
+    if(allow)
     {
-        Pattern_Line += roll_amount;
-        if(Continuous_Scroll && !Cur_Position) if(Pattern_Line < 0) Pattern_Line = 0;
-        if(Continuous_Scroll && (Cur_Position == Song_Length - 1))
+        // Scroll the patterns
+        if(zcheckMouse_nobutton(0, 182, CONSOLE_WIDTH, (Cur_Height - 354) + Patterns_Lines_Offset) == 1)
         {
-            if(Pattern_Line >= patternLines[pSequence[Cur_Position]])
+            Pattern_Line += roll_amount;
+            if(Continuous_Scroll && !Cur_Position) if(Pattern_Line < 0) Pattern_Line = 0;
+            if(Continuous_Scroll && (Cur_Position == Song_Length - 1))
             {
-                Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
+                if(Pattern_Line >= patternLines[pSequence[Cur_Position]])
+                {
+                    Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
+                }
             }
+            Actupated(0);
         }
-        Actupated(0);
+    }
+
+    // Current track slider (horizontal)
+    if(zcheckMouse(POS_HORIZ_SLIDER - 1, (Cur_Height - 171) + Patterns_Lines_Offset,
+                   (Cur_Width - (POS_HORIZ_SLIDER + 1)), 16))
+    {
+        Visible_Columns = Get_Visible_Complete_Tracks();
+
+        gui_track += -roll_amount;
+        if(gui_track < 0)
+        {
+            gui_track = 0;
+        }
+        if(gui_track >= ((Songtracks - Visible_Columns)))
+        {
+            gui_track = ((Songtracks - Visible_Columns));
+        }
+        Actupated(1);
     }
 }
 
@@ -2568,8 +2593,6 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
         }
     }
 }
-
-#define POS_HORIZ_SLIDER 716
 
 // ------------------------------------------------------
 // Set the layout of the horizontal tracks slider and bound the caret

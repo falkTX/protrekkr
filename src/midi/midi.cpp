@@ -422,7 +422,10 @@ void _Midi_Send(int nbr_track, int eff_dat, int row_dat)
         message.push_back(nbr_track);
         message.push_back(eff_dat);
         message.push_back(row_dat);
-        if(midiout) midiout->sendMessage(&message);
+        if(midiout)
+        {
+            midiout->sendMessage(&message);
+        }
     }
 }
 

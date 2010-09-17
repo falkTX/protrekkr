@@ -52,6 +52,7 @@
 #include "../files/include/patterns.h"
 
 #include "../editors/include/editor_setup.h"
+#include "../editors/include/editor_midi.h"
 #include "../editors/include/editor_303.h"
 #include "../editors/include/editor_fx_setup.h"
 #include "../editors/include/editor_synth.h"
