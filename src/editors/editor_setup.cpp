@@ -144,12 +144,16 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(670, (Cur_Height - 145), 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, (Cur_Height - 125), 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 105), 60, 16, "Themes", BUTTON_NO_BORDER | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 85), 29, 16, "1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 85), 29, 16, "2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 65), 29, 16, "3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 65), 29, 16, "4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 45), 29, 16, "5", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 45), 29, 16, "6", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 85), 18, 16, "1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 85), 18, 16, "2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 85), 18, 16, "3", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 65), 18, 16, "4", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 65), 18, 16, "5", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 65), 18, 16, "6", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 45), 18, 16, "7", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 45), 18, 16, "8", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 45), 18, 16, "9", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
     Gui_Draw_Button_Box(8, (Cur_Height - 65), 110, 16, "Default Pattern Font", BUTTON_NORMAL | BUTTON_DISABLED);
 
@@ -700,7 +704,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // set default palette 1
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 85), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 85), 18, 16))
         {
             Restore_Default_Palette(Default_Palette1, Default_Beveled1);
             Get_Phony_Palette();
@@ -709,7 +713,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Set default palette 2
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 85), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 85), 18, 16))
         {
             Restore_Default_Palette(Default_Palette2, Default_Beveled2);
             Get_Phony_Palette();
@@ -718,7 +722,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Set default palette 3
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 65), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 85), 18, 16))
         {
             Restore_Default_Palette(Default_Palette3, Default_Beveled3);
             Get_Phony_Palette();
@@ -727,7 +731,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Set default palette 4
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 65), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 65), 18, 16))
         {
             Restore_Default_Palette(Default_Palette4, Default_Beveled4);
             Get_Phony_Palette();
@@ -736,7 +740,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Set default palette 5
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 45), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 65), 18, 16))
         {
             Restore_Default_Palette(Default_Palette5, Default_Beveled5);
             Get_Phony_Palette();
@@ -745,9 +749,36 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Set default palette 6
-        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 31, (Cur_Height - 45), 29, 16))
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 65), 18, 16))
         {
             Restore_Default_Palette(Default_Palette6, Default_Beveled6);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }
+
+        // Set default palette 7
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 45), 18, 16))
+        {
+            Restore_Default_Palette(Default_Palette7, Default_Beveled7);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }
+
+        // Set default palette 8
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 21, (Cur_Height - 45), 18, 16))
+        {
+            Restore_Default_Palette(Default_Palette8, Default_Beveled8);
+            Get_Phony_Palette();
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 10;
+        }
+
+        // Set default palette 9
+        if(zcheckMouse(520 + (18 + 108) + 2 + 20 + 66 + 42, (Cur_Height - 45), 18, 16))
+        {
+            Restore_Default_Palette(Default_Palette9, Default_Beveled9);
             Get_Phony_Palette();
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 10;

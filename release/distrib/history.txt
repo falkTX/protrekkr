@@ -2,9 +2,37 @@
 ProTrekkr releases history
 ===============================================================================
 
-v2.1.5:
+v2.2.0:
 
-- Improved midi in/out support.
+- Improved midi in/out support (notably by adding velocity).
+- Default instruments volumes are always turned on now
+  as they're used for midi output.
+- Added 3 new themes.
+
+TODO:
+
+- Midi profiles (save files).
+- C(ontroller) C(ommand) mapping 0x00 to 0xff:
+  - Master volume.
+  - 303 select (1 or 2).
+  - 303 pattern 1/2/3/4/5/6/7/8.
+  - 303 bank A/B/C/D.
+  - 303 step increase/decrease.
+  - 303 saw/square.
+  - 303 tune knob.
+  - 303 cutoff knob.
+  - 303 reso knob.
+  - 303 envmod knob.
+  - 303 decay knob.
+  - 303 accent knob.
+  - 303 up.
+  - 303 down.
+  - 303 note/silent.
+  - 303 accent.
+  - 303 slide.
+  - 303 volume.
+  - Channel filter cutoff.
+  - Channel filter frequency.
 
 v2.1.4:
 

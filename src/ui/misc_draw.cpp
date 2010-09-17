@@ -655,7 +655,7 @@ SDL_Color Default_Palette5[] =
     { 0x00, 0x16, 0x32, 0x00 },
     { 0x46, 0x90, 0xee, 0x00 },
 
-    { 0x0,  0x0A, 0x24, 0x00 },
+    { 0x00, 0x0A, 0x24, 0x00 },
     { 0x94, 0xb4, 0xff, 0x00 },
 
     { 0x0a, 0x32, 0x72, 0x00 },
@@ -710,7 +710,7 @@ SDL_Color Default_Palette5[] =
     { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
 };
 
-int Default_Beveled6 = 2;
+int Default_Beveled6 = 0;
 SDL_Color Default_Palette6[] =
 {
     { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
@@ -746,7 +746,7 @@ SDL_Color Default_Palette6[] =
     { 0x20, 0x00, 0x00, 0x00 },
     { 0xee, 0x74, 0x3a, 0x00 },
 
-    { 0x20, 0x00, 0x00, 0x00 },
+    { 0x00, 0x14, 0x14, 0x00 },
     { 0xff, 0xff, 0x94, 0x00 },
 
     { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
@@ -760,6 +760,270 @@ SDL_Color Default_Palette6[] =
 
     { 0xce, 0x00, 0x00, 0x00 },
     { 0xff, 0x74, 0x00, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled7 = 2;
+SDL_Color Default_Palette7[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x96, 0xa6, 0xb6, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x96, 0xa6, 0xb6, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x78, 0x86, 0x94, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0xf4, 0xe4, 0x5e, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x5a, 0x66, 0x76, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0x2a, 0x0c, 0x48, 0x00 },
+    { 0x30, 0x60, 0xc8, 0x00 },
+    { 0x00, 0x10, 0x20, 0x00 },
+
+    { 0x00, 0x08, 0x16, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x96, 0xa6, 0xb6, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },
+
+    { 0x8a, 0x8c, 0x8e, 0x00 },
+    { 0x44, 0x32, 0x4a, 0x00 },
+
+    { 0x58, 0x68, 0x78, 0x00 },
+    { 0xe4, 0xf4, 0xff, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0x12, 0x1e, 0x2e, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0x20, 0x10, 0x32, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xda, 0xf0, 0xff, 0x00 },
+
+    { 0x22, 0x86, 0x50, 0x00 },
+    { 0x7a, 0xca, 0x9c, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled8 = 2;
+SDL_Color Default_Palette8[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x46, 0xaa, 0xc0, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x32, 0x96, 0xac, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x84, 0x14, 0x22, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x16, 0x00, 0x32, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x00, 0x30, 0x44, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0xb2, 0xf6, 0xae, 0x00 },
+    { 0xbe, 0xe0, 0xc8, 0x00 },
+    { 0xff, 0xe8, 0xa4, 0x00 },
+
+    { 0xf2, 0xfe, 0xff, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x46, 0xaa, 0xc0, 0x00 },
+    { 0x00, 0x22, 0x4a, 0x00 },
+
+    { 0x4c, 0xae, 0xc8, 0x00 },
+    { 0x00, 0x4e, 0x5c, 0x00 },
+
+    { 0x66, 0xbe, 0xd0, 0x00 },
+    { 0xc2, 0xf4, 0xff, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0x00, 0x38, 0x42, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0x5e, 0x10, 0x32, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xcc, 0xfe, 0xff, 0x00 },
+
+    { 0x1c, 0x68, 0x80, 0x00 },
+    { 0x6a, 0xde, 0xe6, 0x00 },
+
+    { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 34 Shadow Pattern lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 35 Shadow Pattern lo foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 36 Shadow Pattern hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 37 Shadow Pattern hi foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 38 Shadow Pattern sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 39 Shadow Pattern sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 40 Shadow Note lo background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 41 Shadow Note lo foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 42 Shadow Note hi background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 43 Shadow Note hi foreground (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 44 Shadow Note sel background (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 45 Shadow Note sel foreground (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 46 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 47 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 48 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 49 RGB double inverted buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 50 RGB double inverted buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 51 RGB double inverted buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 52 RGB double buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 53 RGB double buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 54 RGB double buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 55 RGB double input buttons highlight (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 56 RGB double input buttons (calculated)
+    { 0x00, 0x00, 0x00, 0x00 },      // 57 RGB double input buttons shadow (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 58 Phony always black (fixed)
+};
+
+int Default_Beveled9 = 2;
+SDL_Color Default_Palette9[] =
+{
+    { 0x00, 0x00, 0x00, 0x00 },      // 0 lists/samples/vumeters background/sequencer (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 2 static highlight (calculated)
+	{ 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 4 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 5 interactive parts highlight (calculated)
+    { 0x2c, 0x1a, 0x0a, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 7 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 8 pushed button highlight (calculated)
+    { 0x54, 0x32, 0x30, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 10 (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 11 slider highlight (calculated)
+    { 0x16, 0x0a, 0x04, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
+
+    { 0x58, 0xc6, 0x22, 0x00 },
+    { 0x5e, 0x9e, 0xd4, 0x00 },
+    { 0x24, 0xac, 0x52, 0x00 },
+
+    { 0xff, 0xf6, 0xee, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
+
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0xff, 0xee, 0xc2, 0x00 },
+
+    { 0x16, 0x0e, 0x00, 0x00 },
+    { 0xff, 0xf0, 0xd4, 0x00 },
+
+    { 0x48, 0x00, 0x18, 0x00 },
+    { 0xff, 0xff, 0xff, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 25 Note lo background (calculated)
+    { 0xcc, 0xaa, 0x1e, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 27 Note hi background (calculated)
+    { 0xc0, 0xac, 0x1e, 0x00 },
+
+    { 0x00, 0x00, 0x00, 0x00 },      // 29 Note sel background (calculated)
+	{ 0xff, 0xff, 0xc4, 0x00 },
+
+    { 0x6a, 0x3a, 0x00, 0x00 },
+    { 0xa2, 0x8a, 0x54, 0x00 },
 
     { 0xff, 0xff, 0xff, 0x00 },      // 33 mute/play highlight (fixed)
 
@@ -1292,6 +1556,7 @@ void Draw_Editors_Bar(int Highlight)
         BUTTON_NORMAL,
         BUTTON_NORMAL,
         BUTTON_NORMAL,
+        BUTTON_NORMAL,
         BUTTON_NORMAL
     };
     
@@ -1324,19 +1589,26 @@ void Draw_Editors_Bar(int Highlight)
         Actupated(0);
     }
     
-    if(Patterns_Lines_Offset == 0) Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
-    else Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(20, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Sequencer", Highlight_Tab[4]);
-    Gui_Draw_Button_Box(84, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Instrument", Highlight_Tab[2]);
-    Gui_Draw_Button_Box(148, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Synth", Highlight_Tab[6]);
-    Gui_Draw_Button_Box(212, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Sample Ed.", Highlight_Tab[8]);
-    Gui_Draw_Button_Box(276, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "303", Highlight_Tab[9]);
-    Gui_Draw_Button_Box(340, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Track", Highlight_Tab[1]);
-    Gui_Draw_Button_Box(404, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Track FX", Highlight_Tab[7]);
-    Gui_Draw_Button_Box(468, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "FX Setup", Highlight_Tab[3]);
-    Gui_Draw_Button_Box(532, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Reverb", Highlight_Tab[10]);
-    Gui_Draw_Button_Box(596, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Disk IO", Highlight_Tab[0]);
-    Gui_Draw_Button_Box(660, (Cur_Height - 171) + Patterns_Lines_Offset, 62, 16, "Misc. Setup", Highlight_Tab[5]);
+    if(Patterns_Lines_Offset == 0)
+    {
+        Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\010", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    }
+    else
+    {
+        Gui_Draw_Button_Box(0, (Cur_Height - 171) + Patterns_Lines_Offset, 18, 16, "\007", Highlight_Tab[11] | BUTTON_TEXT_CENTERED);
+    }
+    Gui_Draw_Button_Box(20, (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Sequencer", Highlight_Tab[4]);
+    Gui_Draw_Button_Box(20 + TAB_LARG, (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Instrument", Highlight_Tab[2] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 2), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Synth", Highlight_Tab[6] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 3), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Sample Ed.", Highlight_Tab[8] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 4), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "303", Highlight_Tab[9] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 5), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track", Highlight_Tab[1] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 6), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track FX", Highlight_Tab[7] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 7), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "FX Setup", Highlight_Tab[3] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 8), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Reverb", Highlight_Tab[10] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 9), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Disk IO", Highlight_Tab[0] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 10), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Misc. Setup", Highlight_Tab[5] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 11), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Midi Setup", Highlight_Tab[12] | BUTTON_TEXT_CENTERED);
 
     if(Highlight != USER_SCREEN_LARGE_PATTERN)
     {

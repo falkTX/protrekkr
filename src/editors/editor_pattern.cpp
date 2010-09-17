@@ -2569,6 +2569,8 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     }
 }
 
+#define POS_HORIZ_SLIDER 716
+
 // ------------------------------------------------------
 // Set the layout of the horizontal tracks slider and bound the caret
 void Set_Track_Slider(int pos)
@@ -2582,12 +2584,12 @@ void Set_Track_Slider(int pos)
     {
         fpos = 0.0f;
     }
-    Realslider_Horiz(724,
+    Realslider_Horiz(POS_HORIZ_SLIDER,
                      (Cur_Height - 171) + Patterns_Lines_Offset,
                      (int) fpos,
                      Visible_Columns,
                      Songtracks,
-                     Cur_Width - 725,
+                     Cur_Width - (POS_HORIZ_SLIDER + 1),
                      TRUE);
 }
 
@@ -2596,13 +2598,13 @@ void Set_Track_Slider(int pos)
 void Mouse_Sliders_Pattern_Ed(void)
 {
     // Current track slider (horizontal)
-    if(zcheckMouse(723, (Cur_Height - 171) + Patterns_Lines_Offset,
-                   (Cur_Width - 725), 16))
+    if(zcheckMouse(POS_HORIZ_SLIDER - 1, (Cur_Height - 171) + Patterns_Lines_Offset,
+                   (Cur_Width - (POS_HORIZ_SLIDER + 1)), 16))
     {
-        float Pos_Mouse = (float) (Mouse.x - 723);
+        float Pos_Mouse = (float) (Mouse.x - (POS_HORIZ_SLIDER - 1));
         if(Pos_Mouse < 0) Pos_Mouse = 0;
         // Normalize and scale
-        Pos_Mouse = Pos_Mouse / ((float) (Cur_Width - 723));
+        Pos_Mouse = Pos_Mouse / ((float) (Cur_Width - (POS_HORIZ_SLIDER - 1)));
         if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
         Visible_Columns = Get_Visible_Complete_Tracks();
 

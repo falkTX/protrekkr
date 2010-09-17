@@ -133,7 +133,7 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
     }
     switch(Midi_Command)
     {
-        // Pitch bend
+        // Pitch bend (not handled yet).
         case 0xe0:
             Midi_Datas_1 = (Param1 >> 8) & 0xff;
             Midi_Datas_2 = (Param1 >> 16) & 0xff;
@@ -149,8 +149,8 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
                     // Sustain pedal
                     break;
 
-                case 0x7:
-                    // Master volume
+                case 71:
+                    // Master volume (should be in messages table)
                     local_mas_vol = ((float) Midi_Datas_2 / 127.0f);
                     if(local_mas_vol < 0.0f) local_mas_vol = 0.0f;
                     if(local_mas_vol > 1.0f) local_mas_vol = 1.0f;

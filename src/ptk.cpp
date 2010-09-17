@@ -3121,6 +3121,10 @@ void Keyboard_Handler(void)
         {
             gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
         }
+        if(Keys[SDLK_F12])
+        {
+            gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
+        }
     }
 
     // Previous track
@@ -5379,24 +5383,25 @@ void Mouse_Handler(void)
         }
 
         if(zcheckMouse(20, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SEQUENCER || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SEQUENCER;
-        if(zcheckMouse(84, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
+        if(zcheckMouse(20 + (TAB_LARG * 1), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_INSTRUMENT_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_INSTRUMENT_EDIT;
             seditor = 0;
         }
-        if(zcheckMouse(148, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SYNTH_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
-        if(zcheckMouse(212, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SAMPLE_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
-        if(zcheckMouse(276, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TB303_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TB303_EDIT;
-        if(zcheckMouse(340, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
-        if(zcheckMouse(404, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_TRACK_FX_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
-        if(zcheckMouse(468, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_FX_SETUP_EDIT || Patterns_Lines_Offset))
+        if(zcheckMouse(20 + (TAB_LARG * 2), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SYNTH_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SYNTH_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 3), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SAMPLE_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SAMPLE_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 4), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_TB303_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TB303_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 5), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_TRACK_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 6), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_TRACK_FX_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_TRACK_FX_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 7), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_FX_SETUP_EDIT || Patterns_Lines_Offset))
         {
             gui_action = GUI_CMD_SELECT_FX_EDIT;
             teac = 0;
         }
-        if(zcheckMouse(532, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
-        if(zcheckMouse(596, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
-        if(zcheckMouse(660, (Cur_Height - 171) + Add_Offset, 62, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 8), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 9), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 10), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
+        if(zcheckMouse(20 + (TAB_LARG * 11), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
 
         Mouse_Left_Track_Fx_Ed();
         Mouse_Left_Sequencer_Ed();

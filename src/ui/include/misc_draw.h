@@ -39,6 +39,8 @@
 
 // ------------------------------------------------------
 // Constants
+#define TAB_LARG 58
+
 #define USE_FONT 0
 #define USE_FONT_LOW 1
 
@@ -179,6 +181,12 @@ extern int Default_Beveled5;
 extern SDL_Color Default_Palette5[COL_BLACK + 1];
 extern int Default_Beveled6;
 extern SDL_Color Default_Palette6[COL_BLACK + 1];
+extern int Default_Beveled7;
+extern SDL_Color Default_Palette7[COL_BLACK + 1];
+extern int Default_Beveled8;
+extern SDL_Color Default_Palette8[COL_BLACK + 1];
+extern int Default_Beveled9;
+extern SDL_Color Default_Palette9[COL_BLACK + 1];
 extern LONGRGB Phony_Palette[];
 extern int Idx_Palette[];
 extern int curr_tab_highlight;

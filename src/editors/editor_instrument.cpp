@@ -115,7 +115,7 @@ void Draw_Instrument_Ed(void)
             Gui_Draw_Button_Box(382, (Cur_Height - 80), 64, 16, "Loop Type", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(510, (Cur_Height - 134), 58, 16, "Split", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(510, (Cur_Height - 116), 58, 16, "Base Note", BUTTON_NORMAL | BUTTON_DISABLED);
-            Gui_Draw_Button_Box(510, (Cur_Height - 98), 58, 16, "Midi Prg.", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(510, (Cur_Height - 98), 58, 16, "Midi Prog.", BUTTON_NORMAL | BUTTON_DISABLED);
 
             Gui_Draw_Button_Box(729, (Cur_Height - 134), 60, 16, "Mp3 BitRate", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(729, (Cur_Height - 98), 60, 16, "At3 BitRate", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
@@ -1332,12 +1332,12 @@ void Dump_Instruments_Synths_List(int xr, int yr)
 
                             if(Midiprg[rel_val] == -1)
                             {
-                                sprintf(Line, "Midi prg.: -");
+                                sprintf(Line, "Midi prog.: -");
                                 PrintXY(xr + (Cur_Width - 480), yr + (counter * 12), Font, Line);
                             }
                             else
                             {
-                                sprintf(Line, "Midi prg.: %.2d", Midiprg[rel_val]);
+                                sprintf(Line, "Midi prog.: %.2d", Midiprg[rel_val]);
                                 PrintXY(xr + (Cur_Width - 480), yr + (counter * 12), USE_FONT, Line);
                             }
                             break;
