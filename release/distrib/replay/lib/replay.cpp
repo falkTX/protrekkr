@@ -2326,7 +2326,7 @@ void Sp_Player(void)
                                                 toffset,
                                                 glide,
                                                 FALSE, i + 1,
-                                                Sample_Vol[pl_sample[i]]);
+                                                1.0f);
                         }
                     }
                 }
@@ -3358,12 +3358,12 @@ void Schedule_Instrument(int channel,
         Instrument_Schedule_Dat[channel][sub_channel].start_backward = FALSE;
         Instrument_Schedule_Dat[channel][sub_channel].inote = inote;
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
-        Instrument_Schedule_Dat[channel][sub_channel].vol = vol;
+        Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample] * vol;
 #if defined(PTK_SYNTH)
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME;
+        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME * vol;
 #else
-        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].glb_volume * 0.0078125f;
+        Instrument_Schedule_Dat[channel][sub_channel].vol_synth = (PARASynth[sample].glb_volume * 0.0078125f) * vol;
 #endif
 #endif
         Instrument_Schedule_Dat[channel][sub_channel].offset = offset;
@@ -4379,7 +4379,7 @@ void Do_Effects_Ticks_X(void)
                                                 0, 0,
                                                 FALSE,
                                                 i + 1,
-                                                Sample_Vol[pltr_sample[i]]);
+                                                1.0f);
                         }
                     }
                     break;

@@ -6511,7 +6511,8 @@ void Note_Jazz(int track, int note, float volume)
     if(Jazz_Edit || is_recording_2 || !is_editing)
     {
         sp_Tvol_Mod[track] = 1.0f;
-        Schedule_Instrument(track, Sub_Channel,
+        Schedule_Instrument(track,
+                            Sub_Channel,
                             note,
                             Current_Instrument,
                             0,

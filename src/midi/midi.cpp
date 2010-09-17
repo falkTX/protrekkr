@@ -133,6 +133,12 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
     }
     switch(Midi_Command)
     {
+        // Pitch bend
+        case 0xe0:
+            Midi_Datas_1 = (Param1 >> 8) & 0xff;
+            Midi_Datas_2 = (Param1 >> 16) & 0xff;
+            break;
+
         // Control Change
         case 0xb0:
             Midi_Datas_1 = (Param1 >> 8) & 0xff;
@@ -145,13 +151,14 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
 
                 case 0x7:
                     // Master volume
-                    local_mas_vol = ((float) Midi_Datas_2 / 128.0f);
+                    local_mas_vol = ((float) Midi_Datas_2 / 127.0f);
                     if(local_mas_vol < 0.0f) local_mas_vol = 0.0f;
                     if(local_mas_vol > 1.0f) local_mas_vol = 1.0f;
                     break;
 
                 default:
                     Unknown_Message = Param1;
+                    // Handle messages table here
                     break;
             }
             break;
@@ -177,7 +184,6 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
 
         // Note On
         case 0x90:
-
             Midi_Velocity = (Param1 >> 16) & 0xff;
             if(Midi_Velocity > 0xfe) Midi_Velocity = 0xfe;
             tmp_note = (Param1 >> 8) & 0xff;
@@ -209,7 +215,6 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
             break;
 
         default:
-
             Unknown_Message = Param1;
             break;
     }
