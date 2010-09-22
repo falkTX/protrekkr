@@ -8,7 +8,7 @@
     RtMidi WWW site: http://music.mcgill.ca/~gary/rtmidi/
 
     RtMidi: realtime MIDI i/o C++ classes
-    Copyright (c) 2003-2009 Gary P. Scavone
+    Copyright (c) 2003-2010 Gary P. Scavone
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files
@@ -35,7 +35,7 @@
 */
 /**********************************************************************/
 
-// RtMidi: Version 1.0.8
+// RtMidi: Version 1.0.11
 
 #include "include/RtMidi.h"
 #include <sstream>
@@ -46,6 +46,28 @@
 
 RtMidi :: RtMidi() : apiData_(0), connected_(false)
 {
+}
+
+void RtMidi :: error(RtError::Type type)
+{
+/*    if(type == RtError::WARNING)
+    {
+        std::cerr << '\n' << errorString_ << "\n\n";
+    }
+    else if(type == RtError::DEBUG_WARNING)
+    {
+#if defined(__RTMIDI_DEBUG__)
+        std::cerr << '\n' << errorString_ << "\n\n";
+#endif
+    }
+    else
+    {
+        std::cerr << '\n' << errorString_ << "\n\n";
+        throw
+        {
+            RtError(errorString_, type);
+        }
+    }*/
 }
 
 //*********************************************************************//
@@ -61,11 +83,15 @@ void RtMidiIn :: setCallback(RtMidiCallback callback, void *userData)
 {
     if(inputData_.usingCallback)
     {
+        sprintf(errorString_, "RtMidiIn::setCallback: a callback function is already set!");
+        error(RtError::WARNING);
         return;
     }
 
     if(!callback)
     {
+        sprintf(errorString_, "RtMidiIn::setCallback: callback function value is invalid!");
+        error(RtError::WARNING);
         return;
     }
 
@@ -78,6 +104,8 @@ void RtMidiIn :: cancelCallback()
 {
     if(!inputData_.usingCallback)
     {
+        sprintf(errorString_, "RtMidiIn::cancelCallback: no callback function was set!");
+        error(RtError::WARNING);
         return;
     }
 
@@ -107,6 +135,8 @@ double RtMidiIn :: getMessage(std::vector<unsigned char> *message)
 
     if(inputData_.usingCallback)
     {
+        sprintf(errorString_, "RtMidiIn::getNextMessage: a user callback is currently set for this port.");
+        error(RtError::WARNING);
         return 0.0;
     }
 
@@ -149,6 +179,7 @@ RtMidiOut :: RtMidiOut(char *clientName) : RtMidi()
 // OS-X CoreMIDI header files.
 #include <CoreMIDI/CoreMIDI.h>
 #include <CoreAudio/HostTime.h>
+#include <CoreServices/CoreServices.h>
 
 // A structure to hold variables related to the CoreMIDI API
 // implementation.
@@ -181,7 +212,6 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
     const MIDIPacket *packet = &list->packet[0];
     for(unsigned int i = 0; i < list->numPackets; ++i)
     {
-
         // My interpretation of the CoreMIDI documentation: all message
         // types, except sysex, are complete within a packet and there may
         // be several of them in a single packet.  Sysex messages can be
@@ -196,7 +226,7 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
 
         // Calculate time stamp.
         message.timeStamp = 0.0;
-        if (data->firstMessage)
+        if(data->firstMessage)
         {
             data->firstMessage = false;
         }
@@ -210,7 +240,7 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
         apiData->lastTime = packet->timeStamp;
 
         iByte = 0;
-        if ( continueSysex )
+        if(continueSysex)
         {
             // We have a continuing, segmented sysex message.
             if(!(data->ignoreFlags & 0x01))
@@ -221,7 +251,7 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
                     message.bytes.push_back(packet->data[j]);
                 }
             }
-            continueSysex = packet->data[nBytes-1] != 0xF7;
+            continueSysex = packet->data[nBytes - 1] != 0xF7;
 
             if(!continueSysex)
             {
@@ -238,28 +268,32 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
                     {
                         data->queue.push(message);
                     }
-                    //else
+#if defined(__RTMIDI_DEBUG__)
+                    else
+                    {
                         //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+                    }
+#endif
                 }
                 message.bytes.clear();
             }
         }
         else
         {
-            while ( iByte < nBytes )
+            while(iByte < nBytes)
             {
                 size = 0;
                 // We are expecting that the next byte in the packet is a status byte.
                 status = packet->data[iByte];
-                if ( !(status & 0x80) ) break;
+                if(!(status & 0x80)) break;
                 // Determine the number of bytes in the MIDI message.
-                if ( status < 0xC0 ) size = 3;
-                else if ( status < 0xE0 ) size = 2;
-                else if ( status < 0xF0 ) size = 3;
-                else if ( status == 0xF0 )
+                if(status < 0xC0) size = 3;
+                else if(status < 0xE0) size = 2;
+                else if(status < 0xF0) size = 3;
+                else if(status == 0xF0)
                 {
                     // A MIDI sysex
-                    if ( data->ignoreFlags & 0x01 )
+                    if(data->ignoreFlags & 0x01)
                     {
                         size = 0;
                         iByte = nBytes;
@@ -268,11 +302,11 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
                     {
                         size = nBytes - iByte;
                     }
-                    continueSysex =  packet->data[nBytes-1] != 0xF7;
+                    continueSysex =  packet->data[nBytes - 1] != 0xF7;
                 }
-                else if ( status < 0xF3 )
+                else if(status < 0xF3)
                 {
-                    if ( status == 0xF1 && (data->ignoreFlags & 0x02) )
+                    if(status == 0xF1 && (data->ignoreFlags & 0x02))
                     {
                         // A MIDI time code message and we're ignoring it.
                         size = 0;
@@ -283,11 +317,11 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
                         size = 3;
                     }
                 }
-                else if ( status == 0xF3 ) size = 2;
-                else if ( status == 0xF8 )
+                else if(status == 0xF3) size = 2;
+                else if(status == 0xF8)
                 {
                     size = 1;
-                    if ( data->ignoreFlags & 0x02 )
+                    if(data->ignoreFlags & 0x02)
                     {
                         // A MIDI timing tick message and we're ignoring it.
                         size = 0;
@@ -324,6 +358,12 @@ void midiInputCallback(const MIDIPacketList *list, void *procRef, void *srcRef)
                             {
                                 data->queue.push( message );
                             }
+#if defined(__RTMIDI_DEBUG__)
+                            else
+                            {
+                                //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+                            }
+#endif
                         }
                         message.bytes.clear();
                     }
@@ -339,9 +379,16 @@ void RtMidiIn :: initialize(char *clientName)
 {
     // Set up our client.
     MIDIClientRef client;
-    OSStatus result = MIDIClientCreate(CFStringCreateWithCString(NULL, clientName, kCFStringEncodingASCII), NULL, NULL, &client);
+    OSStatus result = MIDIClientCreate(CFStringCreateWithCString(NULL,
+                                                                 clientName,
+                                                                 kCFStringEncodingASCII),
+                                                                 NULL,
+                                                                 NULL,
+                                                                 &client);
     if(result != noErr)
     {
+        sprintf(errorString_, "RtMidiIn::initialize: error creating OS-X MIDI client object.");
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -353,21 +400,28 @@ void RtMidiIn :: initialize(char *clientName)
     inputData_.apiData = (void *) data;
 }
 
-void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
+void RtMidiIn :: openPort(unsigned int portNumber, const std::string portName)
 {
     if(connected_)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: a valid connection already exists!");
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nSrc = MIDIGetNumberOfSources();
     if(nSrc < 1)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: no MIDI input sources found!");
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
+    std::ostringstream ost;
     if(portNumber >= nSrc)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: the 'portNumber' argument (%d) is invalid.", portNumber);
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -375,7 +429,7 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
     CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
     OSStatus result = MIDIInputPortCreate(data->client, 
                                           CFStringCreateWithCString(NULL,
-                                                                    portName.c_str(),
+                                                                    portName,
                                                                     kCFStringEncodingASCII),
                                           midiInputCallback,
                                           (void *) &inputData_,
@@ -383,15 +437,19 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
     if(result != noErr)
     {
         MIDIClientDispose(data->client);
+        errorString_ = "RtMidiIn::openPort: error creating OS-X MIDI input port.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
     // Get the desired input source identifier.
     MIDIEndpointRef endpoint = MIDIGetSource(portNumber);
-    if(endpoint == NULL)
+    if(endpoint == 0)
     {
         MIDIPortDispose(port);
         MIDIClientDispose(data->client);
+        errorString_ = "RtMidiIn::openPort: error getting MIDI input source reference.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -401,16 +459,17 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
     {
         MIDIPortDispose(port);
         MIDIClientDispose(data->client);
+        errorString_ = "RtMidiIn::openPort: error connecting OS-X MIDI input port.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
     // Save our api-specific port information.
     data->port = port;
-
     connected_ = true;
 }
 
-void RtMidiIn :: openVirtualPort(const std::string portName)
+void RtMidiIn :: openVirtualPort(char *portName)
 {
     CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
 
@@ -418,13 +477,15 @@ void RtMidiIn :: openVirtualPort(const std::string portName)
     MIDIEndpointRef endpoint;
     OSStatus result = MIDIDestinationCreate(data->client,
                                             CFStringCreateWithCString(NULL,
-                                                                      portName.c_str(),
+                                                                      portName,
                                                                       kCFStringEncodingASCII),
                                             midiInputCallback,
                                             (void *) &inputData_,
                                             &endpoint);
     if(result != noErr)
     {
+        errorString_ = "RtMidiIn::openVirtualPort: error creating virtual OS-X MIDI destination.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -462,20 +523,181 @@ unsigned int RtMidiIn :: getPortCount()
     return MIDIGetNumberOfSources();
 }
 
-std::string RtMidiIn :: getPortName(unsigned int portNumber,
-                                    char *Name)
+// This function was submitted by Douglas Casey Tucker and apparently
+// derived largely from PortMidi.
+CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal)
+{
+    CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
+    CFStringRef str;
+
+    // Begin with the endpoint's name.
+    str = NULL;
+    MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &str);
+    if(str != NULL)
+    {
+        CFStringAppend(result, str);
+        CFRelease(str);
+    }
+    
+    MIDIEntityRef entity = NULL;
+    MIDIEndpointGetEntity(endpoint, &entity);
+    if(entity == 0)
+    {
+        // probably virtual
+        return result;
+    }
+    
+    if(CFStringGetLength(result) == 0)
+    {
+        // endpoint name has zero length -- try the entity
+        str = NULL;
+        MIDIObjectGetStringProperty(entity, kMIDIPropertyName, &str);
+        if(str != NULL)
+        {
+            CFStringAppend(result, str);
+            CFRelease(str);
+        }
+    }
+
+    // now consider the device's name
+    MIDIDeviceRef device = 0;
+    MIDIEntityGetDevice(entity, &device);
+    if(device == 0)
+    {
+        return result;
+    }
+
+    str = NULL;
+    MIDIObjectGetStringProperty(device, kMIDIPropertyName, &str);
+    if(CFStringGetLength( result ) == 0)
+    {
+        CFRelease(result);
+        return str;
+    }
+    if(str != NULL)
+    {
+        // if an external device has only one entity, throw away
+        // the endpoint name and just use the device name
+        if(isExternal && MIDIDeviceGetNumberOfEntities(device) < 2)
+        {
+            CFRelease(result);
+            return str;
+        }
+        else
+        {
+            if(CFStringGetLength(str) == 0)
+            {
+                CFRelease(str);
+                return result;
+            }
+            // does the entity name already start with the device name?
+            // (some drivers do this though they shouldn't)
+            // if so, do not prepend
+            if(CFStringCompareWithOptions(result, /* endpoint name */
+                                          str /* device name */,
+                                          CFRangeMake(0, CFStringGetLength(str)), 0) != kCFCompareEqualTo)
+            {
+                // prepend the device name to the entity name
+                if(CFStringGetLength(result) > 0)
+                {
+                    CFStringInsert(result, 0, CFSTR(" "));
+                }
+                CFStringInsert(result, 0, str);
+            }
+            CFRelease(str);
+        }
+    }
+    return result;
+}
+
+// This function was submitted by Douglas Casey Tucker and apparently
+// derived largely from PortMidi.
+static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint)
+{
+    CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
+    CFStringRef str;
+    OSStatus err;
+    int i;
+
+    // Does the endpoint have connections?
+    CFDataRef connections = NULL;
+    int nConnected = 0;
+    bool anyStrings = false;
+
+    err = MIDIObjectGetDataProperty(endpoint, kMIDIPropertyConnectionUniqueID, &connections);
+    if(connections != NULL)
+    {
+        // It has connections, follow them
+        // Concatenate the names of all connected devices
+        nConnected = CFDataGetLength(connections) / sizeof(MIDIUniqueID);
+        if(nConnected)
+        {
+            const SInt32 *pid = (const SInt32 *) (CFDataGetBytePtr(connections));
+
+            for(i = 0; i < nConnected; ++i, ++pid)
+            {
+                MIDIUniqueID id = EndianS32_BtoN(*pid);
+                MIDIObjectRef connObject;
+                MIDIObjectType connObjectType;
+                err = MIDIObjectFindByUniqueID(id, &connObject, &connObjectType);
+                if(err == noErr)
+                {
+                    if(connObjectType == kMIDIObjectType_ExternalSource ||
+                       connObjectType == kMIDIObjectType_ExternalDestination)
+                    {
+                        // Connected to an external device's endpoint (10.3 and later).
+                        str = EndpointName((MIDIEndpointRef)(connObject), true);
+                    }
+                    else
+                    {
+                        // Connected to an external device (10.2) (or something else, catch-
+                        str = NULL;
+                        MIDIObjectGetStringProperty( connObject, kMIDIPropertyName, &str );
+                    }
+                    if(str != NULL)
+                    {
+                        if(anyStrings)
+                        {
+                            CFStringAppend( result, CFSTR(", ") );
+                        }
+                        else
+                        {
+                            anyStrings = true;
+                        }
+                        CFStringAppend(result, str);
+                        CFRelease(str);
+                    }
+                }
+            }
+        }
+        CFRelease(connections);
+    }
+    if(anyStrings)
+    {
+        return result;
+    }
+
+    // Here, either the endpoint had no connections, or we failed to obtain names 
+    return EndpointName(endpoint, false);
+}
+
+std::string RtMidiIn :: getPortName(unsigned int portNumber, char *Name)
 {
     CFStringRef nameRef;
     MIDIEndpointRef portRef;
+    std::ostringstream ost;
     char name[128];
 
     if(portNumber >= MIDIGetNumberOfSources())
     {
+        ost << "RtMidiIn::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return 0;
     }
-    portRef = MIDIGetSource( portNumber );
+    portRef = MIDIGetSource(portNumber);
+    nameRef = ConnectedEndpointName(portRef);
 
-    MIDIObjectGetStringProperty(portRef, kMIDIPropertyName, &nameRef);
     CFStringGetCString(nameRef, name, sizeof(name), 0);
     CFRelease(nameRef);
     std::string stringName = name;
@@ -497,15 +719,19 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
 {
     CFStringRef nameRef;
     MIDIEndpointRef portRef;
+    std::ostringstream ost;
     char name[128];
 
     if(portNumber >= MIDIGetNumberOfDestinations())
     {
+        ost << "RtMidiOut::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return 0;
     }
     portRef = MIDIGetDestination(portNumber);
+    nameRef = ConnectedEndpointName(portRef);
 
-    MIDIObjectGetStringProperty(portRef, kMIDIPropertyName, &nameRef);
     CFStringGetCString(nameRef, name, sizeof(name), 0);
     CFRelease( nameRef );
     std::string stringName = name;
@@ -525,6 +751,8 @@ void RtMidiOut :: initialize(char *clientName)
                                        &client);
     if(result != noErr)
     {
+        errorString_ = "RtMidiOut::initialize: error creating OS-X MIDI client object.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -539,17 +767,25 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
 {
     if(connected_)
     {
+        errorString_ = "RtMidiOut::openPort: a valid connection already exists!";
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nDest = MIDIGetNumberOfDestinations();
     if(nDest < 1)
     {
+        errorString_ = "RtMidiOut::openPort: no MIDI output destinations found!";
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
+    std::ostringstream ost;
     if(portNumber >= nDest)
     {
+        ost << "RtMidiOut::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -557,12 +793,14 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
     CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
     OSStatus result = MIDIOutputPortCreate(data->client, 
                                            CFStringCreateWithCString(NULL,
-                                                                     portName.c_str(),
+                                                                     portName,
                                                                      kCFStringEncodingASCII),
                                            &port);
     if(result != noErr)
     {
         MIDIClientDispose(data->client);
+        errorString_ = "RtMidiOut::openPort: error creating OS-X MIDI output port.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -572,6 +810,8 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
     {
         MIDIPortDispose(port);
         MIDIClientDispose(data->client);
+        errorString_ = "RtMidiOut::openPort: error getting MIDI output destination reference.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -591,12 +831,14 @@ void RtMidiOut :: closePort(void)
     }
 }
 
-void RtMidiOut :: openVirtualPort(std::string portName)
+void RtMidiOut :: openVirtualPort(char *portName)
 {
     CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
 
     if(data->endpoint)
     {
+        errorString_ = "RtMidiOut::openVirtualPort: a virtual output port already exists!";
+        error(RtError::WARNING);
         return;
     }
 
@@ -604,11 +846,13 @@ void RtMidiOut :: openVirtualPort(std::string portName)
     MIDIEndpointRef endpoint;
     OSStatus result = MIDISourceCreate(data->client,
                                        CFStringCreateWithCString(NULL,
-                                                                 portName.c_str(),
+                                                                 portName,
                                                                  kCFStringEncodingASCII),
                                        &endpoint);
     if(result != noErr)
     {
+        errorString_ = "RtMidiOut::initialize: error creating OS-X virtual MIDI source.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -639,17 +883,21 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
     unsigned int nBytes = message->size();
     if(nBytes == 0)
     {
+        errorString_ = "RtMidiOut::sendMessage: no data in message argument!";      
+        error(RtError::WARNING);
         return;
     }
 
     if(nBytes > 3 && (message->at(0) != 0xF0))
     {
+        errorString_ = "RtMidiOut::sendMessage: message format problem ... not sysex but > 3 bytes?";      
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int packetBytes, bytesLeft = nBytes;
     unsigned int messageIndex = 0;
-    MIDITimeStamp timeStamp = 0;
+    MIDITimeStamp timeStamp = AudioGetCurrentHostTime();
     CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
 
     while(bytesLeft > 0)
@@ -667,6 +915,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
                                       (const Byte *) &message->at(messageIndex));
         if(!curPacket)
         {
+            errorString_ = "RtMidiOut::sendMessage: could not allocate packet list";      
+            error(RtError::DRIVER_ERROR);
             return;
         }
         messageIndex += packetBytes;
@@ -679,6 +929,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
             result = MIDIReceived(data->endpoint, packetList);
             if(result != noErr)
             {
+                errorString_ = "RtMidiOut::sendMessage: error sending MIDI to virtual destinations.";
+                error(RtError::WARNING);
                 return;
             }
         }
@@ -689,6 +941,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
             result = MIDISend(data->port, data->destinationId, packetList);
             if(result != noErr)
             {
+                errorString_ = "RtMidiOut::sendMessage: error sending MIDI message to port.";
+                error(RtError::WARNING);
                 return;
             }
         }
@@ -711,6 +965,10 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 //
 // Thanks to Pedro Lopez-Cabanillas for help with the ALSA sequencer
 // time stamps and other assorted fixes!!!
+
+// If you don't need timestamping for incoming MIDI events, define the
+// preprocessor definition AVOID_TIMESTAMPING to save resources
+// associated with the ALSA sequencer queues.
 
 #include <pthread.h>
 #include <sys/time.h>
@@ -758,12 +1016,14 @@ extern "C" void *alsaMidiHandler(void *ptr)
     if(result < 0)
     {
         data->doInput = false;
+        //std::cerr << "\nRtMidiIn::alsaMidiHandler: error initializing MIDI event parser!\n\n";
         return 0;
     }
     unsigned char *buffer = (unsigned char *) malloc(apiData->bufferSize);
     if(buffer == NULL)
     {
         data->doInput = false;
+        //std::cerr << "\nRtMidiIn::alsaMidiHandler: error initializing buffer memory!\n\n";
         return 0;
     }
     snd_midi_event_init(apiData->coder);
@@ -771,8 +1031,7 @@ extern "C" void *alsaMidiHandler(void *ptr)
 
     while(data->doInput)
     {
-
-        if(snd_seq_event_input_pending( apiData->seq, 1) == 0)
+        if(snd_seq_event_input_pending(apiData->seq, 1) == 0)
         {
             // No data pending ... sleep a bit.
             usleep(1000);
@@ -780,13 +1039,15 @@ extern "C" void *alsaMidiHandler(void *ptr)
         }
 
         // If here, there should be data.
-        result = snd_seq_event_input( apiData->seq, &ev );
+        result = snd_seq_event_input(apiData->seq, &ev);
         if(result == -ENOSPC)
         {
+            //std::cerr << "\nRtMidiIn::alsaMidiHandler: MIDI input buffer overrun!\n\n";
             continue;
         }
         else if(result <= 0)
         {
+            //std::cerr << "RtMidiIn::alsaMidiHandler: unknown MIDI input error!\n";
             continue;
         }
 
@@ -800,19 +1061,21 @@ extern "C" void *alsaMidiHandler(void *ptr)
         switch(ev->type)
         {
 		    case SND_SEQ_EVENT_PORT_SUBSCRIBED:
+#if defined(__RTMIDI_DEBUG__)
+                std::cout << "RtMidiIn::alsaMidiHandler: port connection made!\n";
+#endif
                 break;
 
     		case SND_SEQ_EVENT_PORT_UNSUBSCRIBED:
 
 #if defined(__RTMIDI_DEBUG__)
-              //std::cerr << "RtMidiIn::alsaMidiHandler: port connection has closed!\n";
-              // FIXME: this is called for all unsubscribe events, even ones
-              //not related to this particular connection.  As it stands, I
-              //see no data provided in the "source" and "dest" fields so
-              //there is nothing we can do about this at this time.
-              // std::cout << "sender = " << ev->source.client << ", dest = " << ev->dest.port << std::endl;
+                /*std::cerr << "RtMidiIn::alsaMidiHandler: port connection has closed!\n";
+                std::cout << "sender = " << (int) ev->data.connect.sender.client << ":"
+                                         << (int) ev->data.connect.sender.port
+                          << ", dest = " << (int) ev->data.connect.dest.client << ":"
+                                         << (int) ev->data.connect.dest.port
+                          << std::endl;*/
 #endif
-              //data->doInput = false;
                 break;
 
             case SND_SEQ_EVENT_QFRAME: // MIDI time code
@@ -846,6 +1109,7 @@ extern "C" void *alsaMidiHandler(void *ptr)
                     if(buffer == NULL)
                     {
                         data->doInput = false;
+                        //std::cerr << "\nRtMidiIn::alsaMidiHandler: error resizing buffer memory!\n\n";
                         break;
                     }
                 }
@@ -854,6 +1118,9 @@ extern "C" void *alsaMidiHandler(void *ptr)
                 nBytes = snd_midi_event_decode(apiData->coder, buffer, apiData->bufferSize, ev);
                 if(nBytes <= 0)
                 {
+#if defined(__RTMIDI_DEBUG__)
+                    //std::cerr << "\nRtMidiIn::alsaMidiHandler: event parsing error or not a MIDI event!\n\n";
+#endif
                     break;
                 }
 
@@ -918,6 +1185,12 @@ extern "C" void *alsaMidiHandler(void *ptr)
             {
                 data->queue.push(message);
             }
+#if defined(__RTMIDI_DEBUG__)
+            else
+            {
+                //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+            }
+#endif
         }
     }
 
@@ -941,6 +1214,8 @@ void RtMidiIn :: initialize(char *clientName)
 
     if(result < 0)
     {
+        errorString_ = "RtMidiIn::initialize: error creating ALSA sequencer input client object.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -955,6 +1230,7 @@ void RtMidiIn :: initialize(char *clientName)
     inputData_.apiData = (void *) data;
 
     // Create the input queue
+#ifndef AVOID_TIMESTAMPING
     data->queue_id = snd_seq_alloc_named_queue(seq, "RtMidi Queue");
     // Set arbitrary tempo (mm=100) and resolution (240)
     snd_seq_queue_tempo_t *qtempo;
@@ -963,6 +1239,7 @@ void RtMidiIn :: initialize(char *clientName)
     snd_seq_queue_tempo_set_ppq(qtempo, 240);
     snd_seq_set_queue_tempo(data->seq, data->queue_id, qtempo);
     snd_seq_drain_output(data->seq);
+#endif
 }
 
 // This function is used to count or get the pinfo structure for a given port number.
@@ -1003,7 +1280,7 @@ unsigned int portInfo(snd_seq_t *seq,
             {
                 return 1;
             }
-            count++;
+            ++count;
         }
     }
 
@@ -1019,25 +1296,33 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string portName)
 {
     if(connected_)
     {
+        errorString_ = "RtMidiIn::openPort: a valid connection already exists!";
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nSrc = this->getPortCount();
     if(nSrc < 1)
     {
+        errorString_ = "RtMidiIn::openPort: no MIDI input sources found!";
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
 	snd_seq_port_info_t *pinfo;
 	snd_seq_port_info_alloca(&pinfo);
 
+    std::ostringstream ost;
     AlsaMidiData *data = static_cast<AlsaMidiData *> (apiData_);
     if(portInfo(data->seq,
                 pinfo,
                 SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
                 (int) portNumber) == 0
-                )
+               )
     {
+        ost << "RtMidiIn::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1057,14 +1342,18 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string portName)
                                    SND_SEQ_PORT_TYPE_MIDI_GENERIC |
                                    SND_SEQ_PORT_TYPE_APPLICATION);
         snd_seq_port_info_set_midi_channels(pinfo, 16);
+#ifndef AVOID_TIMESTAMPING
         snd_seq_port_info_set_timestamping(pinfo, 1);
         snd_seq_port_info_set_timestamp_real(pinfo, 1);    
         snd_seq_port_info_set_timestamp_queue(pinfo, data->queue_id);
-        snd_seq_port_info_set_name(pinfo,  portName.c_str());
+#endif
+        snd_seq_port_info_set_name(pinfo, portName);
         data->vport = snd_seq_create_port(data->seq, pinfo);
   
         if(data->vport < 0)
         {
+            errorString_ = "RtMidiIn::openPort: ALSA error creating input port.";
+            error(RtError::DRIVER_ERROR);
             return;
         }
     }
@@ -1077,14 +1366,18 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string portName)
     snd_seq_port_subscribe_set_dest(data->subscription, &receiver);
     if(snd_seq_subscribe_port(data->seq, data->subscription))
     {
+        errorString_ = "RtMidiIn::openPort: ALSA error making port connection.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
     if(inputData_.doInput == false)
     {
         // Start the input queue
+#ifndef AVOID_TIMESTAMPING
         snd_seq_start_queue(data->seq, data->queue_id, NULL);
         snd_seq_drain_output(data->seq);
+#endif
         // Start our MIDI input thread.
         pthread_attr_t attr;
         pthread_attr_init(&attr);
@@ -1099,13 +1392,15 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string portName)
             snd_seq_unsubscribe_port(data->seq, data->subscription);
             snd_seq_port_subscribe_free(data->subscription);
             inputData_.doInput = false;
+            errorString_ = "RtMidiIn::openPort: error starting MIDI input thread!";
+            error(RtError::THREAD_ERROR);
             return;
         }
     }
     connected_ = true;
 }
 
-void RtMidiIn :: openVirtualPort(std::string portName)
+void RtMidiIn :: openVirtualPort(char *portName)
 {
     AlsaMidiData *data = static_cast<AlsaMidiData *> (apiData_);
  
@@ -1120,14 +1415,18 @@ void RtMidiIn :: openVirtualPort(std::string portName)
 	                               SND_SEQ_PORT_TYPE_MIDI_GENERIC |
 	                               SND_SEQ_PORT_TYPE_APPLICATION);
         snd_seq_port_info_set_midi_channels(pinfo, 16);
+#ifndef AVOID_TIMESTAMPING
         snd_seq_port_info_set_timestamping(pinfo, 1);
         snd_seq_port_info_set_timestamp_real(pinfo, 1);    
         snd_seq_port_info_set_timestamp_queue(pinfo, data->queue_id);
-        snd_seq_port_info_set_name(pinfo, portName.c_str());
+#endif
+        snd_seq_port_info_set_name(pinfo, portName);
         data->vport = snd_seq_create_port(data->seq, pinfo);
 
         if(data->vport < 0)
         {
+            errorString_ = "RtMidiIn::openVirtualPort: ALSA error creating virtual port.";
+            error(RtError::DRIVER_ERROR);
             return;
         }
     }
@@ -1135,8 +1434,10 @@ void RtMidiIn :: openVirtualPort(std::string portName)
     if(inputData_.doInput == false)
     {
         // Start the input queue
+#ifndef AVOID_TIMESTAMPING
         snd_seq_start_queue(data->seq, data->queue_id, NULL);
         snd_seq_drain_output(data->seq);
+#endif
         // Start our MIDI input thread.
         pthread_attr_t attr;
         pthread_attr_init(&attr);
@@ -1151,6 +1452,8 @@ void RtMidiIn :: openVirtualPort(std::string portName)
             snd_seq_unsubscribe_port(data->seq, data->subscription);
             snd_seq_port_subscribe_free(data->subscription);
             inputData_.doInput = false;
+            errorString_ = "RtMidiIn::openPort: error starting MIDI input thread!";
+            error(RtError::THREAD_ERROR);
             return;
         }
     }
@@ -1164,8 +1467,10 @@ void RtMidiIn :: closePort(void)
         snd_seq_unsubscribe_port(data->seq, data->subscription);
         snd_seq_port_subscribe_free(data->subscription);
         // Stop the input queue
+#ifndef AVOID_TIMESTAMPING
         snd_seq_stop_queue(data->seq, data->queue_id, NULL);
         snd_seq_drain_output(data->seq);
+#endif
         connected_ = false;
     }
 }
@@ -1188,7 +1493,9 @@ RtMidiIn :: ~RtMidiIn()
     {
         snd_seq_delete_port(data->seq, data->vport);
     }
+#ifndef AVOID_TIMESTAMPING
     snd_seq_free_queue(data->seq, data->queue_id);
+#endif
     snd_seq_close(data->seq);
     delete data;
 }
@@ -1228,6 +1535,10 @@ std::string RtMidiIn :: getPortName(unsigned int portNumber, char *Name)
         strcpy(Name, stringName.c_str());
         return stringName;
     }
+
+    // If we get here, we didn't find a match.
+    errorString_ = "RtMidiIn::getPortName: error looking for port name!";
+    error(RtError::INVALID_PARAMETER);
     return 0;
 }
 
@@ -1271,6 +1582,10 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
         strcpy(Name, stringName.c_str());
         return stringName;
     }
+
+    // If we get here, we didn't find a match.
+    errorString_ = "RtMidiOut::getPortName: error looking for port name!";
+    error(RtError::INVALID_PARAMETER);
     return 0;
 }
 
@@ -1285,6 +1600,8 @@ void RtMidiOut :: initialize(char *clientName)
 
     if(result < 0)
     {
+        errorString_ = "RtMidiOut::initialize: error creating ALSA sequencer client object.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -1301,11 +1618,17 @@ void RtMidiOut :: initialize(char *clientName)
     result = snd_midi_event_new(data->bufferSize, &data->coder);
     if(result < 0)
     {
+        delete data;
+        errorString_ = "RtMidiOut::initialize: error initializing MIDI event parser!\n\n";
+        error(RtError::DRIVER_ERROR);
         return;
     }
     data->buffer = (unsigned char *) malloc(data->bufferSize);
     if(data->buffer == NULL)
     {
+        delete data;
+        errorString_ = "RtMidiOut::initialize: error allocating buffer memory!\n\n";
+        error(RtError::MEMORY_ERROR);
         return;
     }
     snd_midi_event_init(data->coder);
@@ -1316,24 +1639,31 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
 {
     if(connected_)
     {
+        errorString_ = "RtMidiOut::openPort: a valid connection already exists!";
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nSrc = this->getPortCount();
     if(nSrc < 1)
     {
+        errorString_ = "RtMidiOut::openPort: no MIDI output sources found!";
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
     snd_seq_port_info_t *pinfo;
     snd_seq_port_info_alloca(&pinfo);
-    //std::ostringstream ost;
+    std::ostringstream ost;
     AlsaMidiData *data = static_cast<AlsaMidiData *> (apiData_);
     if(portInfo(data->seq,
                 pinfo,
                 SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
                 (int) portNumber) == 0)
     {
+        ost << "RtMidiOut::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1345,11 +1675,13 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
     if(data->vport < 0)
     {
         data->vport = snd_seq_create_simple_port(data->seq,
-                                                 portName.c_str(),
+                                                 portName,
                                                  SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
                                                  SND_SEQ_PORT_TYPE_MIDI_GENERIC);
         if(data->vport < 0)
         {
+            errorString_ = "RtMidiOut::openPort: ALSA error creating output port.";
+            error(RtError::DRIVER_ERROR);
             return;
         }
     }
@@ -1364,6 +1696,8 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string portName)
     snd_seq_port_subscribe_set_time_real(data->subscription, 1);
     if(snd_seq_subscribe_port(data->seq, data->subscription))
     {
+        errorString_ = "RtMidiOut::openPort: ALSA error making port connection.";
+        error(RtError::DRIVER_ERROR);
         return;
     }
     connected_ = true;
@@ -1380,17 +1714,19 @@ void RtMidiOut :: closePort(void)
     }
 }
 
-void RtMidiOut :: openVirtualPort(std::string portName)
+void RtMidiOut :: openVirtualPort(char *portName)
 {
     AlsaMidiData *data = static_cast<AlsaMidiData *> (apiData_);
     if(data->vport < 0)
     {
-        data->vport = snd_seq_create_simple_port(data->seq, portName.c_str(),
+        data->vport = snd_seq_create_simple_port(data->seq, portName,
                                                  SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
                                                  SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 
         if(data->vport < 0)
         {
+            errorString_ = "RtMidiOut::openVirtualPort: ALSA error creating virtual port.";
+            error(RtError::DRIVER_ERROR);
             return;
         }
     }
@@ -1422,12 +1758,16 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
         result = snd_midi_event_resize_buffer ( data->coder, nBytes);
         if(result != 0)
         {
+            errorString_ = "RtMidiOut::sendMessage: ALSA error resizing MIDI event buffer.";
+            error(RtError::DRIVER_ERROR);
             return;
         }
         free(data->buffer);
         data->buffer = (unsigned char *) malloc(data->bufferSize);
         if(data->buffer == NULL)
         {
+            errorString_ = "RtMidiOut::initialize: error allocating buffer memory!\n\n";
+            error(RtError::MEMORY_ERROR);
             return;
         }
     }
@@ -1444,6 +1784,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
     result = snd_midi_event_encode(data->coder, data->buffer, (long) nBytes, &ev);
     if(result < (int)nBytes)
     {
+        errorString_ = "RtMidiOut::sendMessage: event parsing error!";
+        error(RtError::WARNING);
         return;
     }
 
@@ -1451,6 +1793,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
     result = snd_seq_event_output(data->seq, &ev);
     if(result < 0)
     {
+        errorString_ = "RtMidiOut::sendMessage: error sending MIDI message to port.";
+        error(RtError::WARNING);
         return;
     }
     snd_seq_drain_output(data->seq);
@@ -1507,6 +1851,7 @@ extern "C" void *irixMidiHandler(void *ptr)
     if(fd < 0)
     {
         data->doInput = false;
+        //std::cerr << "\nRtMidiIn::irixMidiHandler: error getting port descriptor!\n\n";
         return 0;
     }
 
@@ -1522,7 +1867,6 @@ extern "C" void *irixMidiHandler(void *ptr)
 
     while(data->doInput)
     {
-
         rmask = mask;
         timeout.tv_sec = 0;
         timeout.tv_usec = 0;
@@ -1537,6 +1881,7 @@ extern "C" void *irixMidiHandler(void *ptr)
         result = mdReceive(apiData->port, &event, 1);
         if(result <= 0)
         {
+            //std::cerr << "\nRtMidiIn::irixMidiHandler: MIDI input read error!\n\n";
             continue;
         }
 
@@ -1580,6 +1925,12 @@ extern "C" void *irixMidiHandler(void *ptr)
                             {
                                 data->queue.push( message );
                             }
+#if defined(__RTMIDI_DEBUG__)
+                            else
+                            {
+                                //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+                            }
+#endif
                         }
                         message.bytes.clear();
                     }
@@ -1637,6 +1988,12 @@ extern "C" void *irixMidiHandler(void *ptr)
                 {
                     data->queue.push( message );
                 }
+#if defined(__RTMIDI_DEBUG__)
+                else
+                {
+                    //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+                }
+#endif
             }
             message.bytes.clear();
         }
@@ -1644,7 +2001,7 @@ extern "C" void *irixMidiHandler(void *ptr)
     return 0;
 }
 
-void RtMidiIn :: initialize()
+void RtMidiIn :: initialize(char *clientName)
 {
     // Initialize the Irix MIDI system.  At the moment, we will not
     // worry about a return value of zero (ports) because there is a
@@ -1661,17 +2018,25 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string /*portName*
 {
     if(connected_)
     {
+        errorString_ = "RtMidiIn::openPort: a valid connection already exists!";
+        error(RtError::WARNING);
         return;
     }
 
     int nPorts = mdInit();
     if(nPorts < 1)
     {
+        errorString_ = "RtMidiIn::openPort: no Irix MIDI input sources found!";
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
+    std::ostringstream ost;
     if(portNumber >= nPorts)
     {
+        ost << "RtMidiIn::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1679,6 +2044,9 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string /*portName*
     data->port = mdOpenInPort(mdGetName(portNumber));
     if(data->port == NULL)
     {
+        ost << "RtMidiIn::openPort: Irix error opening the port (" << portNumber << ").";
+        errorString_ = ost.str();
+        error(RtError::DRIVER_ERROR);
         return;
     }
     mdSetStampMode(data->port, MD_DELTASTAMP);
@@ -1696,13 +2064,17 @@ void RtMidiIn :: openPort(unsigned int portNumber, const std::string /*portName*
     {
         mdClosePort(data->port);
         inputData_.doInput = false;
+        errorString_ = "RtMidiIn::openPort: error starting MIDI input thread!";
+        error(RtError::THREAD_ERROR);
         return;
     }
     connected_ = true;
 }
 
-void RtMidiIn :: openVirtualPort(std::string portName)
+void RtMidiIn :: openVirtualPort(char *portName)
 {
+    errorString_ = "RtMidiIn::openVirtualPort: cannot be implemented in Irix MIDI API!";
+    error(RtError::WARNING);
 }
 
 void RtMidiIn :: closePort(void)
@@ -1745,10 +2117,14 @@ unsigned int RtMidiIn :: getPortCount()
 
 std::string RtMidiIn :: getPortName(unsigned int portNumber, char *Name)
 {
+    std::ostringstream ost;
     int nPorts = mdInit();
 
     if(portNumber >= nPorts)
     {
+        ost << "RtMidiIn::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1782,6 +2158,9 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
 
     if(portNumber >= nPorts)
     {
+        ost << "RtMidiIn::getPortName: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1790,7 +2169,7 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
     return stringName;
 }
 
-void RtMidiOut :: initialize(const std::string& /*clientName*/)
+void RtMidiOut :: initialize(char *clientName)
 {
     // Initialize the Irix MIDI system.  At the moment, we will not
     // worry about a return value of zero (ports) because there is a
@@ -1806,18 +2185,26 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string /*portName
 {
     if(connected_)
     {
+        errorString_ = "RtMidiOut::openPort: a valid connection already exists!";
+        error(RtError::WARNING);
         return;
     }
 
     int nPorts = mdInit();
     if(nPorts < 1)
     {
+        errorString_ = "RtMidiOut::openPort: no Irix MIDI output sources found!";
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
     //  std::ostringstream ost;
+    std::ostringstream ost;
     if(portNumber >= nPorts)
     {
+        ost << "RtMidiOut::openPort: the 'portNumber' argument (" << portNumber << ") is invalid.";
+        errorString_ = ost.str();
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -1825,6 +2212,9 @@ void RtMidiOut :: openPort(unsigned int portNumber, const std::string /*portName
     data->port = mdOpenOutPort(mdGetName(portNumber));
     if(data->port == NULL)
     {
+        ost << "RtMidiOut::openPort: Irix error opening the port (" << portNumber << ").";
+        errorString_ = ost.str();
+        error(RtError::DRIVER_ERROR);
         return;
     }
     mdSetStampMode(data->port, MD_NOSTAMP);
@@ -1841,9 +2231,11 @@ void RtMidiOut :: closePort(void)
     }
 }
 
-void RtMidiOut :: openVirtualPort(std::string portName)
+void RtMidiOut :: openVirtualPort(char *portName)
 {
-
+    // This function cannot be implemented for the Irix MIDI API.
+    errorString_ = "RtMidiOut::openVirtualPort: cannot be implemented in Irix MIDI API!";
+    error(RtError::WARNING);
 }
 
 RtMidiOut :: ~RtMidiOut()
@@ -1873,7 +2265,7 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
     {
         if(nBytes < 3)
         {
-            return; // check for bogus sysex
+            return;     // check for bogus sysex
         }
         event.msg[0] = 0xF0;
         event.msglen = nBytes;
@@ -1894,9 +2286,14 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 
     // Send the event.
     result = mdSend(data->port, &event, 1);
-    if(buffer) free(buffer);
+    if(buffer)
+    {
+        free(buffer);
+    }
     if(result < 1)
     {
+        errorString_ = "RtMidiOut::sendMessage: IRIX error sending MIDI message!";
+        error(RtError::WARNING);
         return;
     }
 }
@@ -1922,6 +2319,9 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 #include <windows.h>
 #include <mmsystem.h>
 
+#define  RT_SYSEX_BUFFER_SIZE 1024
+#define  RT_SYSEX_BUFFER_COUNT 4
+
 // A structure to hold variables related to the CoreMIDI API
 // implementation.
 struct WinMidiData
@@ -1930,7 +2330,7 @@ struct WinMidiData
     HMIDIOUT outHandle;  // Handle to Midi Output Device
     DWORD lastTime;
     RtMidiIn::MidiMessage message;
-    LPMIDIHDR sysexBuffer;
+    LPMIDIHDR sysexBuffer[RT_SYSEX_BUFFER_COUNT];
 };
 
 #if !defined(__GCC__)
@@ -1957,7 +2357,12 @@ static void CALLBACK midiInputCallback(HMIDIOUT hmin,
                                        DWORD midiMessage,
                                        DWORD timestamp)
 {
-    if (inputStatus != MIM_DATA && inputStatus != MIM_LONGDATA) return;
+    if(inputStatus != MIM_DATA &&
+       inputStatus != MIM_LONGDATA &&
+       inputStatus != MIM_LONGERROR)
+    {
+        return;
+    }
 
     //RtMidiIn::RtMidiInData *data = static_cast<RtMidiIn::RtMidiInData *> (instancePtr);
     RtMidiIn::RtMidiInData *data = (RtMidiIn::RtMidiInData *)instancePtr;
@@ -2016,9 +2421,9 @@ static void CALLBACK midiInputCallback(HMIDIOUT hmin,
         }
     }
     else
-    {   // Sysex message ( MIM_LONGDATA )
+    {   // Sysex message (MIM_LONGDATA or MIM_LONGERROR)
         MIDIHDR *sysex = (MIDIHDR *) midiMessage; 
-        if(!(data->ignoreFlags & 0x01))
+        if(!(data->ignoreFlags & 0x01) && inputStatus != MIM_LONGERROR)
         {
             // Sysex message and we're not ignoring it
             for(int i = 0; i < (int) sysex->dwBytesRecorded; i++)
@@ -2035,10 +2440,18 @@ static void CALLBACK midiInputCallback(HMIDIOUT hmin,
         // buffer when an application closes and in this case, we should
         // avoid requeueing it, else the computer suddenly reboots after
         // one or two minutes.
-        if(apiData->sysexBuffer->dwBytesRecorded > 0)
+	    if(apiData->sysexBuffer[sysex->dwUser]->dwBytesRecorded > 0)
         {
-            MMRESULT result = midiInAddBuffer(apiData->inHandle, apiData->sysexBuffer, sizeof(MIDIHDR));
-            if(data->ignoreFlags & 0x01) return;
+            MMRESULT result = midiInAddBuffer(apiData->inHandle, apiData->sysexBuffer[sysex->dwUser], sizeof(MIDIHDR));
+            if (result != MMSYSERR_NOERROR)
+            {
+                std::cerr << "\nRtMidiIn::midiInputCallback: error sending sysex to Midi device!!\n\n";
+                return;
+            }
+            if(data->ignoreFlags & 0x01)
+            {
+                return;
+            }
         }
         else
         {
@@ -2056,22 +2469,30 @@ static void CALLBACK midiInputCallback(HMIDIOUT hmin,
         // As long as we haven't reached our queue size limit, push the message.
         if(data->queueLimit > data->queue.size())
         {
-            data->queue.push( apiData->message );
+            data->queue.push(apiData->message);
         }
+#if defined(__RTMIDI_DEBUG__)
+        else
+        {
+            //std::cerr << "\nRtMidiIn: message queue limit reached!!\n\n";
+        }
+#endif
     }
 
     // Clear the vector for the next input message.
     apiData->message.bytes.clear();
 }
 
-void RtMidiIn :: initialize(char * /*clientName*/)
+void RtMidiIn :: initialize(char *clientName)
 {
     // We'll issue a warning here if no devices are available but not
     // throw an error since the user can plugin something later.
     unsigned int nDevices = midiInGetNumDevs();
-    
+
     if(nDevices == 0)
     {
+        sprintf(errorString_, "RtMidiIn::initialize: no MIDI input devices currently available.");
+        error(RtError::WARNING);
         return;
     }
 
@@ -2087,17 +2508,23 @@ void RtMidiIn :: openPort(unsigned int portNumber,
 {
     if(connected_)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: a valid connection already exists!");
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nDevices = midiInGetNumDevs();
     if(nDevices == 0)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: no MIDI input sources found!");
+        error(RtError::NO_DEVICES_FOUND);
         return;
     }
 
     if(portNumber >= nDevices)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: the 'portNumber' argument (%d) is invalid.", portNumber);
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -2109,43 +2536,57 @@ void RtMidiIn :: openPort(unsigned int portNumber,
                                  CALLBACK_FUNCTION);
     if(result != MMSYSERR_NOERROR)
     {
+        sprintf(errorString_, "RtMidiIn::openPort: error creating Windows MM MIDI input port.");
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
     // Allocate and init the sysex buffer.
-    data->sysexBuffer = (MIDIHDR*) new char[sizeof(MIDIHDR)];
-    data->sysexBuffer->lpData = new char[RT_SYSEX_BUFFER_SIZE];
-    data->sysexBuffer->dwBufferLength = RT_SYSEX_BUFFER_SIZE;
-    data->sysexBuffer->dwFlags = 0;
-
-    result = midiInPrepareHeader(data->inHandle, data->sysexBuffer, sizeof(MIDIHDR));
-    if(result != MMSYSERR_NOERROR)
+    for(int i = 0; i < RT_SYSEX_BUFFER_COUNT; ++i)
     {
-        midiInClose(data->inHandle);
-        return;
-    }
+        data->sysexBuffer[i] = (MIDIHDR *) new char[sizeof(MIDIHDR)];
+        data->sysexBuffer[i]->lpData = new char[RT_SYSEX_BUFFER_SIZE];
+        data->sysexBuffer[i]->dwBufferLength = RT_SYSEX_BUFFER_SIZE;
+        data->sysexBuffer[i]->dwUser = i;   // We use the dwUser parameter as buffer indicator
+        data->sysexBuffer[i]->dwFlags = 0;
 
-    // Register the buffer.
-    result = midiInAddBuffer(data->inHandle, data->sysexBuffer, sizeof(MIDIHDR));
-    if(result != MMSYSERR_NOERROR)
-    {
-        midiInClose(data->inHandle);
-        return;
+        result = midiInPrepareHeader(data->inHandle, data->sysexBuffer[i], sizeof(MIDIHDR));
+        if(result != MMSYSERR_NOERROR)
+        {
+            midiInClose(data->inHandle);
+            sprintf(errorString_, "RtMidiIn::openPort: error starting Windows MM MIDI input port (PrepareHeader).");
+            error(RtError::DRIVER_ERROR);
+            return;
+        }
+
+        // Register the buffer.
+        result = midiInAddBuffer(data->inHandle, data->sysexBuffer[i], sizeof(MIDIHDR));
+        if(result != MMSYSERR_NOERROR)
+        {
+            midiInClose(data->inHandle);
+            sprintf(errorString_, "RtMidiIn::openPort: error starting Windows MM MIDI input port (AddBuffer).");
+            error(RtError::DRIVER_ERROR);
+            return;
+        }
     }
 
     result = midiInStart(data->inHandle);
     if(result != MMSYSERR_NOERROR)
     {
         midiInClose(data->inHandle);
+        sprintf(errorString_, "RtMidiIn::openPort: error starting Windows MM MIDI input port.");
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
     connected_ = true;
 }
 
-void RtMidiIn :: openVirtualPort(std::string portName)
+void RtMidiIn :: openVirtualPort(char *portName)
 {
-
+    // This function cannot be implemented for the Windows MM MIDI API.
+    sprintf(errorString_, "RtMidiIn::openVirtualPort: cannot be implemented in Windows MM MIDI API!");
+    error(RtError::WARNING);
 }
 
 void RtMidiIn :: closePort(void)
@@ -2156,14 +2597,20 @@ void RtMidiIn :: closePort(void)
         midiInReset(data->inHandle);
         midiInStop(data->inHandle);
 
-        int result = midiInUnprepareHeader(data->inHandle,
-                                           data->sysexBuffer,
-                                           sizeof(MIDIHDR));
-        delete []data->sysexBuffer->lpData;
-        delete []data->sysexBuffer;
-        if(result != MMSYSERR_NOERROR)
+        for(int i = 0; i < RT_SYSEX_BUFFER_COUNT; ++i)
         {
-            return;
+            int result = midiInUnprepareHeader(data->inHandle,
+                                               data->sysexBuffer[i],
+                                               sizeof(MIDIHDR));
+            delete []data->sysexBuffer[i]->lpData;
+            delete []data->sysexBuffer[i];
+            if(result != MMSYSERR_NOERROR)
+            {
+                midiInClose(data->inHandle);
+                sprintf(errorString_, "RtMidiIn::openPort: error closing Windows MM MIDI input port (midiInUnprepareHeader).");
+                error(RtError::DRIVER_ERROR);
+                return;
+            }
         }
 
         midiInClose(data->inHandle);
@@ -2192,6 +2639,8 @@ std::string RtMidiIn :: getPortName(unsigned int portNumber, char *Name)
 
     if(portNumber >= nDevices)
     {
+        sprintf(errorString_, "RtMidiIn::getPortName: the 'portNumber' argument (%d) is invalid.", portNumber);
+        error(RtError::INVALID_PARAMETER);
         return("");
     }
 
@@ -2229,6 +2678,8 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
     
     if(portNumber >= nDevices)
     {
+        sprintf(errorString_, "RtMidiOut::getPortName: the 'portNumber' argument (%d) is invalid.", portNumber);
+        error(RtError::INVALID_PARAMETER);
         return("");
     }
 
@@ -2250,13 +2701,15 @@ std::string RtMidiOut :: getPortName(unsigned int portNumber, char *Name)
     return stringName;
 }
 
-void RtMidiOut :: initialize(char * /*clientName*/)
+void RtMidiOut :: initialize(char *clientName)
 {
     // We'll issue a warning here if no devices are available but not
     // throw an error since the user can plug something in later.
     unsigned int nDevices = midiOutGetNumDevs();
     if(nDevices == 0)
     {
+        sprintf(errorString_, "RtMidiOut::initialize: no MIDI output devices currently available.");
+        error(RtError::WARNING);
         return;
     }
 
@@ -2271,12 +2724,23 @@ void RtMidiOut :: openPort(unsigned int portNumber,
 {
     if(connected_)
     {
+        sprintf(errorString_, "RtMidiOut::openPort: a valid connection already exists!");
+        error(RtError::WARNING);
         return;
     }
 
     unsigned int nDevices = midiOutGetNumDevs();
     if(nDevices < 1)
     {
+        sprintf(errorString_, "RtMidiOut::openPort: no MIDI output destinations found!");
+        error(RtError::NO_DEVICES_FOUND);
+        return;
+    }
+
+    if(portNumber >= nDevices)
+    {
+        sprintf(errorString_, "RtMidiOut::openPort: the 'portNumber' argument (%d) is invalid.", portNumber);
+        error(RtError::INVALID_PARAMETER);
         return;
     }
 
@@ -2288,6 +2752,8 @@ void RtMidiOut :: openPort(unsigned int portNumber,
                                   CALLBACK_NULL);
     if(result != MMSYSERR_NOERROR)
     {
+        sprintf(errorString_, "RtMidiOut::openPort: error creating Windows MM MIDI output port.");
+        error(RtError::DRIVER_ERROR);
         return;
     }
 
@@ -2305,9 +2771,11 @@ void RtMidiOut :: closePort(void)
     }
 }
 
-void RtMidiOut :: openVirtualPort(std::string portName)
+void RtMidiOut :: openVirtualPort(char *portName)
 {
-
+    // This function cannot be implemented for the Windows MM MIDI API.
+    sprintf(errorString_, "RtMidiOut::openVirtualPort: cannot be implemented in Windows MM MIDI API!");
+    error(RtError::WARNING);
 }
 
 RtMidiOut :: ~RtMidiOut()
@@ -2325,8 +2793,10 @@ RtMidiOut :: ~RtMidiOut()
 void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 {
     unsigned int nBytes = message->size();
-    if (nBytes == 0)
+    if(nBytes == 0)
     {
+        sprintf(errorString_, "RtMidiOut::sendMessage: message argument is empty!");
+        error(RtError::WARNING);
         return;
     }
 
@@ -2339,8 +2809,10 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 
             // Allocate buffer for sysex data.
             char *buffer = (char *) malloc(nBytes);
-            if( buffer == NULL)
+            if(buffer == NULL)
             {
+                sprintf(errorString_, "RtMidiOut::sendMessage: error allocating sysex message memory!");
+                error(RtError::MEMORY_ERROR);
                 return;
             }
 
@@ -2359,6 +2831,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
             if( result != MMSYSERR_NOERROR)
             {
                 free(buffer);
+                sprintf(errorString_, "RtMidiOut::sendMessage: error preparing sysex header.");
+                error(RtError::DRIVER_ERROR);
                 return;
             }
 
@@ -2367,6 +2841,8 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
             if(result != MMSYSERR_NOERROR)
             {
                 free(buffer);
+                sprintf(errorString_, "RtMidiOut::sendMessage: error sending sysex message.");
+                error(RtError::DRIVER_ERROR);
                 return;
             }
 
@@ -2384,20 +2860,28 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
             // Make sure the message size isn't too big.
             if(nBytes > 3)
             {
+                sprintf(errorString_, "RtMidiOut::sendMessage: message size is greater than 3 bytes (and not sysex)!");
+                error(RtError::WARNING);
                 return;
             }
 
             // Pack MIDI bytes into double word.
             DWORD packet;
             unsigned char *ptr = (unsigned char *) &packet;
+
             for(unsigned int i = 0; i < nBytes; i++)
             {
                 *ptr = message->at(i);
-                ptr++;
+                ++ptr;
             }
 
             // Send the message immediately.
             result = midiOutShortMsg(data->outHandle, packet);
+            if(result != MMSYSERR_NOERROR)
+            {
+                sprintf(errorString_, "RtMidiOut::sendMessage: error sending MIDI message.");
+                error(RtError::WARNING);
+            }
         }
     }
 }

@@ -36,6 +36,7 @@ TODO:
   - Channel filter cutoff.
   - Channel filter frequency.
   - Track on/off.
+  - Transport (rw/ff/play/stop/rec).
 
 v2.1.4:
 

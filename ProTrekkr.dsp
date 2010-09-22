@@ -490,6 +490,10 @@ SOURCE=.\src\midi\include\midi.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\midi\include\RtError.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\midi\include\RtMidi.h
 # End Source File
 # End Group

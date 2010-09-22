@@ -8,7 +8,7 @@
     RtMidi WWW site: http://music.mcgill.ca/~gary/rtmidi/
 
     RtMidi: realtime MIDI i/o C++ classes
-    Copyright (c) 2003-2009 Gary P. Scavone
+    Copyright (c) 2003-2010 Gary P. Scavone
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files
@@ -35,7 +35,7 @@
 */
 /**********************************************************************/
 
-// RtMidi: Version 1.0.8
+// RtMidi: Version 1.0.11
 
 #ifndef _RTMIDI_H_
 #define _RTMIDI_H_
@@ -50,7 +50,7 @@ class RtMidi
         //! Pure virtual openPort() function.
         virtual void openPort(unsigned int portNumber = 0, const std::string portName = std::string("RtMidi")) = 0;
         //! Pure virtual openVirtualPort() function.
-        virtual void openVirtualPort(const std::string portName = std::string("RtMidi")) = 0;
+        virtual void openVirtualPort(char *portName = "RtMidi") = 0;
         //! Pure virtual getPortCount() function.
         virtual unsigned int getPortCount() = 0;
         //! Pure virtual getPortName() function.
@@ -63,14 +63,14 @@ class RtMidi
         RtMidi();
         virtual ~RtMidi(){};
 
-    // A basic error reporting function for internal use in the RtMidi
-    // subclasses.  The behavior of this function can be modified to
-    // suit specific needs.
-    void error(RtError::Type type);
+        // A basic error reporting function for internal use in the RtMidi
+        // subclasses.  The behavior of this function can be modified to
+        // suit specific needs.
+        void error(RtError::Type type);
 
-    void *apiData_;
-    bool connected_;
-    std::string errorString_;
+        void *apiData_;
+        bool connected_;
+        char errorString_[256];
 };
 
 /**********************************************************************/
@@ -123,7 +123,7 @@ class RtMidiIn : public RtMidi
         is currently only supported by the Macintosh OS-X and Linux ALSA
         APIs (the function does nothing for the other APIs).
         */
-        void openVirtualPort(const std::string portName = std::string( "RtMidi Input"));
+        void openVirtualPort(char *portName = "RtMidi Input");
 
         //! Set a callback function to be invoked for incoming MIDI messages.
         /*!
@@ -183,7 +183,9 @@ class RtMidiIn : public RtMidi
             double timeStamp;
 
             // Default constructor.
-            MidiMessage() :bytes(3), timeStamp(0.0) {}
+            MidiMessage() :bytes(3), timeStamp(0.0)
+            {
+            }
         };
 
         // The RtMidiInData structure is used to pass private class data to
@@ -211,7 +213,9 @@ class RtMidiIn : public RtMidi
                              usingCallback(false),
                              userCallback(0),
                              userData(0),
-                             continueSysex(false) {}
+                             continueSysex(false)
+            {
+            }
         };
 
     private:
@@ -267,7 +271,7 @@ class RtMidiOut : public RtMidi
             exception is thrown if an error occurs while attempting to create
             the virtual port.
          */
-        void openVirtualPort(const std::string portName = std::string("RtMidi Output"));
+        void openVirtualPort(char *portName = "RtMidi Output");
 
         //! Return the number of available MIDI output ports.
         unsigned int getPortCount();
