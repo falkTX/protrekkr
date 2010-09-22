@@ -6,7 +6,7 @@ LIBS = src/extralibs/tinyxml/tinyxml.o \
        src/extralibs/tinyxml/tinyxmlerror.o \
        -lasound -lSDL -lsdldraw -lz
 
-FLAGS = -O3 -fno-strict-aliasing -ffast-math -fno-rtti -fexceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
+FLAGS = -g -O3 -fno-strict-aliasing -ffast-math -fno-rtti -fexceptions -Lsrc/extralibs/sdl_draw -Lsrc/extralibs/zlib-1.2.3 \
         -D __LINUX__ -D __GCC__ -D __LINUX_ALSASEQ__ -D __MOT_SWAP__
 
 EXEOBJS = ptk.o \
@@ -35,7 +35,7 @@ protrekkr: $(EXEOBJS)
 	(cd src/extralibs/tinyxml; make)
 	(cd src/extralibs/zlib-1.2.3; make)
 	$(CXX) -o ./release/distrib/ptk_linux -L./ $(FLAGS) $(EXEOBJS) $(LIBS)
-	strip -s -x ./release/distrib/ptk_linux
+#	strip -s -x ./release/distrib/ptk_linux
 #	-rm -f $(EXEOBJS)
 	
 ptk.o: src/ptk.cpp

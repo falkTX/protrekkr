@@ -48,7 +48,7 @@ class RtMidi
     public:
 
         //! Pure virtual openPort() function.
-        virtual void openPort(unsigned int portNumber = 0, const std::string portName = std::string("RtMidi")) = 0;
+        virtual void openPort(unsigned int portNumber = 0, char *portName = "RtMidi") = 0;
         //! Pure virtual openVirtualPort() function.
         virtual void openVirtualPort(char *portName = "RtMidi") = 0;
         //! Pure virtual getPortCount() function.
@@ -114,7 +114,7 @@ class RtMidiIn : public RtMidi
           Otherwise, the default or first port found is opened.
         */
         void openPort(unsigned int portNumber = 0,
-                      const std::string Portname = std::string("RtMidi Input"));
+                      char *Portname = "RtMidi Input");
 
         //! Create a virtual input port, with optional name, to allow software connections (OS X and ALSA only).
         /*!
@@ -257,7 +257,7 @@ class RtMidiOut : public RtMidi
             the port connection.
          */
         void openPort(unsigned int portNumber = 0,
-                      const std::string portName = std::string("RtMidi Output")
+                      char *portName = "RtMidi Output"
                      );
 
         //! Close an open MIDI connection (if one exists).
