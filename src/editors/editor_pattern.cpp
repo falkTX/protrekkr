@@ -375,23 +375,30 @@ void draw_pated(int track, int line, int petrack, int row)
         // Calculate the place holder for the tracks data
         for(i = 0; i < Channels_MultiNotes[cur_track]; i++)
         {
+            // Note
             dover += Cur_Char_size[cur_track] * 3;
             if(dover >= MAX_PATT_SCREEN_X) break;
 
+            // Gap
             dover += PAT_COL_SHIFT - 2;
             if(dover >= MAX_PATT_SCREEN_X) break;
 
+            // Instrument
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
             dover += Cur_Char_size[cur_track];
             if(dover >= MAX_PATT_SCREEN_X) break;
+            
+            // Gap
             dover += 2;
             if(dover >= MAX_PATT_SCREEN_X) break;
         }
         if(dover >= MAX_PATT_SCREEN_X) break;
 
+        // Gap
         dover += PAT_COL_SHIFT;
         if(dover >= MAX_PATT_SCREEN_X) break;
+
         dover += Cur_Char_size[cur_track];
         if(dover >= MAX_PATT_SCREEN_X) break;
         dover += Cur_Char_size[cur_track];
@@ -399,11 +406,13 @@ void draw_pated(int track, int line, int petrack, int row)
 
         dover += PAT_COL_SHIFT;
         if(dover >= MAX_PATT_SCREEN_X) break;
+
         dover += Cur_Char_size[cur_track];
         if(dover >= MAX_PATT_SCREEN_X) break;
         dover += Cur_Char_size[cur_track];
         if(dover >= MAX_PATT_SCREEN_X) break;
 
+        // Gap
         dover += PAT_COL_SHIFT;
         if(dover >= MAX_PATT_SCREEN_X) break;
        
@@ -540,7 +549,9 @@ Disp:;
 // ------------------------------------------------------
 // Draw a pattern row
 void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
-                       int y, int rel, int track, int tVisible_Columns, int pattern)
+                       int y, int rel,
+                       int track, int tVisible_Columns,
+                       int pattern)
 {
     int cur_column;
     int offset_t;
@@ -576,8 +587,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
         for(i = 0; i < Channels_Effects[tracky]; i++)
         {
             p_e_sync = *(RawPatterns + offset_t + PATTERN_FX + (i * 2));
-            if((p_e_sync >> 4) == 0x7) synchro_fx = TRUE;
-
+            if(p_e_sync == 0x7) synchro_fx = TRUE;
         }
     }
     
@@ -817,6 +827,7 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
                 dover += Cur_Char_size[cur_track];
             }
         }
+        //dover += Cur_Char_size[cur_track];
         if(exit_tracks) break;
 
         cur_column++;
@@ -924,7 +935,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
             for(i = 0; i < Channels_Effects[tracky]; i++)
             {
                 p_e_sync = *(RawPatterns + offset_t + PATTERN_FX + (i * 2));
-                if((p_e_sync >> 4) == 0x7) synchro_fx = TRUE;
+                if(p_e_sync == 0x7) synchro_fx = TRUE;
             }
         }
 
@@ -1269,7 +1280,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                     high_col++;
                 }
             }
-            if(exit_tracks) break;
+            //dover += Cur_Char_size[cur_track];
 
             Last_Pixel = dover;
             Last_Pixel_Complete = dover;
@@ -2164,7 +2175,7 @@ int Get_Column_Idx(int track, int mouse_coord)
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-        ret_value++;
+//        ret_value++;
     }
 
     return(ret_value);
@@ -2175,7 +2186,9 @@ int Get_Column_Idx(int track, int mouse_coord)
 int Get_Last_Track_Column(int track)
 {
     // Notes + Volume + Panning + Fx
-    return(((Channels_MultiNotes[track] * 3) + 4 + (Channels_Effects[track] * 4)) - 1);
+    return(((Channels_MultiNotes[track] * 3) +
+           EXTRA_NIBBLE_DAT +
+           (Channels_Effects[track] * 4)) - 1);
 }
 
 // ------------------------------------------------------

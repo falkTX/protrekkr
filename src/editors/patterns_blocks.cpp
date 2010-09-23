@@ -1791,8 +1791,7 @@ int Alloc_Patterns_Pool(void)
 int Get_Max_Nibble_Track(char *Buffer_Multinotes, char *Buffer_Effects, int track)
 {
     return((Buffer_Multinotes[track] * 3) +
-            EXTRA_NIBBLE_DAT +
-            (Buffer_Effects[track] * 4));
+            EXTRA_NIBBLE_DAT + (Buffer_Effects[track] * 4));
 }
 
 // ------------------------------------------------------

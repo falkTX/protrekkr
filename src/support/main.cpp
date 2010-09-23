@@ -619,6 +619,8 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Set_Phony_Palette();
     Refresh_Palette();
 
+    char tt[64];
+
     while(!Prog_End)
     {
         Mouse.wheel = 0;
@@ -671,6 +673,10 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
 #else
                         Uni_Trans = Symbol;
 #endif
+
+                        //sprintf(tt, "%d\n", Uni_Trans);
+                        //OutputDebugString(tt);
+    
                         Keys[Uni_Trans] = TRUE;
 
                         if(!In_Requester)

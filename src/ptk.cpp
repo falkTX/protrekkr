@@ -1905,7 +1905,7 @@ void LoadFile(int Freeindex, const char *str)
             LoadReverb(namerev);
         }
         else if((strcmp(extension, "TWNNBLK1") == 0) ||
-                (strcmp(extension, "TWNNBLK2") == 0)
+                (strcmp(extension, "PROTBLK2") == 0)
                )
         {
             sprintf(namerev, "%s", FileName);

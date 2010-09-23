@@ -132,7 +132,7 @@ void LoadPattern(char *FileName)
         fread(extension, sizeof(char), 9, in);
 
         if(strcmp(extension, "TWNNBLK1") == 0) version = 1;
-        if(strcmp(extension, "TWNNBLK2") == 0) version = 2;
+        if(strcmp(extension, "PROTBLK2") == 0) version = 2;
         if(version)
         {
             // Ok, extension matched!
@@ -164,7 +164,7 @@ void SavePattern(void)
     char Temph[96];
     char extension[10];
 
-    sprintf(extension, "TWNNBLK2");
+    sprintf(extension, "PROTBLK2");
     sprintf(Temph, "Saving '%s.ppb' data in patterns directory...", Selection_Name);
     Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name);
