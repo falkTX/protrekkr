@@ -415,6 +415,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                             
                             case PATTERN_FX:
                             case PATTERN_FX2:
+                            /*
+                            case PATTERN_FX3:
+                            case PATTERN_FX4:*/
                                 // Count the number of synchro fxs
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -480,7 +483,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                             for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                             {   // Rows
                                 TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                if(i == PATTERN_FX || i == PATTERN_FX2)
+                                if(i == PATTERN_FX ||
+                                   i == PATTERN_FX2 /* ||
+                                   i == PATTERN_FX3 ||
+                                   i == PATTERN_FX4 */
+                                  )
                                 {
                                     // Don't save FX 7
                                     if(TmpPatterns_Notes[i] == 0x7)
@@ -516,7 +523,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                 for(j = 0; j < New_patternLines[New_pSequence[l]]; j++)
                                 {   // Rows
                                     TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
-                                    if(i == PATTERN_FX || i == PATTERN_FX2)
+                                    if(i == PATTERN_FX ||
+                                       i == PATTERN_FX2 /* ||
+                                       i == PATTERN_FX3 ||
+                                       i == PATTERN_FX4 */
+                                      )
                                     {
                                         // Don't save FX 7
                                         if(TmpPatterns_Notes[i] == 0x7)
@@ -581,7 +592,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                         }
 
                         // Check the effects column
-                        if(i == PATTERN_FX || i == PATTERN_FX2)
+                        if(i == PATTERN_FX ||
+                           i == PATTERN_FX2 /* ||
+                           i == PATTERN_FX3 ||
+                           i == PATTERN_FX4 */
+                          )
                         {
                             switch(TmpPatterns_Notes[i])
                             {
@@ -848,6 +863,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                         {
                             case PATTERN_FX:
                             case PATTERN_FX2:
+                            /*
+                            case PATTERN_FX3:
+                            case PATTERN_FX4:*/
                                 // Don't save FX 7
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -861,6 +879,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
                             case PATTERN_FXDATA:
                             case PATTERN_FXDATA2:
+                            case PATTERN_FXDATA3:
+                            case PATTERN_FXDATA4:
                                 // Don't save Fx 7 datas
                                 if(TmpPatterns_Notes[i - 1] == 0x7)
                                 {

@@ -161,6 +161,7 @@ int LoadPtk(char *FileName)
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
     int Fx2 = FALSE;
+    int XtraFx = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -209,6 +210,8 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
+            case 'L':
+                XtraFx = TRUE;
             case 'K':
                 Compress_Tracks = TRUE;
             case 'J':
@@ -342,6 +345,12 @@ Read_Mod_File:
             Read_Mod_Data(Channels_MultiNotes, sizeof(char), MAX_TRACKS, in);
         }
 
+        // Up to 4 fx
+        if(XtraFx)
+        {
+            Read_Mod_Data(Channels_Effects, sizeof(char), MAX_TRACKS, in);
+        }
+
         // Load the patterns data
         int Bytes_Per_Track = PATTERN_BYTES;
         if(!Multi)
@@ -386,8 +395,26 @@ Read_Mod_File:
                     {
                         Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX2, sizeof(char), 1, in);
                         Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA2, sizeof(char), 1, in);
+                        if(!XtraFx)
+                        {
+                            // Check if there's data on older 2nd effects columns
+                            int d = *(TmpPatterns_Notes + PATTERN_FX2);
+                            int d2 = *(TmpPatterns_Notes + PATTERN_FXDATA2);
+                            if(*(TmpPatterns_Notes + PATTERN_FX2) ||
+                               *(TmpPatterns_Notes + PATTERN_FXDATA2)
+                              )
+                            {
+                                Channels_Effects[k] = 2;
+                            }
+                        }
                     }
-
+                    if(XtraFx)
+                    {
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX3, sizeof(char), 1, in);
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA3, sizeof(char), 1, in);
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FX4, sizeof(char), 1, in);
+                        Read_Mod_Data(TmpPatterns_Notes + PATTERN_FXDATA4, sizeof(char), 1, in);
+                    }
                 }
             }
         }
@@ -1152,6 +1179,7 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Swap_Short_Buffer(patternLines, MAX_ROWS);
 
             Write_Mod_Data(Channels_MultiNotes, sizeof(char), MAX_TRACKS, in);
+            Write_Mod_Data(Channels_Effects, sizeof(char), MAX_TRACKS, in);
 
             // Clean the unused patterns garbage (doesn't seem to do much)
             for(i = Songtracks; i < MAX_TRACKS; i++)
@@ -1176,6 +1204,10 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                         cur_pattern[PATTERN_FXDATA] = 0;
                         cur_pattern[PATTERN_FX2] = 0;
                         cur_pattern[PATTERN_FXDATA2] = 0;
+                        cur_pattern[PATTERN_FX3] = 0;
+                        cur_pattern[PATTERN_FXDATA3] = 0;
+                        cur_pattern[PATTERN_FX4] = 0;
+                        cur_pattern[PATTERN_FXDATA4] = 0;
                         // Next line
                         cur_pattern += PATTERN_ROW_LEN;
                     }
@@ -1734,12 +1766,13 @@ int Calc_Length(void)
                 {
                     // Check if there's a pattern loop command
                     // or a change in the tempo/ticks
-                    patt_cmd[0] = Cur_Patt[PATTERN_FX];
-                    patt_datas[0] = Cur_Patt[PATTERN_FXDATA];
-                    patt_cmd[1] = Cur_Patt[PATTERN_FX2];
-                    patt_datas[1] = Cur_Patt[PATTERN_FXDATA2];
+                    for(l = 0; l < Channels_Effects[k]; l++)
+                    {
+                        patt_cmd[l] = Cur_Patt[PATTERN_FX + (l * 2)];
+                        patt_datas[l] = Cur_Patt[PATTERN_FXDATA + (l * 2)];
+                    }                    
 
-                    for(l = 0; l < MAX_FX; l++)
+                    for(l = 0; l < Channels_Effects[k]; l++)
                     {
                         switch(patt_cmd[l])
                         {

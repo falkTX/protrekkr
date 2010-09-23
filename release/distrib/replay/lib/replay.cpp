@@ -261,6 +261,7 @@ int PosJump = -1;
 
 char Channels_Polyphony[MAX_TRACKS];
 char Channels_MultiNotes[MAX_TRACKS];
+char Channels_Effects[MAX_TRACKS];
 
 unsigned char pSequence[256];
 
@@ -1008,6 +1009,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Multi notes
         Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
 
+        // Multi fx
+        Mod_Dat_Read(Channels_Effects, sizeof(char) * Songtracks);
+
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
         {
@@ -1751,6 +1755,7 @@ void Pre_Song_Init(void)
 
         Channels_Polyphony[ini] = 1;
         Channels_MultiNotes[ini] = 1;
+        Channels_Effects[ini] = 1;
 
         Player_FD[ini] = 0.0f;
 
@@ -2086,6 +2091,7 @@ void Sp_Player(void)
 #endif
     int toffset;
     int free_sub_channel;
+    int no_fx3;
     
     left_float = 0;
     right_float = 0;
@@ -2123,35 +2129,28 @@ void Sp_Player(void)
 
                 pl_vol_row = *(RawPatterns + efactor + PATTERN_VOLUME);
                 pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
-                pl_eff_row[0] = *(RawPatterns + efactor + PATTERN_FX);
-                pl_dat_row[0] = *(RawPatterns + efactor + PATTERN_FXDATA);
-                pl_eff_row[1] = *(RawPatterns + efactor + PATTERN_FX2);
-                pl_dat_row[1] = *(RawPatterns + efactor + PATTERN_FXDATA2);
+                
+                // Store the effects
+                for(i = 0; i < Channels_Effects[ct]; i++)
+                {
+                    pl_eff_row[i] = *(RawPatterns + efactor + PATTERN_FX + (i * 2));
+                    pl_dat_row[i] = *(RawPatterns + efactor + PATTERN_FXDATA + (i * 2));
 
-                // 303 are always available
-                // since they aren't "really" bounded to any track
 #if defined(PTK_303)
-                if(pl_eff_row[0] == 0x31)
-                {
-                    track3031 = ct;
-                    Fire303(pl_dat_row[0], 0);
-                }
-                if(pl_eff_row[0] == 0x32)
-                {
-                    track3032 = ct;
-                    Fire303(pl_dat_row[0], 1);
-                }
-                if(pl_eff_row[1] == 0x31)
-                {
-                    track3031 = ct;
-                    Fire303(pl_dat_row[1], 0);
-                }
-                if(pl_eff_row[1] == 0x32)
-                {
-                    track3032 = ct;
-                    Fire303(pl_dat_row[1], 1);
-                }
+                    // 303 are always available
+                    // since they aren't "really" bounded to any track
+                    if(pl_eff_row[i] == 0x31)
+                    {
+                        track3031 = ct;
+                        Fire303(pl_dat_row[i], 0);
+                    }
+                    if(pl_eff_row[i] == 0x32)
+                    {
+                        track3032 = ct;
+                        Fire303(pl_dat_row[i], 1);
+                    }
 #endif
+                }
 
                 // Check the 303s fx effects right triggering them
 #if !defined(__STAND_ALONE__)
@@ -2159,8 +2158,10 @@ void Sp_Player(void)
 #endif
 #if defined(PTK_303)
                 {
-                    live303(pl_eff_row[0], pl_dat_row[0]);
-                    live303(pl_eff_row[1], pl_dat_row[1]);
+                    for(i = 0; i < Channels_Effects[ct]; i++)
+                    {
+                        live303(pl_eff_row[i], pl_dat_row[i]);
+                    }
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
                     if(!sr_isrecording) Actualize_303_Ed(0);
@@ -2170,36 +2171,44 @@ void Sp_Player(void)
 #endif
 
 #if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
-                    if(pl_vol_row <= 64 ||  pl_eff_row[0] == 3 || pl_eff_row[1] == 3)
+                for(i = 0; i < Channels_Effects[ct]; i++)
+                {
+                    if(pl_vol_row <= 64 || pl_eff_row[i] == 3)
 #endif
                     {
                         sp_Tvol_Mod[ct] = 1.0f;
+#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
+                        break;
+#endif
                     }
 
+#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
+                }
+#endif
+
 #if defined(PTK_VOLUME_COLUMN)
-                    if(pl_vol_row <= 64)
-                    {
-                        sp_Tvol_Mod[ct] *= (float) pl_vol_row * 0.015625f;
-                    }
+                if(pl_vol_row <= 64)
+                {
+                    sp_Tvol_Mod[ct] *= (float) pl_vol_row * 0.015625f;
+                }
 #endif
 
 #if defined(PTK_FX_SETVOLUME)
+                for(i = 0; i < Channels_Effects[ct]; i++)
+                {
                     // Modulated be effect 3
-                    if(pl_eff_row[0] == 3)
+                    if(pl_eff_row[i] == 3)
                     {
-                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[0] * 0.0039062f;
+                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[i] * 0.0039062f;
                     }
-                    if(pl_eff_row[1] == 3)
-                    {
-                        sp_Tvol_Mod[ct] *= (float) pl_dat_row[1] * 0.0039062f;
-                    }
+                }
 #endif
 
-                    if(pl_pan_row <= 128)
-                    {
-                        TPan[ct] = (float) pl_pan_row * 0.0078125f; 
-                        ComputeStereo(ct);
-                    }
+                if(pl_pan_row <= 128)
+                {
+                    TPan[ct] = (float) pl_pan_row * 0.0078125f; 
+                    ComputeStereo(ct);
+                }
 
                 // Don't check those fx if the channel isn't active
                 if(CHAN_ACTIVE_STATE[Song_Position][ct])
@@ -2208,47 +2217,39 @@ void Sp_Player(void)
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
                     // No controller command for inactive tracks
-                    if((pl_pan_row == 0x90 && pl_eff_row[0] < 128) && c_midiout != -1)
+                    for(i = 0; i < Channels_Effects[ct]; i++)
                     {
-                        Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row[0], pl_dat_row[0]);
-                    }
-                    if((pl_pan_row == 0x90 && pl_eff_row[1] < 128) && c_midiout != -1)
-                    {
-                        Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row[1], pl_dat_row[1]);
-                    }
+                        if((pl_pan_row == 0x90 && pl_eff_row[i] < 128) && c_midiout != -1)
+                        {
+                            Midi_Send(176 + CHAN_MIDI_PRG[ct], pl_eff_row[i], pl_dat_row[i]);
+                        }
 
-                    if((pl_eff_row[0] == 0x80 && pl_dat_row[0] < 128) && c_midiout != -1)
-                    {
-                        Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row[0]);
-                    }
-                    if((pl_eff_row[1] == 0x80 && pl_dat_row[1] < 128) && c_midiout != -1)
-                    {
-                        Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row[1]);
+                        if((pl_eff_row[i] == 0x80 && pl_dat_row[i] < 128) && c_midiout != -1)
+                        {
+                            Midi_Send(176 + CHAN_MIDI_PRG[ct], 0, pl_dat_row[i]);
+                        }
                     }
 #endif
 #endif
 
 #if defined(PTK_FX_PATTERNBREAK)
-                    if(pl_eff_row[0] == 0xd && pl_dat_row[0] < MAX_ROWS)
+                    for(i = 0; i < Channels_Effects[ct]; i++)
                     {
-                        Patbreak_Line = pl_dat_row[0];
-                    }
-                    if(pl_eff_row[1] == 0xd && pl_dat_row[1] < MAX_ROWS)
-                    {
-                        Patbreak_Line = pl_dat_row[1];
+                        if(pl_eff_row[i] == 0xd && pl_dat_row[i] < MAX_ROWS)
+                        {
+                            Patbreak_Line = pl_dat_row[i];
+                        }
                     }
 #endif
 
 #if defined(PTK_FX_POSJUMP)
-                    if(pl_eff_row[0] == 0x1f)
+                    for(i = 0; i < Channels_Effects[ct]; i++)
                     {
-                        if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
-                        PosJump = pl_dat_row[0];
-                    }
-                    if(pl_eff_row[1] == 0x1f)
-                    {
-                        if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
-                        PosJump = pl_dat_row[1];
+                        if(pl_eff_row[i] == 0x1f)
+                        {
+                            if(Patbreak_Line >= MAX_ROWS) Patbreak_Line = 0;
+                            PosJump = pl_dat_row[i];
+                        }
                     }
 #endif
                 }
@@ -2256,10 +2257,11 @@ void Sp_Player(void)
                 // Those 2 will only be used when triggering new notes
                 toffset = 0;
                 glide = 0;
-                if(pl_eff_row[0] == 9) toffset = pl_dat_row[0];
-                else if(pl_eff_row[0] == 5) glide = 1;
-                if(pl_eff_row[1] == 9) toffset = pl_dat_row[1];
-                else if(pl_eff_row[1] == 5) glide = 1;
+                for(i = 0; i < Channels_Effects[ct]; i++)
+                {
+                    if(pl_eff_row[i] == 9) toffset = pl_dat_row[i];
+                    else if(pl_eff_row[i] == 5) glide = 1;
+                }
 
                 // Send notes off to the synth & midi
                 // before triggering any new note
@@ -2307,15 +2309,31 @@ void Sp_Player(void)
                             Note_Sub_Channels[ct][i] = i;
                             Reserved_Sub_Channels[ct][i] = free_sub_channel;
 
-#if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
+#if defined(PTK_VOLUME_COLUMN)
                             // Need to set the instrument volume
-                            if(pl_vol_row > 64 && pl_eff_row[0] != 3 && pl_eff_row[1] != 3)
+                            if(pl_vol_row > 64)
 #endif
                             {
-                                if(pl_sample[i] != 255)
+
+#if defined(PTK_FX_SETVOLUME)
+                                no_fx3 = FALSE;
+                                for(j = 0; j < Channels_Effects[ct]; j++)
                                 {
-                                    sp_Tvol_Mod[ct] = 1.0f;
+                                    if(pl_eff_row[j] == 3)
+                                    {
+                                        no_fx3 = TRUE;
+                                        break;
+                                    }
                                 }
+
+                                if(!no_fx3)
+                                {
+                                    if(pl_sample[i] != 255)
+                                    {
+                                        sp_Tvol_Mod[ct] = 1.0f;
+                                    }
+                                }
+#endif
                             }
 
                             // Start to play it with the specified volume
@@ -3874,13 +3892,12 @@ void Do_Effects_Tick_0(void)
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
         int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
-        pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
-        pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
-        pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
-        pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
 
-        for(j = 0 ; j < MAX_FX; j++)
+        for(j = 0; j < Channels_Effects[trackef]; j++)
         {
+            pltr_eff_row[j] = *(RawPatterns + tefactor + PATTERN_FX + (j * 2));
+            pltr_dat_row[j] = *(RawPatterns + tefactor + PATTERN_FXDATA + (j * 2));
+
             switch(pltr_eff_row[j])
             {
 
@@ -3938,13 +3955,12 @@ void Do_Pattern_Loop(int track)
     int pltr_dat_row[MAX_FX];
 
     int tefactor = Get_Pattern_Offset(pSequence[Song_Position], track, Pattern_Line);
-    pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
-    pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
-    pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
-    pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
 
-    for(j = 0; j < MAX_FX; j++)
+    for(j = 0; j < Channels_Effects[track]; j++)
     {
+        pltr_eff_row[j] = *(RawPatterns + tefactor + PATTERN_FX + (j * 2));
+        pltr_dat_row[j] = *(RawPatterns + tefactor + PATTERN_FXDATA + (j * 2));
+
         switch(pltr_eff_row[j])
         {
             // $06 Pattern loop
@@ -4024,12 +4040,12 @@ void Do_Effects_Ticks_X(void)
         unsigned char pltr_vol_row = *(RawPatterns + tefactor + PATTERN_VOLUME);
 
 #if defined(PTK_FX_0) || defined(PTK_FX_X)
-        pltr_eff_row[0] = *(RawPatterns + tefactor + PATTERN_FX);
-        pltr_eff_row[1] = *(RawPatterns + tefactor + PATTERN_FX2);
+        for(i = 0; i < Channels_Effects[trackef]; i++)
+        {
+            pltr_eff_row[i] = *(RawPatterns + tefactor + PATTERN_FX + (i * 2));
+            pltr_dat_row[i] = *(RawPatterns + tefactor + PATTERN_FXDATA + (i * 2));
+        }
 #endif
-
-        pltr_dat_row[0] = *(RawPatterns + tefactor + PATTERN_FXDATA);
-        pltr_dat_row[1] = *(RawPatterns + tefactor + PATTERN_FXDATA2);
 
 #if defined(PTK_FX_AUTOFADEMODE)
         // Autofade routine
@@ -4093,7 +4109,7 @@ void Do_Effects_Ticks_X(void)
 #endif
 
         // Effects
-        for(k = 0 ; k < MAX_FX; k++)
+        for(k = 0; k < Channels_Effects[trackef]; k++)
         {
 
 #if defined(PTK_FX_FINEVOLUMESLIDEUP) || defined(PTK_FX_FINEVOLUMESLIDEDOWN) || \
@@ -4501,7 +4517,7 @@ void Do_Effects_Ticks_X(void)
 
 #endif  // PTK_FX_X
 
-        } // MAX_FX
+        } // Channels_Effects[trackef]
 
 #if defined(PTK_FX_ARPEGGIO)
         // Let's do the arpeggio

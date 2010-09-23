@@ -939,6 +939,7 @@ int Switch_FullScreen(int Width, int Height)
     Cur_Height = Height;
     CONSOLE_WIDTH = Cur_Width;
     CHANNELS_WIDTH = Cur_Width - 20;
+    TRACKS_WIDTH = Cur_Width - 20 - PAT_COL_NOTE;
     CONSOLE_HEIGHT = Cur_Height;
     CONSOLE_HEIGHT2 = Cur_Height;
     MAX_PATT_SCREEN_X = Cur_Width - 19;

@@ -111,6 +111,8 @@ void Goto_Bottom_Right(void);
 void Goto_Row(int row);
 void Goto_Previous_Position(void);
 void Goto_Song_Position(int Position);
+int Get_Track_Size(int Track, int *Column);
+int Get_Track_Real_Size(int Track);
 int Get_Last_Track_Column(int track);
 int Get_Visible_Complete_Tracks(void);
 int Get_Pattern_Offset(int track, int row, int pattern);

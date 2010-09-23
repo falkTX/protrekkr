@@ -210,6 +210,13 @@ void Actualize_Track_Ed(char gode)
             Actupated(0);
         }
 
+/*        if(gode == 0 || gode == 16)
+        {
+            if(Channels_Effects[Track_Under_Caret] < 1) Channels_Effects[Track_Under_Caret] = 1;
+            if(Channels_Effects[Track_Under_Caret] > MAX_FX) Channels_Effects[Track_Under_Caret] = MAX_FX;
+            Gui_Draw_Arrows_Number_Box2(650, (Cur_Height - 111), Channels_Effects[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        }
+        */
         if(trkchan == TRUE)
         {
             Actupated(0);
@@ -369,13 +376,13 @@ void Mouse_Left_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, (Cur_Height - 61), 16, 16) == 1)
         {
-            Track_Sub_Note(Track_Under_Caret, 1);
+            Track_Sub_Notes(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, (Cur_Height - 61), 16, 16) == 1)
         {
-            Track_Add_Note(Track_Under_Caret, 1);
+            Track_Add_Notes(Track_Under_Caret, 1);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -433,13 +440,13 @@ void Mouse_Right_Track_Ed(void)
         // Multi notes
         if(zcheckMouse(650, (Cur_Height - 61), 16, 16) == 1)
         {
-            Track_Sub_Note(Track_Under_Caret, 10);
+            Track_Sub_Notes(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
         if(zcheckMouse(650 + 44, (Cur_Height - 61), 16, 16) == 1)
         {
-            Track_Add_Note(Track_Under_Caret, 10);
+            Track_Add_Notes(Track_Under_Caret, 10);
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
             teac = 14;
         }
@@ -461,8 +468,8 @@ void Mouse_Sliders_Track_Ed(void)
 }
 
 // ------------------------------------------------------
-// Add a given amount of note to a track
-void Track_Add_Note(int Track_Nbr, int Amount)
+// Add a given amount of notes to a track
+void Track_Add_Notes(int Track_Nbr, int Amount)
 {
     Channels_MultiNotes[Track_Nbr] += Amount;
     if(Channels_MultiNotes[Track_Nbr] > MAX_POLYPHONY) Channels_MultiNotes[Track_Nbr] = MAX_POLYPHONY;
@@ -470,27 +477,65 @@ void Track_Add_Note(int Track_Nbr, int Amount)
     {
         Channels_Polyphony[Track_Nbr] = Channels_MultiNotes[Track_Nbr];
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_LARGE)
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_NORMAL)
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }
 }
 
 // ------------------------------------------------------
-// Remove a given amount of note from a track
-void Track_Sub_Note(int Track_Nbr, int Amount)
+// Remove a given amount of notes from a track
+void Track_Sub_Notes(int Track_Nbr, int Amount)
 {
     Channels_MultiNotes[Track_Nbr] -= Amount;
-    if(Channels_MultiNotes[Track_Nbr] < 1) Channels_MultiNotes[Track_Nbr] = 1;
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_LARGE)
+    if(Channels_MultiNotes[Track_Nbr] < 1)
+    {
+        Channels_MultiNotes[Track_Nbr] = 1;
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Channels_MultiNotes[Track_Nbr] > MAX_TRACKS_NORMAL)
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
+    }
+}
+
+// ------------------------------------------------------
+// Add a given amount of effects to a track
+void Track_Add_Effects(int Track_Nbr, int Amount)
+{
+    Channels_Effects[Track_Nbr] += Amount;
+    if(Channels_Effects[Track_Nbr] > MAX_FX)
+    {
+        Channels_Effects[Track_Nbr] = MAX_FX;
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
+    }
+}
+
+// ------------------------------------------------------
+// Remove a given amount of effects from a track
+void Track_Sub_Effects(int Track_Nbr, int Amount)
+{
+    Channels_Effects[Track_Nbr] -= Amount;
+    if(Channels_Effects[Track_Nbr] < 1) Channels_Effects[Track_Nbr] = 1;
+    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    {
+        Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
+    }
+    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }

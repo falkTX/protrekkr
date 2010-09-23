@@ -2601,7 +2601,7 @@ void RtMidiIn :: closePort(void)
 RtMidiIn :: ~RtMidiIn()
 {
     // Close a connection if it exists.
-    closePort();
+//    closePort();
 
     // Cleanup.
     WinMidiData *data = static_cast<WinMidiData *> (apiData_);
@@ -2760,7 +2760,7 @@ void RtMidiOut :: openVirtualPort(char *portName)
 RtMidiOut :: ~RtMidiOut()
 {
     // Close a connection if it exists.
-    closePort();
+    //closePort();
 
     // Cleanup.
     WinMidiData *data = static_cast<WinMidiData *> (apiData_);
@@ -2781,7 +2781,7 @@ void RtMidiOut :: sendMessage(std::vector<unsigned char> *message)
 
     MMRESULT result;
     WinMidiData *data = static_cast<WinMidiData *> (apiData_);
-    if(data)
+    if(data && data->outHandle)
     {
         if(message->at(0) == 0xF0)
         { // Sysex message

@@ -330,6 +330,7 @@ void Midi_InitIn(void)
         }
         else
         {
+            Midi_CloseIn();
             if(midiin_changed == 1) Status_Box("Midi In device disconnected...");
         }
         midiin_changed = 0;
@@ -372,6 +373,7 @@ void Midi_InitOut(void)
         }
         else
         {
+            Midi_CloseOut();
             if(midiout_changed == 1) Status_Box("Midi Out device disconnected...");
         }
         midiout_changed = 0;
@@ -408,6 +410,7 @@ void Midi_GetAll(void)
 // Free allocated interfaces resources
 void Midi_FreeAll(void)
 {
+    if(midiin_port_opened) midiin->cancelCallback();
     if(midiin) delete midiin;
     if(midiout) delete midiout;
 }

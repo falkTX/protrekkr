@@ -49,7 +49,9 @@ void Actualize_Track_Ed(char gode);
 void Mouse_Left_Track_Ed(void);
 void Mouse_Right_Track_Ed(void);
 void Mouse_Sliders_Track_Ed(void);
-void Track_Add_Note(int Track_Nbr, int Amount);
-void Track_Sub_Note(int Track_Nbr, int Amount);
+void Track_Add_Notes(int Track_Nbr, int Amount);
+void Track_Sub_Notes(int Track_Nbr, int Amount);
+void Track_Add_Effects(int Track_Nbr, int Amount);
+void Track_Sub_Effects(int Track_Nbr, int Amount);
 
 #endif

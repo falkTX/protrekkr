@@ -41,7 +41,7 @@
 // ------------------------------------------------------
 // Constants
 #define NBR_COPY_BLOCKS 5
-#define EXTRA_NIBBLE_DAT 12
+#define EXTRA_NIBBLE_DAT 4
 
 // ------------------------------------------------------
 // Enumerations
@@ -61,7 +61,15 @@ enum COLUMN_TYPE
     EFFECT2HI,
     EFFECT2LO,
     EFFECT2DATHI,
-    EFFECT2DATLO
+    EFFECT2DATLO,
+    EFFECT3HI,
+    EFFECT3LO,
+    EFFECT3DATHI,
+    EFFECT3DATLO,
+    EFFECT4HI,
+    EFFECT4LO,
+    EFFECT4DATHI,
+    EFFECT4DATLO
 };
 
 // ------------------------------------------------------
@@ -89,6 +97,7 @@ extern int block_end_track[NBR_COPY_BLOCKS];
 extern int block_start[NBR_COPY_BLOCKS];
 extern int block_end[NBR_COPY_BLOCKS];
 extern char Buff_MultiNotes[NBR_COPY_BLOCKS][MAX_TRACKS];
+extern char Buff_Effects[NBR_COPY_BLOCKS][MAX_TRACKS];
 
 // ------------------------------------------------------
 // Functions
@@ -130,15 +139,17 @@ void Remove_Track_Line(int track, int Position);
 void Clear_Patterns_Pool(void);
 void Clear_Track_Data(int offset);
 int Alloc_Patterns_Pool(void);
-int Get_Max_Nibble_Track(char *Buffer, int track);
-int Get_Track_Nibble_Start(char *Buffer, int track);
-int Get_Track_From_Nibble(char *Buffer, int nibble);
+int Get_Max_Nibble_Track(char *Buffer_MultiNotes, char *Buffer_Effects, int track);
+int Get_Track_Nibble_Start(char *Buffer_MultiNotes, char *Buffer_Effects, int track);
+int Get_Track_From_Nibble(char *Buffer_MultiNotes, char *Buffer_Effects, int nibble);
 void Select_All_Notes_Block(void);
-int Get_Max_Nibble_Track_From_Nibble(char *Buffer, int nibble);
-int Get_Byte_From_Column(char *Buffer, int column);
-COLUMN_TYPE Get_Column_Type(char *Buffer, int column);
-int Get_Track_Relative_Column(char *Buffer, int column);
+int Get_Max_Nibble_Track_From_Nibble(char *Buffer_MultiNotes, char *Buffer_Effects, int nibble);
+int Get_Max_Nibble_Effects_From_Nibble(char *Buffer_MultiNotes, char *Buffer_Effects, int nibble);
+int Get_Byte_From_Column(char *Buffer_MultiNotes, char *Buffer_Effects, int column);
+COLUMN_TYPE Get_Column_Type(char *Buffer_MultiNotes, char *Buffer_Effects, int column);
+int Get_Track_Relative_Column(char *Buffer_MultiNotes, char *Buffer_Effects, int column);
 int Get_Max_Nibble_All_Tracks(void);
 void Clear_Buff(int Idx);
+int Are_Columns_Compatible(int type_src, int type_dst);
 
 #endif

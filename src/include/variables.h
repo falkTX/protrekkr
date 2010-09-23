@@ -51,9 +51,6 @@
 #define TRUE 1
 #endif
 
-#define MAX_TRACKS_LARGE 10
-#define MAX_TRACKS_NORMAL 14
-
 #define GUI_CMD_NONE 0
 
 #define GUI_CMD_SET_FILES_LIST_SLIDER 1
@@ -115,6 +112,9 @@
 #define GUI_CMD_EXPAND_TRACK_NOTES 80
 
 #define GUI_CMD_SELECT_SCREEN_SETUP_MIDI 81
+
+#define GUI_CMD_REDUCE_TRACK_EFFECTS 82
+#define GUI_CMD_EXPAND_TRACK_EFFECTS 83
 
 #define GUI_CMD_FILELIST_SCROLL 100
 #define GUI_CMD_UPDATE_LOOP_EDITOR_ED 101
@@ -302,6 +302,7 @@ extern int last_index;
 
 extern int CONSOLE_WIDTH;
 extern int CHANNELS_WIDTH;
+extern int TRACKS_WIDTH;
 extern int CONSOLE_HEIGHT;
 extern int Scopish;
 
@@ -401,6 +402,7 @@ extern int allow_save;
 
 extern char Channels_Polyphony[MAX_TRACKS];
 extern char Channels_MultiNotes[MAX_TRACKS];
+extern char Channels_Effects[MAX_TRACKS];
 
 // ------------------------------------------------------
 // Functions

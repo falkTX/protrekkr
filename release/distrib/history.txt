@@ -10,8 +10,12 @@ v2.2.0:
 - Added 3 new themes.
 - Tracker sometimes crashed at exit when using midi.
 - Mouse wheel activated for horizontal patterns slider.
+- Number of effects columns is now selectable (from 1 to 4).
 
 TODO:
+
+- Test patterns loading/saving.
+- Test blocks copies.
 
 - Midi profiles (save files).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:

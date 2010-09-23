@@ -453,6 +453,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                                     {
                                                         *(RawPatterns + free_chan + PATTERN_FX2) = 0xf0;
                                                         *(RawPatterns + free_chan + PATTERN_FXDATA2) = found_tempo;
+                                                        Channels_Effects[pw2] = 2;
                                                         last_tempo = found_tempo;
                                                     }
                                                     break;
@@ -461,11 +462,12 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                         }
                                         if(!found_free_chan)
                                         {
-                                            // Overwrite is the worst case scenario
+                                            // Overwriting is the worst case scenario
                                             if(last_tempo != found_tempo)
                                             {
                                                 *(RawPatterns + tmo + PATTERN_FX2) = 0xf0;
                                                 *(RawPatterns + tmo + PATTERN_FXDATA2) = found_tempo;
+                                                Channels_Effects[pw2] = 2;
                                                 last_tempo = found_tempo;
                                             }
                                         }
@@ -528,6 +530,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 {
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x1d;
                                     *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                    Channels_Effects[pw2] = 2;
                                     vib_chan[pw2] = FALSE;
                                 }
                             }
@@ -551,6 +554,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 {
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x1b;
                                     *(RawPatterns + tmo + PATTERN_FXDATA2) = 0;
+                                    Channels_Effects[pw2] = 2;
                                     arp_chan[pw2] = FALSE;
                                 }
                             }
@@ -608,12 +612,18 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 {
                                     // Vol SlideUp
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x19;
-                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4,
+                                                                                                        (31 - (cur_speed - 1)) * 2.5f,
+                                                                                                        255.0f);
+                                    Channels_Effects[pw2] = 2;
                                 }
                                 else
                                 {
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x1a;
-                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf,
+                                                                                                        (31 - (cur_speed - 1)) * 2.5f,
+                                                                                                        255.0f);
+                                    Channels_Effects[pw2] = 2;
                                 }
                                 // (The portamento retains the value initiated with command 3)
                                 Cmd = 5;
@@ -627,12 +637,18 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 {
                                     // Vol SlideUp
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x19;
-                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4,
+                                                                                                        (31 - (cur_speed - 1)) * 2.5f,
+                                                                                                        255.0f);
+                                    Channels_Effects[pw2] = 2;
                                 }
                                 else
                                 {
                                     *(RawPatterns + tmo + PATTERN_FX2) = 0x1a;
-                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    *(RawPatterns + tmo + PATTERN_FXDATA2) = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf,
+                                                                                                        (31 - (cur_speed - 1)) * 2.5f,
+                                                                                                        255.0f);
+                                    Channels_Effects[pw2] = 2;
                                 }
                                 // (The vibrato retains the value initiated with command 4)
                                 Cmd = 0x1d;
@@ -668,12 +684,16 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 if(Cmd_Dat >= 16)
                                 {
                                     Cmd = 0x19; // Vol SlideUp
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4,
+                                                                         (31 - (cur_speed - 1)) * 2.5f,
+                                                                         255.0f);
                                 }
                                 else
                                 {
                                     Cmd = 0x1a; // Vol Slide Down
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf, (31 - (cur_speed - 1)) * 2.5f, 255.0f);
+                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf,
+                                                                         (31 - (cur_speed - 1)) * 2.5f,
+                                                                         255.0f);
                                 }
                                 break;
 

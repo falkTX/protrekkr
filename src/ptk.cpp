@@ -80,6 +80,7 @@ int Display_Pointer = FALSE;
 
 int CONSOLE_WIDTH;
 int CHANNELS_WIDTH;
+int TRACKS_WIDTH;
 int CONSOLE_HEIGHT;
 int CONSOLE_HEIGHT2;
 int fluzy = -1;
@@ -943,14 +944,28 @@ int Screen_Update(void)
 
         if(gui_action == GUI_CMD_REDUCE_TRACK_NOTES)
         {
-            Track_Sub_Note(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
+            Track_Sub_Notes(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
             Actupated(0);
             Actualize_Track_Ed(14);
         }
 
         if(gui_action == GUI_CMD_EXPAND_TRACK_NOTES)
         {
-            Track_Add_Note(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
+            Track_Add_Notes(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
+            Actupated(0);
+            Actualize_Track_Ed(14);
+        }
+
+        if(gui_action == GUI_CMD_REDUCE_TRACK_EFFECTS)
+        {
+            Track_Sub_Effects(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
+            Actupated(0);
+            Actualize_Track_Ed(14);
+        }
+
+        if(gui_action == GUI_CMD_EXPAND_TRACK_EFFECTS)
+        {
+            Track_Add_Effects(Get_Track_Over_Mouse(Mouse.x, NULL, FALSE), 1);
             Actupated(0);
             Actualize_Track_Ed(14);
         }
@@ -1889,7 +1904,9 @@ void LoadFile(int Freeindex, const char *str)
             sprintf(namerev, "%s", FileName);
             LoadReverb(namerev);
         }
-        else if(strcmp(extension, "TWNNBLK1") == 0)
+        else if((strcmp(extension, "TWNNBLK1") == 0) ||
+                (strcmp(extension, "TWNNBLK2") == 0)
+               )
         {
             sprintf(namerev, "%s", FileName);
             LoadPattern(namerev);
@@ -4293,7 +4310,11 @@ void Keyboard_Handler(void)
                     if(Column_Under_Caret == (9 + j)) ped_cell = PATTERN_FXDATA;       // fx data
                     if(Column_Under_Caret == (11 + j)) ped_cell = PATTERN_FX2;         // fx 2
                     if(Column_Under_Caret == (13 + j)) ped_cell = PATTERN_FXDATA2;     // fx 2 data
-
+                    if(Column_Under_Caret == (15 + j)) ped_cell = PATTERN_FX3;          // fx 3
+                    if(Column_Under_Caret == (17 + j)) ped_cell = PATTERN_FXDATA3;     // fx 3 data
+                    if(Column_Under_Caret == (19 + j)) ped_cell = PATTERN_FX4;         // fx 4
+                    if(Column_Under_Caret == (21 + j)) ped_cell = PATTERN_FXDATA4;     // fx 4 data
+                    
                     ltretvalue = retvalue;
                     xoffseted = (Track_Under_Caret * PATTERN_BYTES) + (Pattern_Line * PATTERN_ROW_LEN) + ped_cell;
 
@@ -4404,6 +4425,10 @@ void Keyboard_Handler(void)
                         if(Column_Under_Caret == (10 + j)) ped_cell = PATTERN_FXDATA;
                         if(Column_Under_Caret == (12 + j)) ped_cell = PATTERN_FX2;
                         if(Column_Under_Caret == (14 + j)) ped_cell = PATTERN_FXDATA2;
+                        if(Column_Under_Caret == (16 + j)) ped_cell = PATTERN_FX3;
+                        if(Column_Under_Caret == (18 + j)) ped_cell = PATTERN_FXDATA3;
+                        if(Column_Under_Caret == (20 + j)) ped_cell = PATTERN_FX4;
+                        if(Column_Under_Caret == (22 + j)) ped_cell = PATTERN_FXDATA4;
 
                         ltretvalue = retvalue;
                         xoffseted = (Track_Under_Caret * PATTERN_BYTES) + (Pattern_Line * PATTERN_ROW_LEN) + ped_cell;

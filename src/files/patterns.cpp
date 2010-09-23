@@ -37,7 +37,8 @@
 // Load the data from a pattern file
 void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
-                      FILE *in)
+                      FILE *in,
+                      int version)
 {
     int Cur_Position = Get_Song_Position();
 
@@ -45,6 +46,10 @@ void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
     Curr_Buff_Block = NBR_COPY_BLOCKS - 1;
 
     Read_Function(Buff_MultiNotes[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
+    if(version == 2)
+    {
+        Read_Function(Buff_Effects[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
+    }
     Read_Function_Swap(&b_buff_xsize[Curr_Buff_Block], sizeof(int), 1, in);
     Read_Function_Swap(&b_buff_ysize[Curr_Buff_Block], sizeof(int), 1, in);
     Read_Function_Swap(&start_buff_nibble[Curr_Buff_Block], sizeof(int), 1, in);
@@ -88,6 +93,7 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
     Calc_selection();
 
     Write_Function(Buff_MultiNotes[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
+    Write_Function(Buff_Effects[Curr_Buff_Block], sizeof(char), MAX_TRACKS, in);
     Write_Function_Swap(&b_buff_xsize[Curr_Buff_Block], sizeof(int), 1, in);
     Write_Function_Swap(&b_buff_ysize[Curr_Buff_Block], sizeof(int), 1, in);
     Write_Function_Swap(&start_buff_nibble[Curr_Buff_Block], sizeof(int), 1, in);
@@ -109,6 +115,7 @@ void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
 void LoadPattern(char *FileName)
 {
     FILE *in;
+    int version = 0;
 
     if(!is_editing)
     {
@@ -124,13 +131,15 @@ void LoadPattern(char *FileName)
         char extension[10];
         fread(extension, sizeof(char), 9, in);
 
-        if(strcmp(extension, "TWNNBLK1") == 0)
+        if(strcmp(extension, "TWNNBLK1") == 0) version = 1;
+        if(strcmp(extension, "TWNNBLK2") == 0) version = 2;
+        if(version)
         {
             // Ok, extension matched!
             Status_Box("Loading Pattern data...");
 
             Read_Data(Selection_Name, sizeof(char), 20, in);
-            Load_Pattern_Data(Read_Data, Read_Data_Swap, in);
+            Load_Pattern_Data(Read_Data, Read_Data_Swap, in, version);
             Actupated(0);
 
             Status_Box("Pattern data loaded ok.");
@@ -155,7 +164,7 @@ void SavePattern(void)
     char Temph[96];
     char extension[10];
 
-    sprintf(extension, "TWNNBLK1");
+    sprintf(extension, "TWNNBLK2");
     sprintf(Temph, "Saving '%s.ppb' data in patterns directory...", Selection_Name);
     Status_Box(Temph);
     sprintf(Temph, "%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name);

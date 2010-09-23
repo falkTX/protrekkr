@@ -45,7 +45,8 @@
 // Functions
 void Load_Pattern_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
-                      FILE *in);
+                      FILE *in,
+                      int version);
 void Save_Pattern_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in);
