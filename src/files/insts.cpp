@@ -45,6 +45,7 @@ void LoadInst(char *FileName)
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
     int Glob_Vol = FALSE;
+    int Combine = FALSE;
 
     Status_Box("Attempting to load an instrument file...");
     FILE *in;
@@ -58,6 +59,8 @@ void LoadInst(char *FileName)
 
         switch(extension[7])
         {
+            case '9':
+                Combine = TRUE;
             case '8':
                 Glob_Vol = TRUE;
             case '7':
@@ -101,10 +104,13 @@ void LoadInst(char *FileName)
         PARASynth[swrite].lfo2_attack = 0;
         PARASynth[swrite].lfo2_decay = 0;
         PARASynth[swrite].lfo2_sustain = 128;
+        PARASynth[swrite].osc_combine = COMBINE_ADD;
+
         PARASynth[swrite].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, swrite,
-                          !old_bug, new_adsr, tight, Env_Modulation, New_Env, FALSE);
+                          !old_bug, new_adsr, tight,
+                          Env_Modulation, New_Env, FALSE, Combine);
 
         // Gsm by default
         if(Pack_Scheme)
@@ -179,7 +185,9 @@ void LoadInst(char *FileName)
         Actualize_Instrument_Ed(2, 0);
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         Status_Box("Instrument loaded ok.");
-    } else {
+    }
+    else
+    {
         Status_Box("Instrument loading failed. (Possible cause: file not found)");
     }
     
@@ -196,7 +204,7 @@ void SaveInst(void)
     char synth_prg;
     int synth_save;
 
-    sprintf(extension, "TWNNINS8");
+    sprintf(extension, "TWNNINS9");
     if(!strlen(nameins[Current_Instrument])) sprintf(nameins[Current_Instrument], "Untitled");
     sprintf (Temph, "Saving '%s.pti' instrument in instruments directory...", nameins[Current_Instrument]);
     Status_Box(Temph);

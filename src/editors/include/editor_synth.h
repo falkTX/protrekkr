@@ -61,6 +61,7 @@
 #define UPDATE_SYNTH_ED_Misc_PARAMS 14
 #define UPDATE_SYNTH_CHANGE_NAME 15
 #define UPDATE_SYNTH_CHANGE_ASSOCIATED_SAMPLE 16
+#define UPDATE_SYNTH_ED_COMBINER 17
 
 // ------------------------------------------------------
 // Functions

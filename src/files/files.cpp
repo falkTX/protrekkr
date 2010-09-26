@@ -162,6 +162,7 @@ int LoadPtk(char *FileName)
     int New_Env = FALSE;
     int Fx2 = FALSE;
     int XtraFx = FALSE;
+    int Combine = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -212,6 +213,7 @@ int LoadPtk(char *FileName)
         {
             case 'L':
                 XtraFx = TRUE;
+                Combine = TRUE;
             case 'K':
                 Compress_Tracks = TRUE;
             case 'J':
@@ -442,7 +444,7 @@ Read_Mod_File:
 
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
                               new_disto, New_adsr, Portable, Env_Modulation,
-                              New_Env, Ntk_Beta);
+                              New_Env, Ntk_Beta, Combine);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo1_period > 128) PARASynth[swrite].lfo1_period = 128;
@@ -1530,7 +1532,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKK");
+        sprintf(extension, "PROTREKL");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

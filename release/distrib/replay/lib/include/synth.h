@@ -52,7 +52,7 @@
 
 // ------------------------------------------------------
 // Constants
-#define SIZE_WAVEFORMS_SPACE 88200
+#define SIZE_WAVEFORMS_SPACE 88273
 
 #define WAVEFORM_SIN 0
 #define WAVEFORM_SAW 1
@@ -61,6 +61,11 @@
 #define WAVEFORM_NONE 4
 #define WAVEFORM_WAV 5
 #define WAVEFORM_PINK 6
+
+#define COMBINE_ADD 0
+#define COMBINE_SUB 1
+#define COMBINE_MUL 2
+#define COMBINE_DIV 3
 
 // ------------------------------------------------------
 // Types
@@ -94,6 +99,7 @@ struct SynthParameters
 
     unsigned char osc1_waveform;
     unsigned char osc2_waveform;
+    unsigned char osc_combine;
 
     int osc1_pw;
     int osc2_pw;
@@ -185,23 +191,23 @@ extern int SamplesPerTick;
 
 /* Sine float-precalculated table, in absolute degrees. */
 #if defined(PTK_SYNTH_SIN)
-extern short STOCK_SIN[SIZE_WAVEFORMS_SPACE * 2];
+extern short STOCK_SIN[SIZE_WAVEFORMS_SPACE];
 #endif
 
 #if defined(PTK_SYNTH_SAW)
-extern short STOCK_SAW[SIZE_WAVEFORMS_SPACE * 2];
+extern short STOCK_SAW[SIZE_WAVEFORMS_SPACE];
 #endif
 
 #if defined(PTK_SYNTH_PULSE)
-extern short STOCK_PULSE[SIZE_WAVEFORMS_SPACE * 2];
+extern short STOCK_PULSE[SIZE_WAVEFORMS_SPACE];
 #endif
 
 #if defined(PTK_SYNTH_WHITE)
-extern short STOCK_WHITE[SIZE_WAVEFORMS_SPACE * 2];
+extern short STOCK_WHITE[SIZE_WAVEFORMS_SPACE];
 #endif
 
 #if defined(PTK_SYNTH_PINK)
-    extern short STOCK_PINK[SIZE_WAVEFORMS_SPACE * 2];
+    extern short STOCK_PINK[SIZE_WAVEFORMS_SPACE];
 #endif
 
 extern int SIZE_WAVEFORMS;
@@ -219,6 +225,7 @@ typedef struct
 {
         char OSC1_WAVEFORM;
         char OSC2_WAVEFORM;
+
         float OSC1_PW;
         float OSC2_PW; 
         float OSC2_DETUNE;
@@ -284,6 +291,8 @@ typedef struct
         float LFO2_DECAY;
         float LFO2_SUSTAIN;
         float LFO2_RELEASE;
+
+        char OSC_COMBINE;
 } SYNTH_DATA, *LPSYNTH_DATA;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
@@ -354,6 +363,7 @@ class CSynth
 
         void LfoAdvance(void);
         void EnvRun(int *track, int *track2);
+        float Math_Func(float in_old, float in_new);
 
         /* Synthesizer properties */
 #if defined(PTK_SYNTH_FILTER)

@@ -1314,6 +1314,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                 fvalue = ((float) (PARASynth[swrite].lfo2_release + 1)) / 512.0f;
                 if(fvalue < 0.15f) fvalue = 0.15f;
                 Write_Mod_Data(&fvalue, sizeof(float), 1, in);
+
+                Write_Mod_Data(&PARASynth[swrite].osc_combine, sizeof(char), 1, in);
             }
 
             Write_Mod_Data(&SampleCompression[swrite], sizeof(char), 1, in);

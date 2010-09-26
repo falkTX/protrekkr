@@ -666,11 +666,11 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             clamp_right_value = right_float * 32767.0f;
 
             // Pre-record
-            Scope_Dats_LeftRight[0][pos_scope] = ((float) clamp_left_value);
-            Scope_Dats_LeftRight[1][pos_scope] = ((float) clamp_right_value);
+            Scope_Dats_LeftRight[0][pos_scope] = clamp_left_value;
+            Scope_Dats_LeftRight[1][pos_scope] = clamp_right_value;
 
-            clamp_left_value = (float) Scope_Dats_LeftRight[0][pos_scope_latency];
-            clamp_right_value = (float) Scope_Dats_LeftRight[1][pos_scope_latency];
+            clamp_left_value = fabsf(Scope_Dats_LeftRight[0][pos_scope_latency]);
+            clamp_right_value = fabsf(Scope_Dats_LeftRight[1][pos_scope_latency]);
             if(clamp_left_value > L_MaxLevel) L_MaxLevel = (int) clamp_left_value;
             if(clamp_right_value > R_MaxLevel) R_MaxLevel = (int) clamp_right_value;
             wait_level++;
@@ -687,8 +687,8 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             if(pos_scope >= (AUDIO_Latency / 2)) pos_scope = 0;
             pos_scope_latency = pos_scope - (AUDIO_Latency / 4);
             if(pos_scope_latency < 0) pos_scope_latency = (AUDIO_Latency / 2) + pos_scope_latency;
-
 #endif
+
         }
 
         if(local_curr_ramp_vol <= 0.0f)
@@ -5374,6 +5374,7 @@ void ResetSynthParameters(SynthParameters *TSP)
 
     TSP->osc1_waveform = WAVEFORM_SAW;
     TSP->osc2_waveform = WAVEFORM_PULSE;
+    TSP->osc_combine = COMBINE_ADD;
     TSP->osc1_pw = 256;
     TSP->osc2_pw = 256;
     TSP->osc2_detune = 65;

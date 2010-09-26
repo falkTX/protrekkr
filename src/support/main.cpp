@@ -619,8 +619,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Set_Phony_Palette();
     Refresh_Palette();
 
-    char tt[64];
-
     while(!Prog_End)
     {
         Mouse.wheel = 0;

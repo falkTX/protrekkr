@@ -11,13 +11,17 @@ v2.2.0:
 - Tracker sometimes crashed at exit when using midi.
 - Mouse wheel activated for horizontal patterns slider.
 - Number of effects columns is now selectable (from 1 to 4).
+- Negative audio values weren't displayed in vu-meter.
+- Added synth oscillators combiner.
 
 TODO:
 
 - Test patterns loading/saving.
 - Test blocks copies.
+- There a selection bug when using more than 1 column effect.
+- Add a second line for patterns headers.
 
-- Midi profiles (save files).
+- Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:
   - Master volume.
   - 303 select (1 or 2).

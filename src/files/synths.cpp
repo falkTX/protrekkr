@@ -45,7 +45,8 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
                        int new_version,
                        int Env_Modulation,
                        int New_Env,
-                       int Ntk_Beta)
+                       int Ntk_Beta,
+                       int Combine)
 {
     if(!new_version)
     {
@@ -266,6 +267,8 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, FILE *),
             Read_Function(&PARASynth[idx].lfo2_sustain, sizeof(char), 1, in);
             Read_Function_Swap(&PARASynth[idx].lfo2_release, sizeof(int), 1, in);
         }
+
+        if(Combine) Read_Function(&PARASynth[idx].osc_combine, sizeof(char), 1, in);
     }
 
     if(!Env_Modulation)
@@ -376,6 +379,8 @@ void Write_Synth_Params(int (*Write_Function)(void *, int ,int, FILE *),
     Write_Function_Swap(&PARASynth[idx].lfo2_decay, sizeof(int), 1, in);
     Write_Function(&PARASynth[idx].lfo2_sustain, sizeof(char), 1, in);
     Write_Function_Swap(&PARASynth[idx].lfo2_release, sizeof(int), 1, in);
+
+    Write_Function(&PARASynth[idx].osc_combine, sizeof(char), 1, in);
 }
 
 // ------------------------------------------------------
@@ -387,6 +392,7 @@ void LoadSynth(char *FileName)
     int new_version = FALSE;
     int Env_Modulation = FALSE;
     int New_Env = FALSE;
+    int Combine = FALSE;
 
     in = fopen(FileName, "rb");
 
@@ -398,6 +404,8 @@ void LoadSynth(char *FileName)
 
         switch(extension[7])
         {
+            case '4':
+                Combine = TRUE;
             case '3':
                 New_Env = TRUE;
             case '2':
@@ -424,7 +432,8 @@ void LoadSynth(char *FileName)
         PARASynth[Current_Instrument].lfo2_release = 0x10000;
 
         Read_Synth_Params(Read_Data, Read_Data_Swap, in, Current_Instrument,
-                          TRUE, TRUE, new_version, Env_Modulation, New_Env, FALSE);
+                          TRUE, TRUE, new_version,
+                          Env_Modulation, New_Env, FALSE, Combine);
 
         // Fix some old Ntk bugs
         if(PARASynth[Current_Instrument].lfo1_period > 128) PARASynth[Current_Instrument].lfo1_period = 128;
@@ -454,7 +463,7 @@ void SaveSynth(void)
     char Temph[MAX_PATH];
     char extension[10];
 
-    sprintf(extension, "TWNNSYN3");
+    sprintf(extension, "TWNNSYN4");
     sprintf (Temph, "Saving '%s.pts' synthesizer program in presets directory...", PARASynth[Current_Instrument].presetname);
     Status_Box(Temph);
 

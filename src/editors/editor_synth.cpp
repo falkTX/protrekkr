@@ -292,22 +292,22 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_OSC1_WAVEFORM ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            Gui_Draw_Button_Box(18, (Cur_Height - 95) - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(44, (Cur_Height - 95) - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(70, (Cur_Height - 95) - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(96, (Cur_Height - 95) - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(122, (Cur_Height - 95) - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, (Cur_Height - 95) - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(24, (Cur_Height - 95) - 1, 23, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(49, (Cur_Height - 95) - 1, 23, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(74, (Cur_Height - 95) - 1, 23, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(99, (Cur_Height - 95) - 1, 23, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(124, (Cur_Height - 95) - 1, 23, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(149, (Cur_Height - 95) - 1, 23, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 23, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Instrument].osc1_waveform)
             {
-                case 0:Gui_Draw_Button_Box(18, (Cur_Height - 95) - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 1:Gui_Draw_Button_Box(44, (Cur_Height - 95) - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 2:Gui_Draw_Button_Box(70, (Cur_Height - 95) - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 3:Gui_Draw_Button_Box(96, (Cur_Height - 95) - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 6:Gui_Draw_Button_Box(122, (Cur_Height - 95) - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5:Gui_Draw_Button_Box(148, (Cur_Height - 95) - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 4:Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 0:Gui_Draw_Button_Box(24, (Cur_Height - 95) - 1, 23, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 1:Gui_Draw_Button_Box(49, (Cur_Height - 95) - 1, 23, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 2:Gui_Draw_Button_Box(74, (Cur_Height - 95) - 1, 23, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 3:Gui_Draw_Button_Box(99, (Cur_Height - 95) - 1, 23, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 6:Gui_Draw_Button_Box(124, (Cur_Height - 95) - 1, 23, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5:Gui_Draw_Button_Box(149, (Cur_Height - 95) - 1, 23, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 4:Gui_Draw_Button_Box(174, (Cur_Height - 95) - 1, 23, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }
 
@@ -315,24 +315,43 @@ void Actualize_Synth_Ed(char gode)
            gode == UPDATE_SYNTH_ED_OSC2_WAVEFORM ||
            gode == UPDATE_SYNTH_ED_VALUES)
         {
-            Gui_Draw_Button_Box(18, (Cur_Height - 41) - 1, 24, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(44, (Cur_Height - 41) - 1, 24, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(70, (Cur_Height - 41) - 1, 24, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(96, (Cur_Height - 41) - 1, 24, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(122, (Cur_Height - 41) - 1, 24, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(148, (Cur_Height - 41) - 1, 24, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 24, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(24, (Cur_Height - 41) - 1, 23, 16, "sin", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(49, (Cur_Height - 41) - 1, 23, 16, "saw", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(74, (Cur_Height - 41) - 1, 23, 16, "pul", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(99, (Cur_Height - 41) - 1, 23, 16, "whit", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(124, (Cur_Height - 41) - 1, 23, 16, "pink", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(149, (Cur_Height - 41) - 1, 23, 16, "instr", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 23, 16, "off", Allow_Button | BUTTON_TEXT_CENTERED);
             switch(PARASynth[Current_Instrument].osc2_waveform)
             {
-                case 0: Gui_Draw_Button_Box(18, (Cur_Height - 41) - 1, 24, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 1: Gui_Draw_Button_Box(44, (Cur_Height - 41) - 1, 24, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 2: Gui_Draw_Button_Box(70, (Cur_Height - 41) - 1, 24, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 3: Gui_Draw_Button_Box(96, (Cur_Height - 41) - 1, 24, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 6: Gui_Draw_Button_Box(122, (Cur_Height - 41) - 1, 24, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 5: Gui_Draw_Button_Box(148, (Cur_Height - 41) - 1, 24, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
-                case 4: Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 24, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 0: Gui_Draw_Button_Box(24, (Cur_Height - 41) - 1, 23, 16, "sin", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 1: Gui_Draw_Button_Box(49, (Cur_Height - 41) - 1, 23, 16, "saw", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 2: Gui_Draw_Button_Box(74, (Cur_Height - 41) - 1, 23, 16, "pul", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 3: Gui_Draw_Button_Box(99, (Cur_Height - 41) - 1, 23, 16, "whit", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 6: Gui_Draw_Button_Box(124, (Cur_Height - 41) - 1, 23, 16, "pink", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 5: Gui_Draw_Button_Box(149, (Cur_Height - 41) - 1, 23, 16, "instr", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case 4: Gui_Draw_Button_Box(174, (Cur_Height - 41) - 1, 23, 16, "off", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
             }
         }
+
+        if(gode == UPDATE_SYNTH_ED_ALL ||
+           gode == UPDATE_SYNTH_ED_COMBINER||
+           gode == UPDATE_SYNTH_ED_VALUES)
+        {
+            Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 0), 17, 16, "+", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 1), 17, 16, "-", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 2), 17, 16, "*", Allow_Button | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 3), 17, 16, "/", Allow_Button | BUTTON_TEXT_CENTERED);
+            switch(PARASynth[Current_Instrument].osc_combine)
+            {
+                case COMBINE_ADD: Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 0), 17, 16, "+", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case COMBINE_SUB: Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 1), 17, 16, "-", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case COMBINE_MUL: Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 2), 17, 16, "*", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+                case COMBINE_DIV: Gui_Draw_Button_Box(4, (Cur_Height - 100) - 1 + (16 * 3), 17, 16, "/", Allow_Button_Pushed | BUTTON_TEXT_CENTERED); break;
+            }
+
+        }
+
 
         // Instrument number
         if(gode == UPDATE_SYNTH_ED_ALL || gode == UPDATE_SYNTH_ED_VALUES)
@@ -1202,43 +1221,43 @@ void Mouse_Left_Synth_Ed(void)
             }  
 
             // OSC1 Waveform
-            if(zcheckMouse(18, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(24, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(44, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(49, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(70, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(74, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(96, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(99, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(122, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(124, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(148, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(149, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(174, (Cur_Height - 95) - 1, 24, 16))
+            if(zcheckMouse(174, (Cur_Height - 95) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc1_waveform = 4;
                 teac = UPDATE_SYNTH_ED_ALL;
@@ -1246,45 +1265,72 @@ void Mouse_Left_Synth_Ed(void)
             }
 
             // OSC2 Waveform
-            if(zcheckMouse(18, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(24, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 0;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(44, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(49, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 1;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(70, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(74, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 2;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(96, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(99, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 3;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(122, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(124, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 6;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(148, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(149, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 5;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
-            if(zcheckMouse(174, (Cur_Height - 41) - 1, 24, 16))
+            if(zcheckMouse(174, (Cur_Height - 41) - 1, 23, 16))
             {
                 PARASynth[Current_Instrument].osc2_waveform = 4;
+                teac = UPDATE_SYNTH_ED_ALL;
+                gui_action = GUI_CMD_UPDATE_SYNTH_ED;
+            }
+
+
+            // Oscillators combiner
+            if(zcheckMouse(4, (Cur_Height - 100) - 1 + (16 * 0), 17, 16))
+            {
+                PARASynth[Current_Instrument].osc_combine = COMBINE_ADD;
+                teac = UPDATE_SYNTH_ED_ALL;
+                gui_action = GUI_CMD_UPDATE_SYNTH_ED;
+            }
+            if(zcheckMouse(4, (Cur_Height - 100) - 1 + (16 * 1), 17, 16))
+            {
+                PARASynth[Current_Instrument].osc_combine = COMBINE_SUB;
+                teac = UPDATE_SYNTH_ED_ALL;
+                gui_action = GUI_CMD_UPDATE_SYNTH_ED;
+            }
+            if(zcheckMouse(4, (Cur_Height - 100) - 1 + (16 * 2), 17, 16))
+            {
+                PARASynth[Current_Instrument].osc_combine = COMBINE_MUL;
+                teac = UPDATE_SYNTH_ED_ALL;
+                gui_action = GUI_CMD_UPDATE_SYNTH_ED;
+            }
+            if(zcheckMouse(4, (Cur_Height - 100) - 1 + (16 * 3), 17, 16))
+            {
+                PARASynth[Current_Instrument].osc_combine = COMBINE_DIV;
                 teac = UPDATE_SYNTH_ED_ALL;
                 gui_action = GUI_CMD_UPDATE_SYNTH_ED;
             }
