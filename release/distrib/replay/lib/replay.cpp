@@ -125,6 +125,20 @@ int64 Vstep1[MAX_TRACKS][MAX_POLYPHONY];
     int64 glidestep[MAX_TRACKS];
 #endif
 
+#if !defined(__STAND_ALONE__)
+float Default_Pan[MAX_TRACKS] =
+{
+     0.4f,  0.6f,
+     0.3f,  0.7f,
+     0.2f,  0.8f,
+    0.15f, 0.85f,
+    0.35f, 0.65f,
+    0.45f, 0.55f,
+    0.25f, 0.75f,
+     0.1f,  0.9f
+};
+#endif
+
 float TPan[MAX_TRACKS];
 int old_note[MAX_TRACKS][MAX_POLYPHONY];
 
@@ -1016,6 +1030,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Multi fx
         Mod_Dat_Read(Channels_Effects, sizeof(char) * Songtracks);
 
+        // Individual volumes
+        Mod_Dat_Read(Track_Volume, sizeof(float) * Songtracks);
+
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
         {
@@ -1798,7 +1815,7 @@ void Pre_Song_Init(void)
         FLANGER_DELAY[ini] = 176;
         FLANGER_OFFSET[ini] = 8192;
 
-        TPan[ini] = 0.5f;
+        TPan[ini] = Default_Pan[ini];
         TCut[ini] = 126.0f;
         ICut[ini] = 0.0039062f;
         FType[ini] = 4;

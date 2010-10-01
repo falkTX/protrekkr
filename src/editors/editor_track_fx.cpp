@@ -57,7 +57,7 @@ void Draw_Track_Fx_Ed(void)
     Gui_Draw_Button_Box(8, (Cur_Height - 110), 64, 16, "Frequency", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, (Cur_Height - 92), 64, 16, "Amplitude", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(8, (Cur_Height - 74), 64, 16, "LFO Status", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(8, (Cur_Height - 56), 64, 16, "Flanger 3D", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 49), 64, 16, "Flanger 3D", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(240, (Cur_Height - 138), 288, 110, "Flanger Settings", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(248, (Cur_Height - 121), 56, 16, "Amount", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -96,8 +96,8 @@ void Actualize_Track_Fx_Ed(char gode)
         {
             if(FLANGER_DEPHASE[Track_Under_Caret] > 3.1415927f) FLANGER_DEPHASE[Track_Under_Caret] = 3.1415927f;
             if(FLANGER_DEPHASE[Track_Under_Caret] < 0.0f) FLANGER_DEPHASE[Track_Under_Caret] = 0.0f;
-            Realslider2(74, (Cur_Height - 56), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 20.371833f), FLANGER_ON[Track_Under_Caret]);
-            outlong(159, (Cur_Height - 56), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 57.29578f), 6);
+            Realslider2(74, (Cur_Height - 49), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 20.371833f), FLANGER_ON[Track_Under_Caret]);
+            outlong(159, (Cur_Height - 49), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 57.29578f), 6);
         }
 
         if(gode == 0 || gode == 5 || gode == 11)
@@ -220,7 +220,7 @@ void Mouse_Sliders_Track_Fx_Ed(void)
             teac = 3;
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
         }
-        if(zcheckMouse(74, (Cur_Height - 56), 148, 16) && FLANGER_ON[Track_Under_Caret])
+        if(zcheckMouse(74, (Cur_Height - 49), 148, 16) && FLANGER_ON[Track_Under_Caret])
         {
             FLANGER_DEPHASE[Track_Under_Caret] = (Mouse.x - 84) * 0.0490873f;
             teac = 4;

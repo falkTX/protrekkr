@@ -47,6 +47,7 @@ TODO:
   - Track on/off.
   - Transport (rw/ff/play/stop/rec).
   - Go to pattern row.
+  - Go to track.
   - Select instrument.
 
 v2.1.4:

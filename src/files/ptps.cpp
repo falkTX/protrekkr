@@ -343,9 +343,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     // Number of tracks is stored here in .ptp format
     char_value = (char) Real_SongTracks;
     Write_Mod_Data(&char_value, sizeof(char), 1, in);
-    
-    Write_Mod_Data(&Song_Length, sizeof(char), 1, in);
 
+    Write_Mod_Data(&Song_Length, sizeof(char), 1, in);
     Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
 
     // Patterns sequence
@@ -359,6 +358,12 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
     char_value = (char) Real_SongTracks;
     Write_Mod_Data(Channels_MultiNotes, sizeof(char), char_value, in);
+
+    Write_Mod_Data(Channels_Effects, sizeof(char), char_value, in);
+    for(i = 0; i < char_value; i++)
+    {
+        Write_Mod_Data(&Track_Volume[i], sizeof(float), 1, in);
+    }
 
     // Check the instruments
     Nbr_Used_Instr = 0;
