@@ -503,7 +503,7 @@ void draw_pated(int track, int line, int petrack, int row)
     bjbox(1,
           y,
           CONSOLE_WIDTH - 20,
-          (Cur_Height - 372) + Patterns_Lines_Offset + 1
+          (Cur_Height - 372) + Patterns_Lines_Offset
          );
 
     for(liner = -VIEWLINE; liner < VIEWLINE + (DISPLAYED_LINES % 2); liner++)
@@ -2593,7 +2593,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     int sched_line;
 
     // Position the caret on the specified track/column with the mouse
-    if(zcheckMouse(1, 183 + 15, CHANNELS_WIDTH, (Cur_Height - 366) + Patterns_Lines_Offset))
+    if(zcheckMouse(1, 183 + 15, CHANNELS_WIDTH, (Cur_Height - 371) + Patterns_Lines_Offset))
     {
         int In_Scrolling = FALSE;
         Get_Column_Over_Mouse(&Track_Under_Caret,
@@ -2608,7 +2608,7 @@ void Mouse_Sliders_Right_Pattern_Ed(void)
     // Go to the row selected with the mouse
     if(!Songplaying)
     {
-        if(zcheckMouse(1, 183 + 15, CHANNELS_WIDTH, (Cur_Height - 366) + Patterns_Lines_Offset))
+        if(zcheckMouse(1, 183 + 15, CHANNELS_WIDTH, (Cur_Height - 371) + Patterns_Lines_Offset))
         {
             if(!is_recording)
             {
@@ -2728,7 +2728,7 @@ void Mouse_Sliders_Pattern_Ed(void)
     }
 
     // End of the marking stuff
-    if(zcheckMouse(1, 183 + 15, MAX_PATT_SCREEN_X, (Cur_Height - 366) + Patterns_Lines_Offset) && !Songplaying)
+    if(zcheckMouse(1, 183 + 15, MAX_PATT_SCREEN_X, (Cur_Height - 371) + Patterns_Lines_Offset) && !Songplaying)
     {
         int track;
         int column;
@@ -2746,7 +2746,7 @@ void Mouse_Left_Pattern_Ed(void)
     int tracks;
 
     // Start of the marking block
-    if(zcheckMouse(1, 183 + 15, MAX_PATT_SCREEN_X, (Cur_Height - 366) + Patterns_Lines_Offset) && !Songplaying)
+    if(zcheckMouse(1, 183 + 15, MAX_PATT_SCREEN_X, (Cur_Height - 371) + Patterns_Lines_Offset) && !Songplaying)
     {
         int track;
         int column;
@@ -3287,12 +3287,12 @@ void Set_Pattern_Size()
     if(Large_Patterns)
     {
         Patterns_Lines_Offset = 132;
-        DISPLAYED_LINES = (Cur_Height - 255) / 8 + 1;
+        DISPLAYED_LINES = (Cur_Height - 256) / 8 + 1;
     }
     else
     {
         Patterns_Lines_Offset = 0;
-        DISPLAYED_LINES = (Cur_Height - 387) / 8 + 1;
+        DISPLAYED_LINES = (Cur_Height - 388) / 8 + 1;
     }
     VIEWLINE = (DISPLAYED_LINES / 2);
 }

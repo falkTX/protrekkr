@@ -20,7 +20,6 @@ TODO:
 - Test patterns loading/saving.
 - Test blocks copies.
 - There a selection bug when using more than 1 column effect.
-- Add a second line for patterns headers.
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:

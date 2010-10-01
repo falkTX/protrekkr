@@ -110,32 +110,32 @@ void Actualize_Track_Ed(char gode)
             if(FType[Track_Under_Caret] >= MAX_FILTER) FType[Track_Under_Caret] = MAX_FILTER;
             switch(FType[Track_Under_Caret])
             {
-                case 0: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 1: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 2: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "BandPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 3: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "BandReject", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 4: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Filter Off", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 5: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -24db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 6: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LoPass -48db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 7: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "LP-24 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 8: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "A. Mod. [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 9: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "A. Mod. [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 10: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Single [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 11: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Single [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 12: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq -15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 13: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq -6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 14: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq +6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 15: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "ParaEq +15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 16: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Custom Delta", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 17: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort L", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 18: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort M", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 19: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort H", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 20: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "Comp. Distort", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 21: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP12 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 22: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
-                case 23: Gui_Draw_Button_Box(139, (Cur_Height - 80), 84, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 0: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "LoPass -12db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 1: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "HiPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 2: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "BandPass", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 3: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "BandReject", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 4: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Filter Off", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 5: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "LoPass -24db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 6: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "LoPass -48db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 7: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "LP-24 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 8: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "A. Mod. [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 9: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "A. Mod. [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 10: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Single [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 11: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Single [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 12: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "ParaEq -15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 13: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "ParaEq -6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 14: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "ParaEq +6db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 15: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "ParaEq +15db", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 16: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Custom Delta", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 17: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Comp. Distort L", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 18: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Comp. Distort M", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 19: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Comp. Distort H", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 20: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "Comp. Distort", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 21: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "W-HP12 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 22: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "W-HP12 [Stereo]", BUTTON_NORMAL | BUTTON_DISABLED); break;
+                case 23: Gui_Draw_Button_Box(141, (Cur_Height - 80), 82, 16, "W-HP24 [Mono]", BUTTON_NORMAL | BUTTON_DISABLED); break;
             }
-            value_box(77, (Cur_Height - 80), FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            value_box(79, (Cur_Height - 80), FType[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
 
         if(gode == 0 || gode == 5 || gode == 15)
@@ -231,14 +231,14 @@ void Mouse_Left_Track_Ed(void)
     {
 
         // Filter type
-        if(zcheckMouse(77, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
+        if(zcheckMouse(79, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret]--;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
+        if(zcheckMouse(123, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret]++;
@@ -405,14 +405,15 @@ void Mouse_Right_Track_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 
-        if(zcheckMouse(77, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
+        // Filter type
+        if(zcheckMouse(79, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] > 0)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret] -= 16;
             teac = 0;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
-        if(zcheckMouse(121, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
+        if(zcheckMouse(123, (Cur_Height - 80), 16, 16) && FType[Track_Under_Caret] < MAX_FILTER)
         {
             ResetFilters(Track_Under_Caret);
             FType[Track_Under_Caret] += 16;
