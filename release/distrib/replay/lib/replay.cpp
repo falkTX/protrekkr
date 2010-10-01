@@ -362,6 +362,10 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
     float mas_ratio_Track[MAX_TRACKS];
 #endif
 
+#if defined(PTK_TRACKS_VOLUME)
+    float Track_Volume[MAX_TRACKS];
+#endif
+
 #if defined(PTK_LIMITER_MASTER)
     float mas_comp_bufferL_Master[MAS_COMPRESSOR_SIZE];
     float mas_comp_bufferR_Master[MAS_COMPRESSOR_SIZE];
@@ -1752,6 +1756,10 @@ void Pre_Song_Init(void)
             sp_Tvol_Synth[ini][i] = 0.0f;
         }
         sp_Tvol_Mod[ini] = 1.0f;
+
+#if defined(PTK_TRACKS_VOLUME)
+        Track_Volume[ini] = 1.0f;
+#endif
 
         Channels_Polyphony[ini] = 1;
         Channels_MultiNotes[ini] = 1;
@@ -3263,6 +3271,11 @@ ByPass_Wav:
                                                 mas_comp_bufferR_Track[c],
                                                 &mas_envR_Track[c]) * 32767.0f;
         }
+#endif
+
+#if defined(PTK_TRACKS_VOLUME)
+        All_Signal_L *= Track_Volume[c];
+        All_Signal_R *= Track_Volume[c];
 #endif
 
         left_float += All_Signal_L;

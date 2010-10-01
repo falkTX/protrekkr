@@ -485,7 +485,6 @@ void SaveSynth(void)
     {
         Status_Box("Synthesizer program save failed.");
     }
-
     Clear_Input();
 }
 #endif

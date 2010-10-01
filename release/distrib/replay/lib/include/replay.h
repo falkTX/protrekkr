@@ -271,6 +271,7 @@ extern unsigned int lchorus_counter2;
 extern unsigned int rchorus_counter2;
 extern int lchorus_delay;
 extern int rchorus_delay;
+extern float Track_Volume[MAX_TRACKS];
 extern float mas_comp_threshold_Track[MAX_TRACKS];
 extern float mas_comp_ratio_Track[MAX_TRACKS];
 extern char Compress_Track[MAX_TRACKS];

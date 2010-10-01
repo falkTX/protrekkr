@@ -154,5 +154,6 @@
 #define PTK_LFO
 #define PTK_FLANGER
 #define PTK_DISCLAP
+#define PTK_TRACKS_VOLUME
 
 #endif

@@ -13,6 +13,7 @@ v2.2.0:
 - Number of effects columns is now selectable (from 1 to 4).
 - Negative audio values weren't displayed in vu-meter.
 - Added synth oscillators combiner.
+- Each track now have separate volume.
 
 TODO:
 
@@ -45,6 +46,8 @@ TODO:
   - Channel filter frequency.
   - Track on/off.
   - Transport (rw/ff/play/stop/rec).
+  - Go to pattern row.
+  - Select instrument.
 
 v2.1.4:
 

@@ -267,18 +267,14 @@ Read_Mod_File:
 #endif
         Free_Samples();
 
-#if defined(PTK_LIMITER_MASTER)
         mas_comp_threshold_Master = 100.0f;
         mas_comp_ratio_Master = 0.0f;
-#endif
 
-#if defined(PTK_LIMITER_TRACKS)
         for(i = 0; i < MAX_TRACKS; i++)
         {
             mas_comp_threshold_Track[i] = 100.0f;
             mas_comp_ratio_Track[i] = 0.0f;
         }
-#endif
 
 #if !defined(__WINAMP__)
         allow_save = TRUE;
@@ -351,6 +347,10 @@ Read_Mod_File:
         if(XtraFx)
         {
             Read_Mod_Data(Channels_Effects, sizeof(char), MAX_TRACKS, in);
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                Read_Mod_Data_Swap(&Track_Volume[i], sizeof(float), 1, in);
+            }
         }
 
         // Load the patterns data
@@ -1182,6 +1182,10 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
 
             Write_Mod_Data(Channels_MultiNotes, sizeof(char), MAX_TRACKS, in);
             Write_Mod_Data(Channels_Effects, sizeof(char), MAX_TRACKS, in);
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                Write_Mod_Data_Swap(&Track_Volume[i], sizeof(float), 1, in);
+            }
 
             // Clean the unused patterns garbage (doesn't seem to do much)
             for(i = Songtracks; i < MAX_TRACKS; i++)

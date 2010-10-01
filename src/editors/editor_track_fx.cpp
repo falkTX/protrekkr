@@ -39,14 +39,15 @@ char fld_chan = FALSE;
 
 // ------------------------------------------------------
 // Functions
-void Display_Compressor(void);
+void Display_Track_Compressor(void);
+void Display_Track_Volume(void);
 
 void Draw_Track_Fx_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_TRACK_FX_EDIT);
 
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Flat_Box("Track FX");
+    Gui_Draw_Flat_Box("Track: Properties, Flanger & Compressor");
 
     Gui_Draw_Button_Box(4, (Cur_Height - 138), 228, 110, "", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 
@@ -67,6 +68,8 @@ void Draw_Track_Fx_Ed(void)
 
     Gui_Draw_Button_Box(536, (Cur_Height - 138), 144, 76, "Compressor", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(544, (Cur_Height - 121), 56, 16, "Active", BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(536, (Cur_Height - 58), 144, 30, "", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
 }
 
 void Actualize_Track_Fx_Ed(char gode)
@@ -190,7 +193,12 @@ void Actualize_Track_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 12)
         {
-            Display_Compressor();
+            Display_Track_Compressor();
+        }
+
+        if(gode == 0 || gode == 13)
+        {
+            Display_Track_Volume();
         }
 
     }//User gui screen match
@@ -272,6 +280,15 @@ void Mouse_Sliders_Track_Fx_Ed(void)
             teac = 12;
         }
 
+        // Volume
+        if(zcheckMouse(602, (Cur_Height - 53), 67, 18))
+        {
+            Track_Volume[Track_Under_Caret] = (Mouse.x - 612.0f) / 50.0f;
+            if(Track_Volume[Track_Under_Caret] > 1.0f) Track_Volume[Track_Under_Caret] = 1.0f;
+            if(Track_Volume[Track_Under_Caret] < 0.0f) Track_Volume[Track_Under_Caret] = 0.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 13;
+        }
     }
 }
 
@@ -321,7 +338,7 @@ void Mouse_Left_Track_Fx_Ed(void)
 
 // ------------------------------------------------------
 // Display compressor sliders
-void Display_Compressor(void)
+void Display_Track_Compressor(void)
 {
     char string[64];
 
@@ -334,4 +351,15 @@ void Display_Compressor(void)
     Realslider_Size(601, (Cur_Height - 85), 50, (int) (mas_comp_ratio_Track[Track_Under_Caret] * 0.5f), Compress_Track[Track_Under_Caret] ? TRUE : FALSE);
     sprintf(string, "%d%%", (int) (mas_comp_ratio_Track[Track_Under_Caret]));
     Print_String(string, 601, (Cur_Height - 83), 67, BUTTON_TEXT_CENTERED);
+}
+
+// ------------------------------------------------------
+// Display volume slider
+void Display_Track_Volume(void)
+{
+    char string[64];
+    Gui_Draw_Button_Box(544, (Cur_Height - 51), 56, 16, "Volume", BUTTON_NORMAL | BUTTON_DISABLED);
+    Realslider_Size(601, (Cur_Height - 51), 50, (int) (Track_Volume[Track_Under_Caret] * 50.0f), TRUE);
+    sprintf(string, "%d%%", (int) (Track_Volume[Track_Under_Caret] * 100.0f));
+    Print_String(string, 601, (Cur_Height - 49), 67, BUTTON_TEXT_CENTERED);
 }

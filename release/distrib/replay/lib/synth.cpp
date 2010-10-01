@@ -2056,8 +2056,8 @@ float CSynth::Math_Func(float in_old, float in_new)
         case COMBINE_SUB:
             return in_old - in_new;
         case COMBINE_MUL:
-            sec_value = ((in_new / 32767.0f));
-            return (in_old * sec_value) * 2.0f;
+            sec_value = (((in_new / 32767.0f) * 0.5f) + 0.5f);
+            return (in_old * sec_value);
         case COMBINE_DIV:
             sec_value = (((in_new / 32767.0f) * 0.5f) + 0.5f) + 1.0f;
             return (in_old / sec_value);
