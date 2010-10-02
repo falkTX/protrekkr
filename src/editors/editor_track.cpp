@@ -191,7 +191,10 @@ void Actualize_Track_Ed(char gode)
                 CSend[Track_Under_Caret] = 127;
             }
             value_box(570, (Cur_Height - 114), CSend[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            CCoef[Track_Under_Caret] = float((float) CSend[Track_Under_Caret] / 127.0f);
+            if(gode == 6)
+            {
+                CCoef[Track_Under_Caret] = float((float) CSend[Track_Under_Caret] / 127.0f);
+            }
         }
 
         if(gode == 0 || gode == 7 || gode == 15)
@@ -525,11 +528,13 @@ void Mouse_Right_Track_Ed(void)
         if(zcheckMouse(570, (Cur_Height - 114), 16, 16) == 1)
         {
             CSend[Track_Under_Caret] -= 16;
+            teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
         if(zcheckMouse(614, (Cur_Height - 114), 16, 16) == 1)
         {
             CSend[Track_Under_Caret] += 16;
+            teac = 6;
             gui_action = GUI_CMD_UPDATE_TRACK_ED;
         }
 

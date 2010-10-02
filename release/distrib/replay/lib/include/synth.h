@@ -502,12 +502,11 @@ class rFilter
 
         float fWork(float input, float f)
         {
-            float fa = 1.0f - f; 
+            float fa = 1.0f - f;
 
-            buffy0 = fa * buffy0 + f * input; 
+            buffy0 = fa * buffy0 + f * input;
             buffy1 = fa * buffy1 + f * buffy0;
-
-            return buffy1;  
+            return buffy1;
         };
 };
 #endif

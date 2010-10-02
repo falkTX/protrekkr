@@ -151,5 +151,7 @@ int Get_Track_Relative_Column(char *Buffer_MultiNotes, char *Buffer_Effects, int
 int Get_Max_Nibble_All_Tracks(void);
 void Clear_Buff(int Idx);
 int Are_Columns_Compatible(int type_src, int type_dst);
+void Delete_Track(void);
+void Insert_Track(void);
 
 #endif

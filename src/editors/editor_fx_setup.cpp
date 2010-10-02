@@ -52,11 +52,12 @@ void Draw_Fx_Ed(void)
 
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("FX Setup (Global)");
-    Gui_Draw_Button_Box(8, (Cur_Height - 136), 224, 96, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(8, (Cur_Height - 136), 224, 110, "Reverb Setup", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(18, (Cur_Height - 120), 56, 16, "Switch", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, (Cur_Height - 102), 56, 16, "Feedback", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, (Cur_Height - 84), 56, 16, "Room Size", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(18, (Cur_Height - 66), 56, 16, "Filter", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(18, (Cur_Height - 48), 56, 16, "Stereo", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(240, (Cur_Height - 136), 288, 96, "Stereo Delay Settings", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
     Gui_Draw_Button_Box(248, (Cur_Height - 120), 56, 16, "L.Delay", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -150,9 +151,9 @@ void Actualize_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 9)
         {
-            if(REVERBFILTER < 0.05f) REVERBFILTER = 0.05f;
-            if(REVERBFILTER > 0.99f) REVERBFILTER = 0.99f;
-            Realslider(77, (Cur_Height - 66), (int) (REVERBFILTER * 128.0f), compressor);
+            if(Reverb_Filter_Amount < 0.05f) Reverb_Filter_Amount = 0.05f;
+            if(Reverb_Filter_Amount > 0.99f) Reverb_Filter_Amount = 0.99f;
+            Realslider(77, (Cur_Height - 66), (int) (Reverb_Filter_Amount * 128.0f), compressor);
         }
 
         if(gode == 0 || gode == 10)
@@ -191,6 +192,15 @@ void Actualize_Fx_Ed(char gode)
             }
             Gui_Draw_Button_Box(706 + (18 + 42) + 2, (Cur_Height - 136), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
+
+        if(gode == 0 || gode == 13)
+        {
+            if(Reverb_Stereo_Amount < 0) Reverb_Stereo_Amount = 0;
+            if(Reverb_Stereo_Amount > 127) Reverb_Stereo_Amount = 127;
+            Realslider(77, (Cur_Height - 48), Reverb_Stereo_Amount, compressor);
+            if(gode == 13) Initreverb(FALSE);
+        }
+
 /*
         if(gode == 0 || gode == 13)
         {
@@ -229,12 +239,24 @@ void Mouse_Sliders_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 7;
         }
+        // Reverb filter
         if(zcheckMouse(77, (Cur_Height - 66), 148, 16) && compressor)
         {
-            REVERBFILTER = (float)(Mouse.x - 87) / 128.0f;
-            if(REVERBFILTER < 0.0f) REVERBFILTER = 0.0f;
+            Reverb_Filter_Amount = (float)(Mouse.x - 87) / 128.0f;
+            if(Reverb_Filter_Amount < 0.0f) Reverb_Filter_Amount = 0.0f;
+            if(Reverb_Filter_Amount > 0.99f) Reverb_Filter_Amount = 0.99f;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 9;
+        }  
+        // Reverb stereo
+        if(zcheckMouse(77, (Cur_Height - 48), 148, 16) && compressor)
+        {
+            int value = (Mouse.x - 87);
+            if(value < 0) value = 0;
+            if(value > 127) value = 127;
+            Reverb_Stereo_Amount = value;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 13;
         }  
         if(zcheckMouse(307, (Cur_Height - 120), 148, 16))
         {
@@ -268,7 +290,7 @@ void Mouse_Sliders_Fx_Ed(void)
             if(mas_attack < 0.0f) mas_attack = 0.0f;
             if(mas_attack > 0.99f) mas_attack = 0.99f;
             gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 13;
+            teac = 14;
         }
 
         // Compressor release
@@ -278,7 +300,7 @@ void Mouse_Sliders_Fx_Ed(void)
             if(mas_release < 0.0f) mas_release = 0.0f;
             if(mas_release > 0.99f) mas_release = 0.99f;
             gui_action = GUI_CMD_UPDATE_FX_ED;
-            teac = 13;
+            teac = 14;
         }
 */
     } // userscreen

@@ -56,6 +56,7 @@ int curr_tab_highlight;
 
 int Nbr_Letters;
 int Font_Height = 11;
+int Font_Height_Small = 7;
 char *Font_Ascii =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz"
@@ -919,7 +920,7 @@ SDL_Color Default_Palette8[] =
     { 0xf2, 0xfe, 0xff, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 18 Font lo (calculated)
 
-    { 0x46, 0xaa, 0xc0, 0x00 },
+    { 0x60, 0xbc, 0xe4, 0x00 },
     { 0x00, 0x22, 0x4a, 0x00 },
 
     { 0x4c, 0xae, 0xc8, 0x00 },
@@ -1787,13 +1788,19 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int flag
     }
     else
     {
-        y_center = ((sy - Font_Height) / 2);
+        if(flags & BUTTON_SMALL_FONT)
+        {
+            y_center = (((sy - 2) - Font_Height_Small) / 2);
+        }
+        else
+        {
+            y_center = ((sy - Font_Height) / 2);
+        }
     }
 
     if(flags & BUTTON_TEXT_CENTERED)
     {
         x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
-        
         PrintXY(x, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
     else

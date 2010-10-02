@@ -1591,7 +1591,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
             Write_Mod_Data(&ICut[twrite], sizeof(float), 1, in);
             Write_Mod_Data(&TPan[twrite], sizeof(float), 1, in);
             Write_Mod_Data(&FType[twrite], sizeof(int), 1, in);
-            // On of them must be != 4
+            // One of them must be != 4
             if(FType[twrite] != 4) Store_TrackFilters = TRUE;
 
             switch(FType[twrite])
@@ -1867,8 +1867,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-    Write_Mod_Data(&REVERBFILTER, sizeof(float), 1, in);
-    
+    Write_Mod_Data(&Reverb_Filter_Amount, sizeof(float), 1, in);
+    Write_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
+
     Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
     if(Store_303_1)
     {

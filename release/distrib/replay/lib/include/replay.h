@@ -266,7 +266,8 @@ typedef struct
 // Variables
 extern float decays[MAX_COMB_FILTERS];
 extern int delays[MAX_COMB_FILTERS];       // delays for the comb filters
-extern int counters[MAX_COMB_FILTERS];
+extern int counters_L[MAX_COMB_FILTERS];
+extern int counters_R[MAX_COMB_FILTERS];
 
 #if defined(PTK_MP3)
 extern char Mp3_BitRate[MAX_INSTRS];
@@ -389,7 +390,8 @@ extern char style[20];
 extern char beatsync[128];
 extern short beatlines[128];
 
-extern float REVERBFILTER;
+extern float Reverb_Filter_Amount;
+extern unsigned char Reverb_Stereo_Amount;
 
 extern float Sample_Vol[MAX_INSTRS];
 

@@ -15,12 +15,18 @@ v2.2.0:
 - Added synth oscillators combiner.
 - Each track now have separate volume.
 - Added lo/med/hi bands equalizers for each track.
+- Delay send had precedence over command 10
+  when updating track tab during play.
+- Cleaned up reverb code (should sound cleaner)
+  and added stereo separation parameter.
 
 TODO:
 
 - Test patterns loading/saving.
 - Test blocks copies.
 - There a selection bug when using more than 1 column effect.
+- Do the insert/delete track functions.
+- Check the wipe function of ptp for the note used extra effects & notes.
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:

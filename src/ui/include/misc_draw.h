@@ -119,6 +119,7 @@
 #define BUTTON_TEXT_VTOP 64
 #define BUTTON_RIGHT_MOUSE 128
 #define BUTTON_INPUT 256
+#define BUTTON_SMALL_FONT 512
 
 #define A_ "\216"
 #define B_ "\217"

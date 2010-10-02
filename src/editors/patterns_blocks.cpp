@@ -1977,6 +1977,7 @@ int Get_Max_Nibble_All_Tracks(void)
     }
     return(max_columns);
 }
+
 // ------------------------------------------------------
 // Return 1 if a column is compatible to another according to a table
 // return 0 otherwise
@@ -1997,4 +1998,18 @@ int Are_Columns_Compatible(int type_src, int type_dst)
         }
     }
     return 0;
+}
+
+// ------------------------------------------------------
+// Delete a track at current caret position
+void Delete_Track(void)
+{
+
+}
+
+// ------------------------------------------------------
+// Insert a track at current caret position
+void Insert_Track(void)
+{
+
 }

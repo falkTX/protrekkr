@@ -163,6 +163,9 @@
 #define GUI_CMD_UPDATE_TRACK_FX_ED 154
 #define GUI_CMD_UPDATE_MIDI_303_ED 155
 
+#define GUI_CMD_INSERT_TRACK 156
+#define GUI_CMD_DELETE_TRACK 157
+
 #define GUI_CMD_RENDER_WAV 169
 
 #define GUI_CMD_REDUCE_POSITIONS_10 170
@@ -413,7 +416,7 @@ void GetBackMouse(void);
 void SeqFill(int st, int en, char n);
 void PutBackMouse(void);
 void Read_SMPT(void);
-void Initreverb();
+void Initreverb(int From_Mixer);
 void init_sample_bank(void);
 int Get_Number_Of_Splits(int n_index);
 void Clear_Instrument_Dat(int n_index, int split, int lenfir);
@@ -451,7 +454,7 @@ void draw_tracked(void);
 void DeleteInstrument(void);
 void Sp_Player(void);             
 void Pre_Song_Init(void);
-void Compressor_work(void);
+void Reverb_work(void);
 void StartRec(void);
 void Notify_Edit(void);
 void Notify_Play(void);

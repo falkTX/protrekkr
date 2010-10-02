@@ -112,7 +112,7 @@ void Init_Tracker_Context_After_ModLoad(void)
     rchorus_counter = MIX_RATE;
     lchorus_counter2 = MIX_RATE - lchorus_delay;
     rchorus_counter2 = MIX_RATE - rchorus_delay;
-    Initreverb();
+    Initreverb(FALSE);
 
 #if defined(PTK_LIMITER_MASTER)
     Mas_Compressor_Set_Variables_Master(mas_comp_threshold_Master,
@@ -163,6 +163,7 @@ int LoadPtk(char *FileName)
     int Fx2 = FALSE;
     int XtraFx = FALSE;
     int Combine = FALSE;
+    int Stereo_Reverb = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -211,6 +212,8 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
+            case 'M':
+                Stereo_Reverb = TRUE;
             case 'L':
                 XtraFx = TRUE;
                 Combine = TRUE;
@@ -669,7 +672,11 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
             }
 
-            Read_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
+            Read_Mod_Data_Swap(&Reverb_Filter_Amount, sizeof(float), 1, in);
+            if(Stereo_Reverb)
+            {
+                Read_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
+            }
 
             for(i = 0; i < MAX_INSTRS; i++)
             {
@@ -1396,7 +1403,8 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 Write_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
             }
-            Write_Mod_Data_Swap(&REVERBFILTER, sizeof(float), 1, in);
+            Write_Mod_Data_Swap(&Reverb_Filter_Amount, sizeof(float), 1, in);
+            Write_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
 
             for(i = 0; i < 128; i++)
             {
@@ -1549,7 +1557,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKL");
+        sprintf(extension, "PROTREKM");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

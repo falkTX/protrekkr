@@ -446,17 +446,25 @@ short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
     int delayedCounter4;
     int delayedCounter5;
     int delayedCounter6;
-    float allBuffer_L[5760];
+    float allBuffer_L1[5760];
     float allBuffer_L2[5760];
     float allBuffer_L3[5760];
     float allBuffer_L4[5760];
     float allBuffer_L5[5760];
     float allBuffer_L6[5760];
+    float allBuffer_R1[5760];
+    float allBuffer_R2[5760];
+    float allBuffer_R3[5760];
+    float allBuffer_R4[5760];
+    float allBuffer_R5[5760];
+    float allBuffer_R6[5760];
     float delay_left_buffer[MAX_COMB_FILTERS][100000];
     float delay_right_buffer[MAX_COMB_FILTERS][100000];
-    int counters[MAX_COMB_FILTERS];
+    int counters_L[MAX_COMB_FILTERS];
+    int counters_R[MAX_COMB_FILTERS];
     int rev_counter;
     rFilter LFP_L;
+    rFilter LFP_R;
     char num_echoes;
     int delays[MAX_COMB_FILTERS];       // delays for the comb filters
     float decays[MAX_COMB_FILTERS];
@@ -503,9 +511,11 @@ extern int gui_bpm_action;
 char compressor;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    float REVERBFILTER = 0.3f;
+    float Reverb_Filter_Amount = 0.3f;
+    unsigned char Reverb_Stereo_Amount = 50;
 #else
-    float REVERBFILTER;
+    float Reverb_Filter_Amount;
+    unsigned char Reverb_Stereo_Amount;
 #endif
 
 int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
@@ -624,9 +634,9 @@ float filterhp2(int ch, float input, float f, float q);
 float Kutoff(int v);
 float Resonance(float v);
 float Bandwidth(int v);
-void Compressor_work(void);
+void Reverb_work(void);
 
-void Initreverb();
+void Initreverb(int From_Mixer);
 
 #if defined(PTK_FLANGER)
     float Filter_FlangerL(int track, float input);
@@ -634,7 +644,7 @@ void Initreverb();
 #endif
 
 volatile int Done_Reset;
-void Reset_Values(void);
+void Reset_Values(int From_Mixer);
 
 // ------------------------------------------------------
 // Audio mixer
@@ -654,7 +664,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 
 #if !defined(__STAND_ALONE__)
-    if(!rawrender)
+    if(!rawrender && Buffer)
     {
 #endif
 
@@ -715,7 +725,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 
         if(local_curr_ramp_vol <= 0.0f)
         {
-            Reset_Values();
+            Reset_Values(TRUE);
         }
 
 #if !defined(__STAND_ALONE__)
@@ -1395,7 +1405,8 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&Disclap[tps_trk], sizeof(char));
         }
 
-        Mod_Dat_Read(&REVERBFILTER, sizeof(float));
+        Mod_Dat_Read(&Reverb_Filter_Amount, sizeof(float));
+        Mod_Dat_Read(&Reverb_Stereo_Amount, sizeof(char));
 
         char tb303_1_enabled;
         char tb303_2_enabled;
@@ -1498,7 +1509,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 
 // ------------------------------------------------------
 // Reset some values before starting playing
-void Reset_Values(void)
+void Reset_Values(int From_Mixer)
 {
     int i;
 
@@ -1541,7 +1552,7 @@ void Reset_Values(void)
         }
 
 #if defined(PTK_COMPRESSOR)
-        Initreverb();
+        Initreverb(From_Mixer);
 #endif
 
         for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
@@ -1624,7 +1635,7 @@ void PTKEXPORT Ptk_Play(void)
     local_ramp_vol = 1.0f;
     local_curr_ramp_vol = 0.0f;
 
-    Reset_Values();
+    Reset_Values(FALSE);
     Done_Reset = FALSE;
 
 #if !defined(__STAND_ALONE__)
@@ -1975,7 +1986,7 @@ void Post_Song_Init(void)
     SubCounter = 0;
     Subicounter = 0;
 
-    Reset_Values();
+    Reset_Values(FALSE);
 
 #if defined(PTK_FX_PATTERNLOOP)
     repeat_loop_pos = -1;
@@ -2138,8 +2149,8 @@ void Sp_Player(void)
     right_float = 0;
 
 #if defined(PTK_COMPRESSOR)
-    delay_left_final = 1.0f;
-    delay_right_final = 1.0f;
+    delay_left_final = 0.0f;
+    delay_right_final = 0.0f;
 #endif
 
     if(Songplaying)
@@ -3360,17 +3371,6 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 {
     int i;
 
-    // Must be prioritary
-/*#if defined(PTK_INSTRUMENTS)
-    for(i = 0; i < polyphony; i++)
-    {
-        if()
-        {
-            return(i);
-        }
-    }
-#endif
-  */  
     for(i = 0; i < polyphony; i++)
     {
         if(
@@ -3969,7 +3969,7 @@ void Do_Effects_Tick_0(void)
 #endif
 
 #if defined(PTK_FX_VIBRATO)
-                // $1c vibrato switch on/off
+                // $1d vibrato switch on/off
                 case 0x1d:
 
                     Vibcounter[trackef] = 0;
@@ -4757,7 +4757,7 @@ void GetPlayerValues(void)
     right_float += rchore;
 
 #if defined(PTK_COMPRESSOR)
-    Compressor_work();
+    Reverb_work();
 #endif
 
     left_float /= 32767.0f;
@@ -5539,36 +5539,65 @@ void Free_Samples(void)
 // ------------------------------------------------------
 // Initialize the reverb data
 #if defined(PTK_COMPRESSOR)
-void Initreverb()
+void Initreverb(int From_Mixer)
 {
     int i;
-    int j;
+    int mlrw;
+    int old_compressor;
 
-    LFP_L.Reset();
+    if(!From_Mixer)
+    {
+        old_compressor = compressor;
+        compressor = FALSE;
+    }
+
+    for(i = 0; i < MAX_COMB_FILTERS; i++)
+    {
+        memset(delay_left_buffer[i], 0, 100000 * sizeof(float));
+        memset(delay_right_buffer[i], 0, 100000 * sizeof(float));
+    }
 
     for(i = 0; i < num_echoes; i++)
     {
-        int mlrw = 99999 - (delays[i] * 4);
-        if(mlrw < 0) mlrw = 0;
-        counters[i] = mlrw;
-    }
- 
-    for(i = 0; i < MAX_COMB_FILTERS; i++)
-    {
-        for(j = 0 ; j < 100000; j++)
-        {
-            delay_left_buffer[i][j] = 0;
-            delay_right_buffer[i][j] = 0;
-        }
+        mlrw = 99999 - (delays[i] * 4);
+        if(mlrw < 0) mlrw += 100000;
+        counters_L[i] = mlrw;
+        mlrw = 99999 - ((delays[i] + (Reverb_Stereo_Amount * 2)) * 4);
+        if(mlrw < 0) mlrw += 100000;
+        counters_R[i] = mlrw;
     }
 
-    rev_counter = 99999;
-    
     InitRevervbFilter();
+
+    LFP_L.Reset();
+    LFP_R.Reset();
+
+    rev_counter = 99999;
+    if(!From_Mixer)
+    {
+        compressor = old_compressor;
+    }
 }
 
 void InitRevervbFilter(void)
 {
+    for(int yb = 0; yb < 5760; yb++)
+    {
+        allBuffer_L1[yb] = 0.0f;
+        allBuffer_L2[yb] = 0.0f;
+        allBuffer_L3[yb] = 0.0f;
+        allBuffer_L4[yb] = 0.0f;
+        allBuffer_L5[yb] = 0.0f;
+        allBuffer_L6[yb] = 0.0f;
+
+        allBuffer_R1[yb] = 0.0f;
+        allBuffer_R2[yb] = 0.0f;
+        allBuffer_R3[yb] = 0.0f;
+        allBuffer_R4[yb] = 0.0f;
+        allBuffer_R5[yb] = 0.0f;
+        allBuffer_R6[yb] = 0.0f;
+    }
+
     currentCounter = 5759;
     delayedCounter = 5759 - int(c_threshold * 44.1f);
     delayedCounter2 = 5759 - int(c_threshold * 50.1f);
@@ -5577,87 +5606,75 @@ void InitRevervbFilter(void)
     delayedCounter5 = 5759 - int(c_threshold * 73.1f);
     delayedCounter6 = 5759 - int(c_threshold * 79.1f);
 
-    if(delayedCounter < 0) delayedCounter = 0;
-    if(delayedCounter2 < 0) delayedCounter2 = 0;
-    if(delayedCounter3 < 0) delayedCounter3 = 0;
-    if(delayedCounter4 < 0) delayedCounter4 = 0;
-    if(delayedCounter5 < 0) delayedCounter5 = 0;
-    if(delayedCounter6 < 0) delayedCounter6 = 0;
+    if(delayedCounter < 0) delayedCounter += 5760;
+    if(delayedCounter2 < 0) delayedCounter2 += 5760;
+    if(delayedCounter3 < 0) delayedCounter3 += 5760;
+    if(delayedCounter4 < 0) delayedCounter4 += 5760;
+    if(delayedCounter5 < 0) delayedCounter5 += 5760;
+    if(delayedCounter6 < 0) delayedCounter6 += 5760;
+}
 
-    for(int yb = 0; yb < 5760; yb++)
-    {
-        allBuffer_L[yb] = 0.0f;
-        allBuffer_L2[yb] = 0.0f;
-        allBuffer_L3[yb] = 0.0f;
-        allBuffer_L4[yb] = 0.0f;
-        allBuffer_L5[yb] = 0.0f;
-        allBuffer_L6[yb] = 0.0f;
-    }
+float allpass_filter_comb(float *Buffer, float value, int counter)
+{
+    float rout = (-Feedback * value) + Buffer[counter];
+    Buffer[currentCounter] = (rout * Feedback) + value;
+    return rout;
 }
 
 // ------------------------------------------------------
-void Compressor_work(void)
+void Reverb_work(void)
 {
     if(compressor)
     {
         float l_rout = 0;
+        float r_rout = 0;
 
         // Comb filter
         for(int i = 0; i < num_echoes; i++)
         {
-            delay_left_buffer[i][rev_counter] = (delay_left_final + delay_right_final +
-                                                 delay_left_buffer[i][counters[i]]) *
+            delay_left_buffer[i][rev_counter] = (delay_left_final +
+                                                 delay_left_buffer[i][counters_L[i]]) *
                                                  decays[i];
-            l_rout += delay_left_buffer[i][counters[i]];
-            if(++counters[i] > 99999) counters[i] = 0;
+            delay_right_buffer[i][rev_counter] = (delay_right_final +
+                                                 delay_right_buffer[i][counters_R[i]]) *
+                                                 decays[i];
+            l_rout += delay_left_buffer[i][counters_L[i]];
+            r_rout += delay_right_buffer[i][counters_R[i]];
+            if(++counters_L[i] > 99999) counters_L[i] -= 99999;
+            if(++counters_R[i] > 99999) counters_R[i] -= 99999;
         }
 
-        if(++rev_counter > 99999) rev_counter = 0;
+        // All pass filters
+        l_rout = LFP_L.fWork(l_rout++, Reverb_Filter_Amount);
+        l_rout = allpass_filter_comb(allBuffer_L1, l_rout, delayedCounter);
+        l_rout = allpass_filter_comb(allBuffer_L2, l_rout, delayedCounter2);
+        l_rout = allpass_filter_comb(allBuffer_L3, l_rout, delayedCounter3);
+        l_rout = allpass_filter_comb(allBuffer_L4, l_rout, delayedCounter4);
+        l_rout = allpass_filter_comb(allBuffer_L5, l_rout, delayedCounter5);
+        l_rout = allpass_filter_comb(allBuffer_L6, l_rout, delayedCounter6);
+        left_float += l_rout;
 
-        // STEREO ALLPASS FILTER:
-        float temp1;
-
-        temp1 = LFP_L.fWork(l_rout++, REVERBFILTER);
-
-        l_rout = (-Feedback * temp1) + allBuffer_L[delayedCounter];
-        allBuffer_L[currentCounter] = (l_rout * Feedback) + temp1;
-
-        temp1 = l_rout;
-        l_rout = (-Feedback * temp1) + allBuffer_L2[delayedCounter2];
-        allBuffer_L2[currentCounter] = (l_rout * Feedback) + temp1;
-
-        temp1 = l_rout;
-        l_rout = (-Feedback * temp1) + allBuffer_L3[delayedCounter3];
-        allBuffer_L3[currentCounter] = (l_rout * Feedback) + temp1;
-
-        temp1 = l_rout;
-        l_rout = (-Feedback * temp1) + allBuffer_L4[delayedCounter4];
-        allBuffer_L4[currentCounter] = (l_rout * Feedback) + temp1;
-
-        temp1 = l_rout;
-        l_rout = (-Feedback * temp1) + allBuffer_L5[delayedCounter5];
-        allBuffer_L5[currentCounter] = (l_rout * Feedback) + temp1;
-
-        // Stereo diffusion
-        right_float += l_rout;
-
-        temp1 = l_rout;
-        l_rout = (-Feedback * temp1) + allBuffer_L6[delayedCounter6];
-        allBuffer_L6[currentCounter] = (l_rout * Feedback) + temp1;
-
+        r_rout = LFP_R.fWork(r_rout++, Reverb_Filter_Amount);
+        r_rout = allpass_filter_comb(allBuffer_R1, r_rout, delayedCounter);
+        r_rout = allpass_filter_comb(allBuffer_R2, r_rout, delayedCounter2);
+        r_rout = allpass_filter_comb(allBuffer_R3, r_rout, delayedCounter3);
+        r_rout = allpass_filter_comb(allBuffer_R4, r_rout, delayedCounter4);
+        r_rout = allpass_filter_comb(allBuffer_R5, r_rout, delayedCounter5);
+        r_rout = allpass_filter_comb(allBuffer_R6, r_rout, delayedCounter6);
+        right_float += r_rout;
+        
         // Updating delayed counters
-        if(++delayedCounter > 5759) delayedCounter = 0;
-        if(++delayedCounter2 > 5759) delayedCounter2 = 0;
-        if(++delayedCounter3 > 5759) delayedCounter3 = 0;
-        if(++delayedCounter4 > 5759) delayedCounter4 = 0;
-        if(++delayedCounter5 > 5759) delayedCounter5 = 0;
-        if(++delayedCounter6 > 5759) delayedCounter6 = 0;
+        if(++delayedCounter > 5759) delayedCounter -= 5759;
+        if(++delayedCounter2 > 5759) delayedCounter2 -= 5759;
+        if(++delayedCounter3 > 5759) delayedCounter3 -= 5759;
+        if(++delayedCounter4 > 5759) delayedCounter4 -= 5759;
+        if(++delayedCounter5 > 5759) delayedCounter5 -= 5759;
+        if(++delayedCounter6 > 5759) delayedCounter6 -= 5759;
 
         // Updating current counter
-        currentCounter++;
-        if(currentCounter > 5759) currentCounter = 0;
+        if(++currentCounter > 5759) currentCounter -= 5759;
 
-        left_float += l_rout;
+        if(++rev_counter > 99999) rev_counter -= 99999;
     }
 }
 #endif

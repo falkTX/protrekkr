@@ -559,7 +559,7 @@ int Init_Context(void)
     // Old preset by default
     Load_Old_Reverb_Presets(0);
 
-    Initreverb();
+    Initreverb(FALSE);
 
     LOGOPIC = Load_Skin_Picture("logo");
     if(!LOGOPIC) return(FALSE);
@@ -1020,7 +1020,9 @@ int Screen_Update(void)
             Display_Beat_Time();
         }
 
-        if(gui_action == GUI_CMD_CHANGE_TRACKS_NBR)
+        if(gui_action == GUI_CMD_CHANGE_TRACKS_NBR ||
+           gui_action == GUI_CMD_INSERT_TRACK ||
+           gui_action == GUI_CMD_DELETE_TRACK)
         {
             Actualize_Master(teac);
             Actupated(0);
@@ -1597,7 +1599,9 @@ int Screen_Update(void)
 
         Gui_Draw_Button_Box(256, 24, 136, 78, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-        Gui_Draw_Button_Box(262, 28, 60, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(262, 28, 38, 16, "Tracks", BUTTON_NORMAL | BUTTON_DISABLED);
+        Gui_Draw_Button_Box(302, 28, 9, 16, I_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(313, 28, 9, 16, D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
         Gui_Draw_Button_Box(262, 46, 60, 16, "Beats/Min.", BUTTON_NORMAL | BUTTON_DISABLED);
         Gui_Draw_Button_Box(262, 64, 60, 16, "Ticks/Beat", BUTTON_NORMAL | BUTTON_DISABLED);
         Display_Beat_Time();
@@ -1614,23 +1618,23 @@ int Screen_Update(void)
         Gui_Draw_Button_Box(332 + (18 * 2), 126, 16, 16, "\014", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 
         Gui_Draw_Button_Box(0, 148, 392, 30, "", BUTTON_NORMAL | BUTTON_DISABLED);
-        Gui_Draw_Button_Box(8, 152, 61, 10, S_ E_ L_ DOT_ SPC_ T_ R_ A_ C_ K_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(8, 164, 61, 10, S_ E_ L_ DOT_ SPC_ N_ O_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8, 152, 61, 10, S_ E_ L_ DOT_ SPC_ T_ R_ A_ C_ K_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8, 164, 61, 10, S_ E_ L_ DOT_ SPC_ N_ O_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
 
-        Gui_Draw_Button_Box(8 + 63, 152, 61, 10, C_ U_ T_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(8 + 63, 164, 61, 10, C_ O_ P_ Y_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + 63, 152, 61, 10, C_ U_ T_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8 + 63, 164, 61, 10, C_ O_ P_ Y_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
 
-        Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + (63 * 2), 152, 61, 10, P_ A_ S_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8 + (63 * 2), 164, 61, 10, D_ E_ L_ E_ T_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
 
-        Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, S_ P_ R_ E_ A_ D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-        Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8 + (63 * 3), 152, 61, 10, S_ P_ R_ E_ A_ D_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8 + (63 * 3), 164, 61, 10, R_ A_ N_ D_ O_ M_ I_ Z_ E_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
 
-        Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(8 + (63 * 4), 164, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8 + (63 * 4), 152, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8 + (63 * 4), 164, 61, 10, S_ E_ M_ I_ TIR_ T_ O_ N_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
 
-        Gui_Draw_Button_Box(8 + (63 * 5), 152, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Button_Box(8 + (63 * 5), 164, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Gui_Draw_Button_Box(8 + (63 * 5), 152, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ U_ P_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
+        Gui_Draw_Button_Box(8 + (63 * 5), 164, 61, 10, O_ C_ T_ A_ V_ E_ SPC_ D_ N_, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE | BUTTON_SMALL_FONT);
 
         Refresh_UI_Context();
 
@@ -1878,7 +1882,8 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGI") == 0 ||
                 strcmp(extension, "TWNNSNGJ") == 0 ||
                 strcmp(extension, "PROTREKK") == 0 ||
-                strcmp(extension, "PROTREKL") == 0)
+                strcmp(extension, "PROTREKL") == 0 ||
+                strcmp(extension, "PROTREKM") == 0)
         {
             sprintf(name, "%s", FileName);
             SongStop();
@@ -2368,6 +2373,9 @@ void Newmod(void)
         TicksPerBeat = 4;
         DelayType = 1;
         mas_vol = 1.0f;
+        Reverb_Filter_Amount = 0.3f;
+        Reverb_Stereo_Amount = 50;
+
         for(i = 0; i < MAX_TRACKS; i++)
         {
             mas_comp_threshold_Track[i] = 100.0f;
@@ -2387,7 +2395,7 @@ void Newmod(void)
 
         // Old preset by default
         Load_Old_Reverb_Presets(DelayType);
-        Initreverb();
+        Initreverb(FALSE);
         for(int spl = 0; spl < MAX_TRACKS; spl++)
         {
             CCoef[spl] = float((float) CSend[spl] / 127.0f);
@@ -5269,6 +5277,25 @@ void Mouse_Handler(void)
             teac = 4;
         }
 
+        // Delete the current track
+        if(zcheckMouse(313, 28, 9, 16) && Songtracks > 1)
+        {
+            Delete_Track();
+            Songtracks--;
+            if(Songtracks < 1) Songtracks = 1;
+            gui_action = GUI_CMD_DELETE_TRACK;
+            teac = 4;
+        }
+        // Insert a track at current position
+        if(zcheckMouse(302, 28, 9, 16) && Songtracks < 16)
+        {
+            Insert_Track();
+            Songtracks++;
+            if(Songtracks > 16) Songtracks = 16;
+            gui_action = GUI_CMD_DELETE_TRACK;
+            teac = 4;
+        }
+        
         // Reduce the number of BPM
         if(zcheckMouse(324, 46, 16, 16) && !Songplaying)
         {
