@@ -3257,12 +3257,29 @@ ByPass_Wav:
         // 32-Bit HQ Interpolated System Flanger
         if(FLANGER_ON[c])
         {
-            FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L * FLANGER_AMOUNT[c] + oldspawn[c] * FLANGER_FEEDBACK[c];
-            FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R * FLANGER_AMOUNT[c] + roldspawn[c] * FLANGER_FEEDBACK[c];
-
-            float fstep1 = POWF(2.0f, sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
-            float fstep2 = POWF(2.0f, sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
-
+            FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_L *
+                                                      FLANGER_AMOUNT[c] +
+                                                      oldspawn[c] *
+                                                      FLANGER_FEEDBACK[c];
+            FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = All_Signal_R *
+                                                       FLANGER_AMOUNT[c] +
+                                                       roldspawn[c] *
+                                                       FLANGER_FEEDBACK[c];
+            float fstep1;
+            float fstep2;
+            float gr_value = FLANGER_GR[c] / 6.283185f;
+            float de_value = FLANGER_GR[c] + FLANGER_DEPHASE[c];
+            if(de_value >= 6.283185f)
+            {
+                de_value -= 6.283185f;
+            }
+            de_value = ((de_value / 6.283185f));
+            fstep1 = POWF2(SIN[(int) (gr_value * 359.0f)] * FLANGER_AMPL[c]);
+            fstep2 = POWF2(SIN[(int) (de_value * 359.0f)] * FLANGER_AMPL[c]);
+            
+            //fstep1 = POWF2(sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
+            //fstep2 = POWF2(sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
+            
             FLANGER_OFFSET2[c] += fstep1;
             FLANGER_OFFSET1[c] += fstep2;  
 
@@ -3274,8 +3291,8 @@ ByPass_Wav:
             oldspawn[c] = FLANGE_LEFTBUFFER[c][(int) (FLANGER_OFFSET2[c])];
             roldspawn[c] = FLANGE_RIGHTBUFFER[c][(int) (FLANGER_OFFSET1[c])];
 
-            All_Signal_L += Filter_FlangerL(c, oldspawn[c]);
-            All_Signal_R += Filter_FlangerR(c, roldspawn[c]);
+            All_Signal_L += Filter_FlangerL(c, ++oldspawn[c]);
+            All_Signal_R += Filter_FlangerR(c, ++roldspawn[c]);
 
             if(++FLANGER_OFFSET[c] >= 16384) FLANGER_OFFSET[c] -= 16384;
             FLANGER_GR[c] += FLANGER_RATE[c];
@@ -3603,7 +3620,7 @@ void Play_Instrument(int channel, int sub_channel)
             sp_Tvol[channel][sub_channel] = vol;
             sp_Tvol_Synth[channel][sub_channel] = vol_synth;
 
-            double spreadnote = (double) POWF(2.0f, note2 / 12.0f);
+            double spreadnote = (double) POWF2(note2 / 12.0f);
             spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
@@ -3708,7 +3725,7 @@ void Play_Instrument(int channel, int sub_channel)
                 }
                 else
                 {
-                    double spreadnote = (double) POWF(2.0f, note / 12.0f);
+                    double spreadnote = (double) POWF2(note / 12.0f);
                     spreadnote *= 4294967296.0f;
 
 #if defined(PTK_FX_ARPEGGIO)
@@ -4585,12 +4602,12 @@ void Do_Effects_Ticks_X(void)
                         Vstep1[trackef][i] = Vstep_arp[trackef][i];
                         break;
                     case 1:
-                        arpnote = (double) POWF(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
+                        arpnote = (double) POWF2(((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] >> 4))) / 12.0f);
                         arpnote *= 4294967296.0f;
                         Vstep1[trackef][i] = (int64) arpnote;
                         break;
                     case 2:
-                        arpnote = (double) POWF(2.0f, ((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
+                        arpnote = (double) POWF2(((Arpeggio_BaseNote[trackef][i] + (Arpeggio_Switch[trackef] & 0xf))) / 12.0f);
                         arpnote *= 4294967296.0f;
                         Vstep1[trackef][i] = (int64) arpnote;
                         break;
@@ -4614,7 +4631,7 @@ void Do_Effects_Ticks_X(void)
 
             for(i = 0; i < Channels_Polyphony[trackef]; i++)
             {
-                vibnote = (double) POWF(2.0f, ((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
+                vibnote = (double) POWF2(((Vibrato_BaseNote[trackef][i] + vib_speed)) / 12.0f);
                 vibnote *= 4294967296.0f;
                 Vstep1[trackef][i] = (int64) vibnote;
             }
@@ -5967,11 +5984,11 @@ float FastLog(float i)
 	float x;
 	float y;
 	x = (float) (*(int *) &i);
-	x *= 1.0f / (1 << 23);;
+	x *= 1.0f / (1 << 23);
 	x = x - 127;
 	y = x - floorf(x);
 	y = (y - y * y) * 0.346607f;
-	return x+y;
+	return x + y;
 }
 float FastPow2(float i)
 {

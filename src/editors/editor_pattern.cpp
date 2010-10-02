@@ -330,44 +330,48 @@ void draw_pated(int track, int line, int petrack, int row)
         // Draw the track header
 
         // Channel number
-        if((dover + (Cur_Char_size[cur_track] + 1)) >= MAX_PATT_SCREEN_X) break;
+        if((dover + (Cur_Char_size[cur_track] + 1)) >= MAX_PATT_SCREEN_X) goto Skip_Header;
         Cur_Char_Function[cur_track].Fnc(dover, y, cur_track, 71, 71 + 6);
         dover += Cur_Char_size[cur_track] + 1;
 
         // Mute on/off
-        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 29) >= MAX_PATT_SCREEN_X) goto Skip_Header;
         if(CHAN_MUTE_STATE[cur_track]) Cur_Char_Function[cur_track].Fnc(dover, y, 25, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y, 26, 0, 0);
         dover += 29;
 
         // Active on/off
-        if((dover + 29) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 29) >= MAX_PATT_SCREEN_X) goto Skip_Header;
         if(CHAN_ACTIVE_STATE[Cur_Position][cur_track]) Cur_Char_Function[cur_track].Fnc(dover, y, 23, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y, 24, 0, 0);
         dover += 29;
 
         // Zoom on/off
-        if((dover + 17) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 17) >= MAX_PATT_SCREEN_X) goto Skip_Header;
         if(Get_Track_Type(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover, y, 27, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y, 28, 0, 0);
         dover += 17;
 
+Skip_Header:
+
         dover = save_dover;
 
-        if((dover + 1) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 1) >= MAX_PATT_SCREEN_X) goto Skip_Header2;
         dover += 1;
 
         // Reduce notes
-        if((dover + 9) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 9) >= MAX_PATT_SCREEN_X) goto Skip_Header2;
         if(Channels_MultiNotes[cur_track] == 1) Cur_Char_Function[cur_track].Fnc(dover, y + 8, 37, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y + 8, 35, 0, 0);
         dover += 9;
 
         // Expand notes
-        if((dover + 20) >= MAX_PATT_SCREEN_X) break;
+        if((dover + 20) >= MAX_PATT_SCREEN_X) goto Skip_Header2;
         if(Channels_MultiNotes[cur_track] == MAX_POLYPHONY) Cur_Char_Function[cur_track].Fnc(dover, y + 8, 38, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y + 8, 36, 0, 0);
         dover += 20;
+
+Skip_Header2:
 
         dover = save_dover;
 

@@ -19,6 +19,7 @@ v2.2.0:
   when updating track tab during play.
 - Cleaned up reverb code (should sound cleaner)
   and added stereo separation parameter.
+- Flanger speeded up.
 
 TODO:
 
