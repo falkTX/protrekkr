@@ -66,6 +66,7 @@
 #define MAX_FILTER 23
 #define MAX_COMB_FILTERS 10
 #define PI 3.1415926535897932384626433832795
+#define PIf 3.1415927f
 
 #define MIX_RATE 44100
 #define fMIX_RATE 44100.0f
@@ -237,6 +238,29 @@ typedef struct
     int SamplesPerTick;
     int shufflestep;
 } VISUAL_DELAY_DAT, *LPVISUAL_DELAY_DAT;
+
+typedef struct
+{
+    float lf;
+    float f1p0[2];
+    float f1p1[2];
+    float f1p2[2];
+    float f1p3[2];
+
+    float hf;
+    float f2p0[2];
+    float f2p1[2];
+    float f2p2[2];
+    float f2p3[2];
+
+    float sdm1[2];
+    float sdm2[2];
+    float sdm3[2];
+
+    float lg;
+    float mg;
+    float hg;
+} EQSTATE, *LPEQSTATE;
 
 // ------------------------------------------------------
 // Variables
@@ -415,6 +439,10 @@ extern int delay_time;
 extern int DelayType;
 #endif
 
+#if defined(PTK_TRACK_EQ)
+extern EQSTATE EqDat[MAX_TRACKS];
+#endif
+
 // ------------------------------------------------------
 // Functions
 void Pre_Song_Init(void);
@@ -462,5 +490,7 @@ void Set_Spline_Boundaries(unsigned int Position,
                            unsigned int LoopEnd,
                            unsigned int LoopStart);
 float Process_Sample(short *Data, int c, int i, unsigned int res_dec);
+void init_eq(LPEQSTATE es);
+float do_eq(LPEQSTATE es, float sample, int Left);
 
 #endif

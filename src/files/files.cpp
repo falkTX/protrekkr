@@ -351,6 +351,13 @@ Read_Mod_File:
             {
                 Read_Mod_Data_Swap(&Track_Volume[i], sizeof(float), 1, in);
             }
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                init_eq(&EqDat[i]);
+                Read_Mod_Data_Swap(&EqDat[i].lg, sizeof(float), 1, in);
+                Read_Mod_Data_Swap(&EqDat[i].mg, sizeof(float), 1, in);
+                Read_Mod_Data_Swap(&EqDat[i].hg, sizeof(float), 1, in);
+            }
         }
 
         // Load the patterns data
@@ -1185,6 +1192,12 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             for(i = 0; i < MAX_TRACKS; i++)
             {
                 Write_Mod_Data_Swap(&Track_Volume[i], sizeof(float), 1, in);
+            }
+            for(i = 0; i < MAX_TRACKS; i++)
+            {
+                Write_Mod_Data_Swap(&EqDat[i].lg, sizeof(float), 1, in);
+                Write_Mod_Data_Swap(&EqDat[i].mg, sizeof(float), 1, in);
+                Write_Mod_Data_Swap(&EqDat[i].hg, sizeof(float), 1, in);
             }
 
             // Clean the unused patterns garbage (doesn't seem to do much)

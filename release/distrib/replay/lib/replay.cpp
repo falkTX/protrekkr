@@ -125,6 +125,10 @@ int64 Vstep1[MAX_TRACKS][MAX_POLYPHONY];
     int64 glidestep[MAX_TRACKS];
 #endif
 
+#if defined(PTK_TRACK_EQ)
+EQSTATE EqDat[MAX_TRACKS];
+#endif
+
 #if !defined(__STAND_ALONE__)
 float Default_Pan[MAX_TRACKS] =
 {
@@ -376,7 +380,7 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
     float mas_ratio_Track[MAX_TRACKS];
 #endif
 
-#if defined(PTK_TRACKS_VOLUME)
+#if defined(PTK_TRACK_VOLUME)
     float Track_Volume[MAX_TRACKS];
 #endif
 
@@ -1032,6 +1036,14 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         // Individual volumes
         Mod_Dat_Read(Track_Volume, sizeof(float) * Songtracks);
+
+        // Eq parameters
+        for(i = 0; i < Songtracks; i++)
+        {
+            Mod_Dat_Read(EqDat[i].lg, sizeof(float));
+            Mod_Dat_Read(EqDat[i].mg, sizeof(float));
+            Mod_Dat_Read(EqDat[i].hg, sizeof(float));
+        }
 
         TmpPatterns = RawPatterns;
         for(int pwrite = 0; pwrite < nPatterns; pwrite++)
@@ -1774,8 +1786,12 @@ void Pre_Song_Init(void)
         }
         sp_Tvol_Mod[ini] = 1.0f;
 
-#if defined(PTK_TRACKS_VOLUME)
+#if defined(PTK_TRACK_VOLUME)
         Track_Volume[ini] = 1.0f;
+#endif
+
+#if defined(PTK_TRACK_EQ)
+        init_eq(&EqDat[ini]);
 #endif
 
         Channels_Polyphony[ini] = 1;
@@ -3217,9 +3233,6 @@ ByPass_Wav:
             }
 #endif
 
-            All_Signal_L *= LVol[c];
-            All_Signal_R *= RVol[c];
-
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
             if(CHAN_MUTE_STATE[c])
             {
@@ -3290,11 +3303,20 @@ ByPass_Wav:
         }
 #endif
 
-#if defined(PTK_TRACKS_VOLUME)
+#if defined(PTK_TRACK_EQ)
+        All_Signal_L = do_eq(&EqDat[c], All_Signal_L, 0);
+        All_Signal_R = do_eq(&EqDat[c], All_Signal_R, 1);
+#endif
+
+        All_Signal_L *= LVol[c];
+        All_Signal_R *= RVol[c];
+
+#if defined(PTK_TRACK_VOLUME)
         All_Signal_L *= Track_Volume[c];
         All_Signal_R *= Track_Volume[c];
 #endif
 
+        // Store to global signals
         left_float += All_Signal_L;
         right_float += All_Signal_R;
 
@@ -4586,7 +4608,7 @@ void Do_Effects_Ticks_X(void)
         if(Vibrato_Switch[trackef])
         {
             vib_speed = ((float) (Vibrato_Switch[trackef] >> 4)) * (float) Vibcounter[trackef];
-            vib_speed = sinf((vib_speed * 0.00045f) / (3.14159f * 2.0f));
+            vib_speed = sinf((vib_speed * 0.00045f) / (PIf * 2.0f));
             vib_amp = (float) (Vibrato_Switch[trackef] & 0xf) * 0.09f;
             vib_speed *= vib_amp;
 
@@ -5947,5 +5969,46 @@ float FastPow2(float i)
 float FastPow(float a, float b)
 {
     return FastPow2(b * FastLog(a));
+}
+#endif
+
+#if defined(PTK_TRACK_EQ)
+// Public domain stuff from Neil C. / Etanza Systems
+static float vsa = (float) (1.0 / 4294967295.0);
+
+void init_eq(LPEQSTATE es)
+{
+    memset(es, 0, sizeof(EQSTATE));
+    es->lg = 1.0f;
+    es->mg = 1.0f;
+    es->hg = 1.0f;
+    es->lf = 2.0f * sinf(PIf * (880.0f / fMIX_RATE));
+    es->hf = 2.0f * sinf(PIf * (5000.0f / fMIX_RATE));
+}
+
+float do_eq(LPEQSTATE es, float sample, int Left)
+{
+    float l;
+    float m;
+    float h;
+
+    es->f1p0[Left] += (es->lf * (sample - es->f1p0[Left])) + vsa;
+    es->f1p1[Left] += (es->lf * (es->f1p0[Left] - es->f1p1[Left]));
+    es->f1p2[Left] += (es->lf * (es->f1p1[Left] - es->f1p2[Left]));
+    es->f1p3[Left] += (es->lf * (es->f1p2[Left] - es->f1p3[Left]));
+    l = es->f1p3[Left];
+    es->f2p0[Left] += (es->hf * (sample - es->f2p0[Left])) + vsa;
+    es->f2p1[Left] += (es->hf * (es->f2p0[Left] - es->f2p1[Left]));
+    es->f2p2[Left] += (es->hf * (es->f2p1[Left] - es->f2p2[Left]));
+    es->f2p3[Left] += (es->hf * (es->f2p2[Left] - es->f2p3[Left]));
+    h = es->sdm3[Left] - es->f2p3[Left];
+    m = es->sdm3[Left] - (h + l);
+    l *= es->lg;
+    m *= es->mg;
+    h *= es->hg;
+    es->sdm3[Left] = es->sdm2[Left];
+    es->sdm2[Left] = es->sdm1[Left];
+    es->sdm1[Left] = sample;
+    return(l + m + h);
 }
 #endif

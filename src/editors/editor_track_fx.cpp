@@ -36,6 +36,7 @@
 // ------------------------------------------------------
 // Variables
 char fld_chan = FALSE;
+extern EQSTATE EqDat[MAX_TRACKS];
 
 // ------------------------------------------------------
 // Functions
@@ -70,6 +71,16 @@ void Draw_Track_Fx_Ed(void)
     Gui_Draw_Button_Box(544, (Cur_Height - 121), 56, 16, "Active", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(536, (Cur_Height - 58), 144, 30, "", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    
+    Gui_Draw_Button_Box(690, (Cur_Height - 138), 100, 110, "Equalizer", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+
+    Gui_Draw_Button_Box(710, (Cur_Height - 55), 16, 16, "C", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(710 + (22 * 1), (Cur_Height - 55), 16, 16, "C", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(710 + (22 * 2), (Cur_Height - 55), 16, 16, "C", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+
+    Gui_Draw_Button_Box(710, (Cur_Height - 40), 16, 16, L_ O_, BUTTON_NORMAL | BUTTON_NO_BORDER | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(710 + (22 * 1), (Cur_Height - 40), 16, 16, M_ E_ D_, BUTTON_NORMAL | BUTTON_NO_BORDER | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(710 + (22 * 2), (Cur_Height - 40), 16, 16, H_ I_, BUTTON_NORMAL | BUTTON_NO_BORDER | BUTTON_TEXT_CENTERED);
 }
 
 void Actualize_Track_Fx_Ed(char gode)
@@ -94,7 +105,7 @@ void Actualize_Track_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 4 || gode == 11)
         {
-            if(FLANGER_DEPHASE[Track_Under_Caret] > 3.1415927f) FLANGER_DEPHASE[Track_Under_Caret] = 3.1415927f;
+            if(FLANGER_DEPHASE[Track_Under_Caret] > PIf) FLANGER_DEPHASE[Track_Under_Caret] = PIf;
             if(FLANGER_DEPHASE[Track_Under_Caret] < 0.0f) FLANGER_DEPHASE[Track_Under_Caret] = 0.0f;
             Realslider2(74, (Cur_Height - 49), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 20.371833f), FLANGER_ON[Track_Under_Caret]);
             outlong(159, (Cur_Height - 49), (int) (FLANGER_DEPHASE[Track_Under_Caret] * 57.29578f), 6);
@@ -201,6 +212,29 @@ void Actualize_Track_Fx_Ed(char gode)
             Display_Track_Volume();
         }
 
+        if(gode == 0 || gode == 14)
+        {
+            Realslider_Vert(710, (Cur_Height - 120),
+                            (int) ((2.0f - EqDat[Track_Under_Caret].lg) * 50.0f),
+                            16,
+                            100 + 16,
+                            64,
+                            TRUE);
+
+            Realslider_Vert(710 + (22 * 1), (Cur_Height - 120),
+                            (int) ((2.0f - EqDat[Track_Under_Caret].mg) * 50.0f),
+                            16,
+                            100 + 16,
+                            64,
+                            TRUE);
+
+            Realslider_Vert(710 + (22 * 2), (Cur_Height - 120),
+                            (int) ((2.0f - EqDat[Track_Under_Caret].hg) * 50.0f),
+                            16,
+                            100 + 16,
+                            64,
+                            TRUE);
+        }
     }//User gui screen match
 }
 
@@ -261,7 +295,8 @@ void Mouse_Sliders_Track_Fx_Ed(void)
         }
 
         // Compressor threshold
-        if(zcheckMouse(602, (Cur_Height - 103), 67, 18))
+        if(zcheckMouse(602, (Cur_Height - 103), 67, 18) &&
+           Compress_Track[Track_Under_Caret])
         {
             Mas_Compressor_Set_Variables_Track(Track_Under_Caret,
                                                (Mouse.x - 612.0f) * 2.0f,
@@ -271,7 +306,8 @@ void Mouse_Sliders_Track_Fx_Ed(void)
         }
 
         // Compressor ratio
-        if(zcheckMouse(602, (Cur_Height - 85), 67, 18))
+        if(zcheckMouse(602, (Cur_Height - 85), 67, 18) &&
+           Compress_Track[Track_Under_Caret])
         {
             Mas_Compressor_Set_Variables_Track(Track_Under_Caret,
                                                mas_comp_threshold_Track[Track_Under_Caret],
@@ -289,6 +325,79 @@ void Mouse_Sliders_Track_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 13;
         }
+
+        // Lo Eq
+        if(zcheckMouse(710, (Cur_Height - 120), 16, 64))
+        {
+            float Pos_Mouse;
+            int Center = Slider_Get_Center(16, 100, 65);
+            Pos_Mouse = ((float) ((Mouse.y - (Cur_Height - 120)) - (Center / 2)));
+            Pos_Mouse /= 54.0f;
+            if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
+            Pos_Mouse *= 2.0f;
+            EqDat[Track_Under_Caret].lg = 2.0f - Pos_Mouse;
+            if(EqDat[Track_Under_Caret].lg < 0.0f) EqDat[Track_Under_Caret].lg = 0.0f;
+            if(EqDat[Track_Under_Caret].lg > 2.0f) EqDat[Track_Under_Caret].lg = 2.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
+        // Med Eq
+        if(zcheckMouse(710 + (22 * 1), (Cur_Height - 120), 16, 64))
+        {
+            float Pos_Mouse;
+            int Center = Slider_Get_Center(16, 100, 65);
+            Pos_Mouse = ((float) ((Mouse.y - (Cur_Height - 120)) - (Center / 2)));
+            Pos_Mouse /= 54.0f;
+            if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
+            Pos_Mouse *= 2.0f;
+            EqDat[Track_Under_Caret].mg = 2.0f - Pos_Mouse;
+            if(EqDat[Track_Under_Caret].mg < 0.0f) EqDat[Track_Under_Caret].mg = 0.0f;
+            if(EqDat[Track_Under_Caret].mg > 2.0f) EqDat[Track_Under_Caret].mg = 2.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
+        // Hi Eq
+        if(zcheckMouse(710 + (22 * 2), (Cur_Height - 120), 16, 64))
+        {
+            float Pos_Mouse;
+            int Center = Slider_Get_Center(16, 100, 65);
+            Pos_Mouse = ((float) ((Mouse.y - (Cur_Height - 120)) - (Center / 2)));
+            Pos_Mouse /= 54.0f;
+            if(Pos_Mouse > 1.0f) Pos_Mouse = 1.0f;
+            Pos_Mouse *= 2.0f;
+            EqDat[Track_Under_Caret].hg = 2.0f - Pos_Mouse;
+            if(EqDat[Track_Under_Caret].hg < 0.0f) EqDat[Track_Under_Caret].hg = 0.0f;
+            if(EqDat[Track_Under_Caret].hg > 2.0f) EqDat[Track_Under_Caret].hg = 2.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
+        // Clear lo band
+        if(zcheckMouse(710, (Cur_Height - 55), 16, 16))
+        {
+            EqDat[Track_Under_Caret].lg = 1.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
+        // Clear med band
+        if(zcheckMouse(710 + (22 * 1), (Cur_Height - 55), 16, 16))
+        {
+            EqDat[Track_Under_Caret].mg = 1.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
+        // Clear hi band
+        if(zcheckMouse(710 + (22 * 2), (Cur_Height - 55), 16, 16))
+        {
+            EqDat[Track_Under_Caret].hg = 1.0f;
+            gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
+            teac = 14;
+        }
+
     }
 }
 
@@ -333,6 +442,7 @@ void Mouse_Left_Track_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_TRACK_FX_ED;
             teac = 0;
         }
+
     }
 }
 

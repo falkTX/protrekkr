@@ -43,6 +43,7 @@ unsigned char Old_pSequence[MAX_SEQUENCES];
 int Nbr_Muted_Tracks;
 int Muted_Tracks[MAX_TRACKS];
 int Nbr_Used_Instr;
+extern EQSTATE EqDat[MAX_TRACKS];
 INSTR_ORDER Used_Instr[MAX_INSTRS];
 INSTR_ORDER Used_Instr2[MAX_INSTRS];
 INSTR_ORDER Used_Instr3[MAX_INSTRS];
@@ -158,6 +159,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Store_At3 = FALSE;
     int Store_8Bit = FALSE;
     int Store_Internal = FALSE;
+
+    int Store_Track_Volume = FALSE;
+    int Store_Track_Eq = FALSE;
 
     int Store_Flanger = FALSE;
     int Store_Disclap = FALSE;
@@ -362,7 +366,24 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Write_Mod_Data(Channels_Effects, sizeof(char), char_value, in);
     for(i = 0; i < char_value; i++)
     {
+        if(Track_Volume[i] <= 0.99f)
+        {
+            Store_Track_Volume = TRUE;
+        }
         Write_Mod_Data(&Track_Volume[i], sizeof(float), 1, in);
+    }
+    for(i = 0; i < char_value; i++)
+    {
+        if(EqDat[i].lg != 1.0f ||
+           EqDat[i].mg != 1.0f ||
+           EqDat[i].hg != 1.0f
+          )
+        {
+            Store_Track_Eq = TRUE;
+        }
+        Write_Mod_Data(&EqDat[i].lg, sizeof(float), 1, in);
+        Write_Mod_Data(&EqDat[i].mg, sizeof(float), 1, in);
+        Write_Mod_Data(&EqDat[i].hg, sizeof(float), 1, in);
     }
 
     // Check the instruments
@@ -420,9 +441,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                             
                             case PATTERN_FX:
                             case PATTERN_FX2:
-                            /*
                             case PATTERN_FX3:
-                            case PATTERN_FX4:*/
+                            case PATTERN_FX4:
                                 // Count the number of synchro fxs
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -489,9 +509,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                             {   // Rows
                                 TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                                 if(i == PATTERN_FX ||
-                                   i == PATTERN_FX2 /* ||
+                                   i == PATTERN_FX2 ||
                                    i == PATTERN_FX3 ||
-                                   i == PATTERN_FX4 */
+                                   i == PATTERN_FX4
                                   )
                                 {
                                     // Don't save FX 7
@@ -529,9 +549,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                 {   // Rows
                                     TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
                                     if(i == PATTERN_FX ||
-                                       i == PATTERN_FX2 /* ||
+                                       i == PATTERN_FX2 ||
                                        i == PATTERN_FX3 ||
-                                       i == PATTERN_FX4 */
+                                       i == PATTERN_FX4
                                       )
                                     {
                                         // Don't save FX 7
@@ -598,9 +618,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
 
                         // Check the effects column
                         if(i == PATTERN_FX ||
-                           i == PATTERN_FX2 /* ||
+                           i == PATTERN_FX2 ||
                            i == PATTERN_FX3 ||
-                           i == PATTERN_FX4 */
+                           i == PATTERN_FX4
                           )
                         {
                             switch(TmpPatterns_Notes[i])
@@ -868,9 +888,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                         {
                             case PATTERN_FX:
                             case PATTERN_FX2:
-                            /*
                             case PATTERN_FX3:
-                            case PATTERN_FX4:*/
+                            case PATTERN_FX4:
                                 // Don't save FX 7
                                 if(TmpPatterns_Notes[i] == 0x7)
                                 {
@@ -1018,6 +1037,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     // Special but only at tick 0
     Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio |
                                   Store_FX_PatternLoop | Store_FX_Reverse);
+
+    Save_Constant("PTK_TRACK_VOLUME", Store_Track_Volume);
+    Save_Constant("PTK_TRACK_EQ", Store_Track_Eq);
 
     // Remap the used instruments
     for(i = 0; i < MAX_INSTRS; i++)

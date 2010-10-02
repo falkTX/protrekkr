@@ -736,7 +736,7 @@ SDL_Color Default_Palette6[] =
     { 0x66, 0x18, 0x14, 0x00 },
     { 0x00, 0x00, 0x00, 0x00 },      // 13 (calculated)
 
-    { 0xff, 0x52, 0x32, 0x00 },
+    { 0x9c, 0x36, 0x00, 0x00 },
     { 0xff, 0x40, 0x00, 0x00 },
     { 0xff, 0xb6, 0x54, 0x00 },
 
@@ -1605,8 +1605,8 @@ void Draw_Editors_Bar(int Highlight)
     Gui_Draw_Button_Box(20 + (TAB_LARG * 2), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Synth", Highlight_Tab[6] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20 + (TAB_LARG * 3), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Sample Ed.", Highlight_Tab[8] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20 + (TAB_LARG * 4), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "303 Units", Highlight_Tab[9] | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(20 + (TAB_LARG * 5), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track (1)", Highlight_Tab[1] | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(20 + (TAB_LARG * 6), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track (2)", Highlight_Tab[7] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 5), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track (I)", Highlight_Tab[1] | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(20 + (TAB_LARG * 6), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Track (II)", Highlight_Tab[7] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20 + (TAB_LARG * 7), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "FX Setup", Highlight_Tab[3] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20 + (TAB_LARG * 8), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Reverb", Highlight_Tab[10] | BUTTON_TEXT_CENTERED);
     Gui_Draw_Button_Box(20 + (TAB_LARG * 9), (Cur_Height - 171) + Patterns_Lines_Offset, TAB_LARG - 2, 16, "Disk IO", Highlight_Tab[0] | BUTTON_TEXT_CENTERED);
@@ -1999,7 +1999,13 @@ void Realslider_Horiz(int x, int y, int value, int displayed, int maximum, int s
 
 // ------------------------------------------------------
 // Display a vertical slider
-void Realslider_Vert(int x, int y, int value, int displayed, int maximum, int size, int enable)
+void Realslider_Vert(int x,
+                     int y,
+                     int value,
+                     int displayed,
+                     int maximum,
+                     int size,
+                     int enable)
 {
     float caret_size;
     float Pos_slider;
