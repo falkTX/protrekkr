@@ -4312,7 +4312,11 @@ void Keyboard_Handler(void)
                    Column_Under_Caret == (7 + j) ||
                    Column_Under_Caret == (9 + j) ||
                    Column_Under_Caret == (11 + j) ||
-                   Column_Under_Caret == (13 + j))
+                   Column_Under_Caret == (13 + j) ||
+                   Column_Under_Caret == (15 + j) ||
+                   Column_Under_Caret == (17 + j) ||
+                   Column_Under_Caret == (19 + j) ||
+                   Column_Under_Caret == (21 + j))
                 {
                     ped_cell = PATTERN_INSTR1 + (i * 2);                    // instrument
                     if(Column_Under_Caret == (3 + j)) ped_cell = PATTERN_VOLUME;       // volume
@@ -4427,7 +4431,11 @@ void Keyboard_Handler(void)
                        Column_Under_Caret == (8 + j) ||
                        Column_Under_Caret == (10 + j) ||
                        Column_Under_Caret == (12 + j) ||
-                       Column_Under_Caret == (14 + j))
+                       Column_Under_Caret == (14 + j) ||
+                       Column_Under_Caret == (16 + j) ||
+                       Column_Under_Caret == (18 + j) ||
+                       Column_Under_Caret == (20 + j) ||
+                       Column_Under_Caret == (22 + j))
                     {
                         ped_cell = PATTERN_INSTR1 + (i * 2);
                         if(Column_Under_Caret == (4 + j)) ped_cell = PATTERN_VOLUME;
