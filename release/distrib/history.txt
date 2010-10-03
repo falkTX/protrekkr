@@ -28,6 +28,7 @@ TODO:
 - There a selection bug when using more than 1 column effect.
 - Do the insert/delete track functions.
 - Check the wipe function of ptp for the note used extra effects & notes.
+- Add double arrows for file lists to jump the previous/next first entry's letter.
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:

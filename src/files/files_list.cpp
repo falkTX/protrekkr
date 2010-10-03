@@ -64,7 +64,7 @@ int lt_items[SCOPE_LAST_DIR];
 int lt_index[SCOPE_LAST_DIR];
 int lt_curr[SCOPE_LAST_DIR];
 int list_counter[SCOPE_LAST_DIR];
-int sort_files = TRUE;
+int sort_files = TRUE;              // Just in case i would need to make it optional someday
 
 FILEENTRY SMPT_LIST[2048];
 char UpName1[1024];
@@ -145,10 +145,13 @@ int FileComp_Files(const void *elem1, const void *elem2)
     int i;
     LPFILEENTRY Ent1 = (LPFILEENTRY) elem1;
     LPFILEENTRY Ent2 = (LPFILEENTRY) elem2;
-    if(Ent1->Type == _A_SUBDIR && Ent2->Type == 0) return 1;
-    if(Ent1->Type == 0 && Ent2->Type == _A_SUBDIR) return -1;
+    
+    // File before directories
+    if(Ent1->Type == _A_SUBDIR && Ent2->Type == _A_FILE) return 1;
+    if(Ent1->Type == _A_FILE && Ent2->Type == _A_SUBDIR) return -1;
 
-    if(Ent1->Type == 0 && Ent2->Type == 0 ||
+    // Make sure both entries share the same type
+    if(Ent1->Type == _A_FILE && Ent2->Type == _A_FILE ||
        Ent1->Type == _A_SUBDIR && Ent1->Type == _A_SUBDIR)
     {
         for(i = 0; Ent1->Name[i]; i++)
@@ -162,6 +165,36 @@ int FileComp_Files(const void *elem1, const void *elem2)
         return strcmp(UpName1, UpName2);
     }
     return 0;
+}
+
+void Insert_List_Separators(void)
+{
+    int i;
+    char Sort_Letter;
+    char Sort_Type;
+    char Cur_Letter;
+    int Cur_Type;
+    
+    Sort_Letter = 0;
+    Sort_Type = Get_FileType(0);
+    for(i = 0; i < list_counter[Scopish]; i++)
+    {
+        // Make sure we're in the same ensemble
+        Cur_Type = Get_FileType(i);
+        if(Sort_Type == Cur_Type && Cur_Type == _A_FILE)
+        {
+            Cur_Letter = toupper(Get_FileName(i)[0]);
+            if(Sort_Letter != Cur_Letter)
+            {
+                Sort_Letter = Cur_Letter;
+                Insert_Entry("", _A_SEP, i);
+            }
+        }
+        else
+        {
+            Sort_Type = Cur_Type;
+        }
+    }
 }
 
 void Set_Current_Dir(void)
@@ -400,15 +433,21 @@ void Read_SMPT(void)
             } // while      
             _findclose(hFile);
 
-            if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-
-            Insert_Entry("", _A_SEP, 0);
+            if(sort_files)
+            {
+                qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
+                Insert_List_Separators();
+            }
+            else
+            {
+                Insert_Entry("", _A_SEP, 0);
+            }
             Insert_Entry("..", _A_SUBDIR, 0);
             Insert_Entry(".", _A_SUBDIR, 0);
         }
     }
 
-    // Add the available drives to the end of the list
+    // Add the available drives to the bottom of the list
     char *Ptr_Drives;
     GetLogicalDriveStrings(1024, List_Drives);
 
@@ -478,10 +517,16 @@ void Read_SMPT(void)
             closedir(dirp);
         }
 
-        if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-
+        if(sort_files)
+        {
+            qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
+            Insert_List_Separators();
+        }
+        else
+        {
+            Insert_Entry("", _A_SEP, 0);
+        }
         // Insert parent directory at the top
-        Insert_Entry("", _A_SEP, 0);
         Insert_Entry("/", _A_SUBDIR, 0);
     }
 
@@ -490,10 +535,16 @@ void Read_SMPT(void)
     // Enum them
     nftw(Dir_Act, &list_file, FTW_PHYS, 0);
 
-    if(sort_files) qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-
+    if(sort_files)
+    {
+        qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
+        Insert_List_Separators();
+    }
+    else
+    {
+        Insert_Entry("", _A_SEP, 0);
+    }
     // Always insert them at the top of the list
-    Insert_Entry("", _A_SEP, 0);
     Insert_Entry("../", _A_SUBDIR, 0);
     Insert_Entry("./", _A_SUBDIR, 0);
 
