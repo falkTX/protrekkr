@@ -20,6 +20,22 @@ v2.2.0:
 - Cleaned up reverb code (should sound cleaner)
   and added stereo separation parameter.
 - Flanger speeded up.
+- Added separators between sorted entries in files lists,
+  also right mouse buttons on arrows is now active
+  (jump to previous/next letter group).
+- Added some converted modules for testing:
+
+  Comic Bakery Remix.ptk
+  Elevator Zax.ptk
+  Factory of hybrid.ptk
+  Loop Influenza.ptk
+  Lunch with the gods.ptk
+  Sudoku padawan.ptk
+  Vacation Climate.ptk
+  Without performer.ptk
+  Wonderland.ptk
+
+  also improved (?) other modules to take advantage of new features.
 
 TODO:
 
@@ -28,8 +44,6 @@ TODO:
 - There a selection bug when using more than 1 column effect.
 - Do the insert/delete track functions.
 - Check the wipe function of ptp for the note used extra effects & notes.
-- Add double arrows for file lists to jump the previous/next first entry's letter.
-- There's a small issue with the speed conversion (6 becomes 3).
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:

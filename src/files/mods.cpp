@@ -46,7 +46,10 @@ int mt_tags[16] =
 
 int mt_channels[16] =
 {
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+     1,  2,  3,  4,
+     5,  6,  7,  8,
+     9, 10, 11, 12,
+    13, 14, 15, 16
 };
 
 float mt_pannels[16] =
@@ -188,7 +191,6 @@ AMIGA_NOTE mt_period_conv[] =
     {   15, 117 },
     {   15, 118 },
     {   14, 119 },
-
 }; 
 
 // ------------------------------------------------------
@@ -248,7 +250,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
 
     char FineTune_Table[] =
     {
-        0,  16,  32,  48,  64,  80,  96,  112,
+         0,   16,  32,  48,  64,  80,  96, 112,
        -112, -96, -80, -64, -48, -32, -24, -16
     };
 
@@ -300,7 +302,13 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         // Remove suspicious chars
         for(j = 0; Name[j]; j++)
         {
-            if(!isalnum(Name[j])) Name[j] = '_';
+            if(!isspace(Name[j]))
+            {
+                if(!isalnum(Name[j]))
+                {
+                    Name[j] = '_';
+                }
+            }
         }
         
         Songtracks = channels;
@@ -453,7 +461,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                                     {
                                                         *(RawPatterns + free_chan + PATTERN_FX2) = 0xf0;
                                                         *(RawPatterns + free_chan + PATTERN_FXDATA2) = found_tempo;
-                                                        Channels_Effects[pw2] = 2;
+                                                        Channels_Effects[k] = 2;
                                                         last_tempo = found_tempo;
                                                     }
                                                     break;

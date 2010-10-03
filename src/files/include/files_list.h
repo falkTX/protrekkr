@@ -48,6 +48,10 @@
 #endif
 
 // ------------------------------------------------------
+// Constants
+#define NBR_ITEMS 11
+
+// ------------------------------------------------------
 // Variables
 extern int lt_ykar[SCOPE_LAST_DIR];
 extern int lt_items[SCOPE_LAST_DIR];
@@ -64,5 +68,8 @@ void Clear_Files_List(void);
 char *Get_FileName(int idx);
 int Get_FileType(int idx);
 void Draw_Lists_Slider(int idx);
+void Files_List_Move(int Amount);
+void Prev_Prefix(void);
+void Next_Prefix(void);
 
 #endif

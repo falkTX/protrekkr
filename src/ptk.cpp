@@ -2547,7 +2547,7 @@ void Actualize_Name(int *newletter, char *nam)
         {
             if(newletter[i])
             {
-                if(namesize < 18)
+                if(namesize < 19)
                 {
                     if(table_newletter[i])
                     {
@@ -5135,17 +5135,7 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
-                {
-                    Instrs_index--;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
-
-                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
-                {
-                    Instrs_index++;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
+                Files_List_Move(1);
 
                 // Select
                 if(zcheckMouse(393, 43, Cur_Width - 412, 133))
@@ -5160,20 +5150,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
             case SCOPE_ZONE_SAMPLE_DIR:
-
-                // Files list up
-                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
-                {
-                    lt_index[Scopish]--;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
-
-                // Files list down
-                if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
-                {
-                    lt_index[Scopish]++;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
+                Files_List_Move(1);
 
                 // Select a file
                 if(zcheckMouse(393, 43, Cur_Width - 412, 133))
@@ -5551,16 +5528,7 @@ void Mouse_Handler(void)
         {
             case SCOPE_ZONE_INSTR_LIST:
             case SCOPE_ZONE_SYNTH_LIST:
-                if(zcheckMouse(394, 42, 16, 14) == 1)
-                {
-                    Instrs_index -= 10;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
-                if(zcheckMouse(394, 162, 16, 14) == 1)
-                {
-                    Instrs_index += 10;
-                    gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
-                }
+                Files_List_Move(10);
                 break;
 
             case SCOPE_ZONE_MOD_DIR:
@@ -5569,17 +5537,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_REVERB_DIR:
             case SCOPE_ZONE_PATTERN_DIR:
             case SCOPE_ZONE_SAMPLE_DIR:
-
-                if(zcheckMouse(394, 42, 16, 14) == 1)
-                {
-                    lt_index[Scopish] -= 10;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
-                if(zcheckMouse(394, 162, 16, 14) == 1)
-                {
-                    lt_index[Scopish] += 10;
-                    gui_action = GUI_CMD_FILELIST_SCROLL;
-                }
+                Files_List_Move(10);
                 break;
         }
 

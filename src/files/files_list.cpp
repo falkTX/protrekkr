@@ -608,7 +608,7 @@ void Dump_Files_List(int xr, int yr)
 
             if(lt_items[Scopish])
             {
-                for(int counter = 0; counter < 11; counter++)
+                for(int counter = 0; counter < NBR_ITEMS; counter++)
                 {
                     int rel_val = y + counter;
 
@@ -667,7 +667,7 @@ void Dump_Files_List(int xr, int yr)
 // Redraw the files list
 void Actualize_Files_List(int modeac)
 {
-    int const brolim = lt_items[Scopish] - 11;
+    int const brolim = lt_items[Scopish] - NBR_ITEMS;
 
     switch(Scopish)
     {
@@ -715,7 +715,7 @@ void Actualize_Files_List(int modeac)
 void Draw_Lists_Slider(int idx)
 {
     SetColor(COL_BLACK);
-    bjbox(Cur_Width - 1, 42, 18, 136);
+    bjbox(Cur_Width - 18, 42, 18, 136);
     SetColor(COL_SLIDER_LO);
     bjbox(Cur_Width - 18, 59 - 1, 15 + 2, 103 + 2);
     SetColor(COL_SLIDER_HI);
@@ -723,6 +723,169 @@ void Draw_Lists_Slider(int idx)
     SetColor(COL_SLIDER_MED);
     bjbox(Cur_Width - 17, 59, 15, 103);
     Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 2, 58 + idx + 1, 16 - 2, 32, "", BUTTON_NORMAL);
-    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 164, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 42, 16, 14, "\01", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Button_Box(MAX_PATT_SCREEN_X + 1, 164, 16, 14, "\02", BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+}
+
+// ------------------------------------------------------
+// Move the lists up & down
+void Files_List_Move(int Amount)
+{
+    switch(Scopish)
+    {
+        case SCOPE_ZONE_INSTR_LIST:
+        case SCOPE_ZONE_SYNTH_LIST:
+
+            if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
+            {
+                Instrs_index -= Amount;
+                gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+            }
+
+            if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
+            {
+                Instrs_index += Amount;
+                gui_action = GUI_CMD_INSTR_SYNTH_SCROLL;
+            }
+            break;
+
+        default:
+
+            // Files list up
+            if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 42, 16, 14))
+            {
+                if(abs(Amount) > 1)
+                {
+                    Prev_Prefix();
+                }
+                else
+                {
+                    lt_index[Scopish] -= Amount;
+                }
+                gui_action = GUI_CMD_FILELIST_SCROLL;
+            }
+
+            // Files list down
+            if(zcheckMouse(MAX_PATT_SCREEN_X + 1, 164, 16, 14))
+            {
+                if(abs(Amount) > 1)
+                {
+                    Next_Prefix();
+                }
+                else
+                {
+                    lt_index[Scopish] += Amount;
+                }
+                gui_action = GUI_CMD_FILELIST_SCROLL;
+            }
+            break;
+    }
+}
+
+// ------------------------------------------------------
+// Move an index in the files list
+// Return TRUE if any boundary has been reached.
+int Move_Idx(int *Idx, int Amount)
+{
+    *Idx += Amount;
+    if(*Idx < 0)
+    {
+        lt_index[Scopish] = 0;
+        return TRUE;
+    }
+    if(*Idx > lt_items[Scopish] - NBR_ITEMS)
+    {
+        lt_index[Scopish] = lt_items[Scopish] - NBR_ITEMS;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// ------------------------------------------------------
+// Go to previous prefix in a file list
+void Prev_Prefix(void)
+{
+    char Cur_Letter;
+    char Start_Letter;
+    int Done_Sep;
+    int Idx = lt_index[Scopish];
+
+    // Adjust to a real entry
+    Done_Sep = FALSE;
+    if(Get_FileType(Idx) == _A_SUBDIR)
+    {
+        Move_Idx(&Idx, -1);
+    }
+    while(Get_FileType(Idx) == _A_SEP)
+    {
+        Done_Sep = TRUE;
+        if(Move_Idx(&Idx, -1)) return;
+    }
+    if(Get_FileType(Idx) == _A_SUBDIR)
+    {
+        lt_index[Scopish] = Idx;
+        return;
+    }
+
+    Start_Letter = toupper(Get_FileName(Idx)[0]);
+    if(Move_Idx(&Idx, -1)) return;
+    if(!Done_Sep)
+    {
+        while(Get_FileType(Idx) == _A_SEP)
+        {
+            if(Move_Idx(&Idx, -1)) return;
+            if(Get_FileType(Idx) != _A_SEP)
+            {
+                Start_Letter = toupper(Get_FileName(Idx)[0]);
+            }
+        }
+    }
+    Cur_Letter = toupper(Get_FileName(Idx)[0]);
+    while(Start_Letter == Cur_Letter)
+    {
+        if(Move_Idx(&Idx, -1)) return;
+        Cur_Letter = toupper(Get_FileName(Idx)[0]);
+    }
+    lt_index[Scopish] = Idx + 1;
+}
+
+// ------------------------------------------------------
+// Go to next prefix in a file list
+void Next_Prefix(void)
+{
+    char Cur_Letter;
+    char Start_Letter;
+    int Idx = lt_index[Scopish];
+    int Was_Dir;
+
+    Was_Dir = FALSE;
+
+    // Adjust to a real entry
+    if(Get_FileType(Idx) == _A_SUBDIR)
+    {
+        Was_Dir = TRUE;
+        Move_Idx(&Idx, 1);
+    }
+    while(Get_FileType(Idx) == _A_SEP)
+    {
+        if(Move_Idx(&Idx, 1)) return;
+    }
+    if(Get_FileType(Idx) == _A_SUBDIR)
+    {
+        lt_index[Scopish] = Idx;
+        return;
+    }
+    if(!Was_Dir)
+    {
+        Start_Letter = toupper(Get_FileName(Idx)[0]);
+        if(Move_Idx(&Idx, 1)) return;
+        Cur_Letter = toupper(Get_FileName(Idx)[0]);
+        while(Start_Letter == Cur_Letter ||
+              Get_FileType(Idx) == _A_SEP)
+        {
+            if(Move_Idx(&Idx, 1)) return;
+            Cur_Letter = toupper(Get_FileName(Idx)[0]);
+        }
+    }
+    lt_index[Scopish] = Idx;
 }
