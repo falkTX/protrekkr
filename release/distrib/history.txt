@@ -29,6 +29,7 @@ TODO:
 - Do the insert/delete track functions.
 - Check the wipe function of ptp for the note used extra effects & notes.
 - Add double arrows for file lists to jump the previous/next first entry's letter.
+- There's a small issue with the speed conversion (6 becomes 3).
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:
