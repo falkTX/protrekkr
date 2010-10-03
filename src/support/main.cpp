@@ -491,9 +491,6 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         exit(0);
     }
 
-//    SDL_putenv("SDL_VIDEO_WINDOW_POS=default");
- //   SDL_putenv("SDL_VIDEO_CENTERED=0");
-
     if((Keyboards = XML_get_string("files", "file", "keyboards", "value")) != NULL)
     {
         memset(KbFileNameToLoad, 0, sizeof(KbFileNameToLoad));
@@ -619,6 +616,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
     Set_Phony_Palette();
     Refresh_Palette();
 
+    if(argc != 1)
+    {
+        LoadFile(0, argv[1]);
+    }
+
     while(!Prog_End)
     {
         Mouse.wheel = 0;
@@ -672,16 +674,11 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
                         Uni_Trans = Symbol;
 #endif
 
-                        //sprintf(tt, "%d\n", Uni_Trans);
-                        //OutputDebugString(tt);
-    
                         Keys[Uni_Trans] = TRUE;
 
                         if(!In_Requester)
                         {
                             Scancode = Translate_Locale_Key(Symbol);
-
-                         //   printf("%x %d %x %d\n", Symbol, Events[i].key.keysym.unicode, Uni_Trans, Uni_Trans);
 
                             Keys_Raw[Scancode] = TRUE;
                             Keys_Raw_Off[Scancode] = FALSE;

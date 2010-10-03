@@ -28,6 +28,7 @@ v2.2.0:
   Comic Bakery Remix.ptk
   Elevator Zax.ptk
   Factory of hybrid.ptk
+  Gone tipsy.ptk
   Loop Influenza.ptk
   Lunch with the gods.ptk
   Sudoku padawan.ptk
@@ -36,6 +37,9 @@ v2.2.0:
   Wonderland.ptk
 
   also improved (?) other modules to take advantage of new features.
+- A module name can now be passed as argument to the tracker and it will
+  be loaded at startup.
+  (this can also be used for associating .ptk files to the tracker).
 
 TODO:
 
