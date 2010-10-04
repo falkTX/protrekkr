@@ -167,7 +167,7 @@ int FileComp_Files(const void *elem1, const void *elem2)
     return 0;
 }
 
-void Insert_List_Separators(void)
+/*void Insert_List_Separators(void)
 {
     int i;
     char Sort_Letter;
@@ -195,7 +195,7 @@ void Insert_List_Separators(void)
             Sort_Type = Cur_Type;
         }
     }
-}
+}*/
 
 void Set_Current_Dir(void)
 {
@@ -436,9 +436,9 @@ void Read_SMPT(void)
             if(sort_files)
             {
                 qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-                Insert_List_Separators();
+                //Insert_List_Separators();
             }
-            else
+            //else
             {
                 Insert_Entry("", _A_SEP, 0);
             }
@@ -520,9 +520,9 @@ void Read_SMPT(void)
         if(sort_files)
         {
             qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-            Insert_List_Separators();
+            //Insert_List_Separators();
         }
-        else
+        //else
         {
             Insert_Entry("", _A_SEP, 0);
         }
@@ -538,9 +538,9 @@ void Read_SMPT(void)
     if(sort_files)
     {
         qsort(&SMPT_LIST[0], list_counter[Scopish], sizeof(FILEENTRY), &FileComp_Files);
-        Insert_List_Separators();
+        //Insert_List_Separators();
     }
-    else
+    //else
     {
         Insert_Entry("", _A_SEP, 0);
     }
@@ -841,6 +841,11 @@ void Prev_Prefix(void)
         }
     }
     Cur_Letter = toupper(Get_FileName(Idx)[0]);
+    if(Cur_Letter != Start_Letter)
+    {
+        // Renew prefix
+        Start_Letter = toupper(Get_FileName(Idx)[0]);
+    }
     while(Start_Letter == Cur_Letter)
     {
         if(Move_Idx(&Idx, -1)) return;

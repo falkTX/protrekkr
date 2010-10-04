@@ -1500,7 +1500,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 
 #if defined(PTK_FX_PATTERNLOOP)
     // No repeat loop
-    repeat_loop_pos = -1;
+    repeat_loop_pos = 0;
     repeat_loop_counter = 0;
     repeat_loop_counter_in = 0;
 #endif
@@ -1989,7 +1989,7 @@ void Post_Song_Init(void)
     Reset_Values(FALSE);
 
 #if defined(PTK_FX_PATTERNLOOP)
-    repeat_loop_pos = -1;
+    repeat_loop_pos = 0;
     repeat_loop_counter = 0;
     repeat_loop_counter_in = 0;
 #endif
@@ -2593,7 +2593,7 @@ void Sp_Player(void)
 
 #if defined(PTK_FX_PATTERNLOOP)
                     // Loops between patterns wouldn't make sense
-                    repeat_loop_pos = -1;
+                    repeat_loop_pos = 0;
                     repeat_loop_counter = 0;
                     repeat_loop_counter_in = 0;
 #endif
@@ -2666,7 +2666,7 @@ void Sp_Player(void)
 #endif
 
 #if defined(PTK_FX_PATTERNLOOP)
-                    repeat_loop_pos = -1;
+                    repeat_loop_pos = 0;
 				    repeat_loop_counter = 0;
                     repeat_loop_counter_in = 0;
 #endif
@@ -3719,8 +3719,8 @@ void Play_Instrument(int channel, int sub_channel)
 
                     if(!no_retrig_note)
                     {
-                            Vstep1[channel][sub_channel] = (int64) spreadnote;
-                            sp_Step[channel][sub_channel] = (int64) spreadnote;
+                        Vstep1[channel][sub_channel] = (int64) spreadnote;
+                        sp_Step[channel][sub_channel] = (int64) spreadnote;
                     }
                 }
                 else
@@ -4271,7 +4271,7 @@ void Do_Effects_Ticks_X(void)
 #endif
 
 #if defined(PTK_FX_SWITCHFLANGER)
-                    // $14 Set filter resonance
+                    // $24 Switch flanger on/off
                     case 0x24:
                         FLANGER_ON[trackef] = (int) pltr_dat_row[k] & 1;
                         break;

@@ -17,7 +17,7 @@ v2.2.0:
 - Added lo/med/hi bands equalizers for each track.
 - Delay send had precedence over command 10
   when updating track tab during play.
-- Cleaned up reverb code (should sound cleaner)
+- Fixed up reverb code (should sound cleaner)
   and added stereo separation parameter.
 - Flanger speeded up.
 - Added separators between sorted entries in files lists,
@@ -37,9 +37,11 @@ v2.2.0:
   Wonderland.ptk
 
   also improved (?) other modules to take advantage of new features.
-- A module name can now be passed as argument to the tracker and it will
-  be loaded at startup.
-  (this can also be used for associating .ptk files to the tracker).
+- A file name can now be passed as argument to the tracker and it will
+  be loaded at startup (can any file recognized by the tracker).
+  (this can be used to associate .ptk files to the tracker).
+- Default repeat loop row is now 0 (was disabled before).
+- Improved .mod/.ft import.
 
 TODO:
 

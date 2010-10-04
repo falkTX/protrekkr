@@ -414,6 +414,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                             int found_free_chan;
                             float speed_to_find = cur_tempo / 125.0f * 50.0f / (float) cur_speed;
                             speed_to_find *= 60.0f;
+                            speed_to_find = (float) ((int) speed_to_find);
 
                             // Now we need to find the exact match for that speed
                             // the ugly big bad brute force way >:D
@@ -804,14 +805,14 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 if(Cmd_Dat >= 0xa0 && Cmd_Dat < 0xb0)
                                 {
                                     Cmd = 0x20;
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xa0, 16.0f, 255.0f);
+                                    Cmd_Dat = (int) (Scale_AmigaMod_Value(Cmd_Dat - 0xa0, 16.0f, 255.0f) / 2.33333f);
                                 }
 
                                 // FINEVOLUME SLIDEDOWN
                                 if(Cmd_Dat >= 0xb0 && Cmd_Dat < 0xc0)
                                 {
                                     Cmd = 0x21;
-                                    Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat - 0xb0, 16.0f, 255.0f);
+                                    Cmd_Dat = (int) (Scale_AmigaMod_Value(Cmd_Dat - 0xb0, 16.0f, 255.0f) / 2.33333f);
                                 }
 
                                 // NOTE CUT
@@ -864,7 +865,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                 AllocateWave(swrite, 0, SampleLength[swrite][0], 1, FALSE, NULL, NULL);
                 for(x = 0; x < SampleLength[swrite][0]; x++)
                 {
-                    *(RawSamples[swrite][0][0] + x) = (short) fgetc(in) << 8;
+                    *(RawSamples[swrite][0][0] + x) = ((short) fgetc(in) << 8);
                 }
                 *(RawSamples[swrite][0][0]) = 0;
 
