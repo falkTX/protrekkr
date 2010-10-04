@@ -344,6 +344,7 @@ class CSynth
 #if defined(PTK_INSTRUMENTS)
                     ,float note_smp
 #endif
+                    , int glide
                    );
         void NoteOff(void);
 

@@ -23,7 +23,7 @@ v2.2.0:
 - Added separators between sorted entries in files lists,
   also right mouse buttons on arrows is now active
   (jump to previous/next letter group).
-- Added some converted modules for testing:
+- Added some more converted modules for testing:
 
   Comic Bakery Remix.ptk
   Elevator Zax.ptk
@@ -31,6 +31,7 @@ v2.2.0:
   Gone tipsy.ptk
   Loop Influenza.ptk
   Lunch with the gods.ptk
+  Space game.ptk
   Sudoku padawan.ptk
   Vacation Climate.ptk
   Without performer.ptk
@@ -42,6 +43,7 @@ v2.2.0:
   (this can be used to associate .ptk files to the tracker).
 - Default repeat loop row is now 0 (was disabled before).
 - Improved .mod/.ft import.
+- Glide effect (5) should now work with synth instruments.
 
 TODO:
 

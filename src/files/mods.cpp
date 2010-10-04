@@ -458,7 +458,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                                 if(!*(RawPatterns + free_chan + PATTERN_FX2))
                                                 {
                                                     found_free_chan = TRUE;
-                                                    if(last_tempo != found_tempo)
+                                                    //if(last_tempo != found_tempo)
                                                     {
                                                         *(RawPatterns + free_chan + PATTERN_FX2) = 0xf0;
                                                         *(RawPatterns + free_chan + PATTERN_FXDATA2) = found_tempo;
@@ -471,12 +471,12 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                         }
                                         if(!found_free_chan)
                                         {
-                                            // Overwriting is the worst case scenario
-                                            if(last_tempo != found_tempo)
+                                            // Extend more (now we can do that)
+                                            //if(last_tempo != found_tempo)
                                             {
-                                                *(RawPatterns + tmo + PATTERN_FX2) = 0xf0;
-                                                *(RawPatterns + tmo + PATTERN_FXDATA2) = found_tempo;
-                                                Channels_Effects[pw2] = 2;
+                                                *(RawPatterns + tmo + PATTERN_FX3) = 0xf0;
+                                                *(RawPatterns + tmo + PATTERN_FXDATA3) = found_tempo;
+                                                Channels_Effects[pw2] = 3;
                                                 last_tempo = found_tempo;
                                             }
                                         }
@@ -487,7 +487,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
                                 }
                                 if(found_exact_st) break;
                             }
-                            if(last_speed != Cmd_Dat)
+                            //if(last_speed != Cmd_Dat)
                             {
                                 *(RawPatterns + tmo + PATTERN_FX) = Cmd;
                                 *(RawPatterns + tmo + PATTERN_FXDATA) = Cmd_Dat;

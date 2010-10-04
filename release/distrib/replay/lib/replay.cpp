@@ -526,6 +526,7 @@ int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
 int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
+int Glide_Stage[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH)
 int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
@@ -1762,6 +1763,7 @@ void Pre_Song_Init(void)
 #endif
 
             Cut_Stage[ini][i] = FALSE;
+            Glide_Stage[ini][i] = FALSE;
 
 #if defined(PTK_SYNTH)
             sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
@@ -2019,6 +2021,7 @@ void Post_Song_Init(void)
 #endif
 
             Cut_Stage[i][j] = FALSE;
+            Glide_Stage[i][j] = FALSE;
 
 #if defined(PTK_INSTRUMENTS)
             sp_Tvol[i][j] = 0.0f;
@@ -2144,7 +2147,8 @@ void Sp_Player(void)
     int toffset;
     int free_sub_channel;
     int no_fx3;
-    
+    int Glide_Synth[MAX_POLYPHONY];
+
     left_float = 0;
     right_float = 0;
 
@@ -2315,6 +2319,12 @@ void Sp_Player(void)
                     else if(pl_eff_row[i] == 5) glide = 1;
                 }
 
+                // Clear glide infos
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
+                {
+                    Glide_Synth[i] = -1;
+                }
+
                 // Send notes off to the synth & midi
                 // before triggering any new note
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
@@ -2331,7 +2341,14 @@ void Sp_Player(void)
                         }
 #endif
 #if defined(PTK_SYNTH)
-                        Synthesizer[ct][j].NoteOff();
+                        if(!glide)
+                        {
+                            Synthesizer[ct][j].NoteOff();
+                        }
+                        else
+                        {
+                            Glide_Synth[i] = j;
+                        }
 #endif
 
 #if !defined(__STAND_ALONE__)
@@ -2354,7 +2371,14 @@ void Sp_Player(void)
                         // A note or no note with an instrument
                         if(pl_note[i] < 120 || (pl_note[i] > 120 && pl_sample[i] != 255))
                         {
-                            free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
+                            if(!glide)
+                            {
+                                free_sub_channel = Get_Free_Sub_Channel(ct, Channels_Polyphony[ct]);
+                            }
+                            else
+                            {
+                                free_sub_channel = Glide_Synth[i];
+                            }
                             if(free_sub_channel == -1) free_sub_channel = i;
 
                             // Mark it as playing
@@ -2709,6 +2733,15 @@ void Sp_Player(void)
                    sp_Cvol_Synth[c][i] <= 0.0f)
                 {
                     Cut_Stage[c][i] = FALSE;
+                    Play_Instrument(c, i);
+                }
+            }
+            else
+            {
+                // Continue an instrument
+                if(Glide_Stage[c][i])
+                {
+                    Glide_Stage[c][i] = FALSE;
                     Play_Instrument(c, i);
                 }
             }
@@ -3402,6 +3435,7 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 #endif
           )
         {
+            // 
             if(!Cut_Stage[channel][i])
             {
                 return(i);
@@ -3457,7 +3491,14 @@ void Schedule_Instrument(int channel,
         Instrument_Schedule_Dat[channel][sub_channel].glide = glide;
         Instrument_Schedule_Dat[channel][sub_channel].Play_Selection = Play_Selection;
         Instrument_Schedule_Dat[channel][sub_channel].midi_sub_channel = midi_sub_channel;
-        Cut_Stage[channel][sub_channel] = TRUE;
+        if(!glide)
+        {
+            Cut_Stage[channel][sub_channel] = TRUE;
+        }
+        else
+        {
+            Glide_Stage[channel][sub_channel] = TRUE;
+        }
     }
 }
 
@@ -3552,18 +3593,24 @@ void Play_Instrument(int channel, int sub_channel)
             {
                 if(Synthesizer[channel][sub_channel].Data.OSC1_WAVEFORM == WAVEFORM_WAV)
                 {
-                    sp_Position[channel][sub_channel].absolu = 0;
-                    sp_Position_osc1[channel][sub_channel].absolu = 0;
+                    if(!glide)
+                    {
+                        sp_Position[channel][sub_channel].absolu = 0;
+                        sp_Position_osc1[channel][sub_channel].absolu = 0;
 
 #if defined(PTK_SYNTH_OSC3)
-                    sp_Position_osc3[channel][sub_channel].absolu = 0;
+                        sp_Position_osc3[channel][sub_channel].absolu = 0;
 #endif
+                    }
 
                 }
                 if(Synthesizer[channel][sub_channel].Data.OSC2_WAVEFORM == WAVEFORM_WAV)
                 {
-                    sp_Position[channel][sub_channel].absolu = 0;
-                    sp_Position_osc2[channel][sub_channel].absolu = 0;
+                    if(!glide)
+                    {
+                        sp_Position[channel][sub_channel].absolu = 0;
+                        sp_Position_osc2[channel][sub_channel].absolu = 0;
+                    }
                 }
             }
 #endif
@@ -3590,8 +3637,11 @@ void Play_Instrument(int channel, int sub_channel)
 #if defined(PTK_SYNTH)
             if(!no_retrig_adsr && !no_retrig_note)
             {
-                Synthesizer[channel][sub_channel].Data.OSC1_WAVEFORM = WAVEFORM_NONE;
-                Synthesizer[channel][sub_channel].Data.OSC2_WAVEFORM = WAVEFORM_NONE;
+                if(!glide)
+                {
+                    Synthesizer[channel][sub_channel].Data.OSC1_WAVEFORM = WAVEFORM_NONE;
+                    Synthesizer[channel][sub_channel].Data.OSC2_WAVEFORM = WAVEFORM_NONE;
+                }
                 if(Synthprg[sample])
                 {
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
@@ -3607,6 +3657,7 @@ void Play_Instrument(int channel, int sub_channel)
 #if defined(PTK_INSTRUMENTS)
                                                              ,note
 #endif
+                                                             ,glide
                                                              );
                 }
             }
@@ -3865,7 +3916,7 @@ void Play_Instrument(int channel, int sub_channel)
             }
 
 #if defined(PTK_SYNTH)
-            if(!no_retrig_adsr && !no_retrig_note)
+            if(!no_retrig_adsr && !no_retrig_note && !glide)
             {
                 sp_Position_osc1[channel][sub_channel] = sp_Position[channel][sub_channel];
                 sp_Position_osc2[channel][sub_channel] = sp_Position[channel][sub_channel];
@@ -3881,20 +3932,27 @@ void Play_Instrument(int channel, int sub_channel)
             New_Instrument[channel] = TRUE;
 
             // Check if we must start playing it backward
-#if defined(PTK_SYNTH)
-            Synthesizer[channel][sub_channel].ENV1_LOOP_BACKWARD = FALSE;
-            Synthesizer[channel][sub_channel].ENV3_LOOP_BACKWARD = FALSE;
-            Synthesizer[channel][sub_channel].ENV2_LOOP_BACKWARD = FALSE;
-#endif
-            Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
-            if(Instrument_Schedule_Dat[channel][sub_channel].start_backward)
+            if(!glide)
             {
 #if defined(PTK_SYNTH)
-                Synthesizer[channel][sub_channel].ENV1_LOOP_BACKWARD = TRUE;
-                Synthesizer[channel][sub_channel].ENV3_LOOP_BACKWARD = TRUE;
-                Synthesizer[channel][sub_channel].ENV2_LOOP_BACKWARD = TRUE;
+                Synthesizer[channel][sub_channel].ENV1_LOOP_BACKWARD = FALSE;
+                Synthesizer[channel][sub_channel].ENV3_LOOP_BACKWARD = FALSE;
+                Synthesizer[channel][sub_channel].ENV2_LOOP_BACKWARD = FALSE;
 #endif
-                Player_LW[channel][sub_channel] = SMP_LOOPING_BACKWARD;
+                Player_LW[channel][sub_channel] = SMP_LOOPING_FORWARD;
+            }
+            if(Instrument_Schedule_Dat[channel][sub_channel].start_backward)
+            {
+                if(!glide)
+                {
+#if defined(PTK_SYNTH)
+                    Synthesizer[channel][sub_channel].ENV1_LOOP_BACKWARD = TRUE;
+                    Synthesizer[channel][sub_channel].ENV3_LOOP_BACKWARD = TRUE;
+                    Synthesizer[channel][sub_channel].ENV2_LOOP_BACKWARD = TRUE;
+#endif
+                    Player_LW[channel][sub_channel] = SMP_LOOPING_BACKWARD;
+                }
+
                 int Max_Loop = Player_NS[channel][sub_channel];
                 // No loop: go to the end of the sample
                 if((int) Player_LE[channel][sub_channel] < Max_Loop) Max_Loop = Player_LE[channel][sub_channel];

@@ -338,6 +338,7 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
 #if defined(PTK_INSTRUMENTS)
                     ,float note_smp
 #endif
+                    ,int glide
                    )
 {
 
@@ -352,42 +353,46 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     float smp_freq;
     float adsr_ratio;
 
-    ENV1_STAGE = SYNTH_ATTACK; /* '0' is off, '1' starts the attack */
-    ENV2_STAGE = SYNTH_ATTACK;
-
-    ENV1_COUNTER = 0; /* Envelope stage counter, in samples */
-    ENV2_COUNTER = 0;
-
     OSC1_STEP = POWF2(note_1 / 12.0f);
     OSC2_STEP = POWF2((note_2 + Data.OSC2_FINETUNE + Data.OSC2_DETUNE) / 12.0f);
 
-    ENV1_VALUE = 0;
-    ENV2_VALUE = 0;
+    if(!glide)
+    {
+        ENV1_STAGE = SYNTH_ATTACK; /* '0' is off, '1' starts the attack */
+        ENV2_STAGE = SYNTH_ATTACK;
 
-    ENV1_MIN = 0;
-    ENV2_MIN = 0;
+        ENV1_COUNTER = 0; /* Envelope stage counter, in samples */
+        ENV2_COUNTER = 0;
 
-    ENV1_VOLUME = 0;
-    ENV2_VOLUME = 0;
+        ENV1_VALUE = 0;
+        ENV2_VALUE = 0;
 
-    sbuf0L = 0.0f;
-    sbuf1L = 0.0f;
-    sbuf0R = 0.0f;
-    sbuf1R = 0.0f;
+        ENV1_MIN = 0;
+        ENV2_MIN = 0;
+
+        ENV1_VOLUME = 0;
+        ENV2_VOLUME = 0;
+
+        sbuf0L = 0.0f;
+        sbuf1L = 0.0f;
+        sbuf0R = 0.0f;
+        sbuf1R = 0.0f;
 
 #if defined(PTK_SYNTH_FILTER_MOOG_LO) || defined(PTK_SYNTH_FILTER_MOOG_BAND)
-    MoogBufferL[0] = 0.0f;
-    MoogBufferL[1] = 0.0f;
-    MoogBufferL[2] = 0.0f;
-    MoogBufferL[3] = 0.0f;
-    MoogBufferL[4] = 0.0f;
+        MoogBufferL[0] = 0.0f;
+        MoogBufferL[1] = 0.0f;
+        MoogBufferL[2] = 0.0f;
+        MoogBufferL[3] = 0.0f;
+        MoogBufferL[4] = 0.0f;
 
-    MoogBufferR[0] = 0.0f;
-    MoogBufferR[1] = 0.0f;
-    MoogBufferR[2] = 0.0f;
-    MoogBufferR[3] = 0.0f;
-    MoogBufferR[4] = 0.0f;
+        MoogBufferR[0] = 0.0f;
+        MoogBufferR[1] = 0.0f;
+        MoogBufferR[2] = 0.0f;
+        MoogBufferR[3] = 0.0f;
+        MoogBufferR[4] = 0.0f;
 #endif
+
+    }
 
     if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
     {
@@ -459,27 +464,30 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     ENV1_A_COEF = (1.0f - ENV1_VALUE) / ENV1b_ATTACK;
     ENV2_A_COEF = (1.0f - ENV2_VALUE) / ENV2b_ATTACK;
 
-    ENV1_LOOP_BACKWARD = FALSE;
-    ENV2_LOOP_BACKWARD = FALSE;
-    ENV3_LOOP_BACKWARD = FALSE;
+    if(!glide)
+    {
+        ENV1_LOOP_BACKWARD = FALSE;
+        ENV2_LOOP_BACKWARD = FALSE;
+        ENV3_LOOP_BACKWARD = FALSE;
 
 #if defined(PTK_SYNTH_LFO1)
-    LFO1_STAGE = SYNTH_ATTACK;
-    LFO1_GR = 0;
-    LFO1_VALUE = 0;
-    LFO1_ADSR_VALUE = 0;
-    LFO1_COUNTER = 0;
-    LFO1_SUBGRCOUNTER = 0;
+        LFO1_STAGE = SYNTH_ATTACK;
+        LFO1_GR = 0;
+        LFO1_VALUE = 0;
+        LFO1_ADSR_VALUE = 0;
+        LFO1_COUNTER = 0;
+        LFO1_SUBGRCOUNTER = 0;
 #endif
 
 #if defined(PTK_SYNTH_LFO2)
-    LFO2_STAGE = SYNTH_ATTACK;
-    LFO2_GR = 0;
-    LFO2_VALUE = 0;
-    LFO2_ADSR_VALUE = 0;
-    LFO2_COUNTER = 0;
-    LFO2_SUBGRCOUNTER = 0;
+        LFO2_STAGE = SYNTH_ATTACK;
+        LFO2_GR = 0;
+        LFO2_VALUE = 0;
+        LFO2_ADSR_VALUE = 0;
+        LFO2_COUNTER = 0;
+        LFO2_SUBGRCOUNTER = 0;
 #endif
+    }
 
 #if defined(PTK_SYNTH_LFO1)
     if(LFO1b_ATTACK < 1.0f) LFO1b_ATTACK = 1.0f;
@@ -504,7 +512,6 @@ void CSynth::NoteOn(int note, float speed, int Looping, unsigned int Length,
     LFO2_R_COEF = Data.LFO2_SUSTAIN / (float) LFO2b_RELEASE;
     LFO2_A_COEF = (1.0f - LFO2_ADSR_VALUE) / LFO2b_ATTACK;
 #endif
-
 }
 
 // ------------------------------------------------------

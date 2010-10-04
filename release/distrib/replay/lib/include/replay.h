@@ -406,6 +406,7 @@ extern int Reserved_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int Locked_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
 extern int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
+extern int Glide_Stage[MAX_TRACKS][MAX_POLYPHONY];
 
 #if defined(PTK_SYNTH)
 extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
