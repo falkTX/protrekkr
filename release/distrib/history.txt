@@ -48,11 +48,12 @@ v2.5.0:
 - Glide effect (5) should now work with synth instruments.
 - Tracks data weren't displayed properly sometimes.
 - Fixed a bug in tracks filters.
+- Implemented insert or delete track functions.
 
 TODO:
 
-- Do the insert/delete track functions.
-- Check the wipe function of ptp for the note used extra effects & notes.
+- Check the wipe function of ptp for the note used extra effects & notes
+  (to ensure that no unused data is left).
 - Test the replay routine.
 
 - Midi profiles (save files for midi setup).

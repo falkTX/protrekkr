@@ -515,5 +515,6 @@ void Draw_Scope(void);
 int Init_Scopes_Buffers(void);
 
 void Remove_Title(void);
+void Switch_Cmd_Playing(int Enable);
 
 #endif

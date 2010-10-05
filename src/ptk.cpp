@@ -1028,6 +1028,8 @@ int Screen_Update(void)
             Actupated(0);
             Draw_Scope();
             Display_Tracks_To_Render();
+            Actualize_Track_Ed(0);
+            Actualize_Track_Fx_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SET_TRACK_CUTOFF_FREQ)
@@ -2211,6 +2213,16 @@ void Notify_Edit(void)
 }
 
 // ------------------------------------------------------
+// Switch the command that can't be modified during playing
+void Switch_Cmd_Playing(int Enable)
+{
+    Gui_Draw_Button_Box(302, 28, 9, 16, I_, BUTTON_NORMAL | (Enable ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+    Gui_Draw_Button_Box(313, 28, 9, 16, D_, BUTTON_NORMAL | (Enable ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED | BUTTON_SMALL_FONT);
+    Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | (Enable ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+    Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | (Enable ? 0 : BUTTON_DISABLED) | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+}
+            
+// ------------------------------------------------------
 // Display playing status
 void Notify_Play(void)
 {
@@ -2220,16 +2232,14 @@ void Notify_Play(void)
         {
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Switch_Cmd_Playing(FALSE);
             Status_Box("Playing song...");
         }
         else
         {
             Gui_Draw_Button_Box(8, 28, 39, 16, "\04", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(49, 28, 39, 16, "\253", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-            Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            Switch_Cmd_Playing(FALSE);
             Status_Box("Playing pattern...");
         }
     }
@@ -3940,8 +3950,7 @@ void Keyboard_Handler(void)
                 L_MaxLevel = 0;
                 R_MaxLevel = 0;
                 Songplaying = TRUE;
-                Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-                Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+                Switch_Cmd_Playing(FALSE);
                 Pattern_Line_Visual = Pattern_Line;
                 key_record_first_time = FALSE;
                 old_key_Pattern_Line = Pattern_Line;
@@ -5263,22 +5272,36 @@ void Mouse_Handler(void)
         }
 
         // Delete the current track
-        if(zcheckMouse(313, 28, 9, 16) && Songtracks > 1)
+        if(zcheckMouse(313, 28, 9, 16) && Songtracks >= 1 && !Songplaying)
         {
-            Delete_Track();
             Songtracks--;
-            if(Songtracks < 1) Songtracks = 1;
+            if(Songtracks < 1)
+            {
+                Songtracks = 1;
+                // Just clear it
+                Reset_Track(pSequence[Song_Position], Track_Under_Caret);
+            }
+            else
+            {
+                Delete_Track();
+            }
             gui_action = GUI_CMD_DELETE_TRACK;
             teac = 4;
         }
         // Insert a track at current position
-        if(zcheckMouse(302, 28, 9, 16) && Songtracks < 16)
+        if(zcheckMouse(302, 28, 9, 16) && Songtracks < 16 && !Songplaying)
         {
-            Insert_Track();
             Songtracks++;
-            if(Songtracks > 16) Songtracks = 16;
-            gui_action = GUI_CMD_DELETE_TRACK;
-            teac = 4;
+            if(Songtracks > 16)
+            {
+                Songtracks = 16;
+            }
+            else
+            {
+                Insert_Track();
+                gui_action = GUI_CMD_INSERT_TRACK;
+                teac = 4;
+            }
         }
         
         // Reduce the number of BPM
@@ -5589,7 +5612,7 @@ void Mouse_Handler(void)
             teac = 2;
         }
 
-        // Songlength - 10
+        // Song_Length - 10
         if(zcheckMouse(188, 64, 16, 16) == 1 && Song_Length != 1)
         {
             int tLength = Song_Length;
@@ -5599,7 +5622,7 @@ void Mouse_Handler(void)
             Actupated(0);
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
         }
-        // Songlength + 10
+        // Song_Length + 10
         if(zcheckMouse(232, 64, 16, 16) == 1 && Song_Length != 255)
         {
             int tLength = Song_Length;
@@ -5939,8 +5962,9 @@ void Actualize_Master(char gode)
     {
         if(BeatsPerMin < 20) BeatsPerMin = 20;
         if(BeatsPerMin > 255) BeatsPerMin = 255;
-        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
-                                                         BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
+        Switch_Cmd_Playing(!Songplaying);
+        //Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
+          //                                               BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
     }
 
     if(gode == 0 || gode == 2)
@@ -5959,8 +5983,9 @@ void Actualize_Master(char gode)
             Actualize_Fx_Ed(10);
             Actualize_Fx_Ed(11);
         }
-        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
-                                                           BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
+        Switch_Cmd_Playing(!Songplaying);
+//        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, (Songplaying ? BUTTON_NORMAL | BUTTON_DISABLED : BUTTON_NORMAL) |
+  //                                                         BUTTON_TEXT_CENTERED | (Songplaying ? 0 : BUTTON_RIGHT_MOUSE));
     }
 
     if(gode == 0)
@@ -5982,8 +6007,7 @@ void Actualize_Master(char gode)
 
     if(gode == 5)
     {
-        Gui_Draw_Arrows_Number_Box(324, 46, BeatsPerMin, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
-        Gui_Draw_Arrows_Number_Box2(324, 64, TicksPerBeat, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+        Switch_Cmd_Playing(TRUE);
     }
 
     if(userscreen == USER_SCREEN_SETUP_EDIT) Actualize_Master_Ed(3);

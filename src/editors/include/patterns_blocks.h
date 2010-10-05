@@ -153,5 +153,6 @@ void Clear_Buff(int Idx);
 int Are_Columns_Compatible(int type_src, int type_dst);
 void Delete_Track(void);
 void Insert_Track(void);
+void Reset_Track(int Position, int Track);
 
 #endif

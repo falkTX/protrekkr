@@ -420,6 +420,9 @@ extern int R_MaxLevel;
 extern CSynth Synthesizer[MAX_TRACKS][MAX_POLYPHONY];
 #endif
 
+extern float oldspawn[MAX_TRACKS];
+extern float roldspawn[MAX_TRACKS];
+
 extern float Player_FD[MAX_TRACKS];
 extern char sp_channelsample[MAX_TRACKS][MAX_POLYPHONY];
 extern char sp_split[MAX_TRACKS][MAX_POLYPHONY];

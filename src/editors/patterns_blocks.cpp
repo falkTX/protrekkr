@@ -83,6 +83,7 @@ COLUMN_TYPE table_compatibilities[] =
     EFFECT3DATHI, EFFECT2DATHI, EFFECTDATHI, EFFECT4DATHI,
     EFFECT4DATHI, EFFECT2DATHI, EFFECT3DATHI, EFFECTDATHI
 };
+extern float Default_Pan[MAX_TRACKS];
 
 // ------------------------------------------------------
 // Clear the data of a copy buffer
@@ -2001,19 +2002,190 @@ int Are_Columns_Compatible(int type_src, int type_dst)
 }
 
 // ------------------------------------------------------
+// Reset a track to it's initial structure
+void Reset_Track(int Position, int Track)
+{
+    int i;
+    int offset;
+    int pattern;
+
+    pattern = pSequence[Position];
+
+    for(i = 0 ; i < patternLines[pattern]; i++)
+    {
+        offset = Get_Pattern_Offset(pattern, Track, i);
+        Clear_Track_Data(offset);
+    }
+    Channels_Polyphony[Track] = 1;
+    Channels_MultiNotes[Track] = 1;
+    Channels_Effects[Track] = 1;
+
+    TPan[Track] = Default_Pan[Track];
+    TCut[Track] = 126.0f;
+    ICut[Track] = 0.0039062f;
+    FType[Track] = 4;
+
+    Compress_Track[Track] = FALSE;
+    mas_comp_threshold_Track[Track] = 100.0f;
+    mas_comp_ratio_Track[Track] = 0;
+
+    oldspawn[Track] = 0;
+    roldspawn[Track] = 0;
+
+    CHAN_MIDI_PRG[Track] = Track;
+
+    LFO_ON[Track] = 0;
+    LFO_RATE[Track] = 0.0001f;
+    LFO_AMPL[Track] = 0;
+
+    FRez[Track] = 64;
+
+    DThreshold[Track] = 32767;
+    DClamp[Track] = 32767;
+    Disclap[Track] = 0;
+
+    DSend[Track] = 0;
+    CSend[Track] = 0;
+
+    Track_Volume[Track] = 1.0f;
+
+    FLANGER_ON[Track] = 0;
+    FLANGER_AMOUNT[Track] = -0.8f;
+    FLANGER_DEPHASE[Track] = 0.0174532f;
+    FLANGER_ON[Track] = 0;
+    FLANGER_RATE[Track] = 0.0068125f / 57.29578f;
+    FLANGER_AMPL[Track] = 0.001f;
+    FLANGER_GR[Track] = 0;
+    FLANGER_FEEDBACK[Track] = -0.51f;
+    FLANGER_DELAY[Track] = 176;
+    FLANGER_OFFSET[Track] = 8192;
+    FLANGER_OFFSET2[Track] = float(FLANGER_OFFSET[Track] - FLANGER_DELAY[Track]);
+    FLANGER_OFFSET1[Track] = float(FLANGER_OFFSET[Track] - FLANGER_DELAY[Track]);
+
+    init_eq(&EqDat[Track]);
+
+    CHAN_MUTE_STATE[Track] = FALSE;
+    for(i = 0; i < Song_Length; i++)
+    {
+        CHAN_ACTIVE_STATE[i][Track] = TRUE;
+    }
+    ComputeStereo(Track);
+}
+
+// ------------------------------------------------------
+// Copy the data & structure of a track into anoter
+void Copy_Track(int Position, int Track_Src, int Track_Dst)
+{
+    int i;
+    int j;
+    int offset_src;
+    int offset_dst;
+    int pattern;
+
+    pattern = pSequence[Position];
+
+    for(i = 0 ; i < patternLines[pattern]; i++)
+    {
+        offset_src = Get_Pattern_Offset(pattern, Track_Src, i);
+        offset_dst = Get_Pattern_Offset(pattern, Track_Dst, i);
+
+        for(j = 0; j < MAX_POLYPHONY; j++)
+        {
+            *(RawPatterns + offset_dst + PATTERN_NOTE1 + (j * 2)) = *(RawPatterns + offset_src + PATTERN_NOTE1 + (j * 2));
+            *(RawPatterns + offset_dst + PATTERN_INSTR1 + (j * 2)) = *(RawPatterns + offset_src + PATTERN_INSTR1 + (j * 2));
+        }
+        *(RawPatterns + offset_dst + PATTERN_VOLUME) = *(RawPatterns + offset_src + PATTERN_VOLUME);
+        *(RawPatterns + offset_dst + PATTERN_PANNING) = *(RawPatterns + offset_src + PATTERN_PANNING);
+        *(RawPatterns + offset_dst + PATTERN_FX) = *(RawPatterns + offset_src + PATTERN_FX);
+        *(RawPatterns + offset_dst + PATTERN_FXDATA) = *(RawPatterns + offset_src + PATTERN_FXDATA);
+        *(RawPatterns + offset_dst + PATTERN_FX2) = *(RawPatterns + offset_src + PATTERN_FX2);
+        *(RawPatterns + offset_dst + PATTERN_FXDATA2) = *(RawPatterns + offset_src + PATTERN_FXDATA2);
+        *(RawPatterns + offset_dst + PATTERN_FX3) = *(RawPatterns + offset_src + PATTERN_FX3);
+        *(RawPatterns + offset_dst + PATTERN_FXDATA3) = *(RawPatterns + offset_src + PATTERN_FXDATA3);
+        *(RawPatterns + offset_dst + PATTERN_FX4) = *(RawPatterns + offset_src + PATTERN_FX4);
+        *(RawPatterns + offset_dst + PATTERN_FXDATA4) = *(RawPatterns + offset_src + PATTERN_FXDATA4);
+    }
+    Channels_Polyphony[Track_Dst] = Channels_Polyphony[Track_Src];
+    Channels_MultiNotes[Track_Dst] = Channels_MultiNotes[Track_Src];
+    Channels_Effects[Track_Dst] = Channels_Effects[Track_Src];
+    CHAN_MUTE_STATE[Track_Dst] = CHAN_MUTE_STATE[Track_Src];
+
+    Compress_Track[Track_Dst] = Compress_Track[Track_Src];
+    mas_comp_threshold_Track[Track_Dst] = mas_comp_threshold_Track[Track_Src];
+    mas_comp_ratio_Track[Track_Dst] = mas_comp_ratio_Track[Track_Src];
+
+    TPan[Track_Dst] = TPan[Track_Src];
+    TCut[Track_Dst] = TCut[Track_Src];
+    ICut[Track_Dst] = ICut[Track_Src];
+    FType[Track_Dst] = FType[Track_Src];
+
+    oldspawn[Track_Dst] = oldspawn[Track_Src];
+    roldspawn[Track_Dst] = roldspawn[Track_Src];
+
+    CHAN_MIDI_PRG[Track_Dst] = CHAN_MIDI_PRG[Track_Src];
+
+    FRez[Track_Dst] = FRez[Track_Src];
+    
+    DThreshold[Track_Dst] = DThreshold[Track_Src];
+    DClamp[Track_Dst] = DClamp[Track_Src];
+    Disclap[Track_Dst] = Disclap[Track_Src];
+
+    DSend[Track_Dst] = DSend[Track_Src];
+    CSend[Track_Dst] = CSend[Track_Src];
+    
+    Track_Volume[Track_Dst] = Track_Volume[Track_Src];
+
+    LFO_ON[Track_Dst] = LFO_ON[Track_Src];
+    LFO_RATE[Track_Dst] = LFO_RATE[Track_Src];
+    LFO_AMPL[Track_Dst] = LFO_AMPL[Track_Src];
+
+    FLANGER_ON[Track_Dst] = FLANGER_ON[Track_Src];
+    FLANGER_AMOUNT[Track_Dst] = FLANGER_AMOUNT[Track_Src];
+    FLANGER_DEPHASE[Track_Dst] = FLANGER_DEPHASE[Track_Src];
+    FLANGER_ON[Track_Dst] = FLANGER_ON[Track_Src];
+    FLANGER_RATE[Track_Dst] = FLANGER_RATE[Track_Src];
+    FLANGER_AMPL[Track_Dst] = FLANGER_AMPL[Track_Src];
+    FLANGER_GR[Track_Dst] = FLANGER_GR[Track_Src];
+    FLANGER_FEEDBACK[Track_Dst] = FLANGER_FEEDBACK[Track_Src];
+    FLANGER_DELAY[Track_Dst] = FLANGER_DELAY[Track_Src];
+    FLANGER_OFFSET[Track_Dst] = FLANGER_OFFSET[Track_Src];
+    FLANGER_OFFSET2[Track_Dst] = FLANGER_OFFSET2[Track_Src];
+    FLANGER_OFFSET1[Track_Dst] = FLANGER_OFFSET1[Track_Src];
+
+    memcpy(&EqDat[Track_Dst], &EqDat[Track_Src], sizeof(EQSTATE));
+
+    for(i = 0; i < Song_Length; i++)
+    {
+        CHAN_ACTIVE_STATE[i][Track_Dst] = CHAN_ACTIVE_STATE[i][Track_Src];
+    }
+    ComputeStereo(Track_Dst);
+}
+
+// ------------------------------------------------------
 // Delete a track at current caret position
 void Delete_Track(void)
 {
+    int i;
 
+    for(i = Track_Under_Caret; i < Songtracks; i++)
+    {
+        Copy_Track(Song_Position, i + 1, i);
+    }
+    Reset_Track(Song_Position, Songtracks);
 }
 
 // ------------------------------------------------------
 // Insert a track at current caret position
 void Insert_Track(void)
 {
+    int i;
+
     if(Songtracks < 16)
     {
-    
-    
+        for(i = Songtracks - 1; i >= Track_Under_Caret; i--)
+        {
+            Copy_Track(Song_Position, i - 1, i);
+        }
+        Reset_Track(Song_Position, Track_Under_Caret);
     }
 }

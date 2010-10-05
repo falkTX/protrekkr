@@ -1880,10 +1880,10 @@ void Pre_Song_Init(void)
 #endif
 
 #if defined(PTK_FLANGER)
-    Flanger_sbuf0L[ini] = 0;
-    Flanger_sbuf1L[ini] = 0;
-    Flanger_sbuf0R[ini] = 0;
-    Flanger_sbuf1R[ini] = 0;
+        Flanger_sbuf0L[ini] = 0;
+        Flanger_sbuf1L[ini] = 0;
+        Flanger_sbuf0R[ini] = 0;
+        Flanger_sbuf1R[ini] = 0;
 #endif
 
     }
