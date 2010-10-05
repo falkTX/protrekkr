@@ -611,5 +611,9 @@ SOURCE=.\src\Support\Project.ico
 SOURCE=.\src\ptk.cpp
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\src\support\Project_16x16.ico
+# End Source File
 # End Target
 # End Project

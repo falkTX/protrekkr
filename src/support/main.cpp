@@ -959,14 +959,14 @@ int Switch_FullScreen(int Width, int Height)
 
 #if defined(__WIN32__)
     HICON hIcon;
+    HICON hIconSmall;
     Main_Window = WMInfo.window;
     HINSTANCE ApphInstance = GetModuleHandle(0);
-    hIcon = LoadIcon(ApphInstance, MAKEINTRESOURCE(IDI_ICON1));
+    hIcon = LoadIcon(ApphInstance, MAKEINTRESOURCE(IDI_ICON));
+    hIconSmall = LoadIcon(ApphInstance, MAKEINTRESOURCE(IDI_ICONSMALL));
     // Set the icon of the window
-    SetClassLong(Main_Window, GCL_HICON, (LONG) hIcon);
-    SetClassLong(Main_Window, GCL_HICONSM, (LONG) hIcon);
-    SendMessage(Main_Window, WM_SETICON, ICON_SMALL, (LONG) hIcon);
     SendMessage(Main_Window, WM_SETICON, ICON_BIG, (LONG) hIcon);
+    SendMessage(Main_Window, WM_SETICON, ICON_SMALL, (LONG) hIconSmall);
 #endif
 
     Init_UI();
