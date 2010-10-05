@@ -1561,6 +1561,7 @@ void Actupated(int modac)
     {
         Column_Under_Caret = 0;
         Track_Under_Caret++;
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
     if(Column_Under_Caret < 0)
     {
@@ -1573,11 +1574,13 @@ void Actupated(int modac)
         {
             max_channel_dat = Get_Max_Nibble_Track(Channels_MultiNotes, Channels_Effects, Track_Under_Caret) - 1;
         }
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
         Column_Under_Caret = max_channel_dat;
     }
     if(Track_Under_Caret > Songtracks - 1)
     {
         Track_Under_Caret = 0;
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
         gui_track = 0;
     }
     Visible_Columns = Get_Visible_Complete_Tracks();
@@ -1588,6 +1591,7 @@ void Actupated(int modac)
         Track_Under_Caret = Songtracks - 1;
         gui_track = Songtracks - (Visible_Columns);
         if(gui_track < 0) gui_track = 0;
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
 
     if(!modac)
@@ -1610,11 +1614,13 @@ void Actupated(int modac)
         if(Track_Under_Caret >= gui_track + Visible_Columns)
         {
             Track_Under_Caret = gui_track + (Visible_Columns - 1);
+            gui_action = GUI_CMD_SET_FOCUS_TRACK;
         }
         // Left
         if(Track_Under_Caret < gui_track)
         {
             Track_Under_Caret = gui_track;
+            gui_action = GUI_CMD_SET_FOCUS_TRACK;
         }
     }
 
@@ -2530,8 +2536,16 @@ void Reset_Pattern_Scrolling_Horiz(void)
 void Set_Track_Slider(int pos)
 {
     Visible_Columns = Get_Visible_Complete_Tracks();
-    if(Track_Under_Caret >= pos + Visible_Columns) Track_Under_Caret = pos + Visible_Columns;
-    if(Track_Under_Caret < pos) Track_Under_Caret = pos;
+    if(Track_Under_Caret >= pos + Visible_Columns)
+    {
+        Track_Under_Caret = pos + Visible_Columns;
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+    }
+    if(Track_Under_Caret < pos)
+    {
+        Track_Under_Caret = pos;
+        gui_action = GUI_CMD_SET_FOCUS_TRACK;
+    }
     float fpos = (float) pos;
 
     if(!(Songtracks - Visible_Columns))

@@ -2149,6 +2149,8 @@ void Sp_Player(void)
     int no_fx3;
     int Glide_Synth[MAX_POLYPHONY];
 
+    float realcut;
+
     left_float = 0;
     right_float = 0;
 
@@ -3060,24 +3062,29 @@ ByPass_Wav:
         }
 
         // -----------------------------------------------
+
+        if(FType[c] != 4)
+        {   // Track filter activated
+            float const dfi = TCut[c] - CCut[c];
+
+            if(dfi < -1.0f || dfi > 1.0f) CCut[c] += dfi * ICut[c];
+
+            realcut = ApplyLfo(CCut[c] - ramper[c], c);
+
+            ramper[c] += Player_FD[c] * realcut * 0.015625f;
+            gco = (int) realcut;
+        }
+
         if(gotsome)
         {
 
 #if defined(PTK_TRACKFILTERS)
             if(FType[c] != 4)
             {   // Track filter activated
-                float const dfi = TCut[c] - CCut[c];
-
-                if(dfi < -1.0f || dfi > 1.0f) CCut[c] += dfi * ICut[c];
 
 #if defined(PTK_FILTER_LOHIBAND)
                 if(FType[c] < 4)
                 {
-
-                    gco = (int) (ApplyLfo(CCut[c] - ramper[c], c));
-
-                    ramper[c] += Player_FD[c] * gco * 0.015625f;
-
                     coef[0] = coeftab[0][gco][FRez[c]][FType[c]];
                     coef[1] = coeftab[1][gco][FRez[c]][FType[c]];
                     coef[2] = coeftab[2][gco][FRez[c]][FType[c]];
@@ -3090,10 +3097,6 @@ ByPass_Wav:
                 else
 #endif
                 {
-                    float const realcut = ApplyLfo(CCut[c] - ramper[c], c);
-
-                    ramper[c] += Player_FD[c] * realcut * 0.015625f;
-
                     switch(FType[c])
                     {
 

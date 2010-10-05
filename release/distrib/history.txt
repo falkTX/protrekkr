@@ -10,8 +10,8 @@ v2.2.0:
 - Added 3 new themes.
 - Tracker sometimes crashed at exit when using midi.
 - Mouse wheel activated for horizontal patterns slider.
+- Fixed a small issue with vu meters values.
 - Number of effects columns is now selectable (from 1 to 4).
-- Negative audio values weren't displayed in vu-meter.
 - Added synth oscillators combiner.
 - Each track now have separate volume.
 - Added lo/med/hi bands equalizers for each track.
@@ -23,8 +23,9 @@ v2.2.0:
 - Added separators between sorted entries in files lists,
   also right mouse buttons on arrows is now active
   (jump to previous/next letter group).
-- Added some more converted modules for testing:
+- Added some more converted modules for testing purposes:
 
+  Amarillo.ptk
   Comic Bakery Remix.ptk
   Elevator Zax.ptk
   Factory of hybrid.ptk
@@ -32,6 +33,7 @@ v2.2.0:
   Loop Influenza.ptk
   Lunch with the gods.ptk
   Space game.ptk
+  Spinning.ptk
   Sudoku padawan.ptk
   Vacation Climate.ptk
   Without performer.ptk
@@ -44,6 +46,8 @@ v2.2.0:
 - Default repeat loop row is now 0 (was disabled before).
 - Improved .mod/.ft import.
 - Glide effect (5) should now work with synth instruments.
+- Tracks data weren't displayed properly sometimes.
+- Fixed a bug in tracks filters.
 
 TODO:
 
