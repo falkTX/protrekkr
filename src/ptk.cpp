@@ -2130,7 +2130,7 @@ void LoadFile(int Freeindex, const char *str)
                 }
                 else
                 {
-                    Status_Box("Invalid file format. I only accept '.wav' '.aiff' '.aifc' '.ptk' '.pti' '.303' '.pts' '.prv' or '.mod' files.");
+                    Status_Box("Invalid file format. I only accept '.wav' '.aiff' '.aifc' '.ptk' '.pti' '.303' '.pts' '.ppb' '.prv' '.mod' or '.ft' files.");
                 }
             }
         }

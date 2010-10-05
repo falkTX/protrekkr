@@ -65,6 +65,7 @@ int lt_index[SCOPE_LAST_DIR];
 int lt_curr[SCOPE_LAST_DIR];
 int list_counter[SCOPE_LAST_DIR];
 int sort_files = TRUE;              // Just in case i would need to make it optional someday
+int nbr_dirs;
 
 FILEENTRY SMPT_LIST[2048];
 char UpName1[1024];
@@ -300,6 +301,7 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
                         }
                     }
                     
+                    nbr_dirs++;
                     Add_Entry(&fpath[len_name], _A_SUBDIR);
                     break;
 
@@ -314,7 +316,7 @@ int list_file(const char *fpath, const struct stat *sb, int typeflag, struct FTW
                         }
                     }
                     
-                    Add_Entry(&fpath[len_name], 0);
+                    Add_Entry(&fpath[len_name], _A_FILE);
                     break;
             }
         }
@@ -355,6 +357,8 @@ void Read_SMPT(void)
 #endif
 
     long hFile;
+
+    nbr_dirs = 0;
 
     switch(Scopish)
     {
@@ -397,7 +401,8 @@ void Read_SMPT(void)
             if(strcmp(c_file.name, ".") &&
                strcmp(c_file.name, ".."))
             {
-               Add_Entry(c_file.name, _A_SUBDIR);
+                nbr_dirs++;
+                Add_Entry(c_file.name, _A_SUBDIR);
             }
         }
 
@@ -409,7 +414,8 @@ void Read_SMPT(void)
                 if(strcmp(c_file.name, ".") &&
                    strcmp(c_file.name, ".."))
                 {
-                   Add_Entry(c_file.name, _A_SUBDIR);
+                    nbr_dirs++;
+                    Add_Entry(c_file.name, _A_SUBDIR);
                 }
             }
         }
@@ -497,6 +503,7 @@ void Read_SMPT(void)
             {
                 if(dp->d_type == DT_DIR)
                 {
+                    nbr_dirs++;
                     Add_Entry(dp->d_name, _A_SUBDIR);
                 }
             }
@@ -551,12 +558,15 @@ void Read_SMPT(void)
 #endif
 
     // Insert a separator between files and directories
-    for(i = list_counter[Scopish] - 1; i >= 0; i--)
+    if(nbr_dirs)
     {
-        if(SMPT_LIST[i].Type == _A_FILE)
+        for(i = list_counter[Scopish] - 1; i >= 0; i--)
         {
-            Insert_Entry("", _A_SEP, i + 1);
-            break;
+            if(SMPT_LIST[i].Type == _A_FILE)
+            {
+                Insert_Entry("", _A_SEP, i + 1);
+                break;
+            }
         }
     }
 }

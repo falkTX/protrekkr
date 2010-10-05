@@ -2011,5 +2011,9 @@ void Delete_Track(void)
 // Insert a track at current caret position
 void Insert_Track(void)
 {
-
+    if(Songtracks < 16)
+    {
+    
+    
+    }
 }

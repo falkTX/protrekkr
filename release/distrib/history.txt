@@ -2,7 +2,7 @@
 ProTrekkr releases history
 ===============================================================================
 
-v2.2.0:
+v2.5.0:
 
 - Improved midi in/out support (notably by adding velocity).
 - Default instruments volumes are always turned on now
@@ -51,11 +51,9 @@ v2.2.0:
 
 TODO:
 
-- Test patterns loading/saving.
-- Test blocks copies.
-- There a selection bug when using more than 1 column effect.
 - Do the insert/delete track functions.
 - Check the wipe function of ptp for the note used extra effects & notes.
+- Test the replay routine.
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:
