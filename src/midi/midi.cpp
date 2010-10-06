@@ -38,6 +38,7 @@
 
 #include "include/midi.h"
 #include "include/RtMidi.h"
+#include "include/midi_dispatch.h"
 
 // ------------------------------------------------------
 // Variables
@@ -87,7 +88,9 @@ int Midi_GetProgram(int midi_program)
 
 // ------------------------------------------------------
 // Handle the midi events
-void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, void *userData)
+void Midi_CallBackIn(double deltatime,
+                     std::vector< unsigned char > *message,
+                     void *userData)
 {
     int Midi_Channel_Number;
     int Midi_Command;
@@ -142,24 +145,8 @@ void Midi_CallBackIn(double deltatime, std::vector< unsigned char > *message, vo
         case 0xb0:
             Midi_Datas_1 = (Param1 >> 8) & 0xff;
             Midi_Datas_2 = (Param1 >> 16) & 0xff;
-            switch(Midi_Datas_1)
-            {
-                case 0x40:
-                    // Sustain pedal
-                    break;
-
-                case 71:
-                    // Master volume (should be in messages table)
-                    local_mas_vol = ((float) Midi_Datas_2 / 127.0f);
-                    if(local_mas_vol < 0.0f) local_mas_vol = 0.0f;
-                    if(local_mas_vol > 1.0f) local_mas_vol = 1.0f;
-                    break;
-
-                default:
-                    Unknown_Message = Param1;
-                    // Handle messages table here
-                    break;
-            }
+            
+            Dispatch_Midi_Msg(Midi_Datas_1, Midi_Datas_2);
             break;
 
         // Program Change

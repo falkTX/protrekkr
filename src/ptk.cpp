@@ -2572,185 +2572,248 @@ void Actualize_Name(int *newletter, char *nam)
 }
 
 // ------------------------------------------------------
-// Render the song as a .wav file
+// Render the song as a .wav file (or collection of files).
+int Must_Render_Track(int Idx)
+{
+    if(rawrender_multi &&
+       rawrender_target == RENDER_TO_FILE)
+    {
+        if(Tracks_To_Render[Idx])
+        {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
 void WavRenderizer()
 {
     plx = 0;
-    char buffer[80];
+    char buffer[MAX_PATH];
+    char buffer_name[MAX_PATH];
     int Save_CHAN_MUTE_STATE[MAX_TRACKS];
     int i;
+    int j;
+    int max_tracks_to_render;
     int Max_Position;
-    WaveFile RF;
+    WaveFile RF[MAX_TRACKS];
     short *Sample_Buffer[2];
     int Pos_In_Memory;
     int Mem_Buffer_Size;
     int Stereo = 0;
+    int do_multi;
     float save_sample_vol;
+    long filesize = 0;
+    int rendered_track = 0;
 
-    sprintf(buffer, "%s.wav", name);
-
-    SongStop();
-    switch(rawrender_target)
+    if(rawrender_multi &&
+       rawrender_target == RENDER_TO_FILE)
     {
-        case RENDER_TO_FILE:
-            if(RF.OpenForWrite(buffer, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
-            {
-                sprintf(buffer, "Can't open '%s.wav' file.", name);
-                Status_Box(buffer);
-                return;
-            }
-            if(rawrender_range)
-            {
-                sprintf(buffer, "Rendering selection to '%s.wav' file. Please wait...", name);
-            }
-            else
-            {
-                sprintf(buffer, "Rendering module to '%s.wav' file. Please wait...", name);
-            }
-            break;
-
-        case RENDER_TO_MONO:
-        case RENDER_TO_STEREO:
-            if(rawrender_range)
-            {
-                sprintf(buffer, "Rendering selection to instrument %d (split %d). Please wait...",
-                        Current_Instrument,
-                        Current_Instrument_Split);
-            }
-            else
-            {
-                sprintf(buffer, "Rendering module to instrument %d (split %d). Please wait...",
-                        Current_Instrument,
-                        Current_Instrument_Split);
-            }
-            break;
-    }
-    Status_Box(buffer);
-    SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
-
-    rawrender = TRUE;
-
-    Pattern_Line = 0;
-    if(rawrender_range)
-    {
-        Song_Position = rawrender_from;
-        Max_Position = rawrender_to + 1;
+        max_tracks_to_render = Songtracks;
+        do_multi = TRUE;
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
+            CHAN_MUTE_STATE[i] = TRUE;
+        }
     }
     else
     {
-        Song_Position = 0;
-        Max_Position = Song_Length;
+        max_tracks_to_render = 1;
+        do_multi = FALSE;
+        SongStop();
     }
 
-    long filesize = 0;
-    done = FALSE;
-
-    for(i = 0; i < MAX_TRACKS; i++)
+    for(j = 0; j < max_tracks_to_render; j++)
     {
-        Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
-        CHAN_MUTE_STATE[i] = Tracks_To_Render[i];
-    }
-
-    switch(rawrender_target)
-    {
-        case RENDER_TO_FILE:
-            SongPlay();
-            while(Song_Position < Max_Position && done == FALSE)
+        if(Must_Render_Track(j))
+        {
+            rendered_track++;
+            if(do_multi)
             {
-                GetPlayerValues();
-                if(rawrender_32float)
-                {
-                    // [-1.0..1.0]
-                    RF.WriteStereoFloatSample(left_float_render, right_float_render);
-                    filesize += 8;
-                }
-                else
-                {
-                    RF.WriteStereoSample(left_value, right_value);
-                    filesize += 4;
-                }
+                SongStop();
+                sprintf(buffer_name, "%s_%x.wav", name, j);
             }
-            RF.Close();
-            break;
-
-        case RENDER_TO_STEREO:
-            Stereo = 1;
-        case RENDER_TO_MONO:
-            Mem_Buffer_Size = AUDIO_Latency * 64;
-            Sample_Buffer[0] = (short *) malloc(Mem_Buffer_Size * 2);
-            memset(Sample_Buffer[0], 0, Mem_Buffer_Size * 2);
-            Sample_Buffer[1] = NULL;
-            if(Sample_Buffer[0])
+            else
             {
-                if(Stereo)
-                {
-                    Sample_Buffer[1] = (short *) malloc(Mem_Buffer_Size * 2);
-                    if(!Sample_Buffer[1])
+                sprintf(buffer_name, "%s.wav", name);
+            }
+
+            switch(rawrender_target)
+            {
+                case RENDER_TO_FILE:
+                    if(RF[j].OpenForWrite(buffer_name, 44100, rawrender_32float ? 32 : 16, 2) != DDC_SUCCESS)
                     {
-                        free(Sample_Buffer[0]);
-                        goto Stop_WavRender;
+                        sprintf(buffer, "Can't open '%s' file.", buffer_name);
+                        Status_Box(buffer);
+                        return;
                     }
-                    memset(Sample_Buffer[1], 0, Mem_Buffer_Size * 2);
-                }
-                Pos_In_Memory = 0;
-                SongPlay();
-                while(Song_Position < Max_Position && done == FALSE)
-                {
-                    if(!Mem_Buffer_Size)
+                    if(rawrender_range)
                     {
-                        // Increase the size of our buffer
-                        Mem_Buffer_Size = (AUDIO_Latency * 64);
-                        Sample_Buffer[0] = (short *) realloc(Sample_Buffer[0], (Pos_In_Memory + Mem_Buffer_Size) * 2);
-                        if(Stereo)
-                        {
-                            Sample_Buffer[1] = (short *) realloc(Sample_Buffer[1], (Pos_In_Memory + Mem_Buffer_Size) * 2);
-                        }
-                    }
-                    GetPlayerValues();
-                    if(Stereo)
-                    {
-                        Sample_Buffer[0][Pos_In_Memory] = left_float_render * 32767.0f;
-                        Sample_Buffer[1][Pos_In_Memory] = right_float_render * 32767.0f;
-                        filesize += 4;
+                        sprintf(buffer, "Rendering selection to '%s' file. Please wait...", buffer_name);
                     }
                     else
                     {
-                        // Mix both channels
-                        Sample_Buffer[0][Pos_In_Memory] = ((left_float_render * 0.5f) +
-                                                           (right_float_render * 0.5f)) * 32767.0f;
-                        filesize += 2;
+                        sprintf(buffer, "Rendering module to '%s' file. Please wait...", buffer_name);
                     }
-                    Pos_In_Memory++;
-                    Mem_Buffer_Size--;
-                }
-                save_sample_vol = 1.0f;
-                if(Get_Number_Of_Splits(Current_Instrument)) save_sample_vol = Sample_Vol[Current_Instrument];
+                    break;
 
-                AllocateWave(Current_Instrument, Current_Instrument_Split,
-                             Pos_In_Memory, (Stereo + 1), TRUE,
-                             NULL, NULL);
+                case RENDER_TO_MONO:
+                case RENDER_TO_STEREO:
+                    if(rawrender_range)
+                    {
+                        sprintf(buffer, "Rendering selection to instrument %d (split %d). Please wait...",
+                                Current_Instrument,
+                                Current_Instrument_Split);
+                    }
+                    else
+                    {
+                        sprintf(buffer, "Rendering module to instrument %d (split %d). Please wait...",
+                                Current_Instrument,
+                                Current_Instrument_Split);
+                    }
+                    break;
+            }
+            Status_Box(buffer);
+            SDL_UpdateRect(Main_Screen, 0, 0, 0, 0);
+            SDL_Delay(10);
 
-                // Fixup the buffer with it's real size
-                memcpy(RawSamples[Current_Instrument][0][Current_Instrument_Split], 
-                       Sample_Buffer[0], (Pos_In_Memory * 2));
-                if(Stereo)
+            rawrender = TRUE;
+
+            Pattern_Line = 0;
+            if(rawrender_range)
+            {
+                Song_Position = rawrender_from;
+                Max_Position = rawrender_to + 1;
+            }
+            else
+            {
+                Song_Position = 0;
+                Max_Position = Song_Length;
+            }
+
+            filesize = 0;
+            done = FALSE;
+
+            if(!do_multi)
+            {
+                for(i = 0; i < MAX_TRACKS; i++)
                 {
-                    memcpy(RawSamples[Current_Instrument][1][Current_Instrument_Split], 
-                           Sample_Buffer[1], (Pos_In_Memory * 2));
-                    free(Sample_Buffer[1]);
-                }
-                free(Sample_Buffer[0]);
-                LoopStart[Current_Instrument][Current_Instrument_Split] = 0;
-                LoopEnd[Current_Instrument][Current_Instrument_Split] = 0;
-                LoopType[Current_Instrument][Current_Instrument_Split] = SMP_LOOP_NONE;
-                Basenote[Current_Instrument][Current_Instrument_Split] = DEFAULT_BASE_NOTE;
-                Renew_Sample_Ed();
-                if(Get_Number_Of_Splits(Current_Instrument) == 1)
-                {
-                    Sample_Vol[Current_Instrument] = save_sample_vol;
+                    Save_CHAN_MUTE_STATE[i] = CHAN_MUTE_STATE[i];
+                    CHAN_MUTE_STATE[i] = Tracks_To_Render[i];
                 }
             }
-            break;
+            else
+            {
+                CHAN_MUTE_STATE[j] = FALSE;
+            }
+
+            switch(rawrender_target)
+            {
+                case RENDER_TO_FILE:
+                    SongPlay();
+                    while(Song_Position < Max_Position && done == FALSE)
+                    {
+                        GetPlayerValues();
+                        if(rawrender_32float)
+                        {
+                            // [-1.0..1.0]
+                            RF[j].WriteStereoFloatSample(left_float_render, right_float_render);
+                            filesize += 8;
+                        }
+                        else
+                        {
+                            RF[j].WriteStereoSample(left_value, right_value);
+                            filesize += 4;
+                        }
+                    }
+                    RF[j].Close();
+                    break;
+
+                case RENDER_TO_STEREO:
+                    Stereo = 1;
+                case RENDER_TO_MONO:
+                    Mem_Buffer_Size = AUDIO_Latency * 64;
+                    Sample_Buffer[0] = (short *) malloc(Mem_Buffer_Size * 2);
+                    memset(Sample_Buffer[0], 0, Mem_Buffer_Size * 2);
+                    Sample_Buffer[1] = NULL;
+                    if(Sample_Buffer[0])
+                    {
+                        if(Stereo)
+                        {
+                            Sample_Buffer[1] = (short *) malloc(Mem_Buffer_Size * 2);
+                            if(!Sample_Buffer[1])
+                            {
+                                free(Sample_Buffer[0]);
+                                goto Stop_WavRender;
+                            }
+                            memset(Sample_Buffer[1], 0, Mem_Buffer_Size * 2);
+                        }
+                        Pos_In_Memory = 0;
+                        SongPlay();
+                        while(Song_Position < Max_Position && done == FALSE)
+                        {
+                            if(!Mem_Buffer_Size)
+                            {
+                                // Increase the size of our buffer
+                                Mem_Buffer_Size = (AUDIO_Latency * 64);
+                                Sample_Buffer[0] = (short *) realloc(Sample_Buffer[0], (Pos_In_Memory + Mem_Buffer_Size) * 2);
+                                if(Stereo)
+                                {
+                                    Sample_Buffer[1] = (short *) realloc(Sample_Buffer[1], (Pos_In_Memory + Mem_Buffer_Size) * 2);
+                                }
+                            }
+                            GetPlayerValues();
+                            if(Stereo)
+                            {
+                                Sample_Buffer[0][Pos_In_Memory] = left_float_render * 32767.0f;
+                                Sample_Buffer[1][Pos_In_Memory] = right_float_render * 32767.0f;
+                                filesize += 4;
+                            }
+                            else
+                            {
+                                // Mix both channels
+                                Sample_Buffer[0][Pos_In_Memory] = ((left_float_render * 0.5f) +
+                                                                   (right_float_render * 0.5f)) * 32767.0f;
+                                filesize += 2;
+                            }
+                            Pos_In_Memory++;
+                            Mem_Buffer_Size--;
+                        }
+                        save_sample_vol = 1.0f;
+                        if(Get_Number_Of_Splits(Current_Instrument)) save_sample_vol = Sample_Vol[Current_Instrument];
+
+                        AllocateWave(Current_Instrument, Current_Instrument_Split,
+                                     Pos_In_Memory, (Stereo + 1), TRUE,
+                                     NULL, NULL);
+
+                        // Fixup the buffer with it's real size
+                        memcpy(RawSamples[Current_Instrument][0][Current_Instrument_Split], 
+                               Sample_Buffer[0], (Pos_In_Memory * 2));
+                        if(Stereo)
+                        {
+                            memcpy(RawSamples[Current_Instrument][1][Current_Instrument_Split], 
+                                   Sample_Buffer[1], (Pos_In_Memory * 2));
+                            free(Sample_Buffer[1]);
+                        }
+                        free(Sample_Buffer[0]);
+                        LoopStart[Current_Instrument][Current_Instrument_Split] = 0;
+                        LoopEnd[Current_Instrument][Current_Instrument_Split] = 0;
+                        LoopType[Current_Instrument][Current_Instrument_Split] = SMP_LOOP_NONE;
+                        Basenote[Current_Instrument][Current_Instrument_Split] = DEFAULT_BASE_NOTE;
+                        Renew_Sample_Ed();
+                        if(Get_Number_Of_Splits(Current_Instrument) == 1)
+                        {
+                            Sample_Vol[Current_Instrument] = save_sample_vol;
+                        }
+                    }
+                    break;
+            }
+            if(do_multi)
+            {
+                CHAN_MUTE_STATE[j] = TRUE;
+            }
+        }
     }
 
 Stop_WavRender:
@@ -2758,9 +2821,19 @@ Stop_WavRender:
     Post_Song_Init();
     Songplaying = FALSE;
 
-    for(i = 0; i < MAX_TRACKS; i++)
+    if(!do_multi)
     {
-        CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
+        }
+    }
+    else
+    {
+        for(i = 0; i < MAX_TRACKS; i++)
+        {
+            CHAN_MUTE_STATE[i] = Save_CHAN_MUTE_STATE[i];
+        }
     }
 
     int minutes = filesize / 10584000;
@@ -2769,10 +2842,20 @@ Stop_WavRender:
     switch(rawrender_target)
     {
         case RENDER_TO_FILE:
-            sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
+            if(do_multi)
+            {
+                sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes per file (Total: %.2f Megabytes). Playback time: %d'%d''.",
+                                float(filesize / 1048576.0f), float(filesize / 1048576.0f) * rendered_track, minutes, seconds);
+            }
+            else
+            {
+                sprintf(buffer, "Wav rendering finished. File size: %.2f Megabytes. Playback time: %d'%d''.",
+                                float(filesize / 1048576.0f), minutes, seconds);
+            }
             break;
         default:
-            sprintf(buffer, "Wav rendering finished. Waveform size: %.2f Megabytes. Playback time: %d'%d''.", float(filesize / 1048576.0f), minutes, seconds);
+            sprintf(buffer, "Wav rendering finished. Waveform size: %.2f Megabytes. Playback time: %d'%d''.",
+                            float(filesize / 1048576.0f), minutes, seconds);
     }
     Status_Box(buffer);
 
@@ -4151,7 +4234,7 @@ void Keyboard_Handler(void)
                 // Save
                 if(Keys[SDLK_s - UNICODE_OFFSET2])
                 {
-                    if(File_Exist("%s"SLASH"%s.ptk", Dir_Mods, name))
+                    if(File_Exist_Req("%s"SLASH"%s.ptk", Dir_Mods, name))
                     {
                         Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_MODULE);
                     }
@@ -4192,7 +4275,7 @@ void Keyboard_Handler(void)
                 // Randomize the values of a selected block
                 if(Keys[SDLK_w - UNICODE_OFFSET2])
                 {
-                    if(File_Exist("%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name))
+                    if(File_Exist_Req("%s"SLASH"%s.ppb", Dir_Patterns, Selection_Name))
                     {
                         Display_Requester(&Overwrite_Requester, GUI_CMD_SAVE_PATTERN);
                     }

@@ -212,6 +212,7 @@ int PosInTick;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     char rawrender;
     char rawrender_32float;
+    char rawrender_multi;
     char rawrender_target;
     int rawrender_range;
     int rawrender_from;
@@ -468,17 +469,17 @@ short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
     float decays[MAX_COMB_FILTERS];
 #endif // PTK_COMPRESSOR
 
-float buf024[MAX_TRACKS];
-float buf124[MAX_TRACKS];
-float buf0[MAX_TRACKS];
-float buf1[MAX_TRACKS];
-float fx1[MAX_TRACKS];
-float fx2[MAX_TRACKS];
-float fy1[MAX_TRACKS];
-float fy2[MAX_TRACKS];
-float xi0[MAX_TRACKS];
-float xi1[MAX_TRACKS];
-float xi2[MAX_TRACKS];
+float buf024[2][MAX_TRACKS];
+float buf124[2][MAX_TRACKS];
+float buf0[2][MAX_TRACKS];
+float buf1[2][MAX_TRACKS];
+float fx1[2][MAX_TRACKS];
+float fx2[2][MAX_TRACKS];
+float fy1[2][MAX_TRACKS];
+float fy2[2][MAX_TRACKS];
+float xi0[2][MAX_TRACKS];
+float xi1[2][MAX_TRACKS];
+float xi2[2][MAX_TRACKS];
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
 extern int gui_thread_action;
@@ -610,19 +611,19 @@ void Record_Delay_Event();
 #endif
 
 void Do_Effects_Ticks_X(void);
-float Filter(float x, char i);
-float filter2p(int ch, float input, float f, float q);
-float filter2px(int ch, float input, float f, float q);
-float filter2p24d(int ch, float input, float f, float q);
-float filterRingMod(int ch, float input, float f, float q);
-float filterRingModStereo(int ch, float input);
-float filterWater(int ch, float input, float f);
-float filterWaterStereo(int ch, float input, float f);
-float filterBellShaped(int ch, float input, float f, float q, float g);
-float filterDelta(int ch, float input, float f, float q);
-float int_filter2p(int ch, float input, float f, float q, float q2);
-float filterhp(int ch, float input, float f, float q);
-float filterhp2(int ch, float input, float f, float q);
+float Filter(int stereo, float x, char i);
+float filter2p(int stereo, int ch, float input, float f, float q);
+float filter2px(int stereo, int ch, float input, float f, float q);
+float filter2p24d(int stereo, int ch, float input, float f, float q);
+float filterRingMod(int stereo, int ch, float input, float f, float q);
+float filterRingModStereo(int stereo, int ch, float input);
+float filterWater(int stereo, int ch, float input, float f);
+float filterWaterStereo(int stereo, int ch, float input, float f);
+float filterBellShaped(int stereo, int ch, float input, float f, float q, float g);
+float filterDelta(int stereo, int ch, float input, float f, float q);
+float int_filter2p(int stereo, int ch, float input, float f, float q, float q2);
+float filterhp(int stereo, int ch, float input, float f, float q);
+float filterhp2(int stereo, int ch, float input, float f, float q);
 
 #if defined(PTK_303)
     void live303(int pltr_eff_row, int pltr_dat_row);
@@ -1511,6 +1512,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 void Reset_Values(int From_Mixer)
 {
     int i;
+    int j;
 
     if(!Done_Reset)
     {
@@ -1548,7 +1550,31 @@ void Reset_Values(int From_Mixer)
             Flanger_sbuf1R[i] = 0;
 #endif
 
+            rms_sumL_Track[i] = 0;
+            rms_sumR_Track[i] = 0;
+            mas_envL_Track[i] = 0;
+            mas_envR_Track[i] = 0;
+            for(j = 0; j < MAS_COMPRESSOR_SIZE; j++)
+            {
+                mas_comp_bufferL_Track[i][j] = 0;
+                mas_comp_bufferR_Track[i][j] = 0;
+            }
+
         }
+
+#if defined(PTK_LIMITER_MASTER)
+        mas_comp_threshold_Master = 100.0f;
+        mas_comp_ratio_Master = 0;
+        rms_sumL_Master = 0;
+        rms_sumR_Master = 0;
+        mas_envL_Master = 0;
+        mas_envR_Master = 0;
+        for(i = 0; i < MAS_COMPRESSOR_SIZE; i++)
+        {
+            mas_comp_bufferL_Master[i] = 0;
+            mas_comp_bufferR_Master[i] = 0;
+        }
+#endif
 
 #if defined(PTK_COMPRESSOR)
         Initreverb(From_Mixer);
@@ -1725,77 +1751,12 @@ void Pre_Song_Init(void)
         for(i = 0; i < MAX_POLYPHONY; i++)
         {
 
-#if defined(PTK_FX_ARPEGGIO)
-            Arpeggio_BaseNote[ini][i] = 0;
-            Vstep_arp[ini][i] = 0;
-#endif
-
-#if defined(PTK_FX_VIBRATO)
-            Vibrato_BaseNote[ini][i] = 0;
-            Vstep_vib[ini][i] = 0;
-#endif
-
-#if defined(PTK_SYNTH)
-            Synth_Was[ini][i] = 0;
-#endif
-
-            Player_WL[ini][i] = 0;
-            Player_WR[ini][i] = 0;
-            Player_Ampli[ini][i] = 0;
-            Player_SC[ini][i] = 0;
-            Player_LT[ini][i] = 0;
-            Player_LW[ini][i] = 0;
-            Player_LS[ini][i] = 0;
-            Player_LE[ini][i] = 0;
-            Player_LL[ini][i] = 0;
-            Player_NS[ini][i] = 0;
-
 #if defined(PTK_SYNTH)
             Synthesizer[ini][i].Reset();
 #endif
 
-            sp_Step[ini][i] = 0;
-
-#if defined(PTK_INSTRUMENTS)
-            sp_Stage[ini][i] = PLAYING_NOSAMPLE;
-#endif
-
-            Cut_Stage[ini][i] = FALSE;
-            Glide_Stage[ini][i] = FALSE;
-
-#if defined(PTK_SYNTH)
-            sp_Stage2[ini][i] = PLAYING_NOSAMPLE;
-            sp_Stage3[ini][i] = PLAYING_NOSAMPLE;
-#endif
-
-            sp_Position[ini][i].absolu = 0;
-
-#if defined(PTK_SYNTH)
-            sp_Position_osc1[ini][i].absolu = 0;
-            sp_Position_osc2[ini][i].absolu = 0;
-
-#if defined(PTK_SYNTH_OSC3)
-            sp_Position_osc3[ini][i].absolu = 0;
-#endif
-#endif
-
             CHAN_ACTIVE_STATE[ini][i] = TRUE;
-
-            old_note[ini][i] = 0;
-
-            Vstep1[ini][i] = 0;
-
-            sp_Cvol[ini][i] = 0.0f;
-            sp_Cvol_Synth[ini][i] = 0.0f;
-
-            sp_channelsample[ini][i] = -1;
-            sp_channelnote[ini][i] = 120;
-            sp_split[ini][i] = 0;
-
-            sp_Tvol[ini][i] = 0.0f;
-            sp_Tvol_Synth[ini][i] = 0.0f;
         }
-        sp_Tvol_Mod[ini] = 1.0f;
 
 #if defined(PTK_TRACK_VOLUME)
         Track_Volume[ini] = 1.0f;
@@ -1809,8 +1770,6 @@ void Pre_Song_Init(void)
         Channels_MultiNotes[ini] = 1;
         Channels_Effects[ini] = 1;
 
-        Player_FD[ini] = 0.0f;
-
         ResetFilters(ini);
 
 #if !defined(__STAND_ALONE__)
@@ -1821,9 +1780,6 @@ void Pre_Song_Init(void)
         CHAN_MUTE_STATE[ini] = 0;
 #endif
 
-        oldspawn[ini] = 0;
-        roldspawn[ini] = 0;
-        
 #if defined(PTK_LFO)
         LFO_ON[ini] = 0;
         LFO_RATE[ini] = 0.0001f;
@@ -1854,34 +1810,9 @@ void Pre_Song_Init(void)
 
         ramper[ini] = 0;
 
-#if defined(PTK_FLANGER)
-        FLANGER_OFFSET2[ini] = float(FLANGER_OFFSET[ini] - FLANGER_DELAY[ini]);
-        FLANGER_OFFSET1[ini] = float(FLANGER_OFFSET[ini] - FLANGER_DELAY[ini]);  
-        for(int ini2 = 0; ini2 < 16400; ini2++)
-        {
-            FLANGE_LEFTBUFFER[ini][ini2] = 0.0f;
-            FLANGE_RIGHTBUFFER[ini][ini2] = 0.0f;
-        }
-#endif
-
 #if !defined(__STAND_ALONE__)
         DSend[ini] = 0;
         CSend[ini] = 0;
-#endif
-
-#if defined(PTK_FX_TRANCEGLIDER)
-        glidestep[ini] = 0;
-#endif
-
-#if defined(PTK_TRACKFILTERS)
-        CCut[ini] = 0.0f;
-#endif
-
-#if defined(PTK_FLANGER)
-        Flanger_sbuf0L[ini] = 0;
-        Flanger_sbuf1L[ini] = 0;
-        Flanger_sbuf0R[ini] = 0;
-        Flanger_sbuf1R[ini] = 0;
 #endif
 
     }
@@ -1903,15 +1834,6 @@ void Pre_Song_Init(void)
 #if defined(PTK_LIMITER_MASTER)
     mas_comp_threshold_Master = 100.0f;
     mas_comp_ratio_Master = 0;
-    rms_sumL_Master = 0;
-    rms_sumR_Master = 0;
-    mas_envL_Master = 0;
-    mas_envR_Master = 0;
-    for(i = 0; i < MAS_COMPRESSOR_SIZE; i++)
-    {
-        mas_comp_bufferL_Master[i] = 0;
-        mas_comp_bufferR_Master[i] = 0;
-    }
 #endif
 
 #if defined(PTK_LIMITER_TRACKS)
@@ -1920,23 +1842,8 @@ void Pre_Song_Init(void)
     {
         mas_comp_threshold_Track[j] = 100.0f;
         mas_comp_ratio_Track[j] = 0;
-        rms_sumL_Track[j] = 0;
-        rms_sumR_Track[j] = 0;
-        mas_envL_Track[j] = 0;
-        mas_envR_Track[j] = 0;
-        for(i = 0; i < MAS_COMPRESSOR_SIZE; i++)
-        {
-            mas_comp_bufferL_Track[j][i] = 0;
-            mas_comp_bufferR_Track[j][i] = 0;
-        }
     }
 #endif
-
-    for(int dini = 0; dini < 131072; dini++)
-    {
-        lbuff_chorus[dini] = 0.0f;
-        rbuff_chorus[dini] = 0.0f;
-    }
 
 #if defined(PTK_FILTER_LOHIBAND)
     for(int cutt = 0; cutt < 128; cutt++)
@@ -1980,7 +1887,94 @@ void Post_Song_Init(void)
         {
             Reserved_Sub_Channels[i][j] = -1;
             Note_Sub_Channels[i][j] = -1;
+
+#if defined(PTK_FX_ARPEGGIO)
+            Arpeggio_BaseNote[i][j] = 0;
+            Vstep_arp[i][j] = 0;
+#endif
+
+#if defined(PTK_FX_VIBRATO)
+            Vibrato_BaseNote[i][j] = 0;
+            Vstep_vib[i][j] = 0;
+#endif
+
+#if defined(PTK_SYNTH)
+            Synth_Was[i][j] = 0;
+#endif
+
+            Player_WL[i][j] = 0;
+            Player_WR[i][j] = 0;
+            Player_Ampli[i][j] = 0;
+            Player_SC[i][j] = 0;
+            Player_LT[i][j] = 0;
+            Player_LW[i][j] = 0;
+            Player_LS[i][j] = 0;
+            Player_LE[i][j] = 0;
+            Player_LL[i][j] = 0;
+            Player_NS[i][j] = 0;
+
+            sp_Step[i][j] = 0;
+
+#if defined(PTK_INSTRUMENTS)
+            sp_Stage[i][j] = PLAYING_NOSAMPLE;
+#endif
+
+            Cut_Stage[i][j] = FALSE;
+            Glide_Stage[i][j] = FALSE;
+
+#if defined(PTK_SYNTH)
+            sp_Stage2[i][j] = PLAYING_NOSAMPLE;
+            sp_Stage3[i][j] = PLAYING_NOSAMPLE;
+#endif
+
+            sp_Position[i][j].absolu = 0;
+
+#if defined(PTK_SYNTH)
+            sp_Position_osc1[i][j].absolu = 0;
+            sp_Position_osc2[i][j].absolu = 0;
+
+#if defined(PTK_SYNTH_OSC3)
+            sp_Position_osc3[i][j].absolu = 0;
+#endif
+#endif
+
+            old_note[i][j] = 0;
+
+            Vstep1[i][j] = 0;
+
+            sp_Cvol[i][j] = 0.0f;
+            sp_Cvol_Synth[i][j] = 0.0f;
+
+            sp_channelsample[i][j] = -1;
+            sp_channelnote[i][j] = 120;
+            sp_split[i][j] = 0;
+
+            sp_Tvol[i][j] = 0.0f;
+            sp_Tvol_Synth[i][j] = 0.0f;
+
         }
+
+        sp_Tvol_Mod[i] = 1.0f;
+
+        Player_FD[i] = 0.0f;
+
+        oldspawn[i] = 0;
+        roldspawn[i] = 0;
+        
+#if defined(PTK_FX_TRANCEGLIDER)
+        glidestep[i] = 0;
+#endif
+
+#if defined(PTK_FLANGER)
+        FLANGER_OFFSET2[i] = float(FLANGER_OFFSET[i] - FLANGER_DELAY[i]);
+        FLANGER_OFFSET1[i] = float(FLANGER_OFFSET[i] - FLANGER_DELAY[i]);  
+        for(int ini2 = 0; ini2 < 16400; ini2++)
+        {
+            FLANGE_LEFTBUFFER[i][ini2] = 0.0f;
+            FLANGE_RIGHTBUFFER[i][ini2] = 0.0f;
+        }
+#endif
+
     }
 
     SubCounter = 0;
@@ -2971,6 +2965,7 @@ ByPass_Wav:
                 if((Synthesizer[c][i].Data.OSC1_WAVEFORM == WAVEFORM_WAV ||
                     Synthesizer[c][i].Data.OSC2_WAVEFORM == WAVEFORM_WAV))
                 {
+                    // It was a stereo signal
                     if(Player_SC[c][i] == 2) grown = TRUE;
                 }
 
@@ -3095,8 +3090,8 @@ ByPass_Wav:
                     coef[3] = coeftab[3][gco][FRez[c]][FType[c]];
                     coef[4] = coeftab[4][gco][FRez[c]][FType[c]];
 
-                    All_Signal_L = Filter(All_Signal_L + 1.0f, c);
-                    if(grown) All_Signal_R = Filter(All_Signal_R + 1.0f, c);
+                    All_Signal_L = Filter(0, All_Signal_L + 1.0f, c);
+                    if(grown) All_Signal_R = Filter(1, All_Signal_R + 1.0f, c);
                 }
                 else
 #endif
@@ -3106,34 +3101,34 @@ ByPass_Wav:
 
 #if defined(PTK_FILTER_LO24)
                         case 5:
-                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filter2p(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filter2p(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_LO48)
                         case 6:
-                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            All_Signal_L = filter2p24d(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p24d(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                All_Signal_R = filter2p(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
-                                All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filter2p(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filter2p24d(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
 
 #if defined(PTK_FILTER_LP24)
                         case 7:
-                            All_Signal_L = filter2p(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filter2p24d(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filter2p(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filter2p24d(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_AMODM)
                         case 8:
-                            All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filterRingMod(c, All_Signal_R, realcut, (float) FRez[c]);
+                            All_Signal_L = filterRingMod(0, c, All_Signal_L, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterRingMod(1, c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
@@ -3141,14 +3136,14 @@ ByPass_Wav:
                         case 9:
                             if(grown)
                             {
-                                All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
-                                All_Signal_R = filterRingModStereo(c, All_Signal_R);
+                                All_Signal_L = filterRingMod(0, c, All_Signal_L, realcut, (float) FRez[c]);
+                                All_Signal_R = filterRingModStereo(0, c, All_Signal_R);
                             }
                             else
                             {
                                 All_Signal_R = All_Signal_L;
-                                All_Signal_L = filterRingMod(c, All_Signal_L, realcut, (float) FRez[c]);
-                                All_Signal_R = filterRingModStereo(c, All_Signal_R);
+                                All_Signal_L = filterRingMod(0, c, All_Signal_L, realcut, (float) FRez[c]);
+                                All_Signal_R = filterRingModStereo(0, c, All_Signal_R);
                                 grown = TRUE;
                             }
                             break;
@@ -3156,103 +3151,103 @@ ByPass_Wav:
 
 #if defined(PTK_FILTER_SINGLEM)
                         case 10:
-                            All_Signal_L = filterWater(c, All_Signal_L, realcut);
-                            if(grown) All_Signal_R = filterWater(c, All_Signal_R, realcut);
+                            All_Signal_L = filterWater(0, c, All_Signal_L, realcut);
+                            if(grown) All_Signal_R = filterWater(1, c, All_Signal_R, realcut);
                             break;
 #endif
 
 #if defined(PTK_FILTER_SINGLES)
                         case 11:
-                            All_Signal_L = filterWater(c, All_Signal_L, realcut);
-                            if(grown) All_Signal_R = filterWaterStereo(c, All_Signal_R, realcut);
+                            All_Signal_L = filterWater(0, c, All_Signal_L, realcut);
+                            if(grown) All_Signal_R = filterWaterStereo(1, c, All_Signal_R, realcut);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM15)
                         case 12:
-                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], -15);
-                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], -15);
+                            All_Signal_L = filterBellShaped(0, c, All_Signal_L, realcut, (float) FRez[c], -15);
+                            if(grown) All_Signal_R = filterBellShaped(1, c, All_Signal_R, realcut, (float) FRez[c], -15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQM6)
                         case 13:
-                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], -6);
-                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], -6);
+                            All_Signal_L = filterBellShaped(0, c, All_Signal_L, realcut, (float) FRez[c], -6);
+                            if(grown) All_Signal_R = filterBellShaped(1, c, All_Signal_R, realcut, (float) FRez[c], -6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP6)
                         case 14:
-                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], 6);
-                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], 6);
+                            All_Signal_L = filterBellShaped(0, c, All_Signal_L, realcut, (float) FRez[c], 6);
+                            if(grown) All_Signal_R = filterBellShaped(1, c, All_Signal_R, realcut, (float) FRez[c], 6);
                             break;
 #endif
 
 #if defined(PTK_FILTER_EQP15)
                         case 15:
-                            All_Signal_L = filterBellShaped(c, All_Signal_L, realcut, (float) FRez[c], 15);
-                            if(grown) All_Signal_R = filterBellShaped(c, All_Signal_R, realcut, (float) FRez[c], 15);
+                            All_Signal_L = filterBellShaped(0, c, All_Signal_L, realcut, (float) FRez[c], 15);
+                            if(grown) All_Signal_R = filterBellShaped(1, c, All_Signal_R, realcut, (float) FRez[c], 15);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DELTA)
                         case 16:
-                            All_Signal_L = filterDelta(c, All_Signal_L, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filterDelta(c, All_Signal_R, realcut, (float) FRez[c]);
+                            All_Signal_L = filterDelta(0, c, All_Signal_L, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterDelta(1, c, All_Signal_R, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTL)
                         case 17:
-                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.25f);
-                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.25f);
+                            All_Signal_L = int_filter2p(0, c, All_Signal_L, realcut, (float) FRez[c], 0.25f);
+                            if(grown) All_Signal_R = int_filter2p(1, c, All_Signal_R, realcut, (float) FRez[c], 0.25f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTM)
                         case 18:
-                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.56f);
-                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.56f);
+                            All_Signal_L = int_filter2p(0, c, All_Signal_L, realcut, (float) FRez[c], 0.56f);
+                            if(grown) All_Signal_R = int_filter2p(1, c, All_Signal_R, realcut, (float) FRez[c], 0.56f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DISTH)
                         case 19:
-                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.78f);
-                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.78f);
+                            All_Signal_L = int_filter2p(0, c, All_Signal_L, realcut, (float) FRez[c], 0.78f);
+                            if(grown) All_Signal_R = int_filter2p(1, c, All_Signal_R, realcut, (float) FRez[c], 0.78f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_DIST)
                         case 20:
-                            All_Signal_L = int_filter2p(c, All_Signal_L, realcut, (float) FRez[c], 0.96f);
-                            if(grown) All_Signal_R = int_filter2p(c, All_Signal_R, realcut, (float) FRez[c], 0.96f);
+                            All_Signal_L = int_filter2p(0, c, All_Signal_L, realcut, (float) FRez[c], 0.96f);
+                            if(grown) All_Signal_R = int_filter2p(1, c, All_Signal_R, realcut, (float) FRez[c], 0.96f);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12M)
                         case 21:
-                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filterhp(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterhp(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP12S)
                         case 22:
-                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            if(grown) All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            if(grown) All_Signal_R = filterhp2(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             break;
 #endif
 
 #if defined(PTK_FILTER_HP24M)
                         case 23:
-                            All_Signal_L = filterhp(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
-                            All_Signal_L = filterhp2(c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
+                            All_Signal_L = filterhp2(0, c, All_Signal_L + 1.0f, realcut, (float) FRez[c]);
                             if(grown)
                             {
-                                All_Signal_R = filterhp(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
-                                All_Signal_R = filterhp2(c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filterhp(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
+                                All_Signal_R = filterhp2(1, c, All_Signal_R + 1.0f, realcut, (float) FRez[c]);
                             }
                             break;
 #endif
@@ -4759,17 +4754,28 @@ void Do_Effects_Ticks_X(void)
 // Reset the tracks filters
 void ResetFilters(int tr)
 {
-    buf024[tr] = 0.0f;
-    buf124[tr] = 0.0f;
-    buf0[tr] = 0.0f;
-    buf1[tr] = 0.0f;
-    fx1[tr] = 0.0f;
-    fx2[tr] = 0.0f;
-    fy1[tr] = 0.0f;
-    fy2[tr] = 0.0f;
-    xi0[tr] = 0.0f;
-    xi1[tr] = 0.0f;
-    xi2[tr] = 0.0f;
+    buf024[0][tr] = 0.0f;
+    buf124[0][tr] = 0.0f;
+    buf0[0][tr] = 0.0f;
+    buf1[0][tr] = 0.0f;
+    fx1[0][tr] = 0.0f;
+    fx2[0][tr] = 0.0f;
+    fy1[0][tr] = 0.0f;
+    fy2[0][tr] = 0.0f;
+    xi0[0][tr] = 0.0f;
+    xi1[0][tr] = 0.0f;
+    xi2[0][tr] = 0.0f;
+    buf024[1][tr] = 0.0f;
+    buf124[1][tr] = 0.0f;
+    buf0[1][tr] = 0.0f;
+    buf1[1][tr] = 0.0f;
+    fx1[1][tr] = 0.0f;
+    fx2[1][tr] = 0.0f;
+    fy1[1][tr] = 0.0f;
+    fy2[1][tr] = 0.0f;
+    xi0[1][tr] = 0.0f;
+    xi1[1][tr] = 0.0f;
+    xi2[1][tr] = 0.0f;
 }
 
 // ------------------------------------------------------
@@ -4986,15 +4992,19 @@ void ComputeCoefs(int freq, int r, int t)
 // Filters run
 
 #if defined(PTK_PROC_FILTER)
-float Filter(float x, char i)
+float Filter(int stereo, float x, char i)
 {
     float y;
 
-    y = coef[0] * x + coef[1] * fx1[i] + coef[2] * fx2[i] + coef[3] * fy1[i] + coef[4] * fy2[i];
-    fy2[i] = fy1[i];
-    fy1[i] = y;
-    fx2[i] = fx1[i];
-    fx1[i] = x;
+    y = coef[0] * x +
+        coef[1] * fx1[stereo][i] +
+        coef[2] * fx2[stereo][i] +
+        coef[3] * fy1[stereo][i] +
+        coef[4] * fy2[stereo][i];
+    fy2[stereo][i] = fy1[stereo][i];
+    fy1[stereo][i] = y;
+    fx2[stereo][i] = fx1[stereo][i];
+    fx1[stereo][i] = x;
     return y;
 }
 #endif
@@ -5015,143 +5025,143 @@ float Bandwidth(int v)
 }
 
 #if defined(PTK_PROC_FILTER2P)
-float filter2p(int ch, float input, float f, float q)
+float filter2p(int stereo, int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
 
     float fa = float(1.0f - f); 
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf0[ch] = fa * buf0[ch] + f * (input + fb * (buf0[ch] - buf1[ch])); 
-    buf1[ch] = fa * buf1[ch] + f * buf0[ch];
-    return buf1[ch];  
+    buf0[stereo][ch] = fa * buf0[stereo][ch] + f * (input + fb * (buf0[stereo][ch] - buf1[stereo][ch])); 
+    buf1[stereo][ch] = fa * buf1[stereo][ch] + f * buf0[stereo][ch];
+    return buf1[stereo][ch];  
 }
 #endif
 
 #if defined(PTK_PROC_FILTERHP2)
-float filterhp2(int ch, float input, float f, float q)
+float filterhp2(int stereo, int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
 
     float fa = float(1.0f - f);
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf024[ch] = fa * buf024[ch] + f * (input + fb * (buf024[ch] - buf124[ch])); 
-    buf124[ch] = fa * buf124[ch] + f * buf024[ch];
-    return input - buf124[ch];
+    buf024[stereo][ch] = fa * buf024[stereo][ch] + f * (input + fb * (buf024[stereo][ch] - buf124[stereo][ch])); 
+    buf124[stereo][ch] = fa * buf124[stereo][ch] + f * buf024[stereo][ch];
+    return input - buf124[stereo][ch];
 }
 #endif
 
 #if defined(PTK_PROC_FILTERHP)
-float filterhp(int ch, float input, float f, float q)
+float filterhp(int stereo, int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
 
     float fa = float(1.0f - f); 
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf0[ch] = fa * buf0[ch] + f * (input + fb * (buf0[ch] - buf1[ch])); 
-    buf1[ch] = fa * buf1[ch] + f * buf0[ch];
-    return input - buf1[ch];  
+    buf0[stereo][ch] = fa * buf0[stereo][ch] + f * (input + fb * (buf0[stereo][ch] - buf1[stereo][ch])); 
+    buf1[stereo][ch] = fa * buf1[stereo][ch] + f * buf0[stereo][ch];
+    return input - buf1[stereo][ch];
 }
 #endif
 
 #if defined(PTK_PROC_FILTER2P24D)
-float filter2p24d(int ch, float input, float f, float q)
+float filter2p24d(int stereo, int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     q *= 0.0078125f;
     float fa = float(1.0f - f); 
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf024[ch] = fa * buf024[ch] + f * (input + fb * (buf024[ch] - buf124[ch])); 
-    buf124[ch] = fa * buf124[ch] + f * buf024[ch];
-    return buf124[ch];  
+    buf024[stereo][ch] = fa * buf024[stereo][ch] + f * (input + fb * (buf024[stereo][ch] - buf124[stereo][ch])); 
+    buf124[stereo][ch] = fa * buf124[stereo][ch] + f * buf024[stereo][ch];
+    return buf124[stereo][ch];  
 }
 #endif
 
 #if defined(PTK_PROC_FILTERRINGMOD)
-float filterRingMod(int ch, float input, float f, float q)
+float filterRingMod(int stereo, int ch, float input, float f, float q)
 {
     q++;
 
     f *= 0.0078125f;
-    buf0[ch] += f * (q * 0.125f);
-    if(buf0[ch] >= 360.0f) buf0[ch] -= 360.0f;
+    buf0[stereo][ch] += f * (q * 0.125f);
+    if(buf0[stereo][ch] >= 360.0f) buf0[stereo][ch] -= 360.0f;
 
-    return input * SIN[(int) buf0[ch]];
+    return input * SIN[(int) buf0[stereo][ch]];
 }
 #endif
 
 #if defined(PTK_PROC_FILTERRINGMODSTEREO)
-float filterRingModStereo(int ch, float input)
+float filterRingModStereo(int stereo, int ch, float input)
 {
-    return input * cosf(buf0[ch] * 0.0174532f);
+    return input * cosf(buf0[stereo][ch] * 0.0174532f);
 }
 #endif
 
 #if defined(PTK_PROC_FILTERWATER)
-float filterWater(int ch, float input, float f)
+float filterWater(int stereo, int ch, float input, float f)
 {
     f = 127.0f - f;
-    float ad = input - buf0[ch];
+    float ad = input - buf0[stereo][ch];
 
-    if(ad > 1.0f || ad < -1.0f) buf0[ch] += ad / f;
-    return buf0[ch];
+    if(ad > 1.0f || ad < -1.0f) buf0[stereo][ch] += ad / f;
+    return buf0[stereo][ch];
 }
 #endif
 
 #if defined(PTK_PROC_FILTERWATERSTEREO)
-float filterWaterStereo(int ch, float input, float f)
+float filterWaterStereo(int stereo, int ch, float input, float f)
 {
     f = 127.0f - f;
-    float ad = input - buf1[ch];
+    float ad = input - buf1[stereo][ch];
 
-    if(ad > 1.0f || ad < -1.0f) buf1[ch] += ad / f;
-    return buf1[ch];
+    if(ad > 1.0f || ad < -1.0f) buf1[stereo][ch] += ad / f;
+    return buf1[stereo][ch];
 }
 #endif
 
 #if defined(PTK_PROC_FILTERDELTA)
-float filterDelta(int ch, float input, float f, float q)
+float filterDelta(int stereo, int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     q *= 0.007874f;
 
-    float output = buf1[ch];
-    if(buf1[ch] > 1.0f || buf1[ch] < -1.0f) buf1[ch] *= q;
+    float output = buf1[stereo][ch];
+    if(buf1[stereo][ch] > 1.0f || buf1[stereo][ch] < -1.0f) buf1[stereo][ch] *= q;
 
-    buf0[ch]++;
-    if(buf0[ch] >= f)
+    buf0[stereo][ch]++;
+    if(buf0[stereo][ch] >= f)
     {
-        buf0[ch] = 0.0f;
+        buf0[stereo][ch] = 0.0f;
         output = input;
-        buf1[ch] = input;
+        buf1[stereo][ch] = input;
     }
     return output;
 }
 #endif
 
-/*float filterDeltaStereo(int ch, float input, float f, float q)
+/*float filterDeltaStereo(int stereo, int ch, float input, float f, float q)
 {
     f = 127.0f - f;
     q *= 0.007874f;
 
-    float output = buf124[ch];
-    if(buf124[ch] > 1.0f || buf124[ch] < -1.0f) buf124[ch] *= q;
+    float output = buf124[stereo][ch];
+    if(buf124[stereo][ch] > 1.0f || buf124[stereo][ch] < -1.0f) buf124[stereo][ch] *= q;
 
     buf024[ch]++;
     if(buf024[ch] >= f)
     {
         buf024[ch] = 0.0f;
         output = input;
-        buf124[ch] = input;
+        buf124[stereo][ch] = input;
     }
     return output;
 }
 */
 
 #if defined(PTK_PROC_FILTERBELLSHAPED)
-float filterBellShaped(int ch, float input, float f, float q, float g)
+float filterBellShaped(int stereo, int ch, float input, float f, float q, float g)
 {
     input++;
     q *= 0.007874f;
@@ -5174,30 +5184,30 @@ float filterBellShaped(int ch, float input, float f, float q, float g)
     a2 = (1.0f - b + a) / t1;
     b1 = a1 = 2.0f * (1.0f - a) / t1;
     a0 = (a + b + 1.0f) / t1;
-    xi0[ch] = input - b1 * xi1[ch] - b2 * xi2[ch];
-    float output = a0 * xi0[ch] + a1 * xi1[ch] + a2 * xi2[ch];
-    xi2[ch] = xi1[ch];
-    xi1[ch] = xi0[ch];
+    xi0[stereo][ch] = input - b1 * xi1[stereo][ch] - b2 * xi2[stereo][ch];
+    float output = a0 * xi0[stereo][ch] + a1 * xi1[stereo][ch] + a2 * xi2[stereo][ch];
+    xi2[stereo][ch] = xi1[stereo][ch];
+    xi1[stereo][ch] = xi0[stereo][ch];
     return output;
 }
 #endif
 
 #if defined(PTK_PROC_FILTERINT2P)
-float int_filter2p(int ch, float input, float f, float q, float q2)
+float int_filter2p(int stereo, int ch, float input, float f, float q, float q2)
 {
     q *= 0.0787401f;
-    input = filter2px(ch, input, f, q2);
+    input = filter2px(stereo, ch, input, f, q2);
     return float(32767.0f * POWF(fabsf(input) / 32767.0f, 1.0f - q / 11.0f));
 }
 
-float filter2px(int ch, float input, float f, float q)
+float filter2px(int stereo, int ch, float input, float f, float q)
 {
     f *= 0.0078125f;
     float fa = float(1.0f - f);
     float fb = float(q * (1.0f + (1.0f / fa)));
-    buf0[ch] = fa * buf0[ch] + f * (input + fb * (buf0[ch] - buf1[ch]));
-    buf1[ch] = fa * buf1[ch] + f * buf0[ch];
-    return buf1[ch];
+    buf0[stereo][ch] = fa * buf0[stereo][ch] + f * (input + fb * (buf0[stereo][ch] - buf1[stereo][ch]));
+    buf1[stereo][ch] = fa * buf1[stereo][ch] + f * buf0[stereo][ch];
+    return buf1[stereo][ch];
 }
 #endif
 

@@ -96,6 +96,7 @@ int Calc_Length(void);
 void Reset_Song_Length(void);
 void Clear_Input(void);
 int File_Exist(char *Format, char *Directory, char *FileName);
+int File_Exist_Req(char *Format, char *Directory, char *FileName);
 void Init_Tracker_Context_After_ModLoad(void);
 int Read_Data(void *value, int size, int amount, FILE *handle);
 int Read_Data_Swap(void *value, int size, int amount, FILE *handle);

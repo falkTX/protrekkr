@@ -1069,13 +1069,29 @@ int File_Exist(char *Format, char *Directory, char *FileName)
     char Temph[MAX_PATH];
 
     sprintf(Temph, Format, Directory, FileName);
-
     in = fopen(Temph, "rb");
     if(in)
     {
+        fclose(in);
+        return(TRUE);
+    }
+    return(FALSE);
+}
+#endif
+
+// ------------------------------------------------------
+// Check if a file exists and prepare a requester if it does
+#if !defined(__WINAMP__)
+int File_Exist_Req(char *Format, char *Directory, char *FileName)
+{
+    char Temph[MAX_PATH];
+
+    sprintf(Temph, Format, Directory, FileName);
+
+    if(File_Exist(Format, Directory, FileName))
+    {
         sprintf(OverWrite_Name, "File '%s' already exists, overwrite ?", Temph);
         Overwrite_Requester.Text = OverWrite_Name;
-        fclose(in);
         return(TRUE);
     }
     return(FALSE);

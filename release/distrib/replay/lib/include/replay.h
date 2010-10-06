@@ -194,6 +194,7 @@ float FastLog(float i);
 #define RENDER_TO_STEREO 2
 extern char rawrender;
 extern char rawrender_32float;
+extern char rawrender_multi;
 extern int rawrender_range;
 extern char rawrender_target;
 extern int rawrender_from;

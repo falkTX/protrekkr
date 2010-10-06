@@ -490,6 +490,10 @@ SOURCE=.\src\midi\include\midi.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\midi\include\midi_dispatch.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\midi\include\RtError.h
 # End Source File
 # Begin Source File
@@ -500,6 +504,10 @@ SOURCE=.\src\midi\include\RtMidi.h
 # Begin Source File
 
 SOURCE=.\src\midi\midi.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\midi\midi_dispatch.cpp
 # End Source File
 # Begin Source File
 

@@ -772,6 +772,9 @@ float CSynth::GetSample(short *Left_Samples,
     unsigned int Length1 = Length;
     unsigned int Length2 = Length;
 
+// ------------------------------------------------
+// Oscillator 1
+
     if(ENV1_STAGE)
     {
         // Oscillator1 On
@@ -831,7 +834,6 @@ float CSynth::GetSample(short *Left_Samples,
                 osc_speed2 = OSC1_SPEED;
                 Left_Samples1 = Left_Samples;
                 Right_Samples1 = Right_Samples;
-
 
 #if defined(PTK_INSTRUMENTS)
                 if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
@@ -1115,6 +1117,9 @@ float CSynth::GetSample(short *Left_Samples,
         }
     }
 
+// ------------------------------------------------
+// Oscillator 3
+
 #if defined(PTK_SYNTH_OSC3)
     if(Data.OSC3_SWITCH)
     {
@@ -1380,6 +1385,9 @@ float CSynth::GetSample(short *Left_Samples,
         }
     }
 #endif // PTK_SYNTH_OSC3
+
+// ------------------------------------------------
+// Oscillator 2
 
 #if defined(PTK_SYNTH_OSC2)
     if(ENV2_STAGE)
@@ -1709,6 +1717,9 @@ float CSynth::GetSample(short *Left_Samples,
     }
 #endif // PTK_SYNTH_OSC2
 
+// ------------------------------------------------
+// Left signal
+
 #if defined(PTK_SYNTH_DISTO)
     if(Data.DISTO != 1.0f)
     {
@@ -1803,6 +1814,10 @@ float CSynth::GetSample(short *Left_Samples,
 
 #endif      // defined(PTK_SYNTH_FILTER)
 
+
+// ------------------------------------------------
+// Right signal
+
     if(Stereo == 2)
     {
 
@@ -1823,6 +1838,7 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 #endif
 
+        // Return right value
         *Right_Signal += GS_VAL2 * vol;
     }
 

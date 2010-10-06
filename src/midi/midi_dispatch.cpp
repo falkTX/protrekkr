@@ -29,45 +29,34 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#ifndef _MIDI_H_
-#define _MIDI_H_
-
 #if !defined(__NO_MIDI__)
 
 // ------------------------------------------------------
 // Includes
-#if defined(__WIN32__)
-#include <Windows.h>
-#include <mmsystem.h>
-#endif
+#include "../include/variables.h"
+#include "../include/ptk.h"
+
+#include "include/midi_dispatch.h"
 
 // ------------------------------------------------------
 // Variables
-extern signed char n_midioutdevices;
-extern signed char n_midiindevices;
-
-extern int midiin_changed;
-extern int midiout_changed;
 
 // ------------------------------------------------------
-// Functions
-void Midi_AllNotesOff(void);
-void Midi_Reset(void);
+// Run various command associated to midi messages
+void Dispatch_Midi_Msg(int CC, int Data)
+{
+    switch(CC)
+    {
+        case 71:
+            // Master volume (should be in messages table)
+            local_mas_vol = ((float) Data / 127.0f);
+            if(local_mas_vol < 0.0f) local_mas_vol = 0.0f;
+            if(local_mas_vol > 1.0f) local_mas_vol = 1.0f;
+            break;
 
-void Midi_GetAll(void);
-void Midi_FreeAll(void);
-
-void Midi_InitIn(void);
-void Midi_CloseIn(void);
-void Midi_InitOut(void);
-void Midi_CloseOut(void);
-
-void Midi_NoteOff(int channel, int note);
-void Midi_Send(int nbr_track, int eff_dat, int row_dat);
-
-char *Midi_GetInName(void);
-char *Midi_GetOutName(void);
-
-#endif
+        default:
+            break;
+    }
+}
 
 #endif

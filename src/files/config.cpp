@@ -62,7 +62,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "PROTCFGC");
+    sprintf(extension, "PROTCFGD");
     Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -115,6 +115,7 @@ void SaveConfig(void)
         Write_Data(KeyboardName, MAX_PATH, 1, out);
 
         Write_Data(&rawrender_32float, sizeof(char), 1, out);
+        Write_Data(&rawrender_multi, sizeof(char), 1, out);
         Write_Data(&rawrender_target, sizeof(char), 1, out);
         Write_Data(&Large_Patterns, sizeof(char), 1, out);
         Write_Data(&Scopish_LeftRight, sizeof(char), 1, out);
@@ -171,7 +172,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "PROTCFGC") == 0)
+        if(strcmp(extension, "PROTCFGD") == 0)
         {
             Read_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -214,6 +215,7 @@ void LoadConfig(void)
             Read_Data(KeyboardName, MAX_PATH, 1, in);
 
             Read_Data(&rawrender_32float, sizeof(char), 1, in);
+            Read_Data(&rawrender_multi, sizeof(char), 1, in);
             Read_Data(&rawrender_target, sizeof(char), 1, in);
             Read_Data(&Large_Patterns, sizeof(char), 1, in);
             Read_Data(&Scopish_LeftRight, sizeof(char), 1, in);

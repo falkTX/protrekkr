@@ -2172,6 +2172,7 @@ void Delete_Track(void)
         Copy_Track(Song_Position, i + 1, i);
     }
     Reset_Track(Song_Position, Songtracks);
+    Column_Under_Caret = 0;
 }
 
 // ------------------------------------------------------
@@ -2187,5 +2188,6 @@ void Insert_Track(void)
             Copy_Track(Song_Position, i - 1, i);
         }
         Reset_Track(Song_Position, Track_Under_Caret);
+        Column_Under_Caret = 0;
     }
 }

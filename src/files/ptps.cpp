@@ -141,11 +141,11 @@ int Check_Range(int Idx, int Bound, int Start)
     {
         if(Idx == Val)
         {
-            return 1;
+            return TRUE;
         }
         Val += 2;
     }
-    return 0;
+    return FALSE;
 }
 
 // ------------------------------------------------------
