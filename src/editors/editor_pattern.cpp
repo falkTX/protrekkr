@@ -1366,6 +1366,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
             high_col++;
             ++cur_column;
 
+            // ------------------------------------------------
             // Record live events
             if(sr_isrecording)
             {
@@ -1425,6 +1426,7 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                             if(livevalue > 0x80) livevalue = 0x80;
                             *(RawPatterns + offset_t + PATTERN_PANNING) = livevalue;
                             break;
+
                         case LIVE_PARAM_303_1_CUTOFF:
                             *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x33;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
@@ -1457,6 +1459,14 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                             *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3a;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
                             break;
+                        case LIVE_PARAM_303_1_ACCENT:
+                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3b;
+                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            break;
+                        case LIVE_PARAM_303_2_ACCENT:
+                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3c;
+                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            break;
                         case LIVE_PARAM_303_1_TUNE:
                             *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3d;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
@@ -1465,12 +1475,12 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                             *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3e;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
                             break;
-                        case LIVE_PARAM_303_1_ACCENT:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3b;
+                        case LIVE_PARAM_303_1_VOLUME:
+                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x41;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
                             break;
-                        case LIVE_PARAM_303_2_ACCENT:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3c;
+                        case LIVE_PARAM_303_2_VOLUME:
+                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x42;
                             *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
                             break;
                     } // Close switch

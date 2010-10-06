@@ -34,6 +34,16 @@
 
 #if !defined(__NO_MIDI__)
 
+// ------------------------------------------------------
+// Structure
+typedef struct
+{
+    void (*routine)(int Data);
+    int CC;
+} MIDI_DISPATCH, *LPMIDI_DISPATCH;
+
+// ------------------------------------------------------
+// Functions
 void Dispatch_Midi_Msg(int CC, int Data);
 
 #endif

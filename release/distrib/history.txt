@@ -49,36 +49,29 @@ v2.5.0:
 - Fixed a bug in tracks filters.
 - Implemented insert or delete track functions.
 - Tracks can now be rendered to .wav in their own separate file.
+- Added clicks removal for tracks panning.
 
 TODO:
 
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:
-  - Master volume.
+
   - 303 select (1 or 2).
   - 303 pattern 1/2/3/4/5/6/7/8.
   - 303 bank A/B/C/D.
   - 303 step increase/decrease.
   - 303 saw/square.
-  - 303 tune knob.
-  - 303 cutoff knob.
-  - 303 reso knob.
-  - 303 envmod knob.
-  - 303 decay knob.
-  - 303 accent knob.
   - 303 up.
   - 303 down.
   - 303 note/silent.
   - 303 accent.
   - 303 slide.
-  - 303 volume.
-  - Channel filter cutoff.
-  - Channel filter frequency.
   - Track on/off.
   - Transport (rw/ff/play/stop/rec).
   - Go to pattern row.
   - Go to track.
   - Select instrument.
+  - Any midi cc written to output (catched with live recording).
 
 v2.1.4:
 

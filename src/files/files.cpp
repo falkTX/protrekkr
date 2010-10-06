@@ -537,6 +537,7 @@ Read_Mod_File:
             if(ICut[twrite] < 0.00006103515625f) ICut[twrite] = 0.00006103515625f;
             Read_Mod_Data_Swap(&TPan[twrite], sizeof(float), 1, in);
             ComputeStereo(twrite);
+            FixStereo(twrite);
             Read_Mod_Data_Swap(&FType[twrite], sizeof(int), 1, in);
             Read_Mod_Data_Swap(&FRez[twrite], sizeof(int), 1, in);
             Read_Mod_Data_Swap(&DThreshold[twrite], sizeof(float), 1, in);

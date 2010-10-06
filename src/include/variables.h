@@ -239,6 +239,8 @@
 #define LIVE_PARAM_303_2_TUNE 16
 #define LIVE_PARAM_303_1_ACCENT 17
 #define LIVE_PARAM_303_2_ACCENT 18
+#define LIVE_PARAM_303_1_VOLUME 19
+#define LIVE_PARAM_303_2_VOLUME 20
 
 #define SCOPE_ZONE_SCOPE 0
 #define SCOPE_ZONE_MOD_DIR 1
@@ -472,7 +474,8 @@ char zcheckMouse(int x, int y, int xs, int ys);
 void FadeToBlack(void);
 void IniCsParNames(void);
 void UpSynth(int peac,int number);
-void ComputeStereo(char channel);
+void ComputeStereo(int channel);
+void FixStereo(int channel);
 void Keyboard_Handler(void);
 void Mouse_Handler(void);
 int Get_Track_Over_Mouse(int Mouse, int *Was_Scrolling, int Left);

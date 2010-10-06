@@ -166,7 +166,9 @@ char Use_Cubic = CUBIC_INT;
 float TCut[MAX_TRACKS];
 float ICut[MAX_TRACKS];
 float LVol[MAX_TRACKS];
+float Old_LVol[MAX_TRACKS];
 float RVol[MAX_TRACKS];
+float Old_RVol[MAX_TRACKS];
 int FType[MAX_TRACKS];
 int FRez[MAX_TRACKS];
 float DThreshold[MAX_TRACKS];
@@ -1283,6 +1285,8 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
             Mod_Dat_Read(&TPan[twrite], sizeof(float));
             ComputeStereo(twrite);
+            FixStereo(twrite);
+
             Mod_Dat_Read(&FType[twrite], sizeof(int));
             Mod_Dat_Read(&FRez[twrite], sizeof(int));
             Mod_Dat_Read(&DThreshold[twrite], sizeof(float));
@@ -2071,6 +2075,7 @@ void Post_Song_Init(void)
     {
         CCoef[spl] = float((float) CSend[spl] / 127.0f);
         ComputeStereo(spl);
+        FixStereo(spl);
     }
 
     Songplaying_Pattern = 0;
@@ -3373,6 +3378,36 @@ ByPass_Wav:
 
         All_Signal_L *= LVol[c];
         All_Signal_R *= RVol[c];
+
+        // Soft panning
+        if(LVol[c] != Old_LVol[c])
+        {
+            if(LVol[c] > Old_LVol[c])
+            {
+                LVol[c] -= 0.001f;
+                if(LVol[c] < Old_LVol[c]) LVol[c] = Old_LVol[c];
+            }
+            else
+            {
+                LVol[c] += 0.001f;
+                if(LVol[c] > Old_LVol[c]) LVol[c] = Old_LVol[c];
+            }
+        }
+
+        if(RVol[c] != Old_RVol[c])
+        {
+            if(RVol[c] > Old_RVol[c])
+            {
+                RVol[c] -= 0.001f;
+                if(RVol[c] < Old_RVol[c]) RVol[c] = Old_RVol[c];
+            }
+            else
+            {
+                RVol[c] += 0.001f;
+                if(RVol[c] > Old_RVol[c]) RVol[c] = Old_RVol[c];
+            }
+        }
+
 
 #if defined(PTK_TRACK_VOLUME)
         All_Signal_L *= Track_Volume[c];
@@ -4798,11 +4833,19 @@ float ApplyLfo(float cy, int trcy)
 }
 
 // ------------------------------------------------------
-// Stereo volume table
+// Set stereo panning
 void ComputeStereo(int channel)
 {
-    LVol[channel] = sqrtf(1.0f - TPan[channel]);
-    RVol[channel] = sqrtf(TPan[channel]);
+    Old_LVol[channel] = sqrtf(1.0f - TPan[channel]);
+    Old_RVol[channel] = sqrtf(TPan[channel]);
+}
+
+// ------------------------------------------------------
+// Bring stereo panning up to date
+void FixStereo(int channel)
+{
+    LVol[channel] = Old_LVol[channel];
+    RVol[channel] = Old_RVol[channel];
 }
 
 // ------------------------------------------------------

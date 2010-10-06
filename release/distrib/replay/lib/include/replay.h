@@ -467,6 +467,7 @@ void Schedule_Instrument(int channel, int sub_channel,
 void Play_Instrument(int channel, int sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
+void FixStereo(int channel);
 void GetPlayerValues(void);
 void noteoff303(char strack);
 void init_sample_bank(void);

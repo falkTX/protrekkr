@@ -909,6 +909,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels)
         {
             TPan[i] = mt_pannels[i];
             ComputeStereo(i);
+            FixStereo(i);
         }
 
         Use_Cubic = NONE_INT;

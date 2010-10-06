@@ -2070,6 +2070,7 @@ void Reset_Track(int Position, int Track)
         CHAN_ACTIVE_STATE[i][Track] = TRUE;
     }
     ComputeStereo(Track);
+    FixStereo(Track);
 }
 
 // ------------------------------------------------------
@@ -2159,6 +2160,7 @@ void Copy_Track(int Position, int Track_Src, int Track_Dst)
         CHAN_ACTIVE_STATE[i][Track_Dst] = CHAN_ACTIVE_STATE[i][Track_Src];
     }
     ComputeStereo(Track_Dst);
+    FixStereo(Track_Dst);
 }
 
 // ------------------------------------------------------
