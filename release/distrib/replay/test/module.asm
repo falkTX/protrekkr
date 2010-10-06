@@ -3,4 +3,4 @@
 
                 global _PTK_MODULE
 
-_PTK_MODULE:   incbin "unit5.ptp"
+_PTK_MODULE:   incbin "primitive.ptp"

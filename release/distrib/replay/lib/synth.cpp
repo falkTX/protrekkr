@@ -752,7 +752,11 @@ float CSynth::GetSample(short *Left_Samples,
     int64 osc_speed1b;
 #endif
     int64 osc_speed2;
+
+#if defined(PTK_SYNTH_OSC2)
     int64 osc_speed_tune;
+#endif
+
     float mul_datL;
     float mul_datR;
     unsigned int i_POSITION[4];
@@ -833,6 +837,9 @@ float CSynth::GetSample(short *Left_Samples,
                 if(Data.OSC1_WAVEFORM != WAVEFORM_WAV)
 #endif
                 {
+
+#if defined(PTK_SYNTH_SIN) || defined(PTK_SYNTH_SAW) || defined(PTK_SYNTH_PULSE) || defined(PTK_SYNTH_WHITE) || defined(PTK_SYNTH_PINK)
+
                     switch(Data.OSC1_WAVEFORM)
                     {
 
@@ -872,6 +879,8 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
 
                     }
+
+#endif
 
 #if defined(PTK_SYNTH_PITCH)
                     osc_speed1 *= 65;

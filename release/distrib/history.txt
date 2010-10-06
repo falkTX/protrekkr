@@ -52,10 +52,6 @@ v2.5.0:
 
 TODO:
 
-- Check the wipe function of ptp for the note used extra effects & notes
-  (to ensure that no unused data is left).
-- Test the replay routine.
-
 - Midi profiles (save files for midi setup).
 - C(ontroller) C(ommand) mapping 0x00 to 0xff:
   - Master volume.

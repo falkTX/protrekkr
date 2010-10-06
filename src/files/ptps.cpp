@@ -131,6 +131,24 @@ int Get_Instr_New_Order(int instr)
 }
 
 // ------------------------------------------------------
+// Check if an index is within range of channel's variable data
+int Check_Range(int Idx, int Bound, int Start)
+{
+    int i;
+    int Val = Start;
+
+    for(i = 0; i < Bound; i++)
+    {
+        if(Idx == Val)
+        {
+            return 1;
+        }
+        Val += 2;
+    }
+    return 0;
+}
+
+// ------------------------------------------------------
 // Save a packed (.ptp) module
 // (Only the samples are actually (if requested) packed,
 //  the rest is just "demangled" to ease packers compression ratio).
@@ -600,6 +618,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                     for(j = 0; j < New_patternLines[pwrite]; j++)
                     {   // Rows
                         TmpPatterns_Notes = TmpPatterns_Tracks + (j * PATTERN_ROW_LEN);
+
                         // Check the volume column
                         if(i == PATTERN_VOLUME)
                         {
@@ -617,11 +636,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                         }
 
                         // Check the effects column
-                        if(i == PATTERN_FX ||
-                           i == PATTERN_FX2 ||
-                           i == PATTERN_FX3 ||
-                           i == PATTERN_FX4
-                          )
+                        if(Check_Range(i, Channels_Effects[k], PATTERN_FX))
                         {
                             switch(TmpPatterns_Notes[i])
                             {
@@ -884,27 +899,25 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                     break;
                             }
                         }
-                        switch(i)
-                        {
-                            case PATTERN_FX:
-                            case PATTERN_FX2:
-                            case PATTERN_FX3:
-                            case PATTERN_FX4:
-                                // Don't save FX 7
-                                if(TmpPatterns_Notes[i] == 0x7)
-                                {
-                                    Write_Mod_Data(&Empty_Var, sizeof(char), 1, in);
-                                }
-                                else
-                                {
-                                    Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
-                                }
-                                break;
 
-                            case PATTERN_FXDATA:
-                            case PATTERN_FXDATA2:
-                            case PATTERN_FXDATA3:
-                            case PATTERN_FXDATA4:
+                        // Is it a legal fx command column ?
+                        if(Check_Range(i, Channels_Effects[k], PATTERN_FX))
+                        {
+                            // Don't save FX 7
+                            if(TmpPatterns_Notes[i] == 0x7)
+                            {
+                                Write_Mod_Data(&Empty_Var, sizeof(char), 1, in);
+                            }
+                            else
+                            {
+                                Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
+                            }
+                        }
+                        else
+                        {
+                            // Is it a legal fx data column ?
+                            if(Check_Range(i, Channels_Effects[k], PATTERN_FXDATA))
+                            {
                                 // Don't save Fx 7 datas
                                 if(TmpPatterns_Notes[i - 1] == 0x7)
                                 {
@@ -914,34 +927,43 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                 {
                                     Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
-                                break;
-
-                            case PATTERN_INSTR1:
-                            case PATTERN_INSTR2:
-                            case PATTERN_INSTR3:
-                            case PATTERN_INSTR4:
-                            case PATTERN_INSTR5:
-                            case PATTERN_INSTR6:
-                            case PATTERN_INSTR7:
-                            case PATTERN_INSTR8:
-                            case PATTERN_INSTR9:
-                            case PATTERN_INSTR10:
-                            case PATTERN_INSTR11:
-                            case PATTERN_INSTR12:
-                            case PATTERN_INSTR13:
-                            case PATTERN_INSTR14:
-                            case PATTERN_INSTR15:
-                            case PATTERN_INSTR16:
-                                // Replace the instrument order
-                                if(TmpPatterns_Notes[i] < MAX_INSTRS)
+                            }
+                            else
+                            {
+                                // Is it a legal instrument column ?
+                                if(Check_Range(i, Channels_MultiNotes[k], PATTERN_INSTR1))
                                 {
-                                    TmpPatterns_Notes[i] = Get_Instr_New_Order(TmpPatterns_Notes[i]);
+                                    // Replace the instrument order
+                                    if(TmpPatterns_Notes[i] < MAX_INSTRS)
+                                    {
+                                        TmpPatterns_Notes[i] = Get_Instr_New_Order(TmpPatterns_Notes[i]);
+                                    }
+                                    Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
                                 }
-                                // no break on purpose
-
-                            default:
-                                Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
-                                break;
+                                else
+                                {
+                                    // Is it a legal note column ?
+                                    if(Check_Range(i, Channels_MultiNotes[k], PATTERN_NOTE1))
+                                    {
+                                        Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
+                                    }
+                                    else
+                                    {
+                                        // We reach this point if we're not in the range of notes or
+                                        // fx for this track
+                                        switch(i)
+                                        {
+                                            case PATTERN_VOLUME:
+                                            case PATTERN_PANNING:
+                                                Write_Mod_Data(TmpPatterns_Notes + i, sizeof(char), 1, in);
+                                                break;
+                                            default:
+                                                Write_Mod_Data(&Empty_Var, sizeof(char), 1, in);
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

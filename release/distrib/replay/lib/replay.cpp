@@ -380,9 +380,7 @@ unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
     float mas_ratio_Track[MAX_TRACKS];
 #endif
 
-#if defined(PTK_TRACK_VOLUME)
     float Track_Volume[MAX_TRACKS];
-#endif
 
 #if defined(PTK_LIMITER_MASTER)
     float mas_comp_bufferL_Master[MAS_COMPRESSOR_SIZE];
@@ -1051,9 +1049,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Eq parameters
         for(i = 0; i < Songtracks; i++)
         {
-            Mod_Dat_Read(EqDat[i].lg, sizeof(float));
-            Mod_Dat_Read(EqDat[i].mg, sizeof(float));
-            Mod_Dat_Read(EqDat[i].hg, sizeof(float));
+            Mod_Dat_Read(&EqDat[i].lg, sizeof(float));
+            Mod_Dat_Read(&EqDat[i].mg, sizeof(float));
+            Mod_Dat_Read(&EqDat[i].hg, sizeof(float));
         }
 
         TmpPatterns = RawPatterns;
@@ -2146,10 +2144,14 @@ void Sp_Player(void)
 #endif
     int toffset;
     int free_sub_channel;
+#if defined(PTK_FX_SETVOLUME)
     int no_fx3;
+#endif
     int Glide_Synth[MAX_POLYPHONY];
 
+#if defined(PTK_TRACKFILTERS)
     float realcut;
+#endif
 
     left_float = 0;
     right_float = 0;
@@ -3063,6 +3065,7 @@ ByPass_Wav:
 
         // -----------------------------------------------
 
+#if defined(PTK_TRACKFILTERS)
         if(FType[c] != 4)
         {   // Track filter activated
             float const dfi = TCut[c] - CCut[c];
@@ -3074,6 +3077,7 @@ ByPass_Wav:
             ramper[c] += Player_FD[c] * realcut * 0.015625f;
             gco = (int) realcut;
         }
+#endif
 
         if(gotsome)
         {
@@ -3964,7 +3968,9 @@ void Play_Instrument(int channel, int sub_channel)
                 if(Synthesizer[channel][sub_channel].Data.OSC1_WAVEFORM == WAVEFORM_WAV)
                 {
                     sp_Position_osc1[channel][sub_channel].half.first = Max_Loop;
+#if defined(PTK_SYNTH_OSC3)
                     sp_Position_osc3[channel][sub_channel].half.first = Max_Loop;
+#endif
                 }
                 if(Synthesizer[channel][sub_channel].Data.OSC2_WAVEFORM == WAVEFORM_WAV)
                 {
