@@ -1670,6 +1670,7 @@ void Refresh_UI_Context(void)
     }
     seditor = 0;
     
+    Actualize_Midi_Ed(0);
     Actualize_Reverb_Ed(0);
     Actualize_DiskIO_Ed(0);
     Actualize_303_Ed(0);

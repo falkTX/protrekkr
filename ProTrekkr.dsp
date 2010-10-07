@@ -112,6 +112,14 @@ SOURCE=.\src\support\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\Support\Project.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\support\Project_16x16.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\Support\Resources.rc
 # End Source File
 # Begin Source File
@@ -612,16 +620,8 @@ SOURCE=.\release\distrib\history.txt
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\Support\Project.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\ptk.cpp
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\src\support\Project_16x16.ico
-# End Source File
 # End Target
 # End Project

@@ -1515,6 +1515,8 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                     liveparam = 0;
                 } // Close liveparam updated
             } // Close is recording
+            // ------------------------------------------------
+
         }
 
         Visible_Columns = Real_visible;
@@ -1607,8 +1609,16 @@ void Actupated(int modac)
     int max_channel_dat = Get_Max_Nibble_Track(Channels_MultiNotes, Channels_Effects, Track_Under_Caret) - 1;
     if(Column_Under_Caret > max_channel_dat)
     {
-        Column_Under_Caret = 0;
-        Track_Under_Caret++;
+        if(Track_Under_Caret < Songtracks - 1)
+        {
+            Column_Under_Caret = 0;
+            Track_Under_Caret++;
+        }
+        else
+        {
+            Column_Under_Caret = 0;
+            Track_Under_Caret = 0;
+        }
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
     }
     if(Column_Under_Caret < 0)
@@ -1627,7 +1637,10 @@ void Actupated(int modac)
     }
     if(Track_Under_Caret > Songtracks - 1)
     {
-        Track_Under_Caret = 0;
+        while(Track_Under_Caret > Songtracks - 1)
+        {
+            Track_Under_Caret--;
+        }
         gui_action = GUI_CMD_SET_FOCUS_TRACK;
         gui_track = 0;
     }
@@ -2217,8 +2230,8 @@ int Get_Column_Idx(int track, int mouse_coord)
         old_dover = dover;
         dover += Cur_Char_size[track] * 3;
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-
         ret_value++;
+
         // Gap
         old_dover = dover;
         dover += PAT_COL_SHIFT - 2;
@@ -2228,13 +2241,13 @@ int Get_Column_Idx(int track, int mouse_coord)
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-
         ret_value++;
+
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-
         ret_value++;
+
         // Gap
         old_dover = dover;
         dover += 2;
@@ -2250,14 +2263,14 @@ int Get_Column_Idx(int track, int mouse_coord)
     old_dover = dover;
     dover += Cur_Char_size[track];
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-    
     ret_value++;
+
     old_dover = dover;
     dover += Cur_Char_size[track];
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+    ret_value++;
 
     // Gap
-    ret_value++;
     old_dover = dover;
     dover += PAT_COL_SHIFT;
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
@@ -2266,15 +2279,15 @@ int Get_Column_Idx(int track, int mouse_coord)
     old_dover = dover;
     dover += Cur_Char_size[track];
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
-
     ret_value++;
+
     old_dover = dover;
     dover += Cur_Char_size[track];
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
+    ret_value++;
 
     // Gap
     old_dover = dover;
-    ret_value++;
     dover += PAT_COL_SHIFT;
     if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
 
@@ -2285,20 +2298,24 @@ int Get_Column_Idx(int track, int mouse_coord)
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
         ret_value++;
+
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
         ret_value++;
+
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
         ret_value++;
+
         old_dover = dover;
         dover += Cur_Char_size[track];
         if(mouse_coord >= old_dover && mouse_coord < dover) return(ret_value);
         ret_value++;
     }
-
+    int Last_Col = Get_Last_Track_Column(track);
+    if(ret_value > Last_Col) ret_value = Last_Col;
     return(ret_value);
 }
 
@@ -2939,7 +2956,7 @@ void Mouse_Left_Pattern_Ed(void)
 
     // Reduce effects
     tracks = Get_Visible_Partial_Tracks();
-    for(i = gui_track; i < gui_track + tracks; i++)
+    for(i = 0; i < tracks; i++)
     {
         start_mute_check_x = pos_effects_icons[i] - 1;
         if(zcheckMouse(start_mute_check_x, 183 + 8, 8, 7))
@@ -2951,7 +2968,7 @@ void Mouse_Left_Pattern_Ed(void)
 
     // Expand effects
     tracks = Get_Visible_Partial_Tracks();
-    for(i = gui_track; i < gui_track + tracks; i++)
+    for(i = 0; i < tracks; i++)
     {
         start_mute_check_x = pos_effects_icons[i] + 9 - 1;
         if(zcheckMouse(start_mute_check_x, 183 + 8, 8, 7))

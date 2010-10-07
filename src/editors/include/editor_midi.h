@@ -62,6 +62,12 @@
 #define UPDATE_MIDI_ED_CC14 UPDATE_MIDI_ED_CC13 + 1
 #define UPDATE_MIDI_ED_CC15 UPDATE_MIDI_ED_CC14 + 1
 
+#define UPDATE_MIDI_ED_CHANGE_NAME UPDATE_MIDI_ED_CC15 + 1
+
+// ------------------------------------------------------
+// Variables
+extern char Midi_Name[20];
+
 // ------------------------------------------------------
 // Functions
 void Draw_Midi_Ed(void);

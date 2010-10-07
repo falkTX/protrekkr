@@ -505,6 +505,7 @@ int Init_Context(void)
 
     sprintf(Selection_Name, "Untitled");
     sprintf(Reverb_Name, "Untitled");
+    sprintf(Midi_Name, "Untitled");
     sprintf(name, "Untitled");
     sprintf(artist, "Somebody");
     sprintf(style, "Anything goes");
@@ -1449,6 +1450,11 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_UPDATE_REVERB_ED)
         {
             Actualize_Reverb_Ed(teac);
+        }
+
+        if(gui_action == GUI_CMD_UPDATE_MIDI_ED)
+        {
+            Actualize_Midi_Ed(teac);
         }
 
         if(gui_action == GUI_CMD_NEW_MODULE)
@@ -2418,6 +2424,7 @@ void Newmod(void)
         Use_Cubic = CUBIC_INT;
         sprintf(Selection_Name, "Untitled");
         sprintf(Reverb_Name, "Untitled");
+        sprintf(Midi_Name, "Untitled");
         sprintf(name, "Untitled");
         sprintf(artist, "Somebody");
         sprintf(style, "Anything Goes");
@@ -3149,12 +3156,20 @@ void Actualize_Input(void)
             gui_action = GUI_CMD_UPDATE_REVERB_ED;
             break;
 
-        // Reverb
+        // Selection
         case INPUT_SELECTION_NAME:
             Actualize_Name(retletter, Selection_Name);
             teac = 3;
             gui_action = GUI_CMD_UPDATE_SEQUENCER;
             break;
+
+        // Reverb
+        case INPUT_MIDI_NAME:
+            Actualize_Name(retletter, Midi_Name);
+            teac = UPDATE_MIDI_ED_CHANGE_NAME;
+            gui_action = GUI_CMD_UPDATE_MIDI_ED;
+            break;
+
     }
 }
 
@@ -3328,6 +3343,10 @@ void Keyboard_Handler(void)
     {
         Unselect_Selection();
         Track_Under_Caret++;
+        if(Track_Under_Caret >= Songtracks)
+        {
+            Track_Under_Caret = 0;
+        }
         Column_Under_Caret = 0;
         Actupated(0);
         gui_action = GUI_CMD_SET_FOCUS_TRACK;

@@ -22,23 +22,8 @@ v2.5.0:
 - Flanger speeded up.
 - Right mouse button in lists arrows is now active
   (jump to previous/next letter group for files lists).
-- Added some more converted modules for testing purposes:
-
-  Amarillo.ptk
-  Comic Bakery Remix.ptk
-  Elevator Zax.ptk
-  Factory of hybrid.ptk
-  Gone tipsy.ptk
-  Loop Influenza.ptk
-  Lunch with the gods.ptk
-  Space game.ptk
-  Spinning.ptk
-  Sudoku padawan.ptk
-  Vacation Climate.ptk
-  Without performer.ptk
-  Wonderland.ptk
-
-  also improved (?) other modules to take advantage of new features.
+- Added 13 new (converted) modules for testing purposes
+  also improved (?) older modules to take advantage of new features.
 - A file name can now be passed as argument to the tracker, it will
   be loaded at startup (can load any file recognized by the tracker).
   (this can be used to associate .ptk files to the tracker).
@@ -55,9 +40,8 @@ v2.5.0:
 TODO:
 
 - Midi profiles (save files for midi setup).
-- C(ontroller) C(ommand) mapping 0x00 to 0xff:
-
-  - Any midi cc written to output (catched with live recording).
+- C(ontroller) C(ommand) mapping 0x00 to 0xff.
+- Metronome.
 
 v2.1.4:
 

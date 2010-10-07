@@ -2098,6 +2098,12 @@ void Clear_Input(void)
         Actualize_Reverb_Ed(0);
     }
 
+    if(snamesel == INPUT_MIDI_NAME)
+    {
+        snamesel = INPUT_NONE;
+        Actualize_Midi_Ed(0);
+    }
+
     if(snamesel == INPUT_SELECTION_NAME)
     {
         snamesel = INPUT_NONE;
