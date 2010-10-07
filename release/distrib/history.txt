@@ -39,8 +39,6 @@ v2.5.0:
 
 TODO:
 
-- Midi profiles (save files for midi setup).
-- C(ontroller) C(ommand) mapping 0x00 to 0xff.
 - Metronome.
 
 v2.1.4:

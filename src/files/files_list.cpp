@@ -80,6 +80,7 @@ char Dir_Mods[MAX_PATH];
 char Dir_Instrs[MAX_PATH];
 char Dir_Presets[MAX_PATH];
 char Dir_Reverbs[MAX_PATH];
+char Dir_MidiCfg[MAX_PATH];
 char Dir_Patterns[MAX_PATH];
 char Dir_Samples[MAX_PATH];
 char *cur_dir;
@@ -223,6 +224,9 @@ void Set_Current_Dir(void)
             case SCOPE_ZONE_REVERB_DIR:
                 strcpy(Dir_Reverbs, "/");
                 break;
+            case SCOPE_ZONE_MIDICFG_DIR:
+                strcpy(Dir_MidiCfg, "/");
+                break;
             case SCOPE_ZONE_PATTERN_DIR:
                 strcpy(Dir_Patterns, "/");
                 break;
@@ -266,6 +270,10 @@ void Set_Current_Dir(void)
         case SCOPE_ZONE_REVERB_DIR:
             CHDIR(filename);
             GETCWD(Dir_Reverbs, MAX_PATH);
+            break;
+        case SCOPE_ZONE_MIDICFG_DIR:
+            CHDIR(filename);
+            GETCWD(Dir_MidiCfg, MAX_PATH);
             break;
         case SCOPE_ZONE_PATTERN_DIR:
             CHDIR(filename);
@@ -379,6 +387,9 @@ void Read_SMPT(void)
             break;
         case SCOPE_ZONE_SAMPLE_DIR:
             cur_dir = Dir_Samples;
+            break;
+        case SCOPE_ZONE_MIDICFG_DIR:
+            cur_dir = Dir_MidiCfg;
             break;
     }
     CHDIR(cur_dir);
@@ -587,12 +598,13 @@ void Dump_Files_List(int xr, int yr)
         case SCOPE_ZONE_PRESET_DIR:
         case SCOPE_ZONE_REVERB_DIR:
         case SCOPE_ZONE_PATTERN_DIR:
+        case SCOPE_ZONE_MIDICFG_DIR:
         case SCOPE_ZONE_SAMPLE_DIR:
             SetColor(COL_BACKGROUND);
             bjbox(xr - 1, yr + 1, Cur_Width - 412, 137);
 
             // Current dir background
-            Gui_Draw_Button_Box(394, 24, Cur_Width - 504, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, Cur_Width - 522, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
             switch(Scopish)
             {
@@ -607,6 +619,9 @@ void Dump_Files_List(int xr, int yr)
                     break;
                 case SCOPE_ZONE_REVERB_DIR:
                     PrintXY(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 504));
+                    break;
+                case SCOPE_ZONE_MIDICFG_DIR:
+                    PrintXY(398, 26, USE_FONT, Dir_MidiCfg, (Cur_Width - 504));
                     break;
                 case SCOPE_ZONE_PATTERN_DIR:
                     PrintXY(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 504));
@@ -685,6 +700,7 @@ void Actualize_Files_List(int modeac)
         case SCOPE_ZONE_INSTR_DIR:
         case SCOPE_ZONE_PRESET_DIR:
         case SCOPE_ZONE_REVERB_DIR:
+        case SCOPE_ZONE_MIDICFG_DIR:
         case SCOPE_ZONE_PATTERN_DIR:
         case SCOPE_ZONE_SAMPLE_DIR:
 

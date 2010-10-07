@@ -36,6 +36,9 @@
 
 // ------------------------------------------------------
 // Constants
+#define NBR_MIDI_DISPATCH_MSG 15
+#define NBR_MIDI_AUTOMATION 48
+
 enum MIDI_AUTOMATION
 {
     MIDI_AUTOMATION_NONE = 0,
@@ -45,6 +48,7 @@ enum MIDI_AUTOMATION
     MIDI_AUTOMATION_TRANSPORT_RECORD,
     MIDI_AUTOMATION_TRANSPORT_FORWARD,
     MIDI_AUTOMATION_TRANSPORT_REWIND,
+    MIDI_AUTOMATION_TRANSPORT_LIVEREC,
     MIDI_AUTOMATION_EDIT_SET_ROW,
     MIDI_AUTOMATION_EDIT_SET_TRACK,
     MIDI_AUTOMATION_EDIT_SET_INSTRUMENT,
@@ -109,12 +113,13 @@ typedef struct
 
 // ------------------------------------------------------
 // Variables
-MIDI_DISPATCH Midi_Dispatch_Table[];
-MIDI_PTK_CMD Str_Midi_Commands[];
+extern MIDI_DISPATCH Midi_Dispatch_Table[NBR_MIDI_DISPATCH_MSG];
+extern MIDI_PTK_CMD Str_Midi_Commands[NBR_MIDI_AUTOMATION];
 
 // ------------------------------------------------------
 // Functions
 void Dispatch_Midi_Msg(int CC, int Data);
+void Init_Midi_Ctrl(int CC, int Data);
 
 #endif
 

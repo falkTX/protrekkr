@@ -379,6 +379,14 @@ void Midi_Transport_Edit(int Data)
 }
 
 // ------------------------------------------------------
+// Start/Stop live rec (EDIT)
+void Midi_Transport_LiveRec(int Data)
+{
+    sr_isrecording ^= 1;
+    gui_action = GUI_CMD_RECORD_303;
+}
+
+// ------------------------------------------------------
 // Set pattern row (EDIT)
 void Midi_Edit_Set_Row(int Data)
 {
@@ -460,79 +468,80 @@ void Midi_Edit_Next_Track(int Data)
 
 // ------------------------------------------------------
 // Dispatch table
-MIDI_DISPATCH Midi_Dispatch_Table[] =
+MIDI_DISPATCH Midi_Dispatch_Table[NBR_MIDI_DISPATCH_MSG] =
 {
-    MIDI_AUTOMATION_NONE, 07,
-    MIDI_AUTOMATION_NONE, 71,
-    MIDI_AUTOMATION_NONE, 74,
-    MIDI_AUTOMATION_NONE, 84,
-    MIDI_AUTOMATION_NONE, 91,
-    MIDI_AUTOMATION_NONE, 05,
-    MIDI_AUTOMATION_NONE, 93,
-    MIDI_AUTOMATION_NONE, 22,
-    MIDI_AUTOMATION_NONE, 23,
-    MIDI_AUTOMATION_NONE, 24,
-    MIDI_AUTOMATION_NONE, 25,
-    MIDI_AUTOMATION_NONE, 26,
-    MIDI_AUTOMATION_NONE, 27,
-    MIDI_AUTOMATION_NONE, 28,
-    MIDI_AUTOMATION_NONE, 29,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0,
+    MIDI_AUTOMATION_NONE, 0
 };
 
-MIDI_PTK_CMD Str_Midi_Commands[] =
+MIDI_PTK_CMD Str_Midi_Commands[NBR_MIDI_AUTOMATION] =
 {
     { OPA_ N_ O_ N_ E_ CPA_, NULL },
 
-    { E_ D_ I_ T_ SLA_ P_ L_ A_ Y_, &Midi_Transport_Play },
-    { E_ D_ I_ T_ SLA_ S_ T_ O_ P_, &Midi_Transport_Stop },
-    { E_ D_ I_ T_ SLA_ E_ D_ I_ T_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Transport_Edit },
-    { E_ D_ I_ T_ SLA_ R_ E_ C_ O_ R_ D_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Transport_Record },
-    { E_ D_ I_ T_ SLA_ F_ O_ R_ W_ A_ R_ D_, &Midi_Transport_Forward },
-    { E_ D_ I_ T_ SLA_ R_ E_ W_ I_ N_ D_, &Midi_Transport_Rewind },
+    { E_ D_ I_ T_ DDT_ SPC_ P_ L_ A_ Y_, &Midi_Transport_Play },
+    { E_ D_ I_ T_ DDT_ SPC_ S_ T_ O_ P_, &Midi_Transport_Stop },
+    { E_ D_ I_ T_ DDT_ SPC_ E_ D_ I_ T_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Transport_Edit },
+    { E_ D_ I_ T_ DDT_ SPC_ R_ E_ C_ O_ R_ D_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Transport_Record },
+    { E_ D_ I_ T_ DDT_ SPC_ F_ O_ R_ W_ A_ R_ D_, &Midi_Transport_Forward },
+    { E_ D_ I_ T_ DDT_ SPC_ R_ E_ W_ I_ N_ D_, &Midi_Transport_Rewind },
+    { E_ D_ I_ T_ DDT_ SPC_ L_ I_ V_ E_ SPC_ R_ E_ C_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Transport_LiveRec },
 
-    { E_ D_ I_ T_ SLA_ S_ E_ T_ SPC_ R_ O_ W_, &Midi_Edit_Set_Row },
-    { E_ D_ I_ T_ SLA_ S_ E_ T_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Set_Track },
-    { E_ D_ I_ T_ SLA_ S_ E_ T_ SPC_ I_ N_ S_ T_ R_ U_ M_ E_ N_ T_, &Midi_Edit_Set_Instrument },
-    { E_ D_ I_ T_ SLA_ P_ R_ E_ V_ I_ O_ U_ S_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Previous_Track },
-    { E_ D_ I_ T_ SLA_ N_ E_ X_ T_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Next_Track },
-    { E_ D_ I_ T_ SLA_ P_ R_ E_ V_ I_ O_ U_ S_ SPC_ R_ O_ W_, &Midi_Edit_Previous_Row },
-    { E_ D_ I_ T_ SLA_ N_ E_ X_ T_ SPC_ R_ O_ W_, &Midi_Edit_Next_Row },
+    { E_ D_ I_ T_ DDT_ SPC_ S_ E_ T_ SPC_ R_ O_ W_, &Midi_Edit_Set_Row },
+    { E_ D_ I_ T_ DDT_ SPC_ S_ E_ T_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Set_Track },
+    { E_ D_ I_ T_ DDT_ SPC_ S_ E_ T_ SPC_ I_ N_ S_ T_ R_ U_ M_ E_ N_ T_, &Midi_Edit_Set_Instrument },
+    { E_ D_ I_ T_ DDT_ SPC_ P_ R_ E_ V_ I_ O_ U_ S_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Previous_Track },
+    { E_ D_ I_ T_ DDT_ SPC_ N_ E_ X_ T_ SPC_ T_ R_ A_ C_ K_, &Midi_Edit_Next_Track },
+    { E_ D_ I_ T_ DDT_ SPC_ P_ R_ E_ V_ I_ O_ U_ S_ SPC_ R_ O_ W_, &Midi_Edit_Previous_Row },
+    { E_ D_ I_ T_ DDT_ SPC_ N_ E_ X_ T_ SPC_ R_ O_ W_, &Midi_Edit_Next_Row },
 
-    { S_ O_ N_ G_ SLA_ S_ E_ T_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_Song_Set_Volume },
-    { S_ O_ N_ G_ SLA_ S_ E_ T_ SPC_ B_ P_ M_, &Midi_Song_Set_BPM },
+    { S_ O_ N_ G_ DDT_ SPC_ S_ E_ T_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_Song_Set_Volume },
+    { S_ O_ N_ G_ DDT_ SPC_ S_ E_ T_ SPC_ B_ P_ M_, &Midi_Song_Set_BPM },
 
-    { T_ R_ A_ C_ K_ SLA_ O_ N_ SLA_ O_ F_ F_, &Midi_Edit_Track_On_Off },
-    { T_ R_ A_ C_ K_ SLA_ P_ A_ N_ N_ I_ N_ G_, &Midi_Track_Set_Panning },
-    { T_ R_ A_ C_ K_ SLA_ V_ O_ L_ U_ M_ E_, &Midi_Track_Set_Volume },
-    { T_ R_ A_ C_ K_ SLA_ L_ F_ O_ SPC_ C_ A_ R_ R_ I_ E_ R_, &Midi_Track_Set_LFO_Carrier },
-    { T_ R_ A_ C_ K_ SLA_ C_ U_ T_ O_ F_ F_, &Midi_Track_Set_Cutoff },
-    { T_ R_ A_ C_ K_ SLA_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_Track_Set_Resonance },
-    { T_ R_ A_ C_ K_ SLA_ R_ E_ V_ E_ R_ B_, &Midi_Track_Set_Reverb },
-    { T_ R_ A_ C_ K_ SLA_ D_ I_ S_ T_ O_ SPC_ T_ H_ R_ E_ S_ H_ O_ L_ D_, &Midi_Track_Set_Disto_Threshold },
-    { T_ R_ A_ C_ K_ SLA_ D_ I_ S_ T_ O_ SPC_ C_ L_ A_ M_ P_, &Midi_Track_Set_Disto_Clamp },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ O_ N_ SLA_ O_ F_ F_, &Midi_Edit_Track_On_Off },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ P_ A_ N_ N_ I_ N_ G_, &Midi_Track_Set_Panning },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_Track_Set_Volume },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ L_ F_ O_ SPC_ C_ A_ R_ R_ I_ E_ R_, &Midi_Track_Set_LFO_Carrier },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ C_ U_ T_ O_ F_ F_, &Midi_Track_Set_Cutoff },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_Track_Set_Resonance },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ R_ E_ V_ E_ R_ B_, &Midi_Track_Set_Reverb },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ D_ I_ S_ T_ O_ SPC_ T_ H_ R_ E_ S_ H_ O_ L_ D_, &Midi_Track_Set_Disto_Threshold },
+    { T_ R_ A_ C_ K_ DDT_ SPC_ D_ I_ S_ T_ O_ SPC_ C_ L_ A_ M_ P_, &Midi_Track_Set_Disto_Clamp },
 
-    { _3 _0 _3 DOT_ _1 SLA_ T_ U_ N_ E_, &Midi_303_Set_1_Tune },
-    { _3 _0 _3 DOT_ _2 SLA_ T_ U_ N_ E_, &Midi_303_Set_2_Tune },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ T_ U_ N_ E_, &Midi_303_Set_Cur_Tune },
-    { _3 _0 _3 DOT_ _1 SLA_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_1_Cutoff },
-    { _3 _0 _3 DOT_ _2 SLA_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_2_Cutoff },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_Cur_Cutoff },
-    { _3 _0 _3 DOT_ _1 SLA_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_1_Resonance },
-    { _3 _0 _3 DOT_ _2 SLA_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_2_Resonance },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_Cur_Resonance },
-    { _3 _0 _3 DOT_ _1 SLA_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_1_Envmod },
-    { _3 _0 _3 DOT_ _2 SLA_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_2_Envmod },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_Cur_Envmod },
-    { _3 _0 _3 DOT_ _1 SLA_ D_ E_ C_ A_ Y_, &Midi_303_Set_1_Decay },
-    { _3 _0 _3 DOT_ _2 SLA_ D_ E_ C_ A_ Y_, &Midi_303_Set_2_Decay },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ D_ E_ C_ A_ Y_, &Midi_303_Set_Cur_Decay },
-    { _3 _0 _3 DOT_ _1 SLA_ A_ C_ C_ E_ N_ T_ , &Midi_303_Set_1_Accent },
-    { _3 _0 _3 DOT_ _2 SLA_ A_ C_ C_ E_ N_ T_, &Midi_303_Set_2_Accent },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ A_ C_ C_ E_ N_ T_, &Midi_303_Set_Cur_Accent },
-    { _3 _0 _3 DOT_ _1 SLA_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_1_Volume },
-    { _3 _0 _3 DOT_ _2 SLA_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_2_Volume },
-    { _3 _0 _3 DOT_ C_ U_ R_ R_ SLA_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_Cur_Volume },
-    { _3 _0 _3 SLA_ S_ W_ I_ T_ C_ H_, &Midi_303_Switch }
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ T_ U_ N_ E_, &Midi_303_Set_1_Tune },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ T_ U_ N_ E_, &Midi_303_Set_2_Tune },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ T_ U_ N_ E_, &Midi_303_Set_Cur_Tune },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_1_Cutoff },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_2_Cutoff },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ C_ U_ T_ O_ F_ F_, &Midi_303_Set_Cur_Cutoff },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_1_Resonance },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_2_Resonance },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ R_ E_ S_ O_ N_ A_ N_ C_ E_, &Midi_303_Set_Cur_Resonance },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_1_Envmod },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_2_Envmod },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ E_ N_ V_ M_ O_ D_, &Midi_303_Set_Cur_Envmod },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ D_ E_ C_ A_ Y_, &Midi_303_Set_1_Decay },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ D_ E_ C_ A_ Y_, &Midi_303_Set_2_Decay },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ D_ E_ C_ A_ Y_, &Midi_303_Set_Cur_Decay },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ A_ C_ C_ E_ N_ T_ , &Midi_303_Set_1_Accent },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ A_ C_ C_ E_ N_ T_, &Midi_303_Set_2_Accent },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ A_ C_ C_ E_ N_ T_, &Midi_303_Set_Cur_Accent },
+    { _3 _0 _3 DOT_ _1 DDT_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_1_Volume },
+    { _3 _0 _3 DOT_ _2 DDT_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_2_Volume },
+    { _3 _0 _3 SPC_ OPA_ C_ U_ R_ R_ DOT_ CPA_ DDT_ SPC_ V_ O_ L_ U_ M_ E_, &Midi_303_Set_Cur_Volume },
+    { _3 _0 _3 DDT_ SPC_ S_ W_ I_ T_ C_ H_, &Midi_303_Switch }
 };
 
 // ------------------------------------------------------
@@ -548,10 +557,9 @@ void Dispatch_Midi_Msg(int CC, int Data)
         {
             if(Str_Midi_Commands[Midi_Dispatch_Table[i].Automation].routine)
             {
-                Str_Midi_Commands[i].routine(Data);
+                Str_Midi_Commands[Midi_Dispatch_Table[i].Automation].routine(Data);
             }
         }
-
     }
 }
 

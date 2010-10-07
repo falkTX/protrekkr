@@ -67,6 +67,7 @@ extern char Dir_Mods[MAX_PATH];
 extern char Dir_Instrs[MAX_PATH];
 extern char Dir_Presets[MAX_PATH];
 extern char Dir_Reverbs[MAX_PATH];
+extern char Dir_MidiCfg[MAX_PATH];
 extern char Dir_Patterns[MAX_PATH];
 extern char Dir_Samples[MAX_PATH];
 extern char Use_Cubic;

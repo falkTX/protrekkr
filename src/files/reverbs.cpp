@@ -64,20 +64,20 @@ void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
 // Save the data to a reverb file (or a module)
 void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
-                      FILE *in)
+                      FILE *out)
 {
     int i;
 
-    Write_Function(&num_echoes, sizeof(char), 1, in);
+    Write_Function(&num_echoes, sizeof(char), 1, out);
 
     // Save the reverb data
     for(i = 0; i < num_echoes; i++)
     {
-        Write_Function_Swap(&delays[i], sizeof(int), 1, in);
+        Write_Function_Swap(&delays[i], sizeof(int), 1, out);
     }
     for(i = 0; i < num_echoes; i++)
     {
-        Write_Function_Swap(&decays[i], sizeof(float), 1, in);
+        Write_Function_Swap(&decays[i], sizeof(float), 1, out);
     }
 }
 

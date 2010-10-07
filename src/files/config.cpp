@@ -62,7 +62,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "PROTCFGD");
+    sprintf(extension, "PROTCFGE");
     Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -110,6 +110,7 @@ void SaveConfig(void)
         Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, out);
         Write_Data(&Dir_Presets, sizeof(Dir_Presets), 1, out);
         Write_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, out);
+        Write_Data(&Dir_MidiCfg, sizeof(Dir_MidiCfg), 1, out);
         Write_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, out);
         Write_Data(&Dir_Samples, sizeof(Dir_Samples), 1, out);
         Write_Data(KeyboardName, MAX_PATH, 1, out);
@@ -126,6 +127,9 @@ void SaveConfig(void)
 
         Write_Data(&Use_Shadows, sizeof(char), 1, out);
         Write_Data(&Global_Patterns_Font, sizeof(char), 1, out);
+
+        // Save the compelte midi automation config
+        Save_MidiCfg_Data(Write_Data, Write_Data_Swap, out);
 
         Write_Data_Swap(&Cur_Width, sizeof(int), 1, out);
         Write_Data_Swap(&Cur_Height, sizeof(int), 1, out);
@@ -172,7 +176,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "PROTCFGD") == 0)
+        if(strcmp(extension, "PROTCFGE") == 0)
         {
             Read_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -210,6 +214,7 @@ void LoadConfig(void)
             Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);
             Read_Data(&Dir_Reverbs, sizeof(Dir_Reverbs), 1, in);
+            Read_Data(&Dir_MidiCfg, sizeof(Dir_MidiCfg), 1, in);
             Read_Data(&Dir_Patterns, sizeof(Dir_Patterns), 1, in);
             Read_Data(&Dir_Samples, sizeof(Dir_Samples), 1, in);
             Read_Data(KeyboardName, MAX_PATH, 1, in);
@@ -239,6 +244,9 @@ void LoadConfig(void)
                 userscreen = USER_SCREEN_DISKIO_EDIT;
                 curr_tab_highlight = USER_SCREEN_DISKIO_EDIT;
             }
+
+            // Reload the compelte midi automation config
+            Load_MidiCfg_Data(Read_Data, Read_Data_Swap, in);
 
             Read_Data_Swap(&Cur_Width, sizeof(int), 1, in);
             Read_Data_Swap(&Cur_Height, sizeof(int), 1, in);
@@ -320,6 +328,18 @@ void LoadConfig(void)
         strcat(Dir_Reverbs, "\\reverbs");
 #else
         strcat(Dir_Reverbs, "/reverbs");
+#endif
+
+    }
+
+    if(!strlen(Dir_MidiCfg))
+    {
+        GETCWD(Dir_MidiCfg, MAX_PATH);
+
+#if defined(__WIN32__)
+        strcat(Dir_MidiCfg, "\\midicfgs");
+#else
+        strcat(Dir_MidiCfg, "/midicfgs");
 #endif
 
     }

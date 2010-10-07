@@ -49,6 +49,7 @@
 #include "../files/include/mods.h"
 #include "../files/include/303s.h"
 #include "../files/include/reverbs.h"
+#include "../files/include/midi_cfg.h"
 #include "../files/include/patterns.h"
 
 #include "../editors/include/editor_setup.h"

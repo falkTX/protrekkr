@@ -467,6 +467,10 @@ SOURCE=.\src\files\insts.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\files\midi_cfg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\files\mods.cpp
 # End Source File
 # Begin Source File
