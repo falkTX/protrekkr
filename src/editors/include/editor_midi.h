@@ -43,6 +43,26 @@
 #endif
 
 // ------------------------------------------------------
+// Constants
+#define UPDATE_MIDI_ED_ALL 0
+#define UPDATE_MIDI_ED_CC0 UPDATE_MIDI_ED_ALL + 1
+#define UPDATE_MIDI_ED_CC1 UPDATE_MIDI_ED_CC0 + 1
+#define UPDATE_MIDI_ED_CC2 UPDATE_MIDI_ED_CC1 + 1
+#define UPDATE_MIDI_ED_CC3 UPDATE_MIDI_ED_CC2 + 1
+#define UPDATE_MIDI_ED_CC4 UPDATE_MIDI_ED_CC3 + 1
+#define UPDATE_MIDI_ED_CC5 UPDATE_MIDI_ED_CC4 + 1
+#define UPDATE_MIDI_ED_CC6 UPDATE_MIDI_ED_CC5 + 1
+#define UPDATE_MIDI_ED_CC7 UPDATE_MIDI_ED_CC6 + 1
+#define UPDATE_MIDI_ED_CC8 UPDATE_MIDI_ED_CC7 + 1
+#define UPDATE_MIDI_ED_CC9 UPDATE_MIDI_ED_CC8 + 1
+#define UPDATE_MIDI_ED_CC10 UPDATE_MIDI_ED_CC9 + 1
+#define UPDATE_MIDI_ED_CC11 UPDATE_MIDI_ED_CC10 + 1
+#define UPDATE_MIDI_ED_CC12 UPDATE_MIDI_ED_CC11 + 1
+#define UPDATE_MIDI_ED_CC13 UPDATE_MIDI_ED_CC12 + 1
+#define UPDATE_MIDI_ED_CC14 UPDATE_MIDI_ED_CC13 + 1
+#define UPDATE_MIDI_ED_CC15 UPDATE_MIDI_ED_CC14 + 1
+
+// ------------------------------------------------------
 // Functions
 void Draw_Midi_Ed(void);
 void Actualize_Midi_Ed(char gode);

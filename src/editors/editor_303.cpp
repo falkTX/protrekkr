@@ -48,6 +48,8 @@ unsigned char tb303_buffer_tone[4][16];
 
 unsigned char editsteps[2][32];
 
+int Refresh_Unit;
+
 extern REQUESTER Overwrite_Requester;
 
 // ------------------------------------------------------
@@ -100,187 +102,191 @@ void Actualize_303_Ed(char gode)
 void Refresh_303_Unit(int Unit, int gode)
 {
     char tcp[40];
+
+    if(userscreen == USER_SCREEN_TB303_EDIT)
+    {
     
-    if(gode == 0 ||
-       gode == 1)
-    {
-        number303(tb303[Unit].patternlength[tb303[Unit].selectedpattern], 118, (Cur_Height - 44));
-    }
-
-    // Selected bassline
-    if(gode == 0)
-    {
-        if(Unit)
+        if(gode == 0 ||
+           gode == 1)
         {
-            Skincopy(577, (Cur_Height - 58), 138, 119, 3, 3);
-            Skincopy(558, (Cur_Height - 58), 143, 119, 3, 3);
-        }
-        else
-        {
-            Skincopy(558, (Cur_Height - 58), 138, 119, 3, 3);
-            Skincopy(577, (Cur_Height - 58), 143, 119, 3, 3);
+            number303(tb303[Unit].patternlength[tb303[Unit].selectedpattern], 118, (Cur_Height - 44));
         }
 
-        // Make sure we display the right boundaries
-        if(editsteps[Unit][tb303[Unit].selectedpattern] > tb303[Unit].patternlength[tb303[Unit].selectedpattern] - 1)
+        // Selected bassline
+        if(gode == 0)
         {
-            editsteps[Unit][tb303[Unit].selectedpattern] = tb303[Unit].patternlength[tb303[Unit].selectedpattern] - 1;
+            if(Unit)
+            {
+                Skincopy(577, (Cur_Height - 58), 138, 119, 3, 3);
+                Skincopy(558, (Cur_Height - 58), 143, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(558, (Cur_Height - 58), 138, 119, 3, 3);
+                Skincopy(577, (Cur_Height - 58), 143, 119, 3, 3);
+            }
+
+            // Make sure we display the right boundaries
+            if(editsteps[Unit][tb303[Unit].selectedpattern] > tb303[Unit].patternlength[tb303[Unit].selectedpattern] - 1)
+            {
+                editsteps[Unit][tb303[Unit].selectedpattern] = tb303[Unit].patternlength[tb303[Unit].selectedpattern] - 1;
+            }
+
+            number303(editsteps[Unit][tb303[Unit].selectedpattern] + 1, 486, (Cur_Height - 114));
+            // Displaying pattern selection leds
+            // Bank [A-D]
+            int tbank303 = tb303[Unit].selectedpattern / 8;
+            tbank303 *= 15;
+            // Restoring background
+            Skincopy(86, (Cur_Height - 74), 6, 66, 59, 14);
+            // Light the bank
+            Skincopy(86 + tbank303, (Cur_Height - 74), 15 + tbank303, 117, 14, 14);
+            // Displaying pattern selection leds
+            // Pattern [1-8]
+            int tpat303 = tb303[Unit].selectedpattern - (tb303[Unit].selectedpattern / 8) * 8;
+            // Restoring background
+            Skincopy(86, (Cur_Height - 116), 6, 24, 59, 30);
+            // Light the bank
+            if(tpat303 < 4)
+            {
+                Skincopy(86 + tpat303 * 15, (Cur_Height - 116), 75 + tpat303 * 15, 117, 14, 14);
+            }
+            else
+            {
+                tpat303 -= 4;
+                Skincopy(86 + tpat303 * 15, (Cur_Height - 101), 75 + tpat303 * 15, 132, 14, 14);
+            }
         }
 
-        number303(editsteps[Unit][tb303[Unit].selectedpattern] + 1, 486, (Cur_Height - 114));
-        // Displaying pattern selection leds
-        // Bank [A-D]
-        int tbank303 = tb303[Unit].selectedpattern / 8;
-        tbank303 *= 15;
-        // Restoring background
-        Skincopy(86, (Cur_Height - 74), 6, 66, 59, 14);
-        // Light the bank
-        Skincopy(86 + tbank303, (Cur_Height - 74), 15 + tbank303, 117, 14, 14);
-        // Displaying pattern selection leds
-        // Pattern [1-8]
-        int tpat303 = tb303[Unit].selectedpattern - (tb303[Unit].selectedpattern / 8) * 8;
-        // Restoring background
-        Skincopy(86, (Cur_Height - 116), 6, 24, 59, 30);
-        // Light the bank
-        if(tpat303 < 4)
+        // Displaying waveform switch
+        if(gode == 0 || gode == 2)
         {
-            Skincopy(86 + tpat303 * 15, (Cur_Height - 116), 75 + tpat303 * 15, 117, 14, 14);
+            if(tb303[Unit].waveform) Skincopy(180, (Cur_Height - 128), 137, 135, 13, 8);
+            else Skincopy(180, (Cur_Height - 128), 137, 125, 13, 8);
         }
-        else
-        {
-            tpat303 -= 4;
-            Skincopy(86 + tpat303 * 15, (Cur_Height - 101), 75 + tpat303 * 15, 132, 14, 14);
-        }
-    }
 
-    // Displaying waveform switch
-    if(gode == 0 || gode == 2)
-    {
-        if(tb303[Unit].waveform) Skincopy(180, (Cur_Height - 128), 137, 135, 13, 8);
-        else Skincopy(180, (Cur_Height - 128), 137, 125, 13, 8);
-    }
+        // Draw 303 Knobs
+        if(gode == 0 || gode == 3) knob(229, (Cur_Height - 124), tb303[Unit].tune / 2);
+        if(gode == 0 || gode == 4) knob(262, (Cur_Height - 124), tb303[Unit].cutoff / 2);
+        if(gode == 0 || gode == 5) knob(295, (Cur_Height - 124), tb303[Unit].resonance / 2);
+        if(gode == 0 || gode == 6) knob(328, (Cur_Height - 124), tb303[Unit].envmod / 2);
+        if(gode == 0 || gode == 7) knob(361, (Cur_Height - 124), tb303[Unit].decay / 2);
+        if(gode == 0 || gode == 8) knob(394, (Cur_Height - 124), tb303[Unit].accent / 2);
 
-    // Draw 303 Knobs
-    if(gode == 0 || gode == 3) knob(229, (Cur_Height - 124), tb303[Unit].tune / 2);
-    if(gode == 0 || gode == 4) knob(262, (Cur_Height - 124), tb303[Unit].cutoff / 2);
-    if(gode == 0 || gode == 5) knob(295, (Cur_Height - 124), tb303[Unit].resonance / 2);
-    if(gode == 0 || gode == 6) knob(328, (Cur_Height - 124), tb303[Unit].envmod / 2);
-    if(gode == 0 || gode == 7) knob(361, (Cur_Height - 124), tb303[Unit].decay / 2);
-    if(gode == 0 || gode == 8) knob(394, (Cur_Height - 124), tb303[Unit].accent / 2);
+        // Restoring notes background
+        if(gode == 0 || gode == 9)
+        {
+            // Restore it
+            Skincopy(88 + 80, 66 + (Cur_Height - 140), 88, 66, 195, 40);
 
-    // Restoring notes background
-    if(gode == 0 || gode == 9)
-    {
-        // Restore it
-        Skincopy(88 + 80, 66 + (Cur_Height - 140), 88, 66, 195, 40);
+            // Light a note
+            switch(tb303[Unit].tone[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]])
+            {
+                case 0: Skincopy(88 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 1: Skincopy(101 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 2: Skincopy(114 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 3: Skincopy(127 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 4: Skincopy(140 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 5: Skincopy(166 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 6: Skincopy(179 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 7: Skincopy(191 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 8: Skincopy(204 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 9: Skincopy(217 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 10: Skincopy(230 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 11: Skincopy(243 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+                case 12: Skincopy(269 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+            }
+        }
 
-        // Light a note
-        switch(tb303[Unit].tone[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]])
+        // Light pause/note led
+        if(gode == 0 || gode == 10)
         {
-            case 0: Skincopy(88 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 1: Skincopy(101 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 2: Skincopy(114 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 3: Skincopy(127 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 4: Skincopy(140 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 5: Skincopy(166 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 6: Skincopy(179 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 7: Skincopy(191 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 8: Skincopy(204 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 9: Skincopy(217 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 10: Skincopy(230 + 80, 66 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 11: Skincopy(243 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
-            case 12: Skincopy(269 + 80, 91 + (Cur_Height - 140), 301, 119, 13, 13); break;
+            if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].pause)
+            {
+                Skincopy(402, (Cur_Height - 79), 138, 119, 3, 3);
+                Skincopy(439, (Cur_Height - 79), 143, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(402, (Cur_Height - 79), 143, 119, 3, 3);
+                Skincopy(439, (Cur_Height - 79), 138, 119, 3, 3);
+            }
         }
-    }
 
-    // Light pause/note led
-    if(gode == 0 || gode == 10)
-    {
-        if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].pause)
+        // Light slide/off led
+        if(gode == 0 || gode == 11)
         {
-            Skincopy(402, (Cur_Height - 79), 138, 119, 3, 3);
-            Skincopy(439, (Cur_Height - 79), 143, 119, 3, 3);
+            if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].slide_flag)
+            {
+                Skincopy(456, (Cur_Height - 57), 138, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(456, (Cur_Height - 57), 143, 119, 3, 3);
+            }
         }
-        else
-        {
-            Skincopy(402, (Cur_Height - 79), 143, 119, 3, 3);
-            Skincopy(439, (Cur_Height - 79), 138, 119, 3, 3);
-        }
-    }
 
-    // Light slide/off led
-    if(gode == 0 || gode == 11)
-    {
-        if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].slide_flag)
+        // Light accent/off led
+        if(gode == 0 || gode == 12)
         {
-            Skincopy(456, (Cur_Height - 57), 138, 119, 3, 3);
+            if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].accent_flag)
+            {
+                Skincopy(431, (Cur_Height - 57), 138, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(431, (Cur_Height - 57), 143, 119, 3, 3);
+            }
         }
-        else
-        {
-            Skincopy(456, (Cur_Height - 57), 143, 119, 3, 3);
-        }
-    }
 
-    // Light accent/off led
-    if(gode == 0 || gode == 12)
-    {
-        if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].accent_flag)
+        // Transpose up flag
+        if(gode == 0 || gode == 13)
         {
-            Skincopy(431, (Cur_Height - 57), 138, 119, 3, 3);
+            if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].transposeup_flag)
+            {
+                Skincopy(406, (Cur_Height - 57), 138, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(406, (Cur_Height - 57), 143, 119, 3, 3);
+            }
         }
-        else
-        {
-            Skincopy(431, (Cur_Height - 57), 143, 119, 3, 3);
-        }
-    }
 
-    // Transpose up flag
-    if(gode == 0 || gode == 13)
-    {
-        if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].transposeup_flag)
+        // Transpose down flag
+        if(gode == 0 || gode == 14)
         {
-            Skincopy(406, (Cur_Height - 57), 138, 119, 3, 3);
+            if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].transposedown_flag)
+            {
+                Skincopy(381, (Cur_Height - 57), 138, 119, 3, 3);
+            }
+            else
+            {
+                Skincopy(381, (Cur_Height - 57), 143, 119, 3, 3);
+            }
         }
-        else
-        {
-            Skincopy(406, (Cur_Height - 57), 143, 119, 3, 3);
-        }
-    }
 
-    // Transpose down flag
-    if(gode == 0 || gode == 14)
-    {
-        if(tb303[Unit].flag[tb303[Unit].selectedpattern][editsteps[Unit][tb303[Unit].selectedpattern]].transposedown_flag)
+        // Volume
+        if(gode == 0 || gode == 15)
         {
-            Skincopy(381, (Cur_Height - 57), 138, 119, 3, 3);
+            // volume background
+            Skincopy(529, (Cur_Height - 115), 449, 25, 19, 88);
+            int tb303v = (int) (tb303engine[Unit].tbVolume * 72.0f);
+            // Volume slider
+            Skincopy(531, (Cur_Height - 42) - tb303v, 0, 116, 13, 11);
         }
-        else
-        {
-            Skincopy(381, (Cur_Height - 57), 143, 119, 3, 3);
-        }
-    }
 
-    // Volume
-    if(gode == 0 || gode == 15)
-    {
-        // volume background
-        Skincopy(529, (Cur_Height - 115), 449, 25, 19, 88);
-        int tb303v = (int) (tb303engine[Unit].tbVolume * 72.0f);
-        // Volume slider
-        Skincopy(531, (Cur_Height - 42) - tb303v, 0, 116, 13, 11);
-    }
-
-    if(gode == 0 || gode == 18)
-    {
-        sprintf(tcp, "%s_", tb303[Unit].pattern_name[tb303[Unit].selectedpattern]);
-
-        if(snamesel == INPUT_303_PATTERN)
+        if(gode == 0 || gode == 18)
         {
-            Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
-        }
-        else
-        {
-            Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tb303[Unit].pattern_name[tb303[Unit].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
+            sprintf(tcp, "%s_", tb303[Unit].pattern_name[tb303[Unit].selectedpattern]);
+
+            if(snamesel == INPUT_303_PATTERN)
+            {
+                Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tcp, BUTTON_PUSHED | BUTTON_INPUT);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tb303[Unit].pattern_name[tb303[Unit].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
+            }
         }
     }
 }

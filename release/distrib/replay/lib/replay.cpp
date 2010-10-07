@@ -2211,8 +2211,9 @@ void Sp_Player(void)
 #endif
                 }
 
-                // Check the 303s fx effects right triggering them
 #if !defined(__STAND_ALONE__)
+                // Check if the user is recording 303 effects
+                // In that case we don't read the row data
                 if(!sr_isrecording)
 #endif
 #if defined(PTK_303)
@@ -4570,10 +4571,10 @@ void Do_Effects_Ticks_X(void)
 #if defined(PTK_FX_SETBPM)
                 // $f0 Set BPM
                 case 0xf0:
-                    if(pltr_dat_row[k] > 20)
+                    if(pltr_dat_row[k] >= 20)
                     {
                         BeatsPerMin = (int) pltr_dat_row[k];
-                        SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));  
+                        SamplesPerTick = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
                         SamplesPerSub = SamplesPerTick / 6;
                     }
 

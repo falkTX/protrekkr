@@ -47,6 +47,9 @@
 extern int Cur_Seq_Buffer;
 extern char Selection_Name[20];
 
+extern int Ext_Pos_Switch;
+extern int Ext_Track_Switch;
+
 // ------------------------------------------------------
 // Functions
 void Draw_Sequencer_Ed(void);

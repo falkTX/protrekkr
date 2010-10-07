@@ -160,6 +160,9 @@
 #define DOT_ "\250"
 #define TIR_ "\251"
 #define SPC_ "\252"
+#define SLA_ "\373"
+#define OPA_ "\374"
+#define CPA_ "\375"
 
 // ------------------------------------------------------
 // Structures

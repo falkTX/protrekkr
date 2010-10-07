@@ -76,6 +76,9 @@ int cur_seq_buffer[] =
 int Remap_From;
 int Remap_To;
 
+int Ext_Pos_Switch;
+int Ext_Track_Switch;
+
 // ------------------------------------------------------
 // Functions
 void SeqFill(int st, int en, char n);

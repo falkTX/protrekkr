@@ -965,6 +965,67 @@ void Display_Patt_Line(int In_Prev_Next, int Shadow_Pattern,
 }
 
 // ------------------------------------------------------
+// Record a FX on a track using various stratagems
+void Record_Live_Fx(int Track,
+                    int Pattern,
+                    int Line,
+                    int Cmd,
+                    int Data,
+                    int Free)
+{
+    int i;
+    int Cur_Track;
+    int offset_t;
+    int Track_Tried;
+
+    Track_Tried = 0;
+    Cur_Track = Track;
+
+Write_Fx:
+
+    offset_t = Get_Pattern_Offset(Pattern, Cur_Track, Line);
+    for(i = 0; i < Channels_Effects[Cur_Track]; i++)
+    {
+        // A fx similar is already there: let's replace it with a new value
+        if(*(RawPatterns + offset_t + PATTERN_FX + (i * 2)) == Cmd)
+        {
+            *(RawPatterns + offset_t + PATTERN_FXDATA + (i * 2)) = Data;
+            return;
+        }
+        // Place it on the first empty column otherwise
+        if(*(RawPatterns + offset_t + PATTERN_FX + (i * 2)) == 0 &&
+           *(RawPatterns + offset_t + PATTERN_FXDATA + (i * 2)) == 0)
+        {
+            *(RawPatterns + offset_t + PATTERN_FX + (i * 2)) = Cmd;
+            *(RawPatterns + offset_t + PATTERN_FXDATA + (i * 2)) = Data;
+            return;
+        }
+    }
+    // No free slot have been found on the row
+    if(Free)
+    {
+        // 303 units aren't bounded to any track so we can try another one for those
+        Cur_Track++;
+        if(Cur_Track >= Songtracks) Cur_Track = 0;
+        // Try with the current amount of tracks
+        Track_Tried++;
+        if(Track_Tried < Songtracks) goto Write_Fx;
+        // Back to where we were
+        Cur_Track = Track;
+    }
+    // We couldn't find any suitable slot
+    // We'll try to increase the number of effects if possible
+    if(Channels_Effects[Cur_Track] < MAX_FX)
+    {
+        Channels_Effects[Cur_Track]++;
+        *(RawPatterns + offset_t + PATTERN_FX + ((Channels_Effects[Cur_Track] - 1) * 2)) = Cmd;
+        *(RawPatterns + offset_t + PATTERN_FXDATA + ((Channels_Effects[Cur_Track] - 1) * 2)) = Data;
+        return;
+    }
+    // We couldn't record the command
+}
+
+// ------------------------------------------------------
 // Draw the caret pattern row
 void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
 {
@@ -979,7 +1040,6 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
     int tracky;
     int high_col;
     int i;
-    int rec_to_fx2;
     int dover_break;
     int Real_visible;
 
@@ -1375,113 +1435,80 @@ void draw_pated_highlight(int track, int line, int petrack, int row, int ypos)
                     if(livevalue < 0) livevalue = 0;
                     if(livevalue > 255) livevalue = 255;
 
-                    // Check if the caret is on any of the extra fx columns
-                    switch(Get_Column_Type(Channels_MultiNotes, Channels_Effects, Column_Under_Caret))
-                    {
-                        case EFFECT2HI:
-                        case EFFECT2LO:
-                        case EFFECT2DATHI:
-                        case EFFECT2DATLO:
-                            rec_to_fx2 = (PATTERN_FX2 - PATTERN_FX);
-                            break;
-                        case EFFECT3HI:
-                        case EFFECT3LO:
-                        case EFFECT3DATHI:
-                        case EFFECT3DATLO:
-                            rec_to_fx2 = (PATTERN_FX3 - PATTERN_FX);
-                            break;
-                        case EFFECT4HI:
-                        case EFFECT4LO:
-                        case EFFECT4DATHI:
-                        case EFFECT4DATLO:
-                            rec_to_fx2 = (PATTERN_FX4 - PATTERN_FX);
-                            break;
-                        default:
-                            rec_to_fx2 = 0;
-                            break;
-                    }
                     switch(liveparam)
                     {
+                        case LIVE_PARAM_SONG_VOLUME:
+                            Record_Live_Fx(cur_track, pattern, line, 0x1c, livevalue, TRUE);
+                            break;
+                        case LIVE_PARAM_SONG_BPM:
+                            Record_Live_Fx(cur_track, pattern, line, 0xf0, livevalue, TRUE);
+                            break;
                         case LIVE_PARAM_TRACK_CUTOFF:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 8;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 8, livevalue, FALSE);
                             break;
                         case LIVE_PARAM_TRACK_RESONANCE:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x14;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x14, livevalue, FALSE);
                             break;
                         case LIVE_PARAM_TRACK_REVERB_SEND:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x11;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x11, livevalue, FALSE);
                             break;
                         case LIVE_PARAM_TRACK_THRESHOLD:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x12;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x12, livevalue, FALSE);
                             break;
                         case LIVE_PARAM_TRACK_CLAMP:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x13;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x13, livevalue, FALSE);
+                            break;
+                        case LIVE_PARAM_TRACK_LFO_CARRIER:
+                            Record_Live_Fx(cur_track, pattern, line, 0x16, livevalue, FALSE);
                             break;
                         case LIVE_PARAM_TRACK_PANNING:
                             if(livevalue > 0x80) livevalue = 0x80;
                             *(RawPatterns + offset_t + PATTERN_PANNING) = livevalue;
                             break;
-
+                        case LIVE_PARAM_TRACK_VOLUME:
+                            *(RawPatterns + offset_t + PATTERN_VOLUME) = livevalue;
+                            break;
                         case LIVE_PARAM_303_1_CUTOFF:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x33;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x33, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_CUTOFF:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x34;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x34, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_RESONANCE:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x35;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x35, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_RESONANCE:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x36;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x36, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_ENVMOD:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x37;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x37, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_ENVMOD:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x38;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x38, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_DECAY:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x39;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x39, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_DECAY:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3a;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x3a, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_ACCENT:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3b;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x3b, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_ACCENT:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3c;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x3c, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_TUNE:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3d;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x3d, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_TUNE:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x3e;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x3e, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_1_VOLUME:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x41;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x41, livevalue, TRUE);
                             break;
                         case LIVE_PARAM_303_2_VOLUME:
-                            *(RawPatterns + offset_t + PATTERN_FX + rec_to_fx2) = 0x42;
-                            *(RawPatterns + offset_t + PATTERN_FXDATA + rec_to_fx2) = livevalue;
+                            Record_Live_Fx(cur_track, pattern, line, 0x42, livevalue, TRUE);
                             break;
                     } // Close switch
 

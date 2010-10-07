@@ -848,6 +848,16 @@ int Screen_Update(void)
             Anat(Song_Position);
         }
 
+        if(gui_action == GUI_CMD_GOTO_PREVIOUS_ROW)
+        {
+            Goto_Previous_Row();
+        }
+
+        if(gui_action == GUI_CMD_GOTO_NEXT_ROW)
+        {
+            Goto_Next_Row();
+        }
+
         if(gui_action == GUI_CMD_REDUCE_SONG_LENGTH)
         {
             Song_Length--;
@@ -865,6 +875,24 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_UPDATE_SEQUENCER)
         {
             Actualize_Sequencer();
+        }
+
+        if(gui_action == GUI_CMD_SWITCH_TRACK_STATUS)
+        {
+            Toggle_Track_On_Off_Status(Ext_Pos_Switch, Ext_Track_Switch);
+            Actualize_Sequencer();
+        }
+
+        if(gui_action == GUI_CMD_UPDATE_PATTERN)
+        {
+            Actupated(0);
+        }
+
+        if(gui_action == GUI_CMD_SET_FOCUS_TRACK_EXTERNAL)
+        {
+            Actupated(0);
+            Actualize_Track_Ed(0);
+            Actualize_Track_Fx_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SET_FOCUS_TRACK)
@@ -897,6 +925,15 @@ int Screen_Update(void)
             Current_Edit_Steps++;
             if(Current_Edit_Steps > 16) Current_Edit_Steps = 16;
             Actualize_Patterned();
+        }
+
+        if(gui_action == GUI_CMD_SELECT_INSTR_EXTERNAL)
+        {
+            Clear_Input();
+            Actualize_Patterned();
+            RefreshSample();
+            Renew_Sample_Ed();
+            Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
         }
 
         if(gui_action == GUI_CMD_PREV_INSTR)
@@ -993,6 +1030,7 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_EDIT_MODE)
         {
             is_recording = 0;
+            is_editing ^= 1;
             is_recording_2 = 0;
             Nbr_Sub_NoteOff = 0;
             SongStop();
@@ -1184,14 +1222,14 @@ int Screen_Update(void)
             Actualize_Master_Ed(0);
         }
 
-        if(gui_action == GUI_CMD_SELECT_SCREEN_SETUP_MIDI)
+        if(gui_action == GUI_CMD_SELECT_MIDI_SETUP)
         {
             retletter[71] = TRUE;
             Actualize_Input();
             retletter[71] = FALSE;
             userscreen = USER_SCREEN_SETUP_MIDI;
             Draw_Midi_Ed();
-            //Actualize_Master_Ed(0);
+            Actualize_Midi_Ed(0);
         }
 
         if(gui_action == GUI_CMD_SELECT_SYNTH_EDIT)
@@ -1320,6 +1358,11 @@ int Screen_Update(void)
         if(gui_action == GUI_CMD_REFRESH_TB303_PARAMS)
         {
             Actualize_303_Ed(teac);
+        }
+
+        if(gui_action == GUI_CMD_REFRESH_TB303_PARAMS_EXTERNAL)
+        {
+            Refresh_303_Unit(Refresh_Unit, teac);
         }
 
         if(gui_action == GUI_CMD_SAVE_303_PATTERN)
@@ -3266,7 +3309,7 @@ void Keyboard_Handler(void)
         }
         if(Keys[SDLK_F12])
         {
-            gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
+            gui_action = GUI_CMD_SELECT_MIDI_SETUP;
         }
     }
 
@@ -4107,8 +4150,6 @@ void Keyboard_Handler(void)
         }
         else
         {
-            is_recording = 0;
-            is_editing ^= 1;
             gui_action = GUI_CMD_EDIT_MODE;
         }
     }
@@ -5289,8 +5330,6 @@ void Mouse_Handler(void)
 
         if(zcheckMouse(8, 82, 80, 16))
         {
-            is_recording = 0;
-            is_editing ^= 1;
             gui_action = GUI_CMD_EDIT_MODE;
         }
 
@@ -5563,7 +5602,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(20 + (TAB_LARG * 8), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_REVERB_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_REVERB_EDIT;
         if(zcheckMouse(20 + (TAB_LARG * 9), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_DISKIO_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_DISKIO_EDIT;
         if(zcheckMouse(20 + (TAB_LARG * 10), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_EDIT || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_EDIT;
-        if(zcheckMouse(20 + (TAB_LARG * 11), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_MIDI || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_SCREEN_SETUP_MIDI;
+        if(zcheckMouse(20 + (TAB_LARG * 11), (Cur_Height - 171) + Add_Offset, TAB_LARG - 2, 16) && (userscreen != USER_SCREEN_SETUP_MIDI || Patterns_Lines_Offset)) gui_action = GUI_CMD_SELECT_MIDI_SETUP;
 
         Mouse_Left_Track_Fx_Ed();
         Mouse_Left_Sequencer_Ed();
