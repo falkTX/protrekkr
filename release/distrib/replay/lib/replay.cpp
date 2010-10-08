@@ -982,6 +982,12 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
         {
             GetPlayerValues();
 
+#if !defined(__STAND_ALONE__)
+            // Gather datas for the scopes and the vumeters
+            clamp_left_value = left_float * 32767.0f;
+            clamp_right_value = right_float * 32767.0f;
+#endif
+
 #if !defined(__WINAMP__)
 #if !defined(__STAND_ALONE__) 
             // Add the metronome at the end of the audio chain
@@ -1038,9 +1044,6 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 
 #if !defined(__STAND_ALONE__)
-            // Gather datas for the scopes and the vumeters
-            clamp_left_value = left_float * 32767.0f;
-            clamp_right_value = right_float * 32767.0f;
 
             // Pre-record
             Scope_Dats_LeftRight[0][pos_scope] = clamp_left_value;
