@@ -137,7 +137,7 @@ void Actualize_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 8)
         {
-            if(compressor == 0)
+            if(compressor == FALSE)
             {
                 Gui_Draw_Button_Box(79, (Cur_Height - 120), 32, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
                 Gui_Draw_Button_Box(113, (Cur_Height - 120), 32, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);

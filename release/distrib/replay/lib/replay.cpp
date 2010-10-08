@@ -950,7 +950,7 @@ void Initreverb(void);
 #endif
 
 volatile int Done_Reset;
-void Reset_Values(int From_Mixer);
+void Reset_Values(void);
 
 // ------------------------------------------------------
 // Audio mixer
@@ -1070,7 +1070,7 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 
         if(local_curr_ramp_vol <= 0.0f)
         {
-            Reset_Values(TRUE);
+            Reset_Values();
         }
 
 #if !defined(__STAND_ALONE__)
@@ -1856,7 +1856,7 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
 
 // ------------------------------------------------------
 // Reset some values before starting playing
-void Reset_Values(int From_Mixer)
+void Reset_Values(void)
 {
     int i;
 
@@ -2012,7 +2012,7 @@ void PTKEXPORT Ptk_Play(void)
     local_ramp_vol = 1.0f;
     local_curr_ramp_vol = 0.0f;
 
-    Reset_Values(FALSE);
+    Reset_Values();
     Done_Reset = FALSE;
 
 #if !defined(__STAND_ALONE__)
@@ -2331,7 +2331,7 @@ void Post_Song_Init(void)
     SubCounter = 0;
     Subicounter = 0;
 
-    Reset_Values(FALSE);
+    Reset_Values();
 
 #if defined(PTK_FX_PATTERNLOOP)
     repeat_loop_pos = 0;

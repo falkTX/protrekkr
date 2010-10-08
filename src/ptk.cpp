@@ -2477,7 +2477,7 @@ void Newmod(void)
         rchorus_counter = MIX_RATE;
         lchorus_counter2 = MIX_RATE - lchorus_delay;
         rchorus_counter2 = MIX_RATE - rchorus_delay;
-        compressor = 0;
+        compressor = FALSE;
         c_threshold = 32;
         delay_time = 0;
 
