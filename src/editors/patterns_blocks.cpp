@@ -1982,6 +1982,7 @@ int Get_Max_Nibble_All_Tracks(void)
 // ------------------------------------------------------
 // Return 1 if a column is compatible to another according to a table
 // return 0 otherwise
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
 int Are_Columns_Compatible(int type_src, int type_dst)
 {
     int i;
@@ -2193,3 +2194,4 @@ void Insert_Track(void)
         Column_Under_Caret = 0;
     }
 }
+#endif
