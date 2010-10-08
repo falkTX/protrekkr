@@ -115,7 +115,7 @@ void Midi_CallBackIn(double deltatime,
         *ptr++ = message->at(i);
     }
 
-#if defined(__MOT_SWAP__)
+#if defined(__BIG_ENDIAN__)
     Param1_Swap = (Param1 & 0xff) << 24;
     Param1_Swap |= ((Param1 >> 8) & 0xff) << 16;
     Param1_Swap |= ((Param1 >> 16) & 0xff) << 8;
