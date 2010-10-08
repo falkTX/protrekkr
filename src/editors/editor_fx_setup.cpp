@@ -198,7 +198,7 @@ void Actualize_Fx_Ed(char gode)
             if(Reverb_Stereo_Amount < 0) Reverb_Stereo_Amount = 0;
             if(Reverb_Stereo_Amount > 127) Reverb_Stereo_Amount = 127;
             Realslider(77, (Cur_Height - 48), Reverb_Stereo_Amount, compressor);
-            if(gode == 13) Initreverb(FALSE);
+            if(gode == 13) Initreverb();
         }
 
 /*

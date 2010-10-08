@@ -445,7 +445,7 @@ void GetBackMouse(void);
 void SeqFill(int st, int en, char n);
 void PutBackMouse(void);
 void Read_SMPT(void);
-void Initreverb(int From_Mixer);
+void Initreverb(void);
 void init_sample_bank(void);
 int Get_Number_Of_Splits(int n_index);
 void Clear_Instrument_Dat(int n_index, int split, int lenfir);

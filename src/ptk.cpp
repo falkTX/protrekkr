@@ -565,7 +565,7 @@ int Init_Context(void)
     // Old preset by default
     Load_Old_Reverb_Presets(0);
 
-    Initreverb(FALSE);
+    Initreverb();
 
     LOGOPIC = Load_Skin_Picture("logo");
     if(!LOGOPIC) return(FALSE);
@@ -2482,7 +2482,7 @@ void Newmod(void)
 
         // Old preset by default
         Load_Old_Reverb_Presets(DelayType);
-        Initreverb(FALSE);
+        Initreverb();
         for(int spl = 0; spl < MAX_TRACKS; spl++)
         {
             CCoef[spl] = float((float) CSend[spl] / 127.0f);

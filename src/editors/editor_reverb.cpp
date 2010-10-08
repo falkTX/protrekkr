@@ -264,7 +264,7 @@ void Mouse_Right_Reverb_Ed(void)
         {
             num_echoes -= 2;
             if(num_echoes < 1) num_echoes = 1;
-            Initreverb(FALSE);
+            Initreverb();
             gui_action = GUI_CMD_UPDATE_REVERB_ED;
             teac = UPDATE_REVERB_ED_ALL;
         }
@@ -274,7 +274,7 @@ void Mouse_Right_Reverb_Ed(void)
         {
             num_echoes += 2;
             if(num_echoes > 10) num_echoes = 10;
-            Initreverb(FALSE);
+            Initreverb();
             gui_action = GUI_CMD_UPDATE_REVERB_ED;
             teac = UPDATE_REVERB_ED_ALL;
         }
@@ -290,7 +290,7 @@ void Mouse_Right_Reverb_Ed(void)
                 if(delays[i] < 167) delays[i] = 167;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
 
@@ -301,7 +301,7 @@ void Mouse_Right_Reverb_Ed(void)
                 if(delays[i] > 15000) delays[i] = 15000;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }
@@ -320,7 +320,7 @@ void Mouse_Left_Reverb_Ed(void)
         {
             num_echoes--;
             if(num_echoes < 1) num_echoes = 1;
-            Initreverb(FALSE);
+            Initreverb();
             gui_action = GUI_CMD_UPDATE_REVERB_ED;
             teac = UPDATE_REVERB_ED_ALL;
         }
@@ -330,7 +330,7 @@ void Mouse_Left_Reverb_Ed(void)
         {
             num_echoes++;
             if(num_echoes > 10) num_echoes = 10;
-            Initreverb(FALSE);
+            Initreverb();
             gui_action = GUI_CMD_UPDATE_REVERB_ED;
             teac = UPDATE_REVERB_ED_ALL;
         }
@@ -369,7 +369,7 @@ void Mouse_Left_Reverb_Ed(void)
                 decays[i] = 0.0f;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }
@@ -383,7 +383,7 @@ void Mouse_Left_Reverb_Ed(void)
                 if(delays[i] < 167) delays[i] = 167;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
 
@@ -394,7 +394,7 @@ void Mouse_Left_Reverb_Ed(void)
                 if(delays[i] > 15000) delays[i] = 15000;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }
@@ -425,7 +425,7 @@ void Mouse_Sliders_Reverb_Ed(void)
                 decays[i] = s_offset * 0.015625f;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }
@@ -439,7 +439,7 @@ void Mouse_Sliders_Reverb_Ed(void)
                 if(delays[i] < 167) delays[i] = 167;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
 
@@ -450,7 +450,7 @@ void Mouse_Sliders_Reverb_Ed(void)
                 if(delays[i] > 15000) delays[i] = 15000;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }
@@ -474,7 +474,7 @@ void Mouse_Sliders_Right_Reverb_Ed(void)
                 if(delays[i] < 167) delays[i] = 167;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
 
@@ -485,7 +485,7 @@ void Mouse_Sliders_Right_Reverb_Ed(void)
                 if(delays[i] > 15000) delays[i] = 15000;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
-                Initreverb(FALSE);
+                Initreverb();
                 break;
             }
         }

@@ -942,7 +942,7 @@ float Resonance(float v);
 float Bandwidth(int v);
 void Reverb_work(void);
 
-void Initreverb(int From_Mixer);
+void Initreverb(void);
 
 #if defined(PTK_FLANGER)
     float Filter_FlangerL(int track, float input);
@@ -1923,7 +1923,7 @@ void Reset_Values(int From_Mixer)
 #endif
 
 #if defined(PTK_COMPRESSOR)
-        Initreverb(From_Mixer);
+        Initreverb();
 #endif
 
         for(int stopper = 0; stopper < MAX_TRACKS; stopper++)
@@ -6049,17 +6049,10 @@ void Free_Samples(void)
 // ------------------------------------------------------
 // Initialize the reverb data
 #if defined(PTK_COMPRESSOR)
-void Initreverb(int From_Mixer)
+void Initreverb(void)
 {
     int i;
     int mlrw;
-    int old_compressor;
-
-    if(!From_Mixer)
-    {
-        old_compressor = compressor;
-        compressor = FALSE;
-    }
 
     for(i = 0; i < MAX_COMB_FILTERS; i++)
     {
@@ -6083,10 +6076,6 @@ void Initreverb(int From_Mixer)
     LFP_R.Reset();
 
     rev_counter = 99999;
-    if(!From_Mixer)
-    {
-        compressor = old_compressor;
-    }
 }
 
 void InitRevervbFilter(void)

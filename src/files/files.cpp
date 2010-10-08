@@ -112,7 +112,7 @@ void Init_Tracker_Context_After_ModLoad(void)
     rchorus_counter = MIX_RATE;
     lchorus_counter2 = MIX_RATE - lchorus_delay;
     rchorus_counter2 = MIX_RATE - rchorus_delay;
-    Initreverb(FALSE);
+    Initreverb();
 
 #if defined(PTK_LIMITER_MASTER)
     Mas_Compressor_Set_Variables_Master(mas_comp_threshold_Master,

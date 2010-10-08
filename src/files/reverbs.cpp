@@ -101,7 +101,7 @@ void LoadReverb(char *FileName)
 
             Read_Data(Reverb_Name, sizeof(char), 20, in);
             Load_Reverb_Data(Read_Data, Read_Data_Swap, in);
-            Initreverb(FALSE);
+            Initreverb();
             Actualize_Reverb_Ed(0);
 
             Status_Box("Reverb data loaded ok.");
