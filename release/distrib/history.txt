@@ -42,6 +42,8 @@ v2.5.0:
 - Metronome implemented (used during recording).
 - Fullscreen mode is now used with current screen resolution.
 - Handled latency at recording startup (so visuals should be synched to audio).
+- Fixed midi handling for big endian machines.
+- Fixed a bug in the reverb that only occured on big endian machines.
 
 v2.1.4:
 

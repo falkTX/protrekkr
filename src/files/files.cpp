@@ -548,7 +548,9 @@ Read_Mod_File:
         }
 
         // Reading mod properties
-        Read_Mod_Data_Swap(&compressor, sizeof(int), 1, in);
+        int cvalue;
+        Read_Mod_Data_Swap(&cvalue, sizeof(int), 1, in);
+        compressor = cvalue;
         Read_Mod_Data_Swap(&c_threshold, sizeof(int), 1, in);
         Read_Mod_Data_Swap(&BeatsPerMin, sizeof(int), 1, in);
         Read_Mod_Data_Swap(&TicksPerBeat, sizeof(int), 1, in);
@@ -1329,7 +1331,9 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             }
 
             // Writing mod properties
-            Write_Mod_Data_Swap(&compressor, sizeof(int), 1, in);
+            int cvalue;   
+            cvalue = compressor;
+            Write_Mod_Data_Swap(&cvalue, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&c_threshold, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&BeatsPerMin, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&TicksPerBeat, sizeof(int), 1, in);
