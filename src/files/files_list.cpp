@@ -609,25 +609,25 @@ void Dump_Files_List(int xr, int yr)
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Mods, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Mods, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Instrs, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Instrs, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Presets, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Presets, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_REVERB_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_MIDICFG_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_MidiCfg, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_MidiCfg, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_PATTERN_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_SAMPLE_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Samples, (Cur_Width - 504));
+                    PrintXY(398, 26, USE_FONT, Dir_Samples, (Cur_Width - 522));
                     break;
             }
 

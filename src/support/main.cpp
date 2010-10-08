@@ -88,6 +88,9 @@ REQUESTER Title_Requester =
     &LOGOPIC, 5
 };
 
+const SDL_VideoInfo *Screen_Info;
+int Startup_Width;
+int Startup_Height;
 extern int Display_Pointer;
 int Burn_Title;
 SDL_Surface *Main_Screen;
@@ -411,6 +414,10 @@ extern SDL_NEED int SDL_main(int argc, char *argv[])
         exit(0);
     }
     memset(ExePath, 0, ExePath_Size + 1);
+
+    Screen_Info = SDL_GetVideoInfo();
+    Startup_Width = Screen_Info->current_w;
+    Startup_Height = Screen_Info->current_h;
 
 #if defined(__LINUX__)
     // Note:
@@ -915,15 +922,16 @@ int Switch_FullScreen(int Width, int Height)
     
     if(FullScreen)
     {
-        Width = SCREEN_WIDTH;
-        Height = SCREEN_HEIGHT;
-        if((Main_Screen = SDL_SetVideoMode(Width, Height,
+        if((Main_Screen = SDL_SetVideoMode(Startup_Width,
+                                           Startup_Height,
                                            SCREEN_BPP,
                                            SDL_SWSURFACE |
                                            (FullScreen ? SDL_FULLSCREEN : 0))) == NULL)
         {
             return(FALSE);
         }
+        Width = Startup_Width;
+        Height = Startup_Height;
     }
     else
     {

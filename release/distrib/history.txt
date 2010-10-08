@@ -36,15 +36,17 @@ v2.5.0:
 - Tracks can now be rendered to .wav in their own separate file.
 - Tracks panning changing are now smoothed.
 - Live recording strategy improved.
-
-TODO:
-
-- Metronome.
+- Implemented a midi automation system to control elements of the track
+  from a midi device (like a master keyboard).
+- Added effect 25: Set shuffle value.
+- Metronome implemented (used during recording).
+- Fullscreen mode is now used with current screen resolution.
+- Handled latency at recording startup (so visuals should be synched to audio).
 
 v2.1.4:
 
-- Added duplicate function to samples editor: increase sample by selection length
-  and copy it's content into the newly created space.
+- Added duplicate function to samples editor: increase sample
+  by selection length and copy it's content into the newly created space.
 - Added Insert function to samples editor: increase sample by selection length
   and insert zeroes into the newly created space.
 - Looks like the signal reduction hack is no longer necessary on Linux.
@@ -185,8 +187,8 @@ v2.0:
 - Rewrote the latency handling routines in a more robust & precise way.
 - Fixed the right mouse button caret horizontal scrolling.
 - Added effect 24: turn flanger on/off.
-- Salvaged 3 NoiseTrekker beta version modules,
-  they really don't sound like in the original one as i had to rework them, though.
+- Salvaged 3 NoiseTrekker beta version modules, they really
+  don't sound like in the original one as i had to rework them, though.
 - Real numbers of used patterns are now counted when saving a .ptk.
 - Fixed a small issue with keyboard handling in message boxes.
 - Added Moog Lo & Moog band filters for synth instruments.
@@ -883,7 +885,7 @@ v1.1b:
 v1.1:
 
 - New record mode
-  (available via shift+space or right mousebutton on "Edit/Record").
+  (available via shift+space or right mousebutton on "Edit/Rec.").
   It works with pc keyboard or external midi devices
   (For the midi the record mode uses midi time stamps
    and the edit mode uses an internal counter).

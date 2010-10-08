@@ -1467,7 +1467,7 @@ void Actualize_Instruments_Synths_List(int modeac)
             Draw_Lists_Slider(Instrs_ykar);
             Dump_Instruments_Synths_List(395, 41);
 
-            Gui_Draw_Button_Box(394, 24, Cur_Width - 504, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, Cur_Width - 522, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             switch(Scopish)
             {
                 case SCOPE_ZONE_INSTR_LIST:

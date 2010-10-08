@@ -172,6 +172,9 @@
 
 #define GUI_CMD_SAVE_MIDICFG 136
 
+#define GUI_CMD_FLASH_METRONOME_ON 137
+#define GUI_CMD_FLASH_METRONOME_OFF 138
+
 #define GUI_CMD_UPDATE_SYNTH_ED 150
 
 #define GUI_CMD_MIDI_NOTE_OFF_1_TRACK 151
@@ -360,6 +363,7 @@ extern SDL_Surface *FONT;
 extern SDL_Surface *FONT_LOW;
 
 extern int gui_action;
+extern int gui_action_metronome;
 extern char teac;
 
 extern MOUSE Mouse;

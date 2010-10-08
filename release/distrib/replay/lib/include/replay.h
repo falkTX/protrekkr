@@ -503,5 +503,8 @@ void Set_Spline_Boundaries(unsigned int Position,
 float Process_Sample(short *Data, int c, int i, unsigned int res_dec);
 void init_eq(LPEQSTATE es);
 float do_eq(LPEQSTATE es, float sample, int Left);
+#if defined(PTK_SHUFFLE)
+void Update_Shuffle(void);
+#endif
 
 #endif

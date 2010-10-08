@@ -40,35 +40,38 @@
 #include "../files/include/files.h"
 #include "../ui/include/requesters.h"
 
-#define POS_X_MIDI 20
-#define STRIDE_X_MIDI 240
+#define POS_X_MIDI1 100
+#define POS_X_MIDI2 335
+#define POS_X_MIDI3 569
 #define GAP_X_MIDI 70
 
 // ------------------------------------------------------
 // Variables
 extern REQUESTER Overwrite_Requester;
 
+extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
+
 char Midi_Name[20];
 
 SCREEN_COORD Pos_Midi_Automation[] =
 {
-    { POS_X_MIDI, 117 },
-    { POS_X_MIDI, 99 },
-    { POS_X_MIDI, 81 },
-    { POS_X_MIDI, 63 },
-    { POS_X_MIDI, 45 },
-
-    { POS_X_MIDI + STRIDE_X_MIDI, 117 },
-    { POS_X_MIDI + STRIDE_X_MIDI, 99 },
-    { POS_X_MIDI + STRIDE_X_MIDI, 81 },
-    { POS_X_MIDI + STRIDE_X_MIDI, 63 },
-    { POS_X_MIDI + STRIDE_X_MIDI, 45 },
-
-    { POS_X_MIDI + (STRIDE_X_MIDI * 2), 117 },
-    { POS_X_MIDI + (STRIDE_X_MIDI * 2), 99 },
-    { POS_X_MIDI + (STRIDE_X_MIDI * 2), 81 },
-    { POS_X_MIDI + (STRIDE_X_MIDI * 2), 63 },
-    { POS_X_MIDI + (STRIDE_X_MIDI * 2), 45 }
+    { POS_X_MIDI1, 99 },
+    { POS_X_MIDI1, 81 },
+    { POS_X_MIDI1, 63 },
+    { POS_X_MIDI1, 45 },
+    
+    { POS_X_MIDI2, 135 },
+    { POS_X_MIDI2, 117 },
+    { POS_X_MIDI2, 99 },
+    { POS_X_MIDI2, 81 },
+    { POS_X_MIDI2, 63 },
+    { POS_X_MIDI2, 45 },
+    
+    { POS_X_MIDI3, 117 },
+    { POS_X_MIDI3, 99 },
+    { POS_X_MIDI3, 81 },
+    { POS_X_MIDI3, 63 },
+    { POS_X_MIDI3, 45 }
 };
 
 // ------------------------------------------------------
@@ -78,12 +81,38 @@ void Mod_Midi_Automation_Value(int Amount);
 
 void Draw_Midi_Ed(void)
 {
+    char middev[80];
+
     Draw_Editors_Bar(USER_SCREEN_SETUP_MIDI);
 
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("Midi Setup");
-    Gui_Draw_Button_Box(POS_X_MIDI, (Cur_Height - 135), 60, 16, "CC", BUTTON_NORMAL | BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-    Gui_Draw_Button_Box(POS_X_MIDI + GAP_X_MIDI, (Cur_Height - 135), 110 + (16 * 2), 16, "Automation", BUTTON_NORMAL | BUTTON_NO_BORDER | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+
+#if defined(__NO_MIDI__)
+    sprintf(middev, "In (%d)", 0);
+#else
+    sprintf(middev, "In (%d)", n_midiindevices);
+#endif
+    Gui_Draw_Button_Box(12, (Cur_Height - 135), 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
+
+#if defined(__NO_MIDI__)
+    sprintf(middev, "Out (%d)", 0);
+#else
+    sprintf(middev, "Out (%d)", n_midioutdevices);
+#endif
+    Gui_Draw_Button_Box(12, (Cur_Height - 117), 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
+
+    Gui_Draw_Button_Box(12, (Cur_Height - 99), 82, 16, "Track Notes Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
+#if defined(__NO_MIDI__)
+    | BUTTON_DISABLED
+#endif
+    );
+    Gui_Draw_Button_Box(12, (Cur_Height - 81), 82, 16, "Song Notes Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
+#if defined(__NO_MIDI__)
+    | BUTTON_DISABLED
+#endif
+    );
+
 
     Gui_Draw_Button_Box(749, (Cur_Height - 142), 34, 16, "Save", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 }
@@ -182,6 +211,55 @@ void Actualize_Midi_Ed(char gode)
             }
         }
 
+        // -----------
+#if !defined(__NO_MIDI__)
+        Midi_InitIn();
+        Midi_InitOut();
+#endif
+
+        // Select midi in device
+        if(gode == UPDATE_MIDI_ED_ALL || gode == UPDATE_MIDI_ED_SEL_IN)
+        {
+#if defined(__NO_MIDI__)
+            value_box(70, (Cur_Height - 134), 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+#else
+            value_box(70, (Cur_Height - 134), c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+#endif
+#if !defined(__NO_MIDI__)
+            if(c_midiin != -1)
+            {
+                Gui_Draw_Button_Box(132, (Cur_Height - 134), 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+#endif
+                Gui_Draw_Button_Box(132, (Cur_Height - 134), 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+#if !defined(__NO_MIDI__)
+            }
+#endif
+        }
+
+        // Select midi out device
+        if(gode == UPDATE_MIDI_ED_ALL || gode == UPDATE_MIDI_ED_SEL_OUT)
+        {
+#if defined(__NO_MIDI__)
+            value_box(70, (Cur_Height - 117), 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
+#else
+            value_box(70, (Cur_Height - 117), c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+#endif
+#if !defined(__NO_MIDI__)
+            if(c_midiout != -1)
+            {
+                Gui_Draw_Button_Box(132, (Cur_Height - 117), 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
+            }
+            else
+            {
+#endif
+                Gui_Draw_Button_Box(132, (Cur_Height - 117), 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
+#if !defined(__NO_MIDI__)
+            }
+#endif
+        }
     }
 }
 
@@ -210,7 +288,6 @@ void Mouse_Left_Midi_Ed(void)
             }
         }
 
-
         // Start midi name input
         if(zcheckMouse(583, (Cur_Height - 142), 164, 16) && snamesel == INPUT_NONE)
         {
@@ -221,6 +298,65 @@ void Mouse_Left_Midi_Ed(void)
             teac = UPDATE_MIDI_ED_CHANGE_NAME;
             gui_action = GUI_CMD_UPDATE_MIDI_ED;
         }
+
+#if !defined(__NO_MIDI__)
+        // Previous midi in device
+        if(zcheckMouse(70, (Cur_Height - 134), 16, 16))
+        {
+            c_midiin--;
+            gui_action = GUI_CMD_UPDATE_MIDI_ED;
+            midiin_changed = 1;
+            teac = UPDATE_MIDI_ED_SEL_IN;
+        }
+        // Next midi in device
+        if(zcheckMouse(114, (Cur_Height - 134), 16, 16))
+        {
+            c_midiin++;
+            gui_action = GUI_CMD_UPDATE_MIDI_ED;
+            midiin_changed = 1;
+            teac = UPDATE_MIDI_ED_SEL_IN;
+        }
+
+        // Previous midi out device
+        if(zcheckMouse(70, (Cur_Height - 117), 16, 16))
+        {
+            c_midiout--;
+            gui_action = GUI_CMD_UPDATE_MIDI_ED;
+            midiout_changed = TRUE;
+            teac = UPDATE_MIDI_ED_SEL_OUT;
+        }
+        // Next midi out device
+        if(zcheckMouse(114, (Cur_Height - 117), 16, 16))
+        {
+            c_midiout++;
+            gui_action = GUI_CMD_UPDATE_MIDI_ED;
+            midiout_changed = TRUE;
+            teac = UPDATE_MIDI_ED_SEL_OUT;
+        }
+#endif
+
+        // Midi track notes off
+#if !defined(__NO_MIDI__)
+        if(zcheckMouse(12, (Cur_Height - 99), 82, 16) == 1 && c_midiout != -1)
+        {
+            Midi_NoteOff(Track_Under_Caret, -1);
+            int i;
+            for(i = 0; i < MAX_POLYPHONY; i++)
+            {
+                Midi_Current_Notes[CHAN_MIDI_PRG[Track_Under_Caret]][i] = 0;
+            }
+            gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
+        }
+#endif
+
+        // All Midi notes off
+#if !defined(__NO_MIDI__)
+        if(zcheckMouse(12, (Cur_Height - 81), 82, 16) == 1 && c_midiout != -1)
+        {
+            Midi_AllNotesOff();
+            gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
+        }
+#endif
 
         Mod_Midi_Automation_Value(1);
     }

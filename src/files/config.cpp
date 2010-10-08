@@ -35,6 +35,7 @@
 
 // ------------------------------------------------------
 // Variables
+extern int metronome_magnify;
 extern int patt_highlight;
 extern char FullScreen;
 extern int Cur_Left;
@@ -127,6 +128,8 @@ void SaveConfig(void)
 
         Write_Data(&Use_Shadows, sizeof(char), 1, out);
         Write_Data(&Global_Patterns_Font, sizeof(char), 1, out);
+
+        Write_Data(&metronome_magnify, sizeof(int), 1, out);
 
         // Save the compelte midi automation config
         Save_MidiCfg_Data(Write_Data, Write_Data_Swap, out);
@@ -231,6 +234,8 @@ void LoadConfig(void)
 
             Read_Data(&Use_Shadows, sizeof(char), 1, in);
             Read_Data(&Global_Patterns_Font, sizeof(char), 1, in);
+
+            Read_Data(&metronome_magnify, sizeof(int), 1, in);
 
             if(Large_Patterns)
             {

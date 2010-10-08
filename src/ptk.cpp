@@ -51,6 +51,9 @@
 SystemSoundActionID WavActionID;
 #endif
 
+extern int metronome_rows_counter;
+extern int metronome_magnify;
+
 extern int Songplaying_Pattern;
 
 extern short *Player_WL[MAX_TRACKS][MAX_POLYPHONY];
@@ -119,6 +122,7 @@ int tretletter = 0;
 int posletter = 0;
 int last_index = -1;
 int gui_action = GUI_CMD_NOP;
+int gui_action_metronome = GUI_CMD_NOP;
 int Column_Under_Caret = 0;
 int Track_Under_Caret = 0;
 int gui_track = 0;
@@ -709,6 +713,17 @@ int Screen_Update(void)
 
     if(actuloop) Afloop();
 
+    if(gui_action_metronome == GUI_CMD_FLASH_METRONOME_ON)
+    {
+        SetColor(COL_VUMETERPEAK);
+        Fillrect(73, 83, 73 + 15, 83 + 15);
+    }
+    if(gui_action_metronome == GUI_CMD_FLASH_METRONOME_OFF)
+    {
+        Gui_Draw_Button_Box(72, 82, 16, 16, "", BUTTON_DISABLED);
+    }
+    gui_action_metronome = GUI_CMD_NOP;
+
     if(gui_action != GUI_CMD_NONE)
     { // There are some for me today.....:)
 
@@ -1051,7 +1066,6 @@ int Screen_Update(void)
             Clear_Midi_Channels_Pool();
             Actupated(0);
             Notify_Edit();
-            Post_Song_Init();
         }
 
         if(gui_action == GUI_CMD_CHANGE_BPM_TICKS_NBR)
@@ -1717,6 +1731,7 @@ int Screen_Update(void)
         gui_bpm_action = FALSE;
         Display_Beat_Time();
         Actualize_Master(2);
+        Display_Shuffle();
     }
 
     if(Songplaying && Pattern_Line_Visual != player_line)
@@ -2260,16 +2275,17 @@ void Notify_Edit(void)
 {
     if(is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Editing...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 82, 62, 16, "Editing...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
     if(is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Recording...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 82, 62, 16, "Recording...", BUTTON_PUSHED | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
     if(!is_editing && !is_recording)
     {
-        Gui_Draw_Button_Box(8, 82, 80, 16, "Edit/Record", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        Gui_Draw_Button_Box(8, 82, 62, 16, "Edit/Rec.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
+    Gui_Draw_Button_Box(72, 82, 16, 16, "", BUTTON_DISABLED);
 }
 
 // ------------------------------------------------------
@@ -4105,12 +4121,15 @@ void Keyboard_Handler(void)
                 is_editing = TRUE;
                 L_MaxLevel = 0;
                 R_MaxLevel = 0;
-                Songplaying = TRUE;
                 Switch_Cmd_Playing(FALSE);
                 Pattern_Line_Visual = Pattern_Line;
                 key_record_first_time = FALSE;
                 old_key_Pattern_Line = Pattern_Line;
                 Clear_Midi_Channels_Pool();
+                player_pos = -1;
+                metronome_rows_counter = 0;
+                Post_Song_Init();
+                Ptk_Play();
             }
         }
 
@@ -5512,6 +5531,7 @@ void Mouse_Handler(void)
                 Set_Track_Zoom(i, TRACK_SMALL);
             }
             Actupated(0);
+            Set_Track_Slider(gui_track);
         }
         // Zoom'em normal
         if(zcheckMouse(332 + (18 * 1), 126, 16, 16))
@@ -5521,6 +5541,7 @@ void Mouse_Handler(void)
                 Set_Track_Zoom(i, TRACK_MEDIUM);
             }
             Actupated(0);
+            Set_Track_Slider(gui_track);
         }
         // Zoom'em large
         if(zcheckMouse(332 + (18 * 2), 126, 16, 16))
@@ -5530,6 +5551,7 @@ void Mouse_Handler(void)
                 Set_Track_Zoom(i, TRACK_LARGE);
             }
             Actupated(0);
+            Set_Track_Slider(gui_track);
         }
 
         // Select track
@@ -6595,7 +6617,7 @@ void Draw_Scope_Files_Button(void)
         case SCOPE_ZONE_SCOPE:
             SetColor(COL_BACKGROUND);
             bjbox(394, 42, 405, 137);
-            Gui_Draw_Button_Box(394, 24, Cur_Width - 504, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(394, 24, Cur_Width - 522, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
             Gui_Draw_Button_Box(Cur_Width - 54, 6, 16, 16, "\255", BUTTON_PUSHED | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
 
             Display_Dirs_Icons(0);

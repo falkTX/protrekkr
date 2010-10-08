@@ -50,6 +50,8 @@ extern int Continuous_Scroll;
 extern int wait_AutoSave;
 extern char Global_Patterns_Font;
 
+extern int metronome_magnify;
+
 extern int Nbr_Keyboards;
 extern int Keyboard_Idx;
 extern char Jazz_Edit;
@@ -59,8 +61,6 @@ extern char Accidental;
 int current_palette_idx;
 
 char Paste_Across;
-
-extern int Midi_Current_Notes[MAX_TRACKS][MAX_POLYPHONY];
 
 char *Labels_PatSize[] =
 {
@@ -87,13 +87,6 @@ char *Get_Keyboard_Label(void);
 char *Get_Keyboard_FileName(void);
 void Load_Keyboard_Def(char *FileName);
 
-void Display_Milliseconds(int Milliseconds)
-{
-    char ms[64];
-    sprintf(ms, "Milliseconds", Milliseconds);
-    PrintXY(456, (Cur_Height - 143), USE_FONT, ms);
-}
-
 void Draw_Master_Ed(void)
 {
     Get_Phony_Palette();
@@ -103,44 +96,19 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("UI Setup");
 
-    char middev[80];
+    Gui_Draw_Button_Box(8, (Cur_Height - 125), 110, 16, "Metronome", BUTTON_NORMAL | BUTTON_DISABLED);
+    PrintXY(8 + 112 + 44 + 21, (Cur_Height - (125 - 2)), USE_FONT, "Rows");
 
-    Gui_Draw_Button_Box(8, (Cur_Height - 133), 310, 64, "", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_VTOP);
+    Gui_Draw_Button_Box(8, (Cur_Height - 85), 110, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
+    PrintXY(8 + 112 + 44 + 21, (Cur_Height - (85 - 2)), USE_FONT, "Milliseconds");
 
-#if defined(__NO_MIDI__)
-    sprintf(middev, "In (%d)", 0);
-#else
-    sprintf(middev, "In (%d)", n_midiindevices);
-#endif
-    Gui_Draw_Button_Box(12, (Cur_Height - 129), 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
-
-#if defined(__NO_MIDI__)
-    sprintf(middev, "Out (%d)", 0);
-#else
-    sprintf(middev, "Out (%d)", n_midioutdevices);
-#endif
-
-    Gui_Draw_Button_Box(12, (Cur_Height - 110), 56, 16, middev, BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(12, (Cur_Height - 90), 124, 16, "All Notes Off (Track)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
-#if defined(__NO_MIDI__)
-    | BUTTON_DISABLED
-#endif
-    );
-    Gui_Draw_Button_Box(138, (Cur_Height - 90), 124, 16, "All Notes Off (Song)", BUTTON_NORMAL | BUTTON_TEXT_CENTERED
-#if defined(__NO_MIDI__)
-    | BUTTON_DISABLED
-#endif
-    );
-
-    Gui_Draw_Button_Box(330, (Cur_Height - 145), 59, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
-    Display_Milliseconds(AUDIO_Milliseconds);
     Gui_Draw_Button_Box(330, (Cur_Height - 125), 114, 16, "Mousewheel Multiplier", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 105), 114, 16, "Rows Highlight", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 85), 114, 16, "Decimal Rows", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 65), 114, 16, "Show Prev/Next Patt.", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 45), 114, 16, "Continuous Scroll", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(520, (Cur_Height - 145), 60, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 105), 110, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(670, (Cur_Height - 145), 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, (Cur_Height - 125), 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 105), 60, 16, "Themes", BUTTON_NO_BORDER | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -174,7 +142,7 @@ void Actualize_Master_Ed(char gode)
         {
             if(AUDIO_Milliseconds < 10) AUDIO_Milliseconds = 10;
             if(AUDIO_Milliseconds > 250) AUDIO_Milliseconds = 250;
-            Gui_Draw_Arrows_Number_Box(391, (Cur_Height - 145), AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box(8 + 112, (Cur_Height - 85), AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         // Create a new sound buffer with the new latency amount
@@ -267,6 +235,7 @@ void Actualize_Master_Ed(char gode)
             Actupated(0);
         }
 
+        // Full screen
         if(gode == 0 || gode == 9)
         {
             if(FullScreen)
@@ -330,9 +299,9 @@ void Actualize_Master_Ed(char gode)
         {
             if(AutoSave < 0) AutoSave = 0;
             if(AutoSave >= sizeof(Labels_AutoSave) / sizeof(char *)) AutoSave = sizeof(Labels_AutoSave) / sizeof(char *) - 1;
-            Gui_Draw_Button_Box(520 + 62 + 2, (Cur_Height - 145), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520 + 62 + 2 + 18, (Cur_Height - 145), 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(520 + 62 + 2 + 48 + 18, (Cur_Height - 145), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112, (Cur_Height - 105), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112 + 18, (Cur_Height - 105), 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112 + 48 + 18, (Cur_Height - 105), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         // Keyboard layout
@@ -359,56 +328,6 @@ void Actualize_Master_Ed(char gode)
             Gui_Draw_Button_Box(520 + 62 + 2 + 108 + 18, (Cur_Height - 125), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
 #endif
 
-        }
-
-        // -----------
-#if !defined(__NO_MIDI__)
-        Midi_InitIn();
-        Midi_InitOut();
-#endif
-
-        // Select midi in device
-        if(gode == 0 || gode == 11)
-        {
-#if defined(__NO_MIDI__)
-            value_box(70, (Cur_Height - 129), 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
-#else
-            value_box(70, (Cur_Height - 129), c_midiin + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-#endif
-#if !defined(__NO_MIDI__)
-            if(c_midiin != -1)
-            {
-                Gui_Draw_Button_Box(132, (Cur_Height - 129), 182, 16, Midi_GetInName(), BUTTON_NORMAL | BUTTON_DISABLED);
-            }
-            else
-            {
-#endif
-                Gui_Draw_Button_Box(132, (Cur_Height - 129), 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
-#if !defined(__NO_MIDI__)
-            }
-#endif
-        }
-
-        // Select midi out device
-        if(gode == 0 || gode == 12)
-        {
-#if defined(__NO_MIDI__)
-            value_box(70, (Cur_Height - 110), 0, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_DISABLED);
-#else
-            value_box(70, (Cur_Height - 110), c_midiout + 1, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-#endif
-#if !defined(__NO_MIDI__)
-            if(c_midiout != -1)
-            {
-                Gui_Draw_Button_Box(132, (Cur_Height - 110), 182, 16, Midi_GetOutName(), BUTTON_NORMAL | BUTTON_DISABLED);
-            }
-            else
-            {
-#endif
-                Gui_Draw_Button_Box(132, (Cur_Height - 110), 182, 16, "None", BUTTON_NORMAL | BUTTON_DISABLED);
-#if !defined(__NO_MIDI__)
-            }
-#endif
         }
 
         // Paste across patterns
@@ -479,6 +398,19 @@ void Actualize_Master_Ed(char gode)
             Gui_Draw_Button_Box(120 + 18, (Cur_Height - 65), 46, 16, Labels_PatSize[Global_Patterns_Font], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
             Gui_Draw_Button_Box(120 + 48 + 18, (Cur_Height - 65), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
+
+        // Milliseconds
+        if(gode == 0 || gode == 22)
+        {
+            if(metronome_magnify < 0) metronome_magnify = 0;
+            if(metronome_magnify > 128) metronome_magnify = 128;
+            Gui_Draw_Arrows_Number_Box(8 + 112, (Cur_Height - 125), metronome_magnify, BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
+            if(!metronome_magnify)
+            {
+                Gui_Draw_Button_Box(8 + 112 + 18, (Cur_Height - 125), 24, 16, "Off", BUTTON_DISABLED | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+        }
+
     }
 }
 
@@ -510,6 +442,24 @@ void Mouse_Right_Master_Ed(void)
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
             teac = 13;
         }
+
+        // Metronome
+        if(zcheckMouse(8 + 112, (Cur_Height - 125), 16, 16))
+        {
+            metronome_magnify -= 10;
+            if(metronome_magnify < 0) metronome_magnify = 0;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 22;
+        }
+
+        // Metronome
+        if(zcheckMouse(8 + 112 + 44, (Cur_Height - 125), 16, 16))
+        {
+            metronome_magnify += 10;
+            if(metronome_magnify > 128) metronome_magnify = 128;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+            teac = 22;
+        }
     }
 }
 
@@ -518,7 +468,7 @@ void Mouse_Left_Master_Ed(void)
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
         // Milliseconds
-        if(zcheckMouse(391, (Cur_Height - 145), 16, 16) == 1)
+        if(zcheckMouse(8 + 112, (Cur_Height - 85), 16, 16))
         {
             if(AUDIO_Milliseconds > 10)
             {
@@ -529,7 +479,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Milliseconds
-        if(zcheckMouse(435, (Cur_Height - 145), 16, 16) == 1)
+        if(zcheckMouse(8 + 112 + 44, (Cur_Height - 85), 16, 16))
         {
             if(AUDIO_Milliseconds < 250)
             {
@@ -540,7 +490,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Mousewheel
-        if(zcheckMouse(446, (Cur_Height - 125), 16, 16) == 1)
+        if(zcheckMouse(446, (Cur_Height - 125), 16, 16))
         {
             MouseWheel_Multiplier--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -548,7 +498,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Mousewheel
-        if(zcheckMouse(446 + 44, (Cur_Height - 125), 16, 16) == 1)
+        if(zcheckMouse(446 + 44, (Cur_Height - 125), 16, 16))
         {
             MouseWheel_Multiplier++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -556,7 +506,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Patterns sep.
-        if(zcheckMouse(446, (Cur_Height - 105), 16, 16) == 1)
+        if(zcheckMouse(446, (Cur_Height - 105), 16, 16))
         {
             patt_highlight--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -564,7 +514,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Patterns sep.
-        if(zcheckMouse(446 + 44, (Cur_Height - 105), 16, 16) == 1)
+        if(zcheckMouse(446 + 44, (Cur_Height - 105), 16, 16))
         {
             patt_highlight++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -688,7 +638,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Previous color
-        if(zcheckMouse(520, (Cur_Height - 105), 16, 16) == 1)
+        if(zcheckMouse(520, (Cur_Height - 105), 16, 16))
         {
             current_palette_idx--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -696,7 +646,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Next color
-        if(zcheckMouse(520 + (18 + 108) + 2, (Cur_Height - 105), 16, 16) == 1)
+        if(zcheckMouse(520 + (18 + 108) + 2, (Cur_Height - 105), 16, 16))
         {
             current_palette_idx++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -802,7 +752,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Default patterns zoom
-        if(zcheckMouse(120, (Cur_Height - 65), 16, 16) == 1)
+        if(zcheckMouse(120, (Cur_Height - 65), 16, 16))
         {
             Global_Patterns_Font--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -810,7 +760,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Default patterns zoom
-        if(zcheckMouse(120 + 48 + 18, (Cur_Height - 65), 16, 16) == 1)
+        if(zcheckMouse(120 + 48 + 18, (Cur_Height - 65), 16, 16))
         {
             Global_Patterns_Font++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -818,7 +768,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Autosave
-        if(zcheckMouse(520 + 62 + 2, (Cur_Height - 145), 16, 16) == 1)
+        if(zcheckMouse(8 + 112, (Cur_Height - 105), 16, 16))
         {
             AutoSave--;
             wait_AutoSave = 0;
@@ -827,7 +777,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Autosave
-        if(zcheckMouse(520 + 62 + 2 + 48 + 18, (Cur_Height - 145), 16, 16) == 1)
+        if(zcheckMouse(8 + 112 + 48 + 18, (Cur_Height - 105), 16, 16))
         {
             AutoSave++;
             wait_AutoSave = 0;
@@ -835,70 +785,9 @@ void Mouse_Left_Master_Ed(void)
             teac = 15;
         }
 
-        // ---
-
-        // Midi track notes off
-#if !defined(__NO_MIDI__)
-        if(zcheckMouse(12, (Cur_Height - 90), 124, 16) == 1 && c_midiout != -1)
-        {
-            Midi_NoteOff(Track_Under_Caret, -1);
-            int i;
-            for(i = 0; i < MAX_POLYPHONY; i++)
-            {
-                Midi_Current_Notes[CHAN_MIDI_PRG[Track_Under_Caret]][i] = 0;
-            }
-            gui_action = GUI_CMD_MIDI_NOTE_OFF_1_TRACK;
-        }
-#endif
-
-        // All Midi notes off
-#if !defined(__NO_MIDI__)
-        if(zcheckMouse(138, (Cur_Height - 90), 124, 16) == 1 && c_midiout != -1)
-        {
-            Midi_AllNotesOff();
-            gui_action = GUI_CMD_MIDI_NOTE_OFF_ALL_TRACKS;
-        }
-#endif
-
-#if !defined(__NO_MIDI__)
-        // Previous midi in device
-        if(zcheckMouse(70, (Cur_Height - 129), 16, 16))
-        {
-            c_midiin--;
-            gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiin_changed = 1;
-            teac = 11;
-        }
-        // Next midi in device
-        if(zcheckMouse(114, (Cur_Height - 129), 16, 16))
-        {
-            c_midiin++;
-            gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiin_changed = 1;
-            teac = 11;
-        }
-
-        // Previous midi out device
-        if(zcheckMouse(70, (Cur_Height - 110), 16, 16) == 1)
-        {
-            c_midiout--;
-            gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiout_changed = TRUE;
-            teac = 12;
-        }
-        // Next midi out device
-        if(zcheckMouse(114, (Cur_Height - 110), 16, 16) == 1)
-        {
-            c_midiout++;
-            gui_action = GUI_CMD_UPDATE_SETUP_ED;
-            midiout_changed = TRUE;
-            teac = 12;
-        }
-#endif
-
 #if !defined(__WIN32__)
         // Keyboard
-        if(zcheckMouse(520 + 62 + 2, (Cur_Height - 125), 16, 16) == 1)
+        if(zcheckMouse(520 + 62 + 2, (Cur_Height - 125), 16, 16))
         {
             Keyboard_Idx--;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -906,7 +795,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Keyboard
-        if(zcheckMouse(520 + 62 + 2 + 108 + 18, (Cur_Height - 125), 16, 16) == 1)
+        if(zcheckMouse(520 + 62 + 2 + 108 + 18, (Cur_Height - 125), 16, 16))
         {
             Keyboard_Idx++;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
@@ -914,6 +803,27 @@ void Mouse_Left_Master_Ed(void)
         }
 #endif
 
+        // Metronome
+        if(zcheckMouse(8 + 112, (Cur_Height - 125), 16, 16))
+        {
+            if(metronome_magnify > 0)
+            {
+                metronome_magnify--;
+                gui_action = GUI_CMD_UPDATE_SETUP_ED;
+                teac = 22;
+            }
+        }
+
+        // Metronome
+        if(zcheckMouse(8 + 112 + 44, (Cur_Height - 125), 16, 16))
+        {
+            if(metronome_magnify < 128)
+            {
+                metronome_magnify++;
+                gui_action = GUI_CMD_UPDATE_SETUP_ED;
+                teac = 22;
+            }
+        }
     }
 }
 

@@ -245,6 +245,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Store_FX_FinePitchUp = FALSE;
     int Store_FX_FinePitchDown = FALSE;
     int Store_FX_SwitchFlanger = FALSE;
+    int Store_FX_Shuffle = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -888,6 +889,11 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_SwitchFlanger = TRUE;
                                     break;
 
+                                // $25 Set shuffle
+                                case 0x25:
+                                    Store_FX_Shuffle = TRUE;
+                                    break;
+
                                 // $31 First TB303 control
                                 case 0x31:
                                     Store_303_1 = TRUE;
@@ -1059,9 +1065,6 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     // Special but only at tick 0
     Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio |
                                   Store_FX_PatternLoop | Store_FX_Reverse);
-
-    Save_Constant("PTK_TRACK_VOLUME", Store_Track_Volume);
-    Save_Constant("PTK_TRACK_EQ", Store_Track_Eq);
 
     // Remap the used instruments
     for(i = 0; i < MAX_INSTRS; i++)
@@ -1820,7 +1823,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_PROC_FILTERHP", Store_Filter_Hp12M | Store_Filter_Hp12S | Store_Filter_Hp24M);
     Save_Constant("PTK_PROC_FILTERHP2", Store_Filter_Hp12S | Store_Filter_Hp24M);
 
-    Save_Constant("PTK_SHUFFLE", shuffle != 0 ? TRUE : FALSE);
+    Save_Constant("PTK_SHUFFLE", shuffle != 0 ? TRUE : FALSE || Store_FX_Shuffle);
 
     Save_Constant("PTK_COMPRESSOR", compressor);
 
@@ -1880,6 +1883,9 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         }
     }
     Save_Constant("PTK_DISCLAP", Store_Disclap);
+
+    Save_Constant("PTK_TRACK_VOLUME", Store_Track_Volume);
+    Save_Constant("PTK_TRACK_EQ", Store_Track_Eq);
 
     for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
     {
