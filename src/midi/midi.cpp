@@ -48,6 +48,9 @@ extern int old_key_Pattern_Line;
 extern int pos_scope;
 extern int pos_scope_latency;
 
+extern int player_pos;
+extern int metronome_rows_counter;
+
 char Midi_In_Name[256];
 char Midi_Out_Name[256];
 
@@ -125,14 +128,18 @@ void Midi_CallBackIn(double deltatime,
             is_editing = TRUE;
             L_MaxLevel = 0;
             R_MaxLevel = 0;
-            Songplaying = TRUE;
             Switch_Cmd_Playing(FALSE);
             Pattern_Line_Visual = Pattern_Line;
             key_record_first_time = FALSE;
             old_key_Pattern_Line = Pattern_Line_Visual;
             Clear_Midi_Channels_Pool();
+            player_pos = -1;
+            metronome_rows_counter = 0;
+            Post_Song_Init();
+            Ptk_Play();
         }
     }
+
     switch(Midi_Command)
     {
         // Pitch bend (not handled yet).
