@@ -13,10 +13,10 @@ EXEOBJS = ptk.o \
           editor_303.o editor_pattern.o editor_sequencer.o editor_track.o editor_track_fx.o \
           patterns_blocks.o editor_synth.o editor_sample.o editor_fx_setup.o editor_setup.o \
           editor_diskio.o editor_reverb.o editor_instrument.o editor_midi.o \
-          samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o \
+          samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o midi_cfg.o \
           bits.o pack.o tinypack.o words.o wputils.o \
           config.o 303s.o synths.o insts.o ptps.o \
-          midi.o RtMidi.o \
+          midi.o RtMidi.o midi_dispatch.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
           samples_ops.o aiff.o riff.o \
@@ -101,6 +101,9 @@ patterns.o: src/files/patterns.cpp
 reverbs.o: src/files/reverbs.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
+midi_cfg.o: src/files/midi_cfg.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
 config.o: src/files/config.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
@@ -120,6 +123,9 @@ midi.o: src/midi/midi.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 RtMidi.o: src/midi/RtMidi.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+midi_dispatch.o: src/midi/midi_dispatch.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 timer.o: src/support/timer.cpp
@@ -187,3 +193,4 @@ wputils.o: src/samples/wavpack/wputils.cpp
 
 tinypack.o: src/samples/wavpack/tinypack.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
+
