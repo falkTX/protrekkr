@@ -8,6 +8,8 @@
 	<string>protrekkr</string>
 	<key>CFBundleIdentifier</key>
 	<string>http://protrekkr.googlecode.com/</string>
+	<key>CFBundleIconFile</key>
+	<string>protrekkr.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
