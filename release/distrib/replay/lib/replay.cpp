@@ -987,23 +987,29 @@ void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             // Add the metronome at the end of the audio chain
             if(trigger_metronome)
             {
-                short *wMetronome_Dats = (short *) Metronome_Dats;
+                short Left_Dat;
+                short Right_Dat;
+                Left_Dat = (Metronome_Dats[(metronome_internal_counter_int * 2) + 1] << 8) |
+                           (Metronome_Dats[(metronome_internal_counter_int * 2)] & 0xff);
+                Right_Dat = Left_Dat;
+
 #if defined(__MACOSX__)
                 if(AUDIO_16Bits)
                 {
-                    left_value += wMetronome_Dats[metronome_internal_counter_int];
-                    right_value += wMetronome_Dats[metronome_internal_counter_int];
+                    left_value += Left_Dat;
+                    right_value += Right_Dat;
                 }
                 else
                 {
                     // ([1.0..-1.0f])
-                    left_float += wMetronome_Dats[metronome_internal_counter_int] / 32767.0f;
-                    right_float += wMetronome_Dats[metronome_internal_counter_int] / 32767.0f;
+                    left_float += (float) (Left_Dat) / 32767.0f;
+                    right_float += (float) (Right_Dat) / 32767.0f;
                 }
 #else
-                left_value += wMetronome_Dats[metronome_internal_counter_int];
-                right_value += wMetronome_Dats[metronome_internal_counter_int];
+                left_value += Left_Dat;
+                right_value += Right_Dat;
 #endif
+
                 metronome_internal_counter_int++;
                 if((metronome_internal_counter_int) == Metronome_Dats_Size)
                 {

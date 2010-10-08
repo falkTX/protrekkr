@@ -2286,6 +2286,7 @@ void Notify_Edit(void)
         Gui_Draw_Button_Box(8, 82, 62, 16, "Edit/Rec.", BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
     }
     Gui_Draw_Button_Box(72, 82, 16, 16, "", BUTTON_DISABLED);
+    gui_action_metronome = GUI_CMD_FLASH_METRONOME_OFF;
 }
 
 // ------------------------------------------------------
