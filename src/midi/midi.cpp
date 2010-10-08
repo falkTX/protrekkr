@@ -104,6 +104,7 @@ void Midi_CallBackIn(double deltatime,
     int tmp_note;
     int Unknown_Message;
     Uint32 Param1 = 0;
+    Uint32 Param1_Swap = 0;
     int i;
     unsigned char *ptr = (unsigned char *) &Param1;
     unsigned int nBytes = message->size();
@@ -113,6 +114,14 @@ void Midi_CallBackIn(double deltatime,
     {
         *ptr++ = message->at(i);
     }
+
+#if defined(__MOT_SWAP__)
+    Param1_Swap = (Param1 & 0xff) << 24;
+    Param1_Swap |= ((Param1 >> 8) & 0xff) << 16;
+    Param1_Swap |= ((Param1 >> 16) & 0xff) << 8;
+    Param1_Swap |= ((Param1 >> 24) & 0xff);
+    Param1 = Param1_Swap;
+#endif    
 
     Midi_Channel_Number = Param1 & 0xf;
     Midi_Command = Param1 & 0xf0;
