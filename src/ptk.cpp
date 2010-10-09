@@ -1844,6 +1844,7 @@ int Screen_Update(void)
 
     return(TRUE);
 }
+#include "aros/debug.H"
 
 // ------------------------------------------------------
 // Attempt to load any supported file format
@@ -1958,8 +1959,11 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "PROTREKM") == 0)
         {
             sprintf(name, "%s", FileName);
+            kprintf("TEST0\n");
             SongStop();
+            kprintf("TEST1\n");
             AUDIO_Stop();
+            kprintf("TEST2\n");
             LoadPtk(name);
             Renew_Sample_Ed();
             AUDIO_Play();
@@ -5739,6 +5743,7 @@ void Mouse_Handler(void)
             case SCOPE_ZONE_SYNTH_LIST:
                 Files_List_Move(10);
                 break;
+
 
             case SCOPE_ZONE_MOD_DIR:
             case SCOPE_ZONE_INSTR_DIR:

@@ -118,7 +118,7 @@ void *AUDIO_Thread(void *arg)
             io->ahir_Position = 0x8000;
             io->ahir_Link = join;
             SendIO((struct IORequest *) io);
-            if (join) WaitIO((struct IORequest *) join);
+            if(join) WaitIO((struct IORequest *) join);
             join = io;
             AHIio = AHIio2; AHIio2 = io;
             AHIbuf = AHIbuf2; AHIbuf2 = buf;
