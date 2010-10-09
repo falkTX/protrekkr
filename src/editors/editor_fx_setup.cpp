@@ -233,7 +233,7 @@ void Mouse_Sliders_Fx_Ed(void)
         {
             Feedback = float(float(Mouse.x - 87) / 127.0f);
             if(Feedback < 0) Feedback = 0;
-            if(Feedback > 0.85f) Feedback = 0.85f;
+            if(Feedback > 0.88f) Feedback = 0.88f;
 
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 2;

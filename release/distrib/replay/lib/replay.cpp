@@ -55,8 +55,8 @@ int SamplesPerTick;
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     int BeatsPerMin = 125;
     int TicksPerBeat = 4;
-    float Feedback = 0.6f;
-    int c_threshold = 32;
+    float Feedback = 0.88f;
+    int c_threshold = 50;
 #else
     int BeatsPerMin;
     int TicksPerBeat;
@@ -805,8 +805,8 @@ extern int gui_bpm_action;
 char compressor;
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    float Reverb_Filter_Cutoff = 0.3f;
-    float Reverb_Filter_Resonance = 0.1f;
+    float Reverb_Filter_Cutoff = 0.08f;
+    float Reverb_Filter_Resonance = 0.5f;
     unsigned char Reverb_Stereo_Amount = 50;
 #else
     float Reverb_Filter_Cutoff;

@@ -1931,6 +1931,7 @@ void LoadFile(int Freeindex, const char *str)
            strcmp(extension, "TWNNINS9") == 0)
         {
             sprintf(instrname, "%s", FileName);
+            Stop_Current_Instrument();
             LoadInst(instrname);
             Renew_Sample_Ed();
         }
@@ -1972,6 +1973,7 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSYN4") == 0)
         {
             sprintf(synthname, "%s", FileName);
+            Stop_Current_Instrument();
             LoadSynth(synthname);
         }
         else if(strcmp(extension, "TWNN3030") == 0 ||
@@ -2462,8 +2464,8 @@ void Newmod(void)
         TicksPerBeat = 4;
         DelayType = 1;
         mas_vol = 1.0f;
-        Reverb_Filter_Cutoff = 0.3f;
-        Reverb_Filter_Resonance = 0.9f;
+        Reverb_Filter_Cutoff = 0.08f;
+        Reverb_Filter_Resonance = 0.5f;
         Reverb_Stereo_Amount = 50;
 
         for(i = 0; i < MAX_TRACKS; i++)

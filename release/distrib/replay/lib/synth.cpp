@@ -2028,7 +2028,7 @@ float CSynth::MoogFilterL(void)
     #if defined(PTK_SYNTH_FILTER_MOOG_LO)
         return(MoogBufferL[4] * 32767.0f);
     #endif
-    #if defined(PTK_SYNTH_FILTER_MOOG_NAND)
+    #if defined(PTK_SYNTH_FILTER_MOOG_BAND)
         return((3.0f * (MoogBufferL[3] - MoogBufferL[4])) * 32767.0f);
     #endif
 #endif
@@ -2066,7 +2066,7 @@ float CSynth::MoogFilterR(void)
     #if defined(PTK_SYNTH_FILTER_MOOG_LO)
         return(MoogBufferR[4] * 32767.0f);
     #endif
-    #if defined(PTK_SYNTH_FILTER_MOOG_NAND)
+    #if defined(PTK_SYNTH_FILTER_MOOG_BAND)
         return((3.0f * (MoogBufferR[3] - MoogBufferR[4])) * 32767.0f);
     #endif
 #endif

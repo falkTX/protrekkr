@@ -186,16 +186,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] =  4.0f;
             decays[9] =  1.0f;
 
-            delays[0] = 1000 / 2;
-            delays[1] = 1100 / 2; 
-            delays[2] = 1200 / 2;
-            delays[3] = 1300 / 2;
-            delays[4] = 1400 / 2;
-            delays[5] = 1800 / 2;
-            delays[6] = 1900 / 2;
-            delays[7] = 2000 / 2;
-            delays[8] = 2100 / 2;
-            delays[9] = 2200 / 2;
+            delays[0] = 100;
+            delays[1] = 300; 
+            delays[2] = 500;
+            delays[3] = 200;
+            delays[4] = 800;
+            delays[5] = 650;
+            delays[6] = 720;
+            delays[7] = 450;
+            delays[8] = 2100;
+            delays[9] = 1500;
 
             num_echoes = 10;
             break;

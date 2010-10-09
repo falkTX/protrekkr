@@ -6,6 +6,8 @@ v2.5.1:
 
 - Tracks are only shadowed during playing.
 - Added cutomizable resonance for reverb filter.
+- Tracker could crash when loading an instrument
+  over another one which was still playing.
 
 v2.5.0:
 
