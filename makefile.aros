@@ -18,7 +18,7 @@ EXEOBJS = ptk.o \
           samples_pack.o files_list.o files.o mods.o patterns.o reverbs.o midi_cfg.o \
           bits.o pack.o tinypack.o words.o wputils.o \
           config.o 303s.o synths.o insts.o ptps.o \
-          midi.o \
+          midi.o midi_dispatch.o \
           timer.o main.o \
           misc_draw.o draw_primitives.o requesters.o xml.o \
           samples_ops.o aiff.o riff.o \
@@ -130,6 +130,9 @@ midi.o: src/midi/midi.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 RtMidi.o: src/midi/RtMidi.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+midi_dispatch.o: src/midi/midi_dispatch.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 timer.o: src/support/timer.cpp

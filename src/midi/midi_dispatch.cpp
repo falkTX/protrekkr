@@ -29,8 +29,6 @@
 // SUCH DAMAGE.
 // ------------------------------------------------------
 
-#if !defined(__NO_MIDI__)
-
 // ------------------------------------------------------
 // Includes
 #include "../include/variables.h"
@@ -563,4 +561,3 @@ void Dispatch_Midi_Msg(int CC, int Data)
     }
 }
 
-#endif

@@ -32,8 +32,6 @@
 #ifndef _MIDI_DISPATCH_H_
 #define _MIDI_DISPATCH_H_
 
-#if !defined(__NO_MIDI__)
-
 // ------------------------------------------------------
 // Constants
 #define NBR_MIDI_DISPATCH_MSG 15
@@ -120,7 +118,5 @@ extern MIDI_PTK_CMD Str_Midi_Commands[NBR_MIDI_AUTOMATION];
 // Functions
 void Dispatch_Midi_Msg(int CC, int Data);
 void Init_Midi_Ctrl(int CC, int Data);
-
-#endif
 
 #endif
