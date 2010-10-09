@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.5.1:
+
+- Tracks are only shadowed during playing.
+- Added cutomizable resonance for reverb filter.
+
 v2.5.0:
 
 - Improved midi in/out support (notably by adding velocity).

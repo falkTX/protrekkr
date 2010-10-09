@@ -37,7 +37,7 @@
 // Load the data from a reverb file (or a module)
 void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
-                      FILE *in)
+                      FILE *in, int New)
 {
     int i;
 
@@ -46,12 +46,14 @@ void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
     for(i = 0; i < MAX_COMB_FILTERS; i++)
     {
         delays[i] = 1000;
+        if(New) delays[i] /= 2;
         decays[i] = 0.0f;
     }
 
     for(i = 0; i < num_echoes; i++)
     {
         Read_Function_Swap(&delays[i], sizeof(int), 1, in);
+        if(New) delays[i] /= 2;
     }
     for(i = 0; i < num_echoes; i++)
     {
@@ -86,6 +88,7 @@ void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
 void LoadReverb(char *FileName)
 {
     FILE *in;
+    int New_Reverb = FALSE;
     in = fopen(FileName, "rb");
 
     if(in != NULL)
@@ -94,13 +97,22 @@ void LoadReverb(char *FileName)
         char extension[10];
         fread(extension, sizeof(char), 9, in);
 
-        if(strcmp(extension, "TWNNREV1") == 0)
+        if(strcmp(extension, "TWNNREV1") == 0 ||
+           strcmp(extension, "PROTREV2") == 0
+          )
         {
+            switch(extension[7])
+            {
+                case '2':
+                    New_Reverb = TRUE;
+                    break;
+            }
+
             // Ok, extension matched!
             Status_Box("Loading Reverb data...");
 
             Read_Data(Reverb_Name, sizeof(char), 20, in);
-            Load_Reverb_Data(Read_Data, Read_Data_Swap, in);
+            Load_Reverb_Data(Read_Data, Read_Data_Swap, in, New_Reverb);
             Initreverb();
             Actualize_Reverb_Ed(0);
 
@@ -174,16 +186,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] =  4.0f;
             decays[9] =  1.0f;
 
-            delays[0] = 1000;
-            delays[1] = 1100; 
-            delays[2] = 1200;
-            delays[3] = 1300;
-            delays[4] = 1400;
-            delays[5] = 1800;
-            delays[6] = 1900;
-            delays[7] = 2000;
-            delays[8] = 2100;
-            delays[9] = 2200;
+            delays[0] = 1000 / 2;
+            delays[1] = 1100 / 2; 
+            delays[2] = 1200 / 2;
+            delays[3] = 1300 / 2;
+            delays[4] = 1400 / 2;
+            delays[5] = 1800 / 2;
+            delays[6] = 1900 / 2;
+            delays[7] = 2000 / 2;
+            delays[8] = 2100 / 2;
+            delays[9] = 2200 / 2;
 
             num_echoes = 10;
             break;
@@ -200,16 +212,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] = -13.0f;
             decays[9] =   9.0f;
 
-            delays[0] = 1000;
-            delays[1] = 1600; 
-            delays[2] = 2100;
-            delays[3] = 2400;
-            delays[4] = 2290;
-            delays[5] = 2350;
-            delays[6] = 2400;
-            delays[7] = 2500;
-            delays[8] = 2680;
-            delays[9] = 3410;
+            delays[0] = 1000 / 2;
+            delays[1] = 1600 / 2;
+            delays[2] = 2100 / 2;
+            delays[3] = 2400 / 2;
+            delays[4] = 2290 / 2;
+            delays[5] = 2350 / 2;
+            delays[6] = 2400 / 2;
+            delays[7] = 2500 / 2;
+            delays[8] = 2680 / 2;
+            delays[9] = 3410 / 2;
 
             num_echoes = 10;
             break;
@@ -226,16 +238,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] =  7.0f;
             decays[9] =  2.0f;
 
-            delays[0] =  100;
-            delays[1] =  200; 
-            delays[2] =  300;
-            delays[3] = 1000;
-            delays[4] = 1190;
-            delays[5] = 1250;
-            delays[6] = 1300;
-            delays[7] = 1400;
-            delays[8] = 1580;
-            delays[9] = 1610;
+            delays[0] =  100 / 2;
+            delays[1] =  200 / 2;
+            delays[2] =  300 / 2;
+            delays[3] = 1000 / 2;
+            delays[4] = 1190 / 2;
+            delays[5] = 1250 / 2;
+            delays[6] = 1300 / 2;
+            delays[7] = 1400 / 2;
+            delays[8] = 1580 / 2;
+            delays[9] = 1610 / 2;
 
             num_echoes = 10;
             break;
@@ -246,10 +258,10 @@ void Load_Old_Reverb_Presets(int Type)
             decays[2] = 12.0f;
             decays[3] =  3.0f;
 
-            delays[0] = 2000;
-            delays[1] = 4400; 
-            delays[2] = 5000;
-            delays[3] = 6200;
+            delays[0] = 2000 / 2;
+            delays[1] = 4400 / 2;
+            delays[2] = 5000 / 2;
+            delays[3] = 6200 / 2;
 
             num_echoes = 4;
             break;
@@ -260,10 +272,10 @@ void Load_Old_Reverb_Presets(int Type)
             decays[2] = 31.0f;
             decays[3] =  0.0f;
 
-            delays[0] = 3012;
-            delays[1] = 4012;
-            delays[2] = 4022;
-            delays[3] = 5232;
+            delays[0] = 3012 / 2;
+            delays[1] = 4012 / 2;
+            delays[2] = 4022 / 2;
+            delays[3] = 5232 / 2;
 
             num_echoes = 4;
             break;
@@ -280,16 +292,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] = -13.0f;
             decays[9] =   9.0f;
 
-            delays[0] = 20;
-            delays[1] = 600;  
-            delays[2] = 100;
-            delays[3] = 400;
-            delays[4] = 290;
-            delays[5] = 1350;
-            delays[6] = 400;
-            delays[7] = 1500;
-            delays[8] = 1680;
-            delays[9] = 1410;
+            delays[0] = 20 / 2;
+            delays[1] = 600 / 2;
+            delays[2] = 100 / 2;
+            delays[3] = 400 / 2;
+            delays[4] = 290 / 2;
+            delays[5] = 1350 / 2;
+            delays[6] = 400 / 2;
+            delays[7] = 1500 / 2;
+            delays[8] = 1680 / 2;
+            delays[9] = 1410 / 2;
 
             num_echoes = 10;
             break;
@@ -306,16 +318,16 @@ void Load_Old_Reverb_Presets(int Type)
             decays[8] = -13.0f;
             decays[9] =  12.0f;
 
-            delays[0] = 20;
-            delays[1] = 600;  
-            delays[2] = 700;
-            delays[3] = 800;
-            delays[4] = 990;
-            delays[5] = 1350;
-            delays[6] = 1400;
-            delays[7] = 1500;
-            delays[8] = 1680;
-            delays[9] = 1910;
+            delays[0] = 20 / 2;
+            delays[1] = 600 / 2; 
+            delays[2] = 700 / 2;
+            delays[3] = 800 / 2;
+            delays[4] = 990 / 2;
+            delays[5] = 1350 / 2;
+            delays[6] = 1400 / 2;
+            delays[7] = 1500 / 2;
+            delays[8] = 1680 / 2;
+            delays[9] = 1910 / 2;
 
             num_echoes = 10;
             break;

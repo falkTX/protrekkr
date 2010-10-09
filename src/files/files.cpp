@@ -164,6 +164,7 @@ int LoadPtk(char *FileName)
     int XtraFx = FALSE;
     int Combine = FALSE;
     int Stereo_Reverb = FALSE;
+    int Reverb_Resonance = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -212,6 +213,8 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
+            case 'N':
+                Reverb_Resonance = TRUE;
             case 'M':
                 Stereo_Reverb = TRUE;
             case 'L':
@@ -599,7 +602,7 @@ Read_Mod_File:
         // Load the new reverb data
         if(New_Reverb)
         {
-            Load_Reverb_Data(Read_Mod_Data, Read_Mod_Data_Swap, in);
+            Load_Reverb_Data(Read_Mod_Data, Read_Mod_Data_Swap, in, !Reverb_Resonance);
         }
 
         // Reading track part sequence
@@ -675,7 +678,12 @@ Read_Mod_File:
                 Read_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
             }
 
-            Read_Mod_Data_Swap(&Reverb_Filter_Amount, sizeof(float), 1, in);
+            Read_Mod_Data_Swap(&Reverb_Filter_Cutoff, sizeof(float), 1, in);
+
+            if(Reverb_Resonance)
+            {
+                Read_Mod_Data_Swap(&Reverb_Filter_Resonance, sizeof(float), 1, in);
+            }
             if(Stereo_Reverb)
             {
                 Read_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
@@ -1424,7 +1432,8 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 Write_Mod_Data_Swap(&beatlines[i], sizeof(short), 1, in);
             }
-            Write_Mod_Data_Swap(&Reverb_Filter_Amount, sizeof(float), 1, in);
+            Write_Mod_Data_Swap(&Reverb_Filter_Cutoff, sizeof(float), 1, in);
+            Write_Mod_Data_Swap(&Reverb_Filter_Resonance, sizeof(float), 1, in);
             Write_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
 
             for(i = 0; i < 128; i++)
@@ -1578,7 +1587,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKM");
+        sprintf(extension, "PROTREKN");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

@@ -394,7 +394,8 @@ extern char style[20];
 extern char beatsync[128];
 extern short beatlines[128];
 
-extern float Reverb_Filter_Amount;
+extern float Reverb_Filter_Cutoff;
+extern float Reverb_Filter_Resonance;
 extern unsigned char Reverb_Stereo_Amount;
 
 extern float Sample_Vol[MAX_INSTRS];

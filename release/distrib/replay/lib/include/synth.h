@@ -497,15 +497,16 @@ class rFilter
 
         void Reset()
         {
-            buffy0 = 1.0f;
+            buffy0 = 0.0f;
             buffy1 = 0.0f;
         };
 
-        float fWork(float input, float f)
+        float fWork(float input, float f, float q)
         {
             float fa = 1.0f - f;
+            float fb = float(q * (1.0f + (1.0f / fa)));
 
-            buffy0 = fa * buffy0 + f * input;
+            buffy0 = fa * buffy0 + f * (input + fb * (buffy0 - buffy1));
             buffy1 = fa * buffy1 + f * buffy0;
             return buffy1;
         };

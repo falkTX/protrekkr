@@ -46,6 +46,9 @@ int Table_Interpolation_Inc[] = { SPLINE_INT, CUBIC_INT, CUBIC_INT };
 
 // ------------------------------------------------------
 // Functions
+void Display_Reverb_Cutoff(void);
+void Display_Reverb_Resonance(void);
+
 void Draw_Fx_Ed(void)
 {
     Draw_Editors_Bar(USER_SCREEN_FX_SETUP_EDIT);
@@ -151,9 +154,7 @@ void Actualize_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 9)
         {
-            if(Reverb_Filter_Amount < 0.05f) Reverb_Filter_Amount = 0.05f;
-            if(Reverb_Filter_Amount > 0.99f) Reverb_Filter_Amount = 0.99f;
-            Realslider(77, (Cur_Height - 66), (int) (Reverb_Filter_Amount * 128.0f), compressor);
+            Display_Reverb_Cutoff();
         }
 
         if(gode == 0 || gode == 10)
@@ -201,6 +202,11 @@ void Actualize_Fx_Ed(char gode)
             if(gode == 13) Initreverb();
         }
 
+        if(gode == 0 || gode == 14)
+        {
+            Display_Reverb_Resonance();
+        }
+
 /*
         if(gode == 0 || gode == 13)
         {
@@ -227,7 +233,7 @@ void Mouse_Sliders_Fx_Ed(void)
         {
             Feedback = float(float(Mouse.x - 87) / 127.0f);
             if(Feedback < 0) Feedback = 0;
-            if(Feedback > 0.99f) Feedback = 0.99f;
+            if(Feedback > 0.85f) Feedback = 0.85f;
 
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 2;
@@ -239,14 +245,23 @@ void Mouse_Sliders_Fx_Ed(void)
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 7;
         }
-        // Reverb filter
-        if(zcheckMouse(77, (Cur_Height - 66), 148, 16) && compressor)
+        // Reverb filter cutoff
+        if(zcheckMouse(77, (Cur_Height - 66), 67, 16) && compressor)
         {
-            Reverb_Filter_Amount = (float)(Mouse.x - 87) / 128.0f;
-            if(Reverb_Filter_Amount < 0.0f) Reverb_Filter_Amount = 0.0f;
-            if(Reverb_Filter_Amount > 0.99f) Reverb_Filter_Amount = 0.99f;
+            Reverb_Filter_Cutoff = (float)(Mouse.x - 87) / 50.0f;
+            if(Reverb_Filter_Cutoff < 0.02f) Reverb_Filter_Cutoff = 0.02f;
+            if(Reverb_Filter_Cutoff > 0.99f) Reverb_Filter_Cutoff = 0.99f;
             gui_action = GUI_CMD_UPDATE_FX_ED;
             teac = 9;
+        }  
+        // Reverb filter resonance
+        if(zcheckMouse(150, (Cur_Height - 66), 67, 16) && compressor)
+        {
+            Reverb_Filter_Resonance = (float)(Mouse.x - 160) / 50.0f;
+            if(Reverb_Filter_Resonance < 0.02f) Reverb_Filter_Resonance = 0.02f;
+            if(Reverb_Filter_Resonance > 0.99f) Reverb_Filter_Resonance = 0.99f;
+            gui_action = GUI_CMD_UPDATE_FX_ED;
+            teac = 14;
         }  
         // Reverb stereo
         if(zcheckMouse(77, (Cur_Height - 48), 148, 16) && compressor)
@@ -433,4 +448,28 @@ void Mouse_Left_Fx_Ed(void)
         }
 
     }
+}
+
+void Display_Reverb_Cutoff(void)
+{
+    char string[64];
+
+    if(Reverb_Filter_Cutoff < 0.02f) Reverb_Filter_Cutoff = 0.02f;
+    if(Reverb_Filter_Cutoff > 0.99f) Reverb_Filter_Cutoff = 0.99f;
+
+    Realslider_Size(77, (Cur_Height - 66), 55, (int) (Reverb_Filter_Cutoff * 55.0f), compressor);
+    sprintf(string, "%d%%", (int) (Reverb_Filter_Cutoff * 102.0f));
+    Print_String(string, 77, (Cur_Height - (66 - 2)), 55 + 17, BUTTON_TEXT_CENTERED);
+}
+
+void Display_Reverb_Resonance(void)
+{
+    char string[64];
+
+    if(Reverb_Filter_Resonance < 0.02f) Reverb_Filter_Resonance = 0.02f;
+    if(Reverb_Filter_Resonance > 0.99f) Reverb_Filter_Resonance = 0.99f;
+
+    Realslider_Size(150, (Cur_Height - 66), 55, (int) (Reverb_Filter_Resonance * 55.0f), compressor);
+    sprintf(string, "%d%%", (int) (Reverb_Filter_Resonance * 102.0f));
+    Print_String(string, 150, (Cur_Height - (66 - 2)), 55 + 17, BUTTON_TEXT_CENTERED);
 }

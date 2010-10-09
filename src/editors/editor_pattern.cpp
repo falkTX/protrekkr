@@ -322,7 +322,10 @@ void draw_pated(int track, int line, int petrack, int row)
         shadow_tracks[cur_track] = FALSE;
         if(!CHAN_ACTIVE_STATE[Cur_Position][cur_track])
         {
-            shadow_tracks[cur_track] = Use_Shadows;
+            if(Songplaying)
+            {
+                shadow_tracks[cur_track] = Use_Shadows;
+            }
         }
 
         save_dover = dover;

@@ -276,8 +276,14 @@ void Actualize_Track_Ed(char gode)
 
         if(gode == 0 || gode == 13 || gode == 14 || gode == 15)
         {
-            if(Channels_Polyphony[Track_Under_Caret] < 1) Channels_Polyphony[Track_Under_Caret] = 1;
-            if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY) Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
+            if(Channels_Polyphony[Track_Under_Caret] < 1)
+            {
+                Channels_Polyphony[Track_Under_Caret] = 1;
+            }
+            if(Channels_Polyphony[Track_Under_Caret] > MAX_POLYPHONY)
+            {
+                Channels_Polyphony[Track_Under_Caret] = MAX_POLYPHONY;
+            }
             Gui_Draw_Arrows_Number_Box2(647, (Cur_Height - 110), Channels_Polyphony[Track_Under_Caret], BUTTON_NORMAL | BUTTON_TEXT_CENTERED | BUTTON_RIGHT_MOUSE);
         }
         if(gode == 0 || gode == 14 || gode == 13 || gode == 15)

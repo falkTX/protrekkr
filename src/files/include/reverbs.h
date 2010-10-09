@@ -43,7 +43,7 @@
 // Functions
 void Load_Reverb_Data(int (*Read_Function)(void *, int ,int, FILE *),
                       int (*Read_Function_Swap)(void *, int ,int, FILE *),
-                      FILE *in);
+                      FILE *in, int New);
 void Save_Reverb_Data(int (*Write_Function)(void *, int ,int, FILE *),
                       int (*Write_Function_Swap)(void *, int ,int, FILE *),
                       FILE *in);

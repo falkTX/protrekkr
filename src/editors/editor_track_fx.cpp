@@ -97,7 +97,7 @@ void Actualize_Track_Fx_Ed(char gode)
 
         if(gode == 0 || gode == 7 || gode == 11)
         {
-            if(FLANGER_FEEDBACK[Track_Under_Caret] > 1.0f) FLANGER_FEEDBACK[Track_Under_Caret] = 1.0f;
+            if(FLANGER_FEEDBACK[Track_Under_Caret] > 0.9f) FLANGER_FEEDBACK[Track_Under_Caret] = 0.9f;
             if(FLANGER_FEEDBACK[Track_Under_Caret] < -1.0f) FLANGER_FEEDBACK[Track_Under_Caret] = -1.0f;
             Realslider(308, (Cur_Height - 67), 64 + (int) (FLANGER_FEEDBACK[Track_Under_Caret] * 64.0f), FLANGER_ON[Track_Under_Caret]);
             outlong(458, (Cur_Height - 67), long(FLANGER_FEEDBACK[Track_Under_Caret] * 100.0f), 1);

@@ -287,7 +287,7 @@ void Mouse_Right_Reverb_Ed(void)
             if(zcheckMouse(Table_Arrows[i].x + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] -= 50;
-                if(delays[i] < 167) delays[i] = 167;
+                if(delays[i] < 83) delays[i] = 83;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
                 Initreverb();
@@ -380,7 +380,7 @@ void Mouse_Left_Reverb_Ed(void)
             if(zcheckMouse(Table_Arrows[i].x + 18, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]--;
-                if(delays[i] < 167) delays[i] = 167;
+                if(delays[i] < 83) delays[i] = 83;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
                 Initreverb();
@@ -436,7 +436,7 @@ void Mouse_Sliders_Reverb_Ed(void)
             if(zcheckMouse(Table_Arrows[i].x, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i]--;
-                if(delays[i] < 167) delays[i] = 167;
+                if(delays[i] < 83) delays[i] = 83;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
                 Initreverb();
@@ -471,7 +471,7 @@ void Mouse_Sliders_Right_Reverb_Ed(void)
             if(zcheckMouse(Table_Arrows[i].x, (Cur_Height - 115) + Table_Arrows[i].y, 16, 16))
             {
                 delays[i] -= 50;
-                if(delays[i] < 167) delays[i] = 167;
+                if(delays[i] < 83) delays[i] = 83;
                 teac = 0;
                 gui_action = GUI_CMD_UPDATE_REVERB_ED;
                 Initreverb();

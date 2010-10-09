@@ -1844,7 +1844,6 @@ int Screen_Update(void)
 
     return(TRUE);
 }
-#include "aros/debug.H"
 
 // ------------------------------------------------------
 // Attempt to load any supported file format
@@ -1956,14 +1955,12 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "TWNNSNGJ") == 0 ||
                 strcmp(extension, "PROTREKK") == 0 ||
                 strcmp(extension, "PROTREKL") == 0 ||
-                strcmp(extension, "PROTREKM") == 0)
+                strcmp(extension, "PROTREKM") == 0 ||
+                strcmp(extension, "PROTREKN") == 0)
         {
             sprintf(name, "%s", FileName);
-            kprintf("TEST0\n");
             SongStop();
-            kprintf("TEST1\n");
             AUDIO_Stop();
-            kprintf("TEST2\n");
             LoadPtk(name);
             Renew_Sample_Ed();
             AUDIO_Play();
@@ -2465,7 +2462,8 @@ void Newmod(void)
         TicksPerBeat = 4;
         DelayType = 1;
         mas_vol = 1.0f;
-        Reverb_Filter_Amount = 0.3f;
+        Reverb_Filter_Cutoff = 0.3f;
+        Reverb_Filter_Resonance = 0.9f;
         Reverb_Stereo_Amount = 50;
 
         for(i = 0; i < MAX_TRACKS; i++)

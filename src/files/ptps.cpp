@@ -1895,7 +1895,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         }
     }
 
-    Write_Mod_Data(&Reverb_Filter_Amount, sizeof(float), 1, in);
+    Write_Mod_Data(&Reverb_Filter_Cutoff, sizeof(float), 1, in);
+    Write_Mod_Data(&Reverb_Filter_Resonance, sizeof(float), 1, in);
     Write_Mod_Data(&Reverb_Stereo_Amount, sizeof(char), 1, in);
 
     Write_Mod_Data(&Store_303_1, sizeof(char), 1, in);
