@@ -97,10 +97,10 @@ void Draw_Master_Ed(void)
     Gui_Draw_Flat_Box("UI Setup");
 
     Gui_Draw_Button_Box(8, (Cur_Height - 125), 110, 16, "Metronome", BUTTON_NORMAL | BUTTON_DISABLED);
-    PrintXY(8 + 112 + 44 + 21, (Cur_Height - (125 - 2)), USE_FONT, "Rows");
+    PrintString(8 + 112 + 44 + 21, (Cur_Height - (125 - 2)), USE_FONT, "Rows");
 
-    Gui_Draw_Button_Box(8, (Cur_Height - 85), 110, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
-    PrintXY(8 + 112 + 44 + 21, (Cur_Height - (85 - 2)), USE_FONT, "Milliseconds");
+    Gui_Draw_Button_Box(8, (Cur_Height - 105), 110, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
+    PrintString(8 + 112 + 44 + 21, (Cur_Height - (105 - 2)), USE_FONT, "Milliseconds");
 
     Gui_Draw_Button_Box(330, (Cur_Height - 125), 114, 16, "Mousewheel Multiplier", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 105), 114, 16, "Rows Highlight", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -108,7 +108,7 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(330, (Cur_Height - 65), 114, 16, "Show Prev/Next Patt.", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 45), 114, 16, "Continuous Scroll", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    Gui_Draw_Button_Box(8, (Cur_Height - 105), 110, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(8, (Cur_Height - 85), 110, 16, "Auto Save", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(670, (Cur_Height - 145), 60, 16, "Full Screen", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520, (Cur_Height - 125), 60, 16, "Keyboard", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(520 + (18 + 108) + 2 + 20 + 66, (Cur_Height - 105), 60, 16, "Themes", BUTTON_NO_BORDER | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
@@ -137,12 +137,12 @@ void Actualize_Master_Ed(char gode)
 
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
-        // Milliseconds
+        // Latency
         if(gode == 0 || gode == 5)
         {
             if(AUDIO_Milliseconds < 10) AUDIO_Milliseconds = 10;
             if(AUDIO_Milliseconds > 250) AUDIO_Milliseconds = 250;
-            Gui_Draw_Arrows_Number_Box(8 + 112, (Cur_Height - 85), AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Arrows_Number_Box(8 + 112, (Cur_Height - 105), AUDIO_Milliseconds, BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         // Create a new sound buffer with the new latency amount
@@ -299,9 +299,9 @@ void Actualize_Master_Ed(char gode)
         {
             if(AutoSave < 0) AutoSave = 0;
             if(AutoSave >= sizeof(Labels_AutoSave) / sizeof(char *)) AutoSave = sizeof(Labels_AutoSave) / sizeof(char *) - 1;
-            Gui_Draw_Button_Box(8 + 112, (Cur_Height - 105), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(8 + 112 + 18, (Cur_Height - 105), 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
-            Gui_Draw_Button_Box(8 + 112 + 48 + 18, (Cur_Height - 105), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112, (Cur_Height - 85), 16, 16, "\03", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112 + 18, (Cur_Height - 85), 46, 16, Labels_AutoSave[AutoSave], BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_TEXT_CENTERED);
+            Gui_Draw_Button_Box(8 + 112 + 48 + 18, (Cur_Height - 85), 16, 16, "\04", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
         }
 
         // Keyboard layout
@@ -467,8 +467,8 @@ void Mouse_Left_Master_Ed(void)
 {
     if(userscreen == USER_SCREEN_SETUP_EDIT)
     {
-        // Milliseconds
-        if(zcheckMouse(8 + 112, (Cur_Height - 85), 16, 16))
+        // Latency
+        if(zcheckMouse(8 + 112, (Cur_Height - 105), 16, 16))
         {
             if(AUDIO_Milliseconds > 10)
             {
@@ -478,8 +478,8 @@ void Mouse_Left_Master_Ed(void)
             }
         }
 
-        // Milliseconds
-        if(zcheckMouse(8 + 112 + 44, (Cur_Height - 85), 16, 16))
+        // Latency
+        if(zcheckMouse(8 + 112 + 44, (Cur_Height - 105), 16, 16))
         {
             if(AUDIO_Milliseconds < 250)
             {
@@ -768,7 +768,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Autosave
-        if(zcheckMouse(8 + 112, (Cur_Height - 105), 16, 16))
+        if(zcheckMouse(8 + 112, (Cur_Height - 85), 16, 16))
         {
             AutoSave--;
             wait_AutoSave = 0;
@@ -777,7 +777,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Autosave
-        if(zcheckMouse(8 + 112 + 48 + 18, (Cur_Height - 105), 16, 16))
+        if(zcheckMouse(8 + 112 + 48 + 18, (Cur_Height - 85), 16, 16))
         {
             AutoSave++;
             wait_AutoSave = 0;

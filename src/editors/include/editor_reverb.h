@@ -85,5 +85,6 @@ void Mouse_Right_Reverb_Ed(void);
 void Mouse_Left_Reverb_Ed(void);
 void Mouse_Sliders_Reverb_Ed(void);
 void Mouse_Sliders_Right_Reverb_Ed(void);
+void Mouse_Reverb_Ed();
 
 #endif

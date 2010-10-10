@@ -56,7 +56,7 @@ void Fillrect(int x1, int y1, int x2, int y2);
 void UISetPalette(SDL_Color *Palette, int Amount);
 void Copy(SDL_Surface *Source, int x, int y, int x1, int y1, int x2, int y2);
 void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest, int x, int y, int x1, int y1, int x2, int y2);
-void PrintXY(int x, int y, int Font_Type, char *String, int max_x = -1);
+void PrintString(int x, int y, int Font_Type, char *String, int max_x = -1);
 void Push_Update_Rect(int x, int y, int width, int height);
 
 #endif

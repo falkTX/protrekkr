@@ -20,7 +20,7 @@ EXEOBJS = ptk.o \
           config.o 303s.o synths.o insts.o ptps.o \
           midi.o midi_dispatch.o \
           timer.o main.o \
-          misc_draw.o draw_primitives.o requesters.o xml.o \
+          misc_draw.o draw_primitives.o requesters.o xml.o gadgets.o \
           samples_ops.o aiff.o riff.o \
           spline.o tb_303.o wavpack.o samples_unpack.o replay.o synth.o endianness.o \
           sounddriver_aos4.o
@@ -142,49 +142,52 @@ main.o: src/support/main.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<
 
 misc_draw.o: src/ui/misc_draw.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 draw_primitives.o: src/ui/draw_primitives.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 requesters.o: src/ui/requesters.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 xml.o: src/ui/xml.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/ui/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
+
+gadgets.o: src/ui/gadgets.cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 samples_ops.o: src/samples/samples_ops.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/samples/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 aiff.o: src/samples/aiff/aiff.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/samples/aiff/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 riff.o: src/wav/samples/riff.cpp
-	$(CXX) -c -o $(@) $(FLAGS) src/samples/wav/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 spline.o: release/distrib/replay/lib/spline.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 tb_303.o: release/distrib/replay/lib/tb_303.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 wavpack.o: release/distrib/replay/lib/wavpack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 samples_unpack.o: release/distrib/replay/lib/samples_unpack.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 replay.o: release/distrib/replay/lib/replay.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 synth.o: release/distrib/replay/lib/synth.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 endianness.o: release/distrib/replay/lib/endianness.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 sounddriver_aos4.o: release/distrib/replay/lib/sounddriver/sounddriver_aos4.cpp
-	$(CXX) -c -o $(@) $(FLAGS) release/distrib/replay/lib/sounddriver/$(*).cpp
+	$(CXX) -c -o $(@) $(FLAGS) $<
 
 bits.o: src/samples/wavpack/bits.cpp
 	$(CXX) -c -o $(@) $(FLAGS) $<

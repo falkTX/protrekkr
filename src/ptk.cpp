@@ -650,6 +650,7 @@ int Screen_Update(void)
     {
         redraw_everything = TRUE;
         Env_Change = FALSE;
+        
     }
 
     for(i = 0; i < Channels_Polyphony[Track_Under_Caret]; i++)
@@ -5232,6 +5233,8 @@ void Mouse_Handler(void)
     }
 
     // Check Zones for GUI clicks -----------------------------------
+    
+    Mouse_Reverb_Ed();
 
     if(Mouse.button_oneshot & MOUSE_LEFT_BUTTON)
     {
@@ -6052,7 +6055,7 @@ void Display_Beat_Time(void)
     char String[64];
     sprintf(String, "1/4 Beat Time: %d ms.", (int) (15000.0f / (float) BeatsPerMin));
     Gui_Clear_Array(268, 86, 120, 16);
-    PrintXY(268, 86, USE_FONT, String);
+    PrintString(268, 86, USE_FONT, String);
 }
 
 // ------------------------------------------------------
@@ -6488,7 +6491,7 @@ void Draw_Scope(void)
                     nibble_pos = 0;
                     cur_pos_x = 394;
                 }
-                PrintXY(cur_pos_x + 4,
+                PrintString(cur_pos_x + 4,
                         44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
                         USE_FONT,
                         table_channels_scopes[i + MAX_TRACKS]);
@@ -6526,16 +6529,16 @@ void Draw_Scope(void)
                 // Print the number of the track
                 if(CHAN_ACTIVE_STATE[scope_pos][i])
                 {
-                    PrintXY(cur_pos_x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                            USE_FONT, table_channels_scopes[i]);
+                    PrintString(cur_pos_x + 4, 44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                                USE_FONT, table_channels_scopes[i]);
                     active_channel = TRUE;
                 }
                 else
                 {
-                    PrintXY(cur_pos_x + 4,
-                            44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
-                            USE_FONT_LOW,
-                            table_channels_scopes[i]);
+                    PrintString(cur_pos_x + 4,
+                                44 + (ptrTbl_Dat->y_pos - ptrTbl_Dat->y_large),
+                                USE_FONT_LOW,
+                                table_channels_scopes[i]);
                     active_channel = FALSE;
                 }
                 x_max = max_right / ptrTbl_Dat->x_max;

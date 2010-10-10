@@ -609,25 +609,25 @@ void Dump_Files_List(int xr, int yr)
             switch(Scopish)
             {
                 case SCOPE_ZONE_MOD_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Mods, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Mods, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_INSTR_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Instrs, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Instrs, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_PRESET_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Presets, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Presets, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_REVERB_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Reverbs, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_MIDICFG_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_MidiCfg, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_MidiCfg, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_PATTERN_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Patterns, (Cur_Width - 522));
                     break;
                 case SCOPE_ZONE_SAMPLE_DIR:
-                    PrintXY(398, 26, USE_FONT, Dir_Samples, (Cur_Width - 522));
+                    PrintString(398, 26, USE_FONT, Dir_Samples, (Cur_Width - 522));
                     break;
             }
 
@@ -649,11 +649,11 @@ void Dump_Files_List(int xr, int yr)
                         switch(Get_FileType(rel_val))
                         {
                             case _A_SUBDIR:
-                                PrintXY(xr, yr + (counter * space), USE_FONT_LOW, Get_FileName(rel_val), Cur_Width - 504);
-                                PrintXY(xr + (Cur_Width - 436), yr + (counter * space) + 1, USE_FONT_LOW, "<Dir>");
+                                PrintString(xr, yr + (counter * space), USE_FONT_LOW, Get_FileName(rel_val), Cur_Width - 504);
+                                PrintString(xr + (Cur_Width - 436), yr + (counter * space) + 1, USE_FONT_LOW, "<Dir>");
                                 break;
                             case _A_FILE:
-                                PrintXY(xr, yr + (counter * space) + 1, USE_FONT, Get_FileName(rel_val), Cur_Width - 504);
+                                PrintString(xr, yr + (counter * space) + 1, USE_FONT, Get_FileName(rel_val), Cur_Width - 504);
                                 File = fopen(Get_FileName(rel_val), "rb");
                                 if(File)
                                 {
@@ -664,12 +664,12 @@ void Dump_Files_List(int xr, int yr)
                                     }
                                     else sprintf(Size_String, "%9.d", Size);
                                     int pos = (xr + (Cur_Width - 415)) - Get_Size_Text(Size_String);
-                                    PrintXY(pos, yr + (counter * space) + 1, USE_FONT, Size_String);
+                                    PrintString(pos, yr + (counter * space) + 1, USE_FONT, Size_String);
                                     fclose(File);
                                 }
                                 else
                                 {
-                                    PrintXY(xr + (Cur_Width - 460), yr + (counter * space) + 1, USE_FONT_LOW, "<Locked>");
+                                    PrintString(xr + (Cur_Width - 460), yr + (counter * space) + 1, USE_FONT_LOW, "<Locked>");
                                 }
                                 break;
                             case _A_SEP:
@@ -682,7 +682,7 @@ void Dump_Files_List(int xr, int yr)
             }
             else
             {
-                PrintXY(xr, yr, USE_FONT_LOW, Get_FileName(0));
+                PrintString(xr, yr, USE_FONT_LOW, Get_FileName(0));
             }
             break;
     }

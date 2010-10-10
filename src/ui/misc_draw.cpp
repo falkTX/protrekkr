@@ -1084,7 +1084,7 @@ void Blit_note(int x, int y, int note, int y1, int y2, int size, int acc);
 
 void out_decchar(int x, int y, int number, char smith)
 {
-    PrintXY(x, y, USE_FONT, DecChar[number]);
+    PrintString(x, y, USE_FONT, DecChar[number]);
 }
 
 void Get_Phony_Palette(void)
@@ -1702,7 +1702,7 @@ void Print_String(char *str, int x, int y, int size_x, int flags)
     {
         x += (size_x - Get_Size_Text(str)) / 2;
     }
-    PrintXY(x, y, USE_FONT, (char *) str);
+    PrintString(x, y, USE_FONT, (char *) str);
 }
 
 // ------------------------------------------------------
@@ -1804,11 +1804,11 @@ void Gui_Draw_Button_Box(int x, int y, int sx, int sy, const char *str, int flag
     if(flags & BUTTON_TEXT_CENTERED)
     {
         x += ((sx + 1) - Get_Size_Text((char *) str)) / 2;
-        PrintXY(x, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        PrintString(x, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
     else
     {
-        PrintXY(x + 4, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
+        PrintString(x + 4, y + y_center, flags & BUTTON_LOW_FONT ? USE_FONT_LOW : USE_FONT, (char *) str);
     }
 }
 
@@ -1827,7 +1827,7 @@ void Gui_Draw_Flat_Box(const char *str)
     SetColor(COL_STATIC_MED);
 
     Fillrect(2, (Cur_Height - 150), Cur_Width - 6, (Cur_Height - 24));
-    PrintXY(4, (Cur_Height - 151), USE_FONT, (char *) str);
+    PrintString(4, (Cur_Height - 151), USE_FONT, (char *) str);
 }
 
 // ------------------------------------------------------
@@ -2563,22 +2563,22 @@ void out_nibble(int x, int y, int Font_Type, int number)
 {
     switch(number)
     {
-        case 0: PrintXY(x, y, Font_Type, "0"); break;
-        case 1: PrintXY(x, y, Font_Type, "1"); break;
-        case 2: PrintXY(x, y, Font_Type, "2"); break;
-        case 3: PrintXY(x, y, Font_Type, "3"); break;
-        case 4: PrintXY(x, y, Font_Type, "4"); break;
-        case 5: PrintXY(x, y, Font_Type, "5"); break;
-        case 6: PrintXY(x, y, Font_Type, "6"); break;
-        case 7: PrintXY(x, y, Font_Type, "7"); break;
-        case 8: PrintXY(x, y, Font_Type, "8"); break;
-        case 9: PrintXY(x, y, Font_Type, "9"); break;
-        case 10: PrintXY(x, y, Font_Type, "A"); break;
-        case 11: PrintXY(x, y, Font_Type, "B"); break;
-        case 12: PrintXY(x, y, Font_Type, "C"); break;
-        case 13: PrintXY(x, y, Font_Type, "D"); break;
-        case 14: PrintXY(x, y, Font_Type, "E"); break;
-        case 15: PrintXY(x, y, Font_Type, "F"); break;
+        case 0: PrintString(x, y, Font_Type, "0"); break;
+        case 1: PrintString(x, y, Font_Type, "1"); break;
+        case 2: PrintString(x, y, Font_Type, "2"); break;
+        case 3: PrintString(x, y, Font_Type, "3"); break;
+        case 4: PrintString(x, y, Font_Type, "4"); break;
+        case 5: PrintString(x, y, Font_Type, "5"); break;
+        case 6: PrintString(x, y, Font_Type, "6"); break;
+        case 7: PrintString(x, y, Font_Type, "7"); break;
+        case 8: PrintString(x, y, Font_Type, "8"); break;
+        case 9: PrintString(x, y, Font_Type, "9"); break;
+        case 10: PrintString(x, y, Font_Type, "A"); break;
+        case 11: PrintString(x, y, Font_Type, "B"); break;
+        case 12: PrintString(x, y, Font_Type, "C"); break;
+        case 13: PrintString(x, y, Font_Type, "D"); break;
+        case 14: PrintString(x, y, Font_Type, "E"); break;
+        case 15: PrintString(x, y, Font_Type, "F"); break;
     }
 }
 
@@ -2610,6 +2610,14 @@ int Get_Size_Text(char *String)
     }
     return(len - 1);
 }
+
+// ------------------------------------------------------
+// Return the height of the font
+int Get_Font_Height(void)
+{
+    return(Font_Height);
+}
+
 
 // ------------------------------------------------------
 // Load a .bmp picture into a SDL surface

@@ -131,10 +131,10 @@ void Draw_DiskIO_Ed(void)
 
     Gui_Draw_Button_Box(342, (Cur_Height - 130), 404, 102, "", BUTTON_NORMAL | BUTTON_DISABLED);
 
-    PrintXY(350, (Cur_Height - 128), USE_FONT, "Tracks To Render :");
+    PrintString(350, (Cur_Height - 128), USE_FONT, "Tracks To Render :");
     Display_Tracks_To_Render();
 
-    PrintXY(654, (Cur_Height - 124), USE_FONT, "Render To :");
+    PrintString(654, (Cur_Height - 124), USE_FONT, "Render To :");
 
     Gui_Draw_Button_Box(350, (Cur_Height - 68), 106, 16, "Output Bits Quality", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(350, (Cur_Height - 49), 106, 16, "One file per track", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -589,7 +589,7 @@ void Display_Song_Length(void)
     {
         sprintf(ms, "%.2d:%.2d:%.2d", song_Hours, song_Minutes, song_Seconds);
         Gui_Draw_Button_Box(254, (Cur_Height - 58), 80, 16, "", BUTTON_NORMAL | BUTTON_DISABLED);
-        PrintXY(274, (Cur_Height - 56), USE_FONT, ms);
+        PrintString(274, (Cur_Height - 56), USE_FONT, ms);
     }
 }
 

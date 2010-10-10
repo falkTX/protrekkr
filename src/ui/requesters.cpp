@@ -256,7 +256,7 @@ int Check_Requester(LPREQUESTER Requester)
 
         for(i = 0; i < Nbr_Lines; i++)
         {
-            PrintXY(Pos_X + Req_Txt_Pos_X[i],
+            PrintString(Pos_X + Req_Txt_Pos_X[i],
                     Pos_Y + ((i + 1) * Font_Height) + (Font_Height / 2),
                     USE_FONT, Req_Txt_Lines[i]);
         }

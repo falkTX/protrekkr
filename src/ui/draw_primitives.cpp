@@ -231,7 +231,11 @@ void Copy_To_Surface(SDL_Surface *Source, SDL_Surface *dest,
 
 // ------------------------------------------------------
 // Print a string on the screen
-void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
+void PrintString(int x,
+                 int y,
+                 int Font_Type,
+                 char *String,
+                 int max_x)
 {
     int Idx;
     int Idx2;
@@ -242,6 +246,7 @@ void PrintXY(int x, int y, int Font_Type, char *String, int max_x)
     SDL_Rect Src_Rect;
     SDL_Rect Dst_Rect;
 
+    /* FIX: this should be compensated by the gadget class */
     y += 2;
 
     Dst_Rect.y = y;

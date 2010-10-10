@@ -370,6 +370,10 @@ SOURCE=.\src\ui\include\draw_primitives.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\ui\include\gadgets.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\UI\include\Misc_Draw.h
 # End Source File
 # Begin Source File
@@ -384,6 +388,10 @@ SOURCE=.\src\UI\include\xml.h
 # Begin Source File
 
 SOURCE=.\src\ui\draw_primitives.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ui\gadgets.cpp
 # End Source File
 # Begin Source File
 

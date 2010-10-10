@@ -34,6 +34,7 @@
 #include "include/editor_reverb.h"
 #include "../files/include/files.h"
 #include "../ui/include/requesters.h"
+#include "../ui/include/gadgets.h"
 
 // ------------------------------------------------------
 // Variables
@@ -81,7 +82,21 @@ int Update_Slider[] =
     UPDATE_REVERB_ED_DECAY9,
     UPDATE_REVERB_ED_DECAY10
 };
+/*
+void Pos_Exit(GADGETID id, int button, int wheel, int x, int y)
+{
 
+}
+
+USERGADGET Gadgets_Reverb_List[] = 
+{
+    { BUTTON, "Echoes", 10, -135, 60, 16, ALIGN_LEFT, GADGET_STATIC_BEVEL, TRUE, Pos_Exit, NULL },
+    { BUTTON, NULL, NULL, NULL, NULL, NULL, ALIGN_CENTER, NULL, NULL, NULL, NULL }
+};
+GADGETPOOL Reverb_IDs;
+
+Gadgets Gadgets_Reverb(1);
+*/
 // ------------------------------------------------------
 // Functions
 void Display_Delays_Arrows(void);
@@ -91,6 +106,8 @@ void Display_Decay_Slider(int Index);
 // Display the panel
 void Draw_Reverb_Ed(void)
 {
+    //Gadgets_Reverb.Create_List(Gadgets_Reverb_List, &Reverb_IDs);
+
     Draw_Editors_Bar(USER_SCREEN_REVERB_EDIT);
 
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -127,10 +144,24 @@ void Draw_Reverb_Ed(void)
 
 // ------------------------------------------------------
 // Redraw the elements on the screen
+void Mouse_Reverb_Ed()
+{
+    if(userscreen == USER_SCREEN_REVERB_EDIT)
+    {
+      //  Gadgets_Reverb.Set_Screen_Dimensions(Cur_Width, Cur_Height);
+        //Gadgets_Reverb.Process_Click(&Mouse);
+    }
+}
+
+// ------------------------------------------------------
+// Redraw the elements on the screen
 void Actualize_Reverb_Ed(int gode)
 {
     if(userscreen == USER_SCREEN_REVERB_EDIT)
     {
+    //    Gadgets_Reverb.Set_Screen_Dimensions(Cur_Width, Cur_Height);
+      //  Gadgets_Reverb.Display_List(&Reverb_IDs);
+
         // Echoes
         if(gode == UPDATE_REVERB_ED_ALL || gode == UPDATE_REVERB_ED_ECHOES)
         {
@@ -315,6 +346,7 @@ void Mouse_Left_Reverb_Ed(void)
 {
     if(userscreen == USER_SCREEN_REVERB_EDIT)
     {
+
         // Number of echoes
         if(zcheckMouse(72, (Cur_Height - 135), 16, 16))
         {

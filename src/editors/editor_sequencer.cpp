@@ -174,8 +174,8 @@ void Actualize_Seq_Ed(char gode)
             }
             else
             { // rel range OK
-                PrintXY(93, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
-                PrintXY(261, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
+                PrintString(93, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
+                PrintString(261, (Cur_Height - 95) + lseq * 12, USE_FONT, "000");
             }
         } // for end
         Actupated(0);
