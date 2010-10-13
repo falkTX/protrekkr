@@ -44,6 +44,7 @@ extern int Cur_Width;
 extern int Cur_Height;
 extern int Continuous_Scroll;
 extern char AutoSave;
+extern char AutoBackup;
 extern char Scopish_LeftRight;
 extern char Jazz_Edit;
 extern char Accidental;
@@ -63,7 +64,7 @@ void SaveConfig(void)
     char KeyboardName[MAX_PATH];
     signed char phony = -1;
 
-    sprintf(extension, "PROTCFGE");
+    sprintf(extension, "PROTCFGF");
     Status_Box("Saving 'ptk.cfg'...");
 
     sprintf(FileName, "%s"SLASH"ptk.cfg", ExePath);
@@ -106,6 +107,7 @@ void SaveConfig(void)
         Write_Data_Swap(&Beveled, sizeof(Beveled), 1, out);
         Write_Data_Swap(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, out);
         Write_Data(&AutoSave, sizeof(AutoSave), 1, out);
+        Write_Data(&AutoBackup, sizeof(AutoBackup), 1, out);
         
         Write_Data(&Dir_Mods, sizeof(Dir_Mods), 1, out);
         Write_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, out);
@@ -179,7 +181,7 @@ void LoadConfig(void)
         char extension[10];
 
         Read_Data(extension, sizeof(char), 9, in);
-        if(strcmp(extension, "PROTCFGE") == 0)
+        if(strcmp(extension, "PROTCFGF") == 0)
         {
             Read_Data_Swap(&Current_Edit_Steps, sizeof(Current_Edit_Steps), 1, in);
             Read_Data_Swap(&patt_highlight, sizeof(patt_highlight), 1, in);
@@ -213,6 +215,7 @@ void LoadConfig(void)
             Read_Data_Swap(&Beveled, sizeof(Beveled), 1, in);
             Read_Data_Swap(&Continuous_Scroll, sizeof(Continuous_Scroll), 1, in);
             Read_Data(&AutoSave, sizeof(AutoSave), 1, in);
+            Read_Data(&AutoBackup, sizeof(AutoBackup), 1, in);
             Read_Data(&Dir_Mods, sizeof(Dir_Mods), 1, in);
             Read_Data(&Dir_Instrs, sizeof(Dir_Instrs), 1, in);
             Read_Data(&Dir_Presets, sizeof(Dir_Presets), 1, in);

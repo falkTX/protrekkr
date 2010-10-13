@@ -60,8 +60,13 @@ GADGETID Gadgets::Create(GADGET_TYPE Type, char *string,
                          int width, int height,
                          GADGET_ALIGN align, int user,
                          int enabled,
-                         void (*button_event)(GADGETID id, int button, int wheel, int x, int y),
-                         void (*draw_event)(GADGETID id, int x, int y, int width, int height, int user_dat))
+                         void (*button_event)(GADGETID id,
+                                              int button, int wheel,
+                                              int x, int y),
+                         void (*draw_event)(GADGETID id,
+                                            int x, int y,
+                                            int width, int height,
+                                            int user_dat))
 {
 
     LPGADGET New_Gadget;
@@ -198,7 +203,8 @@ int Gadgets::Display(GADGETID id, int highlight)
                 if(Cur_Gadget->draw_event)
                 {
                     Cur_Gadget->draw_event(Cur_Gadget->id, x, y,
-                                           Cur_Gadget->width, Cur_Gadget->height, Cur_Gadget->vint);
+                                           Cur_Gadget->width, Cur_Gadget->height,
+                                           Cur_Gadget->vint);
                 }
                 break;
 
@@ -430,7 +436,8 @@ LPGADGET Gadgets::__Get_From_Id(GADGETID id)
 
 // ------------------------------------------------------
 // Return the left position of a string in a gadget
-void Gadgets::__Get_String_Left(LPGADGET gadget, char *string, LPPOINT pos)
+void Gadgets::__Get_String_Left(LPGADGET gadget,
+                                char *string, LPPOINT pos)
 {
     pos->x = 3;
     pos->y = (((gadget->height - 1) - Get_Font_Height()) / 2);
@@ -439,7 +446,8 @@ void Gadgets::__Get_String_Left(LPGADGET gadget, char *string, LPPOINT pos)
 
 // ------------------------------------------------------
 // Return the left position of a string in a gadget
-void Gadgets::__Get_String_Center(LPGADGET gadget, char *string, LPPOINT pos)
+void Gadgets::__Get_String_Center(LPGADGET gadget,
+                                  char *string, LPPOINT pos)
 {
     pos->x = (((gadget->width - 1) - Get_Size_Text(string)) / 2) - 1;
     if(pos->x < -1) pos->x = -1;
@@ -449,7 +457,8 @@ void Gadgets::__Get_String_Center(LPGADGET gadget, char *string, LPPOINT pos)
 
 // ------------------------------------------------------
 // Return the right justified position of a string in a gadget
-void Gadgets::__Get_String_Right(LPGADGET gadget, char *string, LPPOINT pos)
+void Gadgets::__Get_String_Right(LPGADGET gadget,
+                                 char *string, LPPOINT pos)
 {
     pos->x = (((gadget->width - 1) - Get_Size_Text(string))) - 3;
     if(pos->x < 1) pos->x = 1;
@@ -459,7 +468,8 @@ void Gadgets::__Get_String_Right(LPGADGET gadget, char *string, LPPOINT pos)
 
 // ------------------------------------------------------
 // Retrieve the assigned alignement of a gadget
-void Gadgets::__Get_Align(LPGADGET gadget, char *string, LPPOINT pos)
+void Gadgets::__Get_Align(LPGADGET gadget,
+                          char *string, LPPOINT pos)
 {
     switch(gadget->align)
     {
@@ -658,7 +668,8 @@ void Gadgets::Process_Click(LPMOUSE mouse)
             if(Gadget_Y < 0) Gadget_Y = Screen_Height + Gadget_Y;
 
             if(Cur_Gadget->clicked &&
-               (Cur_Gadget->type == HSCROLLBAR || Cur_Gadget->type == VSCROLLBAR))
+               (Cur_Gadget->type == HSCROLLBAR ||
+                Cur_Gadget->type == VSCROLLBAR))
             {
                 if(mouse->button == MOUSE_LEFT_BUTTON ||
                    mouse->button == MOUSE_RIGHT_BUTTON ||
@@ -683,7 +694,8 @@ void Gadgets::Process_Click(LPMOUSE mouse)
             }
             else if(Check_Coordinates(x, y,
                                       BOUNDRECT(Gadget_X, Gadget_Y,
-                                                Cur_Gadget->width, Cur_Gadget->height)))
+                                                Cur_Gadget->width,
+                                                Cur_Gadget->height)))
             {
                 Gadget_Type = __Get_Type(Cur_Gadget->id);
                 if(Gadget_Type == BUTTON || Gadget_Type == STRING ||
@@ -741,7 +753,8 @@ LPGADGET Gadgets::__Check_Clicked(void)
 
 // ------------------------------------------------------
 // Check if a coordinate is within boundaries
-int Gadgets::Check_Coordinates(int srcx, int srcy, BOUNDRECT &dst)
+int Gadgets::Check_Coordinates(int srcx, int srcy,
+                               BOUNDRECT &dst)
 {
     if(srcx >= dst.x && srcx < dst.x + dst.width)
     {
@@ -755,20 +768,26 @@ int Gadgets::Check_Coordinates(int srcx, int srcy, BOUNDRECT &dst)
 
 // ------------------------------------------------------
 // Run the associated event of a gadget
-void Gadgets::__Run_Event(LPMOUSE mouse, LPGADGET gadget, int Last_Button)
+void Gadgets::__Run_Event(LPMOUSE mouse,
+                          LPGADGET gadget,
+                          int Last_Button)
 {
     LOCALPOINT local;
 
     if(gadget->button_event != NULL)
     {
         local.Load(mouse, gadget);
-        gadget->button_event(gadget->id, Last_Button ? gadget->last_button : mouse->button, mouse->wheel, local.x, local.y);
+        gadget->button_event(gadget->id,
+                             Last_Button ? gadget->last_button : mouse->button,
+                             mouse->wheel,
+                             local.x, local.y);
     }
 }
 
 // ------------------------------------------------------
 // Create a pool of gadgets from a list
-int Gadgets::Create_List(USERGADGET GadgetsList[], LPGADGETPOOL Pool)
+int Gadgets::Create_List(USERGADGET GadgetsList[],
+                         LPGADGETPOOL Pool)
 {
     int i;
     int Nbr_Gadgets_To_Create;
@@ -844,7 +863,8 @@ void Gadgets::Display_List(LPGADGETPOOL Pool)
 
 // ------------------------------------------------------
 // Set the value of a scrollbar gadget
-int Gadgets::__Calc_ScrollBar_Value(GADGETID id, int value, int max)
+int Gadgets::__Calc_ScrollBar_Value(GADGETID id,
+                                    int value, int max)
 {
     float Scrollbar_Max_Size;
     float Scrollbar_Size;
@@ -918,9 +938,15 @@ int Gadgets::__Calc_ScrollBar_Pos(GADGETID id, int value)
             case VSCROLLBAR:
                 Center = (Gadget->scrollbar_innersize / 2) + Gadget->scrollbar_grip;
                 Gadget->scrollbar_pos = value - Center;
-                if(Gadget->scrollbar_pos < 0) Gadget->scrollbar_pos = 0;
+                if(Gadget->scrollbar_pos < 0)
+                {
+                    Gadget->scrollbar_pos = 0;
+                }
                 maximum = (int) Scrollbar_Max_Size - Gadget->scrollbar_innersize;
-                if(Gadget->scrollbar_pos > maximum) Gadget->scrollbar_pos = maximum;
+                if(Gadget->scrollbar_pos > maximum)
+                {
+                    Gadget->scrollbar_pos = maximum;
+                }
                 return(TRUE);
 
             default:
@@ -932,7 +958,8 @@ int Gadgets::__Calc_ScrollBar_Pos(GADGETID id, int value)
 
 // ------------------------------------------------------
 // Set the mouse grip position inside a scrollbar
-void Gadgets::__Calc_Scrollbar_Grip(LPMOUSE mouse, LPGADGET gadget)
+void Gadgets::__Calc_Scrollbar_Grip(LPMOUSE mouse,
+                                    LPGADGET gadget)
 {
     LOCALPOINT local;
     int local_coord;
@@ -970,7 +997,8 @@ void Gadgets::__Calc_Scrollbar_Grip(LPMOUSE mouse, LPGADGET gadget)
 
 // ------------------------------------------------------
 // Set the current and maximum values of a scrollbar and re-display it
-void Gadgets::Set_ScrollBar_Amount(GADGETID id, int value, int max)
+void Gadgets::Set_ScrollBar_Amount(GADGETID id,
+                                   int value, int max)
 {
     if(__Calc_ScrollBar_Value(id, value, max))
     {

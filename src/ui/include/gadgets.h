@@ -94,8 +94,13 @@ typedef struct
     int height;
     GADGET_TYPE type;
     GADGETID id;
-    void (*button_event)(GADGETID id, int button, int wheel, int x, int y);
-    void (*draw_event)(GADGETID id, int x, int y, int width, int height, int user_dat);
+    void (*button_event)(GADGETID id,
+                         int button, int wheel,
+                         int x, int y);
+    void (*draw_event)(GADGETID id,
+                       int x, int y,
+                       int width, int height,
+                       int user_dat);
     union
     {
         int vint;
@@ -126,8 +131,13 @@ typedef struct
     GADGET_ALIGN align;
     int user;
     int enabled;
-    void (*button_event)(GADGETID id, int button, int wheel, int x, int y);
-    void (*draw_event)(GADGETID id, int x, int y, int width, int height, int user_dat);
+    void (*button_event)(GADGETID id,
+                         int button, int wheel,
+                         int x, int y);
+    void (*draw_event)(GADGETID id,
+                       int x, int y,
+                       int width, int height,
+                       int user_dat);
 } USERGADGET, *LPUSERGADGET;
 
 // ------------------------------------------------------
@@ -135,7 +145,8 @@ typedef struct
 class BOUNDRECT
 {
     public:
-        BOUNDRECT(int x, int y, int width, int height)
+        BOUNDRECT(int x, int y,
+                  int width, int height)
         {
             this->x  = x;
             this->y  = y;
@@ -186,8 +197,13 @@ class Gadgets
                         int width, int height,
                         GADGET_ALIGN align, int user,
                         int enabled,
-                        void (*button_event)(GADGETID id, int button, int wheel, int x, int y),
-                        void (*draw_event)(GADGETID id, int x, int y, int width, int height, int user_dat)
+                        void (*button_event)(GADGETID id,
+                                             int button, int wheel,
+                                             int x, int y),
+                        void (*draw_event)(GADGETID id,
+                                           int x, int y,
+                                           int width, int height,
+                                           int user_dat)
                        );
         int Display(GADGETID id, int Highlight);
         void Display_List(LPGADGETPOOL Pool);
@@ -226,7 +242,8 @@ class Gadgets
                       int colhi, int colmid, int collo,
                       int bevel);
         void Free(GADGETID id);
-        int Check_Coordinates(int srcx, int srcy, BOUNDRECT &dst);
+        int Check_Coordinates(int srcx, int srcy,
+                              BOUNDRECT &dst);
 
         int Nbr_Gadgets;
         LPGADGET *GadgetsArray;

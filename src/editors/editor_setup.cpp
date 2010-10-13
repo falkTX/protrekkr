@@ -44,6 +44,7 @@ extern char FullScreen;
 extern int Cur_Width;
 extern int Cur_Height;
 extern char AutoSave;
+extern char AutoBackup;
 extern int Beveled;
 extern char Use_Shadows;
 extern int Continuous_Scroll;
@@ -96,11 +97,11 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(0, (Cur_Height - 153), fsize, 130, "", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Flat_Box("UI Setup");
 
-    Gui_Draw_Button_Box(8, (Cur_Height - 125), 110, 16, "Metronome", BUTTON_NORMAL | BUTTON_DISABLED);
-    PrintString(8 + 112 + 44 + 21, (Cur_Height - (125 - 2)), USE_FONT, "Rows");
+    Gui_Draw_Button_Box(8, (Cur_Height - 125), 110, 16, "Metronome (Rows)", BUTTON_NORMAL | BUTTON_DISABLED);
+    //PrintString(8 + 112 + 44 + 21, (Cur_Height - (125 - 2)), USE_FONT, "Rows");
 
-    Gui_Draw_Button_Box(8, (Cur_Height - 105), 110, 16, "Latency", BUTTON_NORMAL | BUTTON_DISABLED);
-    PrintString(8 + 112 + 44 + 21, (Cur_Height - (105 - 2)), USE_FONT, "Milliseconds");
+    Gui_Draw_Button_Box(8, (Cur_Height - 105), 110, 16, "Latency (Milliseconds)", BUTTON_NORMAL | BUTTON_DISABLED);
+    //PrintString(8 + 112 + 44 + 21, (Cur_Height - (105 - 2)), USE_FONT, "Milliseconds");
 
     Gui_Draw_Button_Box(330, (Cur_Height - 125), 114, 16, "Mousewheel Multiplier", BUTTON_NORMAL | BUTTON_DISABLED);
     Gui_Draw_Button_Box(330, (Cur_Height - 105), 114, 16, "Rows Highlight", BUTTON_NORMAL | BUTTON_DISABLED);
@@ -126,7 +127,8 @@ void Draw_Master_Ed(void)
     Gui_Draw_Button_Box(8, (Cur_Height - 65), 110, 16, "Default Pattern Font", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(8, (Cur_Height - 45), 110, 16, "Paste Across Pattern", BUTTON_NORMAL | BUTTON_DISABLED);
-    Gui_Draw_Button_Box(194, (Cur_Height - 45), 62, 16, "Play In Edit", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(184, (Cur_Height - 125), 72, 16, "Play While Edit", BUTTON_NORMAL | BUTTON_DISABLED);
+    Gui_Draw_Button_Box(184, (Cur_Height - 105), 72, 16, "Auto Backup", BUTTON_NORMAL | BUTTON_DISABLED);
 
     Gui_Draw_Button_Box(734, (Cur_Height - 125), 42, 16, "Accid.", BUTTON_NORMAL | BUTTON_DISABLED);
 }
@@ -350,13 +352,13 @@ void Actualize_Master_Ed(char gode)
         {
             if(Jazz_Edit)
             {
-                Gui_Draw_Button_Box(258, (Cur_Height - 45), 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 45), 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258, (Cur_Height - 125), 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 125), 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
-                Gui_Draw_Button_Box(258, (Cur_Height - 45), 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
-                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 45), 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258, (Cur_Height - 125), 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 125), 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -408,6 +410,21 @@ void Actualize_Master_Ed(char gode)
             if(!metronome_magnify)
             {
                 Gui_Draw_Button_Box(8 + 112 + 18, (Cur_Height - 125), 24, 16, "Off", BUTTON_DISABLED | BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+        }
+
+        // Auto backup
+        if(gode == 0 || gode == 23)
+        {
+            if(AutoBackup)
+            {
+                Gui_Draw_Button_Box(258, (Cur_Height - 105), 29, 16, "On", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 105), 29, 16, "Off", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+            }
+            else
+            {
+                Gui_Draw_Button_Box(258, (Cur_Height - 105), 29, 16, "On", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
+                Gui_Draw_Button_Box(258 + 31, (Cur_Height - 105), 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
 
@@ -592,7 +609,7 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Play while editing
-        if(zcheckMouse(258, (Cur_Height - 45), 29, 16))
+        if(zcheckMouse(258, (Cur_Height - 125), 29, 16))
         {
             Jazz_Edit = TRUE;
             teac = 18;
@@ -600,14 +617,14 @@ void Mouse_Left_Master_Ed(void)
         }
 
         // Play while editing
-        if(zcheckMouse(258 + 31, (Cur_Height - 45), 29, 16))
+        if(zcheckMouse(258 + 31, (Cur_Height - 125), 29, 16))
         {
             Jazz_Edit = FALSE;
             teac = 18;
             gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
 
-        // Play while editing
+        // Accidental type
         if(zcheckMouse(780, (Cur_Height - 125), 14, 16))
         {
             Accidental ^= TRUE;
@@ -823,6 +840,22 @@ void Mouse_Left_Master_Ed(void)
                 gui_action = GUI_CMD_UPDATE_SETUP_ED;
                 teac = 22;
             }
+        }
+
+        // Auto backup on
+        if(zcheckMouse(258, (Cur_Height - 105), 29, 16))
+        {
+            AutoBackup = TRUE;
+            teac = 23;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
+        }
+
+        // Auto backup off
+        if(zcheckMouse(258 + 31, (Cur_Height - 105), 29, 16))
+        {
+            AutoBackup = FALSE;
+            teac = 23;
+            gui_action = GUI_CMD_UPDATE_SETUP_ED;
         }
     }
 }

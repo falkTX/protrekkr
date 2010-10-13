@@ -8,6 +8,9 @@ v2.5.1:
 - Added cutomizable resonance for reverb filter.
 - Tracker could crash when loading an instrument
   over another one which was still playing.
+- Autosave function was broken.
+- Added auto backup function, the tracker will create a backup
+  of any existing old module version before overwriting the new one.
 
 v2.5.0:
 

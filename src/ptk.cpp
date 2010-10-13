@@ -142,7 +142,6 @@ char namerev[MAX_PATH];
 char namemidicfg[MAX_PATH];
 char artist[20];
 char style[20];
-char autosavename[MAX_PATH];
 
 int Current_Instrument = 0;
 int restx = 0;
@@ -3129,9 +3128,7 @@ Uint32 Timer_CallBack(Uint32 interval, void *param)
         // Autosave module
         if(wait_AutoSave > Values_AutoSave[AutoSave])
         {
-            strcpy(autosavename, name);
-            strcat(autosavename, "_bak");
-            Pack_Module(autosavename);
+            Pack_Module(name);
         }
     }
 

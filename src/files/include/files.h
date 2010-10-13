@@ -80,6 +80,7 @@ extern para303 tb303[2];
 // Functions
 int LoadPtk(char *FileName);
 int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory);
+void Backup_Module(char *FileName);
 int Pack_Module(char *FileName);
 int TestMod(void);
 void LoadSynth(char *FileName);

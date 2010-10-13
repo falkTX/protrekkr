@@ -69,6 +69,7 @@ extern char OverWrite_Name[1024];
 extern SynthParameters PARASynth[128];
 
 extern int Beveled;
+char AutoBackup;
 
 int Mod_Length;
 int Mod_Simulate;
@@ -1555,8 +1556,54 @@ Uint8 *Depack_Data(Uint8 *Memory, int Sizen, int Size_Out)
 }
 
 // ------------------------------------------------------
-// Save a packed .ptk module
+// Backup a module
 #if !defined(__WINAMP__)
+void Backup_Module(char *FileName)
+{
+    FILE *In;
+    FILE *Out;
+    int backup_size;
+    unsigned char *backup_mem;
+    time_t rawtime;
+    struct tm *timeinfo;
+    char backup_savename[MAX_PATH];
+
+    sprintf(backup_savename, "%s"SLASH"%s.ptk", Dir_Mods, FileName);
+
+    In = fopen(backup_savename, "rb");
+    if(In)
+    {
+        // If the module already exists then load it
+        // and make a backup before saving the new version
+        backup_size = Get_File_Size(In);
+        backup_mem = (unsigned char *) malloc(backup_size);
+        if(backup_mem)
+        {
+           time(&rawtime);
+           timeinfo = localtime(&rawtime);
+           
+            fread(backup_mem, 1, backup_size, In);
+            sprintf(backup_savename,
+                    "%s"SLASH"%s_%.2d%.2d%.2d.ptk",
+                    Dir_Mods,
+                    name,
+                    timeinfo->tm_hour,
+                    timeinfo->tm_min,
+                    timeinfo->tm_sec);
+            Out = fopen(backup_savename, "wb");
+            if(Out)
+            {
+                fwrite(backup_mem, 1, backup_size, Out);
+                fclose(Out);
+            }
+            free(backup_mem);
+        }
+        fclose(In);
+    }
+}
+
+// ------------------------------------------------------
+// Pack & save .ptk module
 int Pack_Module(char *FileName)
 {
     FILE *output;
@@ -1566,6 +1613,9 @@ int Pack_Module(char *FileName)
     Uint8 *Final_Mem_Out;
     int Depack_Size;
 
+    // Reset autosave counter
+    wait_AutoSave = 0;
+    
     if(!strlen(FileName))
     {
         sprintf(name, "Can't save module without a name...");
@@ -1573,6 +1623,10 @@ int Pack_Module(char *FileName)
         return(FALSE);
     }
 
+    // Backup the old version of the module
+    if(AutoBackup) Backup_Module(FileName);
+
+    // Save the new one
     sprintf(Temph, "%s"SLASH"%s.ptk", Dir_Mods, FileName);
 
     int Len = SavePtk("", FALSE, SAVE_CALCLEN, NULL);
