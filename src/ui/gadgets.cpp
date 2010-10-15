@@ -179,7 +179,7 @@ int Gadgets::Display(GADGETID id, int highlight)
 
         switch(Cur_Gadget->type)
         {
-            case STATIC:
+            case TYPE_STATIC:
                 __Get_Align(Cur_Gadget, Cur_Gadget->string, &String_Pos);
                 if(Cur_Gadget->vint == GADGET_STATIC_BEVEL)
                 {
@@ -208,7 +208,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                 }
                 break;
 
-            case BUTTON:
+            case TYPE_BUTTON:
                 Draw_Box(x, y, Cur_Gadget->width,
                          Cur_Gadget->height, Cur_Gadget->clicked,
                          Color_Hi, Color_Mid, Color_Lo, TRUE);
@@ -220,7 +220,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Cur_Gadget->string);
                 break;
 
-            case TEXT:
+            case TYPE_TEXT:
                 __Get_Align(Cur_Gadget, Cur_Gadget->string, &String_Pos);
                 SetColor(COL_HI);
                 PrintString(x + 2 + String_Pos.x,
@@ -234,7 +234,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Cur_Gadget->string);
                 break;
 
-            case NUMBER:
+            case TYPE_NUMBER:
                 memset(Value, 0, sizeof(Value));
                 Draw_Box(x, y,
                          Cur_Gadget->width, Cur_Gadget->height,
@@ -249,7 +249,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Value);
                 break;
 
-            case TIMER:
+            case TYPE_TIMER:
                 memset(Value, 0, sizeof(Value));
                 Draw_Box(x, y, Cur_Gadget->width, 
                          Cur_Gadget->height, Cur_Gadget->clicked,
@@ -263,7 +263,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Value);
                 break;
 
-            case NAKED_STRING:
+            case TYPE_NAKED_STRING:
                 memset(Value, 0, sizeof(Value));
 
                 CurString = Cur_Gadget->vstr;
@@ -285,7 +285,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Value);
                 break;
 
-            case STRING:
+            case TYPE_STRING:
                 memset(Value, 0, sizeof(Value));
                 Draw_Box(x, y,
                          Cur_Gadget->width, Cur_Gadget->height,
@@ -322,7 +322,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                             Value);
                 break;
 
-            case HSCROLLBAR:
+            case TYPE_HSCROLLBAR:
                 Draw_Box(x, y,
                          Cur_Gadget->width, Cur_Gadget->height,
                          FALSE,
@@ -333,7 +333,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                          0, Color_Slider, 0, FALSE);
                 break;
 
-            case VSCROLLBAR:
+            case TYPE_VSCROLLBAR:
                 Draw_Box(x, y, Cur_Gadget->width,
                          Cur_Gadget->height, TRUE,
                          COL_LO, COL_MED, COL_HI, TRUE);
@@ -343,7 +343,7 @@ int Gadgets::Display(GADGETID id, int highlight)
                          0, Color_Slider, 0, FALSE);
                 break;
 
-            case ARRAY:
+            case TYPE_ARRAY:
                 Draw_Box(x, y,
                          Cur_Gadget->width, Cur_Gadget->height,
                          TRUE,
@@ -529,7 +529,7 @@ LPGADGET Gadgets::__Check_Mouse_Over(LPMOUSE mouse)
                 __Run_Event(mouse, Clicked_Gadget, TRUE);
             }
         }
-        if(Clicked_Gadget->type == ARRAY) return(NULL);
+        if(Clicked_Gadget->type == TYPE_ARRAY) return(NULL);
         return(Clicked_Gadget);
     }
     for(i = 0; i < Nbr_Gadgets; i++)
@@ -538,14 +538,14 @@ LPGADGET Gadgets::__Check_Mouse_Over(LPMOUSE mouse)
         Gadget_Type = __Get_Type(Cur_Gadget->id);
         switch(Gadget_Type)
         {
-            case HSCROLLBAR:
+            case TYPE_HSCROLLBAR:
                 Bound_Left = 5 + Cur_Gadget->scrollbar_pos;
                 Bound_Top = 5;
                 Bound_Width = Cur_Gadget->scrollbar_innersize - (GADGET_STATIC_BEVEL * 2);
                 Bound_Height = Cur_Gadget->height;
                 break;
 
-            case VSCROLLBAR:
+            case TYPE_VSCROLLBAR:
                 Bound_Left = 5;
                 Bound_Top = 5 + Cur_Gadget->scrollbar_pos;
                 Bound_Width = Cur_Gadget->width;
@@ -571,10 +571,10 @@ LPGADGET Gadgets::__Check_Mouse_Over(LPMOUSE mouse)
                                        Bound_Width - (Bound_Left * 2),
                                        Bound_Height)))
         {
-            if(Gadget_Type == BUTTON ||
-               Gadget_Type == STRING ||
-               Gadget_Type == HSCROLLBAR ||
-               Gadget_Type == VSCROLLBAR)
+            if(Gadget_Type == TYPE_BUTTON ||
+               Gadget_Type == TYPE_STRING ||
+               Gadget_Type == TYPE_HSCROLLBAR ||
+               Gadget_Type == TYPE_VSCROLLBAR)
             {
                 return(Cur_Gadget);
             }
@@ -593,7 +593,7 @@ void Gadgets::__End_Mouse_Over()
     Cur_Gadget = __Check_Clicked();
     if(Cur_Gadget)
     {
-        if(Cur_Gadget->type != ARRAY)
+        if(Cur_Gadget->type != TYPE_ARRAY)
         {
             Display(Cur_Gadget->id, GADGET_NOHIGHLIGHT);
         }
@@ -671,8 +671,8 @@ void Gadgets::Process_Click(LPMOUSE mouse)
             if(Gadget_Y < 0) Gadget_Y = Screen_Height + Gadget_Y;
 
             if(Cur_Gadget->clicked &&
-               (Cur_Gadget->type == HSCROLLBAR ||
-                Cur_Gadget->type == VSCROLLBAR))
+               (Cur_Gadget->type == TYPE_HSCROLLBAR ||
+                Cur_Gadget->type == TYPE_VSCROLLBAR))
             {
                 if(mouse->button == MOUSE_LEFT_BUTTON ||
                    mouse->button == MOUSE_RIGHT_BUTTON ||
@@ -682,8 +682,8 @@ void Gadgets::Process_Click(LPMOUSE mouse)
                     Cur_Gadget->clicked = TRUE;
                     switch(Cur_Gadget->type)
                     {
-                        case HSCROLLBAR:
-                        case VSCROLLBAR:
+                        case TYPE_HSCROLLBAR:
+                        case TYPE_VSCROLLBAR:
                             __Run_Event(mouse, Cur_Gadget, FALSE);
                             break;
                         default:
@@ -701,9 +701,9 @@ void Gadgets::Process_Click(LPMOUSE mouse)
                                                 Cur_Gadget->height)))
             {
                 Gadget_Type = __Get_Type(Cur_Gadget->id);
-                if(Gadget_Type == BUTTON || Gadget_Type == STRING ||
-                   Gadget_Type == ARRAY || Gadget_Type == HSCROLLBAR ||
-                   Gadget_Type == VSCROLLBAR)
+                if(Gadget_Type == TYPE_BUTTON || Gadget_Type == TYPE_STRING ||
+                   Gadget_Type == TYPE_ARRAY || Gadget_Type == TYPE_HSCROLLBAR ||
+                   Gadget_Type == TYPE_VSCROLLBAR)
                 {
                     if(!__Check_Clicked())
                     {
@@ -715,8 +715,8 @@ void Gadgets::Process_Click(LPMOUSE mouse)
                             Cur_Gadget->clicked = TRUE;
                             switch(Cur_Gadget->type)
                             {
-                                case HSCROLLBAR:
-                                case VSCROLLBAR:
+                                case TYPE_HSCROLLBAR:
+                                case TYPE_VSCROLLBAR:
                                     // Set the grip coordinates for first event
                                     __Calc_Scrollbar_Grip(mouse, Cur_Gadget);
                                     __Run_Event(mouse, Cur_Gadget, FALSE);
@@ -882,13 +882,13 @@ int Gadgets::__Calc_ScrollBar_Value(GADGETID id,
 
         switch(Gadget->type)
         {
-            case HSCROLLBAR:
+            case TYPE_HSCROLLBAR:
                 Scrollbar_Max_Size = (float) (Gadget->width - 8 - Gadget->vint);
                 Scrollbar_Max_Size *= Scrollbar_Size;
                 Gadget->scrollbar_innersize = (int) Scrollbar_Max_Size;
                 return(TRUE);
 
-            case VSCROLLBAR:
+            case TYPE_VSCROLLBAR:
                 Scrollbar_Max_Size = (float) (Gadget->height - 8 - Gadget->vint);
                 Scrollbar_Max_Size *= Scrollbar_Size;
                 Gadget->scrollbar_innersize = (int) Scrollbar_Max_Size;
@@ -908,11 +908,11 @@ float Gadgets::__Get_ScrollBar_Max(LPGADGET gadget)
 {
     switch(gadget->type)
     {
-        case HSCROLLBAR:
+        case TYPE_HSCROLLBAR:
             return((float) (gadget->width - 8 - gadget->vint));
             break;
 
-        case VSCROLLBAR:
+        case TYPE_VSCROLLBAR:
             return((float) (gadget->height - 8 - gadget->vint));
             break;
 
@@ -937,8 +937,8 @@ int Gadgets::__Calc_ScrollBar_Pos(GADGETID id, int value)
 
         switch(Gadget->type)
         {
-            case HSCROLLBAR:
-            case VSCROLLBAR:
+            case TYPE_HSCROLLBAR:
+            case TYPE_VSCROLLBAR:
                 Center = (Gadget->scrollbar_innersize / 2) + Gadget->scrollbar_grip;
                 Gadget->scrollbar_pos = value - Center;
                 if(Gadget->scrollbar_pos < 0)
@@ -972,12 +972,12 @@ void Gadgets::__Calc_Scrollbar_Grip(LPMOUSE mouse,
 
     switch(gadget->type)
     {
-        case HSCROLLBAR:
+        case TYPE_HSCROLLBAR:
             gap = 4;
             local_coord = local.x;
             break;
 
-        case VSCROLLBAR:
+        case TYPE_VSCROLLBAR:
             gap = 4;
             local_coord = local.y;
             break;
