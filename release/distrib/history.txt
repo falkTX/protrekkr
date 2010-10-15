@@ -11,6 +11,7 @@ v2.5.1:
 - Autosave function was broken.
 - Added auto backup function, the tracker will create a backup
   of any existing old module version before overwriting the new one.
+- Reverb threshold delays table was lacking some values.
 
 v2.5.0:
 

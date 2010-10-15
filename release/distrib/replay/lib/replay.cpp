@@ -748,7 +748,7 @@ short *RawSamples[MAX_INSTRS][2][MAX_INSTRS_SPLITS];
     int delayedCounter[10];
     float reverb_threshold_delay[] = 
     {
-        44.1f, 50.1f, 60.1f, 70.1f, 73.1f, 79.1f, 64.0f, 55.0f
+        44.1f, 50.1f, 60.1f, 70.1f, 73.1f, 79.1f, 64.0f, 55.0f, 20.0f, 32.0f
     };
     float allBuffer_L[10][5760];
     float allBuffer_R[10][5760];
@@ -6089,13 +6089,11 @@ void InitRevervbFilter(void)
 
     for(i = 0; i < 10; i++)
     {
-        for(int yb = 0; yb < 5760; yb++)
-        {
-            allBuffer_L[i][yb] = 0.0f;
-            allBuffer_R[i][yb] = 0.0f;
-        }
+        memset(allBuffer_L[i], 0, 5760 * sizeof(float));
+        memset(allBuffer_R[i], 0, 5760 * sizeof(float));
         delayedCounter[i] = 5759 - int(c_threshold * reverb_threshold_delay[i]);
         if(delayedCounter[i] < 0) delayedCounter[i] += 5760;
+        if(delayedCounter[i] > 5759) delayedCounter[i] -= 5759;
     }
 }
 
