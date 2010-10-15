@@ -79,13 +79,11 @@ typedef int GADGETID;
 
 // ------------------------------------------------------
 // Structures
-#ifndef POINT
 typedef struct
 {
     int x;
     int y;
-} POINT, *LPPOINT;
-#endif
+} COORDINATE, *LPCOORDINATE;
 
 typedef struct
 {
@@ -234,10 +232,10 @@ class Gadgets
     private:
 
         LPGADGET __Get_From_Id(GADGETID id);
-        void __Get_String_Left(LPGADGET gadget, char *string, LPPOINT pos);
-        void __Get_String_Center(LPGADGET gadget, char *string, LPPOINT pos);
-        void __Get_String_Right(LPGADGET gadget, char *string, LPPOINT pos);
-        void __Get_Align(LPGADGET gadget, char *string, LPPOINT pos);
+        void __Get_String_Left(LPGADGET gadget, char *string, LPCOORDINATE pos);
+        void __Get_String_Center(LPGADGET gadget, char *string, LPCOORDINATE pos);
+        void __Get_String_Right(LPGADGET gadget, char *string, LPCOORDINATE pos);
+        void __Get_Align(LPGADGET gadget, char *string, LPCOORDINATE pos);
         LPGADGET __Check_Mouse_Over(LPMOUSE mouse);
         void __End_Mouse_Over();
         void __Set_Mouse_Over_State(GADGETID id, int status);

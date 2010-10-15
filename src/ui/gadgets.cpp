@@ -129,7 +129,7 @@ int Gadgets::Display(GADGETID id, int highlight)
     int Color_Mid;
     int Color_Lo;
     int Color_Slider;
-    POINT String_Pos;
+    COORDINATE String_Pos;
     char Value[256];
     int Remaining_Chars;
     LPGADGET Refresh_Highlight;
@@ -437,7 +437,7 @@ LPGADGET Gadgets::__Get_From_Id(GADGETID id)
 // ------------------------------------------------------
 // Return the left position of a string in a gadget
 void Gadgets::__Get_String_Left(LPGADGET gadget,
-                                char *string, LPPOINT pos)
+                                char *string, LPCOORDINATE pos)
 {
     pos->x = 3;
     pos->y = (((gadget->height - 1) - Get_Font_Height()) / 2);
@@ -447,7 +447,7 @@ void Gadgets::__Get_String_Left(LPGADGET gadget,
 // ------------------------------------------------------
 // Return the left position of a string in a gadget
 void Gadgets::__Get_String_Center(LPGADGET gadget,
-                                  char *string, LPPOINT pos)
+                                  char *string, LPCOORDINATE pos)
 {
     pos->x = (((gadget->width - 1) - Get_Size_Text(string)) / 2) - 1;
     if(pos->x < -1) pos->x = -1;
@@ -458,7 +458,7 @@ void Gadgets::__Get_String_Center(LPGADGET gadget,
 // ------------------------------------------------------
 // Return the right justified position of a string in a gadget
 void Gadgets::__Get_String_Right(LPGADGET gadget,
-                                 char *string, LPPOINT pos)
+                                 char *string, LPCOORDINATE pos)
 {
     pos->x = (((gadget->width - 1) - Get_Size_Text(string))) - 3;
     if(pos->x < 1) pos->x = 1;
@@ -469,7 +469,7 @@ void Gadgets::__Get_String_Right(LPGADGET gadget,
 // ------------------------------------------------------
 // Retrieve the assigned alignement of a gadget
 void Gadgets::__Get_Align(LPGADGET gadget,
-                          char *string, LPPOINT pos)
+                          char *string, LPCOORDINATE pos)
 {
     switch(gadget->align)
     {
