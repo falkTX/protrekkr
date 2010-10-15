@@ -6109,13 +6109,15 @@ inline float allpass_filter(float *Buffer, float value, int counter)
 // ------------------------------------------------------
 void Reverb_work(void)
 {
+    int i;
+
     if(compressor)
     {
         float l_rout = 0;
         float r_rout = 0;
 
         // Comb filter
-        for(int i = 0; i < num_echoes; i++)
+        for(i = 0; i < num_echoes; i++)
         {
             delay_left_buffer[i][rev_counter] = (delay_left_final +
                                                  delay_left_buffer[i][counters_L[i]]) *
@@ -6133,7 +6135,7 @@ void Reverb_work(void)
         l_rout = LFP_L.fWork(l_rout, Reverb_Filter_Cutoff, Reverb_Filter_Resonance);
         r_rout = LFP_R.fWork(r_rout, Reverb_Filter_Cutoff, Reverb_Filter_Resonance);
 
-        for(i = 0 ; i < 10; i++)
+        for(i = 0; i < 10; i++)
         {
             l_rout = allpass_filter(allBuffer_L[i], l_rout, delayedCounter[i]);
             r_rout = allpass_filter(allBuffer_R[i], r_rout, delayedCounter[i]);

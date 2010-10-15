@@ -520,7 +520,10 @@ LPGADGET Gadgets::__Check_Mouse_Over(LPMOUSE mouse)
             if(Check_Coordinates(mouse->x, mouse->y,
                                  BOUNDRECT(Gadget_X, Gadget_Y,
                                            Clicked_Gadget->width,
-                                           Clicked_Gadget->height)))
+                                           Clicked_Gadget->height
+                                          )
+                                )
+              )
             {
                 // Button up event sent to the gadget
                 __Run_Event(mouse, Clicked_Gadget, TRUE);
@@ -754,7 +757,7 @@ LPGADGET Gadgets::__Check_Clicked(void)
 // ------------------------------------------------------
 // Check if a coordinate is within boundaries
 int Gadgets::Check_Coordinates(int srcx, int srcy,
-                               BOUNDRECT &dst)
+                               BOUNDRECT dst)
 {
     if(srcx >= dst.x && srcx < dst.x + dst.width)
     {

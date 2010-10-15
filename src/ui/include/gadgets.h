@@ -34,8 +34,13 @@
 
 // ------------------------------------------------------
 // Includes
+#if defined(__GCC__)
+#include "../../support/include/main.h"
+#include "../../include/variables.h"
+#else
 #include "../support/include/main.h"
 #include "../include/variables.h"
+#endif
 #include "misc_draw.h"
 
 // ------------------------------------------------------
@@ -74,6 +79,14 @@ typedef int GADGETID;
 
 // ------------------------------------------------------
 // Structures
+#ifndef POINT
+typedef struct
+{
+    int x;
+    int y;
+} POINT, *LPPOINT;
+#endif
+
 typedef struct
 {
     int Max;
@@ -243,8 +256,7 @@ class Gadgets
                       int bevel);
         void Free(GADGETID id);
         int Check_Coordinates(int srcx, int srcy,
-                              BOUNDRECT &dst);
-
+                              BOUNDRECT dst);
         int Nbr_Gadgets;
         LPGADGET *GadgetsArray;
         int Screen_Width;
