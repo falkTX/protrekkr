@@ -5327,8 +5327,8 @@ void GetPlayerValues(void)
 #endif
 
     // It looks like the maximum range for OSS is -8192 +8192
-    // (higher than that will produce heavily satured signals
-    //  i don't know if it's a bug in drivers in Linux mixer or anything)
+    // (higher than that will produce heavily saturated signals
+    //  i don't know if it's a bug from Linux mixer/Driver or anything)
 
     // It looks like they (hopefully) fixed their shit so this nasty hack is no longer required.
 /*    #if defined(__LINUX__) && !defined(__FREEBSD__)
@@ -6097,11 +6097,11 @@ void InitRevervbFilter(void)
     }
 }
 
-inline float allpass_filter(float *Buffer, float value, int counter)
+inline float allpass_filter(float *Buffer, float input, int counter)
 {
-    float rout = (-Feedback * value) + Buffer[counter];
-    Buffer[currentCounter] = (rout * Feedback) + value;
-    return rout;
+    float output = (-Feedback * input) + Buffer[currentCounter];
+    Buffer[counter] = (output * Feedback) + input;
+    return output;
 }
 
 // ------------------------------------------------------
