@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.5.2:
+
+- Slightly improved the smoothing of the reverb.
+- Added an option to tune the 2 303 units together.
+
 v2.5.1:
 
 - Tracks are only shadowed during playing.

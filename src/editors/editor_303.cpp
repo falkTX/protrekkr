@@ -119,11 +119,13 @@ void Refresh_303_Unit(int Unit, int gode)
             {
                 Skincopy(577, (Cur_Height - 58), 138, 119, 3, 3);
                 Skincopy(558, (Cur_Height - 58), 143, 119, 3, 3);
+                Gui_Draw_Button_Box(668, (Cur_Height - 78), 64, 16, "Tune to 1", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
             else
             {
                 Skincopy(558, (Cur_Height - 58), 138, 119, 3, 3);
                 Skincopy(577, (Cur_Height - 58), 143, 119, 3, 3);
+                Gui_Draw_Button_Box(668, (Cur_Height - 78), 64, 16, "Tune to 2", BUTTON_NORMAL | BUTTON_TEXT_CENTERED);
             }
 
             // Make sure we display the right boundaries
@@ -811,7 +813,7 @@ void Mouse_Left_303_Ed(void)
             teac = 0;
         }
 
-        // rand tones
+        // Rand tones
         if(zcheckMouse(8, (Cur_Height - 80), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
@@ -836,7 +838,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // rand noteon
+        // Rand noteon
         if(zcheckMouse(8, (Cur_Height - 98), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
@@ -847,7 +849,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // clear pat...
+        // Clear pattern
         if(zcheckMouse(8, (Cur_Height - 116), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
@@ -863,7 +865,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // reset pat...
+        // Reset pattern
         if(zcheckMouse(8, (Cur_Height - 134), 64, 16))
         {
             for(char alter = 0; alter < 16; alter++)
@@ -879,7 +881,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // all notes up
+        // All notes up
         if(zcheckMouse(600, (Cur_Height - 98), 64, 16))
         {
             tb303_notes_up();
@@ -887,7 +889,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // all notes down
+        // All notes down
         if(zcheckMouse(668, (Cur_Height - 98), 64, 16))
         {
             tb303_notes_down();
@@ -895,7 +897,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // copy pattern
+        // Copy pattern
         if(zcheckMouse(600, (Cur_Height - 78), 64, 16))
         {
             tb303_copy_pattern();
@@ -903,7 +905,7 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
         }
 
-        // paste pattern
+        // Paste pattern
         if(zcheckMouse(600, (Cur_Height - 60), 64, 16))
         {
             tb303_paste_pattern();
@@ -959,6 +961,21 @@ void Mouse_Left_303_Ed(void)
             {
                 gui_action = GUI_CMD_SAVE_303_PATTERN;
             }
+        }
+
+        // Tune to the other unit
+        if(zcheckMouse(668, (Cur_Height - 78), 64, 16))
+        {
+            if(sl3)
+            {
+                tb303[1].tune = tb303[0].tune;
+            }
+            else
+            {
+                tb303[0].tune = tb303[1].tune;
+            }
+            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
+            teac = 3;
         }
     }
 }
