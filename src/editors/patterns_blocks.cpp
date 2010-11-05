@@ -39,6 +39,8 @@
 
 // ------------------------------------------------------
 // Variables
+extern char Global_Patterns_Font;
+
 unsigned char *Spec_BuffBlock;
 unsigned char *BuffBlock[NBR_COPY_BLOCKS];
 int Buff_Full[NBR_COPY_BLOCKS];
@@ -2072,6 +2074,8 @@ void Reset_Track(int Position, int Track)
     }
     ComputeStereo(Track);
     FixStereo(Track);
+
+    Set_Track_Zoom(Track, (TRACK_TYPE) Global_Patterns_Font);
 }
 
 // ------------------------------------------------------
@@ -2162,6 +2166,9 @@ void Copy_Track(int Position, int Track_Src, int Track_Dst)
     }
     ComputeStereo(Track_Dst);
     FixStereo(Track_Dst);
+
+    /* Make sure the track still look the same */
+    Set_Track_Zoom(Track_Dst, Get_Track_Zoom(Track_Src));
 }
 
 // ------------------------------------------------------
@@ -2186,7 +2193,7 @@ void Insert_Track(void)
 
     if(Songtracks < 16)
     {
-        for(i = Songtracks - 1; i >= Track_Under_Caret; i--)
+        for(i = Songtracks - 1; i > Track_Under_Caret; i--)
         {
             Copy_Track(Song_Position, i - 1, i);
         }

@@ -119,7 +119,7 @@ int Get_Pattern_Offset(int track, int row, int pattern);
 void Reset_Patterns_Zoom(void);
 void Toggle_Track_Zoom(int track, int large);
 void Clear_Track_Zoom(int track);
-TRACK_TYPE Get_Track_Type(int track);
+TRACK_TYPE Get_Track_Zoom(int track);
 void Set_Track_Zoom(int track, TRACK_TYPE type);
 void Draw_Pattern_Right_Stuff();
 void Set_Pattern_Size();

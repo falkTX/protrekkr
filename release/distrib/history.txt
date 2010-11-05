@@ -4,8 +4,10 @@ ProTrekkr releases history
 
 v2.5.2:
 
-- Slightly improved the smoothing of the reverb.
+- Slightly improved the smoothing of the reverb
+  (making it sound a bit less metallic).
 - Added an option to tune the 2 303 units together.
+- Tracked crashed when using insert command on track 0.
 
 v2.5.1:
 

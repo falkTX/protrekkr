@@ -617,11 +617,11 @@ void Track_Add_Notes(int Track_Nbr, int Amount)
     {
         Channels_Polyphony[Track_Nbr] = Channels_MultiNotes[Track_Nbr];
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }
@@ -636,11 +636,11 @@ void Track_Sub_Notes(int Track_Nbr, int Amount)
     {
         Channels_MultiNotes[Track_Nbr] = 1;
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }
@@ -655,11 +655,11 @@ void Track_Add_Effects(int Track_Nbr, int Amount)
     {
         Channels_Effects[Track_Nbr] = MAX_FX;
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }
@@ -671,11 +671,11 @@ void Track_Sub_Effects(int Track_Nbr, int Amount)
 {
     Channels_Effects[Track_Nbr] -= Amount;
     if(Channels_Effects[Track_Nbr] < 1) Channels_Effects[Track_Nbr] = 1;
-    if(Get_Track_Type(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_LARGE && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_MEDIUM);
     }
-    if(Get_Track_Type(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
+    if(Get_Track_Zoom(Track_Nbr) == TRACK_MEDIUM && Get_Track_Real_Size(Track_Nbr) >= TRACKS_WIDTH)
     {
         Set_Track_Zoom(Track_Nbr, TRACK_SMALL);
     }

@@ -351,7 +351,7 @@ void draw_pated(int track, int line, int petrack, int row)
 
         // Zoom on/off
         if((dover + 17) >= MAX_PATT_SCREEN_X) goto Skip_Header;
-        if(Get_Track_Type(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover, y, 27, 0, 0);
+        if(Get_Track_Zoom(cur_track) != TRACK_MEDIUM) Cur_Char_Function[cur_track].Fnc(dover, y, 27, 0, 0);
         else Cur_Char_Function[cur_track].Fnc(dover, y, 28, 0, 0);
         dover += 17;
 
@@ -3281,7 +3281,7 @@ void Toggle_Track_Zoom(int track, int large)
 {
     if(large)
     {
-        if(Get_Track_Type(track) == TRACK_LARGE)
+        if(Get_Track_Zoom(track) == TRACK_LARGE)
         {
             Set_Track_Zoom(track, TRACK_MEDIUM);
         }
@@ -3292,7 +3292,7 @@ void Toggle_Track_Zoom(int track, int large)
     }
     else
     {
-        if(Get_Track_Type(track) == TRACK_SMALL)
+        if(Get_Track_Zoom(track) == TRACK_SMALL)
         {
             Set_Track_Zoom(track, TRACK_MEDIUM);
         }
@@ -3305,7 +3305,7 @@ void Toggle_Track_Zoom(int track, int large)
 
 // ------------------------------------------------------
 // Return the type of a track
-TRACK_TYPE Get_Track_Type(int track)
+TRACK_TYPE Get_Track_Zoom(int track)
 {
     switch(Cur_Char_size[track])
     {
