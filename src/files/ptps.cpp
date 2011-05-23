@@ -246,6 +246,8 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Store_FX_FinePitchDown = FALSE;
     int Store_FX_SwitchFlanger = FALSE;
     int Store_FX_Shuffle = FALSE;
+    int Store_FX_RevCuto = FALSE;
+    int Store_FX_RevReso = FALSE;
 
     int Store_Synth = FALSE;
 
@@ -894,6 +896,16 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_Shuffle = TRUE;
                                     break;
 
+                                // $26 Set reverb cutoff
+                                case 0x26:
+                                    Store_FX_RevCuto = TRUE;
+                                    break;
+
+                                // $27 Set reverb resonane
+                                case 0x27:
+                                    Store_FX_RevReso = TRUE;
+                                    break;
+
                                 // $31 First TB303 control
                                 case 0x31:
                                     Store_303_1 = TRUE;
@@ -1062,9 +1074,13 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_FINEPITCHDOWN", Store_FX_FinePitchDown);
     Save_Constant("PTK_FX_SWITCHFLANGER", Store_FX_SwitchFlanger);
 
+    Save_Constant("PTK_FX_SETREVCUTO", Store_FX_RevCuto);
+    Save_Constant("PTK_FX_SETREVRESO", Store_FX_RevReso);
+
     // Special but only at tick 0
     Save_Constant("PTK_FX_TICK0", Store_FX_Vibrato | Store_FX_Arpeggio |
-                                  Store_FX_PatternLoop | Store_FX_Reverse);
+                                  Store_FX_PatternLoop | Store_FX_Reverse |
+                                  Store_FX_RevCuto | Store_FX_RevReso);
 
     // Remap the used instruments
     for(i = 0; i < MAX_INSTRS; i++)
@@ -1824,7 +1840,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_PROC_FILTERHP2", Store_Filter_Hp12S | Store_Filter_Hp24M);
 
     Save_Constant("PTK_SHUFFLE", shuffle != 0 ? TRUE : FALSE || Store_FX_Shuffle);
-
+    
     Save_Constant("PTK_COMPRESSOR", compressor);
 
     for(int tps_pos = 0; tps_pos < Song_Length; tps_pos++)

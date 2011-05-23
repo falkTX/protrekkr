@@ -3740,8 +3740,13 @@ ByPass_Wav:
 #endif
 
 #if defined(PTK_TRACK_EQ)
-        All_Signal_L = do_eq(&EqDat[c], All_Signal_L, 0);
-        All_Signal_R = do_eq(&EqDat[c], All_Signal_R, 1);
+        if(EqDat[c].lg != 1.0f ||
+           EqDat[c].mg != 1.0f ||
+           EqDat[c].hg != 1.0f)
+        {
+            All_Signal_L = do_eq(&EqDat[c], All_Signal_L, 0);
+            All_Signal_R = do_eq(&EqDat[c], All_Signal_R, 1);
+        }
 #endif
 
         All_Signal_L *= LVol[c];
@@ -3775,7 +3780,6 @@ ByPass_Wav:
                 if(RVol[c] > Old_RVol[c]) RVol[c] = Old_RVol[c];
             }
         }
-
 
 #if defined(PTK_TRACK_VOLUME)
         All_Signal_L *= Track_Volume[c];
@@ -4417,7 +4421,8 @@ void Play_Instrument(int channel, int sub_channel)
 void Do_Effects_Tick_0(void)
 {
 
-#if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE)
+#if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE) || defined(PTK_SHUFFLE) || \
+    defined(PTK_FX_SETREVCUTO) || defined(PTK_FX_SETREVRESO)
     int i;
     int j;
     int pltr_eff_row[MAX_FX];
@@ -4479,6 +4484,20 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
                     gui_bpm_action = TRUE;
 #endif
+                    break;
+#endif
+
+#if defined(PTK_FX_SETREVCUTO)
+                case 0x26:
+                    Reverb_Filter_Cutoff = pltr_dat_row[j] / 255.0f * 0.99f;
+                    if(Reverb_Filter_Cutoff < 0.02f) Reverb_Filter_Cutoff = 0.02f;
+                    break;
+#endif
+
+#if defined(PTK_FX_SETREVRESO)
+                case 0x27:
+                    Reverb_Filter_Resonance = pltr_dat_row[j] / 255.0f * 0.99f;
+                    if(Reverb_Filter_Resonance < 0.02f) Reverb_Filter_Resonance = 0.02f;
                     break;
 #endif
 
