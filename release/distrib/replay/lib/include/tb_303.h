@@ -102,6 +102,7 @@ struct para303
     unsigned char decay;             //Decay                   UBYTE           6       0x00 to 0x7f (pattern mode)
     unsigned char accent;            //Accent                  UBYTE           7       0x00 to 0x7f (pattern mode)
     unsigned char waveform;          //Waveform                UBYTE           8       0x00 = triangle, 0x01 = square (pattern mode)
+    unsigned char scale;
     
     unsigned char patternlength[32]; // 32 = 4 bank * 8 patterns
     unsigned char tone[32][16];
@@ -149,11 +150,12 @@ class gear303
 
         void tbNoteOn(int tbNote, para303 *PARAT303);
 
-        float tbGetSample(void);
+        float tbGetSample(para303 *PARAT303);
         float tbBuf[5];
         float tbVolume;
         float TickPos;
         int Note_Off;
+        int tbCurMultiple;
 
         float RampVolume;
         float tbTargetRealVolume;

@@ -49,5 +49,7 @@ void Actualize_Fx_Ed(char gode);
 void Mouse_Sliders_Fx_Ed(void);
 void Mouse_Right_Fx_Ed(void);
 void Mouse_Left_Fx_Ed(void);
+void Display_Reverb_Cutoff(void);
+void Display_Reverb_Resonance(void);
 
 #endif

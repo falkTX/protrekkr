@@ -166,6 +166,7 @@ int LoadPtk(char *FileName)
     int Combine = FALSE;
     int Stereo_Reverb = FALSE;
     int Reverb_Resonance = FALSE;
+    int Tb303_Scaling = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -214,6 +215,8 @@ int LoadPtk(char *FileName)
 
         switch(extension[7])
         {
+            case 'O':
+                Tb303_Scaling = TRUE;
             case 'N':
                 Reverb_Resonance = TRUE;
             case 'M':
@@ -709,6 +712,12 @@ Read_Mod_File:
                 Read_Mod_Data(&tb303[j].decay, sizeof(char), 1, in);
                 Read_Mod_Data(&tb303[j].accent, sizeof(char), 1, in);
                 Read_Mod_Data(&tb303[j].waveform, sizeof(char), 1, in);
+                // Default value
+                tb303[j].scale = 1;
+                if(Tb303_Scaling)
+                {
+                    Read_Mod_Data(&tb303[j].scale, sizeof(char), 1, in);
+                }
                 if(Portable)
                 {
                     for(i = 0; i < 32; i++)
@@ -1460,6 +1469,8 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 Write_Mod_Data(&tb303[j].decay, sizeof(char), 1, in);
                 Write_Mod_Data(&tb303[j].accent, sizeof(char), 1, in);
                 Write_Mod_Data(&tb303[j].waveform, sizeof(char), 1, in);
+                Write_Mod_Data(&tb303[j].scale, sizeof(char), 1, in);
+
                 for(i = 0; i < 32; i++)
                 {
                     Save_303_Data(Write_Mod_Data, Write_Mod_Data_Swap, in, j, i); 
@@ -1641,7 +1652,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKN");
+        sprintf(extension, "PROTREKO");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

@@ -66,6 +66,7 @@ void gear303::reset(void)
     tbFirstRow = 1;
     tbTargetRealVolume = 1.0f;
     tbTargetRealVolumeRamp = 0.0f;
+    tbCurMultiple = 0;
 
     tbCutoff = 0.5f;
     tbResonance = 0.5f;
@@ -90,7 +91,7 @@ void gear303::reset(void)
 
 // ------------------------------------------------------
 // Render 1 32bit-float sample
-float gear303::tbGetSample(void)
+float gear303::tbGetSample(para303 *PARAT303)
 {
     // Get Oscillator values
     switch(tbWaveform)
@@ -120,7 +121,7 @@ float gear303::tbGetSample(void)
 
     // The sliding operation reduces the cutoff freq of 1/4
     // by the speed tbDecay.
-    TickPos = tbDecay / (float) SamplesPerTick;
+    TickPos = (tbDecay / (float) PARAT303->scale) / (float) SamplesPerTick;
 
     if(tbAutoMod)
     {
@@ -174,45 +175,45 @@ float gear303::tbGetSample(void)
 
     if(tbCurrentVolume < tbTargetVolume)
     {
-        tbCurrentVolume += 0.001f;
+        tbCurrentVolume += 0.001f;// / (float) PARAT303->scale;
         if(tbCurrentVolume > tbTargetVolume) tbCurrentVolume = tbTargetVolume;
     }
     else
     {
-        tbCurrentVolume -= 0.001f;
+        tbCurrentVolume -= 0.001f;// / (float) PARAT303->scale;
         if(tbCurrentVolume < tbTargetVolume) tbCurrentVolume = tbTargetVolume;
     }
 
-    float output = tbFilter();// * (1.0f + tbAccent);
+    float output = tbFilter() * (1.0f + tbAccent);
     if(output < -32767.0f) output = -32767.0f;
     if(output > 32767.0f) output = 32767.0f;
 
     if(tbAccent > 0.0f)
     {
-        tbAccent -= 0.0001f;
+        tbAccent -= 0.0001f;// / (float) PARAT303->scale;
         if(tbAccent < 0.0f) tbAccent = 0.0f;
     }
 
     if(tbRampVolume > RampVolume)
     {
-        // That's for explicit note off
-        tbRampVolume -= 0.0005f;
+        // That's for an explicit note off
+        tbRampVolume -= 0.0005f;// / (float) PARAT303->scale;
         if(tbRampVolume < RampVolume) tbRampVolume = RampVolume;
     }
     else
     {
-        tbRampVolume += 0.05f;
+        tbRampVolume += 0.05f;// / (float) PARAT303->scale;
         if(tbRampVolume > RampVolume) tbRampVolume = RampVolume;
     }
 
     if(tbTargetRealVolumeRamp > tbTargetRealVolume)
     {
-        tbTargetRealVolumeRamp -= 0.1f;
+        tbTargetRealVolumeRamp -= 0.1f;// / (float) PARAT303->scale;
         if(tbTargetRealVolumeRamp < tbTargetRealVolume) tbTargetRealVolumeRamp = tbTargetRealVolume;
     }
     else
     {
-        tbTargetRealVolumeRamp += 0.1f;
+        tbTargetRealVolumeRamp += 0.1f;// / (float) PARAT303->scale;
         if(tbTargetRealVolumeRamp > tbTargetRealVolume) tbTargetRealVolumeRamp = tbTargetRealVolume;
     }
     return(output * tbTargetRealVolumeRamp * tbRampVolume * tbCurrentVolume);

@@ -1926,6 +1926,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         Write_Mod_Data(&tb303[0].decay, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[0].accent, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[0].waveform, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[0].scale, sizeof(char), 1, in);
         Write_Mod_Data(tb303[0].patternlength, sizeof(char), 32, in);
         Write_Mod_Data(tb303[0].tone, sizeof(char), 32 * 16, in);
         Write_Mod_Data(tb303[0].flag, sizeof(struct flag303), 32 * 16, in);
@@ -1942,6 +1943,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
         Write_Mod_Data(&tb303[1].decay, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[1].accent, sizeof(char), 1, in);
         Write_Mod_Data(&tb303[1].waveform, sizeof(char), 1, in);
+        Write_Mod_Data(&tb303[1].scale, sizeof(char), 1, in);
         Write_Mod_Data(tb303[1].patternlength, sizeof(char), 32, in);
         Write_Mod_Data(tb303[1].tone, sizeof(char), 32 * 16, in);
         Write_Mod_Data(tb303[1].flag, sizeof(struct flag303), 32 * 16, in);

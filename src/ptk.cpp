@@ -1957,7 +1957,8 @@ void LoadFile(int Freeindex, const char *str)
                 strcmp(extension, "PROTREKK") == 0 ||
                 strcmp(extension, "PROTREKL") == 0 ||
                 strcmp(extension, "PROTREKM") == 0 ||
-                strcmp(extension, "PROTREKN") == 0)
+                strcmp(extension, "PROTREKN") == 0 ||
+                strcmp(extension, "PROTREKO") == 0)
         {
             sprintf(name, "%s", FileName);
             SongStop();

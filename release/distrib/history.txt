@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.5.3:
+
+- 303 units speeds can be scaled.
+- Added effects 26 & 27 (set reverb cutoff & resonance).
+
 v2.5.2:
 
 - Slightly improved the smoothing of the reverb
