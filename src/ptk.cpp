@@ -6748,7 +6748,9 @@ void Note_Jazz(int track, int note, float volume)
                             0,
                             !is_recording,
                             -(Sub_Channel + 1),
-                            volume);
+                            volume,
+                            0,
+                            0);
     }
 }
 

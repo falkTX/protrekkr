@@ -2782,7 +2782,9 @@ void Sp_Player(void)
                                                 toffset,
                                                 glide,
                                                 FALSE, i + 1,
-                                                1.0f);
+                                                1.0f,
+                                                Song_Position,
+                                                Pattern_Line);
                         }
                     }
                 }
@@ -3830,6 +3832,8 @@ ByPass_Wav:
 int Get_Free_Sub_Channel(int channel, int polyphony)
 {
     int i;
+    int oldest;
+    int age_value;
 
     for(i = 0; i < polyphony; i++)
     {
@@ -3856,15 +3860,29 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 #if defined(PTK_INSTRUMENTS)
     for(i = 0; i < polyphony; i++)
     {
-        if(sp_Stage[channel][i] == PLAYING_SAMPLE_NOTEOFF)
+        if(!Cut_Stage[channel][i])
         {
-            return(i);
+            if(sp_Stage[channel][i] == PLAYING_SAMPLE_NOTEOFF)
+            {
+                return(i);
+            }
         }
     }
 #endif
 
+    // Take the oldest playing one
+    oldest = 0;
+    age_value = Instrument_Schedule_Dat[channel][0].age;
+    for(i = 1; i < polyphony; i++)
+    {
+        if(Instrument_Schedule_Dat[channel][i].age < age_value)
+        {
+            oldest = i;
+        }
+    }
+
     // None found
-    return(-1);
+    return(oldest);
 }
 
 // ------------------------------------------------------
@@ -3879,7 +3897,9 @@ void Schedule_Instrument(int channel,
                          int glide,
                          int Play_Selection,
                          int midi_sub_channel,
-                         float vol)
+                         float vol,
+                         int Pos,
+                         int Row)
 {
     int Cur_Position = Song_Position;
     if(CHAN_ACTIVE_STATE[Cur_Position][channel])
@@ -3901,6 +3921,8 @@ void Schedule_Instrument(int channel,
         Instrument_Schedule_Dat[channel][sub_channel].glide = glide;
         Instrument_Schedule_Dat[channel][sub_channel].Play_Selection = Play_Selection;
         Instrument_Schedule_Dat[channel][sub_channel].midi_sub_channel = midi_sub_channel;
+        Instrument_Schedule_Dat[channel][sub_channel].age = (Pos << 8) | Row;
+
         if(!glide)
         {
             Cut_Stage[channel][sub_channel] = TRUE;
@@ -5018,7 +5040,9 @@ void Do_Effects_Ticks_X(void)
                                                 0, 0,
                                                 FALSE,
                                                 i + 1,
-                                                1.0f);
+                                                1.0f,
+                                                Song_Position,
+                                                Pattern_Line);
                         }
                     }
                     break;

@@ -233,6 +233,7 @@ typedef struct
     int Play_Selection;
     int midi_sub_channel;
     int start_backward;
+    int age;
 } INSTR_SCHEDULE, *LPINSTR_SCHEDULE;
 
 typedef struct
@@ -464,7 +465,9 @@ void Schedule_Instrument(int channel, int sub_channel,
                          int glide,
                          int Play_Selection,
                          int midi_sub_channel,
-                         float volume);
+                         float volume,
+                         int Pos,
+                         int Row);
 void Play_Instrument(int channel, int sub_channel);
 void ResetFilters(int tr);
 void ComputeStereo(int channel);
