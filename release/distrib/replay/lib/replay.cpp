@@ -2703,6 +2703,7 @@ void Sp_Player(void)
                         if(!glide)
                         {
                             Synthesizer[ct][j].NoteOff();
+                            sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
                         }
                         else
                         {
@@ -2801,11 +2802,15 @@ void Sp_Player(void)
                             j = Reserved_Sub_Channels[ct][i];
 
 #if defined(PTK_INSTRUMENTS)
-                            if(sp_Stage[ct][j] == PLAYING_SAMPLE) sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                            if(sp_Stage[ct][j] == PLAYING_SAMPLE)
+                            {
+                                sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
+                            }
 #endif
 
 #if defined(PTK_SYNTH)
                             Synthesizer[ct][j].NoteOff();
+                            sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
 #endif
 
                             Reserved_Sub_Channels[ct][i] = -1;
@@ -3849,7 +3854,6 @@ int Get_Free_Sub_Channel(int channel, int polyphony)
 #endif
           )
         {
-            // 
             if(!Cut_Stage[channel][i])
             {
                 return(i);
