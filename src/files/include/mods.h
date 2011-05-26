@@ -50,6 +50,6 @@ typedef struct
 
 // ------------------------------------------------------
 // Functions
-void LoadAmigaMod(char *Name, const char *FileName, int channels);
+void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooster);
 
 #endif

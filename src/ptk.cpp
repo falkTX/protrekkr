@@ -1866,6 +1866,7 @@ void LoadFile(int Freeindex, const char *str)
     char st_type = 0;
     short inx = 0;
     int fmtchklen = 0;
+    int digibooster = FALSE;
 
     const char *FileName = str;
 
@@ -1873,9 +1874,10 @@ void LoadFile(int Freeindex, const char *str)
     {
         char extension[10];
         int extension_AIFF[3];
+        char extension_digi[21];
         unsigned extension_New;
         int modext;
-        int found_mod;
+        char found_mod;
         int i;
         //char rebext[5];
 
@@ -1891,6 +1893,11 @@ void LoadFile(int Freeindex, const char *str)
         fseek(in, 0, SEEK_SET);
         fread(&extension_AIFF, sizeof(char), 12, in);
 
+        memset(extension_digi, 0, sizeof(extension_digi));
+        fseek(in, 0, SEEK_SET);
+        fread(&extension_digi, sizeof(char), 20, in);
+
+        // Look for sound/noise/star/protracker module
         found_mod = 0;
         for(i = 0; i < sizeof(mt_tags) / sizeof(int); i++)
         {
@@ -1900,6 +1907,15 @@ void LoadFile(int Freeindex, const char *str)
                 break;
             }
         }
+        
+        // Look for a digibooster v1.x module
+        if(strcmp(extension_digi, "DIGI Booster module") == 0)
+        {
+            digibooster = TRUE;
+            // Retrieve the number of channels
+            fseek(in, 25, SEEK_SET);
+            fread(&found_mod, sizeof(char), 1, in);
+        }
 
         if(found_mod)
         {
@@ -1907,7 +1923,7 @@ void LoadFile(int Freeindex, const char *str)
             // name / number of channels
             SongStop();
             AUDIO_Stop();
-            LoadAmigaMod(name, FileName, found_mod);
+            LoadAmigaMod(name, FileName, found_mod, digibooster);
             Renew_Sample_Ed();
             fclose(in);
             gui_action = GUI_CMD_NONE;
