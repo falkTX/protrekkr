@@ -231,23 +231,23 @@ int Check_Requester(LPREQUESTER Requester)
     if(Current_Requester == Requester)
     {
         int i;
-        Gui_Draw_Button_Box(Pos_X, Pos_Y, Size_X, Size_Y, "", BUTTON_NORMAL | BUTTON_DISABLED);
-        Gui_Draw_Button_Box(Pos_X + BEVEL_SIZE - 1, Pos_Y + BEVEL_SIZE - 1,
-                            Size_X - ((BEVEL_SIZE - 1) * 2), Size_Y - ((BEVEL_SIZE - 1) * 2),
-                            "", BUTTON_PUSHED | BUTTON_DISABLED);
         if(Req_Picture)
         {
             SetColor(COL_BLACK);
-            Fillrect(Pos_X + BEVEL_SIZE,
+            /*Fillrect(Pos_X + BEVEL_SIZE,
                      Pos_Y + BEVEL_SIZE,
                      Pos_X + BEVEL_SIZE + Size_X - (BEVEL_SIZE * 2) + 1,
-                     Pos_Y + BEVEL_SIZE + Size_Y - (BEVEL_SIZE * 2) + 1);
+                     Pos_Y + BEVEL_SIZE + Size_Y - (BEVEL_SIZE * 2) + 1);*/
             // Display the picture
             Copy(Req_Picture, Pos_X + BEVEL_SIZE + 1, Pos_Y + BEVEL_SIZE + 1,
                  0, 0, Req_Picture->w, Req_Picture->h - 2);
         }
         else
         {
+            Gui_Draw_Button_Box(Pos_X, Pos_Y, Size_X, Size_Y, "", BUTTON_NORMAL | BUTTON_DISABLED);
+            Gui_Draw_Button_Box(Pos_X + BEVEL_SIZE - 1, Pos_Y + BEVEL_SIZE - 1,
+                                Size_X - ((BEVEL_SIZE - 1) * 2), Size_Y - ((BEVEL_SIZE - 1) * 2),
+                                "", BUTTON_PUSHED | BUTTON_DISABLED);
             // Or the intern box
             Gui_Draw_Button_Box(Pos_X + (BEVEL_SIZE + 1), Pos_Y + (BEVEL_SIZE + 1),
                                 Size_X - ((BEVEL_SIZE + 1) * 2), Size_Y - ((BEVEL_SIZE + 1) * 2),

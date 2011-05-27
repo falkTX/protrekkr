@@ -83,6 +83,8 @@ void Draw_303_Ed(void)
 
     Skincopy(80, (Cur_Height - 140), 0, 0, 510, 114);
 
+    Gui_Draw_Button_Box(668, (Cur_Height - 60), 64, 16, "Scale", BUTTON_NORMAL | BUTTON_DISABLED | BUTTON_NO_BORDER | BUTTON_TEXT_CENTERED);
+
     Actualize_303_Ed(0);
 }
 
@@ -290,6 +292,12 @@ void Refresh_303_Unit(int Unit, int gode)
                 Gui_Draw_Button_Box(600, (Cur_Height - 120), 164, 16, tb303[Unit].pattern_name[tb303[Unit].selectedpattern], BUTTON_NORMAL | BUTTON_INPUT);
             }
         }
+
+        if(gode == 0 || gode == 19)
+        {
+            Gui_Draw_Arrows_Number_Box2(670, (Cur_Height - 42), tb303[Unit].scale, BUTTON_NORMAL | BUTTON_RIGHT_MOUSE | BUTTON_TEXT_CENTERED);
+        }
+
     }
 }
 
@@ -977,6 +985,27 @@ void Mouse_Left_303_Ed(void)
             gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
             teac = 3;
         }
+
+        // Scale
+        if(zcheckMouse(670, (Cur_Height - 42), 16, 16))
+        {
+            tb303[sl3].scale--;
+            if(tb303[sl3].scale < 1) tb303[sl3].scale = 1;
+            tb303engine[sl3].tbCurMultiple = tb303[sl3].scale;
+            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
+            teac = 19;
+        }
+
+        // Scale
+        if(zcheckMouse(670 + 44, (Cur_Height - 42), 16, 16))
+        {
+            tb303[sl3].scale++;
+            if(tb303[sl3].scale > 16) tb303[sl3].scale = 16;
+            tb303engine[sl3].tbCurMultiple = tb303[sl3].scale;
+            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
+            teac = 19;
+        }
+
     }
 }
 

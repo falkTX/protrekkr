@@ -427,7 +427,6 @@ void Actualize_Master_Ed(char gode)
                 Gui_Draw_Button_Box(258 + 31, (Cur_Height - 105), 29, 16, "Off", BUTTON_PUSHED | BUTTON_TEXT_CENTERED);
             }
         }
-
     }
 }
 

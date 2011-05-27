@@ -718,6 +718,7 @@ Read_Mod_File:
                 {
                     Read_Mod_Data(&tb303[j].scale, sizeof(char), 1, in);
                 }
+                tb303engine[j].tbCurMultiple = tb303[j].scale;
                 if(Portable)
                 {
                     for(i = 0; i < 32; i++)
