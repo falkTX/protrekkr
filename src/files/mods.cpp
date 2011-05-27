@@ -193,7 +193,7 @@ AMIGA_NOTE mt_period_conv[] =
     {   14, 119 },
 }; 
 
-BYTE *Mod_Dat;
+unsigned char *Mod_Dat;
 int Pos_Mod_Dat;
 int Mod_Size;
 
@@ -214,9 +214,9 @@ int Mod_Pos()
 
 // ------------------------------------------------------
 // Retrieve a byte from the .mod data
-BYTE Getc_Mod()
+unsigned char Getc_Mod()
 {
-    BYTE ret;
+    unsigned char ret;
     ret = Mod_Dat[Pos_Mod_Dat];
     Pos_Mod_Dat++;
     return ret;
@@ -224,14 +224,14 @@ BYTE Getc_Mod()
 
 // ------------------------------------------------------
 // Retrieve a word from the .mod data
-WORD Getc_Mod_Word()
+unsigned short Getc_Mod_Word()
 {
     return (int) (Getc_Mod() << 8) + (int) Getc_Mod();
 }
 
 // ------------------------------------------------------
 // Retrieve a word from the .mod data
-DWORD Getc_Mod_Dword()
+unsigned int Getc_Mod_Dword()
 {
     return (int) (Getc_Mod() << 24) + 
            (int) (Getc_Mod() << 16) + 
@@ -334,7 +334,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
         Mod_Size = ftell(in);
         fseek(in, 0, SEEK_SET);
 
-        Mod_Dat = (BYTE *) malloc(Mod_Size);
+        Mod_Dat = (unsigned char *) malloc(Mod_Size);
         if(Mod_Dat)
         {
             fread(Mod_Dat, 1, Mod_Size, in);
@@ -358,16 +358,16 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
             {
                 // Convert the digi booster pro module to a protracker one
                 // Determine the amount of patterns and samples
-                BYTE *Digi_Mod;
+                unsigned char *Digi_Mod;
                 int Smps_Length = 0;
                 int PattSize;
                 int Old_Pos;
                 int Packed;
-                DWORD Version;
-                BYTE BitMasks[64];
-                BYTE *bDigi_Mod;
-                WORD *wDigi_Mod;
-                WORD *wDigi_Mod2;
+                unsigned int Version;
+                unsigned char BitMasks[64];
+                unsigned char *bDigi_Mod;
+                unsigned short *wDigi_Mod;
+                unsigned short *wDigi_Mod2;
                 
                 // Check the version
                 Seek_Mod(24, SEEK_SET);
@@ -390,7 +390,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                 {
                     Smps_Length += Getc_Mod_Dword();
                 }
-                Digi_Mod = (BYTE *) malloc((Patterns * 64 * 4 * channels) + Smps_Length + 1084);
+                Digi_Mod = (unsigned char *) malloc((Patterns * 64 * 4 * channels) + Smps_Length + 1084);
                 if(!Digi_Mod)
                 {
                     Status_Box("Not enough memory.");
@@ -430,7 +430,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                 }
 
                 memset(Name, 0, 21);
-                Read_Mod((BYTE *) Name, 20);
+                Read_Mod((unsigned char *) Name, 20);
 
                 Seek_Mod(642, SEEK_SET);
                 
@@ -441,7 +441,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                     Seek_Mod(30 - 19, SEEK_CUR);
                 }
 
-                wDigi_Mod = (WORD *) (Digi_Mod + 1084);
+                wDigi_Mod = (unsigned short *) (Digi_Mod + 1084);
 
                 // Decode the pattern data
                 if(Packed)
@@ -491,7 +491,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                     }
                 }
 
-                bDigi_Mod = (BYTE *) wDigi_Mod;
+                bDigi_Mod = (unsigned char *) wDigi_Mod;
 
                 // Copy the samples
                 for(i = 0; i < 31; i++)
@@ -515,7 +515,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
             if(!digibooster)
             {
                 memset(Name, 0, 21);
-                Read_Mod((BYTE *) Name, 20);
+                Read_Mod(Name, 20);
             }
             else
             {
@@ -560,7 +560,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                 if(!digibooster)
                 {
                     memset(nameins[swrite], 0, 20);
-                    Read_Mod((BYTE *) &nameins[swrite], 19);
+                    Read_Mod(&nameins[swrite], 19);
 
                     // Jump over 3 unhandled bytes for PTK samplename.
                 }
