@@ -8,6 +8,7 @@ v2.5.3:
 - Added effects 26 & 27 (set reverb cutoff & resonance).
 - Some notes were missed in multi-notes channels sometimes.
 - Fixed a bug occuring with automatic note offs on the synth.
+- Ptk can now import DigiBooster v1.x modules (.digi).
 
 v2.5.2:
 

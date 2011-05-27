@@ -206,6 +206,13 @@ void Read_Mod(void *Dest, int Size)
 }
 
 // ------------------------------------------------------
+// Retrieve the current position in a .mod
+int Mod_Pos()
+{
+    return Pos_Mod_Dat;
+}
+
+// ------------------------------------------------------
 // Retrieve a byte from the .mod data
 BYTE Getc_Mod()
 {
@@ -224,7 +231,7 @@ WORD Getc_Mod_Word()
 
 // ------------------------------------------------------
 // Retrieve a word from the .mod data
-WORD Getc_Mod_Dword()
+DWORD Getc_Mod_Dword()
 {
     return (int) (Getc_Mod() << 24) + 
            (int) (Getc_Mod() << 16) + 
@@ -276,25 +283,8 @@ float Scale_AmigaMod_Value(int value, float scale1, float scale2)
     return(newvalue);
 }
 
-// DIGI Booster module V1.4
-// DIGI Booster module V1.5
-// DIGI Booster module V1.7
-// DIGI Booster module TAP!
-// DIGI Booster module V1.6
-// DBM0
-//
-// - DAVE
-// - DOKTOR
-// - DRAWER
-// - ELBIE
-// - GANJA
-// - LLOYD
-// - REVISO
-// - SPECTRA
-// - VINCEBLOOD
-
 // ------------------------------------------------------
-// Load a .mod file
+// Load a .mod, .ft or .digi file
 void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooster)
 {
     FILE *in;
@@ -315,6 +305,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
     int vib_chan[16];
     int vib_last[16];
     int arp_chan[16];
+    int last_vol_fade[16];
     int cur_tempo = 125;
     int cur_speed = 6;
     int found_tempo;
@@ -333,6 +324,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
         vib_chan[i] = 0;
         vib_last[i] = 0;
         arp_chan[i] = 0;
+        last_vol_fade[i] = 0;
     }
 
     in = fopen(FileName, "rb");
@@ -360,42 +352,175 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
 
             init_sample_bank();
             Pre_Song_Init();
+            int Patterns;
 
             if(digibooster)
             {
                 // Convert the digi booster pro module to a protracker one
                 // Determine the amount of patterns and samples
                 BYTE *Digi_Mod;
-                int Smp_Length = 0;
-                int Patterns;
+                int Smps_Length = 0;
+                int PattSize;
+                int Old_Pos;
+                int Packed;
+                DWORD Version;
+                BYTE BitMasks[64];
+                BYTE *bDigi_Mod;
+                WORD *wDigi_Mod;
+                WORD *wDigi_Mod2;
+                
+                // Check the version
+                Seek_Mod(24, SEEK_SET);
+                Version = Getc_Mod();
+                Seek_Mod(26, SEEK_SET);
+                Packed = Getc_Mod();
                 Seek_Mod(46, SEEK_SET);
                 // Total length of patterns
-                Patterns = (Getc_Mod() + 1) * 1024;
+                if(Version < 0x12)
+                {
+                    Patterns = Getc_Mod();
+                }
+                else
+                {
+                    Patterns = Getc_Mod() + 1;
+                }
                 Seek_Mod(176, SEEK_SET);
                 // Total length of samples
                 for(i = 0; i < 31; i++)
                 {
-                    Smp_Length += Getc_Mod_Dword();
+                    Smps_Length += Getc_Mod_Dword();
                 }
-                Digi_Mod = (BYTE *) malloc(Patterns + Smp_Length + 1084);
+                Digi_Mod = (BYTE *) malloc((Patterns * 64 * 4 * channels) + Smps_Length + 1084);
                 if(!Digi_Mod)
                 {
                     Status_Box("Not enough memory.");
                     Clear_Input();
                     return;
                 }
-                memset(Digi_Mod, 0, Patterns + Smp_Length + 1084);
-                Digi_Mod[1080] = mt_tags[channels - 1];
+                memset(Digi_Mod, 0, (Patterns * 64 * 4 * channels) + Smps_Length + 1084);
+                
+                Seek_Mod(47, SEEK_SET);
+                int Length = Getc_Mod() + 1;
+                Digi_Mod[950] = Length;
+                for(i = 0; i < 128; i++)
+                {
+                    Digi_Mod[952 + i] = Getc_Mod();
+                }
+
+                for(i = 0; i < 31; i++)
+                {
+                    SampleLength[i][0] = Getc_Mod_Dword();
+                }
+                for(i = 0; i < 31; i++)
+                {
+                    LoopStart[i][0] = Getc_Mod_Dword();
+                }
+                /* (Loop length) */
+                for(i = 0; i < 31; i++)
+                {
+                    LoopEnd[i][0] = Getc_Mod_Dword();
+                }
+                for(i = 0; i < 31; i++)
+                {
+                    Sample_Vol[i] = Scale_AmigaMod_Value(Getc_Mod(), 63.0f, 0.99f);
+                }
+                for(i = 0; i < 31; i++)
+                {
+                    Finetune[i][0] = FineTune_Table[Getc_Mod() & 0xf];
+                }
+
+                memset(Name, 0, 21);
+                Read_Mod((BYTE *) Name, 20);
+
+                Seek_Mod(642, SEEK_SET);
+                
+                for(i = 0; i < 31; i++)
+                {
+                    memset(nameins[i], 0, 20);
+                    Read_Mod(&nameins[i], 19);
+                    Seek_Mod(30 - 19, SEEK_CUR);
+                }
+
+                wDigi_Mod = (WORD *) (Digi_Mod + 1084);
+
+                // Decode the pattern data
+                if(Packed)
+                {
+                    // Packed patterns
+                    for(k = 0; k < Patterns; k++)
+                    {
+                        Old_Pos = Mod_Pos();
+                        PattSize = Getc_Mod_Word() + 2;
+                        Read_Mod(BitMasks, 64);
+                        for(i = 0; i < 64; i++)
+                        {
+                            for(j = 7; j >= 0; j--)
+                            {
+                                // Check bit mask
+                                if(BitMasks[i] & (1 << j))
+                                {
+                                    *wDigi_Mod++ = Getc_Mod() | (Getc_Mod() << 8);
+                                    *wDigi_Mod++ = Getc_Mod() | (Getc_Mod() << 8);
+                                }
+                                else
+                                {
+                                    *wDigi_Mod++ = 0;
+                                    *wDigi_Mod++ = 0;
+                                }
+                            }
+                        }
+                        Seek_Mod(Old_Pos + PattSize, SEEK_SET);
+                    }
+                }
+                else
+                {
+                    // Non-packed patterns
+                    for(k = 0; k < Patterns; k++)
+                    {
+                        for(j = 0; j < channels; j++)
+                        {
+                            wDigi_Mod2 = &wDigi_Mod[j * 2];
+                            for(i = 0; i < 64; i++)
+                            {
+                                wDigi_Mod2[0] = Getc_Mod() | (Getc_Mod() << 8);
+                                wDigi_Mod2[1] = Getc_Mod() | (Getc_Mod() << 8);
+                                wDigi_Mod2 += (channels * 2);
+                            }
+                        }
+                        wDigi_Mod += (channels * 2 * 64);
+                    }
+                }
+
+                bDigi_Mod = (BYTE *) wDigi_Mod;
+
+                // Copy the samples
+                for(i = 0; i < 31; i++)
+                {
+                    if(SampleLength[i][0])
+                    {
+                        Read_Mod(bDigi_Mod, SampleLength[i][0]);
+                        bDigi_Mod += SampleLength[i][0];
+                    }
+                }
+
                 free(Mod_Dat);
                 // This is the new mod
                 Mod_Dat = Digi_Mod;
             }
 
-            // Read the title
-            memset(Name, 0, 21);
-            sprintf(style, "Converted");
-            Read_Mod((BYTE *) Name, 20);
+            Seek_Mod(0, SEEK_SET);
 
+            // Read the title
+            sprintf(style, "Converted");
+            if(!digibooster)
+            {
+                memset(Name, 0, 21);
+                Read_Mod((BYTE *) Name, 20);
+            }
+            else
+            {
+                Seek_Mod(20, SEEK_CUR);
+            }
             if(!strlen(Name))
             {
                 strcpy(Name, FileName);
@@ -431,40 +556,54 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
             for(swrite = 0; swrite < 31; swrite++)
             {
                 SampleType[swrite][0] = 1;
-                memset(nameins[swrite], 0, 20);
-                Read_Mod((BYTE *) &nameins[swrite], 19);
+
+                if(!digibooster)
+                {
+                    memset(nameins[swrite], 0, 20);
+                    Read_Mod((BYTE *) &nameins[swrite], 19);
+
+                    // Jump over 3 unhandled bytes for PTK samplename.
+                }
+                else
+                {
+                    Seek_Mod(19, SEEK_CUR);
+                }
+                Seek_Mod(3, SEEK_CUR);
 
                 // Remove suspicious chars
                 for(j = 0; nameins[swrite][j]; j++)
                 {
                     if(!isalnum(nameins[swrite][j])) nameins[swrite][j] = '_';
                 }
-        
+    
                 sprintf(SampleName[swrite][0], "Untitled.wav");
+                    
+                if(!digibooster)
+                {
+                    Clear_Instrument_Dat(swrite, 0, 0);
 
-                // Jump over 3 unhandled bytes for PTK samplename.
-                Seek_Mod(3, SEEK_CUR);
+                    SampleLength[swrite][0] = Getc_Mod_Word();
+                    SampleLength[swrite][0] *= 2;
 
-                Clear_Instrument_Dat(swrite, 0, 0);
+                    Finetune[swrite][0] = FineTune_Table[Getc_Mod() & 0xf];
+                    Sample_Vol[swrite] = Scale_AmigaMod_Value(Getc_Mod(), 63.0f, 0.99f);
 
-                SampleLength[swrite][0] = Getc_Mod_Word();
-                SampleLength[swrite][0] *= 2;
-                Read_Mod((BYTE *) &Finetune[swrite][0], 1);
+                    // Calculate/Adapt AMIGA loop points to ptk LoopPoints
+                    LoopStart[swrite][0] = Getc_Mod_Word();
+                    LoopStart[swrite][0] *= 2;
+                    LoopEnd[swrite][0] = Getc_Mod_Word();
+                    LoopEnd[swrite][0] *= 2;
+                }
+                else
+                {
+                    Seek_Mod(2 + 1 + 1 + 2 + 2, SEEK_CUR);
+                }
 
-                Finetune[swrite][0] = FineTune_Table[Finetune[swrite][0] & 0xf];
-                Sample_Vol[swrite] = Scale_AmigaMod_Value(Getc_Mod(), 63.0f, 0.99f);
                 Sample_Amplify[swrite][0] = 0.5f;
                 Basenote[swrite][0] = DEFAULT_BASE_NOTE - 5 + 12 + 12 + 12 + 12 - 2;
-
-                // Calculate/Adapt AMIGA loop points to ptk LoopPoints
-                LoopStart[swrite][0] = Getc_Mod_Word();
-                LoopStart[swrite][0] *= 2;
-                long Replen = Getc_Mod_Word();
-                Replen *= 2;
-
-                if(Replen > 2)
+                if(LoopEnd[swrite][0] > 2)
                 {
-                    LoopEnd[swrite][0] = LoopStart[swrite][0] + Replen;
+                    LoopEnd[swrite][0] = LoopStart[swrite][0] + LoopEnd[swrite][0];
                     LoopType[swrite][0] = SMP_LOOP_FORWARD;
                 }
                 else
@@ -493,6 +632,10 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                 pSequence[tps] = Getc_Mod();
                 if(pSequence[tps] >= nPatterns) nPatterns = pSequence[tps] + 1;
                 patternLines[tps] = 64;
+            }
+            if(digibooster)
+            {
+                nPatterns = Patterns;
             }
 
             // JUMP OVER THE HEADER
@@ -614,7 +757,6 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
 
                     // Jump to the pattern to retrieve
                     Seek_Mod(1084 + (pSequence[pwrite] * (4 * channels * 64) + (4 * channels * li2)), SEEK_SET);
-
                     for(pw2 = 0; pw2 < channels; pw2++)
                     {
                         int tmo = Get_Pattern_Offset(pSequence[pwrite], pw2, li2);
@@ -808,13 +950,24 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                                     if(Cmd_Dat >= 16)
                                     {
                                         Cmd = 0x19; // Vol SlideUp
+                                        if(digibooster)
+                                        {
+                                            if(Cmd_Dat == 0) Cmd_Dat = (last_vol_fade[pw2]);
+                                            else last_vol_fade[pw2] = Cmd_Dat;
+                                        }
                                         Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat >> 4,
                                                                              (31 - (cur_speed - 1)) * 2.5f,
                                                                              255.0f);
+
                                     }
                                     else
                                     {
-                                        Cmd = 0x1a; // Vol Slide Down
+                                        if(digibooster)
+                                        {
+                                            Cmd = 0x1a; // Vol Slide Down
+                                            if(Cmd_Dat == 0) Cmd_Dat = last_vol_fade[pw2];
+                                            else last_vol_fade[pw2] = Cmd_Dat;
+                                        }
                                         Cmd_Dat = (int) Scale_AmigaMod_Value(Cmd_Dat & 0xf,
                                                                              (31 - (cur_speed - 1)) * 2.5f,
                                                                              255.0f);
@@ -1002,6 +1155,7 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
             BeatsPerMin = 125;
             TicksPerBeat = 4;
             mas_vol = 0.75f;
+            compressor = FALSE;
 
             free(Mod_Dat);
             Mod_Dat = NULL;
