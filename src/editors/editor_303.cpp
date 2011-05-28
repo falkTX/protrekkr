@@ -410,6 +410,28 @@ void Mouse_Right_303_Ed(void )
             liveparam = LIVE_PARAM_303_1_ACCENT + sl3;
             livevalue = tempz << 1;
         }
+
+        // Scale
+        if(zcheckMouse(670, (Cur_Height - 42), 16, 16))
+        {
+            int value = tb303[sl3].scale;
+            value -= 4;
+            if(value < 1) value = 1;
+            tb303[sl3].scale = value;
+            tb303engine[sl3].tbCurMultiple = tb303[sl3].scale;
+            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
+            teac = 19;
+        }
+
+        // Scale
+        if(zcheckMouse(670 + 44, (Cur_Height - 42), 16, 16))
+        {
+            tb303[sl3].scale += 4;
+            if(tb303[sl3].scale > 16) tb303[sl3].scale = 16;
+            tb303engine[sl3].tbCurMultiple = tb303[sl3].scale;
+            gui_action = GUI_CMD_REFRESH_TB303_PARAMS;
+            teac = 19;
+        }
     }
 }
 

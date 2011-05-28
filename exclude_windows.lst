@@ -6,6 +6,7 @@
 *.o*
 *.obj*
 *.a
+*.exp*
 *.ptp*
 *.ptk*
 *.psm*
