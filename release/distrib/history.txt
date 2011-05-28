@@ -9,6 +9,7 @@ v2.5.3:
 - Some notes were missed in multi-notes channels sometimes.
 - Fixed a bug occuring with automatic note offs on the synth.
 - Ptk can now import DigiBooster v1.x modules (.digi).
+- Tracker could hang sometimes when calculating a song length.
 
 v2.5.2:
 

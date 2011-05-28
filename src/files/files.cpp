@@ -1865,6 +1865,7 @@ int Calc_Length(void)
     int Samples;
     int ilen;
     int early_exit = FALSE;
+    int already_in_loop = FALSE;
 
     shuffle_switch = -1;
     Samples = (int) ((60 * MIX_RATE) / (BeatsPerMin * TicksPerBeat));
@@ -1900,30 +1901,35 @@ int Calc_Length(void)
                         switch(patt_cmd[l])
                         {
                             case 0x6:
-                                if(!patt_datas[l])
+                                if(!already_in_loop)
                                 {
-                                    rep_counter = -1;
-                                    rep_pos = pos_patt;
-                                }
-                                else
-                                {
-                                    if(rep_counter == -1)
+                                    if(!patt_datas[l])
                                     {
-                                        rep_counter = (int) patt_datas[l];
-                                        pos_patt = rep_pos;
+                                        rep_counter = -1;
+                                        rep_pos = pos_patt;
+                                        already_in_loop = TRUE;
                                     }
                                     else
                                     {
-                                        // count
-                                        rep_counter--;
-                                        if(rep_counter)
+                                        if(rep_counter == -1)
                                         {
+                                            rep_counter = (int) patt_datas[l];
                                             pos_patt = rep_pos;
                                         }
                                         else
                                         {
-                                            rep_counter = -1;
-                                            rep_pos = 0;
+                                            // count
+                                            rep_counter--;
+                                            if(rep_counter)
+                                            {
+                                                pos_patt = rep_pos;
+                                            }
+                                            else
+                                            {
+                                                rep_counter = -1;
+                                                rep_pos = 0;
+                                                already_in_loop = FALSE;
+                                            }
                                         }
                                     }
                                 }
@@ -1984,6 +1990,7 @@ int Calc_Length(void)
                     // End the pattern here
                     pos_patt = patternLines[pSequence[i]];
                     rep_counter = -1;
+                    already_in_loop = FALSE;
                     rep_pos = 0;
                 }
             }
