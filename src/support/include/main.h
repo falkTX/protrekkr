@@ -92,6 +92,7 @@ void Message_Error(char *Message);
 int Switch_FullScreen(int Width, int Height);
 int Get_LShift(void);
 int Get_RShift(void);
+int Get_Caps(void);
 int Get_LAlt(void);
 int Get_RAlt(void);
 int Get_LCtrl(void);

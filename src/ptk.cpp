@@ -3993,9 +3993,19 @@ void Keyboard_Handler(void)
     // -------------------------------------------
 
     int Shift = 0;
-    if(Get_LShift() || Get_RShift())
+    if(Get_Caps())
     {
-        Shift = UNICODE_OFFSET1;
+        if(!Get_LShift() && !Get_RShift())
+        {
+            Shift = UNICODE_OFFSET1;
+        }
+    }
+    else
+    {
+        if(Get_LShift() || Get_RShift())
+        {
+            Shift = UNICODE_OFFSET1;
+        }
     }
 
     if(snamesel == INPUT_NONE && !reelletter)
@@ -4021,7 +4031,9 @@ void Keyboard_Handler(void)
         if(Keys[SDLK_KP8]) retvalue = 8;
         if(Keys_Unicode[SDLK_9]) retvalue = 9;
         if(Keys[SDLK_KP9]) retvalue = 9;
-        if(Keys[SDLK_a - Shift]) retvalue = 10;
+        if(Keys[SDLK_a - Shift]) {
+            retvalue = 10;
+        }
         if(Keys[SDLK_b - Shift]) retvalue = 11;
         if(Keys[SDLK_c - Shift]) retvalue = 12;
         if(Keys[SDLK_d - Shift]) retvalue = 13;

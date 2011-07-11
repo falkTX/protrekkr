@@ -241,6 +241,12 @@ int Get_RShift(void)
     return(FALSE);
 }
 
+int Get_Caps(void)
+{
+    if(SDL_GetModState() & KMOD_CAPS) return(TRUE);
+    return(FALSE);
+}
+
 int Get_LAlt(void)
 {
     if(SDL_GetModState() & KMOD_LALT) return(TRUE);

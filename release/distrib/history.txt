@@ -2,6 +2,11 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.5.4:
+
+- Fixed 2 issues with interpolate commands (it wouldn't work on all effects)
+  and the whole commmand column is now filled with the first value.
+
 v2.5.3:
 
 - 303 units speeds can now be scaled.
