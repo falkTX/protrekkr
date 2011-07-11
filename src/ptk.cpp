@@ -3429,33 +3429,44 @@ void Keyboard_Handler(void)
         if(!Get_LShift())
         {
             // Jump to row 0
-            if(Keys[SDLK_F5] && Pattern_Line != 0)
+            if(Keys[SDLK_F5])
             {
-                Goto_Row(0);
+                if(Pattern_Line != 0) Goto_Row(0);
             }
 
             // Jump to row 16
-            if(Keys[SDLK_F6] && Pattern_Line != 16)
+            if(Keys[SDLK_F6])
             {
-                Goto_Row(16);
+                int line = patternLines[pSequence[Cur_Position]] / 4;
+                if(line > patternLines[pSequence[Cur_Position]] - 1) line = patternLines[pSequence[Cur_Position]] - 1;
+                if(Pattern_Line != line) Goto_Row(line);
             }
 
             // Jump to row 32
-            if(Keys[SDLK_F7] && Pattern_Line != 32)
+            if(Keys[SDLK_F7])
             {
-                Goto_Row(32);
+                int line = patternLines[pSequence[Cur_Position]] / 4;
+                line *= 2;
+                if(line > patternLines[pSequence[Cur_Position]] - 1) line = patternLines[pSequence[Cur_Position]] - 1;
+                if(Pattern_Line != line) Goto_Row(line);
             }
 
             // Jump to row 48
-            if(Keys[SDLK_F8] && Pattern_Line != 48)
+            if(Keys[SDLK_F8])
             {
-                Goto_Row(48);
+                int line = patternLines[pSequence[Cur_Position]] / 4;
+                line *= 3;
+                if(line > patternLines[pSequence[Cur_Position]] - 1) line = patternLines[pSequence[Cur_Position]] - 1;
+                if(Pattern_Line != line) Goto_Row(line);
             }
 
             // Jump to row 63
-            if(Keys[SDLK_F9] && Pattern_Line != 63)
+            if(Keys[SDLK_F9])
             {
-                Goto_Row(63);
+                int line = patternLines[pSequence[Cur_Position]] / 4;
+                line *= 4;
+                if(line > patternLines[pSequence[Cur_Position]] - 1) line = patternLines[pSequence[Cur_Position]] - 1;
+                if(Pattern_Line != line) Goto_Row(line);
             }
         }
 
@@ -5728,7 +5739,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(188, 82, 16, 16))
         {
             int ltp = patternLines[pSequence[Cur_Position]];
-            ltp -= 16;
+            ltp -= 8;
             if(ltp < 1) ltp = 1;
             patternLines[pSequence[Cur_Position]] = ltp;
             if(Pattern_Line >= patternLines[pSequence[Cur_Position]]) Pattern_Line = patternLines[pSequence[Cur_Position]] - 1;
@@ -5738,7 +5749,7 @@ void Mouse_Handler(void)
         if(zcheckMouse(232, 82, 16, 16))
         {
             int ltp = patternLines[pSequence[Cur_Position]];
-            ltp += 16;
+            ltp += 8;
             if(ltp > 128) ltp = 128;
             patternLines[pSequence[Cur_Position]] = ltp;
             gui_action = GUI_CMD_SET_PATTERN_LENGTH;

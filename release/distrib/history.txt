@@ -6,6 +6,8 @@ v2.5.4:
 
 - Fixed 2 issues with interpolate commands (it wouldn't work on all effects)
   and the whole commmand column is now filled with the first value.
+- Input was partly disabled when caps lock was turned on.
+- Right mouse button on pattern lines will now increase/decrease value by 8.
 
 v2.5.3:
 
