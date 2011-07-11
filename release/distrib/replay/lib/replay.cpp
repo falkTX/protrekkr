@@ -6238,10 +6238,10 @@ void Reverb_work(void)
             if(++counters_R[i] > 99999) counters_R[i] -= 99999;
         }
 
-        // All pass filters
         l_rout = LFP_L.fWork(l_rout, Reverb_Filter_Cutoff, Reverb_Filter_Resonance);
         r_rout = LFP_R.fWork(r_rout, Reverb_Filter_Cutoff, Reverb_Filter_Resonance);
 
+        // All pass filters
         for(i = 0; i < 10; i++)
         {
             l_rout = allpass_filter(allBuffer_L[i], l_rout, delayedCounter[i]);

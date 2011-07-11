@@ -509,21 +509,21 @@ int Delete_Selection(int Position)
                         }
                         break;
                     case EFFECTLO:
+                    case EFFECTDATLO:
                     case EFFECTHI:
                     case EFFECTDATHI:
-                    case EFFECTDATLO:
                     case EFFECT2LO:
+                    case EFFECT2DATLO:
                     case EFFECT2HI:
                     case EFFECT2DATHI:
-                    case EFFECT2DATLO:
                     case EFFECT3LO:
+                    case EFFECT3DATLO:
                     case EFFECT3HI:
                     case EFFECT3DATHI:
-                    case EFFECT3DATLO:
                     case EFFECT4LO:
+                    case EFFECT4DATLO:
                     case EFFECT4HI:
                     case EFFECT4DATHI:
-                    case EFFECT4DATLO:
                         Set_Pattern_Column(Position, xbc, ybc, 0);
                         break;
                 }
@@ -1001,8 +1001,8 @@ SELECTION Get_Real_Selection(int Default)
 // Interpolate a selected effects column
 void Interpolate_Block(int Position)
 {
-    int startvalue[3] = { 0, 0, 0 };
-    int endvalue[3] = { 0, 0, 0 };
+    int startvalue[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int endvalue[10] =   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     int ranlen;
     int cran;
     int tran;
@@ -1032,12 +1032,45 @@ void Interpolate_Block(int Position)
                 endvalue[1] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
 
+            case EFFECTHI:
+            case EFFECTLO:
+                startvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                break;
+
+            case EFFECT2HI:
+            case EFFECT2LO:
+                startvalue[3] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                break;
+
+            case EFFECT3HI:
+            case EFFECT3LO:
+                startvalue[4] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                break;
+
+            case EFFECT4HI:
+            case EFFECT4LO:
+                startvalue[5] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                break;
+
             case EFFECTDATHI:
             case EFFECTDATLO:
+                startvalue[6] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                endvalue[6] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
+                break;
             case EFFECT2DATHI:
             case EFFECT2DATLO:
-                startvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
-                endvalue[2] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
+                startvalue[7] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                endvalue[7] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
+                break;
+            case EFFECT3DATHI:
+            case EFFECT3DATLO:
+                startvalue[8] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                endvalue[8] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
+                break;
+            case EFFECT4DATHI:
+            case EFFECT4DATLO:
+                startvalue[9] |= Read_Pattern_Column(Position, xbc, Sel.y_start);
+                endvalue[9] |= Read_Pattern_Column(Position, xbc, Sel.y_end);
                 break;
         }
     }
@@ -1059,12 +1092,49 @@ void Interpolate_Block(int Position)
                 end_value = endvalue[1];
                 break;
 
+            case EFFECTHI:
+            case EFFECTLO:
+                start_value = startvalue[2];
+                end_value = startvalue[2];
+                break;
+
+            case EFFECT2HI:
+            case EFFECT2LO:
+                start_value = startvalue[3];
+                end_value = startvalue[3];
+                break;
+
+            case EFFECT3HI:
+            case EFFECT3LO:
+                start_value = startvalue[4];
+                end_value = startvalue[4];
+                break;
+
+            case EFFECT4HI:
+            case EFFECT4LO:
+                start_value = startvalue[5];
+                end_value = startvalue[5];
+                break;
+
             case EFFECTDATHI:
             case EFFECTDATLO:
+                start_value = startvalue[6];
+                end_value = endvalue[6];
+                break;
             case EFFECT2DATHI:
             case EFFECT2DATLO:
-                start_value = startvalue[2];
-                end_value = endvalue[2];
+                start_value = startvalue[7];
+                end_value = endvalue[7];
+                break;
+            case EFFECT3DATHI:
+            case EFFECT3DATLO:
+                start_value = startvalue[8];
+                end_value = endvalue[8];
+                break;
+            case EFFECT4DATHI:
+            case EFFECT4DATLO:
+                start_value = startvalue[9];
+                end_value = endvalue[9];
                 break;
         }
 
@@ -1072,6 +1142,7 @@ void Interpolate_Block(int Position)
         {
             switch(type)
             {
+
                 case VOLUMEHI:
                 case VOLUMELO:
                 case PANNINGHI:
@@ -1081,10 +1152,23 @@ void Interpolate_Block(int Position)
 
                     // No break
 
+                case EFFECTHI:
+                case EFFECTLO:
+                case EFFECT2HI:
+                case EFFECT2LO:
+                case EFFECT3HI:
+                case EFFECT3LO:
+                case EFFECT4HI:
+                case EFFECT4LO:
+
                 case EFFECTDATHI:
                 case EFFECTDATLO:
                 case EFFECT2DATHI:
                 case EFFECT2DATLO:
+                case EFFECT3DATHI:
+                case EFFECT3DATLO:
+                case EFFECT4DATHI:
+                case EFFECT4DATLO:
                     if(start_value != 0xff || end_value != 0xff)
                     {
                         ranlen = Sel.y_end - Sel.y_start;
@@ -1158,6 +1242,10 @@ void Randomize_Block(int Position)
                     case EFFECTDATLO:
                     case EFFECT2DATHI:
                     case EFFECT2DATLO:
+                    case EFFECT3DATHI:
+                    case EFFECT3DATLO:
+                    case EFFECT4DATHI:
+                    case EFFECT4DATLO:
                         Write_Pattern_Column(Position, xbc, ybc, (rand() & 0xff));
                         break;
                 }
