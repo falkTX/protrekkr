@@ -1212,16 +1212,66 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             if(strlen(FileName)) rtrim_string(FileName, 20);
             Write_Mod_Data(FileName, sizeof(char), 20, in);
 
-            // Calc the real number of patterns
             nPatterns = 0;
-            for(i = 0 ; i < Song_Length; i++)
+
+            int found_dat_in_patt;
+
+            // Calc the real number of patterns
+            for(j = 0; j < MAX_PATTERNS; j++)
+            {
+                cur_pattern_col = RawPatterns + (j * PATTERN_LEN);
+                found_dat_in_patt = FALSE;
+                // Next column
+                for(i = 0; i < Songtracks; i++)
+                {
+                    cur_pattern = cur_pattern_col + (i * PATTERN_BYTES);
+                    // Next pattern
+                    for(k = 0; k < patternLines[j]; k++)
+                    {
+                        for(l = 0; l < MAX_POLYPHONY; l += 2)
+                        {
+                            if(cur_pattern[PATTERN_NOTE1 + l] != 121 ||
+                               cur_pattern[PATTERN_INSTR1 + l] != 255)
+                            {
+                                found_dat_in_patt = TRUE;
+                                break;
+                            }
+                        }
+                        if(cur_pattern[PATTERN_VOLUME] != 255 ||
+                           cur_pattern[PATTERN_PANNING] != 255 ||
+                           cur_pattern[PATTERN_FX] != 0 ||
+                           cur_pattern[PATTERN_FXDATA] != 0 ||
+                           cur_pattern[PATTERN_FX2] != 0 ||
+                           cur_pattern[PATTERN_FXDATA2] != 0 ||
+                           cur_pattern[PATTERN_FX3] != 0 ||
+                           cur_pattern[PATTERN_FXDATA3] != 0 ||
+                           cur_pattern[PATTERN_FX4] != 0 ||
+                           cur_pattern[PATTERN_FXDATA4] != 0)
+                        {
+                            // Was used
+                            found_dat_in_patt = TRUE;
+                            break;
+                        }
+                        // Next line
+                        cur_pattern += PATTERN_ROW_LEN;
+                        if(found_dat_in_patt) break;
+                    }
+                    if(found_dat_in_patt) break;
+                }
+                if(found_dat_in_patt)
+                {
+                    nPatterns = j + 1;
+                }
+            }
+
+/*            for(i = 0 ; i < Song_Length; i++)
             {
                 if((pSequence[i] + 1) > nPatterns)
                 {
                     nPatterns = pSequence[i] + 1;
                 }
             }
-
+*/
             Write_Mod_Data(&nPatterns, sizeof(char), 1, in);
             Write_Mod_Data(&Song_Length, sizeof(char), 1, in);
             Write_Mod_Data(&Use_Cubic, sizeof(char), 1, in);
@@ -1258,8 +1308,8 @@ int SavePtk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                     {
                         for(l = 0; l < MAX_POLYPHONY; l += 2)
                         {
-                            cur_pattern[PATTERN_NOTE1 + i] = 121;
-                            cur_pattern[PATTERN_INSTR1 + i] = 255;
+                            cur_pattern[PATTERN_NOTE1 + l] = 121;
+                            cur_pattern[PATTERN_INSTR1 + l] = 255;
                         }
 
                         cur_pattern[PATTERN_VOLUME] = 255;

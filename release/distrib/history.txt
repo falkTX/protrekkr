@@ -8,6 +8,10 @@ v2.5.4:
   and the whole commmand column is now filled with the first value.
 - Input was partly disabled when caps lock was turned on.
 - Right mouse button on pattern lines will now increase/decrease value by 8.
+- F5 to F9 keys now jumps to 0, 1/4, 2/4, 3/4, 4/4 of the patterns lines.
+- Per request, I changed the way the number of patterns is calculated
+  when saving a song, the tracker now looks for any used (scratch) patterns
+  and save them within the .ptk module.
 
 v2.5.3:
 
