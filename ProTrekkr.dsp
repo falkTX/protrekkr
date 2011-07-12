@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /D "__MOT_SWAP__" /D "__MP3_CODEC__" /D "__AT3_CODEC__" /D "__GSM_CODEC__" /D "__ADPCM_CODEC__" /D "__TRUESPEECH_CODEC__" /FR /FD /Gs /c
+# ADD CPP /nologo /W3 /GX /O2 /Ob2 /D "__WIN32__" /D "NDEBUG" /D "_WINDOWS" /D "__WINDOWS_MM__" /D "__MOT_SWAP__" /D "__MP3_CODEC__" /D "__AT3_CODEC__" /D "__GSM_CODEC__" /D "__ADPCM_CODEC__" /D "__TRUESPEECH_CODEC__" /FD /Gs /c
+# SUBTRACT CPP /Z<none> /Fr
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
@@ -54,6 +55,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 kernel32.lib user32.lib sdl.lib dsound.lib msacm32.lib zlib.lib winmm.lib advapi32.lib sdl_draw.lib shlwapi.lib tinyxml.lib sdlmain.lib msvcrt.lib libcp.lib /nologo /subsystem:windows /pdb:none /machine:I386 /nodefaultlib /out:"release/distrib/ptk_win.exe"
+# SUBTRACT LINK32 /debug
 
 !ELSEIF  "$(CFG)" == "ProTrekkr - Win32 Debug"
 

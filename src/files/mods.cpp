@@ -230,7 +230,7 @@ unsigned short Getc_Mod_Word()
 }
 
 // ------------------------------------------------------
-// Retrieve a word from the .mod data
+// Retrieve a double word from the .mod data
 unsigned int Getc_Mod_Dword()
 {
     return (int) (Getc_Mod() << 24) + 
@@ -459,8 +459,13 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                                 // Check bit mask
                                 if(BitMasks[i] & (1 << j))
                                 {
-                                    *wDigi_Mod++ = Getc_Mod() | (Getc_Mod() << 8);
-                                    *wDigi_Mod++ = Getc_Mod() | (Getc_Mod() << 8);
+                                    int value;
+                                    value = (int) Getc_Mod();
+                                    value |= (int) (Getc_Mod() << 8);
+                                    *wDigi_Mod++ = value;
+                                    value = (int) Getc_Mod();
+                                    value |= (int) (Getc_Mod() << 8);
+                                    *wDigi_Mod++ = value;
                                 }
                                 else
                                 {
@@ -482,8 +487,13 @@ void LoadAmigaMod(char *Name, const char *FileName, int channels, int digibooste
                             wDigi_Mod2 = &wDigi_Mod[j * 2];
                             for(i = 0; i < 64; i++)
                             {
-                                wDigi_Mod2[0] = Getc_Mod() | (Getc_Mod() << 8);
-                                wDigi_Mod2[1] = Getc_Mod() | (Getc_Mod() << 8);
+                                int value;
+                                value = (int) Getc_Mod();
+                                value |= (int) (Getc_Mod() << 8);
+                                wDigi_Mod2[0] = value;
+                                value = (int) Getc_Mod();
+                                value |= (int) (Getc_Mod() << 8);
+                                wDigi_Mod2[1] = value;
                                 wDigi_Mod2 += (channels * 2);
                             }
                         }
