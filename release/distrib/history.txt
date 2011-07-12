@@ -6,11 +6,12 @@ v2.5.4:
 
 - Fixed 2 issues with interpolate command: it wouldn't work on all effects
   and the whole commmand column is now properly filled with the first value.
-- Input was partly disabled when caps lock was turned on.
-- Right mouse button on pattern lines will now increase/decrease value by 8.
+- Input was partially disabled when caps lock was turned on.
+- Using right mouse button on "pattern lines" arrows
+  will now increase/decrease value by 8.
 - F5 to F9 keys now jumps to 0, 1/4, 2/4, 3/4, 4/4 of the patterns lines.
-- Per request, I changed the way the number of patterns is calculated
-  when saving a song, the tracker now looks for any used (scratch) patterns
+- Changed the way the number of patterns is calculated when saving a song,
+  the tracker now looks for any used (scratch) patterns
   and save them within the .ptk module.
 - Fixed an issue in digibooster import function which was due
   to a MSVC compiler quirk.

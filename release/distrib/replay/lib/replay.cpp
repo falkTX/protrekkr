@@ -2425,6 +2425,15 @@ void Post_Song_Init(void)
     Songplaying_Pattern = 0;
     AUDIO_ResetTimer();
     Delay_Sound_Buffer = 0;
+    for(i = 0; i < 256; i++)
+    {
+        Delays_Pos_Sound_Buffer[i].Line = 0;
+        Delays_Pos_Sound_Buffer[i].Pos = 0;
+        Delays_Pos_Sound_Buffer[i].SamplesPerTick = 0;
+#if defined(PTK_SHUFFLE)
+        Delays_Pos_Sound_Buffer[i].shufflestep = 0;
+#endif
+    }
 }
 
 // ------------------------------------------------------
