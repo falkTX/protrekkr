@@ -127,7 +127,7 @@ void Actualize_Track_Fx_Ed(char gode)
             outlong(458, (Cur_Height - 85), (int) (FLANGER_AMPL[Track_Under_Caret] * 10000.0f), 1);
         }
 
-        if(gode == 0 || gode == 2)
+        if(gode == 0 || gode == 2 || gode == 11)
         {
             if(LFO_RATE[Track_Under_Caret] < 0.0001f) LFO_RATE[Track_Under_Caret] = 0.0001f;
             if(LFO_RATE[Track_Under_Caret] > 0.0078125f) LFO_RATE[Track_Under_Caret] = 0.0078125f;
@@ -138,14 +138,14 @@ void Actualize_Track_Fx_Ed(char gode)
             outfloat(138, (Cur_Height - 74), tmprate, 3);
         }
 
-        if(gode == 0 || gode == 3)
+        if(gode == 0 || gode == 3 || gode == 11)
         {
             if(LFO_AMPL[Track_Under_Caret] < 0) LFO_AMPL[Track_Under_Caret] = 0;
             if(LFO_AMPL[Track_Under_Caret] > 128) LFO_AMPL[Track_Under_Caret] = 128;
             Realslider(74, (Cur_Height - 92), (int) (LFO_AMPL[Track_Under_Caret]), LFO_ON[Track_Under_Caret]);
         }
 
-        if(gode == 0 || gode == 9)
+        if(gode == 0 || gode == 9 || gode == 11)
         {
             if(LFO_ON[Track_Under_Caret] == 1)
             {

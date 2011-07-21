@@ -4866,6 +4866,13 @@ void Do_Effects_Ticks_X(void)
                         break;
 #endif
 
+#if defined(PTK_FX_TRACK_FILTER_LFO)
+                    // $28 Switch track filter on/off
+                    case 0x28:
+                        LFO_ON[trackef] = (int) pltr_dat_row[k] & 1;
+                        break;
+#endif
+
                 }
             }
 

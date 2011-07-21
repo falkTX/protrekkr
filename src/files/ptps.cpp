@@ -245,6 +245,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     int Store_FX_FinePitchUp = FALSE;
     int Store_FX_FinePitchDown = FALSE;
     int Store_FX_SwitchFlanger = FALSE;
+    int Store_FX_SwitchTrackLFO = FALSE;
     int Store_FX_Shuffle = FALSE;
     int Store_FX_RevCuto = FALSE;
     int Store_FX_RevReso = FALSE;
@@ -906,6 +907,12 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
                                     Store_FX_RevReso = TRUE;
                                     break;
 
+                                // $28 Switch tracker LFO
+                                case 0x28:
+                                    Store_FX_SwitchTrackLFO = TRUE;
+                                    break;
+
+
                                 // $31 First TB303 control
                                 case 0x31:
                                     Store_303_1 = TRUE;
@@ -1073,6 +1080,7 @@ int SavePtp(FILE *in, int Simulate, char *FileName)
     Save_Constant("PTK_FX_FINEPITCHUP", Store_FX_FinePitchUp);
     Save_Constant("PTK_FX_FINEPITCHDOWN", Store_FX_FinePitchDown);
     Save_Constant("PTK_FX_SWITCHFLANGER", Store_FX_SwitchFlanger);
+    Save_Constant("PTK_FX_TRACK_FILTER_LFO", Store_FX_SwitchTrackLFO);
 
     Save_Constant("PTK_FX_SETREVCUTO", Store_FX_RevCuto);
     Save_Constant("PTK_FX_SETREVRESO", Store_FX_RevReso);
