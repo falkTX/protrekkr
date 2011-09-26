@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2010 Franck Charlet.
+// Copyright (C) 2008-2011 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -115,7 +115,7 @@ int AIFFFile::Open(const char *Filename)
     file = fopen(Filename, "rb");
     if(file)
     {
-        // Those 2 compression schemes are not supported
+        // Those compression schemes are not supported
         chunk_size = SeekChunk("ALAW");
         if(chunk_size) return 0;
         chunk_size = SeekChunk("ULAW");

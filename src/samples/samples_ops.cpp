@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2010 Franck Charlet.
+// Copyright (C) 2008-2011 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -175,6 +175,7 @@ int Sample_Crop(int32 range_start, int32 range_end)
     {
         Stop_Current_Instrument();
         AUDIO_Stop();
+
         nc = SampleChannels[Current_Instrument][Current_Instrument_Split];
 
         NewBuffer[0] = (short *) malloc(cropsize * 2 + 8);

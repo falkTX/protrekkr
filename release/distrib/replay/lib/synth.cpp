@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2010 Franck Charlet.
+// Copyright (C) 2008-2011 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1157,7 +1157,6 @@ float CSynth::GetSample(short *Left_Samples,
                     osc_speed1 *= 65;
 #endif
                     Length = SIZE_WAVEFORMS;
-                    //Rns = SIZE_WAVEFORMS;
                     Loop_Sub = SIZE_WAVEFORMS;
                     Loop_Type = SMP_LOOP_FORWARD;
                     Stereo = 1;

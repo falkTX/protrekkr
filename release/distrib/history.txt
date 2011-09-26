@@ -2,6 +2,10 @@
 ProTrekkr releases history
 ===============================================================================
 
+v2.5.5:
+
+- Added effect 28: turn track LFO on/off.
+
 v2.5.4:
 
 - Fixed 2 issues with interpolate command: it wouldn't work on all effects
