@@ -100,19 +100,19 @@ int XML_get_integer(char *section, char *key, char *name, char *value, int *dest
 
 const char *XML_get_value(char *tag, char *essemble, char *name, char *attr)
 {
-    TiXmlHandle *files;
-    TiXmlHandle *file;
+    TiXmlElement *files;
+    TiXmlElement *file;
     TiXmlElement *element;
     TiXmlHandle hdl(&doc);
     const char *value;
 
-    files = &hdl.FirstChildElement(tag);
+    files = hdl.FirstChildElement(tag).ToElement();
     if(!files) return(NULL);
 
-    file = &files->FirstChildElement(essemble);
+    file = files->FirstChildElement(essemble);
     if(!file) return(NULL);
 
-    element = file->Element();
+    element = file->ToElement();
     while(element)
     {
         if(SDL_strcasecmp(element->Attribute("name"), name) == 0)
