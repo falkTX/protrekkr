@@ -33,66 +33,71 @@
 // Includes
 #include "include/sounddriver_linux.h"
 
+#include "jack/jack.h"
+
 // ------------------------------------------------------
-// Variables
-unsigned int AUDIO_To_Fill;
-int AUDIO_Samples;
-int AUDIO_Play_Flag;
-float AUDIO_Timer;
+// Variables (internal)
+int AUDIO_Samples = 0;
+int AUDIO_Play_Flag = FALSE;
+float AUDIO_Timer = 0.0f;
 
-int volatile AUDIO_Acknowledge;
-int AUDIO_Device;
-short *AUDIO_SoundBuffer;
-audio_buf_info AUDIO_Info_Buffer;
-pthread_t hThread;
-int volatile Thread_Running;
-int AUDIO_SoundBuffer_Size;
+// ------------------------------------------------------
+// Variables (jack)
+jack_client_t* jaudio_client = NULL;
+jack_port_t* jaudio_port1 = NULL;
+jack_port_t* jaudio_port2 = NULL;
 
-int AUDIO_Latency;
+// ------------------------------------------------------
+// Variables (external helpers, not really used here)
+int volatile AUDIO_Acknowledge = 0;
+int AUDIO_Latency = 0;
 int AUDIO_Milliseconds = 20;
+
+int AUDIO_Create_Sound_Buffer(int) {}
+void AUDIO_Stop_Sound_Buffer(void) {}
 
 // ------------------------------------------------------
 // Functions
-int AUDIO_Create_Sound_Buffer(int milliseconds);
-void AUDIO_Stop_Sound_Buffer(void);
 void (STDCALL *AUDIO_Mixer)(Uint8 *, Uint32);
-void AUDIO_Mixer_Fill_Buffer(void *, Uint32);
-void AUDIO_Synth_Play(void);
 
-// ------------------------------------------------------
-// Name: AUDIO_Thread()
-// Desc: Audio rendering
-void *AUDIO_Thread(void *arg)
+static int jaudio_process_callback(jack_nframes_t nframes, void*)
 {
-    while(Thread_Running)
-    {
-        if(AUDIO_SoundBuffer)
-        {
-            AUDIO_Acknowledge = FALSE;
-            if(AUDIO_Play_Flag)
-            {
-                AUDIO_Mixer((Uint8 *) AUDIO_SoundBuffer, AUDIO_SoundBuffer_Size);
-            }
-            else
-            {
-                unsigned int i;
-                char *pSamples = (char *) AUDIO_SoundBuffer;
-                for(i = 0; i < AUDIO_SoundBuffer_Size; i++)
-                {
-                    pSamples[i] = 0;
-                }
-                AUDIO_Acknowledge = TRUE;
-            }
-            write(AUDIO_Device, AUDIO_SoundBuffer, AUDIO_SoundBuffer_Size);
+    float* audioBuf1 = (float*)jack_port_get_buffer(jaudio_port1, nframes);
+    float* audioBuf2 = (float*)jack_port_get_buffer(jaudio_port2, nframes);
 
-            AUDIO_Samples += AUDIO_SoundBuffer_Size;
-            AUDIO_Timer = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
+    AUDIO_Acknowledge = FALSE;
+
+    if (AUDIO_Play_Flag)
+    {
+        Uint8 mixerBuf[nframes*2];
+        AUDIO_Mixer(mixerBuf, nframes*2);
+
+        for (jack_nframes_t i=0; i < nframes; ++i)
+        {
+             audioBuf1[i] = float(mixerBuf[        i])*2.0f-1.0f;
+             audioBuf2[i] = float(mixerBuf[nframes+i])*2.0f-1.0f;
         }
-        usleep(10);
+
+        AUDIO_Samples += nframes;
+        AUDIO_Timer    = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
     }
-    Thread_Running = 1; 
-    pthread_exit(0);
-    return(0);
+    else
+    {
+        for (jack_nframes_t i=0; i < nframes; ++i)
+            *audioBuf1++ = *audioBuf2++ = 0.0f;
+
+        AUDIO_Acknowledge = TRUE;
+    }
+
+    return 0;
+}
+
+static void jaudio_shutdown_callback(void* arg)
+{
+    jaudio_client = NULL;
+    jaudio_port1 = NULL;
+    jaudio_port2 = NULL;
+    AUDIO_Play_Flag = FALSE;
 }
 
 // ------------------------------------------------------
@@ -102,106 +107,20 @@ int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
 {
     AUDIO_Mixer = Mixer;
 
-    char *Mixer_Name;
-    int8 Mixer_Volume[4];
+    jaudio_client = jack_client_open("protrekkr", JackNullOption, NULL);
 
-    AUDIO_Device = open("/dev/dsp", O_WRONLY, 0);
-    if(AUDIO_Device >= 0)
-    {
-        return(AUDIO_Create_Sound_Buffer(AUDIO_Milliseconds));
-    }
-    
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-    else
-    {
-        Message_Error("Error while calling open(\"/dev/dsp\")");
-    }
-#endif
+    if (jaudio_client == NULL)
+        return FALSE;
 
-    return(FALSE);
-}
+    jaudio_port1 = jack_port_register(jaudio_client, "out1", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+    jaudio_port2 = jack_port_register(jaudio_client, "out2", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
-// ------------------------------------------------------
-// Name: AUDIO_Create_Sound_Buffer()
-// Desc: Create an audio buffer of given milliseconds
-int AUDIO_Create_Sound_Buffer(int milliseconds)
-{
-    int num_fragments;
-    int frag_size;
+    jack_set_process_callback(jaudio_client, jaudio_process_callback, NULL);
+    jack_on_shutdown(jaudio_client, jaudio_shutdown_callback, NULL);
 
-    if(milliseconds < 10) milliseconds = 10;
-    if(milliseconds > 250) milliseconds = 250;
+    AUDIO_Latency = jack_get_buffer_size(jaudio_client);
 
-    num_fragments = 6;
-    frag_size = (int) (AUDIO_PCM_FREQ * (milliseconds / 1000.0f));
-
-    int Dsp_Val;
-    struct sched_param p;
-
-	frag_size = 10 + (int) (logf((float) (frag_size >> 9)) / logf(2.0f));
-
-    Dsp_Val = (num_fragments << 16) | frag_size;
-    ioctl(AUDIO_Device, SNDCTL_DSP_SETFRAGMENT, &Dsp_Val);
-
-    Dsp_Val = AUDIO_DBUF_CHANNELS;
-    ioctl(AUDIO_Device, SNDCTL_DSP_CHANNELS, &Dsp_Val);
-    Dsp_Val = AFMT_S16_NE;
-    ioctl(AUDIO_Device, SNDCTL_DSP_SETFMT, &Dsp_Val);
-    Dsp_Val = AUDIO_PCM_FREQ;
-    ioctl(AUDIO_Device, SNDCTL_DSP_SPEED, &Dsp_Val);
-
-    if((ioctl(AUDIO_Device, SNDCTL_DSP_GETOSPACE, &AUDIO_Info_Buffer) < 0))
-    {
-        ioctl(AUDIO_Device, SNDCTL_DSP_GETBLKSIZE, &AUDIO_Info_Buffer.fragsize);
-    }
-
-    AUDIO_SoundBuffer_Size = AUDIO_Info_Buffer.fragsize;
-    AUDIO_Latency = AUDIO_SoundBuffer_Size;
-
-    AUDIO_SoundBuffer = (short *) malloc(AUDIO_SoundBuffer_Size << 1);
-
-    p.sched_priority = 1;
-    Thread_Running = 1;
-    pthread_setschedparam(pthread_self(), SCHED_FIFO , &p);
-    if(pthread_create(&hThread, NULL, AUDIO_Thread, NULL) == 0)
-    {
-        return(TRUE);
-    }
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-    Message_Error("Error while calling pthread_create()");
-#endif
-
-    Thread_Running = 0;
-
-    return(FALSE);
-}
-
-// ------------------------------------------------------
-// Name: AUDIO_Wait_For_Thread()
-// Desc: Wait for a command acknowledgment from the thread
-void AUDIO_Wait_For_Thread(void)
-{
-    if(Thread_Running)
-    {
-        if(AUDIO_Play_Flag)
-        {
-            while(AUDIO_Acknowledge)
-            {
-                usleep(10);
-            };
-        }
-        else
-        {
-            if(hThread)
-            {
-                while(!AUDIO_Acknowledge)
-                {
-                    usleep(10);
-                };
-            }
-        }
-    }
+    return (jaudio_client != NULL) ? TRUE : FALSE;
 }
 
 // ------------------------------------------------------
@@ -211,7 +130,11 @@ void AUDIO_Play(void)
 {
     AUDIO_ResetTimer();
     AUDIO_Play_Flag = TRUE;
-    AUDIO_Wait_For_Thread();
+
+    if (jaudio_client == NULL)
+        return;
+
+    jack_activate(jaudio_client);
 }
 
 // ------------------------------------------------------
@@ -253,26 +176,11 @@ int AUDIO_GetSamples(void)
 void AUDIO_Stop(void)
 {
     AUDIO_Play_Flag = FALSE;
-    AUDIO_Wait_For_Thread();
-}
 
-// ------------------------------------------------------
-// Name: AUDIO_Stop_Sound_Buffer()
-// Desc: Release the audio buffer
-void AUDIO_Stop_Sound_Buffer(void)
-{
-    AUDIO_Stop();
+    if (jaudio_client == NULL)
+        return;
 
-    if(hThread)
-    {
-        Thread_Running = 0;
-        while(!Thread_Running)
-        {
-            usleep(10);
-        }
-        if(AUDIO_SoundBuffer) free(AUDIO_SoundBuffer);
-        AUDIO_SoundBuffer = NULL;
-    }
+    jack_deactivate(jaudio_client);
 }
 
 // ------------------------------------------------------
@@ -280,7 +188,15 @@ void AUDIO_Stop_Sound_Buffer(void)
 // Desc: Stop everything
 void AUDIO_Stop_Driver(void)
 {
-    AUDIO_Stop_Sound_Buffer();
-    if(AUDIO_Device) close(AUDIO_Device);
-    AUDIO_Device = 0;
+    if (jaudio_client == NULL)
+        return;
+
+    jack_port_unregister(jaudio_client, jaudio_port2);
+    jaudio_port2 = NULL;
+
+    jack_port_unregister(jaudio_client, jaudio_port1);
+    jaudio_port1 = NULL;
+
+    jack_client_close(jaudio_client);
+    jaudio_client = NULL;
 }
