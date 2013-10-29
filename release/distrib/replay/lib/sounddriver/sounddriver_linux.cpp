@@ -61,6 +61,12 @@ void AUDIO_Stop_Sound_Buffer(void) {}
 void (STDCALL *AUDIO_Mixer)(Uint8 *, Uint32) = NULL;
 void (STDCALL *AUDIO_MixerFloat)(float*, float*, Uint32) = NULL;
 
+static int jaudio_bufsize_callback(jack_nframes_t newBufferSize, void*)
+{
+    AUDIO_Latency = newBufferSize;
+    return 0;
+}
+
 static int jaudio_process_callback(jack_nframes_t nframes, void*)
 {
     float* audioBuf1 = (float*)jack_port_get_buffer(jaudio_port1, nframes);
@@ -121,6 +127,7 @@ int _init_JACK()
     jaudio_port1 = jack_port_register(jaudio_client, "out1", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     jaudio_port2 = jack_port_register(jaudio_client, "out2", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
+    jack_set_buffer_size_callback(jaudio_client, jaudio_bufsize_callback, NULL);
     jack_set_process_callback(jaudio_client, jaudio_process_callback, NULL);
     jack_on_shutdown(jaudio_client, jaudio_shutdown_callback, NULL);
 
