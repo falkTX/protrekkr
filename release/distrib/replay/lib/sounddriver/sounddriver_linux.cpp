@@ -68,7 +68,7 @@ static int jaudio_process_callback(jack_nframes_t nframes, void*)
 
     AUDIO_Acknowledge = FALSE;
 
-    if (AUDIO_Play_Flag)
+    if (AUDIO_Play_Flag && (AUDIO_MixerFloat || AUDIO_Mixer))
     {
         if (AUDIO_MixerFloat)
         {
