@@ -66,6 +66,9 @@ static int jaudio_process_callback(jack_nframes_t nframes, void*)
     float* audioBuf1 = (float*)jack_port_get_buffer(jaudio_port1, nframes);
     float* audioBuf2 = (float*)jack_port_get_buffer(jaudio_port2, nframes);
 
+    memset(audioBuf1, 0, sizeof(float)*nframes);
+    memset(audioBuf2, 0, sizeof(float)*nframes);
+
     AUDIO_Acknowledge = FALSE;
 
     if (AUDIO_Play_Flag && (AUDIO_MixerFloat || AUDIO_Mixer))
@@ -75,7 +78,7 @@ static int jaudio_process_callback(jack_nframes_t nframes, void*)
             AUDIO_MixerFloat(audioBuf1, audioBuf2, nframes);
         }
         else
-	{
+        {
             Uint8 mixerBuf[nframes*2];
             AUDIO_Mixer(mixerBuf, nframes*2);
 
@@ -88,8 +91,8 @@ static int jaudio_process_callback(jack_nframes_t nframes, void*)
     }
     else
     {
-        for (jack_nframes_t i=0; i < nframes; ++i)
-            *audioBuf1++ = *audioBuf2++ = 0.0f;
+        //for (jack_nframes_t i=0; i < nframes; ++i)
+        //    *audioBuf1++ = *audioBuf2++ = 0.0f;
 
         AUDIO_Acknowledge = TRUE;
     }
