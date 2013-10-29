@@ -1306,9 +1306,10 @@ int STDCALL Ptk_InitDriver(void)
 
 #if defined(__WIN32__)
     if(!AUDIO_Init_Driver(hWnd, &Mixer))
-#else
-    //if(!AUDIO_Init_Driver(&Mixer))
+#elif defined(__LINUX__)
     if(!AUDIO_Init_DriverFloat(&MixerFloat))
+#else
+    if(!AUDIO_Init_Driver(&Mixer))
 #endif
     {
         return(FALSE);
