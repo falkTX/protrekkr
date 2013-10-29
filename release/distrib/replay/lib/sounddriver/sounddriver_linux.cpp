@@ -123,7 +123,9 @@ int _init_JACK()
 
     AUDIO_Latency = jack_get_buffer_size(jaudio_client);
 
-    return (jaudio_client != NULL) ? TRUE : FALSE;
+    jack_activate(jaudio_client);
+
+    return TRUE;
 }
 
 int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
@@ -147,11 +149,6 @@ void AUDIO_Play(void)
 {
     AUDIO_ResetTimer();
     AUDIO_Play_Flag = TRUE;
-
-    if (jaudio_client == NULL)
-        return;
-
-    jack_activate(jaudio_client);
 }
 
 // ------------------------------------------------------
@@ -193,11 +190,6 @@ int AUDIO_GetSamples(void)
 void AUDIO_Stop(void)
 {
     AUDIO_Play_Flag = FALSE;
-
-    if (jaudio_client == NULL)
-        return;
-
-    jack_deactivate(jaudio_client);
 }
 
 // ------------------------------------------------------
