@@ -945,6 +945,107 @@ volatile int Done_Reset;
 void Reset_Values(void);
 
 // ------------------------------------------------------
+// Audio mixer, float version
+void STDCALL MixerFloat(float *buf1, float* buf2, Uint32 Len)
+{
+#if !defined(__STAND_ALONE__)
+    float clamp_left_value;
+    float clamp_right_value;
+#endif
+
+#if !defined(__STAND_ALONE__)
+    if(!rawrender)
+    {
+#endif
+        for(Uint32 i = 0; i < Len; ++i)
+        {
+            GetPlayerValues();
+
+#if !defined(__STAND_ALONE__)
+            // Gather datas for the scopes and the vumeters
+            clamp_left_value = left_float * 32767.0f;
+            clamp_right_value = right_float * 32767.0f;
+#endif
+
+#if !defined(__WINAMP__)
+#if !defined(__STAND_ALONE__) 
+            // Add the metronome at the end of the audio chain
+            if(trigger_metronome)
+            {
+                short Left_Dat;
+                short Right_Dat;
+                Left_Dat = (Metronome_Dats[(metronome_internal_counter_int * 2) + 1] << 8) |
+                           (Metronome_Dats[(metronome_internal_counter_int * 2)] & 0xff);
+                Right_Dat = Left_Dat;
+
+#if defined(__MACOSX__)
+                if(AUDIO_16Bits)
+                {
+                    left_value += Left_Dat;
+                    right_value += Right_Dat;
+                }
+                else
+                {
+                    // ([1.0..-1.0f])
+                    left_float += (float) (Left_Dat) / 32767.0f;
+                    right_float += (float) (Right_Dat) / 32767.0f;
+                }
+#else
+                left_value += Left_Dat;
+                right_value += Right_Dat;
+#endif
+
+                metronome_internal_counter_int++;
+                if((metronome_internal_counter_int) == Metronome_Dats_Size)
+                {
+                    metronome_internal_counter_int = 0;
+                    trigger_metronome = FALSE;
+                    metronome_latency = TRUE;
+                }
+            }
+#endif
+#endif
+
+            *buf1++ = left_float;
+            *buf2++ = right_float;
+
+#if !defined(__STAND_ALONE__)
+            // Pre-record
+            Scope_Dats_LeftRight[0][pos_scope] = clamp_left_value;
+            Scope_Dats_LeftRight[1][pos_scope] = clamp_right_value;
+
+            clamp_left_value = fabsf(Scope_Dats_LeftRight[0][pos_scope_latency]);
+            clamp_right_value = fabsf(Scope_Dats_LeftRight[1][pos_scope_latency]);
+            if(clamp_left_value > L_MaxLevel) L_MaxLevel = (int) clamp_left_value;
+            if(clamp_right_value > R_MaxLevel) R_MaxLevel = (int) clamp_right_value;
+            wait_level++;
+            if(wait_level > 127)
+            {
+                wait_level = 0;
+                L_MaxLevel -= 128;
+                R_MaxLevel -= 128;
+                if(L_MaxLevel < 0) L_MaxLevel = 0;
+                if(R_MaxLevel < 0) R_MaxLevel = 0;
+            }
+
+            pos_scope++;
+            if(pos_scope >= (AUDIO_Latency / 2)) pos_scope = 0;
+            pos_scope_latency = pos_scope - (AUDIO_Latency / 4);
+            if(pos_scope_latency < 0) pos_scope_latency = (AUDIO_Latency / 2) + pos_scope_latency;
+#endif
+        }
+
+        if(local_curr_ramp_vol <= 0.0f)
+        {
+            Reset_Values();
+        }
+
+#if !defined(__STAND_ALONE__)
+    } //RawRender
+#endif
+}
+
+// ------------------------------------------------------
 // Audio mixer
 void STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 {
@@ -1206,7 +1307,8 @@ int STDCALL Ptk_InitDriver(void)
 #if defined(__WIN32__)
     if(!AUDIO_Init_Driver(hWnd, &Mixer))
 #else
-    if(!AUDIO_Init_Driver(&Mixer))
+    //if(!AUDIO_Init_Driver(&Mixer))
+    if(!AUDIO_Init_DriverFloat(&MixerFloat))
 #endif
     {
         return(FALSE);

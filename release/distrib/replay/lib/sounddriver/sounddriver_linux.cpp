@@ -58,7 +58,8 @@ void AUDIO_Stop_Sound_Buffer(void) {}
 
 // ------------------------------------------------------
 // Functions
-void (STDCALL *AUDIO_Mixer)(Uint8 *, Uint32);
+void (STDCALL *AUDIO_Mixer)(Uint8 *, Uint32) = NULL;
+void (STDCALL *AUDIO_MixerFloat)(float*, float*, Uint32) = NULL;
 
 static int jaudio_process_callback(jack_nframes_t nframes, void*)
 {
@@ -69,14 +70,15 @@ static int jaudio_process_callback(jack_nframes_t nframes, void*)
 
     if (AUDIO_Play_Flag)
     {
+#if 0
         Uint8 mixerBuf[nframes*2];
         AUDIO_Mixer(mixerBuf, nframes*2);
 
         for (jack_nframes_t i=0; i < nframes; ++i)
-        {
-             audioBuf1[i] = float(mixerBuf[        i])*2.0f-1.0f;
-             audioBuf2[i] = float(mixerBuf[nframes+i])*2.0f-1.0f;
-        }
+            audioBuf1[i] = audioBuf2[i] = double((signed short)((mixerBuf[2*i+1]<<8) | mixerBuf[2*i]))*2.0/65535.0;
+#else
+        AUDIO_MixerFloat(audioBuf1, audioBuf2, nframes);
+#endif
 
         AUDIO_Samples += nframes;
         AUDIO_Timer    = ((((float) AUDIO_Samples) * (1.0f / (float) AUDIO_Latency)) * 1000.0f);
@@ -103,9 +105,14 @@ static void jaudio_shutdown_callback(void* arg)
 // ------------------------------------------------------
 // Name: AUDIO_Init_Driver()
 // Desc: Init the audio driver
-int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
+
+// int AUDIO_Init_Driver(void (*Mixer)(Uint8 *, Uint32))
+// {
+//     AUDIO_Mixer = Mixer;
+
+int AUDIO_Init_DriverFloat(void (*MixerFloat)(float*, float*, Uint32))
 {
-    AUDIO_Mixer = Mixer;
+    AUDIO_MixerFloat = MixerFloat;
 
     jaudio_client = jack_client_open("protrekkr", JackNullOption, NULL);
 
